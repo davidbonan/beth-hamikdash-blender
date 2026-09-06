@@ -1,5 +1,7 @@
 # Beit HaMikdash × « Seder HaAvodah » (Ishay Ribo)
 
+![Beit HaMikdash](hero.png)
+
 Film de ~6 min sur l'Avodah de Yom Kippour : un seul mouvement d'est en ouest (lumière → Kodesh HaKodashim) puis retour vers la lumière. Pipeline hybride : blockout Blender à l'échelle de la Mishna, stylisation IA conditionnée par la profondeur, montage sur les mesures du morceau.
 
 Le Temple filmé est celui **à venir** : architecture hérodienne (*Middot*), et dans le Kodesh HaKodashim l'Arche revenue à sa place sur l'Even HaShetiya — celle de Moïse, cachée sous le Temple et révélée (*Yoma* 54a ; Rambam *Beit HaBe'hira* 4:1), avec la kaporet et ses deux keruvim (fiche §8h).
