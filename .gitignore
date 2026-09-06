@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.blend1
+.DS_Store
+renders/
+shot_list_seder_haavodah.md
