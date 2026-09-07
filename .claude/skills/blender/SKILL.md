@@ -25,7 +25,7 @@ sauvegarder, il faut donc chaîner blockout puis export dans la même instance.
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
-| `beit_hamikdash_blockout.py` | construit toute la scène + 19 caméras + marqueurs | rien (mémoire) |
+| `beit_hamikdash_blockout.py` | construit toute la scène + 21 caméras + marqueurs | rien (mémoire) |
 | `beit_hamikdash_export.py` | images clés couleur + profondeur, ou planche de contrôle | `renders/blockout/` ou `renders/planche/`, **et le .blend** |
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
@@ -94,12 +94,12 @@ la vérification la plus rapide qu'il n'a rien cassé.
 ## Exporter les images clés
 
 ```bash
-# planche de contrôle des 19 plans, 640 × 360 + index HTML
+# planche de contrôle des 21 plans, 640 × 360 + index HTML
 $BLENDER -b beit_hamikdash.blend \
     -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py -- --planche
 open renders/planche/planche.html
 
-# production : couleur + profondeur, 1920 × 1080, les 19 plans
+# production : couleur + profondeur, 1920 × 1080, les 21 plans
 $BLENDER -b beit_hamikdash.blend \
     -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py
 

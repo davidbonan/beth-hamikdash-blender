@@ -2,7 +2,7 @@
 
 ![Beit HaMikdash](hero.png)
 
-Film de ~6 min sur l'Avodah de Yom Kippour : un seul mouvement d'est en ouest (lumière → Kodesh HaKodashim) puis retour vers la lumière. Pipeline hybride : blockout Blender à l'échelle de la Mishna, stylisation IA conditionnée par la profondeur, montage sur les mesures du morceau.
+Film de ~6 min sur l'Avodah de Yom Kippour : un seul mouvement d'est en ouest (lumière → Kodesh HaKodashim) puis retour vers la lumière. Pipeline hybride : blockout Blender à l'échelle de la Mishna, stylisation IA conditionnée par la profondeur.
 
 Le Temple filmé est celui **à venir** : architecture hérodienne (*Middot*), et dans le Kodesh HaKodashim l'Arche revenue à sa place sur l'Even HaShetiya — celle de Moïse, cachée sous le Temple et révélée (*Yoma* 54a ; Rambam *Beit HaBe'hira* 4:1), avec la kaporet et ses deux keruvim (fiche §8h).
 
@@ -12,14 +12,15 @@ Le Temple filmé est celui **à venir** : architecture hérodienne (*Middot*), e
 |---|---|
 | `fiche_technique_beit_hamikdash.md` | Référence architecturale : cotes en amot, sources (*Middot*, *Yoma*, *Tamid*, Rambam, Josèphe), matériaux, §9 = liste des erreurs à ne jamais laisser passer. |
 | `beit_hamikdash_blockout.py` | Script Blender : génère toute la scène en volumes gris + 15 caméras animées + marqueurs de timeline. |
-| `shot_list_seder_haavodah.md` | Découpage en 19 plans calé sur la structure du morceau, + pipeline de production (étapes A→E). |
 | `prompts_par_plan.md` | Prompt image/vidéo par plan, prompt négatif commun, réglages, checklist de vérification. |
 | `beit_hamikdash.blend` | Scène générée par le script (à régénérer après toute modification du script). |
 | `beit_hamikdash_export.py` | Images clés des plans : planche de contrôle en 640 × 360 (`-- --planche`), ou fichiers de production couleur + profondeur en 1920 × 1080. |
 | `beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
 | `beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre, quel plan dure combien. Ne reconstruit rien. |
 | `.claude/skills/blender/` | Skill Claude Code : les incantations headless des quatre scripts, et l'invariant « le script est la source, le .blend est l'artefact ». |
-| `.claude/skills/fal-video/` | Skill Claude Code + client `fal_video.py` : génère un plan sur fal.ai en ligne de commande (image-to-video première + dernière frame), sans passer par le site. |
+| `.claude/skills/fal-video/` | Skill Claude Code + clients `fal_image.py` / `fal_video.py` : stylise une frame clé et génère un plan sur fal.ai en ligne de commande, sans passer par le site. |
+| `.claude/skills/fal-retouche/` | Skill Claude Code + client `retouche.py` : corrige un défaut localisé d'une image validée sans regénérer le cadre. |
+| `.claude/skills/mikdash/` | Skill Claude Code : banque de sources (*Middot*, *Tamid*, *Yoma*, Rambam, Josèphe) pour répondre cote en main plutôt que de mémoire. |
 | `renders/` | Sorties, une étape du pipeline par dossier — voir ci-dessous. |
 
 ### Le dossier `renders/`
@@ -29,7 +30,7 @@ Un dossier par étape, et rien à la racine :
 | Dossier | Étape | Contenu |
 |---|---|---|
 | `renders/blockout/` | 1 | rendus Blender 1920 × 1080 : `CAM_xx_{debut,fin}.png` et `..._profondeur.png`. Ce sont les entrées de l'i2i. |
-| `renders/planche/` | 1 | planche de contrôle 640 × 360 + `planche.html` : première et dernière image des 19 plans, avec focale et frames. |
+| `renders/planche/` | 1 | planche de contrôle 640 × 360 + `planche.html` : première et dernière image des 21 plans, avec focale et frames. |
 | `renders/style/` | 2 | images clés stylisées (`fal_image.py`). |
 | `renders/video/` | 4 | les mp4 (`fal_video.py`). |
 | `renders/archive/` | — | `style/`, `video/`, `validate/` périmés : générations faites avant les re-cadrages consignés plus bas, plus `frames_orphelines/`. Rien ne les lit. |
@@ -65,7 +66,7 @@ portent les mêmes noms, le même nombre de sommets et de faces, et chaque somme
 **17 µm au plus** de celui que posait la primitive (0,000035 ama, sur un bâtiment de
 100 amot — c'est la résolution du float32 à 115 m de l'origine, pas un déplacement).
 Aucune normale n'est rentrante, ce qui compte parce que c'est la passe Normal qui
-conditionne l'i2i, et `beit_hamikdash_analyse_plans.py` redonne les mêmes dix-neuf
+conditionne l'i2i, et `beit_hamikdash_analyse_plans.py` redonne les mêmes vingt-deux
 diagnostics.
 
 ### Interroger la scène sans la reconstruire
@@ -78,7 +79,7 @@ diagnostics.
     -P beit_hamikdash_inspect.py -- --voit 3
 ```
 
-`--scene` (défaut) donne les collections, les 19 plans et l'étendue ; `--objets
+`--scene` (défaut) donne les collections, les 21 plans et l'étendue ; `--objets
 <motif>` les bornes en amot d'un objet ; `--camera <plan>` la pose, le champ et la
 vitesse aux deux frames clés ; `--voit <plan> [debut|fin]` **ce que le cadre contient
 vraiment**, mesuré à la grille de rayons et par part d'écran. C'est cette dernière
@@ -138,7 +139,7 @@ données par frame (mesure de la plage Z, carte de profondeur) retombent alors �
 échantillon — ils ne dépendent pas de l'échantillonnage. Compter large : sur Metal
 (M5 Pro), le plan 9a en 640 × 360 met déjà ~2 min, chargement du .blend compris.
 
-Planche de contrôle des 19 plans (rendu Eevee 640 × 360, début + fin de chaque caméra) :
+Planche de contrôle des 21 plans (rendu Eevee 640 × 360, début + fin de chaque caméra) :
 
 ```bash
 /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend \
@@ -157,7 +158,7 @@ Et la mesure qui va avec — pour chaque plan, ce que ses deux frames ont en com
     -P beit_hamikdash_blockout.py -P beit_hamikdash_analyse_plans.py
 ```
 
-**19 plans et non 15** : quatre se filment en deux prises. Un i2v à deux frames
+**22 plans et non 15** : quatre se filment en deux prises, le 5 en a une seconde — `5b`, le Nom — et le 7 deux de plus — `7c` le 'hoshen, `7d` le tsits : « il revêtait les habits d'or » — qui ne sont pas des coupes mais des moments de plus. Un i2v à deux frames
 n'interpole que ce que les deux frames partagent, et sur le 7 (panoramique de 142°),
 le 9 (relevé de 56° pour 46° de champ), le 13 (traversée du mur est du Heikhal) et
 le 14 (grue franchissant une ligne d'horizon) elles ne partageaient rien. La durée
@@ -165,9 +166,18 @@ totale ne bouge pas : chaque plan coupé garde la sienne, répartie sur ses deux
 moitiés. Elles s'appellent `7a`/`7b`, `9a`/`9b`, `13a`/`13b`, `14a`/`14b` — dans les
 scripts fal aussi (`--plan 9a`).
 
+**Plan 1b, l'orbite** : là où le plan 1 s'arrête (850 amot de la cible, sur l'axe), la
+caméra tourne de 30° vers le sud-est à rayon, hauteur et cible constants — sa
+première frame est la dernière du plan 1, sa dernière découvre en trois quarts la
+Stoa royale et le flanc sud de l'Azara, où le plan 2 entre. L'arc est échantillonné
+tous les 2° (`orbite`, `TRAJECTOIRES` dans le blockout) : deux keyframes n'auraient
+donné qu'une corde. Sa frame de début est la frame de fin validée du plan 1, sa
+frame de fin s'édite avec celle-ci en `--reference` (matière raccordée), et le mp4
+veo-lite existe (`renders/video/CAM_01B_veo-lite_20260907-074220.mp4`).
+
 ## Pipeline
 
-1. **Blockout** — lancer le script, vérifier les 19 plans sur la planche, rendre en Eevee avec les passes **Combined + Depth + Normal** (déjà activées). Les sujets non architecturaux (kohanim, par, ma'hta) existent en volumes grossiers dans **une collection par plan**, `75_Plan03`, `75_Plan05`, `75_Plan06`… : ils stabilisent les passes Depth/Normal pour que l'i2i ne réinvente pas le sujet à chaque image, et l'export ne montre que celle du plan qu'il rend. La foule du jour vit dans `76_Foule`, à part : un proxy est le sujet d'un plan, la foule est l'état permanent (emplacements et sources : §12 de la fiche technique) — **les Léviim du Doukhan en font partie**, ils ne sont le sujet d'aucun plan.
+1. **Blockout** — lancer le script, vérifier les 21 plans sur la planche, rendre en Eevee avec les passes **Combined + Depth + Normal** (déjà activées). Les sujets non architecturaux (kohanim, par, ma'hta) existent en volumes grossiers dans **une collection par plan**, `75_Plan03`, `75_Plan05`, `75_Plan06`… : ils stabilisent les passes Depth/Normal pour que l'i2i ne réinvente pas le sujet à chaque image, et l'export ne montre que celle du plan qu'il rend. La foule du jour vit dans `76_Foule`, à part : un proxy est le sujet d'un plan, la foule est l'état permanent (emplacements et sources : §12 de la fiche technique) — **les Léviim du Doukhan en font partie**, ils ne sont le sujet d'aucun plan.
 
    **Le script ne sauvegarde pas le .blend.** En headless sa géométrie est donc jetée à la sortie de Blender. Pour reconstruire *et* exporter, chaîner les deux scripts dans la même instance — c'est l'export qui appelle `wm.save_mainfile` :
 
@@ -183,7 +193,7 @@ scripts fal aussi (`--plan 9a`).
        -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py
    ```
 
-   Sans argument le script exporte les 19 plans ; après `--` on lui passe les caméras à réexporter seules. Les frames viennent des propriétés `frame_debut` / `frame_fin` de chaque caméra. La carte de profondeur est normalisée 0-1 sur la plage réellement visible du frame (mesurée sur la passe Z), **échelle logarithmique, proche = blanc** : ni le proche ni le lointain n'est écrasé.
+   Sans argument le script exporte les 21 plans ; après `--` on lui passe les caméras à réexporter seules. Les frames viennent des propriétés `frame_debut` / `frame_fin` de chaque caméra. La carte de profondeur est normalisée 0-1 sur la plage réellement visible du frame (mesurée sur la passe Z), **échelle logarithmique, proche = blanc** : ni le proche ni le lointain n'est écrasé.
 
    Puis stylisation via le skill `fal-video` — entrées dans `renders/blockout/`, sortie dans `renders/style/` :
 
@@ -196,7 +206,7 @@ scripts fal aussi (`--plan 9a`).
 
    Deux points que le plan 9 a mis au jour, valables pour tous les plans : l'export ne laisse visible que la collection de sujet du plan rendu — une silhouette d'un autre plan traînant dans le cadre devient un objet inventé —, et une frame dont le cadre ne montre plus la scène du plan a désormais son propre plan plutôt qu'une ligne `**Prompt fin**`.
 3. **Contrôle halakhique** de chaque image clé contre la §9 de la fiche technique. Corriger en inpainting avant d'animer.
-4. **Mouvement** — image-to-video, en ne décrivant que la caméra et ce qui a le droit de bouger ; 5–10 s générées, ralenties à 50 % au montage. À deux frames quand le plan avance, à **une seule image + prompt de mouvement** quand la caméra est fixe (plans 6 et 15 : leurs deux frames sont la même image, mesurée à 100 % de recouvrement — un couple identique ne donne rien à interpoler et le modèle comble en dérivant).
+4. **Mouvement** — image-to-video, en ne décrivant que la caméra et ce qui a le droit de bouger ; 5–10 s générées. À deux frames quand le plan avance, à **une seule image + prompt de mouvement** quand la caméra est fixe (plans 6 et 15 : leurs deux frames sont la même image, mesurée à 100 % de recouvrement — un couple identique ne donne rien à interpoler et le modèle comble en dérivant).
 
    ```bash
    python3 .claude/skills/fal-video/fal_video.py --plan 9a --simulation      # prompt, coût, contrôle
@@ -206,9 +216,8 @@ scripts fal aussi (`--plan 9a`).
    **Contrôle avant génération, obligatoire** : le script affiche le bloc **CONTRÔLE AVANT VIDÉO** de `prompts_par_plan.md` et refuse de générer sans `--controle-fait`. Deux passes sur les deux frames stylisées — le **positionnement** de chaque élément comparé au blockout (place, échelle, orientation, nombre, cadrage) et les **zones d'accès** de la §12 de la fiche technique : le peuple ne dépasse pas les 11 amot de l'Ezrat Israël, le Doukhan est aux Léviim, l'Ezrat Cohanim et l'espace entre l'Oulam et l'autel aux cohanim, le Kodesh HaKodashim au seul Cohen Gadol. L'i2v ne corrige rien : il fait marcher la silhouette mal placée.
 
    Prompt et négatif viennent de `prompts_par_plan.md` (ligne **Mouvement** du plan), le mp4 arrive dans `renders/video/`. Clé `FAL_AI_KEY` dans le `.env`.
-5. **Montage** (DaVinci Resolve) — poser les marqueurs de sections sur l'audio, couper sur les débuts de mesure (75 BPM, 4/4 → 3,2 s), LUT et grain uniques pour tout le film.
 
-Ordre conseillé : plans 1-2-15 (style) → 8-9a-9b-13a-13b (cœur technique) → 11-12 → 4-5-6-14a-14b → 3-7a-7b-10.
+Ordre conseillé : plans 1-2-15 (style) → 8-9a-9b-13a-13b (cœur technique) → 11-12 → 4-5-6-14a-14b → 3-7a-7b-7c-7d-10.
 
 ## Règles non négociables
 
@@ -216,7 +225,7 @@ Ordre conseillé : plans 1-2-15 (style) → 8-9a-9b-13a-13b (cœur technique) �
 - Kodesh HaKodashim = obscurité, l'Arche et ses keruvim pris dans la lueur de la braise, fumée ; aucun autre décor, aucun personnage. L'Arche est **fermée**, ses deux keruvim ont des visages d'enfant tournés l'un vers l'autre, ailes au-dessus des têtes (fiche §8h) — jamais d'anges adultes, jamais de tables de la Loi visibles. Proxys : la ma'hta posée entre les deux badim, au pied de l'Arche (plan 11, *Yoma* 5:1) ; la silhouette du plan 12 est au seuil de la parokhet intérieure, de dos.
 - Menora à **7** branches ; Table au **nord**, Menora au **sud** ; autel d'or au centre, sans feu à Kippour.
 - Mizbea'h **blanc** (chaulé) avec **rampe**, jamais d'escalier. Oulam **sans portes**.
-- Quatre vêtements de lin blanc à l'intérieur — jamais les huit vêtements d'or.
+- Quatre vêtements de lin blanc pour tout le service intérieur (Lév. 16:4). Les huit vêtements d'or **deux plans seulement**, 7c et 7d — le revêtement sur la parole « il revêtait les habits d'or » (*Yoma* 3:4, 7:3), en gros plans sans visage — jamais dans un plan intérieur du film.
 - Pas de coupole, arc en fer à cheval, minaret, statue, colonne corinthienne intérieure.
 - Mouvements de caméra lents uniquement : travelling, grue, pan. Aucun zoom, aucune caméra portée. Mesuré, pas jugé à l'œil : `beit_hamikdash_analyse_plans.py` donne la glisse de l'image en largeurs de cadre par seconde, et refuse au-delà de 0,06.
 - Portes de l'Azara **ouvertes**, Nikanor comprise : elles le sont dès l'aube (*Tamid* 3:7 ; *Yoma* 3:1–2). Fermées, elles bouchent l'axe est-ouest, qui est le mouvement du film.
@@ -226,7 +235,7 @@ Ordre conseillé : plans 1-2-15 (style) → 8-9a-9b-13a-13b (cœur technique) �
 
 - **Portes du Heikhal** : ouvertes pendant l'avoda, battants rabattus dans l'embrasure de 6 amot (`PORTES_HEIKHAL_OUVERTES = True`). Pivoter un battant autour de son centre ne l'ouvre pas — il traverse le mur.
 - **Plan 12** : l'espace d'une ama entre les deux parokhot ne peut contenir aucune caméra ; le franchissement se filme depuis le Kodesh HaKodashim, côté nord (agrafe nord, *Yoma* 5:1).
-- **Plan 5** : depuis le Doukhan, l'autel masque le taureau (placé entre l'Oulam et l'autel, *Yoma* 3:8) ; la caméra vient du nord, au-dessus des anneaux.
+- **Plan 5a** : depuis le Doukhan, l'autel masque le taureau (placé entre l'Oulam et l'autel, *Yoma* 3:8) ; la caméra vient du nord, au-dessus des anneaux.
 - **Caméra du plan 1 (et du plan 15)** : sur l'axe Heikhal–Nikanor, `y = 0` (avant : 100 amot au sud). À 100 amot au sud, l'autel — 9 amot au sud de l'axe — se reprojetait sur l'ouverture de l'Oulam et la colonne de fumée semblait sortir de la porte. Sur l'axe, qui est la ligne de mire de la para adouma (*Middot* 2:4), elle tombe au ras du montant sud. Départ reculé à 1200 amot de la cible (avant : 1000), sur la même ligne de visée — même angle de plongée, donc les mêmes cours et la même foule par-dessus les murs, façade à 20 % de la largeur du cadre au lieu de 24 %, et une approche de ×1,43 au lieu de ×1,18 sur les 12 s. L'arrivée et le plan 15 ne bougent pas ; **les frames stylisées et le mp4 du plan 1 datent de l'ancien départ**.
 - **Colonne de fumée** : proxy géométrique `Colonne_fumee_NN` dans le blockout (quinze volutes chevauchées au-dessus de la ma'arakha, collection `77_Fumee`, ombre portée coupée). Sans volume à cet endroit le styliseur invente la source — il a sorti un petit autel d'or à cornes posé sur le mur est de l'Azara. Depuis le mont des Oliviers l'autel lui-même n'est jamais visible : 10 amot derrière un mur de 25, il faudrait la caméra à 337 amot au-dessus du sol de l'Azara.
 - **Position du Mizbea'h** : décalé de **9 amot vers le sud** par rapport à l'axe du Heikhal, bord nord à 60,5 amot du mur nord de l'Azara (*Middot* 5:2 ; Rambam *Beit HaBe'hira* 5:13–15). L'avis de R. Yehouda (*Zeva'him* 58b : autel centré face à l'ouverture) n'est pas retenu. Fiche §5 et script alignés sur cette ligne.
@@ -258,7 +267,7 @@ Ordre conseillé : plans 1-2-15 (style) → 8-9a-9b-13a-13b (cœur technique) �
 - **Fenêtre du Beit Avtinas, ce qu'elle ne montre jamais** : la cour. L'appui est à 2 amot du sol d'une chambre posée 26 amot au-dessus de l'Azara, et la caméra n'est que 1,3 ama plus haut que lui : la mire qui rase l'appui franchit le mur de l'Azara à 27 amot et n'atteindrait le sol qu'à 214 amot, bien au-delà du mur nord. Décrire « la cour » dans le prompt revient à la faire inventer.
 - **Table des épices (plan 3)** : posée en travers face à la caméra, elle ne laissait qu'un liseré au bas du cadre. Elle court maintenant le long du mur ouest, en fuyante, avec onze coupes et le mortier — les onze épices sont le sujet de la chambre autant que le Cohen Gadol.
 
-- **Quatre plans coupés en deux, sur mesure et non à l'œil.** `beit_hamikdash_analyse_plans.py` tire une grille de rayons à travers chaque frame et reprojette les points touchés dans l'autre caméra, occultation comprise. Deux chiffres : ce que le mouvement chasse hors champ, et — celui qui décide — la part de la frame de fin **déjà visible au début**, car ce qu'elle laisse de côté, le modèle doit l'inventer. Sous 40 %, le plan est coupé. Mesures d'origine : plan 7 **0 %** (la cible traversait l'axe de la caméra, 142° de panoramique), plan 9 **7 %** (56° de relevé pour 46° de champ vertical), plan 13 **17 %** (la caméra traversait le mur est du Heikhal et changeait de pièce), plan 14 **0 %** (grue de 54 amot balayant la cible de 70). Les dix-neuf plans sont aujourd'hui au-dessus du seuil.
+- **Quatre plans coupés en deux, sur mesure et non à l'œil.** `beit_hamikdash_analyse_plans.py` tire une grille de rayons à travers chaque frame et reprojette les points touchés dans l'autre caméra, occultation comprise. Deux chiffres : ce que le mouvement chasse hors champ, et — celui qui décide — la part de la frame de fin **déjà visible au début**, car ce qu'elle laisse de côté, le modèle doit l'inventer. Sous 40 %, le plan est coupé. Mesures d'origine : plan 7 **0 %** (la cible traversait l'axe de la caméra, 142° de panoramique), plan 9 **7 %** (56° de relevé pour 46° de champ vertical), plan 13 **17 %** (la caméra traversait le mur est du Heikhal et changeait de pièce), plan 14 **0 %** (grue de 54 amot balayant la cible de 70). Les vingt-deux plans sont aujourd'hui au-dessus du seuil (le 5b, caméra quasi fixe, trivialement).
 - **Un travelling avant n'est pas un panoramique.** La première version de la mesure prenait le plus faible des deux sens et condamnait la Stoa du plan 2 à 0 % : dans un couloir, aucune pierre n'est commune aux deux frames alors que l'image d'arrivée est l'agrandissement du centre de l'image de départ — exactement ce qu'un i2v sait faire. Ce qui compte n'est pas ce qui sort du cadre, c'est ce qui y entre sans avoir été annoncé. Corollaire : l'occultation doit être testée, sinon une grue qui se lève au-dessus d'un mur passe à 100 % de couverture pour un pays qu'elle n'avait jamais vu (mesuré sur le plan 14).
 - **Le plan 6 ne montrait pas son sujet.** Posée à 6 amot au-dessus du sol de l'Oulam, la caméra avait le Mizbea'h — 32 × 32 × 10, à 24 amot et à cheval sur l'axe (y −25..7) — exactement en travers : la ligne de visée passait sous son couronnement et toute la cour prosternée était derrière. Il faut **35 amot** de hauteur pour raser l'angle nord-est de l'autel et rattraper le sol à Nikanor ; l'ouverture de l'Oulam en fait 40, la caméra y tient. Et il faut se décaler au bord **nord** de l'ouverture, sinon la colonne de fumée — qui monte de l'autel à y −9 — coupe le cadre en deux. Même correction au départ du plan 14a.
 - **La prosternation se comptait en trois colonnes.** 33 silhouettes couchées pour « toute l'Azara » : à 35 amot de haut et 80 de distance, trois traits sur un dallage vide. Le champ couvre maintenant l'emprise exacte de la foule debout — Ezrat Israël *et* Ezrat Cohanim sur toute la largeur, puis l'Ezrat Nashim —, la prosternation concernant les deux cours (*Yoma* 6:2).
@@ -274,10 +283,6 @@ Ordre conseillé : plans 1-2-15 (style) → 8-9a-9b-13a-13b (cœur technique) �
 - **Valeur de l'ama : 0,48 m, gelée.** Elle ne change aucun cadrage — toute la géométrie passe par `m()` et la perspective est invariante d'échelle. Elle ne touche que deux choses : `H_HOMME = 3.65`, où l'homme est défini en mètres (1,75 m ÷ 0,48), et les trois lampes ponctuelles en watts (ma'arakha 1500, flammes de la Menora 15, ma'hta 8), dont l'éclairement varie en 1/ama² quand le soleil, en W/m², est invariant. À l'image, la seule différence est la taille d'un homme contre le bâtiment : 3,65 % de la façade de 100 amot ici, 3,04 % à 0,576 — et le plan 6 n'a pas besoin d'une foule 20 % plus petite.
 - **Branches de la Menora : droites, en diagonale** (Rambam, Rashi ; `MENORA_DROITE = True`). Le choix ne vit pas dans la géométrie : au plan 9a, sur 920 rayons, seules les deux marches de pierre touchent l'écran — la tige, les branches et les coupes tiennent sous 0,1 % du cadre. C'est le styliseur qui dessine les branches, et sans consigne il peint la courbe de l'Arc de Titus. La forme est donc écrite dans les prompts 9a et 13a et dans le NÉGATIF commun ; sans cela le réglage du script ne décide de rien.
 - **Couronne d'Hélène, sortie du mur.** Posée à x −92,5, l'anneau de 2,4 amot s'enfonçait de 1,9 dans le linteau du mur est du Heikhal (x −98..−92) : le plan 8 ne la touchait d'aucun rayon alors que son prompt la décrit. Centre reporté à **x −90,6**, à l'est de la face du mur d'au moins son rayon, sous la vigne (vigne z 29,7..36,3, couronne 27,9..28,1).
-
-## À trancher avant de produire
-
-- **Timecodes** : ceux du shot list sont estimés. Poser les marqueurs sur l'audio réel et remplir la colonne « Vrai timecode » avant tout rendu.
 
 ## Diffusion
 

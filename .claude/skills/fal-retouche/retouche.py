@@ -31,6 +31,7 @@ import argparse
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 
@@ -225,9 +226,25 @@ def travail(dossier, nom):
     return os.path.join(chemin, nom)
 
 
+RETOUCHE_FINALE = re.compile(r"_retouche(\d+)_([A-Za-z0-9.\-]+)$")
+
+
 def chemin_libre(dossier, base, modele):
+    """Une retouche du même modèle **compte** au lieu de s'empiler.
+
+    Une chaîne qui rempile `_retouche1_gpt2` à chaque passe dépasse les 255 octets
+    de nom de fichier au bout d'une quinzaine (macOS, `OSError: File name too long`),
+    et la génération est perdue après avoir été payée. Le suffixe du même modèle est
+    donc absorbé — `_retouche13_gpt2` devient `_retouche14_gpt2` ; un changement de
+    modèle ouvre un nouveau segment, qui garde l'historique lisible.
+    """
     os.makedirs(dossier, exist_ok=True)
-    for index in range(1, 100):
+    depart = 1
+    marque = RETOUCHE_FINALE.search(base)
+    if marque and marque.group(2) == modele:
+        depart = int(marque.group(1)) + 1
+        base = base[: marque.start()]
+    for index in range(depart, 100):
         chemin = os.path.join(dossier, f"{base}_retouche{index}_{modele}.png")
         if not os.path.exists(chemin):
             return chemin

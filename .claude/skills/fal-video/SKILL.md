@@ -33,6 +33,7 @@ python3 .claude/skills/fal-video/fal_image.py --plan 9a --frame fin --seed 90901
 | `--seed N` | tirée au hasard | **la même seed pour les deux frames d'un plan** ; à noter dans le journal |
 | `--controle a b c` | `1.0` | poids du conditionnement des modèles `depth*` ; une valeur = une variante |
 | `--force` | ligne **Force** du plan | force i2i (`depth-i2i` uniquement) |
+| `--reference <png>` | — | frame stylisée **validée** d'un plan voisin, jointe en dernière image : le modèle y prend la matière, jamais la composition (plan 1b, raccordé au plan 1) |
 | `--etapes` / `--guidage` | 28 / 3.5 | `num_inference_steps`, `guidance_scale` (modèles Flux) |
 
 Entrées : `renders/blockout/CAM_xx_{debut,fin}.png` (rendu couleur) et `..._profondeur.png`
@@ -127,6 +128,32 @@ ont pas besoin : le soleil y sculpte déjà les masses.
 - **Les ornements inventés.** Bandeaux d'or à anneaux sur chaque fût de la Stoa, venus de
   nulle part. Un négatif propre au plan suffit (`gold bands around the columns, bronze
   rings or hooks on the columns`).
+
+## Ce qu'un gros plan doit montrer se bâtit, il ne se prompte pas
+
+Le plan 10 est un gros plan sur les deux mains du Cohen Gadol, et le blockout n'en
+donnait aucune : les avant-bras s'arrêtaient net sur les ustensiles. Trois seeds et
+**douze retouches** — dont six sur les mains seules, en `masque` puis en `decoupe` —
+n'ont jamais rendu autre chose qu'une **moufle lisse sans un doigt**. Deux proxys de
+mains ajoutés au blockout (`main_poing`, `main_crochet` : masse, quatre doigts, pouce)
+et les deux mains sont sorties **justes du premier coup, sans une retouche**.
+
+La règle, qui prolonge celle de l'échelle des figures : **ce que la caméra regarde
+doit exister dans la géométrie**. Un modèle d'édition repeint ce qu'on lui donne ; il
+n'invente bien que ce qui est petit et vague. Le sujet d'un plan n'est ni l'un ni
+l'autre. Corollaire inverse, déjà connu : ajouter de la géométrie qu'aucune caméra ne
+voit ne corrige jamais un prompt.
+
+## Deux objets alignés sur l'axe de vue ne se séparent pas en les éloignant
+
+Toujours au plan 10. Le poing disparaissait derrière la vasque de la ma'hta ; la
+reculer le long de son manche — physiquement juste, c'est à cela que sert le manche
+long de *Yoma* 4:4 — n'y a rien changé. La caméra regardait **le long du manche**
+(produit scalaire −1,01 entre l'axe de vue et l'axe du manche) : la vasque se
+projetait sur le poing à toute distance. Seul l'**écart latéral** les a séparés.
+
+Avant de déplacer un objet qui en masque un autre, mesurer l'angle entre l'axe de vue
+et l'axe qui les joint. S'il est proche de 0, la distance ne sert à rien.
 
 ## L'échelle des figures ne se devine pas
 
@@ -255,9 +282,40 @@ python3 .claude/skills/fal-video/fal_video.py --plan 9a --duree 8 --controle-fai
 | `h3-turbo` | `minimax/h3-max-turbo/image-to-video` | 5 à 15 s | 0,04 $/s (768p) ; 0,025 en 480p | non | **768p maximum**, et le prompt complet (FIGURES + PLACES) lui fait **peupler le Heikhal** d'une foule de cohanim et d'endeuillés ; réduit à la seule ligne Mouvement il garde la salle vide mais **arrache la parokhet** et la fait battre au plafond vers 4,5 s |
 | `seedance` | `fal-ai/bytedance/seedance/v1.5/pro/image-to-video` | 4 à 12 s | 0,052 $/s (720p) | non | dolly propre mais **fait marcher** la silhouette : viole « nothing else moves » |
 | `veo-hq` | `fal-ai/veo3.1/first-last-frame-to-video` | 4, 6, 8 s | 0,20 $/s | oui | non testé |
+| `seedance2` | `bytedance/seedance-2.5/image-to-video` | 4 à 30 s | 0,473 $/s en 720p ; 0,2205 en 480p, 1,164 en 1080p | non | tient le plan 12 **une fois le prompt réécrit pour lui** (voir plus bas) ; dix fois `veo-lite` |
 
-Écartés : `bytedance/seedance-2.5/image-to-video` (0,473 $/s en 720p, dix fois
-`veo-lite` pour le même service) et `minimax/h3-max` (768p maximum, comme sa variante turbo).
+Écarté aussi : `minimax/h3-max` (768p maximum, comme sa variante turbo).
+
+### Ce que `seedance2` a fait du plan 12
+
+Essai à 8 s, frame de début validée seule, `--sans-fin`, prompt par défaut (Mouvement +
+FIGURES + PLACES) : 3,78 $ pour une sortie **inutilisable**. Le « very slow dolly backward »
+recule d'un mur : à 4 s la caméra est **sortie** du Kodesh HaKodashim, à 8 s elle est
+dehors sur le parvis, à colonnade et plein soleil. Et comme MiniMax, le modèle lit
+FIGURES et PLACES comme un **contenu à peindre** — le plan qui doit montrer le Cohen
+Gadol **seul** finit avec des centaines de figures en talith agenouillées face au
+Sanctuaire. Sortie 1284 × 716 : l'aspect de l'entrée, pas les 1280 × 720 annoncés.
+
+Second essai, même frame, même durée, même prix, **prompt réécrit** : la caméra reste
+dans la chambre, le mur d'or tient la gauche et le rideau la droite du premier au dernier
+plan, la silhouette ne bouge pas, aucune autre figure n'apparaît, la salle reste sombre.
+Le modèle n'est donc pas en cause — le prompt l'était.
+
+Trois règles en sortent, propres aux modèles **sans prompt négatif** :
+
+1. **Ne pas envoyer FIGURES + PLACES.** Ces blocs tiennent les gens à leur place chez veo
+   et les **font naître** chez seedance 2.5 comme chez MiniMax. Sur un plan qui ne montre
+   qu'une personne, passer `--prompt` avec la seule ligne Mouvement.
+2. **Borner la course de la caméra en distance, pas en adjectif.** « very slow dolly
+   backward » a reculé de trente amot à travers la pierre ; « a few centimetres only, the
+   camera stays inside this small dark chamber for the whole shot » a tenu.
+3. **Nommer ce qui doit rester dans le cadre**, mur par mur : « the hammered gold wall
+   keeps filling the left, the woven curtain keeps filling the right ». Chaque interdit
+   se retourne en ancrage positif — « the room never opens onto a courtyard, a colonnade
+   or the sky » plutôt qu'un négatif que l'endpoint ne prend pas.
+
+Reste le prix, dix fois `veo-lite` pour huit secondes. Le modèle ne s'ouvre que si le film
+a besoin de ses 30 s d'un seul tenant.
 
 La famille MiniMax coûte cinq fois moins que `veo-lite` et monte à 15 s, mais aucune de ses
 sorties ne dépasse 768p et elle lit le prompt comme un **contenu à peindre**, pas comme une
@@ -266,7 +324,7 @@ naître les gens eux-mêmes. Un modèle qui ne sait pas lire une interdiction ne
 les plans d'intérieur.
 
 `kling3` et `flux3` montent à 15 et 20 s : de quoi couvrir un plan entier au lieu de
-générer 8 s et de ralentir au montage. Depuis le découpage en dix-neuf, les plans
+générer 8 s et de ralentir au montage. Depuis le découpage en vingt-deux, les plans
 font 12 à 33 s et **onze d'entre eux tiennent en 15 s** — `kling3` les couvre d'une
 seule génération. Restent le 3, le 5, le 11, le 12 (25 s) et le 15 (33 s), à couvrir
 en ralenti ou en deux segments.
@@ -279,7 +337,7 @@ scripts. Les modifier là, jamais dans le code.
 | Bloc | Ce qu'il tient | Injecté |
 |---|---|---|
 | **STYLE** | Temple debout, **neuf et intact**, et l'endroit **majestueux** : grand appareil hérodien en gros blocs fraîchement taillés, face lisse à marge ciselée, assises de niveau et joints filiformes, pierre propre — plus l'ancrage « vraie photo 35 mm, jamais un rendu 3D ». Ville alentour habitée | préfixe du prompt image (`STYLE +`) |
-| **FIGURES** | La **tenue**, trois classes : le **peuple** en tenue d'aujourd'hui (costume, redingote, kaftan, djellaba), les **Léviim** en lin blanc, les **cohanim et le Cohen Gadol** en bigdei lavan. Tête couverte par kippa, talith ou coiffe de lin — rien d'autre | suffixe image **et** vidéo |
+| **FIGURES** | La **tenue**, trois classes : le **peuple** en tenue d'aujourd'hui (costume, redingote, kaftan, djellaba), les **Léviim** en lin blanc, les **cohanim et le Cohen Gadol** en bigdei lavan. Tête couverte par kippa, talith ou coiffe de lin — rien d'autre. Un plan qui déroge porte sa ligne `**Figures**`, qui remplace le bloc (7c et 7d : les huit vêtements d'or) | suffixe image **et** vidéo |
 | **PLACES** | **Qui se tient où** : peuple aux cours extérieures et aux 11 amot de l'Ezrat Israël, Léviim sur le Doukhan, cohanim à l'ouest de la marche, Oulam et Heikhal vides sauf le Cohen Gadol | suffixe image **et** vidéo |
 | **NÉGATIF** | Interdits : coupole, minaret, site actuel, ruines, tourisme | `negative_prompt` vidéo, replié dans l'instruction d'édition |
 | **ÉDITION** | Repeindre sans rien déplacer | préfixe de l'instruction d'édition |
@@ -325,6 +383,7 @@ fin, pas au milieu.
 - **prompt vidéo** = la ligne `**Mouvement**` du plan — jamais la ligne `**Prompt**`,
   qui produirait des personnages difformes en i2v ;
 - **négatif** = bloc NÉGATIF commun + le `**Négatif**` propre au plan ;
+- **`**Figures**`** (facultatif) = remplace le bloc FIGURES pour ce seul plan (7c et 7d, habits d'or) ;
 - **`**Édition finale**`** (facultatif) = la contrainte du plan que le modèle lâche,
   réinjectée **juste avant le CADRAGE** ;
 - **force i2i** = la ligne `**Force**` du plan ;

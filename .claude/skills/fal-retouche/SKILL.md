@@ -144,6 +144,51 @@ ajoute seul. Donc :
 - Les interdits du film (coupole, minaret, site actuel) restent utiles ici : les
   reprendre en clair dans l'instruction si la retouche risque de les ramener.
 
+## Une main ne se retouche pas : elle se bâtit dans le blockout
+
+Mesuré six fois sur le plan 10, un gros plan sur les deux mains du Cohen Gadol. En
+`masque`, la zone d'une main fait ~180 × 255 px dans un cadre de 1920 : `gpt2` y rend
+une **moufle lisse sans un seul doigt**, ou une masse enflée aussi large que l'objet
+tenu, et l'instruction la plus détaillée n'y change rien — trois passes, trois moufles.
+La même instruction en `--methode decoupe --marge 0.4`, où le modèle travaille la main
+à pleine échelle, rend enfin des doigts — mais **une main par passe**, chacune à sa
+propre chair, et le raccord entre les deux ne vient jamais.
+
+**La retouche n'était pas le bon outil.** Ces six passes ont été abandonnées : les
+deux mains ont été **bâties dans le blockout** (`main_poing`, `main_crochet`), et la
+frame regénérée les a rendues justes du premier coup, sans une retouche. Ce que la
+caméra regarde doit exister dans la géométrie — la retouche corrige un détail, elle
+ne fabrique pas le sujet d'un plan.
+
+Corollaire de contrôle : **une main se juge à 100 %, jamais sur une planche réduite**.
+À 1300 px de large, une moufle sans doigts passe pour une main ; deux clips ont été
+générés et payés sur ce jugement-là avant que le défaut ne soit vu.
+
+## Le nom de fichier a une limite, et elle est atteinte
+
+Chaque passe ajoutait son `_retouche1_<modele>` au nom de l'entrée. Au bout d'une
+quinzaine de passes le nom dépasse les **255 octets** de macOS et la génération meurt à
+l'écriture (`OSError: [Errno 63] File name too long`) — après avoir été payée. Depuis,
+`chemin_libre()` **absorbe** le suffixe du même modèle : `_retouche13_gpt2` devient
+`_retouche14_gpt2`. Un changement de modèle ouvre un nouveau segment, l'historique
+reste lisible. Une chaîne déjà longue se renomme à la main avant de la reprendre.
+
+## Une pièce ajoutée ne se raccorde pas toute seule
+
+Demander au modèle de **poser** un objet allongé (un manche, une tige, une lanière) et de le
+**raccorder** à ce qu'il tient est une correction de trop dans la même phrase : mesuré sur le
+manche de la ma'hta du plan 10, `gpt2` a rendu un beau jonc d'or à pommeau qui s'arrêtait au
+poignet sans jamais atteindre le bassin — une pièce flottante, lue comme un sceptre planté
+dans la ceinture. Deux passes rechaînées :
+
+1. la pièce, décrite par sa forme et son trajet ;
+2. le raccord seul — nommer le point de départ et le point d'arrivée (« il quitte la lèvre du
+   bassin, traverse le poing fermé et court sur la manche »), et **dire quoi effacer** de la
+   passe précédente (« supprime ce pommeau »), sans quoi le modèle garde les deux.
+
+Le corollaire pour la lecture d'un plan rapproché : ce qui distingue un ustensile d'un bol,
+c'est son manche **entier**. Un moignon entre le poing et l'objet ne se lit pas.
+
 ## Sorties
 
 - `<image>_retouche<N>_<modele>.png` — le résultat recomposé, l'index s'incrémente.

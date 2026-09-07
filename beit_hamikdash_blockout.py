@@ -425,8 +425,12 @@ MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ
 MAT_TISSU = lambda: etoffe("Parokhet", (0.2, 0.2, 0.55))
 MAT_SOL = lambda: dallage("Sol", (0.75, 0.72, 0.65))
 MAT_LIN = lambda: etoffe("Lin_blanc", (0.88, 0.87, 0.83))     # bigdei lavan des kohanim
+MAT_TEKHELET = lambda: etoffe("Tekhelet_meil", (0.13, 0.20, 0.52))   # laine tekhelet du me'il (Rambam Klei HaMikdash 9:3)
+MAT_EPHOD = lambda: etoffe("Ephod_or_tisse", (0.82, 0.62, 0.28))     # fil d'or filé dans la laine (Rambam 9:5)
+MAT_SHOHAM = lambda: material("Shoham", (0.10, 0.14, 0.12))
 MAT_BETE = lambda: material("Robe_animale", (0.32, 0.26, 0.22))
 MAT_KETORET = lambda: material("Ketoret", (0.42, 0.30, 0.16))
+MAT_CHAIR = lambda: material("Chair", (0.62, 0.42, 0.32))       # les mains nues, seule peau du film
 MAT_MARBRE = lambda: marbre("Marbre_blanc", (0.93, 0.92, 0.89))
 MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
 # L'or des parois est un placage martelé sur de la pierre, pas un ustensile tourné :
@@ -1651,18 +1655,21 @@ for ns, sy in (("N", 1), ("S", -1)):
 H_HOMME = 3.65        # 1.75 m en amot
 
 
-def proxies_du_plan(numero):
-    return f"75_Plan{numero:02d}"
+def proxies_du_plan(numero, lettre="", frame=""):
+    """75_Plan05 pour tout le plan, 75_Plan05A pour une prise, 75_Plan05B_fin pour une frame."""
+    return f"75_Plan{numero:02d}{lettre}" + (f"_{frame}" if frame else "")
 
 
 # Tenues (fiche §12, bloc FIGURES de prompts_par_plan.md) : le peuple en habits
 # d'aujourd'hui, talith sur la tête ou non ; les Léviim en robe de lin unie ; les
 # cohanim dans les quatre vêtements blancs, coiffe plate (Yoma 7:5). Trois corps
 # différents, et pas trois teintes : à vingt amot le styliseur ne lit qu'une silhouette.
-AM, TALITH, LEVI, KOHEN = "am", "talith", "levi", "kohen"
+AM, TALITH, LEVI, KOHEN, KOHEN_GADOL = "am", "talith", "levi", "kohen", "kohen_gadol"
 TENUES_AM = (TALITH, TALITH, TALITH, AM, AM)
 
 def _etoffe(tenue, nom):
+    if tenue == KOHEN_GADOL:
+        return MAT_TEKHELET()
     if tenue in (LEVI, KOHEN):
         return MAT_LIN()
     return MAT_FOULE() if alea(nom, 6) < 0.6 else MAT_TALITH()
@@ -1681,6 +1688,68 @@ def _pieces_de_tenue(name, tenue, h, col):
                     0.61 * h, 0.655 * h, col, MAT_LIN())]
     return []
 
+def _pieces_bigdei_zahav(name, h, col):
+    """Les quatre vêtements du Cohen Gadol par-dessus le me'il (Yoma 7:5 ; Rambam Klei HaMikdash 9).
+
+    Bâti face à l'ouest comme toute silhouette : le dos est en +x. L'éphod est un
+    tablier tissé d'or pendu dans le dos, des coudes aux pieds, large comme le dos
+    d'épaule à épaule (9:9) ; ses deux bretelles montent aux épaules et portent les
+    deux pierres de shoham ; le 'heshev le ceint par-dessus le me'il (10:3) ; le
+    'hoshen, un zeret carré, pend sur la poitrine, tenu par deux chaînes d'or qui
+    passent sur les épaules (9:6-10). Au bas du me'il, clochettes d'or et grenades
+    alternées (9:4) ; celles que le tablier couvre ne sont pas bâties.
+    """
+    k = h / H_HOMME
+    prof = 0.26 * k
+    or_tisse = MAT_EPHOD()
+    pieces = [
+        # Enroulée à plat sur le crâne (Rambam 8:2), pas posée dessus : elle coiffe la
+        # sphère de la tête, le cordon du tsits passe sous son bord, les cheveux dessous.
+        cyl(f"{name}_mitsnefet", 0, 0, 0.94 * h, 1.012 * h, 0.088 * h, col, MAT_LIN(), verts=12),
+        box(f"{name}_ephod", 0.34 * k, 0.40 * k, -0.36 * k, 0.36 * k, 0.02 * h, 0.62 * h, col, or_tisse),
+        box(f"{name}_heshev", -prof - 0.06 * k, 0.42 * k, -0.40 * k, 0.40 * k, 0.60 * h, 0.65 * h, col, or_tisse),
+        box(f"{name}_hoshen", -prof - 0.08 * k, -prof - 0.02 * k, -0.25 * k, 0.25 * k,
+            0.62 * h, 0.62 * h + 0.5 * k, col, or_tisse),
+        box(f"{name}_tsits", -0.092 * h, -0.078 * h, -0.05 * h, 0.05 * h, 0.94 * h, 0.965 * h, col, MAT_OR()),
+        cyl(f"{name}_tsits_cordon", 0, 0, 0.925 * h, 0.937 * h, 0.086 * h, col, MAT_TEKHELET(), verts=12),
+    ]
+    # Quatre rangs de trois pierres, chacune carrée et sertie d'or (Ex. 28:17-20 ; Rambam 9:6),
+    # et un anneau d'or à chaque coin : les deux du haut reçoivent les chaînes, les deux du
+    # bas les cordons de tekhelet qui le lient à l'éphod (Ex. 28:28 ; Rambam 9:8).
+    for rang in range(4):
+        for colonne in range(3):
+            y = (colonne - 1) * 0.16 * k
+            z = 0.62 * h + 0.5 * k - (rang + 0.5) * 0.125 * k
+            pieces.append(box(f"{name}_even_{rang}{colonne}", -prof - 0.11 * k, -prof - 0.08 * k,
+                              y - 0.05 * k, y + 0.05 * k, z - 0.045 * k, z + 0.045 * k, col, MAT_SHOHAM()))
+    for s_y in (-1, 1):
+        for z in (0.62 * h + 0.03 * k, 0.62 * h + 0.47 * k):
+            pieces.append(sphere(f"{name}_tabaat{s_y:+d}_{z:.2f}", -prof - 0.05 * k, s_y * 0.25 * k, z,
+                                 0.025 * k, col, MAT_OR(), segs=6))
+    for s in (-1, 1):
+        y = s * 0.28 * k
+        pieces += [
+            box(f"{name}_bretelle_dos{s:+d}", 0.34 * k, 0.40 * k, y - 0.07 * k, y + 0.07 * k,
+                0.62 * h, 0.85 * h, col, or_tisse),
+            box(f"{name}_bretelle_epaule{s:+d}", -prof - 0.04 * k, 0.40 * k, y - 0.07 * k, y + 0.07 * k,
+                0.83 * h, 0.86 * h, col, or_tisse),
+            box(f"{name}_shoham{s:+d}", -0.06 * k, 0.06 * k, y - 0.06 * k, y + 0.06 * k,
+                0.86 * h, 0.90 * h, col, MAT_SHOHAM()),
+            box(f"{name}_chaine{s:+d}", -prof - 0.08 * k, -0.06 * k, y - 0.015 * k, y + 0.015 * k,
+                0.86 * h, 0.88 * h, col, MAT_OR()),
+        ]
+    rayon = 0.37 * k
+    for i in range(144):
+        angle = 2 * math.pi * i / 144
+        x, y = rayon * math.cos(angle), rayon * math.sin(angle)
+        if x > 0.30 * k:
+            continue
+        if i % 2 == 0:
+            pieces.append(sphere(f"{name}_paamon_{i:03d}", x, y, 0.04 * h, 0.04 * k, col, MAT_OR(), segs=6))
+        else:
+            pieces.append(sphere(f"{name}_rimon_{i:03d}", x, y, 0.04 * h, 0.045 * k, col, MAT_TEKHELET(), segs=6))
+    return pieces
+
 def silhouette(name, x, y, z0, col, tenue=KOHEN, h=H_HOMME, lacet=0.0):
     """Figure debout : robe, torse, épaules, bras, cou, tête, plus sa tenue.
 
@@ -1696,8 +1765,12 @@ def silhouette(name, x, y, z0, col, tenue=KOHEN, h=H_HOMME, lacet=0.0):
     corps = _etoffe(tenue, name)
     k = h / H_HOMME
     ep, prof = 0.50 * k, 0.26 * k
+    # Le me'il tombe droit « comme tous les manteaux » et n'a pas de manches (Rambam
+    # Klei HaMikdash 9:3) : bras en lin de la kutonet, bas serré pour que l'éphod le frôle.
+    evasement = 0.36 * k if tenue == KOHEN_GADOL else 0.44 * k
+    manches = MAT_LIN() if tenue == KOHEN_GADOL else corps
     pieces = [
-        cone(f"{name}_robe", 0, 0, 0, 0.52 * h, 0.44 * k, 0.32 * k, col, corps, verts=12),
+        cone(f"{name}_robe", 0, 0, 0, 0.52 * h, evasement, 0.32 * k, col, corps, verts=12),
         box(f"{name}_torse", -prof, prof, -0.34 * k, 0.34 * k, 0.50 * h, 0.83 * h, col, corps),
         box(f"{name}_epaules", -prof, prof, -ep, ep, 0.76 * h, 0.83 * h, col, corps),
         cyl(f"{name}_cou", 0, 0, 0.80 * h, 0.88 * h, 0.13 * k, col, corps, verts=8),
@@ -1705,8 +1778,9 @@ def silhouette(name, x, y, z0, col, tenue=KOHEN, h=H_HOMME, lacet=0.0):
     ]
     for s in (-1, 1):
         pieces.append(cyl(f"{name}_bras{s:+d}", 0, s * (ep - 0.11 * k), 0.50 * h,
-                          0.79 * h, 0.11 * k, col, corps, verts=8))
-    pieces += _pieces_de_tenue(name, tenue, h, col)
+                          0.79 * h, 0.11 * k, col, manches, verts=8))
+    pieces += (_pieces_bigdei_zahav(name, h, col) if tenue == KOHEN_GADOL
+               else _pieces_de_tenue(name, tenue, h, col))
     _poser(pieces, x, y, z0, lacet)
 
 def instrument_de_levi(nom, genre, x, y, z0, col):
@@ -1744,6 +1818,22 @@ def kohen_prosterne(name, x, y, z0, col, mat=None):
 def kohen(name, x, y, z0, col):
     """Un cohen seul, sujet d'un plan : la silhouette en tenue de service."""
     silhouette(name, x, y, z0, col, KOHEN)
+
+def kohen_prosterne_de_pres(name, x, y, z0, col):
+    """Prosterné pour un plan rapproché : « הִשְׁתַּחֲוָאָה זוֹ פִּשּׁוּט יָדַיִם וְרַגְלַיִם » (Megillah 22b).
+
+    La dalle de `kohen_prosterne` suffit à 80 amot ; à dix, le styliseur y lit un banc.
+    Origine aux hanches, là où l'homme se tenait debout : le tronc s'allonge vers
+    l'ouest, tête et bras tendus devant, jambes tendues derrière.
+    """
+    lin = MAT_LIN()
+    box(f"{name}_tronc", x - 1.5, x, y - 0.5, y + 0.5, z0, z0 + 0.45, col, lin)
+    sphere(f"{name}_tete", x - 1.8, y, z0 + 0.28, 0.28, col, lin, segs=8)
+    for s in (-1, 1):
+        cyl_between(f"{name}_bras{s:+d}", (x - 1.35, y + s * 0.5, z0 + 0.3),
+                    (x - 2.5, y + s * 0.85, z0 + 0.12), 0.11, col, lin, verts=8)
+        cyl_between(f"{name}_jambe{s:+d}", (x, y + s * 0.25, z0 + 0.25),
+                    (x + 1.7, y + s * 0.4, z0 + 0.2), 0.15, col, lin, verts=8)
 
 def machta(name, x, y, z0, col, avec_braises=True, manche_vers=None):
     """Ma'hta de Kippour : bassin d'or de trois kabin, manche long.
@@ -1807,6 +1897,79 @@ def kaf(name, x, y, z0, col, avec_ketoret=True):
                    [(0.20, 0.22), (0.21, 0.26), (0.19, 0.31), (0.14, 0.36),
                     (0.07, 0.395), (0.0, 0.41)], col, MAT_KETORET(), verts=20)
 
+def _unite(v):
+    n = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) or 1.0
+    return (v[0] / n, v[1] / n, v[2] / n)
+
+
+def _vers(depuis, cible):
+    return _unite((cible[0] - depuis[0], cible[1] - depuis[1], cible[2] - depuis[2]))
+
+
+def _repere(u):
+    """Trièdre autour d'un axe : `u`, la verticale redressée, et leur produit."""
+    w = _unite((-u[2] * u[0], -u[2] * u[1], 1 - u[2] * u[2]))
+    v = (u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0])
+    return w, v
+
+
+def _pas(point, *termes):
+    for direction, longueur in termes:
+        point = (point[0] + longueur * direction[0],
+                 point[1] + longueur * direction[1],
+                 point[2] + longueur * direction[2])
+    return point
+
+
+def main_poing(name, centre, vers, col):
+    """Poing fermé sur le manche de la ma'hta.
+
+    Le plan 10 est un gros plan sur les deux mains, et le blockout n'en donnait
+    aucune : l'avant-bras s'arrêtait net sur l'ustensile. Le styliseur devait donc
+    les inventer, sur 180 px de large, et rendait une moufle lisse sans un seul
+    doigt — six passes de retouche n'y ont rien changé. Le volume est bâti ici :
+    masse du poing le long du manche, quatre doigts en travers dessous, pouce au-
+    dessus. C'est ce qu'on voit d'une main fermée sur une barre, et c'est tout ce
+    qu'il faut pour que le modèle n'ait plus qu'à repeindre.
+
+    `vers` : le point vers lequel court le manche (le coude).
+    """
+    chair = MAT_CHAIR()
+    u = _vers(centre, vers)
+    w, v = _repere(u)
+    cyl_between(f"{name}_poing", _pas(centre, (u, -0.11)), _pas(centre, (u, 0.11)),
+                0.115, col, chair, verts=12)
+    for rang, le_long in enumerate((-0.087, -0.029, 0.029, 0.087)):
+        assise = _pas(centre, (u, le_long), (w, -0.080))
+        cyl_between(f"{name}_doigt{rang}", _pas(assise, (v, -0.090)), _pas(assise, (v, 0.090)),
+                    0.027, col, chair, verts=8)
+    cyl_between(f"{name}_pouce", _pas(centre, (u, -0.09), (w, 0.085)),
+                _pas(centre, (u, 0.07), (w, 0.075), (v, -0.04)), 0.034, col, chair, verts=8)
+
+
+def main_crochet(name, centre, vers, col):
+    """Main crochetée sur la lèvre du kaf, doigts par-dessus le bord.
+
+    Le kaf n'a pas de manche (*Tamid* 5:4 : « דּוֹמֶה לְתַרְקַב גָּדוֹל שֶׁל זָהָב », un récipient
+    de mesure ouvert) et le Rambam le fait tenir « שְׂפַת הַכַּף בְּרָאשֵׁי אֶצְבְּעוֹתָיו »
+    (*Avodat Yom HaKippurim* 4:1) — par la lèvre, du bout des doigts. C'est donc la
+    seule prise que la forme donne, et celle que le blockout doit montrer.
+
+    `centre` : le dos de la main, contre la panse ; `vers` : le centre du bol.
+    """
+    chair = MAT_CHAIR()
+    u = _vers(centre, vers)
+    w, v = _repere(u)
+    cyl_between(f"{name}_dos", _pas(centre, (u, -0.14)), _pas(centre, (u, 0.03)),
+                0.100, col, chair, verts=12)
+    for rang, en_travers in enumerate((-0.084, -0.028, 0.028, 0.084)):
+        assise = _pas(centre, (v, en_travers), (w, 0.02))
+        cyl_between(f"{name}_doigt{rang}", assise, _pas(assise, (u, 0.19), (w, -0.07)),
+                    0.026, col, chair, verts=8)
+    cyl_between(f"{name}_pouce", _pas(centre, (v, -0.10), (w, -0.03)),
+                _pas(centre, (v, -0.11), (u, 0.10), (w, -0.09)), 0.032, col, chair, verts=8)
+
+
 def taureau(name, x, y, z0, col, tete=(0, -1)):
     """Par (~2.6 m au garrot compris). `tete` : direction unitaire de la tête (défaut : sud)."""
     tx, ty = tete
@@ -1830,11 +1993,26 @@ def taureau(name, x, y, z0, col, tete=(0, -1)):
 #     donc de dos pour une caméra qui vient du nord-est.
 #     Tout le monde est sur les 10 amot de plat : les douze marches en prennent 12 sur
 #     les 22 (Middot 3:6), et les proxys avaient les pieds enfouis dedans.
+#     Le par et le Kohen Gadol servent les deux prises, 5a (l'aveu) et 5b (le Nom). Ce
+#     qui change entre elles, c'est le rang des cohanim : debout au 5a et au début du
+#     5b, couchés à la fin du 5b — « כּוֹרְעִים וּמִשְׁתַּחֲוִים וְנוֹפְלִים עַל פְּנֵיהֶם » à l'ouïe du Nom
+#     (Yoma 6:2). Le Kohen Gadol, lui, ne bouge pas : debout, les mains sur le par, il
+#     achève le Nom sur leur bénédiction et leur dit « תטהרו » (Rambam, Avodat Yom
+#     HaKippourim 2:7). Au 5b la rangée est doublée vers le nord, en profondeur de
+#     cadre, et la paire ouest recule d'une ama et demie : couché, un homme tendu fait
+#     quatre amot, et les mains du rang à x -63 entraient dans les marches.
 PLAN_05 = proxies_du_plan(5)
 taureau("Par_HaHatat", -61.5, 4, Z_AZ, PLAN_05, tete=(0, -1))
 kohen("KohenGadol_par", -59, 0.5, Z_AZ, PLAN_05)
 for nm, (x, y) in {"nord_O": (-63, 9), "nord_E": (-57, 9), "sud_O": (-63, -3), "sud_E": (-57, -3)}.items():
-    kohen(f"Kohen_par_{nm}", x, y, Z_AZ, PLAN_05)
+    kohen(f"Kohen_par_{nm}", x, y, Z_AZ, proxies_du_plan(5, "A"))
+COHANIM_NOM = {f"{cote}_{rang}": (x, y)
+               for rang, y in (("sud", -3), ("nord", 9), ("nord2", 15), ("nord3", 21))
+               for cote, x in (("O", -61.5), ("E", -57))
+               if (cote, rang) != ("E", "sud")}   # il serait entre l'objectif et le Kohen Gadol
+for nm, (x, y) in COHANIM_NOM.items():
+    kohen(f"Kohen_nom_{nm}_debout", x, y, Z_AZ, proxies_du_plan(5, "B", "debut"))
+    kohen_prosterne_de_pres(f"Kohen_nom_{nm}_couche", x, y, Z_AZ, proxies_du_plan(5, "B", "fin"))
 
 # --- CAM_03 : le Kohen Gadol de dos devant la fenêtre du Beit Avtinas, table des épices
 # Tout est calé sur PORTE_MAYIM : la chambre a suivi la porte quand elle est passée
@@ -1885,12 +2063,26 @@ for i, x in enumerate(plage(12, 126, 5)):
 PLAN_10 = proxies_du_plan(10)
 kohen("KohenGadol_seuil", -136, -8.5, Z_BAT, PLAN_10)
 COUDE_D, COUDE_G = (-136.0, -8.11, Z_BAT + 2.30), (-136.0, -8.89, Z_BAT + 2.30)
-machta("Machta_mains", -137.00, -7.70, Z_BAT + 1.90, PLAN_10, manche_vers=COUDE_D)
+# La vasque était posée contre le poignet et le poing, bâti sur le manche, passait
+# derrière sa lèvre. Deux corrections : elle recule de 0,35 ama le long du manche —
+# c'est à cela que sert le manche long de Kippour (*Yoma* 4:4) — et elle s'écarte au
+# nord. Reculer seule ne suffisait pas : la caméra regarde presque **le long du
+# manche** (produit scalaire −1,01 entre l'axe de vue et l'axe du manche), si bien
+# que la vasque se projetait pile sur le poing quelle que soit la distance. C'est
+# l'écart latéral, pas la distance, qui sépare deux objets alignés sur l'axe de vue.
+machta("Machta_mains", -137.31, -7.25, Z_BAT + 1.80, PLAN_10, manche_vers=COUDE_D)
 kaf("Kaf_mains", -136.65, -9.45, Z_BAT + 1.95, PLAN_10)
-cyl_between("KohenGadol_seuil_avantbras_d", COUDE_D, (-136.55, -7.85, Z_BAT + 2.10),
+# La manche s'arrête au poignet et la main prend la suite : bâtie jusqu'à l'ustensile,
+# elle y enterrait la main, qui ressortait en moufle. Les deux mains sont posées hors
+# des vasques — le poing sur le manche de la ma'hta, à l'aplomb du poignet ; la gauche
+# en dehors de la lèvre du kaf, ses doigts seuls passant par-dessus le bord.
+cyl_between("KohenGadol_seuil_avantbras_d", COUDE_D, (-136.36, -7.87, Z_BAT + 2.19),
             0.12, PLAN_10, MAT_LIN(), verts=10)
-cyl_between("KohenGadol_seuil_avantbras_g", COUDE_G, (-136.50, -9.25, Z_BAT + 2.15),
+cyl_between("KohenGadol_seuil_avantbras_g", COUDE_G, (-136.30, -9.05, Z_BAT + 2.22),
             0.12, PLAN_10, MAT_LIN(), verts=10)
+main_poing("Main_droite_machta", (-136.55, -7.749, Z_BAT + 2.13), COUDE_D, PLAN_10)
+main_crochet("Main_gauche_kaf", (-136.38, -9.09, Z_BAT + 2.25),
+             (-136.65, -9.45, Z_BAT + 2.25), PLAN_10)
 
 # --- CAM_11 : ma'hta posée sur la pierre, entre les deux badim, au pied de l'Arche
 #     (Yoma 5:1). Aucune figure ici (fiche 8e).
@@ -1909,6 +2101,35 @@ cyl_between("KohenGadol_passage_avantbras_d", COUDE_P_D, (-139.95, 8.48, Z_BAT +
             0.12, PLAN_12, MAT_LIN(), verts=10)
 cyl_between("KohenGadol_passage_avantbras_g", COUDE_P_G, (-139.95, 7.52, Z_BAT + 2.12),
             0.12, PLAN_12, MAT_LIN(), verts=10)
+
+# --- CAM_07C / CAM_07D : « il ôtait les habits de lin blanc et revêtait les habits d'or »
+# Le revêtement (Yoma 3:4, 7:3 : « ils lui apportaient les habits d'or et il s'habillait »),
+# derrière « un drap de lin fin tendu entre lui et le peuple » (Yoma 3:4, 3:6). Les
+# immersions et changements de Kippour se font sur le toit du Beit HaParva, au sud de
+# l'Azara (Middot 5:3 ; Yoma 3:3) — le blockout n'a pas la chambre : le poste est au sol,
+# côté sud, hors des rangs (x −40, y −60), et les deux gros plans ne montrent que lui et
+# le drap. Deux plans, deux collections, la même figure au même endroit, face à l'est :
+# 7c le 'hoshen de face cadré sous le menton, ses mains aux anneaux du bas où le cordon
+# de tekhelet le lie à l'éphod (Ex. 28:28) ; 7d le tsits noué à la nuque, de dos, ses
+# mains au nœud (Rambam Klei HaMikdash 9:2 ; 10:3). Le reste de la journée est en lin.
+VET_X, VET_Y = -40, -60
+for prise, cote_drap, coudes, mains in (
+        # 7c : mains aux anneaux du bas, à l'extérieur du 'hoshen (y ±0,25) et sous lui,
+        # là où le cordon descend vers le 'heshev — posées devant, elles cachaient le
+        # quatrième rang de pierres.
+        ("C", -1, ((VET_X, VET_Y - 0.39, Z_AZ + 2.22), (VET_X, VET_Y + 0.39, Z_AZ + 2.22)),
+                   ((VET_X + 0.36, VET_Y - 0.36, Z_AZ + 2.24), (VET_X + 0.36, VET_Y + 0.36, Z_AZ + 2.24))),
+        # 7d : coudes écartés, mains de part et d'autre de la nuque — serrés, les
+        # avant-bras couvraient toute la tête.
+        ("D", 1, ((VET_X + 0.10, VET_Y - 0.62, Z_AZ + 2.80), (VET_X + 0.10, VET_Y + 0.62, Z_AZ + 2.80)),
+                  ((VET_X - 0.30, VET_Y - 0.17, Z_AZ + 3.30), (VET_X - 0.30, VET_Y + 0.17, Z_AZ + 3.30)))):
+    plan = proxies_du_plan(7, prise)
+    silhouette(f"KohenGadol_vet_{prise}", VET_X, VET_Y, Z_AZ, plan, KOHEN_GADOL, lacet=math.pi)
+    box(f"Drap_lin_{prise}", VET_X + cote_drap * 1.8, VET_X + cote_drap * 1.9, VET_Y - 3, VET_Y + 3,
+        Z_AZ, Z_AZ + 5, plan, MAT_LIN())
+    for cote, coude, main in zip("gd", coudes, mains):
+        cyl_between(f"KohenGadol_vet_{prise}_avantbras_{cote}", coude, main, 0.12, plan, MAT_LIN(), verts=10)
+        sphere(f"KohenGadol_vet_{prise}_main_{cote}", *main, 0.10, plan, MAT_LIN(), segs=8)
 
 # ----------------------------------------------------------------------------
 # 76 — FOULE DE YOM KIPPOUR
@@ -2165,9 +2386,26 @@ for vt in ('AgX', 'Filmic'):
         continue
 
 # ----------------------------------------------------------------------------
-# CAMÉRAS — 19 plans, timecodes indicatifs (à recaler sur l'audio réel)
+# CAMÉRAS — 20 plans, timecodes indicatifs (à recaler sur l'audio réel)
 #   (nom, durée s, focale mm, cam_debut, cam_fin, cible_debut, cible_fin)  — positions en amot
 # ----------------------------------------------------------------------------
+def orbite(cible, rayon, z, deg_debut, deg_fin, pas_deg=2):
+    """Points en amot d'un arc horizontal autour de cible : angle 0 = est, positif vers le nord."""
+    n = max(2, int(round(abs(deg_fin - deg_debut) / pas_deg)) + 1)
+    return [(cible[0] + rayon * math.cos(math.radians(a)),
+             cible[1] + rayon * math.sin(math.radians(a)), z)
+            for a in (deg_debut + (deg_fin - deg_debut) * i / (n - 1) for i in range(n))]
+
+# Le plan 1B tourne autour du Temple là où le plan 1 s'arrête : même cible, même
+# rayon (850 amot), même hauteur, donc sa première frame est la dernière du plan 1.
+# 30° vers le sud-est : la caméra quitte l'axe de la para (Middot 2:4) et découvre la
+# Stoa royale et le flanc sud de l'Azara, où le plan 2 va entrer.
+ORBITE_01B = orbite((-100, 0), 850, 105, 0, -30)
+
+# Une caméra dont le nom est dans TRAJECTOIRES suit le polygone donné (un keyframe par
+# point, à pas de temps constant) au lieu de la droite cam_debut → cam_fin.
+TRAJECTOIRES = {"CAM_01B_Orbite_SudEst": ORBITE_01B}
+
 SHOTS = [
     # Le recouvrement entre la frame de début et la frame de fin est mesuré par
     # beit_hamikdash_analyse_plans.py : c'est lui, et non la longueur de la course,
@@ -2189,6 +2427,7 @@ SHOTS = [
     # cadre : géométriquement exact, mais le Temple s'y perd. 85 mm le porte à 24 % et
     # garde les cours, la foule et la crête. Le plan 15 doit rester identique.
     ("CAM_01_Ouverture_MontOliviers", 12, 85, (1400, 0, 160), (750, 0, 105), (-100, 0, 40), (-100, 0, 40)),
+    ("CAM_01B_Orbite_SudEst", 12, 85, ORBITE_01B[0], ORBITE_01B[-1], (-100, 0, 40), (-100, 0, 40)),
     # Travelling dans la nef de la Stoa royale (colonnades y=-250 et y=-235) :
     # l'axe de l'allée est y=-242.5, tout autre y met une colonne en travers du cadre.
     # Les colonnes sont au pas de 10 depuis x = -202 : ouvrir à -190 collait la caméra
@@ -2212,7 +2451,12 @@ SHOTS = [
     # hauteur du cadre. Le « petit dans le cadre » du découpage n'est pas atteignable
     # dans une pièce de cette taille : à 20 mm, depuis l'angle sud-est, il en tient la
     # moitié — un plan moyen, avec la table en fuyante et deux murs.
-    ("CAM_03_Beit_Avtinas", 25, 20, (-9.5, -82.5, Z_AZ + 28.8), (-10.5, -81, Z_AZ + 28.8), (-12.5, -74.5, Z_AZ + 28.2), (-12.5, -74.5, Z_AZ + 28.2)),
+    # Course divisée par deux le 6/09. À 2,5 amot d'avance depuis 8,5, la table —
+    # à 4 amot de l'objectif — balayait le cadre : premier plan à x1,37 contre x1,22
+    # pour le mur du fond, et l'i2v amplifiait encore (x1,42 / x1,18 mesurés). Le plan
+    # perdait son sujet par la gauche. À 1,25 amot : x1,15 et x1,10, le même mouvement
+    # sans que rien ne sorte du cadre.
+    ("CAM_03_Beit_Avtinas", 25, 20, (-9.5, -82.5, Z_AZ + 28.8), (-10, -81.75, Z_AZ + 28.8), (-12.5, -74.5, Z_AZ + 28.2), (-12.5, -74.5, Z_AZ + 28.2)),
     # La grue partait du sol de l'Ezrat Nashim pour finir 22 amot plus haut en se
     # rapprochant de 30 : le dallage et la foule du premier plan quittaient le cadre
     # entièrement. Montée et approche réduites de moitié.
@@ -2232,7 +2476,17 @@ SHOTS = [
     # Le par est entre l'Oulam et le Mizbea'h (Yoma 3:8) : depuis le Doukhan, l'autel de
     # 10 amot le masque entièrement. Seule ligne de vue au sol : depuis le nord, au-dessus
     # des anneaux, en rasant l'angle nord-ouest de l'autel (-54, 7).
-    ("CAM_05_Doukhan_Taureau", 25, 40, (-38, 36, Z_AZ + 4), (-44, 33, Z_AZ + 4), (-61.5, 4, Z_AZ + 2.5), (-62.5, 4, Z_AZ + 2.5)),
+    ("CAM_05A_Doukhan_Taureau", 25, 40, (-38, 36, Z_AZ + 4), (-44, 33, Z_AZ + 4), (-61.5, 4, Z_AZ + 2.5), (-62.5, 4, Z_AZ + 2.5)),
+    # 5b : le Nom. Même lieu que le 5a, la caméra passe du nord au sud-est et descend à
+    # hauteur d'homme : l'autel ferme la droite du cadre, les douze marches montent à
+    # gauche, la cour file vers le nord au centre. Le Kohen Gadol est vu de dos, trois
+    # quarts droit — jamais de visage —, debout, les mains sur le par ; les cohanim
+    # tombent autour de lui à l'ouïe du Nom (Yoma 6:2) et lui seul reste debout (Rambam,
+    # Avodat Yom HaKippourim 2:7). Le poste est contraint : il n'y a que 5 amot entre le
+    # Kohen Gadol et le yesod (x -54), et le Kiyor est à (-59, -8) (Middot 3:6) — posée
+    # à (-56, -10) la caméra l'avait à 2 amot et un cohen debout en plein axe. Collée au
+    # yesod, à 3,8 amot de haut pour lire les corps au sol. Poussée d'une ama, cible fixe.
+    ("CAM_05B_Le_Nom", 15, 28, (-54.8, -7.5, Z_AZ + 3.8), (-55.2, -6.6, Z_AZ + 3.8), (-59.3, 2.5, Z_AZ + 2.0), (-59.3, 2.5, Z_AZ + 2.0)),
     # Le plan signature ne montrait pas son sujet. Posée à 6 amot au-dessus du sol de
     # l'Oulam, la caméra avait le Mizbea'h — 32 x 32 x 10, à 24 amot devant elle et à
     # cheval sur l'axe (y -25..7) — exactement en travers : la ligne de visée passait
@@ -2272,6 +2526,14 @@ SHOTS = [
     # ne donne aucune arête. C'est le cas de la Stoa du plan 2 : le rendu couleur ne
     # porte rien, la carte de profondeur si. Plan à styliser avec `--structure`.
     ("CAM_07B_Rampe", 12, 35, (-38, -62, Z_AZ + 3), (-38, -57, Z_AZ + 3), (-38, -28, Z_AZ + 9), (-38, -28, Z_AZ + 9)),
+    # 7c : le 'hoshen. De face, 40 mm, cadré sous le menton : à 1,6 ama le cadre fait
+    # 1,44 × 0,81 amot, du 'heshev au bas du cou — jamais le visage — et le 'hoshen
+    # (un zeret) en prend 35 % de large ; à 2,26 il n'en prenait que 25 % et restait un
+    # bijou. Poussée de 0,2 ama (×1,14) sur les douze pierres.
+    ("CAM_07C_Hoshen", 8, 40, (VET_X + 1.94, VET_Y, Z_AZ + 2.66), (VET_X + 1.74, VET_Y, Z_AZ + 2.66), (VET_X + 0.34, VET_Y, Z_AZ + 2.56), (VET_X + 0.34, VET_Y, Z_AZ + 2.56)),
+    # 7d : le tsits. De dos, 40 mm, sur la nuque : mitsnefet enroulée à plat, cordon de
+    # tekhelet noué, ses deux mains au nœud ; le drap de lin au fond. Même poussée.
+    ("CAM_07D_Tsits", 8, 40, (VET_X - 2.4, VET_Y, Z_AZ + 3.5), (VET_X - 2.1, VET_Y, Z_AZ + 3.5), (VET_X - 0.2, VET_Y, Z_AZ + 3.38), (VET_X - 0.2, VET_Y, Z_AZ + 3.38)),
     # 55 mm sur une cible à 7 amot finissait en aplat de parokhet. On monte les 12 marches
     # et on révèle l'ouverture de 20 x 40, les malterot et la vigne d'or.
     # La caméra divisait sa distance à la cible par 2,2 : à ce taux d'approche les deux
@@ -2342,9 +2604,10 @@ for (name, dur, focal, c0, c1, t0, t1) in SHOTS:
     con.track_axis = 'TRACK_NEGATIVE_Z'
     con.up_axis = 'UP_Y'
     # Keyframes de position (interpolation linéaire = mouvement constant)
-    for obj, p0, p1 in ((cam, c0, c1), (tgt, t0, t1)):
-        obj.location = tuple(m(c) for c in p0); obj.keyframe_insert("location", frame=f0)
-        obj.location = tuple(m(c) for c in p1); obj.keyframe_insert("location", frame=f1)
+    for obj, points in ((cam, TRAJECTOIRES.get(name, [c0, c1])), (tgt, [t0, t1])):
+        for i, p in enumerate(points):
+            obj.location = tuple(m(c) for c in p)
+            obj.keyframe_insert("location", frame=round(f0 + (f1 - f0) * i / (len(points) - 1)))
         for fc in fcurves_of(obj):
             for kp in fc.keyframe_points:
                 kp.interpolation = 'LINEAR'

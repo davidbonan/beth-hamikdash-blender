@@ -8,6 +8,7 @@ Bibliothèque standard uniquement — aucune installation.
 """
 
 import json
+import mimetypes
 import os
 import re
 import time
@@ -31,7 +32,7 @@ def texte_prompts():
         return fichier.read()
 
 
-PLANS = ("1", "2", "3", "4", "5", "6", "7a", "7b", "8", "9a", "9b", "10", "11", "12",
+PLANS = ("1", "1b", "2", "3", "4", "5a", "5b", "6", "7a", "7b", "7c", "7d", "8", "9a", "9b", "10", "11", "12",
          "13a", "13b", "14a", "14b", "15")
 
 
@@ -40,8 +41,10 @@ def numero_de_plan(valeur):
 
     Quatre plans se filment en deux prises — le tilt du 9, le panoramique du 7, la
     traversée de porte du 13, la grue du 14 : leurs deux bouts ne partagent pas assez
-    d'image pour qu'un i2v les relie (beit_hamikdash_analyse_plans.py). Le numéro nu
-    d'un plan coupé est refusé plutôt que deviné : « 9 » ne désigne plus rien.
+    d'image pour qu'un i2v les relie (beit_hamikdash_analyse_plans.py). Le 7 en a deux
+    de plus, 7c et 7d — le 'hoshen et le tsits, le revêtement des habits d'or — qui ne
+    sont pas des coupes mais des moments de plus, comme le 5b. Le numéro nu d'un plan coupé est refusé
+    plutôt que deviné : « 9 » ne désigne plus rien.
     """
     demande = valeur.strip().lower()
     if demande in PLANS:
@@ -89,8 +92,18 @@ def bloc_texte(texte, nom):
     return texte[titre.start():fin].strip()
 
 
+def figures_du_plan(texte, section):
+    """Bloc FIGURES commun, ou la ligne **Figures** du plan quand il en porte une.
+
+    La tenue vaut pour tout le film, à une exception près, écrite dans les plans qui
+    la portent : aux 7c et 7d le Cohen Gadol revêt les habits d'or (Yoma 7:3-5) là où
+    le bloc commun le veut en lin blanc. La ligne du plan remplace le bloc entier.
+    """
+    return champ(section, "Figures") or bloc_commun(texte, "FIGURES")
+
+
 def camera_du_plan(section):
-    trouve = re.search(r"\((?:[^)]*?)(CAM_\d{2}[AB]?)", section)
+    trouve = re.search(r"\((?:[^)]*?)(CAM_\d{2}[A-Z]?)", section)
     if not trouve:
         raise SystemExit("Identifiant CAM_xx absent de l'en-tête du plan")
     return trouve.group(1)
@@ -105,11 +118,11 @@ def negatif_du_plan(texte, section):
     return negatif
 
 
-def images_du_plan(camera, depart, fin):
+def images_du_plan(camera, depart, fin, avec_fin=True):
     depart = depart or os.path.join(DOSSIER_IMAGES, f"{camera}_debut.png")
-    fin = fin or os.path.join(DOSSIER_IMAGES, f"{camera}_fin.png")
+    fin = (fin or os.path.join(DOSSIER_IMAGES, f"{camera}_fin.png")) if avec_fin else None
     for chemin in (depart, fin):
-        if not os.path.exists(chemin):
+        if chemin and not os.path.exists(chemin):
             raise SystemExit(f"Image absente : {chemin}")
     return depart, fin
 
@@ -142,14 +155,20 @@ def appel(url, methode="GET", entetes=None, corps=None, brut=False):
 
 
 def televerse(chemin, cle):
-    """Met une image locale sur le CDN fal et renvoie son URL publique."""
+    """Met un fichier local sur le CDN fal et renvoie son URL publique.
+
+    Le CDN refuse le téléversement si le type déclaré ne correspond pas au contenu
+    (« Unsupported file format » sur un mp4 annoncé en image/png) : il se lit sur
+    l'extension, il ne se suppose pas.
+    """
+    type_mime = mimetypes.guess_type(chemin)[0] or "application/octet-stream"
     jeton = appel(URL_JETON, "POST",
                   {"Authorization": f"Key {cle}", "Content-Type": "application/json"},
                   b"{}")
     with open(chemin, "rb") as fichier:
         octets = fichier.read()
     reponse = appel(f"{jeton['base_url']}/files/upload", "POST",
-                    {"Authorization": f"Bearer {jeton['token']}", "Content-Type": "image/png"},
+                    {"Authorization": f"Bearer {jeton['token']}", "Content-Type": type_mime},
                     octets)
     return reponse["access_url"]
 

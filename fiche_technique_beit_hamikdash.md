@@ -15,7 +15,7 @@ Quand les sources divergent, la ligne retenue est indiquée ; à faire valider p
 | Orientation | Le Heikhal est à l'**ouest**, l'entrée principale à l'**est**. Le Cohen entre en marchant vers l'ouest. | Axe est-ouest = axe de la caméra pour le parcours du Cohen Gadol. |
 | Origine Blender | Coin sud-est du Heikhal (bâtiment) ou centre du Mizbea'h | Le Mizbea'h n'est pas centré sur l'axe du Heikhal : il est décalé de **9 amot vers le sud** (voir §5). Ne pas « corriger » cela. |
 | Portes du Heikhal | **Ouvertes**, battants rabattus dans l'embrasure de 6 amot, contre les jambages (`PORTES_HEIKHAL_OUVERTES = True`) | Elles sont ouvertes pendant l'avoda et fermées bouchent les plans 8, 9 et 13. Pivoter un battant autour de son centre ne l'ouvre pas : il traverse le mur. `False` pour la version fermée. |
-| Proxys de sujet | Kohanim (cylindre + sphère, 1,75 m), figures prosternées, par, ma'hta et kaf — **une collection par plan** : `75_Plan03`, `75_Plan05`, `75_Plan06`, `75_Plan10`, `75_Plan11`, `75_Plan12` | Volumes grossiers, sans ressemblance : ils donnent aux passes Depth/Normal une structure stable pour l'i2i. L'export ne montre que celle du plan rendu. Aucun personnage dans le Kodesh HaKodashim (§8e). |
+| Proxys de sujet | Kohanim (cylindre + sphère, 1,75 m), figures prosternées, par, ma'hta et kaf — **une collection par plan** : `75_Plan03`, `75_Plan05` (+ `75_Plan05A`, `75_Plan05B_debut`, `75_Plan05B_fin` : une prise ou une frame), `75_Plan06`, `75_Plan10`, `75_Plan11`, `75_Plan12` | Volumes grossiers, sans ressemblance : ils donnent aux passes Depth/Normal une structure stable pour l'i2i. L'export ne montre que celle du plan rendu. Aucun personnage dans le Kodesh HaKodashim (§8e). |
 | Collections | `00_HarHabayit`, `10_EzratNashim`, `20_Azara`, `30_Mizbeach`, `40_Ulam`, `50_Heikhal`, `60_KodeshHakodashim`, `65_Aron`, `70_Kelim`, `75_Plan..`, `76_Foule`, `77_Fumee`, `80_Lishkot`, `90_Cameras` | `65_Aron` : l'Arche, permanente comme les kelim, avec le biseau fin des orfèvreries (badim de 0,06 ama de rayon). |
 
 ---
@@ -249,7 +249,7 @@ l'ama du §0). 3 kabin = 4,14 l = 0,037 ama³.
 7. Kiyor et Beit HaMitba'haïm.
 8. Har HaBayit (500 × 500) et portiques en fond, Soreg et 'Heil.
 9. Caméras et trajets (voir le shot list) : position et cible keyframées, contrainte Track To, marqueur de timeline par plan.
-10. Proxys de sujet (une collection `75_PlanNN` par plan) là où le sujet n'est pas de l'architecture : par et kohanim (plan 5), figures prosternées (plan 6), Cohen Gadol et table (plan 3), Cohen Gadol, ma'hta et kaf (plans 10, 12), ma'hta seule (plan 11).
+10. Proxys de sujet (une collection `75_PlanNN` par plan) là où le sujet n'est pas de l'architecture : par et kohanim (plan 5a), kohanim debout puis prosternés autour du Cohen Gadol (plan 5b), figures prosternées (plan 6), Cohen Gadol et table (plan 3), Cohen Gadol, ma'hta et kaf (plans 10, 12), ma'hta seule (plan 11).
 11. **Planche de contrôle** : rendre la première et la dernière image des 15 caméras (`renders/planche/planche.html`) avant tout rendu définitif. Une caméra posée dans un solide ou finissant dans une surface ne se voit que là, jamais dans la table des caméras.
 
 ## 12. Où se tiennent les gens (peuple, Léviim, cohanim)
@@ -278,13 +278,15 @@ Les places ne sont pas un choix de mise en scène : la Mishna les donne, et l'ax
 
 **Les cohanim sont la seule exception** : eux seuls portent les *bigdei lavan*, lin blanc uni, et la coiffe de lin plate du service — ils officient, ils ne sont pas dans l'assemblée.
 
+**Le Cohen Gadol, en or, deux gros plans.** Le lin blanc est le vêtement du service intérieur (Lév. 16:4) ; les habits d'or se revêtent entre les immersions, derrière un drap de lin tendu entre lui et le peuple (*Yoma* 3:4, 3:6 ; 7:3), sur le toit du Beit HaParva (*Middot* 5:3). Les plans 7c et 7d le montrent ainsi, sur la parole « il revêtait les habits d'or », sans visage : le 'hoshen de face cadré sous le menton, le tsits noué à la nuque de dos — forme selon Rambam *Klei HaMikdash* 8–10 : me'il tout tekhelet sans manches, éphod et 'heshev tissés d'or, 'hoshen carré d'un zeret à douze pierres en quatre rangs (Ex. 28:17–20) lié à l'éphod par des cordons de tekhelet (Ex. 28:28), pierres de shoham aux épaules, mitsnefet enroulée à plat, tsits noué à la nuque. Ces deux plans portent leur propre ligne `**Figures**`, qui remplace le bloc commun ; tous les autres restent au lin blanc.
+
 Personne ne fait face à l'objectif : tout le monde est tourné vers le Heikhal, vu de dos.
 
 **Où la règle est appliquée.** Bloc **FIGURES** en tête de `prompts_par_plan.md`. Il est ajouté automatiquement, pour **tous** les plans :
 - aux prompts d'image — `lit_plan()` de `fal_image.py`, sur la variante « édition » comme sur la variante conditionnée ;
 - au prompt vidéo — `lit_plan()` de `fal_video.py`, à la suite de la ligne **Mouvement**. Sans cela l'i2v rhabillait les gens d'une image à l'autre et la règle ne tenait que sur la frame de départ.
 
-Modifier le bloc FIGURES, jamais les scripts.
+Modifier le bloc FIGURES, jamais les scripts ; un plan qui déroge écrit sa ligne `**Figures**`, lue par `figures_du_plan()` de `fal_commun.py` à la place du bloc.
 
 **Où les places sont contrôlées.** Le tableau ci-dessus est repris dans le bloc **CONTRÔLE AVANT VIDÉO** de `prompts_par_plan.md`, que `fal_video.py` affiche avant chaque génération : sans `--controle-fait`, aucun plan ne part. Le contrôle porte sur les deux frames stylisées (positions des objets contre le blockout, puis zone de chaque silhouette), et se repasse sur le mp4 — un modèle i2v fait marcher les figurants et leur fait franchir une frontière que la frame de départ respectait.
 

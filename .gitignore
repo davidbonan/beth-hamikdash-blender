@@ -4,3 +4,10 @@ __pycache__/
 .DS_Store
 renders/
 shot_list_seder_haavodah.md
+
+# Montage et bande son — hors périmètre modélisation
+audio/
+montage_seder_haavodah.py
+sous_titres_seder_haavodah.py
+sous_titres_seder_haavodah.fr.srt
+piste_sous_titres_seder_haavodah.py

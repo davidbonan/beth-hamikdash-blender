@@ -40,7 +40,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from fal_commun import (DOSSIER_IMAGES, RACINE, bloc_commun, camera_du_plan, champ, cle_api,
+from fal_commun import (DOSSIER_IMAGES, RACINE, bloc_commun, camera_du_plan, figures_du_plan, champ, cle_api,
                         numero_de_plan,
                         genere, negatif_du_plan, section_plan, telecharge, televerse,
                         texte_prompts)
@@ -130,7 +130,8 @@ def images_entree(reg):
     les surfaces du blockout sont blanches et l'ambiante les met au même gris — la
     colonnade est invisible en couleur alors qu'elle est nette en profondeur.
     """
-    return [reg["couleur"], reg["profondeur"]] if reg["structure"] else [reg["couleur"]]
+    images = [reg["couleur"], reg["profondeur"]] if reg["structure"] else [reg["couleur"]]
+    return images + [reg["reference"]] if reg["reference"] else images
 
 
 def charge_nano(reg):
@@ -270,8 +271,9 @@ def lit_plan(plan, etiquette):
     # l'instruction, sinon le bloc NÉGATIF ne sert à rien.
     negatif = negatif_du_plan(texte, section)
     hors_scene = champ(section, f"Édition {etiquette}") or champ(section, "Édition")
-    # Qui est là et où : les deux blocs valent pour tout le film, pas pour un plan.
-    qui = f'{bloc_commun(texte, "FIGURES")} {bloc_commun(texte, "PLACES")}'
+    # Qui est là et où : les deux blocs valent pour tout le film ; seule la tenue
+    # peut être reprise par une ligne **Figures** du plan (figures_du_plan).
+    qui = f'{figures_du_plan(texte, section)} {bloc_commun(texte, "PLACES")}'
     # La contrainte d'un plan que le modèle lâche depuis le milieu de l'instruction
     # se remet ici, juste avant le CADRAGE, seule place où elle tient encore.
     finale = (champ(section, f"Édition finale {etiquette}")
@@ -292,6 +294,16 @@ PHRASE_STRUCTURE = (
     " and far in black. Read the geometry from it — every column, figure and edge is"
     " there — and light the scene yourself: the grey render carries the layout, not the"
     " light."
+)
+
+
+PHRASE_REFERENCE = (
+    " The last attached image is this very same Temple already painted at the same hour"
+    " from another angle, and it is the reference for every material: match its stone,"
+    " its gold ornaments, its curtain, its smoke, its sky, its light and the grain of its"
+    " crowds exactly, so that the two pictures read as two frames of one continuous shot."
+    " Take colours, textures and light from it — never its composition, which is the"
+    " first image's alone."
 )
 
 
@@ -320,6 +332,9 @@ def arguments():
     analyseur.add_argument("--union", default=UNION, help="poids du ControlNet Union (general-depth)")
     analyseur.add_argument("--structure", action="store_true",
                            help="joint la carte de profondeur en seconde image (rendu couleur sans relief)")
+    analyseur.add_argument("--reference",
+                           help="frame stylisée déjà validée d'un plan voisin, jointe en dernière image : "
+                                "le modèle y prend la matière, pas la composition")
     analyseur.add_argument("--sortie", default=DOSSIER_SORTIE)
     analyseur.add_argument("--simulation", action="store_true", help="affiche la charge utile sans générer")
     return analyseur.parse_args()
@@ -332,6 +347,8 @@ def main():
     prompt = prompts[modele.get("prompt", "image")]
     if args.structure:
         prompt += PHRASE_STRUCTURE
+    if args.reference:
+        prompt += PHRASE_REFERENCE
     force = args.force if args.force is not None else force_plan
     seed = args.seed if args.seed is not None else random.randint(1, 2**31 - 1)
     couleur, profondeur = images_de_frame(camera, args.frame)
@@ -345,7 +362,8 @@ def main():
     reglages = {"prompt": prompt, "negatif": negatif, "force": force, "seed": seed,
                 "etapes": args.etapes, "guidage": args.guidage,
                 "couleur": "<couleur>", "profondeur": "<profondeur>", "controle": args.controle[0],
-                "union": args.union, "structure": args.structure}
+                "union": args.union, "structure": args.structure,
+                "reference": "<reference>" if args.reference else None}
 
     if args.simulation:
         print(json.dumps(modele["charge"](reglages), indent=2, ensure_ascii=False))
@@ -354,12 +372,15 @@ def main():
     cle = cle_api()
     reglages["couleur"] = televerse(couleur, cle)
     reglages["profondeur"] = televerse(profondeur, cle)
+    if args.reference:
+        reglages["reference"] = televerse(args.reference, cle)
     for controle in args.controle:
         reglages["controle"] = controle
         resultat = genere(modele["endpoint"], modele["charge"](reglages), cle)
         if not resultat.get("images"):
             raise SystemExit(f"Réponse sans image : {json.dumps(resultat, ensure_ascii=False)[:400]}")
-        nom = f"{camera}_{args.frame}_{args.modele}_c{controle:.2f}_g{args.guidage:g}_seed{seed}.png"
+        nom = (f"{camera}_{args.frame}_{args.modele}{'_ref' if args.reference else ''}"
+               f"_c{controle:.2f}_g{args.guidage:g}_seed{seed}.png")
         print(telecharge(resultat["images"][0]["url"], os.path.join(args.sortie, nom)), flush=True)
 
 

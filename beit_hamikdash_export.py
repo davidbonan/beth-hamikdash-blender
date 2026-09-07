@@ -1,6 +1,6 @@
 """Exporte les images clés des plans : planche de contrôle, ou fichiers de production.
 
-    # planche de contrôle des 19 plans, 640 x 360 + index HTML
+    # planche de contrôle des 20 plans, 640 x 360 + index HTML
     /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend \
         -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py -- --planche
 
@@ -30,15 +30,16 @@ Rejouable : le script reconstruit ses groupes de compositing et remesure les pla
 
 import math
 import os
+import re
 import sys
 
 import bpy
 import numpy as np
 
 CAMERAS = (
-    "CAM_01_Ouverture_MontOliviers", "CAM_02_Portique_Sud", "CAM_03_Beit_Avtinas",
-    "CAM_04_Grue_EzratNashim", "CAM_05_Doukhan_Taureau", "CAM_06_Prosternation",
-    "CAM_07A_Beit_Mitbachaim", "CAM_07B_Rampe", "CAM_08_Ulam",
+    "CAM_01_Ouverture_MontOliviers", "CAM_01B_Orbite_SudEst", "CAM_02_Portique_Sud", "CAM_03_Beit_Avtinas",
+    "CAM_04_Grue_EzratNashim", "CAM_05A_Doukhan_Taureau", "CAM_05B_Le_Nom", "CAM_06_Prosternation",
+    "CAM_07A_Beit_Mitbachaim", "CAM_07B_Rampe", "CAM_07C_Hoshen", "CAM_07D_Tsits", "CAM_08_Ulam",
     "CAM_09A_Heikhal_Kelim", "CAM_09B_Heikhal_Parokhet", "CAM_10_Mains_Machta",
     "CAM_11_Kodesh_HaKodashim", "CAM_12_Entre_Parokhot",
     "CAM_13A_Retour_Heikhal", "CAM_13B_Retour_Oulam",
@@ -74,14 +75,24 @@ def cameras_demandees(args):
 
 # --- visibilité par plan ------------------------------------------------------
 
-def numero_du_plan(nom):
-    """CAM_07A_Beit_Mitbachaim -> 7. Les moitiés d'un plan coupé partagent son numéro."""
-    return int(nom.split("_")[1][:2])
-
-
 def prefixe_du_plan(nom):
     """CAM_07A_Beit_Mitbachaim -> CAM_07A. C'est le nom des fichiers du plan."""
     return "_".join(nom.split("_")[:2])
+
+
+SUJET = re.compile(r"^75_Plan(\d{2})([A-Z]?)(?:_(debut|fin))?$")
+
+
+def est_sujet_de(nom_collection, nom_camera, etiquette):
+    """75_Plan05 sert aux deux prises et aux deux frames du plan 5 ; 75_Plan05A à la
+    seule prise 5a ; 75_Plan05B_fin à la seule frame de fin de la prise 5b."""
+    trouve = SUJET.match(nom_collection)
+    if not trouve:
+        return False
+    numero, lettre, frame = trouve.groups()
+    prise = prefixe_du_plan(nom_camera).removeprefix("CAM_")
+    return (numero == prise[:2] and lettre in ("", prise[2:])
+            and frame in (None, etiquette))
 
 
 def masquer(nom_collection, cacher):
@@ -90,18 +101,17 @@ def masquer(nom_collection, cacher):
         collection.hide_render = cacher
 
 
-def montrer_le_sujet(nom):
-    """Ne laisse visibles que les proxys du plan rendu.
+def montrer_le_sujet(nom, etiquette):
+    """Ne laisse visibles que les proxys du plan rendu, à la frame rendue.
 
     Un sujet qui traîne dans le cadre d'un autre plan devient un objet inventé : la
     silhouette du plan 12, restée devant la parokhet, est ressortie en second
     candélabre au fond du Heikhal. La foule, elle, est l'état permanent du jour et
     reste en place — Léviim du Doukhan compris.
     """
-    propre = f"75_Plan{numero_du_plan(nom):02d}"
     for collection in bpy.data.collections:
         if collection.name.startswith("75_Plan"):
-            collection.hide_render = collection.name != propre
+            collection.hide_render = not est_sujet_de(collection.name, nom, etiquette)
     masquer("76_Foule", nom in SANS_FOULE)
 
 
@@ -284,7 +294,7 @@ def ligne_de_plan(nom):
 def exporter_planche(scene, dossier, noms):
     """Couleur seule, en 640 x 360, plus l'index HTML qui les met côte à côte.
 
-    L'index liste toujours les dix-neuf plans, même quand on n'en re-rend qu'un :
+    L'index liste toujours les vingt plans, même quand on n'en re-rend qu'un :
     une planche amputée de seize lignes n'est plus une planche de contrôle.
     """
     os.makedirs(dossier, exist_ok=True)
@@ -294,9 +304,9 @@ def exporter_planche(scene, dossier, noms):
     for nom in noms:
         cam = bpy.data.objects[nom]
         scene.camera = cam
-        montrer_le_sujet(nom)
         prefixe = prefixe_du_plan(nom)
         for etiquette, frame in frames_cles(cam):
+            montrer_le_sujet(nom, etiquette)
             scene.frame_set(frame)
             rendre(scene, couleur, transformation,
                    os.path.join(dossier, f"{prefixe}_{etiquette}.png"))
@@ -316,9 +326,9 @@ def exporter_production(scene, dossier, noms):
     for nom in noms:
         cam = bpy.data.objects[nom]
         scene.camera = cam
-        montrer_le_sujet(nom)
         prefixe = prefixe_du_plan(nom)
         for etiquette, frame in frames_cles(cam):
+            montrer_le_sujet(nom, etiquette)
             scene.frame_set(frame)
             proche, lointain = plage_z(scene, mesure)
             cam[f"profondeur_{etiquette}"] = (proche, lointain)

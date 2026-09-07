@@ -199,9 +199,11 @@ def montrer_camera(scene, cam):
           f"champ {h:.1f}° × {v:.1f}°", flush=True)
     print(f"  frames {f0}..{f1} = {cam['duree_s']:.0f} s à {scene.render.fps} fps",
           flush=True)
-    sujet = bpy.data.collections.get(f"75_Plan{int(cam.name.split('_')[1][:2]):02d}")
+    prise = cam.name.split("_")[1]
+    sujets = [c for c in bpy.data.collections
+              if re.match(rf"^75_Plan{prise[:2]}(?:{prise[2:]})?(?:_debut|_fin)?$", c.name)]
     print(f"  proxys de sujet : "
-          + (f"{sujet.name}, {len(sujet.objects)} objets" if sujet
+          + (", ".join(f"{c.name} ({len(c.objects)} objets)" for c in sujets) if sujets
              else "aucune collection 75_Plan pour ce plan") + "\n", flush=True)
     print(f"  {'':<7} {'caméra (amot)':>26}   {'cible (amot)':>26}", flush=True)
     poses = []
