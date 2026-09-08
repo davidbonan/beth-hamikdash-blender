@@ -54,7 +54,6 @@ Trois niveaux, à ne jamais mélanger dans une réponse.
 
 | Fichier | Ce qu'il contient |
 |---|---|
-| `fiche_technique_beit_hamikdash.md` | la ligne **retenue** pour le film : cotes, matériaux, divergences arbitrées, §9 les erreurs à ne pas filmer, §12 qui se tient où |
-| `shot_list_seder_haavodah.md` | découpage des plans et ce que chaque caméra montre |
-| `prompts_par_plan.md` | la description visuelle validée de chaque plan |
+| `fiche_technique_beit_hamikdash.md` | la ligne **retenue** : cotes, matériaux, divergences arbitrées, §9 les erreurs à ne pas filmer, §12 qui se tient où |
+| `cameras.json` | les plans déclarés : focale, durée, course de la caméra et de sa cible |
 | `beit_hamikdash_blockout.py` | la géométrie réellement construite — l'état de vérité de la 3D |

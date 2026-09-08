@@ -14,9 +14,8 @@ Quand les sources divergent, la ligne retenue est indiquée ; à faire valider p
 | Conversion | **1 ama = 0,48 m** (Rav 'Haïm Naeh) — **gelée** | Alternatives écartées : 0,525 m (Ritmeyer, archéologie), 0,576 m (Hazon Ish). La valeur ne change aucun cadrage : toute la géométrie passe par `m()` et la perspective est invariante d'échelle. Elle ne touche que deux choses, à re-dériver ensemble si elle bougeait un jour — `H_HOMME = 3.65` (l'homme est défini en mètres, 1,75 m ÷ 0,48) et les trois lampes ponctuelles en watts (ma'arakha 1500, flammes de la Menora 15, ma'hta 8 ; l'éclairement varie en 1/ama², le soleil en W/m² est invariant). À l'image, la seule différence est la taille d'un homme contre le bâtiment : 3,65 % de la façade de 100 amot ici, 3,04 % à 0,576 — et le plan 6 n'a pas besoin d'une foule 20 % plus petite. |
 | Orientation | Le Heikhal est à l'**ouest**, l'entrée principale à l'**est**. Le Cohen entre en marchant vers l'ouest. | Axe est-ouest = axe de la caméra pour le parcours du Cohen Gadol. |
 | Origine Blender | Coin sud-est du Heikhal (bâtiment) ou centre du Mizbea'h | Le Mizbea'h n'est pas centré sur l'axe du Heikhal : il est décalé de **9 amot vers le sud** (voir §5). Ne pas « corriger » cela. |
-| Portes du Heikhal | **Ouvertes**, battants rabattus dans l'embrasure de 6 amot, contre les jambages (`PORTES_HEIKHAL_OUVERTES = True`) | Elles sont ouvertes pendant l'avoda et fermées bouchent les plans 8, 9 et 13. Pivoter un battant autour de son centre ne l'ouvre pas : il traverse le mur. `False` pour la version fermée. |
-| Proxys de sujet | Kohanim (cylindre + sphère, 1,75 m), figures prosternées, par, ma'hta et kaf — **une collection par plan** : `75_Plan03`, `75_Plan05` (+ `75_Plan05A`, `75_Plan05B_debut`, `75_Plan05B_fin` : une prise ou une frame), `75_Plan06`, `75_Plan10`, `75_Plan11`, `75_Plan12` | Volumes grossiers, sans ressemblance : ils donnent aux passes Depth/Normal une structure stable pour l'i2i. L'export ne montre que celle du plan rendu. Aucun personnage dans le Kodesh HaKodashim (§8e). |
-| Collections | `00_HarHabayit`, `10_EzratNashim`, `20_Azara`, `30_Mizbeach`, `40_Ulam`, `50_Heikhal`, `60_KodeshHakodashim`, `65_Aron`, `70_Kelim`, `75_Plan..`, `76_Foule`, `77_Fumee`, `80_Lishkot`, `90_Cameras` | `65_Aron` : l'Arche, permanente comme les kelim, avec le biseau fin des orfèvreries (badim de 0,06 ama de rayon). |
+| Portes du Heikhal | **Ouvertes**, battants rabattus dans l'embrasure de 6 amot, contre les jambages (`PORTES_HEIKHAL_OUVERTES = True`) | Elles sont ouvertes pendant l'avoda et, fermées, bouchent l'axe est-ouest. Pivoter un battant autour de son centre ne l'ouvre pas : il traverse le mur. `False` pour la version fermée. |
+| Collections | `00_HarHabayit`, `10_EzratNashim`, `20_Azara`, `30_Mizbeach`, `40_Ulam`, `50_Heikhal`, `60_KodeshHakodashim`, `65_Aron`, `70_Kelim`, `76_Foule`, `77_Fumee`, `80_Lishkot`, `90_Cameras` | `65_Aron` : l'Arche, permanente comme les kelim, avec le biseau fin des orfèvreries (badim de 0,06 ama de rayon). |
 
 ---
 
@@ -248,9 +247,8 @@ l'ama du §0). 3 kabin = 4,14 l = 0,037 ama³.
 6. Murs de l'Azara avec les 7 portes (10 × 20), **dans l'ordre d'ouest en est** (§5) : au sud Delek, Bekhorot, **Mayim** ; au nord Nitzotz, Korban, **Beit HaMoked**. Trois **corps de porte** de 20 amot de large débordant de 12 : Sha'ar HaMayim (aliyah = Beit Avtinas) et Sha'ar HaNitzotz (aliyah = Beit HaNitzotz, *Middot* 1:5) au droit de leur porte, le Beit HaMoked à cheval sur le mur. La Lishkat Parhedrin contre le corps de Sha'ar HaMayim, la Lishkat HaGazit à cheval sur le mur nord. Dans l'Ezrat Israël, les deux lishkot de Sha'ar Nikanor (Pin'has HaMalbish, Osei 'Havitin — *Middot* 1:4).
 7. Kiyor et Beit HaMitba'haïm.
 8. Har HaBayit (500 × 500) et portiques en fond, Soreg et 'Heil.
-9. Caméras et trajets (voir le shot list) : position et cible keyframées, contrainte Track To, marqueur de timeline par plan.
-10. Proxys de sujet (une collection `75_PlanNN` par plan) là où le sujet n'est pas de l'architecture : par et kohanim (plan 5a), kohanim debout puis prosternés autour du Cohen Gadol (plan 5b), figures prosternées (plan 6), Cohen Gadol et table (plan 3), Cohen Gadol, ma'hta et kaf (plans 10, 12), ma'hta seule (plan 11).
-11. **Planche de contrôle** : rendre la première et la dernière image des 15 caméras (`renders/planche/planche.html`) avant tout rendu définitif. Une caméra posée dans un solide ou finissant dans une surface ne se voit que là, jamais dans la table des caméras.
+9. Caméras : déclarées dans `cameras.json`, posées par `beit_hamikdash_cameras.py` — position et cible keyframées, contrainte Track To, marqueur de timeline par plan.
+10. **Planche de contrôle** : rendre la première et la dernière image de chaque caméra (`renders/planche/planche.html`) avant tout rendu définitif. Une caméra posée dans un solide ou finissant dans une surface ne se voit que là, jamais dans la table des caméras.
 
 ## 12. Où se tiennent les gens (peuple, Léviim, cohanim)
 
@@ -282,12 +280,8 @@ Les places ne sont pas un choix de mise en scène : la Mishna les donne, et l'ax
 
 Personne ne fait face à l'objectif : tout le monde est tourné vers le Heikhal, vu de dos.
 
-**Où la règle est appliquée.** Bloc **FIGURES** en tête de `prompts_par_plan.md`. Il est ajouté automatiquement, pour **tous** les plans :
-- aux prompts d'image — `lit_plan()` de `fal_image.py`, sur la variante « édition » comme sur la variante conditionnée ;
-- au prompt vidéo — `lit_plan()` de `fal_video.py`, à la suite de la ligne **Mouvement**. Sans cela l'i2v rhabillait les gens d'une image à l'autre et la règle ne tenait que sur la frame de départ.
+**Où la règle est appliquée.** Dans le prompt d'édition de chaque frame, qui nomme la tenue des figures que la caméra voit — et dans celui-là seul : donnée au prompt vidéo, la même description fait *naître* des figures chez les modèles i2v sans prompt négatif (skill `fal-video`).
 
-Modifier le bloc FIGURES, jamais les scripts ; un plan qui déroge écrit sa ligne `**Figures**`, lue par `figures_du_plan()` de `fal_commun.py` à la place du bloc.
+**Où les places sont contrôlées.** Sur les deux frames stylisées, avant toute génération vidéo, puis sur le mp4 : l'i2v n'a aucun plan de correction, et une silhouette posée dans une zone qui lui est fermée se met à y marcher (skill `fal-video`).
 
-**Où les places sont contrôlées.** Le tableau ci-dessus est repris dans le bloc **CONTRÔLE AVANT VIDÉO** de `prompts_par_plan.md`, que `fal_video.py` affiche avant chaque génération : sans `--controle-fait`, aucun plan ne part. Le contrôle porte sur les deux frames stylisées (positions des objets contre le blockout, puis zone de chaque silhouette), et se repasse sur le mp4 — un modèle i2v fait marcher les figurants et leur fait franchir une frontière que la frame de départ respectait.
-
-**Dans le blockout.** Collection `76_Foule`, distincte des collections de sujet `75_PlanNN` : un proxy est le sujet d'un plan, la foule est l'état permanent du jour — **les douze Léviim du Doukhan en font partie**, ils ne sont le sujet d'aucun plan et disparaissaient du Doukhan quand un plan masquait les sujets d'un autre. Silhouettes individuelles dans l'Ezrat Israël et l'Ezrat Cohanim (les caméras s'en approchent), en trois tenues — talith rabattu ou tête nue pour le peuple, robe de lin **et instrument** pour les Léviim (neuf kinorot, deux nevalim, un tziltzal : *Arakhin* 2:5, 2:3 ; *Tamid* 7:3 ; les ketanim chantent sans instrument, *Arakhin* 2:6), lin, coiffe plate et avnet pour les cohanim ; blocs de 5 amot à hauteur d'homme dans l'Ezrat Nashim et sur le Har HaBayit, où une foule de Kippour se compte en milliers. Le plan 6 masque `76_Foule` et garde ses propres figures prosternées.
+**Dans le blockout.** Collection `76_Foule` (`FOULE = True`) : la foule est l'état permanent du jour — **les douze Léviim du Doukhan en font partie**, postés du matin au soir et sujets d'aucun plan.

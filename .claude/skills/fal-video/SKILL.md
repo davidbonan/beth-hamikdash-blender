@@ -1,65 +1,66 @@
 ---
 name: fal-video
-description: Génère les images clés stylisées et le plan vidéo du film sur fal.ai (édition du blockout par IA, puis image-to-video première + dernière frame) en ligne de commande, sans passer par le site fal.ai. À utiliser dès qu'il faut styliser une frame clé, animer un plan, relancer une génération, changer de modèle ou récupérer un mp4 — « stylise le plan 9 », « génère le plan 9 », « anime CAM_08 », « refais le plan 12 en kling ».
+description: Génère l'image clé stylisée puis le plan vidéo sur fal.ai (édition IA du rendu Blender, puis image-to-video première + dernière frame) en ligne de commande, sans passer par le site fal.ai. À utiliser dès qu'il faut styliser une frame clé, animer un plan, relancer une génération, changer de modèle ou récupérer un mp4 — « stylise ce plan », « génère les deux frames », « anime CAM_03 », « refais-le en kling », « combien ça coûte ».
 ---
 
 # Génération fal.ai
 
-Deux scripts, deux étapes du pipeline (README) :
+Deux scripts, deux étapes du pipeline :
 
-| Script | Étape | Sortie |
-|---|---|---|
-| `fal_image.py` | 2 — images clés stylisées à partir du blockout | `renders/style/` |
-| `fal_video.py` | 4 — image-to-video première + dernière frame | `renders/video/` |
+| Script | Étape | Entrée | Sortie |
+|---|---|---|---|
+| `fal_image.py` | stylise une frame clé | `renders/blockout/` | `renders/style/` |
+| `fal_video.py` | relie deux frames en vidéo | `renders/style/` | `renders/video/` |
 
-La plomberie commune (clé API, téléversement CDN, file d'attente, lecture de
-`prompts_par_plan.md`) est dans `fal_commun.py`.
+Les entrées viennent du skill **camera**, qui pose le plan et exporte
+`renders/blockout/<caméra>_{debut,fin}.png` et leurs `_profondeur.png`.
+La plomberie commune — clé API, téléversement CDN, file d'attente — est dans
+`fal_commun.py`.
 
-**Toujours passer `--simulation` d'abord** pour relire le prompt et le coût avant
-de payer une génération.
+**Toujours passer `--simulation` d'abord** pour relire le prompt et le coût avant de
+payer une génération.
 
 ## Images clés
 
 ```bash
-python3 .claude/skills/fal-video/fal_image.py --plan 9a --frame debut --seed 90901
-python3 .claude/skills/fal-video/fal_image.py --plan 9a --frame fin --seed 90901
+python3 .claude/skills/fal-video/fal_image.py --camera CAM_03_Heikhal --frame debut \
+    --seed 30301 --prompt "..."
+python3 .claude/skills/fal-video/fal_image.py --camera CAM_03_Heikhal --frame fin \
+    --seed 30301 --prompt "..."
 ```
 
 | Option | Défaut | Effet |
 |---|---|---|
-| `--plan N` | requis | plan 1-15, lettre comprise pour un plan coupé (`9a`) ; détermine la caméra, le prompt et la force |
+| `--camera` | requis | nom de la caméra, tel qu'il est dans `cameras.json` |
 | `--frame debut\|fin` | `debut` | quelle frame clé styliser |
+| `--prompt` | requis | ce que le cadre doit devenir — voir « Écrire le prompt » |
 | `--modele` | `gpt2` | voir la table ci-dessous |
-| `--seed N` | tirée au hasard | **la même seed pour les deux frames d'un plan** ; à noter dans le journal |
+| `--seed N` | tirée au hasard | **la même seed pour les deux frames d'un plan** |
 | `--controle a b c` | `1.0` | poids du conditionnement des modèles `depth*` ; une valeur = une variante |
-| `--force` | ligne **Force** du plan | force i2i (`depth-i2i` uniquement) |
-| `--reference <png>` | — | frame stylisée **validée** d'un plan voisin, jointe en dernière image : le modèle y prend la matière, jamais la composition (plan 1b, raccordé au plan 1) |
+| `--force` | `0.85` | force i2i (`depth-i2i` uniquement) |
+| `--negatif` | vide | prompt négatif ; seul `general-depth` en tient compte |
+| `--structure` | absent | joint la carte de profondeur en seconde image |
+| `--reference <png>` | — | frame stylisée **validée** d'un plan voisin, jointe en dernière image : le modèle y prend la matière, jamais la composition |
 | `--etapes` / `--guidage` | 28 / 3.5 | `num_inference_steps`, `guidance_scale` (modèles Flux) |
-
-Entrées : `renders/blockout/CAM_xx_{debut,fin}.png` (rendu couleur) et `..._profondeur.png`
-(carte de profondeur), produits par `beit_hamikdash_export.py`.
-
-**Les plans coupés portent une lettre** : `--plan 9a`, `--plan 9b`, et de même pour
-7, 13 et 14. Le numéro nu d'un plan coupé est refusé plutôt que deviné.
 
 ### Deux familles de modèles, et pourquoi l'édition gagne
 
-**Édition** (`gpt2`, `nano-pro`, `nano2`, `seedream`, `seedream-lite`, `flux2-pro`) : le rendu Blender part en
-entrée avec une instruction « repeins sans rien déplacer » (bloc ÉDITION de
-`prompts_par_plan.md`). La géométrie de la Mishna est conservée par construction —
-c'est la seule famille qui passe le contrôle du plan 9.
+**Édition** (`gpt2`, `nano-pro`, `nano2`, `seedream`, `seedream-lite`, `flux2-pro`) :
+le rendu Blender part en entrée avec une instruction « repeins sans rien déplacer ».
+La géométrie de la Mishna est conservée par construction — c'est la seule famille qui
+passe un contrôle d'intérieur.
 
 **Conditionnement par la profondeur** (`depth`, `depth-i2i`, `pro-depth`, `canny`) :
-le modèle regénère l'image en suivant la carte de profondeur. Mesuré sur le plan 9 :
+le modèle regénère l'image en suivant la carte de profondeur. Mesuré dans le Heikhal :
 les ustensiles, trop petits et trop peu contrastés à 15-25 m, sont réinventés à chaque
 fois. À garder pour les plans de matière et de ciel, pas pour les plans contrôlés.
 
 | `--modele` | Endpoint | Prix | Mesuré |
 |---|---|---|---|
 | `gpt2` | `openai/gpt-image-2/edit` | ~0,08 $ (facturé au token, `quality: high`) | **retenu** : le meilleur verrou de cadrage des six. Sortie à l'aspect de l'entrée, 1920 × 1072 |
-| `nano-pro` | `fal-ai/nano-banana-pro/edit` | 0,15 $/image | second : tient les trois plans testés, mais invente une colonnade sur une façade plane. Sortie 2752 × 1536 |
-| `nano2` | `fal-ai/nano-banana-2/edit` | 0,08 $ | recompose : mur devenu pylône isolé au plan 4, **taureau supprimé** au plan 5 |
-| `seedream` | `bytedance/seedream/v5/pro/edit` | 0,0675 $ | visages de face au premier plan ; Oulam repeint en temple grec au plan 5 |
+| `nano-pro` | `fal-ai/nano-banana-pro/edit` | 0,15 $/image | second : tient les cadrages testés, mais invente une colonnade sur une façade plane. Sortie 2752 × 1536 |
+| `nano2` | `fal-ai/nano-banana-2/edit` | 0,08 $ | recompose : un mur devenu pylône isolé, un animal de premier plan **supprimé** |
+| `seedream` | `bytedance/seedream/v5/pro/edit` | 0,0675 $ | visages de face au premier plan ; l'Oulam repeint en temple grec |
 | `seedream-lite` | `fal-ai/bytedance/seedream/v5/lite/edit` | ~0,03 $ | keffiehs dans la foule, colonnade gréco-romaine inventée, le moins détaillé |
 | `flux2-pro` | `fal-ai/flux-2-pro/edit` | 0,03 $ | ramène le site actuel — tuiles rouges, paraboles, voitures — et vide les plans de toute figure |
 | `depth` | `fal-ai/flux-control-lora-depth` | ~0,04 $ | à `--controle 1.0` le style est là, la géométrie flotte ; 1.2 → granité doré ; 1.5 → bruit |
@@ -68,339 +69,235 @@ fois. À garder pour les plans de matière et de ciel, pas pour les plans contr�
 | `canny` | `fal-ai/flux-control-lora-canny` | ~0,04 $ | belle lumière, mobilier inventé, keruv figuré |
 | `general-depth` | `fal-ai/flux-general` + ControlNet Union | — | **indisponible** : « Could not load pipeline » sur 5 chemins de poids (InstantX, Shakker-Labs, jasperai, XLabs). Le compte ne charge pas de ControlNet externe |
 
-Les six lignes de la famille édition ont été mesurées ensemble sur les frames de début
-des plans 1, 4 et 5, à seed commune par plan ; les lignes `depth*` datent du plan 9.
-
 `gpt2` n'a **ni seed ni prompt négatif** : la seed passée est ignorée, elle ne sert
 qu'à nommer le fichier. Deux appels identiques ne donnent donc pas la même image, et
 la frame de fin d'un plan quasi immobile se **dérive** de la frame de début (voir plus
 bas) plutôt que de se regénérer.
 
-### Ce que le plan 1 a montré sur le cadrage
-
 Le verrou de cadrage est ce qui sépare les modèles, pas le rendu. Sur une façade
 **plane** dans le blockout, `gpt2` est le seul des six à la laisser plane : les autres
-y collent une colonnade à chapiteaux dorés. Même chose au plan 4, où le mur qui
-remplit le cadre reste un mur chez `gpt2` et devient un pylône isolé sur fond de ciel
-chez `nano2`.
+y collent une colonnade à chapiteaux dorés. En échange il sort en 1920 × 1072 quand
+`nano-pro` monte à 2752 × 1536 — sans importance, les modèles i2v rendent en 1080p.
 
-En échange, `gpt2` sort en 1920 × 1072 quand `nano-pro` monte à 2752 × 1536. Sans
-importance pour la suite : les modèles i2v rendent en 1080p.
+## Écrire le prompt d'édition
 
-### Trois pièges appris sur le plan 9
+Le prompt se donne en entier sur la ligne de commande. Aucun modèle d'édition ne
+prend de prompt négatif : les interdits se plient dans l'instruction
+(« Never show any of these: … »). Un prompt qui tient réunit, **dans cet ordre** :
 
-1. **Aucun modèle d'édition ne prend de prompt négatif.** Le script plie donc le bloc
-   NÉGATIF dans l'instruction (« Never show any of these: … »). Sans ça, les keruvim du
-   parokhet sortent en anges à visage humain.
-2. **Une frame dont le cadre ne montre plus la scène du plan a sa propre ligne
-   `**Prompt fin**`** dans `prompts_par_plan.md` (le tilt final du plan 9 ne montre que
-   le haut du rideau et le plafond). Décrire les kelim quand ils sont hors cadre revient
-   à demander au modèle de les réinventer : il refabrique la pièce entière.
-3. **Les proxys de sujet doivent sortir du cadre.** Une silhouette d'un autre plan qui
-   traîne au fond devient un second candélabre. Chaque plan a désormais sa collection
-   de sujet (`75_Plan09`, `75_Plan12`…) et `beit_hamikdash_export.py` ne laisse
-   visible que celle du plan qu'il rend. La foule, elle, reste : c'est l'état
-   permanent du jour, Léviim du Doukhan compris.
+1. **La consigne d'édition** — repeindre sans rien déplacer, sans rien ajouter, sans
+   recomposer le cadre.
+2. **Le style** — Temple debout, neuf et intact ; grand appareil hérodien en gros blocs
+   fraîchement taillés, face lisse à marge ciselée, assises de niveau, joints
+   filiformes ; ancrage « vraie photo 35 mm, jamais un rendu 3D ».
+3. **Ce que le cadre contient**, et lui seul.
+4. **Qui est là et où** — tenue et place des figures que la caméra voit.
+5. **Les interdits**, retournés en ancrages positifs quand c'est possible.
+6. **Le verrou de cadrage, en dernier.**
+
+L'ordre n'est pas cosmétique : une instruction longue dilue ce qu'elle porte au
+milieu. Mesuré — une clause de cadrage noyée à 2 500 caractères a donné un Sanctuaire
+décentré et deux fois trop gros ; la même remise en **dernière position**, précédée de
+« LAST AND MOST IMPORTANT, above every other instruction », a tenu. Une contrainte
+structurelle se met à la fin. Et une seule : mises au même endroit, la troisième se
+dilue à son tour.
+
+**Les ancrages positifs battent les négatifs.** Sur une esplanade, `minaret` était
+déjà dans les interdits et le modèle a quand même sorti un minaret à balcon, une
+façade à arcades et une barrière métallique. C'est la phrase positive qui a réglé le
+problème : « beyond the colonnade the esplanade stays bare pale pavement under open
+sky, nothing later than the Second Temple ever enters the frame ». Même chose sur une
+ligne de crête : « nothing breaks that skyline: no tower, spire, belfry, minaret, dome
+or pointed roof ».
+
+**Une consigne ne nomme que ce que la caméra voit.** Décrire une foule qu'un mur
+occulte, ou des ustensiles sortis du cadre, c'est demander au modèle de les inventer —
+et il refabrique la pièce entière. Avant d'écrire le prompt d'une frame, vérifier le
+cadre : `inspect.py -- --voit <plan> [debut|fin]` (skill **blender**).
 
 ## Quand le rendu couleur ne porte plus rien : `--structure`
 
-Dans un volume fermé — la Stoa du plan 2 — toutes les surfaces du blockout sont
-blanches et l'ambiante les met au même gris : la colonnade est **invisible** en couleur
-alors qu'elle est nette en profondeur. `--structure` joint la carte de profondeur en
-seconde image et dit au modèle d'y lire la géométrie et d'éclairer lui-même.
+Dans un volume fermé — une colonnade couverte, un couloir — toutes les surfaces du
+blockout sont blanches et l'ambiante les met au même gris : la structure est
+**invisible** en couleur alors qu'elle est nette en profondeur. `--structure` joint la
+carte de profondeur en seconde image et dit au modèle d'y lire la géométrie et
+d'éclairer lui-même. À réserver aux plans dont le rendu couleur est plat : en
+extérieur, le soleil sculpte déjà les masses.
 
-```bash
-python3 .claude/skills/fal-video/fal_image.py --plan 2 --frame debut --structure --seed 20201
-```
+## Trois leçons de géométrie qui ne se rattrapent pas au prompt
 
-À réserver aux plans dont le rendu couleur est plat. Les extérieurs (plans 1, 15) n'en
-ont pas besoin : le soleil y sculpte déjà les masses.
+### Ce que la caméra regarde doit exister dans la géométrie
 
-## Deux inventions à couper d'entrée
+Un gros plan sur deux mains, sans mains dans le blockout : trois seeds et **douze
+retouches** — dont six sur les mains seules — n'ont jamais rendu autre chose qu'une
+moufle lisse sans un doigt. Deux proxys de mains ajoutés à la scène (masse, quatre
+doigts, pouce) et les mains sont sorties **justes du premier coup, sans une retouche**.
 
-- **Le site actuel remonte.** Sur le plan 2, veo a fait apparaître un minaret à balcon,
-  une façade de mosquée à arcades, des silhouettes en vêtements modernes et une barrière
-  métallique — alors que `minaret` était déjà dans le NÉGATIF. Les modèles vidéo tiennent
-  mal les négatifs : il faut un **ancrage positif** (« beyond the colonnade the esplanade
-  stays bare pale pavement under open sky, nothing later than the Second Temple ever
-  enters the frame »). Le négatif commun a été complété, mais c'est la phrase positive
-  qui a réglé le problème.
-- **Les ornements inventés.** Bandeaux d'or à anneaux sur chaque fût de la Stoa, venus de
-  nulle part. Un négatif propre au plan suffit (`gold bands around the columns, bronze
-  rings or hooks on the columns`).
+Un modèle d'édition repeint ce qu'on lui donne ; il n'invente bien que ce qui est
+petit et vague. Le sujet d'un plan n'est ni l'un ni l'autre. Corollaire inverse :
+ajouter de la géométrie qu'aucune caméra ne voit ne corrige jamais un prompt.
 
-## Ce qu'un gros plan doit montrer se bâtit, il ne se prompte pas
+### Deux objets alignés sur l'axe de vue ne se séparent pas en les éloignant
 
-Le plan 10 est un gros plan sur les deux mains du Cohen Gadol, et le blockout n'en
-donnait aucune : les avant-bras s'arrêtaient net sur les ustensiles. Trois seeds et
-**douze retouches** — dont six sur les mains seules, en `masque` puis en `decoupe` —
-n'ont jamais rendu autre chose qu'une **moufle lisse sans un doigt**. Deux proxys de
-mains ajoutés au blockout (`main_poing`, `main_crochet` : masse, quatre doigts, pouce)
-et les deux mains sont sorties **justes du premier coup, sans une retouche**.
-
-La règle, qui prolonge celle de l'échelle des figures : **ce que la caméra regarde
-doit exister dans la géométrie**. Un modèle d'édition repeint ce qu'on lui donne ; il
-n'invente bien que ce qui est petit et vague. Le sujet d'un plan n'est ni l'un ni
-l'autre. Corollaire inverse, déjà connu : ajouter de la géométrie qu'aucune caméra ne
-voit ne corrige jamais un prompt.
-
-## Deux objets alignés sur l'axe de vue ne se séparent pas en les éloignant
-
-Toujours au plan 10. Le poing disparaissait derrière la vasque de la ma'hta ; la
-reculer le long de son manche — physiquement juste, c'est à cela que sert le manche
-long de *Yoma* 4:4 — n'y a rien changé. La caméra regardait **le long du manche**
-(produit scalaire −1,01 entre l'axe de vue et l'axe du manche) : la vasque se
+Un poing disparaissait derrière la vasque de l'ustensile qu'il tenait ; reculer la
+vasque le long de son manche n'y a rien changé. La caméra regardait **le long du
+manche** (produit scalaire −1,01 entre l'axe de vue et l'axe du manche) : la vasque se
 projetait sur le poing à toute distance. Seul l'**écart latéral** les a séparés.
 
 Avant de déplacer un objet qui en masque un autre, mesurer l'angle entre l'axe de vue
 et l'axe qui les joint. S'il est proche de 0, la distance ne sert à rien.
 
-## L'échelle des figures ne se devine pas
+### L'échelle des figures ne se devine pas
 
-Sur le plan 1, les six modèles ont peint la foule du premier plan à **60 px** de haut
-quand la géométrie en impose **14** — quatre fois trop grand, avec des maisons à toit
-plat deux fois plus petites que les hommes debout devant elles.
-
-La cause n'est pas le modèle, c'est une ligne `**Édition**` qui décrivait une foule
-**hors champ**. Le test qui tranche, et qu'il faut faire avant d'accuser un modèle :
+Sur un plan large, six modèles ont peint la foule du premier plan à **60 px** de haut
+quand la géométrie en imposait **14**, avec des maisons deux fois plus petites que les
+hommes debout devant elles. Le test qui tranche, avant d'accuser un modèle :
 
 ```bash
-# combien de figures ce plan voit-il vraiment, et sur combien de pixels
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule 1
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule <plan>
 ```
 
-Mesuré sur CAM_01 début, sur 1621 figures : **0 / 462** sur l'esplanade — le mur est
-du Har HaBayit les cache toutes —, 24/576 à l'Ezrat Nashim, 9/129 cohanim, 2/12
-Léviim. **35 figures visibles, médiane 12,4 px sur 1080.** À ce compte, le blockout
-ne porte aucune référence humaine lisible : tout ce que le modèle peint en foule est
-inventé, et il l'invente au cadrage photo. À comparer au plan 4 début, qui en voit 96
-à 190 px de médiane — et qui sort juste sans qu'on ait rien à lui dire.
+Mesuré sur ce plan large, sur 1 621 figures : **0 / 462** sur l'esplanade — le mur les
+cache toutes —, 24/576 à l'Ezrat Nashim, 9/129 cohanim, 2/12 Léviim. **35 figures
+visibles, médiane 12,4 px sur 1080.** À ce compte le blockout ne porte aucune
+référence humaine lisible : tout ce que le modèle peint en foule est inventé, et il
+l'invente au cadrage photo. Un plan qui en voit 96 à 190 px de médiane sort juste sans
+qu'on ait rien à lui dire.
 
-C'est la **médiane** qui compte, pas le maximum : à la fin du plan 4 la caméra
-traverse la foule de l'Ezrat Nashim et un bloc frôle l'objectif à 3 000 px.
+C'est la **médiane** qui compte, pas le maximum : une figure qui frôle l'objectif
+monte à 3 000 px et fausse tout.
 
-Deux règles en sortent :
-
-1. **Une ligne `**Édition**` ne nomme que ce que la caméra voit.** Décrire des blocs
-   de foule que le mur occulte, c'est demander une foule inventée — exactement le
-   piège déjà connu pour les kelim hors cadre du plan 9.
-2. **Là où le blockout ne donne pas l'échelle, il faut la dire en chiffres**, et dans
-   la ligne `**Édition finale**` où elle tient. Sur le plan 1 : « la façade fait
-   100 amot, un homme 3,65, donc un homme = 1/27 de la façade, et aucune figure ne
-   dépasse 1/60 de la hauteur d'image ». Après quoi les maisons du premier plan sont
-   ressorties à 50 px pour 50 px prédits.
-
-Corollaire pour le blockout : peupler l'esplanade n'aurait rien changé — le mur la
-cache. Ajouter de la géométrie qu'aucune caméra ne voit ne corrige jamais un prompt.
+Là où le blockout ne donne pas l'échelle, **la dire en chiffres**, et dans la dernière
+clause : « la façade fait 100 amot, un homme 3,65, donc un homme = 1/27 de la façade,
+et aucune figure ne dépasse 1/60 de la hauteur d'image ». Après quoi les maisons du
+premier plan sont ressorties à 50 px pour 50 px prédits.
 
 ## Deux frames, une seule image, ou une coupe
 
-`beit_hamikdash_analyse_plans.py` mesure, pour chaque plan, la part de la frame de
-fin **déjà visible au début** — ce qu'elle laisse de côté, le modèle doit l'inventer.
+`beit_hamikdash_analyse_plans.py` mesure, pour chaque plan, la part de la frame de fin
+**déjà visible au début** — ce qu'elle laisse de côté, le modèle doit l'inventer.
 Trois régimes, trois conduites :
 
-| Mesure | Plans | Conduite |
-|---|---|---|
-| **100 % / caméra fixe** | 6, 15 | **Une seule image + prompt de mouvement.** Deux frames identiques ne donnent rien à interpoler ; le modèle comble en inventant une dérive. Ce qui bouge est dans les corps, la fumée, les tissus — pas dans la caméra |
-| **couverture ≥ 40 %** | tous les autres | Deux frames. La frame de fin porte un contenu qu'on veut contrôler (le taureau, la vigne d'or, la porte de Nikanor) et qu'il ne faut pas laisser inventer |
-| **couverture < 40 %** | plus aucun | Le plan se coupe dans Blender, il ne se rattrape pas au prompt. C'est ce qui a donné 7a/7b, 9a/9b, 13a/13b, 14a/14b |
+| Mesure | Conduite |
+|---|---|
+| **100 % / caméra fixe** | **Une seule image + prompt de mouvement** (`--sans-fin`). Deux frames identiques ne donnent rien à interpoler ; le modèle comble en inventant une dérive. Ce qui bouge est dans les corps, la fumée, les tissus |
+| **couverture ≥ 40 %** | Deux frames. La frame de fin porte un contenu qu'on veut contrôler et qu'il ne faut pas laisser inventer |
+| **couverture < 40 %** | Le plan se coupe **dans Blender**, il ne se rattrape pas au prompt : deux caméras dans `cameras.json` au lieu d'une |
 
 Un travelling **avant** garde une couverture haute même quand plus une pierre n'est
 commune aux deux frames : l'image d'arrivée est l'agrandissement du centre de l'image
-de départ, ce qu'un i2v sait faire. Ce qui tue un plan n'est pas ce qui sort du
-cadre, c'est ce qui y entre sans avoir été annoncé — panoramique, relevé, grue qui
-franchit un mur.
+de départ, ce qu'un i2v sait faire. Ce qui tue un plan n'est pas ce qui sort du cadre,
+c'est ce qui y entre sans avoir été annoncé — panoramique, relevé, grue qui franchit
+un mur.
 
 ## Frame de fin : éditer ou dériver
 
 Deux éditions indépendantes de deux blockouts **quasi identiques** ne convergent pas :
-sur le plan 1, la façade est ressortie en marbre blanc au début et tout en or à la fin,
-avec la même seed et le même prompt. Le modèle n'a aucune mémoire d'un appel à l'autre.
+sur un plan large, la façade est ressortie en marbre blanc au début et tout en or à la
+fin, avec la même seed et le même prompt. Le modèle n'a aucune mémoire d'un appel à
+l'autre.
 
-- **Mouvement franc** (dolly + tilt du plan 9) : deux éditions ; la géométrie diffère
-  assez pour que chacune tienne debout.
-- **Quasi-immobile** (plan 1 : le blockout ne bougeait que de 5 % d'échelle) : **dériver**
-  la frame de fin de la frame de début validée, par zoom géométrique. Le facteur est le
+- **Mouvement franc** : deux éditions ; la géométrie diffère assez pour que chacune
+  tienne debout.
+- **Quasi-immobile** (moins de ~15 % d'échelle entre les deux frames) : **dériver** la
+  frame de fin de la frame de début validée, par zoom géométrique. Le facteur est le
   rapport des distances caméra → cible, et la continuité de matière est alors exacte.
 
 ```bash
 # facteur = |C_debut - cible| / |C_fin - cible|, ici 1,1768
 ffmpeg -i renders/style/CAM_01_debut_….png -vf "scale=3239:1808,crop=2752:1536" \
-       renders/style/CAM_01_fin_derive_dolly_seed10101.png
+       renders/style/CAM_01_fin_derive.png
 ```
 
 Corollaire : un travelling qui ne change pas l'échelle d'au moins ~15 % ne se **voit**
-pas sur 8 s. Sur le plan 1, les 8 frames extraites du premier essai étaient
-indistinguables ; corriger la course dans le blockout, pas au montage.
+pas sur 8 s. Corriger la course dans `cameras.json`, pas au montage.
 
 ## Vidéo
 
-### Le contrôle qui précède toute génération
-
-`fal_video.py` refuse de générer tant que `--controle-fait` n'est pas passé, et affiche
-d'abord le bloc **CONTRÔLE AVANT VIDÉO** de `prompts_par_plan.md` — deux passes sur les
-**deux frames stylisées** :
-
-1. **Positions** — frame stylisée à côté du blockout de la même caméra, objet par objet :
-   même place, même échelle, même orientation, même nombre, même cadrage.
-2. **Zones d'accès** (fiche technique §12) — pour chaque silhouette : a-t-elle le droit
-   d'être là ? Le peuple s'arrête aux 11 amot de l'Ezrat Israël, le Doukhan est aux
-   Léviim (douze au moins), l'Ezrat Cohanim et l'entre-Oulam-et-autel aux cohanim,
-   l'Oulam et le Heikhal sont **vides** à l'heure de l'encens, le Kodesh HaKodashim
-   n'a que le Cohen Gadol.
-
-La raison d'en faire un verrou et pas une consigne : l'i2v n'a aucun plan de correction,
-il amplifie la frame de départ. Un objet déplacé y reste huit secondes, et une silhouette
-posée dans une zone qui lui est fermée se met à y **marcher** (mesuré sur `seedance`, qui
-fait marcher la silhouette du plan 9). Ce qui est en défaut se reprend par ré-édition ou
-inpainting de la frame — jamais par un négatif ajouté au prompt vidéo, que les modèles
-i2v tiennent mal. `--simulation` affiche le bloc sans rien exiger.
-
 ```bash
-python3 .claude/skills/fal-video/fal_video.py --plan 9a --duree 8 --controle-fait \
-    --depart renders/style/CAM_09A_debut_nano-pro_c1.00_g3.5_seed90901.png \
-    --fin renders/style/CAM_09A_fin_nano-pro_c1.00_g3.5_seed90901.png
+python3 .claude/skills/fal-video/fal_video.py --camera CAM_03_Heikhal --duree 8 \
+    --depart renders/style/CAM_03_Heikhal_debut_gpt2_c1.00_g3.5_seed30301.png \
+    --fin    renders/style/CAM_03_Heikhal_fin_gpt2_c1.00_g3.5_seed30301.png \
+    --prompt "the camera glides slowly forward down the hall; nothing else moves"
 ```
 
 | Option | Défaut | Effet |
 |---|---|---|
-| `--plan N` | requis | plan 1-15, lettre comprise pour un plan coupé (`9a`) ; détermine la caméra, le prompt et les images |
+| `--camera` | requis | nom de la caméra ; sert aux chemins par défaut et au nom du mp4 |
+| `--prompt` | requis | **le mouvement de caméra, et lui seul** |
 | `--modele` | `veo-lite` | voir la table ci-dessous |
 | `--duree N` | max du modèle | secondes générées |
-| `--depart` / `--fin` | `renders/blockout/CAM_xx_{debut,fin}.png` | **pointer sur `renders/style/`** pour animer les frames stylisées |
-| `--prompt` | ligne **Mouvement** du plan | remplace le prompt de caméra |
+| `--depart` / `--fin` | `renders/blockout/<caméra>_{debut,fin}.png` | **pointer sur `renders/style/`** pour animer les frames stylisées |
+| `--negatif` | vide | pour les endpoints qui en prennent un |
+| `--sans-fin` | absent | n'impose aucune frame de fin (endpoints image-to-video seuls) |
 | `--seed N` | — | `veo*`, `seedance` |
-| `--controle-fait` | absent | atteste le contrôle positions + zones ; **sans lui, rien n'est généré** |
 
-| `--modele` | Endpoint | Durées | Prix (audio coupé) | Négatif | Mesuré sur le plan 9 |
+Le prompt i2v ne décrit **que la caméra**. Ce qui est dans le cadre est déjà dans les
+deux images ; le redécrire pousse le modèle à le réinventer, et sur les modèles sans
+prompt négatif à le **peupler**.
+
+### Le contrôle qui précède toute génération
+
+L'i2v n'a aucun plan de correction : il amplifie la frame de départ. Un objet déplacé
+y reste huit secondes, et une silhouette posée dans une zone qui lui est fermée se met
+à y **marcher**. Avant de payer, deux passes sur les **deux frames stylisées** :
+
+1. **Positions** — frame stylisée à côté du rendu Blender de la même caméra, objet par
+   objet : même place, même échelle, même orientation, même nombre, même cadrage.
+2. **Zones d'accès** (§12 de `fiche_technique_beit_hamikdash.md`) — pour chaque
+   silhouette : a-t-elle le droit d'être là ? Le peuple s'arrête aux 11 amot de
+   l'Ezrat Israël, le Doukhan est aux Léviim (douze au moins), l'Ezrat Cohanim et
+   l'entre-Oulam-et-autel aux cohanim, l'Oulam et le Heikhal sont **vides** à l'heure
+   de l'encens, le Kodesh HaKodashim n'a que le Cohen Gadol.
+
+Ce qui est en défaut se reprend par ré-édition ou par le skill **fal-retouche** —
+jamais par un négatif ajouté au prompt vidéo, que les modèles i2v tiennent mal.
+
+| `--modele` | Endpoint | Durées | Prix (audio coupé) | Négatif | Mesuré |
 |---|---|---|---|---|---|
-| `veo-lite` | `fal-ai/veo3.1/lite/first-last-frame-to-video` | **8 s seulement** | 0,05 $/s en 1080p | oui | **retenu** : dolly puis tilt exactement comme la ligne Mouvement, kelim qui sortent par le bas, rien d'autre ne bouge, 1920 × 1080 |
-| `flux3` | `blackforestlabs/flux-3/first-last-frame-to-video` | 5 à 20 s | 0,29 $/s en 1080p, 0,17 en 720p | non | propre, mais traverse la parokhet en gros plan au milieu du plan ; 3,6 × le prix de `veo-lite` |
-| `kling3` | `fal-ai/kling-video/v3/pro/image-to-video` | 3 à 15 s | 0,112 $/s | oui | **écarte les pans du rideau** — une action qui appartient au plan 12 ; sortie en 1928 × 1072 |
+| `veo-lite` | `fal-ai/veo3.1/lite/first-last-frame-to-video` | **8 s seulement** | 0,05 $/s en 1080p | oui | **retenu** : dolly puis tilt exactement comme demandé, rien d'autre ne bouge, 1920 × 1080 |
+| `flux3` | `blackforestlabs/flux-3/first-last-frame-to-video` | 5 à 20 s | 0,29 $/s en 1080p, 0,17 en 720p | non | propre, mais traverse un rideau en gros plan au milieu du plan ; 3,6 × le prix de `veo-lite` |
+| `kling3` | `fal-ai/kling-video/v3/pro/image-to-video` | 3 à 15 s | 0,112 $/s | oui | **écarte les pans d'un rideau** — une action que personne ne lui a demandée ; sortie en 1928 × 1072 |
 | `veo` | `fal-ai/veo3.1/fast/first-last-frame-to-video` | 4, 6, 8 s | 0,10 $/s | oui | même famille que `veo-lite` au double du prix |
 | `kling` | `fal-ai/kling-video/o1/image-to-video` | 3 à 10 s | 0,112 $/s | non | travelling le plus lent, architecture stable ; ajoute des flammes sur les portes |
-| `h3-turbo` | `minimax/h3-max-turbo/image-to-video` | 5 à 15 s | 0,04 $/s (768p) ; 0,025 en 480p | non | **768p maximum**, et le prompt complet (FIGURES + PLACES) lui fait **peupler le Heikhal** d'une foule de cohanim et d'endeuillés ; réduit à la seule ligne Mouvement il garde la salle vide mais **arrache la parokhet** et la fait battre au plafond vers 4,5 s |
-| `seedance` | `fal-ai/bytedance/seedance/v1.5/pro/image-to-video` | 4 à 12 s | 0,052 $/s (720p) | non | dolly propre mais **fait marcher** la silhouette : viole « nothing else moves » |
+| `h3-turbo` | `minimax/h3-max-turbo/image-to-video` | 5 à 15 s | 0,04 $/s (768p) ; 0,025 en 480p | non | **768p maximum**, lit le prompt comme un contenu à peindre : une salle vide se remplit de figures ; réduit au seul mouvement il **arrache le rideau** vers 4,5 s |
+| `seedance` | `fal-ai/bytedance/seedance/v1.5/pro/image-to-video` | 4 à 12 s | 0,052 $/s (720p) | non | dolly propre mais **fait marcher** les silhouettes : viole « nothing else moves » |
 | `veo-hq` | `fal-ai/veo3.1/first-last-frame-to-video` | 4, 6, 8 s | 0,20 $/s | oui | non testé |
-| `seedance2` | `bytedance/seedance-2.5/image-to-video` | 4 à 30 s | 0,473 $/s en 720p ; 0,2205 en 480p, 1,164 en 1080p | non | tient le plan 12 **une fois le prompt réécrit pour lui** (voir plus bas) ; dix fois `veo-lite` |
+| `seedance2` | `bytedance/seedance-2.5/image-to-video` | 4 à 30 s | 0,473 $/s en 720p ; 0,2205 en 480p, 1,164 en 1080p | non | tient un intérieur **une fois le prompt réécrit pour lui** ; dix fois `veo-lite` |
 
 Écarté aussi : `minimax/h3-max` (768p maximum, comme sa variante turbo).
 
-### Ce que `seedance2` a fait du plan 12
+### Les modèles sans prompt négatif se pilotent autrement
 
-Essai à 8 s, frame de début validée seule, `--sans-fin`, prompt par défaut (Mouvement +
-FIGURES + PLACES) : 3,78 $ pour une sortie **inutilisable**. Le « very slow dolly backward »
-recule d'un mur : à 4 s la caméra est **sortie** du Kodesh HaKodashim, à 8 s elle est
-dehors sur le parvis, à colonnade et plein soleil. Et comme MiniMax, le modèle lit
-FIGURES et PLACES comme un **contenu à peindre** — le plan qui doit montrer le Cohen
-Gadol **seul** finit avec des centaines de figures en talith agenouillées face au
-Sanctuaire. Sortie 1284 × 716 : l'aspect de l'entrée, pas les 1280 × 720 annoncés.
+Mesuré sur `seedance2`, 8 s, 3,78 $ pour une sortie **inutilisable** : « very slow
+dolly backward » a reculé de trente amot **à travers la pierre** — à 4 s la caméra
+était sortie de la chambre, à 8 s dehors au plein soleil — et le prompt de figures a
+été lu comme un contenu à peindre, remplissant d'agenouillés un plan qui devait
+montrer un homme seul. Même frame, même durée, même prix, **prompt réécrit** : la
+caméra est restée dans la chambre du premier au dernier plan. Le modèle n'était pas en
+cause.
 
-Second essai, même frame, même durée, même prix, **prompt réécrit** : la caméra reste
-dans la chambre, le mur d'or tient la gauche et le rideau la droite du premier au dernier
-plan, la silhouette ne bouge pas, aucune autre figure n'apparaît, la salle reste sombre.
-Le modèle n'est donc pas en cause — le prompt l'était.
-
-Trois règles en sortent, propres aux modèles **sans prompt négatif** :
-
-1. **Ne pas envoyer FIGURES + PLACES.** Ces blocs tiennent les gens à leur place chez veo
-   et les **font naître** chez seedance 2.5 comme chez MiniMax. Sur un plan qui ne montre
-   qu'une personne, passer `--prompt` avec la seule ligne Mouvement.
-2. **Borner la course de la caméra en distance, pas en adjectif.** « very slow dolly
-   backward » a reculé de trente amot à travers la pierre ; « a few centimetres only, the
-   camera stays inside this small dark chamber for the whole shot » a tenu.
+1. **Ne pas décrire les figures.** Ce qui tient les gens à leur place chez `veo` les
+   **fait naître** chez `seedance2` comme chez MiniMax.
+2. **Borner la course en distance, pas en adjectif.** « a few centimetres only, the
+   camera stays inside this small dark chamber for the whole shot » a tenu là où
+   « very slow » a traversé un mur.
 3. **Nommer ce qui doit rester dans le cadre**, mur par mur : « the hammered gold wall
    keeps filling the left, the woven curtain keeps filling the right ». Chaque interdit
-   se retourne en ancrage positif — « the room never opens onto a courtyard, a colonnade
-   or the sky » plutôt qu'un négatif que l'endpoint ne prend pas.
-
-Reste le prix, dix fois `veo-lite` pour huit secondes. Le modèle ne s'ouvre que si le film
-a besoin de ses 30 s d'un seul tenant.
-
-La famille MiniMax coûte cinq fois moins que `veo-lite` et monte à 15 s, mais aucune de ses
-sorties ne dépasse 768p et elle lit le prompt comme un **contenu à peindre**, pas comme une
-contrainte : les blocs FIGURES et PLACES, qui tiennent les gens à leur place chez veo, y font
-naître les gens eux-mêmes. Un modèle qui ne sait pas lire une interdiction ne peut pas porter
-les plans d'intérieur.
+   se retourne en ancrage positif.
 
 `kling3` et `flux3` montent à 15 et 20 s : de quoi couvrir un plan entier au lieu de
-générer 8 s et de ralentir au montage. Depuis le découpage en vingt-deux, les plans
-font 12 à 33 s et **onze d'entre eux tiennent en 15 s** — `kling3` les couvre d'une
-seule génération. Restent le 3, le 5, le 11, le 12 (25 s) et le 15 (33 s), à couvrir
-en ralenti ou en deux segments.
-
-## Règles qui valent pour tout le film
-
-Six blocs en tête de `prompts_par_plan.md`, injectés dans **chaque** plan par les deux
-scripts. Les modifier là, jamais dans le code.
-
-| Bloc | Ce qu'il tient | Injecté |
-|---|---|---|
-| **STYLE** | Temple debout, **neuf et intact**, et l'endroit **majestueux** : grand appareil hérodien en gros blocs fraîchement taillés, face lisse à marge ciselée, assises de niveau et joints filiformes, pierre propre — plus l'ancrage « vraie photo 35 mm, jamais un rendu 3D ». Ville alentour habitée | préfixe du prompt image (`STYLE +`) |
-| **FIGURES** | La **tenue**, trois classes : le **peuple** en tenue d'aujourd'hui (costume, redingote, kaftan, djellaba), les **Léviim** en lin blanc, les **cohanim et le Cohen Gadol** en bigdei lavan. Tête couverte par kippa, talith ou coiffe de lin — rien d'autre. Un plan qui déroge porte sa ligne `**Figures**`, qui remplace le bloc (7c et 7d : les huit vêtements d'or) | suffixe image **et** vidéo |
-| **PLACES** | **Qui se tient où** : peuple aux cours extérieures et aux 11 amot de l'Ezrat Israël, Léviim sur le Doukhan, cohanim à l'ouest de la marche, Oulam et Heikhal vides sauf le Cohen Gadol | suffixe image **et** vidéo |
-| **NÉGATIF** | Interdits : coupole, minaret, site actuel, ruines, tourisme | `negative_prompt` vidéo, replié dans l'instruction d'édition |
-| **ÉDITION** | Repeindre sans rien déplacer | préfixe de l'instruction d'édition |
-| **CADRAGE** | Verrou de cadre, **en dernier** | fin de l'instruction d'édition |
-
-`FIGURES` et `PLACES` vont aussi au prompt **vidéo** : sans eux l'i2v rhabille les gens
-et les fait franchir des frontières que la frame de départ respectait.
-
-Sur les extérieurs, deux ancrages **positifs** restent indispensables — les négatifs
-seuls n'ont jamais suffi : « nothing later than the Second Temple ever enters the frame »
-pour l'esplanade, et « nothing breaks that skyline: no tower, spire, belfry, minaret,
-dome or pointed roof » pour la crête, qui sinon ramène un minaret et le clocher de
-l'Ascension.
-
-## La contrainte qui ne tient qu'à la fin : `**Édition finale**`
-
-Le bloc `**Édition**` d'un plan est suivi de FIGURES, PLACES et de toute la liste des
-interdits : une consigne qui y est posée se retrouve à ~1 500 caractères de la fin et le
-modèle la lâche. Mesuré sur le plan 3 : la bande verticale du Sanctuaire vue par la
-fenêtre, décrite dans `**Édition**` comme « une face plane, aucune colonne, aucun
-chapiteau », ressortait avec une colonnade à chapiteaux dorés et une corniche à trois
-seeds de suite — le journal la portait déjà en réserve.
-
-La même phrase déplacée dans une ligne `**Édition finale**`, que le script injecte entre
-les interdits et le CADRAGE, tient du premier coup. À réserver à **une** contrainte par
-plan : mise au même endroit, la troisième se dilue à son tour.
-
-## Attention à la dilution
-
-L'instruction du plan 1 a atteint ~2 500 caractères à force d'ajouts, et le modèle a
-commencé à **lâcher la clause de cadrage** noyée au milieu : Heikhal décentré et deux
-fois trop gros. Remise en **dernière position**, précédée de « LAST AND MOST IMPORTANT,
-above every other instruction », elle a retenu. Une contrainte structurelle se met à la
-fin, pas au milieu.
-
-## D'où viennent les prompts
-
-`prompts_par_plan.md` est la seule source :
-
-- **prompt image** = bloc STYLE + ligne `**Prompt**` du plan (ou `**Prompt fin**` pour
-  la dernière frame quand elle existe) ;
-- **instruction d'édition** = bloc ÉDITION + le prompt image + le négatif en interdits ;
-- **prompt vidéo** = la ligne `**Mouvement**` du plan — jamais la ligne `**Prompt**`,
-  qui produirait des personnages difformes en i2v ;
-- **négatif** = bloc NÉGATIF commun + le `**Négatif**` propre au plan ;
-- **`**Figures**`** (facultatif) = remplace le bloc FIGURES pour ce seul plan (7c et 7d, habits d'or) ;
-- **`**Édition finale**`** (facultatif) = la contrainte du plan que le modèle lâche,
-  réinjectée **juste avant le CADRAGE** ;
-- **force i2i** = la ligne `**Force**` du plan ;
-- **caméra** = le `CAM_xx` de l'en-tête du plan.
-
-Modifier le markdown, pas les scripts.
+générer 8 s et de ralentir au montage.
 
 ## Après la génération
 
-1. Contrôle halakhique de l'image et du mp4 contre la §9 de
-   `fiche_technique_beit_hamikdash.md` — pour le plan 9 : 7 branches, Table à droite,
-   Menora à gauche, rideau du sol au plafond, aucune coupole, aucun visage.
-1. Repasser sur le mp4 les deux contrôles d'avant génération : un objet que le modèle a
-   fait dériver au fil du plan, et surtout une silhouette qui **remonte vers l'ouest** et
-   franchit une frontière que la frame de départ respectait.
-2. Remplir la ligne du plan dans le journal de production de `prompts_par_plan.md`
-   (seed, outil image, outil vidéo, force, version retenue).
+1. Contrôle contre la §9 de `fiche_technique_beit_hamikdash.md` — sept branches à la
+   Menora, Table au nord, rideau du sol au plafond, aucune coupole, aucun visage.
+2. Repasser sur le mp4 les deux contrôles d'avant génération : un objet que le modèle a
+   fait dériver au fil du plan, et surtout une silhouette qui franchit une frontière
+   que la frame de départ respectait.
+3. Noter la seed, le modèle image, le modèle vidéo et la version retenue — le script
+   les écrit dans le nom du fichier, c'est le seul journal qui ne se périme pas.
 
 ## Clé API
 

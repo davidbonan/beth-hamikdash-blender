@@ -1,6 +1,6 @@
 ---
 name: blender
-description: Pilote la scène Blender du film (blockout, export des images clés, inspection de la scène) en ligne de commande headless. À utiliser dès qu'il faut regénérer le blockout après avoir touché au script, exporter les frames ou la planche de contrôle, mesurer le recouvrement des plans, ou simplement répondre à une question sur la scène — « où est le Doukhan », « que voit la caméra du plan 9 », « la fenêtre du Beit Avtinas montre-t-elle la cour », « regénère la scène », « refais la planche », « exporte le plan 12 ».
+description: Pilote la scène Blender du Beit HaMikdash en ligne de commande headless — reconstruire le blockout après avoir touché au script, inspecter la scène, exporter la visite 3D. À utiliser dès qu'il faut regénérer la scène ou répondre à une question sur elle — « où est le Doukhan », « regénère la scène », « la fenêtre du Beit Avtinas montre-t-elle la cour », « quelle taille fait cet objet dans la scène », « refais la visite ». Pour poser une caméra et en exporter les images clés, c'est le skill camera.
 ---
 
 # Blender en ligne de commande
@@ -14,21 +14,26 @@ BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
 `beit_hamikdash_blockout.py` **construit** la scène ; `beit_hamikdash.blend` en est
 la sortie. Toute modification faite à la main dans l'interface de Blender est perdue
 à la reconstruction suivante. Une correction se porte donc **dans le script**, jamais
-dans le .blend.
+dans le .blend. Même chose pour les caméras, qui vivent dans `cameras.json`.
 
 Corollaire : le .blend sur le disque date du dernier **export** —
 `beit_hamikdash_export.py` est le seul script qui appelle `wm.save_mainfile`. Le
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
-sauvegarder, il faut donc chaîner blockout puis export dans la même instance.
+sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les quatre scripts
+## Les six scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
-| `beit_hamikdash_blockout.py` | construit toute la scène + 21 caméras + marqueurs | rien (mémoire) |
+| `beit_hamikdash_blockout.py` | construit le Temple, son pays et la foule du jour | rien (mémoire) |
+| `beit_hamikdash_cameras.py` | pose les plans déclarés dans `cameras.json` | rien (mémoire) |
 | `beit_hamikdash_export.py` | images clés couleur + profondeur, ou planche de contrôle | `renders/blockout/` ou `renders/planche/`, **et le .blend** |
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
+| `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
+
+Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
+seule commande. Ce qui suit sert quand on veut les lancer soi-même.
 
 ## Où atterrissent les sorties
 
@@ -40,7 +45,6 @@ Un dossier par étape du pipeline, et **rien à la racine de `renders/`** :
 | `renders/planche/` | `beit_hamikdash_export.py -- --planche` | contrôle 640 × 360 + `planche.html` |
 | `renders/style/` | `fal_image.py` | images clés stylisées |
 | `renders/video/` | `fal_video.py` | mp4 |
-| `renders/archive/` | personne | générations périmées, gardées, jamais relues |
 
 Les chemins sont des constantes : `SOUS_DOSSIER_BLOCKOUT` / `SOUS_DOSSIER_PLANCHE`
 dans l'export, `DOSSIER_IMAGES` / `DOSSIER_SORTIE` dans les scripts fal. En déplacer
@@ -54,10 +58,10 @@ répond en une seconde. Ne pas mettre `-P beit_hamikdash_blockout.py` devant.
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --scene
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --objets Doukhan
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --camera 9a
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit 3
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit 9a fin
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule 1
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --camera CAM_03_Heikhal
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit heikhal
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit heikhal fin
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule 01
 ```
 
 | Commande | Répond à |
@@ -72,7 +76,7 @@ $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule 1
 « est-ce que ce plan montre X », et elle tient compte de l'occultation. Un plan qui
 ne renvoie aucune géométrie a sa caméra dans un mur.
 
-Le numéro de plan s'écrit comme on veut : `9`, `09`, `9a`, `CAM_09A`, ou le nom complet.
+Le plan se nomme comme on veut : `CAM_03_Heikhal`, `3`, `03`, ou `heikhal`.
 
 ## Reconstruire la scène
 
@@ -85,43 +89,32 @@ $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_blockout.py
 # reconstruire ET sauvegarder le .blend (c'est l'export qui sauvegarde)
 $BLENDER -b beit_hamikdash.blend \
     -P beit_hamikdash_blockout.py \
+    -P beit_hamikdash_cameras.py \
     -P beit_hamikdash_export.py -- --planche
 ```
 
-Le blockout annonce en dernière ligne son compte d'objets, de caméras et d'images —
-la vérification la plus rapide qu'il n'a rien cassé.
+Le blockout annonce en dernière ligne son compte d'objets et de collections — la
+vérification la plus rapide qu'il n'a rien cassé.
 
-## Exporter les images clés
+`FOULE = True` en tête du blockout ajoute les figures de Yom Kippour : le peuple dans
+l'Ezrat Israël, les cohanim dans l'Ezrat Kohanim, les Léviim et leurs instruments sur
+le Doukhan, les masses de l'Ezrat Nashim et du Har HaBayit. `False` (défaut) ne bâtit
+que l'architecture : 9 178 objets contre 18 913.
 
-```bash
-# planche de contrôle des 21 plans, 640 × 360 + index HTML
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py -- --planche
-open renders/planche/planche.html
-
-# production : couleur + profondeur, 1920 × 1080, les 21 plans
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py
-
-# un ou plusieurs plans seulement
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py -- CAM_09A_Heikhal_Kelim
-```
-
-L'export ne laisse visible que la collection de sujet du plan rendu (`75_PlanNN`) :
-une silhouette d'un autre plan restée dans le cadre devient un objet inventé par le
-styliseur.
-
-## Mesurer les plans
+## Exporter la visite 3D
 
 ```bash
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py -P beit_hamikdash_analyse_plans.py
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py
+open visite/index.html
 ```
 
-Colonne « couvert » = la part de la frame de fin déjà visible au début. Sous 40 %,
-le plan est à couper en deux. Colonne « cadre/s » = la glisse de l'image ; au-delà
-de 0,06, le mouvement n'est plus lent.
+Ce script **lit** le .blend sauvegardé : il fusionne les volumes par concept — les
+milliers de volumes de dix collections deviennent 68 maillages — et écrit `visite/temple.glb`
+avec `visite/reperes.json`. Le lien géométrie ↔ encyclopédie passe par
+`visite/concepts.json`, où chaque concept déclare les préfixes de noms d'objets qui
+lui appartiennent. Un ajout au blockout que `concepts.json` ne déclare pas ressort en
+fin de sortie sous « volumes sans concept » : c'est la liste de ce qu'il reste à
+nommer.
 
 ## Détails de plomberie
 
@@ -133,10 +126,10 @@ de 0,06, le mouvement n'est plus lent.
 - **`-b`** (background, sans interface) est obligatoire ici : sans lui Blender ouvre
   une fenêtre et n'en sort pas.
 - **Pas de `bpy.ops` pour créer de la géométrie** dans le blockout : chaque appel
-  d'opérateur réévalue le graphe de dépendances, coût quadratique en nombre d'objets
-  (la scène en a 4692). Les volumes se posent en `bpy.data` via les helpers `box`,
-  `cyl`, `cone`, `sphere`, `prism`, `tore`, `cyl_between` — s'il manque une forme,
-  écrire un helper de plus, pas un opérateur.
+  d'opérateur réévalue le graphe de dépendances, coût quadratique en nombre d'objets.
+  Les volumes se posent en `bpy.data` via les helpers `box`, `cyl`, `cone`, `sphere`,
+  `prism`, `tore`, `cyl_between` — s'il manque une forme, écrire un helper de plus,
+  pas un opérateur.
 - **1 ama = `AMA` mètres**, et le .blend porte la valeur en propriété de scène
   (`scene["AMA_metres"]`). Les helpers convertissent : **tout se donne en amot**
   dans le script, jamais en mètres.

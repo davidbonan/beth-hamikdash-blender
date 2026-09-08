@@ -1,7 +1,11 @@
 """Plomberie fal.ai partagée par les générations image et vidéo.
 
-Deux choses ici : l'accès à fal.ai (clé, téléversement sur le CDN, file d'attente)
-et la lecture de `prompts_par_plan.md`, seule source des prompts du film.
+L'accès à fal.ai — clé, téléversement sur le CDN, file d'attente — et la résolution
+des images clés d'un plan dans `renders/blockout/`.
+
+Les prompts ne vivent pas ici : ils se donnent en ligne de commande. Le dépôt n'en
+tient aucun catalogue, parce que ce qu'on demande à un modèle change à chaque essai
+et qu'un fichier de prompts figé se met à mentir dès la deuxième génération.
 
 Clé API : FAL_AI_KEY, dans l'environnement ou dans le `.env` à la racine.
 Bibliothèque standard uniquement — aucune installation.
@@ -10,13 +14,11 @@ Bibliothèque standard uniquement — aucune installation.
 import json
 import mimetypes
 import os
-import re
 import time
 import urllib.error
 import urllib.request
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-FICHIER_PROMPTS = os.path.join(RACINE, "prompts_par_plan.md")
 DOSSIER_IMAGES = os.path.join(RACINE, "renders", "blockout")
 
 URL_JETON = "https://rest.alpha.fal.ai/storage/auth/token?storage_type=fal-cdn-v3"
@@ -25,97 +27,17 @@ INTERVALLE_SONDAGE = 5      # s ; une génération dure de 10 s (image) à 5 min
 DELAI_MAX = 900             # s
 
 
-# --- prompts_par_plan.md ------------------------------------------------------
+# --- images clés --------------------------------------------------------------
 
-def texte_prompts():
-    with open(FICHIER_PROMPTS, encoding="utf-8") as fichier:
-        return fichier.read()
-
-
-PLANS = ("1", "1b", "2", "3", "4", "5a", "5b", "6", "7a", "7b", "7c", "7d", "8", "9a", "9b", "10", "11", "12",
-         "13a", "13b", "14a", "14b", "15")
-
-
-def numero_de_plan(valeur):
-    """« 9 », « 9A », « 9a » -> « 9a ». Un plan coupé en deux porte une lettre.
-
-    Quatre plans se filment en deux prises — le tilt du 9, le panoramique du 7, la
-    traversée de porte du 13, la grue du 14 : leurs deux bouts ne partagent pas assez
-    d'image pour qu'un i2v les relie (beit_hamikdash_analyse_plans.py). Le 7 en a deux
-    de plus, 7c et 7d — le 'hoshen et le tsits, le revêtement des habits d'or — qui ne
-    sont pas des coupes mais des moments de plus, comme le 5b. Le numéro nu d'un plan coupé est refusé
-    plutôt que deviné : « 9 » ne désigne plus rien.
-    """
-    demande = valeur.strip().lower()
-    if demande in PLANS:
-        return demande
-    raise ValueError(f"plan inconnu : {valeur}. Plans : {', '.join(PLANS)}")
-
-
-def section_plan(texte, plan):
-    motif = rf"^## Plan {re.escape(str(plan))} — .*?(?=^## |\Z)"
-    trouve = re.search(motif, texte, re.MULTILINE | re.DOTALL)
-    if not trouve:
-        raise SystemExit(f"Plan {plan} absent de {FICHIER_PROMPTS}")
-    return trouve.group(0)
-
-
-def champ(section, nom):
-    trouve = re.search(rf"^\*\*{nom}\*\*\s*:\s*(.+)$", section, re.MULTILINE)
-    return trouve.group(1).strip() if trouve else None
-
-
-def bloc_commun(texte, nom):
-    """Un bloc en citation des « Blocs communs », replié en un paragraphe.
-
-    STYLE, FIGURES, PLACES, NÉGATIF, ÉDITION, CADRAGE. Le titre peut porter un
-    commentaire après les astérisques, et le bloc s'étend sur toutes les lignes
-    de citation qui suivent.
-    """
-    motif = rf"^\*\*{nom}\*\*.*\n((?:>.*\n)+)"
-    trouve = re.search(motif, texte, re.MULTILINE)
-    if not trouve:
-        raise SystemExit(f"Bloc {nom} commun introuvable dans prompts_par_plan.md")
-    return " ".join(l.lstrip("> ").strip() for l in trouve.group(1).splitlines())
-
-
-def bloc_texte(texte, nom):
-    """Un bloc des « Blocs communs » qui tient sur plusieurs lignes (liste, tableau).
-
-    Titre compris : le bloc est affiché à l'écran, pas injecté dans un prompt.
-    """
-    titre = re.search(rf"^(?:\*\*|## ){nom}.*$", texte, re.MULTILINE | re.IGNORECASE)
-    if not titre:
-        raise SystemExit(f"Bloc {nom} introuvable dans prompts_par_plan.md")
-    suite = re.search(r"^(?:\*\*|## |---)", texte[titre.end():], re.MULTILINE)
-    fin = titre.end() + (suite.start() if suite else len(texte) - titre.end())
-    return texte[titre.start():fin].strip()
-
-
-def figures_du_plan(texte, section):
-    """Bloc FIGURES commun, ou la ligne **Figures** du plan quand il en porte une.
-
-    La tenue vaut pour tout le film, à une exception près, écrite dans les plans qui
-    la portent : aux 7c et 7d le Cohen Gadol revêt les habits d'or (Yoma 7:3-5) là où
-    le bloc commun le veut en lin blanc. La ligne du plan remplace le bloc entier.
-    """
-    return champ(section, "Figures") or bloc_commun(texte, "FIGURES")
-
-
-def camera_du_plan(section):
-    trouve = re.search(r"\((?:[^)]*?)(CAM_\d{2}[A-Z]?)", section)
-    if not trouve:
-        raise SystemExit("Identifiant CAM_xx absent de l'en-tête du plan")
-    return trouve.group(1)
-
-
-def negatif_du_plan(texte, section):
-    """NÉGATIF commun + le négatif propre au plan."""
-    negatif = bloc_commun(texte, "NÉGATIF")
-    propre = champ(section, "Négatif")
-    if propre:
-        negatif += ", " + propre.replace("NÉGATIF +", "").strip(" ,")
-    return negatif
+def images_de_frame(camera, etiquette):
+    """(rendu couleur, carte de profondeur) de la frame `debut` ou `fin` d'un plan."""
+    base = os.path.join(DOSSIER_IMAGES, f"{camera}_{etiquette}")
+    couleur, profondeur = base + ".png", base + "_profondeur.png"
+    for chemin in (couleur, profondeur):
+        if not os.path.exists(chemin):
+            raise SystemExit(f"Image absente : {chemin} — l'exporter avec "
+                             f"beit_hamikdash_export.py")
+    return couleur, profondeur
 
 
 def images_du_plan(camera, depart, fin, avec_fin=True):

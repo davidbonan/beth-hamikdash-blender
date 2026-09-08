@@ -6,13 +6,13 @@
 Les autres scripts du dépôt *fabriquent* ; celui-ci ne fait que lire, et il lit le
 .blend tel qu'il a été sauvegardé — pas de `-P beit_hamikdash_blockout.py` devant.
 C'est toute la raison d'être du script : répondre en une seconde à « où est le
-Doukhan », « qu'est-ce que la caméra du plan 9 a vraiment dans le cadre », « la
-fenêtre du Beit Avtinas montre-t-elle la cour », questions qui se posaient jusqu'ici
-en écrivant un script jetable et en attendant une reconstruction complète.
+Doukhan », « qu'est-ce que cette caméra a vraiment dans le cadre », « la fenêtre du
+Beit Avtinas montre-t-elle la cour », questions qui se posaient jusqu'ici en écrivant
+un script jetable et en attendant une reconstruction complète.
 
 Le .blend est un artefact dérivé : il date du dernier `beit_hamikdash_export.py`,
-seul script qui appelle `wm.save_mainfile`. Après une modification du blockout non
-suivie d'un export, ce qu'on lit ici est l'ancienne scène.
+seul script qui appelle `wm.save_mainfile`. Après une modification du blockout ou de
+`cameras.json` non suivie d'un export, ce qu'on lit ici est l'ancienne scène.
 
 Commandes
     --scene                    collections, durée, caméras, étendue    (défaut)
@@ -21,7 +21,8 @@ Commandes
     --voit <plan> [debut|fin]  ce que le cadre contient vraiment, par part d'écran
     --foule <plan> [debut|fin] combien de figures le plan voit, et de quelle taille
 
-<plan> se donne au choix : 9, 09, 9a, CAM_09A, ou le nom complet.
+<plan> se donne au choix : le nom complet de la caméra (CAM_03_Heikhal), son numéro
+(3, 03) ou n'importe quel fragment de son nom (heikhal).
 """
 
 import math
@@ -55,7 +56,7 @@ def cameras(scene):
 
 
 def resoudre(scene, cle):
-    """« 9a », « 09A », « CAM_09A », le nom complet — tous mènent à la même caméra."""
+    """« 3 », « 03 », « heikhal », « CAM_03_Heikhal » — tous mènent à la même caméra."""
     liste = cameras(scene)
     cherche = cle.upper().removeprefix("CAM_")
     for cam in liste:
@@ -199,12 +200,7 @@ def montrer_camera(scene, cam):
           f"champ {h:.1f}° × {v:.1f}°", flush=True)
     print(f"  frames {f0}..{f1} = {cam['duree_s']:.0f} s à {scene.render.fps} fps",
           flush=True)
-    prise = cam.name.split("_")[1]
-    sujets = [c for c in bpy.data.collections
-              if re.match(rf"^75_Plan{prise[:2]}(?:{prise[2:]})?(?:_debut|_fin)?$", c.name)]
-    print(f"  proxys de sujet : "
-          + (", ".join(f"{c.name} ({len(c.objects)} objets)" for c in sujets) if sujets
-             else "aucune collection 75_Plan pour ce plan") + "\n", flush=True)
+    print(flush=True)
     print(f"  {'':<7} {'caméra (amot)':>26}   {'cible (amot)':>26}", flush=True)
     poses = []
     for etiquette, frame in (("début", f0), ("fin", f1)):
@@ -368,11 +364,11 @@ def main():
         return montrer_objets(scene, reste[0])
     if commande == "--camera":
         if not reste:
-            sys.exit("--camera attend un plan (9, 9a, CAM_09A…).")
+            sys.exit("--camera attend un plan (3, 03, heikhal, CAM_03_Heikhal…).")
         return montrer_camera(scene, resoudre(scene, reste[0]))
     if commande == "--voit":
         if not reste:
-            sys.exit("--voit attend un plan (9, 9a, CAM_09A…).")
+            sys.exit("--voit attend un plan (3, 03, heikhal, CAM_03_Heikhal…).")
         etiquette = reste[1].lower() if len(reste) > 1 else "debut"
         if etiquette not in ("debut", "début", "fin"):
             sys.exit(f"--voit attend « debut » ou « fin », pas « {etiquette} ».")
@@ -380,7 +376,7 @@ def main():
                                      "fin" if etiquette == "fin" else "debut")
     if commande == "--foule":
         if not reste:
-            sys.exit("--foule attend un plan (9, 9a, CAM_09A…).")
+            sys.exit("--foule attend un plan (3, 03, heikhal, CAM_03_Heikhal…).")
         etiquette = reste[1].lower() if len(reste) > 1 else "debut"
         if etiquette not in ("debut", "début", "fin"):
             sys.exit(f"--foule attend « debut » ou « fin », pas « {etiquette} ».")

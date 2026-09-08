@@ -1,0 +1,585 @@
+{
+  "_lisez_moi": "Encyclopédie de la visite. Une entrée par concept. `prefixes` fait le lien avec les noms d'objets du blockout : beit_hamikdash_visite.py y attache chaque volume (préfixe le plus long gagnant), et regroupe en un seul maillage par concept. `dit`/`retenu`/`modelise` sont les trois plans que le skill mikdash interdit de confondre.",
+  "concepts": [
+    {
+      "id": "mur_har_habayit",
+      "nom": "Mur du Har HaBayit",
+      "zone": "har_habayit",
+      "prefixes": [
+        "HarHabayit_mur",
+        "HarHabayit_creneaux",
+        "HarHabayit_soubassement"
+      ]
+    },
+    {
+      "id": "sol_har_habayit",
+      "nom": "Esplanade du Har HaBayit",
+      "zone": "har_habayit",
+      "prefixes": [
+        "HarHabayit_sol",
+        "Podium_har",
+        "Podium_azara"
+      ]
+    },
+    {
+      "id": "soreg",
+      "nom": "Soreg",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Soreg_"
+      ]
+    },
+    {
+      "id": "heil",
+      "nom": "'Heil et ses douze marches",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Heil_marche"
+      ]
+    },
+    {
+      "id": "stoa_royale",
+      "nom": "Stoa royale",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Stoa_sud",
+        "Portique_sud",
+        "Portique_stoa"
+      ]
+    },
+    {
+      "id": "portiques",
+      "nom": "Portiques est, nord et ouest",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Portique_est",
+        "Portique_nord",
+        "Portique_ouest"
+      ]
+    },
+    {
+      "id": "ezrat_nashim",
+      "nom": "Ezrat Nashim",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "EzratNashim_mur",
+        "EzratNashim_sol",
+        "EzratNashim_couronnement"
+      ]
+    },
+    {
+      "id": "porte_est_ezrat_nashim",
+      "nom": "Porte orientale de l'Ezrat Nashim",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "EzratNashim_porte"
+      ]
+    },
+    {
+      "id": "gezuztra",
+      "nom": "Gezuztra (la galerie)",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Gezuztra"
+      ]
+    },
+    {
+      "id": "lishkat_haetzim",
+      "nom": "Lishkat HaEtzim",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Etzim"
+      ]
+    },
+    {
+      "id": "lishkat_hametzoraim",
+      "nom": "Lishkat HaMetzoraïm",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Metzoraim"
+      ]
+    },
+    {
+      "id": "lishkat_hanezirim",
+      "nom": "Lishkat HaNezirim",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Nezirim"
+      ]
+    },
+    {
+      "id": "lishkat_beit_shemanya",
+      "nom": "Lishkat Beit Shemanya",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Shemanya"
+      ]
+    },
+    {
+      "id": "quinze_marches",
+      "nom": "Les quinze marches",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Marche_Nikanor"
+      ]
+    },
+    {
+      "id": "shaar_nikanor",
+      "nom": "Porte de Nikanor",
+      "zone": "azara",
+      "prefixes": [
+        "Nikanor_"
+      ]
+    },
+    {
+      "id": "azara",
+      "nom": "Azara",
+      "zone": "azara",
+      "prefixes": [
+        "Azara_mur",
+        "Azara_sol",
+        "Azara_couronnement"
+      ]
+    },
+    {
+      "id": "portes_azara",
+      "nom": "Portes nord et sud de l'Azara",
+      "zone": "azara",
+      "prefixes": [
+        "Azara_porte"
+      ]
+    },
+    {
+      "id": "doukhan",
+      "nom": "Doukhan",
+      "zone": "azara",
+      "prefixes": [
+        "Doukhan"
+      ]
+    },
+    {
+      "id": "ezrat_israel",
+      "nom": "Ezrat Israël et Ezrat Cohanim",
+      "zone": "azara",
+      "prefixes": [
+        "Marche_EzratIsrael_Cohanim"
+      ]
+    },
+    {
+      "id": "mizbeach",
+      "nom": "Mizbea'h HaNe'hoshet",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Mizbeach_corps",
+        "Mizbeach_haut",
+        "Mizbeach_yessod",
+        "Keren_"
+      ]
+    },
+    {
+      "id": "hout_hasikra",
+      "nom": "'Hout HaSikra",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Mizbeach_sikra"
+      ]
+    },
+    {
+      "id": "kevesh",
+      "nom": "Kevesh (la rampe)",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kevesh"
+      ]
+    },
+    {
+      "id": "maarakhot",
+      "nom": "Les ma'arakhot",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Maarakha_"
+      ]
+    },
+    {
+      "id": "kiyor",
+      "nom": "Kiyor",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kiyor"
+      ]
+    },
+    {
+      "id": "beit_hamitbahayim",
+      "nom": "Beit HaMitba'hayim",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Pilier",
+        "Table_marbre"
+      ]
+    },
+    {
+      "id": "tabaot",
+      "nom": "Les tabaot (anneaux)",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Anneau"
+      ]
+    },
+    {
+      "id": "batiment",
+      "nom": "Le Beit (le Bâtiment)",
+      "zone": "oulam",
+      "prefixes": [
+        "Batiment_socle"
+      ]
+    },
+    {
+      "id": "oulam",
+      "nom": "Oulam",
+      "zone": "oulam",
+      "prefixes": [
+        "Ulam_facade",
+        "Ulam_epaule",
+        "Ulam_flanc",
+        "Ulam_plafond",
+        "Ulam_klonas",
+        "Maltera"
+      ]
+    },
+    {
+      "id": "douze_marches_oulam",
+      "nom": "Les douze marches de l'Oulam",
+      "zone": "oulam",
+      "prefixes": [
+        "Marche_Ulam"
+      ]
+    },
+    {
+      "id": "petah_oulam",
+      "nom": "Ouverture de l'Oulam",
+      "zone": "oulam",
+      "prefixes": [
+        "Ulam_or_est"
+      ]
+    },
+    {
+      "id": "gefen_zahav",
+      "nom": "Gefen Zahav (la vigne d'or)",
+      "zone": "oulam",
+      "prefixes": [
+        "Vigne_"
+      ]
+    },
+    {
+      "id": "couronne_helene",
+      "nom": "Couronne d'Hélène",
+      "zone": "oulam",
+      "prefixes": [
+        "Couronne_Helene"
+      ]
+    },
+    {
+      "id": "tables_oulam",
+      "nom": "Les deux tables de l'Oulam",
+      "zone": "oulam",
+      "prefixes": [
+        "Ulam_table"
+      ]
+    },
+    {
+      "id": "heikhal",
+      "nom": "Heikhal",
+      "zone": "heikhal",
+      "prefixes": [
+        "Heikhal_mur",
+        "Heikhal_or_mur",
+        "Heikhal_or_plafond",
+        "Heikhal_or_est",
+        "Heikhal_plinthe",
+        "Heikhal_corniche",
+        "Heikhal_caisson",
+        "Heikhal_or_sol"
+      ]
+    },
+    {
+      "id": "portes_heikhal",
+      "nom": "Portes du Heikhal",
+      "zone": "heikhal",
+      "prefixes": [
+        "Heikhal_porte"
+      ]
+    },
+    {
+      "id": "taim",
+      "nom": "Ta'im (les cellules)",
+      "zone": "heikhal",
+      "prefixes": [
+        "Corps_mur",
+        "Corps_plafond"
+      ]
+    },
+    {
+      "id": "kaleh_orev",
+      "nom": "Kaleh Orev",
+      "zone": "heikhal",
+      "prefixes": [
+        "Kaleh_orev"
+      ]
+    },
+    {
+      "id": "maake",
+      "nom": "Ma'ake (le garde-corps)",
+      "zone": "heikhal",
+      "prefixes": [
+        "Maake"
+      ]
+    },
+    {
+      "id": "menora",
+      "nom": "Menora",
+      "zone": "heikhal",
+      "prefixes": [
+        "Menora_"
+      ]
+    },
+    {
+      "id": "shulchan",
+      "nom": "Shul'han et le Le'hem HaPanim",
+      "zone": "heikhal",
+      "prefixes": [
+        "Shulchan",
+        "Lechem",
+        "Snif",
+        "Bazikh",
+        "Kaneh"
+      ]
+    },
+    {
+      "id": "mizbeach_hazahav",
+      "nom": "Mizbea'h HaZahav",
+      "zone": "heikhal",
+      "prefixes": [
+        "Mizbeach_Zahav"
+      ]
+    },
+    {
+      "id": "parokhet",
+      "nom": "Les deux Parokhot",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Parokhet_"
+      ]
+    },
+    {
+      "id": "kodesh_hakodashim",
+      "nom": "Kodesh HaKodashim",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "KhK_"
+      ]
+    },
+    {
+      "id": "even_hashetiya",
+      "nom": "Even HaShetiya",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Even_HaShetiya"
+      ]
+    },
+    {
+      "id": "aron",
+      "nom": "Aron HaBrit",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Aron_caisse",
+        "Aron_argaz",
+        "Aron_zer",
+        "Aron_anneau",
+        "Aron_bad"
+      ]
+    },
+    {
+      "id": "kaporet",
+      "nom": "Kaporet et les keruvim",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Aron_kaporet",
+        "Aron_keruv"
+      ]
+    },
+    {
+      "id": "contenu_aron",
+      "nom": "Ce que contient l'Aron",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Aron_mate",
+        "Aron_tsintsenet",
+        "Aron_pakh"
+      ]
+    },
+    {
+      "id": "lishkat_hagazit",
+      "nom": "Lishkat HaGazit",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_HaGazit"
+      ]
+    },
+    {
+      "id": "beit_hamoked",
+      "nom": "Beit HaMoked",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked"
+      ]
+    },
+    {
+      "id": "shaar_hamayim",
+      "nom": "Sha'ar HaMayim",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_ShaarHaMayim",
+        "ShaarHaMayim_"
+      ]
+    },
+    {
+      "id": "beit_avtinas",
+      "nom": "Lishkat Beit Avtinas",
+      "zone": "lishkot",
+      "prefixes": [
+        "BeitAvtinas"
+      ]
+    },
+    {
+      "id": "shaar_hanitzotz",
+      "nom": "Sha'ar HaNitzotz",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_ShaarHaNitzotz",
+        "ShaarHaNitzotz_"
+      ]
+    },
+    {
+      "id": "beit_hanitzotz",
+      "nom": "Chambre du Beit HaNitzotz",
+      "zone": "lishkot",
+      "prefixes": [
+        "BeitHaNitzotz"
+      ]
+    },
+    {
+      "id": "lishkat_parhedrin",
+      "nom": "Lishkat Parhedrin",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_Parhedrin"
+      ]
+    },
+    {
+      "id": "lishkat_osei_chavitin",
+      "nom": "Lishkat Osei 'Havitin",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_Osei_Chavitin"
+      ]
+    },
+    {
+      "id": "lishkat_pinchas",
+      "nom": "Lishkat Pin'has HaMalbish",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_Pinchas_HaMalbish"
+      ]
+    },
+    {
+      "id": "sculptures_murs",
+      "nom": "Sculptures des murs : keruvim, palmiers, fleurs",
+      "zone": "heikhal",
+      "prefixes": [
+        "Kir_Heikhal",
+        "Kir_KhK"
+      ]
+    },
+    {
+      "id": "chaines_devir",
+      "nom": "Chaînes devant le Devir",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Devir_chaine"
+      ]
+    },
+    {
+      "id": "yam",
+      "nom": "Yam (la Mer de bronze)",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Yam"
+      ]
+    },
+    {
+      "id": "mekhonot",
+      "nom": "Les dix mekhonot",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Mekhona_"
+      ]
+    },
+    {
+      "id": "mukhni",
+      "nom": "Mukhni du Kiyor",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Mukhni_"
+      ]
+    },
+    {
+      "id": "magrefa",
+      "nom": "Magrefa",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Magrefa"
+      ]
+    },
+    {
+      "id": "yakhin_boaz",
+      "nom": "Yakhin et Boaz",
+      "zone": "oulam",
+      "prefixes": [
+        "Yakhin_",
+        "Boaz_"
+      ]
+    },
+    {
+      "id": "tavla_helene",
+      "nom": "Tablette d'Hélène",
+      "zone": "oulam",
+      "prefixes": [
+        "Tavla_Helene"
+      ]
+    },
+    {
+      "id": "candelabres_shoeva",
+      "nom": "Candélabres de Sim'hat Beit HaShoeva",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Candelabre_Shoeva"
+      ]
+    },
+    {
+      "id": "shofarot",
+      "nom": "Les treize shofarot",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Shofar_"
+      ]
+    },
+    {
+      "id": "shaar_shushan",
+      "nom": "Sha'ar Shushan",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Shushan_"
+      ]
+    }
+  ]
+}

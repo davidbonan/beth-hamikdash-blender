@@ -1,9 +1,12 @@
 """
 BEIT HAMIKDASH — BLOCKOUT GÉNÉRATIF (Second Temple, selon Mishna Middot)
 =========================================================================
-Usage : Blender 3.x / 4.x → onglet Scripting → New → coller → Run Script (Alt+P).
-Le script crée une scène complète en volumes gris, à l'échelle, avec 15 caméras
-liées à des marqueurs de timeline (la caméra active change automatiquement au rendu).
+Usage : Blender 3.x / 4.x → onglet Scripting → New → coller → Run Script (Alt+P),
+ou en headless, chaîné avec les scripts qui l'exploitent (voir README).
+
+Le script crée une scène complète en volumes gris, à l'échelle : le bâtiment, ses
+ustensiles, le pays autour et la foule du jour. Il ne pose aucune caméra — elles
+sont déclarées dans cameras.json et bâties par beit_hamikdash_cameras.py.
 
 Conventions
 - 1 ama = AMA mètres (0.48 par défaut, Rav 'Haïm Naeh). Changer la constante suffit.
@@ -29,11 +32,20 @@ AMA = 0.48            # mètres par ama  (alternatives : 0.525 Ritmeyer, 0.576 H
 FPS = 24
 MENORA_DROITE = True  # CHOIX : True = branches droites en diagonale (Rambam/Rashi), False = courbes
 PORTES_HEIKHAL_OUVERTES = True  # battants rabattus dans l'embrasure, comme pendant l'avoda
+# Foule de Yom Kippour : False = architecture seule. Retire toute la collection
+# 76_Foule — peuple de l'Ezrat Israël, cohanim de l'Ezrat Kohanim, Léviim et leurs
+# instruments sur le Doukhan, masses de l'Ezrat Nashim, du Har HaBayit et du portique.
+FOULE = False
+# Les mâts d'or de Simhat Beit HaShoeva (Soucca 5:2) : dressés dans l'Ezrat Nashim le
+# jour de Kippour aussi (CHOIX — la Mishna les dit « là », sans dire qu'on les démonte).
+CANDELABRES_SHOEVA = True
 NETTOYER_SCENE = True
 
 # Niveaux (en amot)
-Z_HAR = -13.5   # Har HaBayit  (12 marches du 'Heil × 0.5 + 15 marches × 0.5 sous l'Azara)
-Z_EZN = -7.5    # Ezrat Nashim
+Z_HAR = -16.0   # Har HaBayit : 12 marches du 'Heil (6) + 15 marches (7,5) + Ezrat Israël (2,5) sous l'Azara
+Z_ROCHE = -240  # pied des murs de soutènement de l'esplanade, sous le fond du Kidron
+Z_EZN = -10.0   # Ezrat Nashim : 15 marches sous l'Ezrat Israël (Middot 2:5), elle-même 2,5 sous l'Ezrat Kohanim (2:6)
+Z_EZI = -2.5    # Ezrat Israël : « מַעֲלָה גְבוֹהָה אַמָּה וְהַדּוּכָן נָתוּן עָלֶיהָ וּבוֹ שָׁלֹשׁ מַעֲלוֹת » (Middot 2:6)
 Z_AZ = 0.0      # Azara
 Z_BAT = 6.0     # sol de l'Oulam / Heikhal (12 marches de 0.5)
 
@@ -417,20 +429,184 @@ def nuee(name, rgb):
     _creuser(mat, _grain(mat, 1.5), 1.0, 0.9)
     return mat
 
+def bois_sculpte(name, rgb):
+    """Chêne des maltera'ot : « קוֹרוֹת מְצֻיָּרוֹת וּמְכֻיָּרוֹת » (Bartenura sur Middot 3:7),
+    sculptées, pas nues. Le fil du bois, plus un relief de rinceaux en travers du fil
+    — c'est ce relief qui entre dans la passe Normal et que le styliseur cisèle."""
+    mat = bois(name, rgb)
+    if name in _MATIERES_CABLEES and mat.node_tree.nodes.get("Rinceaux"):
+        return mat
+    liens = mat.node_tree.links
+    rinceaux = _noeud(mat, "ShaderNodeTexWave", -900, -300)
+    rinceaux.name = "Rinceaux"
+    rinceaux.wave_type = 'RINGS'
+    rinceaux.rings_direction = 'X'
+    rinceaux.wave_profile = 'SAW'
+    rinceaux.inputs["Scale"].default_value = 1.0 / m(0.6)
+    rinceaux.inputs["Distortion"].default_value = 4.0
+    rinceaux.inputs["Detail"].default_value = 2.0
+    liens.new(_position(mat), rinceaux.inputs["Vector"])
+    _creuser(mat, rinceaux.outputs["Factor"], 0.9, 0.05)
+    return mat
+
+# Les quatre matières de la parokhet (Shekalim 8:5 ; Rashi Ex. 26:31) : tekhelet,
+# argaman, tola'at shani, lin — à parts égales, et aucun fil d'or (Ex. 26:31).
+MATIERES_PAROKHET = ((0.10, 0.17, 0.48), (0.40, 0.08, 0.30), (0.55, 0.08, 0.08), (0.86, 0.84, 0.78))
+CHAMP_PAROKHET = 5.0      # hauteur d'un champ de couleur, en amot : 40 amot font 8 champs, 2 par matière
+
+def parokhet(name):
+    """Étoffe lourde et plate en champs larges des quatre matières, à parts égales.
+
+    Un bleu uni se stylisait en rideau de velours à plis : la fiche (§8d) veut les
+    quatre couleurs « en champs larges, lin blanc compris », sans un fil d'or. Les
+    champs sont lus en Z du monde, donc les deux parokhot portent le même tissage.
+    Le relief du tissage — deux trames croisées — et une lisière sombre entre les
+    champs donnent à la passe Normal une surface de laine et non un aplat.
+    """
+    mat, neuf = _neuf(name, MATIERES_PAROKHET[0])
+    if not neuf:
+        return mat
+    liens = mat.node_tree.links
+    bsdf = _bsdf(mat)
+    bsdf.inputs["Roughness"].default_value = 0.92
+    bsdf.inputs["Sheen Weight"].default_value = 0.4
+    bsdf.inputs["Sheen Roughness"].default_value = 0.5
+    axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1500, 0)
+    liens.new(_position(mat), axe.inputs["Vector"])
+    rang = _noeud(mat, "ShaderNodeMath", -1340, 0)
+    rang.operation = "DIVIDE"
+    rang.inputs[1].default_value = m(CHAMP_PAROKHET)
+    liens.new(axe.outputs["Z"], rang.inputs[0])
+    numero = _noeud(mat, "ShaderNodeMath", -1180, 120)
+    numero.operation = "FLOOR"
+    liens.new(rang.outputs[0], numero.inputs[0])
+    matiere = _noeud(mat, "ShaderNodeMath", -1020, 120)
+    matiere.operation = "MODULO"
+    matiere.inputs[1].default_value = 4.0
+    liens.new(numero.outputs[0], matiere.inputs[0])
+    part = _noeud(mat, "ShaderNodeMath", -860, 120)
+    part.operation = "DIVIDE"
+    part.inputs[1].default_value = 4.0
+    liens.new(matiere.outputs[0], part.inputs[0])
+    choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
+    rampe = choix.color_ramp
+    rampe.interpolation = 'CONSTANT'
+    rampe.elements[0].position = 0.0
+    rampe.elements[0].color = (*MATIERES_PAROKHET[0], 1.0)
+    rampe.elements[1].position = 0.25
+    rampe.elements[1].color = (*MATIERES_PAROKHET[1], 1.0)
+    rampe.elements.new(0.5).color = (*MATIERES_PAROKHET[2], 1.0)
+    rampe.elements.new(0.75).color = (*MATIERES_PAROKHET[3], 1.0)
+    liens.new(part.outputs[0], choix.inputs["Factor"])
+    # Lisière : un liseré plus sombre au bord de chaque champ, là où la frise change.
+    lisiere = _noeud(mat, "ShaderNodeMath", -1180, -140)
+    lisiere.operation = "FRACT"
+    liens.new(rang.outputs[0], lisiere.inputs[0])
+    bord = _noeud(mat, "ShaderNodeValToRGB", -1020, -140)
+    bord.color_ramp.elements[0].position = 0.0
+    bord.color_ramp.elements[0].color = (0.55, 0.55, 0.55, 1.0)
+    bord.color_ramp.elements[1].position = 0.06
+    liens.new(lisiere.outputs[0], bord.inputs["Factor"])
+    teinte = _noeud(mat, "ShaderNodeMixRGB", -500, 160)
+    teinte.blend_type = 'MULTIPLY'
+    teinte.inputs["Factor"].default_value = 1.0
+    liens.new(choix.outputs["Color"], teinte.inputs["Color1"])
+    liens.new(bord.outputs["Color"], teinte.inputs["Color2"])
+    liens.new(teinte.outputs["Color"], bsdf.inputs["Base Color"])
+    _creuser(mat, bord.outputs["Color"], 0.6, 0.02)
+    for sens, k in (('Y', 0), ('Z', 1)):
+        trame = _noeud(mat, "ShaderNodeTexWave", -900, -500 - 220 * k)
+        trame.bands_direction = sens
+        trame.inputs["Scale"].default_value = 1.0 / m(0.04)
+        trame.inputs["Distortion"].default_value = 0.5
+        trame.inputs["Detail"].default_value = 1.0
+        liens.new(_position(mat), trame.inputs["Vector"])
+        _creuser(mat, trame.outputs["Factor"], 0.35, 0.004)
+    return mat
+
+BRUME = (0.72, 0.73, 0.74)           # la couleur du fond de ciel à l'horizon (voir `ciel`)
+VOILE_DEBUT, VOILE_FIN = 1500, 5500  # amot depuis l'origine : d'où le pays se fond dans la brume
+
+def _voiler(mat):
+    """Perspective atmosphérique dans la matière : passé VOILE_DEBUT amot de l'origine,
+    la couleur se fond vers la brume du ciel. Eevee n'a pas de brouillard sans volume,
+    et un volume sur un pays de six mille amot de côté se paye à chaque frame ; une
+    colline à cinq mille amot rendue au même contraste qu'un mur à cent se lisait
+    collée dessus (plan 1). Le voile ne touche que le pays."""
+    if mat.node_tree.nodes.get("Voile"):
+        return mat
+    liens = mat.node_tree.links
+    bsdf = _bsdf(mat)
+    distance = _noeud(mat, "ShaderNodeVectorMath", -1300, 600)
+    distance.operation = 'LENGTH'
+    liens.new(_position(mat), distance.inputs[0])
+    part = _noeud(mat, "ShaderNodeMapRange", -1100, 600)
+    part.clamp = True
+    part.inputs["From Min"].default_value = m(VOILE_DEBUT)
+    part.inputs["From Max"].default_value = m(VOILE_FIN)
+    part.inputs["To Max"].default_value = 0.85
+    liens.new(distance.outputs["Value"], part.inputs["Value"])
+    voile = _noeud(mat, "ShaderNodeMixRGB", -300, 600)
+    voile.name = "Voile"
+    voile.inputs["Color2"].default_value = (*BRUME, 1.0)
+    entree = bsdf.inputs["Base Color"]
+    if entree.links:
+        liens.new(entree.links[0].from_socket, voile.inputs["Color1"])
+    else:
+        voile.inputs["Color1"].default_value = entree.default_value
+    liens.new(part.outputs["Result"], voile.inputs["Factor"])
+    liens.new(voile.outputs["Color"], entree)
+    return mat
+
+def terre(name):
+    """Collines de Jérusalem : calcaire affleurant et garrigue, en terrasses.
+
+    Les terrasses ne sont pas bâties : un relief en dents de scie lu en Z du monde
+    (pas de 4 amot) marque les murets de soutènement sur toute pente — c'est ce que
+    les prompts des plans 1 et 14b appellent « olive terraces ».
+    """
+    mat, neuf = _neuf(name, (0.52, 0.45, 0.33))
+    if not neuf:
+        return mat
+    liens = mat.node_tree.links
+    _bsdf(mat).inputs["Roughness"].default_value = 0.95
+    melange = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
+    melange.inputs["Color1"].default_value = (0.46, 0.39, 0.27, 1.0)   # roche et terre nues
+    melange.inputs["Color2"].default_value = (0.26, 0.29, 0.16, 1.0)   # garrigue
+    liens.new(_grain(mat, 45.0), melange.inputs["Factor"])
+    liens.new(melange.outputs["Color"], _bsdf(mat).inputs["Base Color"])
+    _voiler(mat)
+    axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1500, -600)
+    liens.new(_position(mat), axe.inputs["Vector"])
+    terrasse = _noeud(mat, "ShaderNodeMath", -1340, -600)
+    terrasse.operation = "DIVIDE"
+    terrasse.inputs[1].default_value = m(4.0)
+    liens.new(axe.outputs["Z"], terrasse.inputs[0])
+    dents = _noeud(mat, "ShaderNodeMath", -1180, -600)
+    dents.operation = "FRACT"
+    liens.new(terrasse.outputs[0], dents.inputs[0])
+    _creuser(mat, dents.outputs[0], 0.7, 0.5)
+    _creuser(mat, _grain(mat, 10.0), 1.0, 0.8)
+    _creuser(mat, _grain(mat, 1.5), 0.5, 0.12)
+    return mat
+
+def eau(name):
+    """Eau du Kiyor : sombre, lisse, elle ne renvoie que le ciel et le bronze."""
+    mat, neuf = _neuf(name, (0.05, 0.08, 0.09))
+    if neuf:
+        bsdf = _bsdf(mat)
+        bsdf.inputs["Roughness"].default_value = 0.04
+        bsdf.inputs["Specular IOR Level"].default_value = 0.6
+        _creuser(mat, _grain(mat, 0.25), 0.15, 0.003)
+    return mat
+
 MAT_PIERRE = lambda: pierre("Pierre_claire", (0.85, 0.82, 0.74))
 MAT_OR = lambda: metal("Or", (1.0, 0.76, 0.33), 0.3)
 MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
-MAT_TISSU = lambda: etoffe("Parokhet", (0.2, 0.2, 0.55))
 MAT_SOL = lambda: dallage("Sol", (0.75, 0.72, 0.65))
 MAT_LIN = lambda: etoffe("Lin_blanc", (0.88, 0.87, 0.83))     # bigdei lavan des kohanim
-MAT_TEKHELET = lambda: etoffe("Tekhelet_meil", (0.13, 0.20, 0.52))   # laine tekhelet du me'il (Rambam Klei HaMikdash 9:3)
-MAT_EPHOD = lambda: etoffe("Ephod_or_tisse", (0.82, 0.62, 0.28))     # fil d'or filé dans la laine (Rambam 9:5)
-MAT_SHOHAM = lambda: material("Shoham", (0.10, 0.14, 0.12))
-MAT_BETE = lambda: material("Robe_animale", (0.32, 0.26, 0.22))
-MAT_KETORET = lambda: material("Ketoret", (0.42, 0.30, 0.16))
-MAT_CHAIR = lambda: material("Chair", (0.62, 0.42, 0.32))       # les mains nues, seule peau du film
 MAT_MARBRE = lambda: marbre("Marbre_blanc", (0.93, 0.92, 0.89))
 MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
 # L'or des parois est un placage martelé sur de la pierre, pas un ustensile tourné :
@@ -438,6 +614,15 @@ MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
 MAT_OR_PLAQUE = lambda: metal("Or_plaque", (1.0, 0.76, 0.33), 0.4)
 MAT_CEDRE = lambda: bois("Cedre", (0.44, 0.25, 0.14))
 MAT_CHENE = lambda: bois("Chene", (0.36, 0.25, 0.15))
+MAT_CHENE_SCULPTE = lambda: bois_sculpte("Chene_sculpte", (0.36, 0.25, 0.15))
+MAT_PAROKHET = lambda: parokhet("Parokhet_tissee")
+MAT_TERRE = lambda: terre("Terre_Jerusalem")
+MAT_MAISON = lambda: _voiler(pierre("Maisons", (0.66, 0.59, 0.46)))   # la ville, deux tons sous le Temple
+MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)))
+MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
+MAT_EAU = lambda: eau("Eau_Kiyor")
+MAT_FER = lambda: metal("Fer", (0.30, 0.29, 0.28), 0.6)            # crochets des ninnasin (Middot 3:5)
+MAT_SIKRA = lambda: material("Sikra", (0.55, 0.10, 0.06))          # le 'hout hasikra (Middot 3:1)
 
 # ----------------------------------------------------------------------------
 # VOLUMES
@@ -857,6 +1042,62 @@ def rovadim(name, base, normale, a0, a1, z0, z1, col, mat, reserve=()):
 
 
 
+def creneaux(name, x0, x1, y0, y1, z, col, mat=None, pas=4.0, large=2.0, haut=2.0):
+    """Merlons sur la crête d'un mur, le long de son grand côté.
+
+    Aucune source halakhique : c'est l'appareil hérodien que les stylisations des
+    plans 1 et 14b dessinent d'elles-mêmes (« crenellated outer wall »), et que le
+    blockout doit donc porter pour qu'il ne change pas d'une image à l'autre. CHOIX.
+    """
+    long_x = (x1 - x0) >= (y1 - y0)
+    a0, a1 = (x0, x1) if long_x else (y0, y1)
+    for k, c in enumerate(plage(a0 + pas / 2, a1 - pas / 2, pas)):
+        if long_x:
+            box(f"{name}_{k:03d}", c - large / 2, c + large / 2, y0, y1, z, z + haut, col, mat)
+        else:
+            box(f"{name}_{k:03d}", x0, x1, c - large / 2, c + large / 2, z, z + haut, col, mat)
+
+
+def couronnement(name, x0, x1, y0, y1, z, col, mat=None, saillie=0.5, reserve=()):
+    """Assise de couronnement d'un mur : une ama qui déborde de `saillie` sur les deux
+    faces, à cheval sur la crête. Un mur qui s'arrête net se lit en boîte ; l'assise
+    qui déborde donne la ligne d'ombre qui fait le mur. `reserve` : intervalles du
+    grand côté que le couronnement saute — les corps de porte qui passent la crête."""
+    long_x = (x1 - x0) >= (y1 - y0)
+    a0, a1 = (x0, x1) if long_x else (y0, y1)
+    for j, (u0, u1) in enumerate(_hors_reserve(a0, a1, z - 0.5, z + 0.5,
+                                               [(r0, r1, z - 1, z + 1) for r0, r1 in reserve])):
+        if long_x:
+            box(f"{name}_{j}", u0, u1, y0 - saillie, y1 + saillie, z - 0.5, z + 0.5, col, mat)
+        else:
+            box(f"{name}_{j}", x0 - saillie, x1 + saillie, u0, u1, z - 0.5, z + 0.5, col, mat)
+
+
+def battants(name, x0, x1, y0, y1, z0, h, col, mat, largeur=10):
+    """Deux vantaux rabattus dans l'embrasure d'une porte percée dans un mur — ouverts,
+    comme ceux de Nikanor et du Heikhal. `x0..x1, y0..y1` : l'emprise de la baie dans
+    l'épaisseur du mur ; le vantail court le long du jambage, sur les trois quarts
+    de l'épaisseur, épais de 0,3 ama."""
+    large_en_x = (x1 - x0) >= (y1 - y0)   # baie d'un mur nord-sud : les jambages sont en x
+    if large_en_x:
+        u0, u1 = y0 + (y1 - y0) * 0.15, y1 - (y1 - y0) * 0.15
+        box(f"{name}_O", x0, x0 + 0.3, u0, u1, z0, z0 + h, col, mat)
+        box(f"{name}_E", x1 - 0.3, x1, u0, u1, z0, z0 + h, col, mat)
+    else:
+        u0, u1 = x0 + (x1 - x0) * 0.15, x1 - (x1 - x0) * 0.15
+        box(f"{name}_S", u0, u1, y0, y0 + 0.3, z0, z0 + h, col, mat)
+        box(f"{name}_N", u0, u1, y1 - 0.3, y1, z0, z0 + h, col, mat)
+
+
+def crochet(name, x, y, z, sens, col):
+    """Crochet de fer des ninnasin : une tige horizontale qui sort du bloc de cèdre,
+    relevée au bout. `sens` : ±1, le côté en x où il sort."""
+    fer = MAT_FER()
+    cyl_between(f"{name}_tige", (x, y, z), (x + sens * 0.30, y, z), 0.035, col, fer, verts=6)
+    cyl_between(f"{name}_pointe", (x + sens * 0.30, y, z - 0.02), (x + sens * 0.30, y, z + 0.14),
+                0.035, col, fer, verts=6)
+
+
 def cyl_between(name, p0, p1, r, col, mat=None, verts=16):
     """Cylindre entre deux points (amot)."""
     a, b = Vector([m(c) for c in p0]), Vector([m(c) for c in p1])
@@ -968,17 +1209,57 @@ mur_perce("HarHabayit_mur_ouest", HX0, HX0 + 3, HY0, HY1, Z_HAR, Z_HAR + H_HAR,
           "00_HarHabayit", [(0, 10)], 20)             # Kiponus (CHOIX)
 mur_perce("HarHabayit_mur_est", HX1 - 3, HX1, HY0, HY1, Z_HAR, Z_HAR + H_HAR_EST,
           "00_HarHabayit", [(0, 10)], 20)             # Sha'ar HaMizrahi, sur l'axe
+# « שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה » (Middot 1:3) : le dessin de Suse au-dessus
+# de la porte est, tourné vers le mont des Oliviers. Un bas-relief : rempart et trois
+# tours crénelées, dans la pierre du mur.
+SHUSHAN_Z = Z_HAR + 20.4
+box("Shushan_plaque", HX1, HX1 + 0.15, -4.5, 4.5, SHUSHAN_Z, SHUSHAN_Z + 3.2, "00_HarHabayit")
+box("Shushan_rempart", HX1 + 0.15, HX1 + 0.35, -3.8, 3.8, SHUSHAN_Z + 0.3, SHUSHAN_Z + 1.3, "00_HarHabayit")
+for k, y in enumerate((-3.0, 0.0, 3.0)):
+    h = 2.6 if y == 0 else 2.0
+    box(f"Shushan_tour_{k}", HX1 + 0.15, HX1 + 0.4, y - 0.6, y + 0.6, SHUSHAN_Z + 0.3, SHUSHAN_Z + h, "00_HarHabayit")
+    for j, yc in enumerate((y - 0.45, y, y + 0.45)):
+        box(f"Shushan_tour_{k}_merlon_{j}", HX1 + 0.15, HX1 + 0.4, yc - 0.12, yc + 0.12,
+            SHUSHAN_Z + h, SHUSHAN_Z + h + 0.25, "00_HarHabayit")
+# Crête des murs : merlons (CHOIX, appareil hérodien — les stylisations des plans 1 et
+# 14b crénelaient d'elles-mêmes cette enceinte, autant que le blockout le fixe).
+for nm, xa, xb, ya, yb, h in (("sud", HX0, HX1, HY0, HY0 + 3, H_HAR),
+                              ("nord", HX0, HX1, HY1 - 3, HY1, H_HAR),
+                              ("ouest", HX0, HX0 + 3, HY0 + 3, HY1 - 3, H_HAR),
+                              ("est", HX1 - 3, HX1, HY0 + 3, HY1 - 3, H_HAR_EST)):
+    creneaux(f"HarHabayit_creneaux_{nm}", xa, xb, ya, yb, Z_HAR + h, "00_HarHabayit")
+# Murs de soutènement : l'esplanade est une terrasse bâtie au-dessus du Kidron et du
+# Tyropéon, ses murs descendent jusqu'au rocher. Sans lui, le pays passait sous le
+# dallage et l'esplanade flottait au-dessus de ses propres vallées.
+box("HarHabayit_soubassement", HX0, HX1, HY0, HY1, Z_ROCHE, Z_HAR - 1, "00_HarHabayit")
 pas = 10
+# Le portique est est le seul bas, comme son mur (Middot 2:4) : colonnes et toit
+# tiennent sous la crête de 24 amot.
+H_PORTIQUE, H_PORTIQUE_EST = 25, 21
 for i, x in enumerate(range(HX0 + 15, HX1 - 10, pas)):
-    colonne(f"Portique_sud_{i:03d}", x, HY0 + 15, Z_HAR, Z_HAR + 25, 1.5)
-    colonne(f"Portique_nord_{i:03d}", x, HY1 - 15, Z_HAR, Z_HAR + 25, 1.5)
+    colonne(f"Portique_sud_{i:03d}", x, HY0 + 15, Z_HAR, Z_HAR + H_PORTIQUE, 1.5)
+    colonne(f"Portique_nord_{i:03d}", x, HY1 - 15, Z_HAR, Z_HAR + H_PORTIQUE, 1.5)
 for i, y in enumerate(range(HY0 + 25, HY1 - 20, pas)):
-    colonne(f"Portique_ouest_{i:03d}", HX0 + 15, y, Z_HAR, Z_HAR + 25, 1.5)
+    colonne(f"Portique_ouest_{i:03d}", HX0 + 15, y, Z_HAR, Z_HAR + H_PORTIQUE, 1.5)
     if abs(y) > 6:      # dégager la ligne de mire de la para (Middot 2:4)
-        colonne(f"Portique_est_{i:03d}", HX1 - 15, y, Z_HAR, Z_HAR + 25, 1.5)
+        colonne(f"Portique_est_{i:03d}", HX1 - 15, y, Z_HAR, Z_HAR + H_PORTIQUE_EST, 1.5)
 # Stoa royale au sud : seconde rangée de colonnes
 for i, x in enumerate(range(HX0 + 15, HX1 - 10, pas)):
-    colonne(f"Stoa_sud_{i:03d}", x, HY0 + 30, Z_HAR, Z_HAR + 25, 1.5)
+    colonne(f"Stoa_sud_{i:03d}", x, HY0 + 30, Z_HAR, Z_HAR + H_PORTIQUE, 1.5)
+# Les portiques sont couverts (Josèphe, Guerre V, 5, 2 : plafonds de cèdre sur les
+# colonnades) : du mur à la rangée de colonnes, chapiteau compris. À ciel ouvert,
+# les colonnes se lisaient d'en haut en rangées de bornes sur le dallage.
+DEBORD_CHAPITEAU = 1.5 * 1.45 + 0.7
+for nm, xa, xb, ya, yb, zt in (
+        ("nord", HX0 + 3, HX1 - 3, HY1 - 15 - DEBORD_CHAPITEAU, HY1 - 3, Z_HAR + H_PORTIQUE),
+        ("ouest", HX0 + 3, HX0 + 15 + DEBORD_CHAPITEAU, HY0 + 32, HY1 - 15 - DEBORD_CHAPITEAU, Z_HAR + H_PORTIQUE),
+        ("est", HX1 - 15 - DEBORD_CHAPITEAU, HX1 - 3, HY0 + 32, HY1 - 15 - DEBORD_CHAPITEAU, Z_HAR + H_PORTIQUE_EST),
+        ("stoa_bas_cote", HX0 + 3, HX1 - 3, HY0 + 3, HY0 + 13, Z_HAR + H_PORTIQUE)):
+    box(f"Portique_{nm}_plafond", xa, xb, ya, yb, zt, zt + 1.4, "00_HarHabayit", MAT_CEDRE())
+    box(f"Portique_{nm}_toit", xa, xb, ya, yb, zt + 1.4, zt + 2, "00_HarHabayit")
+# Le dessus du plafond de la Stoa est de la pierre aussi : vu d'en haut (plans 1, 1b,
+# 15), un toit de cèdre faisait une bande brune de cinq cents amot.
+box("Stoa_sud_toit", HX0, HX1, HY0 + 13, HY0 + 32, Z_HAR + 27, Z_HAR + 27.6, "00_HarHabayit")
 # Plafond de la nef centrale de la Stoa (cèdre selon Josèphe). Sans lui la colonnade
 # est ouverte au ciel : CAM_02 ne filmait que du fond de monde entre des piliers, et
 # le « cedar ceiling » du prompt n'avait aucune géométrie à habiller.
@@ -994,7 +1275,8 @@ for y in (HY0 + 15, HY0 + 30):
     box(f"Stoa_sud_sabliere_{y:+.0f}", HX0, HX1, y - 0.6, y + 0.6,
         Z_HAR + 23.8, Z_HAR + 25, "00_HarHabayit", MAT_CEDRE())
 
-# 'Heil : 12 marches de 0.5 × 0.5 (Middot 2:3) côté est, l'accès principal. Elles
+# 'Heil : 12 marches de 0.5 × 0.5 (Middot 2:3) côté est, l'accès principal (les trois
+# autres côtés se bâtissent avec le soreg, plus bas, où leur cote est connue). Elles
 # montent du dallage au niveau de l'Ezrat Nashim et s'arrêtent contre la face est de
 # son mur (x 145) : posées 5 amot plus à l'ouest, elles étaient enfouies dans le
 # podium. Le soreg qui borde le 'Heil se construit avec les lishkot, plus bas : sa
@@ -1002,6 +1284,122 @@ for y in (HY0 + 15, HY0 + 30):
 for i in range(12):
     box(f"Heil_marche_{i:02d}", 150.5 - i * 0.5, 151 - i * 0.5, -67.5, 67.5,
         Z_HAR, Z_HAR + 0.5 * (i + 1), "00_HarHabayit")
+
+# ----------------------------------------------------------------------------
+# 01 — LE PAYS : collines de Jérusalem, la ville, les oliviers
+#   Rien n'était modélisé au-delà du Har HaBayit : le Temple se lisait posé sur une
+#   mer (README, ciel physique écarté pour cela), et au plan 14b la grue découvrait
+#   par-dessus le mur un vide que le styliseur remplissait à sa guise — collines,
+#   maisons et terrasses différentes d'une image à l'autre. Les prompts des plans 1
+#   et 14b les nomment (« mist in the Kidron valley, olive terraces and low
+#   flat-roofed houses on the hills ») : ils ont maintenant une géométrie.
+#   Le relief est un CHOIX lissé sur les cotes réelles, en amot depuis l'esplanade
+#   (740 m) : Kidron 650, mont des Oliviers 810, Tyropéon 700, ville haute 770,
+#   collines de l'ouest 800 et plus. Aucune source halakhique ici.
+# ----------------------------------------------------------------------------
+PAYS = "01_Pays"
+
+
+def _profil(u, points):
+    """Interpolation en cosinus entre (abscisse, cote) triées : des collines, pas des toits."""
+    if u <= points[0][0]:
+        return points[0][1]
+    for (u0, z0), (u1, z1) in zip(points, points[1:]):
+        if u <= u1:
+            t = (u - u0) / (u1 - u0)
+            return z0 + (z1 - z0) * (1 - math.cos(math.pi * t)) / 2
+    return points[-1][1]
+
+
+# Vers l'ouest la crête est tenue sous la ligne de toit du plan 1 (à 850 amot, le
+# faîte à 100 est vu 0,35° sous l'horizontale ; une colline à 3000 amot doit rester
+# sous 60 pour passer dessous) : le Sanctuaire garde sa silhouette sur le ciel.
+RELIEF_EO = [(-6000, 60), (-3000, 60), (-1300, 49), (-517, -97), (HX0, -45),
+             (HX1, -60), (733, -200), (2383, 132), (4000, 60), (6000, 30)]
+RELIEF_NS = [(-6000, -60), (-2000, -130), (HY0 - 800, -80), (HY0, 0), (HY1, 0),
+             (HY1 + 600, 35), (2000, 55), (6000, 80)]
+
+
+def hors_esplanade(x, y):
+    """Distance au rectangle du Har HaBayit (négative dedans)."""
+    return max(HX0 - x, x - HX1, HY0 - y, y - HY1)
+
+
+def altitude(x, y):
+    """Cote du sol naturel en (x, y), en amot. Sous l'esplanade, enfoui dans la roche ;
+    à moins de 80 amot de ses murs, tenu sous le dallage pour que le pays ne remonte
+    jamais par-dessus la crête de soutènement."""
+    marge = hors_esplanade(x, y)
+    if marge < 2:
+        return Z_HAR - 8
+    z = (_profil(x, RELIEF_EO) + _profil(y, RELIEF_NS)
+         + 5 * math.sin(x / 90) * math.sin(y / 110)
+         + 3 * math.sin(x / 37 + 1.3) * math.cos(y / 29 + 0.4)
+         + 1.5 * math.sin((x + y) / 13))
+    if marge < 80:
+        z = min(z, Z_HAR - 4 - (80 - marge) * 0.1)
+    return z
+
+
+def relief(name, x0, x1, y0, y1, pas, col, mat):
+    """Nappe du sol naturel, une face par case de `pas` amot."""
+    xs, ys = plage(x0, x1, pas), plage(y0, y1, pas)
+    n = len(xs)
+    verts = [(x, y, altitude(x, y)) for y in ys for x in xs]
+    faces = [[j * n + i, j * n + i + 1, (j + 1) * n + i + 1, (j + 1) * n + i]
+             for j in range(len(ys) - 1) for i in range(n - 1)]
+    return mesh_from_pydata(name, verts, faces, col, mat)
+
+
+def maison(nom, x, y, col):
+    """Maison à toit plat, enfoncée dans la pente ; un étage en retrait une fois sur trois."""
+    z = altitude(x, y)
+    l, p = 5 + 8 * alea(nom, 1), 5 + 8 * alea(nom, 2)
+    h = 4 + 4 * alea(nom, 3)
+    box(nom, x - l / 2, x + l / 2, y - p / 2, y + p / 2, z - 2.5, z + h, col, MAT_MAISON())
+    if alea(nom, 4) < 0.35:
+        box(f"{nom}_etage", x - l / 2 + 1, x + l / 2 - 2, y - p / 2 + 1, y + p / 2 - 1,
+            z + h, z + h + 3, col, MAT_MAISON())
+
+
+def olivier(nom, x, y, col):
+    z = altitude(x, y)
+    r = 1.6 + 1.4 * alea(nom, 1)
+    cyl(f"{nom}_tronc", x, y, z - 0.5, z + 1.6, 0.25, col, MAT_TRONC(), verts=6)
+    sphere(f"{nom}_houppier", x, y, z + 1.6 + r * 0.8, r, col, MAT_FEUILLAGE(), segs=8)
+
+
+def _densite_ville(x, y):
+    """Où la ville est : dense à l'ouest (ville haute) et au sud (cité de David),
+    clairsemée sur le mont des Oliviers — villages et tombeaux."""
+    if x > HX1 + 200:
+        return 0.22
+    if x < HX0 - 30 or y < HY0 - 30:
+        return 0.85
+    return 0.5
+
+
+relief("Pays_relief", -6000, 6000, -6000, 6000, 50, PAYS, MAT_TERRE())
+for i in range(2600):
+    nom = f"Maison_{i:04d}"
+    x, y = -3800 + 7300 * alea(nom, 5), -3800 + 7300 * alea(nom, 6)
+    if hors_esplanade(x, y) < 70 or altitude(x, y) < -175:   # le fond des vallées : jardins
+        continue
+    if alea(nom, 0) < _densite_ville(x, y):
+        maison(nom, x, y, PAYS)
+# Le mont des Oliviers d'abord, puis quelques bosquets sur les autres pentes.
+for i in range(1300):
+    nom = f"Olivier_{i:04d}"
+    x, y = HX1 + 120 + 3000 * alea(nom, 5), -2400 + 4800 * alea(nom, 6)
+    if hors_esplanade(x, y) < 60 or altitude(x, y) < -185 or alea(nom, 0) > 0.7:
+        continue
+    olivier(nom, x, y, PAYS)
+for i in range(400):
+    nom = f"Olivier_ouest_{i:04d}"
+    x, y = -3500 + 3200 * alea(nom, 5), -3000 + 6000 * alea(nom, 6)
+    if hors_esplanade(x, y) < 60 or altitude(x, y) < -175 or alea(nom, 0) > 0.3:
+        continue
+    olivier(nom, x, y, PAYS)
 
 # ----------------------------------------------------------------------------
 # 10 — EZRAT NASHIM (135 × 135), Middot 2:5
@@ -1034,9 +1432,56 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
                       [((a + b) / 2, 6)], 12)
         else:
             box(nom, a, b, c, d, Z_EZN, Z_EZN + 15, "10_EzratNashim")
-# Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b)
-box("Gezuztra_nord", EX0, EX1, 64, 67.5, Z_EZN + 10, Z_EZN + 11, "10_EzratNashim")
-box("Gezuztra_sud", EX0, EX1, -67.5, -64, Z_EZN + 10, Z_EZN + 11, "10_EzratNashim")
+# Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
+# entre les chambres d'angle — elle traversait leurs murs. Une dalle nue en l'air ne
+# se lisait pas : elle porte maintenant sur des colonnes et un garde-corps.
+for nm, ya, yb, devant in (("nord", 64, 67.5, 64), ("sud", -67.5, -64, -64)):
+    box(f"Gezuztra_{nm}", EX0 + 40, EX1 - 40, ya, yb, Z_EZN + 10, Z_EZN + 11, "10_EzratNashim")
+    sens = 1 if devant > 0 else -1
+    box(f"Gezuztra_{nm}_garde", EX0 + 40, EX1 - 40, devant, devant + sens * 0.5,
+        Z_EZN + 11, Z_EZN + 13, "10_EzratNashim")
+    for i, x in enumerate(plage(EX0 + 44, EX1 - 44, 7)):
+        colonne(f"Gezuztra_{nm}_colonne_{i:02d}", x, devant + sens * 0.9, Z_EZN, Z_EZN + 10, 0.6,
+                "10_EzratNashim")
+# Couronnement des murs de l'Ezrat Nashim, et les battants d'or de sa porte est :
+# « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעֲרֵי נִיקָנוֹר » (Middot 2:3).
+couronnement("EzratNashim_couronnement_nord", EX0 - 0.5, EX1 - 0.5, 67.5, 72.5, Z_EZN + H_MUR_EN, "10_EzratNashim")
+couronnement("EzratNashim_couronnement_sud", EX0 - 0.5, EX1 - 0.5, -72.5, -67.5, Z_EZN + H_MUR_EN, "10_EzratNashim")
+couronnement("EzratNashim_couronnement_est", EX1, EX1 + 5, -72.5 - 0.5, 72.5 + 0.5, Z_EZN + H_MUR_EN, "10_EzratNashim")
+battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashim", MAT_OR())
+# Treize shofarot (Shekalim 6:5) : les troncs « en forme de shofar » — étroits en haut,
+# larges en bas, pour qu'on n'y glisse pas la main (Bartenura) — le long du mur est, de
+# part et d'autre de la porte. Bronze : CHOIX, la Mishna n'en dit pas la matière.
+SHOFAR = [(0.62, 0.0), (0.60, 0.12), (0.40, 0.60), (0.24, 1.35), (0.20, 1.55), (0.14, 1.55), (0.12, 1.2), (0.0, 1.1)]
+for k, y in enumerate([-26.5 + 3.4 * i for i in range(7)] + [6.1 + 3.4 * i for i in range(6)]):
+    revolution(f"Shofar_{k:02d}", EX1 - 1.4, y, Z_EZN, SHOFAR, "10_EzratNashim", MAT_BRONZE(), verts=20)
+# Simhat Beit HaShoeva (Soucca 5:2-3 ; 52b) : « מְנוֹרוֹת שֶׁל זָהָב הָיוּ שָׁם, וְאַרְבָּעָה סְפָלִים
+# שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד » — hauts de cinquante amot, dans
+# l'Ezrat Nashim. Quatre mâts (nombre : CHOIX, la Mishna dit « des menorot »), quatre
+# coupes et quatre échelles chacun, un barreau toutes les deux amot.
+if CANDELABRES_SHOEVA:
+    H_CANDELABRE = 50
+    for k, (x, y) in enumerate(((EX0 + 30, -20), (EX0 + 30, 20), (EX1 - 30, -20), (EX1 - 30, 20))):
+        nom = f"Candelabre_Shoeva_{k}"
+        cyl(f"{nom}_socle", x, y, Z_EZN, Z_EZN + 1.0, 1.6, "10_EzratNashim", MAT_OR(), verts=24)
+        cone(f"{nom}_mat", x, y, Z_EZN + 1.0, Z_EZN + H_CANDELABRE, 0.55, 0.35, "10_EzratNashim", MAT_OR(), verts=16)
+        for j in range(4):
+            a = math.pi / 2 * j
+            dx, dy = math.cos(a), math.sin(a)
+            cyl_between(f"{nom}_bras_{j}", (x, y, Z_EZN + H_CANDELABRE - 0.6),
+                        (x + 1.8 * dx, y + 1.8 * dy, Z_EZN + H_CANDELABRE - 0.2), 0.12, "10_EzratNashim", MAT_OR(), verts=8)
+            revolution(f"{nom}_sefel_{j}", x + 1.8 * dx, y + 1.8 * dy, Z_EZN + H_CANDELABRE - 0.2,
+                       [(0.25, 0.0), (0.7, 0.55), (0.75, 0.7), (0.62, 0.7), (0.0, 0.25)], "10_EzratNashim", MAT_OR(), verts=16)
+            pied = (x + 4.0 * dx, y + 4.0 * dy, Z_EZN)
+            haut = (x + 0.5 * dx, y + 0.5 * dy, Z_EZN + H_CANDELABRE - 1.5)
+            lat = (-dy * 0.5, dx * 0.5)
+            for s, cote in ((-1, "a"), (1, "b")):
+                cyl_between(f"{nom}_echelle_{j}_montant_{cote}", (pied[0] + s * lat[0], pied[1] + s * lat[1], pied[2]),
+                            (haut[0] + s * lat[0], haut[1] + s * lat[1], haut[2]), 0.07, "10_EzratNashim", MAT_CEDRE(), verts=6)
+            for i, t in enumerate(plage(0.02, 0.98, 2.0 / (H_CANDELABRE - 1.5))):
+                px, py, pz = (pied[c] + (haut[c] - pied[c]) * t for c in range(3))
+                cyl_between(f"{nom}_echelle_{j}_barreau_{i:02d}", (px - lat[0], py - lat[1], pz), (px + lat[0], py + lat[1], pz),
+                            0.04, "10_EzratNashim", MAT_CEDRE(), verts=6)
 # Quinze marches semi-circulaires vers la porte de Nikanor (Middot 2:5), 0.5 × 0.5,
 # centrées sur l'axe, rayon décroissant en montant
 for i in range(15):
@@ -1049,7 +1494,9 @@ for i in range(15):
 # 20 — AZARA (187 × 135), Middot 5:1–2
 # ----------------------------------------------------------------------------
 AX0, AX1, AY0, AY1 = -187, 0, -67.5, 67.5
-box("Azara_sol", AX0, AX1, AY0, AY1, Z_AZ - 1, Z_AZ, "20_Azara", MAT_SOL())
+X_DOUKHAN = AX1 - 13.5       # pied de la volée : marche d'une ama puis trois demies, sur 2,5 amot de large
+box("Azara_sol", AX0, X_DOUKHAN, AY0, AY1, Z_AZ - 1, Z_AZ, "20_Azara", MAT_SOL())
+box("EzratIsrael_sol", X_DOUKHAN, AX1, AY0, AY1, Z_EZI - 1, Z_EZI, "20_Azara", MAT_SOL())
 H_MUR = 25
 T = 5   # épaisseur des murs
 # L'Azara et l'Ezrat Nashim sont des terrasses taillées dans le Har HaBayit, pas des
@@ -1059,19 +1506,30 @@ T = 5   # épaisseur des murs
 # Deux blocs et non un : le mur est de l'Azara (x 0..5) descend déjà à Z_EZN, une
 # masse qui monterait à Z_AZ sous lui lui donnerait une face coplanaire.
 box("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN, "00_HarHabayit")
-box("Podium_azara", AX0 - T, AX1, AY0 - T, AY1 + T, Z_EZN, Z_AZ, "00_HarHabayit")
+box("Podium_azara", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_EZN, Z_AZ, "00_HarHabayit")
+box("Podium_ezrat_israel", X_DOUKHAN, AX1, AY0 - T, AY1 + T, Z_EZN, Z_EZI - 1, "00_HarHabayit")
+# Le seuil de Nikanor : le sol de l'Ezrat Israël continue dans l'épaisseur du mur, sinon la
+# baie ouvre sur le vide entre ses deux vantaux.
+box("Nikanor_seuil", AX1, AX1 + T, -5, 5, Z_EZN, Z_EZI, "20_Azara", MAT_SOL())
 # Mur est avec la porte de Nikanor (10 × 20) au centre
 box("Azara_mur_est_S", AX1, AX1 + T, AY0 - T, -5, Z_EZN, Z_AZ + H_MUR, "20_Azara")
 box("Azara_mur_est_N", AX1, AX1 + T, 5, AY1 + T, Z_EZN, Z_AZ + H_MUR, "20_Azara")
-box("Nikanor_linteau", AX1, AX1 + T, -5, 5, Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
+box("Nikanor_linteau", AX1, AX1 + T, -5, 5, Z_EZI + 20, Z_AZ + H_MUR, "20_Azara")
 # Battants rabattus dans l'embrasure, comme ceux du Heikhal : les portes de l'Azara
 # sont ouvertes dès l'aube (Tamid 3:7 ; Yoma 3:1-2), et à Kippour pendant l'avoda.
 # Fermés, ils bouchaient l'axe est-ouest — la colonne vertébrale du film : les plans
 # 6, 13 et 14 finissaient sur deux vantaux de bronze là où le découpage demande
 # l'ouverture de l'Oulam au fond. Ils contredisaient aussi la ligne de mire de la
 # para adouma (Middot 2:4), que le mur est bas est fait pour dégager.
-box("Nikanor_porte_S", AX1 + 1, AX1 + 4.5, -5, -4.7, Z_AZ, Z_AZ + 20, "20_Azara", MAT_BRONZE())
-box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_AZ, Z_AZ + 20, "20_Azara", MAT_BRONZE())
+box("Nikanor_porte_S", AX1 + 1, AX1 + 4.5, -5, -4.7, Z_EZI, Z_EZI + 20, "20_Azara", MAT_BRONZE())
+box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara", MAT_BRONZE())
+# « שְׁנֵי פִשְׁפְּשִׁין הָיוּ לוֹ לְשַׁעַר נִיקָנוֹר, אֶחָד בִּימִינוֹ וְאֶחָד בִּשְׂמֹאלוֹ » (Middot 2:6) : deux
+# guichets de bronze de part et d'autre de la grande porte, côté Azara. Cote (3 × 8) :
+# CHOIX. Les vantaux sont posés sur le nu du mur — la baie n'est pas percée, et la face
+# est, dix amot au-dessus du sol de l'Ezrat Nashim, n'en reçoit pas.
+for cote, y0, y1 in (("S", -14.5, -11.5), ("N", 11.5, 14.5)):
+    box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + 8, "20_Azara", MAT_BRONZE())
+    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + 8, Z_EZI + 8.4, "20_Azara", MAT_BRONZE())
 # Mur ouest
 box("Azara_mur_ouest", AX0 - T, AX0, AY0 - T, AY1 + T, Z_AZ, Z_AZ + H_MUR, "20_Azara")
 # Murs nord et sud avec trois portes chacun (10 × 20). Positions : CHOIX (Middot 1:4)
@@ -1103,14 +1561,23 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
     for p in ouvertures:
         box(f"Azara_porte_{nm}_{p:+.0f}_linteau", p - 5, p + 5, y0, y1,
             Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
-# Marche Ezrat Israël / Ezrat Cohanim (1 ama) + Doukhan (3 marches de 0.5) — Middot 2:6
-box("Marche_EzratIsrael_Cohanim", -11, -10, AY0, AY1, Z_AZ, Z_AZ + 1, "20_Azara")
+        # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
+        # ouverts dès l'aube (Tamid 3:7). Le פתח de HaGazit n'est pas un שער.
+        if p != (GAZIT_X0 + GAZIT_X1) / 2:
+            battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
+                     Z_AZ, 20, "20_Azara", MAT_OR())
+# Ezrat Israël → Ezrat Kohanim (Middot 2:6, R. Eliezer ben Yaakov) : « מַעֲלָה גְבוֹהָה אַמָּה
+# וְהַדּוּכָן נָתוּן עָלֶיהָ וּבוֹ שָׁלֹשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה, נִמְצֵאת עֶזְרַת כֹּהֲנִים גְּבוֹהָה
+# מֵעֶזְרַת יִשְׂרָאֵל שְׁתֵּי אַמּוֹת וּמֶחֱצָה ». Une volée qui monte vers l'ouest, sur toute la largeur :
+# la marche d'une ama, puis les trois demi-marches du Doukhan, la dernière affleurant la cour.
+# Les boîtes emboîtées d'avant faisaient un mur de 2,5 amot en travers de la porte.
+box("Marche_EzratIsrael_Cohanim", AX1 - 12, AX1 - 11, AY0, AY1, Z_EZI - 1, Z_EZI + 1, "20_Azara")
 for i in range(3):
-    box(f"Doukhan_{i}", -12 - i * 0.5, -11, -40, 40, Z_AZ, Z_AZ + 1 + 0.5 * (i + 1), "20_Azara")
+    box(f"Doukhan_{i}", AX1 - 12.5 - i * 0.5, AX1 - 12 - i * 0.5, AY0, AY1, Z_EZI - 1, Z_EZI + 1.5 + 0.5 * i, "20_Azara")
 
 # Chambres du pourtour — 80_Lishkot. Elles sont adossées aux murs de l'Azara mais
-# posées sur le Har HaBayit : leur pied est à Z_HAR, 13,5 amot sous le sol de la cour
-# qu'elles bordent. Les faire partir de Z_AZ les laissait en l'air. Middot 1:7 le dit
+# posées sur la terrasse du 'Heil (plus bas) : leur pied est à Z_EZN, dix amot sous le sol
+# de la cour qu'elles bordent. Les faire partir de Z_AZ les laissait en l'air. Middot 1:7 le dit
 # du Beit HaMoked : « אֶחָד פָּתוּחַ לַחֵיל וְאֶחָד פָּתוּחַ לָעֲזָרָה » — une porte à chaque
 # niveau, donc un bâtiment qui les enjambe.
 SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du Beit
@@ -1129,7 +1596,7 @@ NORD_Y0 = 2 * AXE_MUR_N - NORD_Y1     # symétrique du précédent par rapport �
 # sans quoi les deux toits seraient coplanaires, et la largeur laisse la caméra du
 # plan 7a passer entre lui et la Lishkat HaGazit.
 lishka("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
-       Z_HAR, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
+       Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
 maake("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
       Z_AZ + 30, "80_Lishkot")
 # Lishkat HaGazit, même parti : à cheval, deux פתחים opposés (Yoma 25a).
@@ -1142,7 +1609,7 @@ maake("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
 # Cohen Gadol avait DEUX lishkot — ce que Yoma 19a laisse ouvert (« וְלֹא יָדַעְנָא »
 # laquelle est au nord, laquelle au sud) — et non que Parhedrin = HaEtz.
 lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1,
-       Z_HAR, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
+       Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
 maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
 
 # Sha'ar HaNitzotz, la porte nord la plus occidentale — le seul corps de porte que la
@@ -1152,7 +1619,7 @@ maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Li
 # (Middot 1:1 ; Tamid 1:1), et son aliyah regarde l'Azara.
 NZ_X0, NZ_X1 = PORTE_NITZOTZ - 10, PORTE_NITZOTZ + 10
 NZ_Y0, NZ_Y1, NZ_Z0 = AY1 + T, NORD_Y1, Z_AZ + 25
-lishka("Beit_ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, Z_HAR, NZ_Z0,
+lishka("Beit_ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, Z_EZN, NZ_Z0,
        "80_Lishkot", [("N", *PORTE_SHAAR)])
 terrasse_de_porte("ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, NZ_Z0,
                   (PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5), "80_Lishkot")
@@ -1173,7 +1640,7 @@ aliyah("BeitHaNitzotz", PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5, NZ_Y0, NZ_Y1, NZ_Z
 BA_X0, BA_X1 = PORTE_MAYIM - 5, PORTE_MAYIM + 5
 BA_Y0, BA_Y1, BA_Z0 = AY0 - T - SAILLIE, AY0 - T, Z_AZ + 25
 SM_X0, SM_X1 = PORTE_MAYIM - 10, PORTE_MAYIM + 10
-lishka("Beit_ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, Z_HAR, BA_Z0,
+lishka("Beit_ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, Z_EZN, BA_Z0,
        "80_Lishkot", [("S", *PORTE_SHAAR)])
 terrasse_de_porte("ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, BA_Z0,
                   (BA_X0, BA_X1), "80_Lishkot")
@@ -1185,7 +1652,7 @@ aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
 # Elle touche le corps de porte par les socles : à corps jointifs les deux socles se
 # recouvriraient sur leur débord, et deux faces supérieures coplanaires clignotent.
 lishka("Lishkat_Parhedrin", SM_X0 - 16, SM_X0 - 1, BA_Y0, BA_Y1,
-       Z_HAR, Z_AZ + 15, "80_Lishkot", [("S", *PORTE_LISHKA)])
+       Z_EZN, Z_AZ + 15, "80_Lishkot", [("S", *PORTE_LISHKA)])
 maake("Lishkat_Parhedrin", SM_X0 - 16, SM_X0 - 1, BA_Y0, BA_Y1, Z_AZ + 15, "80_Lishkot")
 
 # Les deux lishkot de Sha'ar Nikanor, dans l'Ezrat Israël, de part et d'autre de la
@@ -1194,7 +1661,7 @@ maake("Lishkat_Parhedrin", SM_X0 - 16, SM_X0 - 1, BA_Y0, BA_Y1, Z_AZ + 15, "80_L
 # HaBe'hira 5:17). CHOIX : Pin'has au nord (la droite de qui entre), leur cote et leur
 # hauteur, qu'aucune source ne donne. Elles s'ouvrent à l'ouest, sur la cour.
 for nm, ny0, ny1 in (("Pinchas_HaMalbish", 5, 20), ("Osei_Chavitin", -20, -5)):
-    lishka(f"Lishkat_{nm}", -8, AX1, ny0, ny1, Z_AZ, Z_AZ + 20,
+    lishka(f"Lishkat_{nm}", -8, AX1, ny0, ny1, Z_EZI, Z_AZ + 20,
            "80_Lishkot", [("O", *PORTE_LISHKA)])
     maake(f"Lishkat_{nm}", -8, AX1, ny0, ny1, Z_AZ + 20, "80_Lishkot")
 
@@ -1206,11 +1673,57 @@ for nm, ny0, ny1 in (("Pinchas_HaMalbish", 5, 20), ("Osei_Chavitin", -20, -5)):
 HEIL = 10
 SX0, SX1 = AX0 - T - HEIL, EX1 + 5 + HEIL
 SY0, SY1 = -(NORD_Y1 + HEIL), NORD_Y1 + HEIL
+# Un treillis de bois (Middot 2:3 ; fiche §2 : « séparation légère, pas un mur ») :
+# poteaux au pas de 3 amot et deux lisses. La lame pleine d'avant se lisait en muret.
+SOREG_H = 1.67
 for nm, xa, xb, ya, yb in (("sud", SX0, SX1, SY0, SY0 + 0.2),
                            ("nord", SX0, SX1, SY1 - 0.2, SY1),
-                           ("ouest", SX0, SX0 + 0.2, SY0, SY1),
-                           ("est", SX1 - 0.2, SX1, SY0, SY1)):
-    box(f"Soreg_{nm}", xa, xb, ya, yb, Z_HAR, Z_HAR + 1.67, "00_HarHabayit")
+                           ("ouest", SX0, SX0 + 0.2, SY0 + 0.2, SY1 - 0.2),
+                           ("est", SX1 - 0.2, SX1, SY0 + 0.2, SY1 - 0.2)):
+    for k, (zb, zh) in enumerate(((Z_HAR + 0.55, Z_HAR + 0.68), (Z_HAR + SOREG_H - 0.13, Z_HAR + SOREG_H))):
+        box(f"Soreg_{nm}_lisse_{k}", xa, xb, ya, yb, zb, zh, "00_HarHabayit", MAT_CHENE())
+    long_x = (xb - xa) >= (yb - ya)
+    a0, a1 = (xa, xb) if long_x else (ya + 1.5, yb - 1.5)   # les poteaux d'angle sont ceux des grands côtés
+    for k, c in enumerate(plage(a0, a1, 3)):
+        if long_x:
+            box(f"Soreg_{nm}_poteau_{k:03d}", c - 0.15, c + 0.15, ya - 0.05, yb + 0.05,
+                Z_HAR, Z_HAR + SOREG_H + 0.15, "00_HarHabayit", MAT_CHENE())
+        else:
+            box(f"Soreg_{nm}_poteau_{k:03d}", xa - 0.05, xb + 0.05, c - 0.15, c + 0.15,
+                Z_HAR, Z_HAR + SOREG_H + 0.15, "00_HarHabayit", MAT_CHENE())
+# La terrasse du 'Heil sur les trois autres côtés : le sol y est celui de l'Ezrat Nashim
+# (Z_EZN), et ses douze marches descendent vers le soreg comme à l'est, en laissant les
+# mêmes quatre amot de plat devant lui. À l'ouest, dix amot de 'Heil ne laissent pas de
+# terrasse : les marches montent jusqu'au pied du podium. Les corps de porte et lishkot
+# du pourtour sont posés sur cette terrasse, leur porte sur le 'Heil s'ouvre dessus.
+HEIL_MARCHES = 12
+for cote, ya, yb in (("nord", AY1 + T, NORD_Y1), ("sud", -NORD_Y1, AY0 - T)):
+    box(f"Heil_terrasse_{cote}", AX0 - T, SX1 - 4, ya, yb, Z_HAR, Z_EZN, "00_HarHabayit")
+for i in range(HEIL_MARCHES):
+    z = Z_HAR + 0.5 * (i + 1)
+    box(f"Heil_marche_nord_{i:02d}", SX0 + 4, SX1 - 4, SY1 - 4 - 0.5 * (i + 1), SY1 - 4 - 0.5 * i, Z_HAR, z, "00_HarHabayit")
+    box(f"Heil_marche_sud_{i:02d}", SX0 + 4, SX1 - 4, SY0 + 4 + 0.5 * i, SY0 + 4 + 0.5 * (i + 1), Z_HAR, z, "00_HarHabayit")
+    box(f"Heil_marche_ouest_{i:02d}", SX0 + 4 + 0.5 * i, SX0 + 4 + 0.5 * (i + 1), -NORD_Y1, NORD_Y1, Z_HAR, z, "00_HarHabayit")
+# De la terrasse aux portes latérales : dix amot, vingt marches de « רוּם מַעֲלָה חֲצִי אַמָּה
+# וְשִׁלְחָהּ חֲצִי אַמָּה » (Middot 2:3), sur la largeur de la baie. Devant les trois portes
+# sans corps de porte ; Moked, Nitzotz et Mayim montent dans leur bâtiment.
+for nm, x, cote in (("Korban", PORTE_KORBAN, "nord"), ("Bekhorot", PORTE_BEKHOROT, "sud"), ("Delek", PORTE_DELEK, "sud")):
+    for k in range(20):
+        if cote == "nord":
+            ya, yb = AY1 + T + 0.5 * k, AY1 + T + 0.5 * (k + 1)
+        else:
+            ya, yb = AY0 - T - 0.5 * (k + 1), AY0 - T - 0.5 * k
+        box(f"Escalier_{nm}_{k:02d}", x - 5, x + 5, ya, yb, Z_EZN, Z_AZ - 0.5 * k, "20_Azara")
+# Couronnement des murs de l'Azara : une assise en débord sur la crête, qui saute
+# les corps de porte passant les 25 amot (Beit HaMoked, HaGazit, et les terrasses
+# de Sha'ar HaNitzotz et de Sha'ar HaMayim).
+couronnement("Azara_couronnement_est", AX1, AX1 + T, AY0 - T - 0.5, AY1 + T + 0.5, Z_AZ + H_MUR, "20_Azara")
+couronnement("Azara_couronnement_ouest", AX0 - T, AX0, AY0 + 0.5, AY1 - 0.5, Z_AZ + H_MUR, "20_Azara")
+couronnement("Azara_couronnement_nord", AX0 - T - 0.5, AX1 - 0.5, AY1, AY1 + T, Z_AZ + H_MUR, "20_Azara",
+             reserve=[(PORTE_MOKED - 10.5, PORTE_MOKED + 10.5), (GAZIT_X0 - 0.5, GAZIT_X1 + 0.5),
+                      (NZ_X0 - LISHKA_DEBORD, NZ_X1 + LISHKA_DEBORD)])
+couronnement("Azara_couronnement_sud", AX0 - T - 0.5, AX1 - 0.5, AY0 - T, AY0, Z_AZ + H_MUR, "20_Azara",
+             reserve=[(SM_X0 - LISHKA_DEBORD, SM_X1 + LISHKA_DEBORD)])
 
 # ----------------------------------------------------------------------------
 # 30 — MIZBEA'H (Middot 3:1) + rampe + Kiyor + Beit HaMitba'haïm
@@ -1219,21 +1732,48 @@ MX0, MX1 = -54, -22          # 32 amot, à 22 amot de l'Oulam
 MY0, MY1 = -25, 7            # CHOIX : centre 9 amot au sud de l'axe, bord nord à 60.5 du mur nord
                              # (Middot 5:2 ; Rambam Beit HaBe'hira 5:13-15). R. Yehouda (autel centré,
                              # Zeva'him 58b) non retenu. Voir README « Tranché ».
-box("Mizbeach_yessod", MX0, MX1, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_corps", MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ + 1, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
+# Le yessod ne fait pas le tour : « הַיְסוֹד הָיָה מְהַלֵּךְ עַל פְּנֵי כָל הַצָּפוֹן וְעַל פְּנֵי כָל
+# הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת וּבַמִּזְרָח אַמָּה אַחַת » (Middot 3:1 ; fiche §6). Tout le
+# nord et tout l'ouest, une ama à l'angle sud-ouest sur le sud, une ama à l'angle
+# nord-est sur l'est ; le corps descend donc jusqu'au sol sur les faces est et sud.
+box("Mizbeach_yessod_N", MX0 + 1, MX1, MY1 - 1, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
+box("Mizbeach_yessod_O", MX0, MX0 + 1, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
+box("Mizbeach_yessod_S", MX0 + 1, MX0 + 2, MY0, MY0 + 1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
+box("Mizbeach_yessod_E", MX1 - 1, MX1, MY1 - 2, MY1 - 1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
+box("Mizbeach_corps", MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
 box("Mizbeach_haut", MX0 + 2, MX1 - 2, MY0 + 2, MY1 - 2, Z_AZ + 6, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX_FEU())
 for (nm, x, y) in [("SE", MX1 - 3, MY0 + 2), ("NE", MX1 - 3, MY1 - 3), ("NO", MX0 + 2, MY1 - 3), ("SO", MX0 + 2, MY0 + 2)]:
     box(f"Keren_{nm}", x, x + 1, y, y + 1, Z_AZ + 9, Z_AZ + 10, "30_Mizbeach", MAT_CHAUX_FEU())
-# Ma'arakha (feu) : petit volume noir au centre
-box("Maarakha", MX0 + 8, MX1 - 8, MY0 + 8, MY1 - 8, Z_AZ + 9, Z_AZ + 9.6, "30_Mizbeach", braise("Braise"))
+# « וְחוּט שֶׁל סִקְרָא חוֹגְרוֹ בָאֶמְצַע » (Middot 3:1) : la ligne rouge à mi-hauteur, qui sépare
+# les sangs d'en haut des sangs d'en bas — le seul trait de couleur sur la chaux.
+for nm, xa, xb, ya, yb in (("E", MX1 - 1, MX1 - 0.97, MY0 + 1, MY1 - 1), ("O", MX0 + 0.97, MX0 + 1, MY0 + 1, MY1 - 1),
+                           ("N", MX0 + 1, MX1 - 1, MY1 - 1, MY1 - 0.97), ("S", MX0 + 1, MX1 - 1, MY0 + 0.97, MY0 + 1)):
+    box(f"Mizbeach_sikra_{nm}", xa, xb, ya, yb, Z_AZ + 4.95, Z_AZ + 5.05, "30_Mizbeach", MAT_SIKRA())
+# Quatre ma'arakhot le jour de Kippour (Rambam, Temidin ouMousafin 2:4 — l'avis de
+# R. Yossi, Yoma 4:6 ; le tana kama en compte trois) : la grande à l'est, celle de la
+# ketoret à l'angle sud-ouest (Tamid 2:4-5), la troisième pour entretenir le feu, la
+# quatrième pour les membres du tamid de la veille. Chacune : deux lits de bûches
+# croisées sous les braises. Une seule dalle noire de 16 amot se lisait en bassin.
+MAARAKHOT = (("gedola", -36, -28, -13, -5), ("ketoret", -48, -45, -19, -16),
+             ("kiyum", -48, -45, -4, -1), ("kippour", -42, -39, -19, -16))
+for nm, xa, xb, ya, yb in MAARAKHOT:
+    for lit, (le_long, zb) in enumerate((("x", Z_AZ + 9.0), ("y", Z_AZ + 9.35))):
+        for k, c in enumerate(plage(0.15, 0.85, 0.35)):
+            if le_long == "x":
+                cyl_between(f"Maarakha_{nm}_buche_{lit}{k}", (xa, ya + (yb - ya) * c, zb + 0.18),
+                            (xb, ya + (yb - ya) * c, zb + 0.18), 0.17, "30_Mizbeach", MAT_CHENE(), verts=8)
+            else:
+                cyl_between(f"Maarakha_{nm}_buche_{lit}{k}", (xa + (xb - xa) * c, ya, zb + 0.18),
+                            (xa + (xb - xa) * c, yb, zb + 0.18), 0.17, "30_Mizbeach", MAT_CHENE(), verts=8)
+    box(f"Maarakha_{nm}", xa + 0.2, xb - 0.2, ya + 0.2, yb - 0.2, Z_AZ + 9.6, Z_AZ + 9.95, "30_Mizbeach", braise("Braise"))
 # Le feu lui-même. La ma'arakha était une boîte noire sans source : la colonne de fumée
 # montait d'un autel éteint, et la rampe du plan 7b n'avait que la lumière du ciel — la
 # raison pour laquelle elle ne se détachait ni de l'autel ni du dallage.
-feu = lampe("Maarakha_feu", 'AREA',
-            (m((MX0 + MX1) / 2), m((MY0 + MY1) / 2), m(Z_AZ + 10)))
+_, GX0, GX1, GY0, GY1 = MAARAKHOT[0]
+feu = lampe("Maarakha_feu", 'AREA', (m((GX0 + GX1) / 2), m((GY0 + GY1) / 2), m(Z_AZ + 10.2)))
 feu.data.shape = 'RECTANGLE'
-feu.data.size = m(MX1 - MX0 - 16)
-feu.data.size_y = m(MY1 - MY0 - 16)
+feu.data.size = m(GX1 - GX0)
+feu.data.size_y = m(GY1 - GY0)
 feu.data.energy = 1500
 feu.data.color = (1.0, 0.42, 0.13)
 link_to(feu, "30_Mizbeach")
@@ -1251,7 +1791,7 @@ link_to(feu, "30_Mizbeach")
 # écartées de l'axe en montant, avec une dérive vers le sud en haut : à quinze sphères
 # espacées de trois amot on lisait un chapelet de boules. La silhouette est bosselée,
 # la passe Z reste écrite (matière `nuee`), et le sommet quitte l'axe du Sanctuaire.
-FUMEE_X, FUMEE_Y = (MX0 + MX1) / 2, (MY0 + MY1) / 2
+FUMEE_X, FUMEE_Y = (GX0 + GX1) / 2, (GY0 + GY1) / 2    # au-dessus de la grande ma'arakha
 MAT_FUMEE = nuee("Fumee", (0.80, 0.80, 0.82))
 for i in range(40):
     t = i / 39
@@ -1267,16 +1807,127 @@ for i in range(40):
 xc = (MX0 + MX1) / 2
 wedge_ramp("Kevesh", xc - 8, xc + 8, MY0 - 30, MY0, Z_AZ, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX())
 box("Kevesh_raccord", xc - 8, xc + 8, MY0, MY0 + 2, Z_AZ, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX())
+# « וּשְׁנֵי כְבָשִׁים קְטַנִּים יוֹצְאִין מִן הַכֶּבֶשׁ, שֶׁבָּהֶן פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב, מֻבְדָּלִין מִן
+# הַמִּזְבֵּחַ אַמָּה אַחַת » (Middot 3:3 ; Rambam Beit HaBe'hira 2:14 : celui du sovev à
+# l'ouest, celui du yessod à l'est) : deux passerelles qui quittent la rampe à la
+# hauteur du sovev (6) et du yessod (1), et rejoignent l'autel à une ama d'écart.
+Y_SOVEV_RAMPE = MY0 - 30 + 30 * 6 / 9       # là où la rampe passe 6 amot
+Y_YESSOD_RAMPE = MY0 - 30 + 30 * 1 / 9      # et une ama
+box("Kevesh_katan_sovev", xc - 10.5, xc - 8, Y_SOVEV_RAMPE, MY0 + 1, Z_AZ + 5.6, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
+box("Kevesh_katan_yessod", xc + 8, xc + 10.5, Y_YESSOD_RAMPE, MY0, Z_AZ + 0.6, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
 # Kiyor : entre l'Oulam et le Mizbea'h, décalé vers le sud (Middot 3:6). La même michna
 # donne les 22 amot et les douze marches ; les marches en prennent 12, il reste 10 amot
 # de plat entre x -64 et -54, et c'est là que le bassin tient.
-cyl("Kiyor_pied", -59, -8, Z_AZ, Z_AZ + 1, 0.8, "30_Mizbeach", MAT_BRONZE())
-cyl("Kiyor_bassin", -59, -8, Z_AZ + 1, Z_AZ + 2.2, 1.6, "30_Mizbeach", MAT_BRONZE())
-# Beit HaMitba'haïm au nord : 8 piliers, 8 tables de marbre, 24 anneaux
+# Bronze, sur son pied (le כַּן, Shemot 30:18) ; douze robinets, « שְׁנֵים עָשָׂר דַּד »,
+# le perfectionnement de Ben Katin (Yoma 3:10 ; fiche §7). Deux cylindres empilés se
+# lisaient en tambour : profil tourné, panse, lèvre, et l'eau dans la vasque.
+KIYOR_X, KIYOR_Y = -59, -8
+revolution("Kiyor", KIYOR_X, KIYOR_Y, Z_AZ,
+           [(1.05, 0.0), (1.0, 0.12), (0.55, 0.30), (0.45, 0.55), (0.45, 0.95), (0.60, 1.05),
+            (1.35, 1.25), (1.65, 1.60), (1.72, 2.05), (1.80, 2.20), (1.82, 2.30), (1.68, 2.30),
+            (1.62, 2.05), (1.45, 1.55), (0.0, 1.30)], "30_Mizbeach", MAT_BRONZE(), verts=36)
+cyl("Kiyor_eau", KIYOR_X, KIYOR_Y, Z_AZ + 1.95, Z_AZ + 2.02, 1.66, "30_Mizbeach", MAT_EAU(), verts=36)
+for i in range(12):
+    a = 2 * math.pi * i / 12
+    dx, dy = math.cos(a), math.sin(a)
+    cyl_between(f"Kiyor_dad_{i:02d}", (KIYOR_X + 1.45 * dx, KIYOR_Y + 1.45 * dy, Z_AZ + 1.45),
+                (KIYOR_X + 2.0 * dx, KIYOR_Y + 2.0 * dy, Z_AZ + 1.40), 0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
+    cyl_between(f"Kiyor_dad_{i:02d}_bec", (KIYOR_X + 2.0 * dx, KIYOR_Y + 2.0 * dy, Z_AZ + 1.40),
+                (KIYOR_X + 2.0 * dx, KIYOR_Y + 2.0 * dy, Z_AZ + 1.22), 0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
+# Mukhni de Ben Katin (Yoma 3:10 ; 37a) : la roue qui descend le Kiyor dans son puits
+# chaque soir, « כְּדֵי שֶׁלֹּא יִהְיוּ מֵימָיו נִפְסָלִין בְּלִינָה ». Un poteau, une potence, une
+# roue et une chaîne jusqu'au bord de la cuve ; la forme est un CHOIX.
+MUKHNI_X = KIYOR_X - 3.5
+cyl("Mukhni_poteau", MUKHNI_X, KIYOR_Y, Z_AZ, Z_AZ + 5.6, 0.22, "30_Mizbeach", MAT_CEDRE(), verts=12)
+cyl_between("Mukhni_potence", (MUKHNI_X, KIYOR_Y, Z_AZ + 5.3), (KIYOR_X, KIYOR_Y, Z_AZ + 5.3), 0.16, "30_Mizbeach", MAT_CEDRE(), verts=10)
+cyl_between("Mukhni_jambe_de_force", (MUKHNI_X, KIYOR_Y, Z_AZ + 3.6), (MUKHNI_X + 1.8, KIYOR_Y, Z_AZ + 5.2), 0.1, "30_Mizbeach", MAT_CEDRE(), verts=8)
+tore("Mukhni_roue", MUKHNI_X, KIYOR_Y - 0.45, Z_AZ + 3.8, 0.8, 0.08, "30_Mizbeach", MAT_CEDRE(), rotation=(math.pi / 2, 0, 0))
+for k in range(6):
+    a = math.pi * k / 6
+    cyl_between(f"Mukhni_rayon_{k}", (MUKHNI_X + 0.75 * math.cos(a), KIYOR_Y - 0.45, Z_AZ + 3.8 + 0.75 * math.sin(a)),
+                (MUKHNI_X - 0.75 * math.cos(a), KIYOR_Y - 0.45, Z_AZ + 3.8 - 0.75 * math.sin(a)), 0.04, "30_Mizbeach", MAT_CEDRE(), verts=6)
+cyl_between("Mukhni_essieu", (MUKHNI_X, KIYOR_Y - 0.6, Z_AZ + 3.8), (MUKHNI_X, KIYOR_Y + 0.3, Z_AZ + 3.8), 0.06, "30_Mizbeach", MAT_FER(), verts=8)
+for k, (z0, z1) in enumerate(((5.3, 4.6), (4.6, 3.9), (3.9, 3.2), (3.2, 2.5))):
+    cyl_between(f"Mukhni_chaine_{k}", (KIYOR_X, KIYOR_Y, Z_AZ + z0), (KIYOR_X, KIYOR_Y, Z_AZ + z1), 0.05, "30_Mizbeach", MAT_FER(), verts=6)
+# Magrefa (Tamid 5:6 ; Arakhin 10b-11a) : « אַמָּה עַל אַמָּה, וְיָד יוֹצֵא מִמֶּנָּה, וַעֲשָׂרָה
+# נְקָבִים הָיוּ בָהּ ». Posée entre l'Oulam et le Mizbea'h, là où on la jette (Tamid 5:6).
+box("Magrefa", -61, -60, 13, 14, Z_AZ, Z_AZ + 0.15, "30_Mizbeach", MAT_BRONZE())
+cyl_between("Magrefa_yad", (-60, 13.5, Z_AZ + 0.08), (-58.4, 13.5, Z_AZ + 0.08), 0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
+for k in range(10):
+    cyl(f"Magrefa_nekev_{k}", -60.85 + 0.19 * k, 13.5, Z_AZ + 0.15, Z_AZ + 0.55, 0.045, "30_Mizbeach", MAT_BRONZE(), verts=8)
+
+# --- Les cuivres de Shlomo (Melakhim I 7:23-39 ; Divrei HaYamim II 4:2-6), à côté du
+#     Kiyor de la Mishna — comme Menachot 98b range les dix menorot de Shlomo autour de
+#     celle de Moshé. Ils sont du Premier Temple : Middot ne les connaît pas (CHOIX).
+# La Mer : dix amot de bord à bord, cinq de haut, trente de tour, « כְּמַעֲשֵׂה שְׂפַת כּוֹס
+# פֶּרַח שׁוֹשָׁן », deux rangs de coloquintes sous la lèvre, douze bœufs, trois vers chaque
+# vent, « וְכָל אֲחֹרֵיהֶם בָּיְתָה ». « עַל כֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב » (7:39) :
+# au sud-est du bâtiment, entre les marches de l'Oulam et la rampe.
+YAM_X, YAM_Y, YAM_Z = -63, -40, Z_AZ + 2.2
+YAM = [(0.6, 0.0), (3.6, 0.5), (4.5, 1.6), (4.75, 3.2), (4.7, 3.9), (5.0, 4.6), (5.2, 5.0),
+       (4.95, 5.0), (4.6, 4.4), (4.45, 3.0), (3.6, 1.0), (0.0, 0.6)]
+revolution("Yam", YAM_X, YAM_Y, YAM_Z, YAM, "30_Mizbeach", MAT_BRONZE(), verts=48)
+cyl("Yam_eau", YAM_X, YAM_Y, YAM_Z + 4.2, YAM_Z + 4.27, 4.5, "30_Mizbeach", MAT_EAU(), verts=48)
+for rang, z in enumerate((3.55, 3.85)):
+    for k in range(75):
+        a = 2 * math.pi * (k + 0.5 * rang) / 75
+        sphere(f"Yam_peka_{rang}{k:02d}", YAM_X + 4.8 * math.cos(a), YAM_Y + 4.8 * math.sin(a), YAM_Z + z, 0.14,
+               "30_Mizbeach", MAT_BRONZE(), segs=6)
+
+
+def boeuf(name, x, y, z0, d, col, mat):
+    """Bœuf de la Mer : tête vers `d` (vecteur cardinal), croupe vers le centre."""
+    dx, dy = d
+    px, py = -dy, dx
+
+    def pt(le_long, en_travers):
+        return x + dx * le_long + px * en_travers, y + dy * le_long + py * en_travers
+
+    (ax, ay), (bx, by) = pt(0, -0.5), pt(2.4, 0.5)
+    box(f"{name}_corps", ax, bx, ay, by, z0 + 1.0, z0 + 2.1, col, mat)
+    (ax, ay), (bx, by) = pt(2.3, -0.28), pt(3.0, 0.28)
+    box(f"{name}_tete", ax, bx, ay, by, z0 + 1.55, z0 + 2.1, col, mat)
+    for k, (l, t) in enumerate(((0.35, -0.32), (0.35, 0.32), (2.0, -0.32), (2.0, 0.32))):
+        cx, cy = pt(l, t)
+        cyl(f"{name}_patte_{k}", cx, cy, z0, z0 + 1.0, 0.13, col, mat, verts=8)
+    for k, s in enumerate((-1, 1)):
+        (ax, ay), (bx, by) = pt(2.85, s * 0.2), pt(2.95, s * 0.55)
+        cyl_between(f"{name}_corne_{k}", (ax, ay, z0 + 2.1), (bx, by, z0 + 2.5), 0.04, col, mat, verts=6)
+
+
+for nm, d in (("E", (1, 0)), ("N", (0, 1)), ("O", (-1, 0)), ("S", (0, -1))):
+    for k, t in enumerate((-1.5, 0.0, 1.5)):
+        boeuf(f"Yam_shor_{nm}{k}", YAM_X + d[0] * 3.0 - d[1] * t, YAM_Y + d[1] * 3.0 + d[0] * t, Z_AZ, d,
+              "30_Mizbeach", MAT_BRONZE())
+# Les dix mekhonot (Melakhim I 7:27-39) : socles de bronze de 4 × 4 × 3 sur quatre roues
+# d'une ama et demie, panneaux à lions, bœufs et keruvim (ici : leurs cadres seulement),
+# et une cuve de quatre amot sur chacun. « חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף
+# הַבַּיִת מִשְּׂמֹאל » : sur l'épaule du bâtiment — la plateforme de 6 amot, à côté du corps.
+MEKHONA = [(1.4, 0.0), (1.9, 0.25), (2.0, 0.9), (1.85, 1.35), (1.7, 1.35), (1.75, 0.9), (1.55, 0.35), (0.0, 0.2)]
+for cote, y in (("S", -42.5), ("N", 42.5)):
+    for k, x in enumerate((-105, -120, -135, -150, -165)):
+        nom = f"Mekhona_{cote}{k}"
+        box(f"{nom}_corps", x - 2, x + 2, y - 2, y + 2, Z_BAT + 0.9, Z_BAT + 3.6, "30_Mizbeach", MAT_BRONZE())
+        for face, (xa, xb, ya, yb) in (("E", (x + 2, x + 2.12, y - 1.8, y + 1.8)), ("O", (x - 2.12, x - 2, y - 1.8, y + 1.8)),
+                                        ("N", (x - 1.8, x + 1.8, y + 2, y + 2.12)), ("S", (x - 1.8, x + 1.8, y - 2.12, y - 2))):
+            box(f"{nom}_cadre_{face}_bas", xa, xb, ya, yb, Z_BAT + 1.2, Z_BAT + 1.4, "30_Mizbeach", MAT_BRONZE())
+            box(f"{nom}_cadre_{face}_haut", xa, xb, ya, yb, Z_BAT + 3.1, Z_BAT + 3.3, "30_Mizbeach", MAT_BRONZE())
+        for j, (rx, ry) in enumerate(((-1.3, -2.2), (1.3, -2.2), (-1.3, 2.2), (1.3, 2.2))):
+            tore(f"{nom}_roue_{j}", x + rx, y + ry, Z_BAT + 0.75, 0.62, 0.13, "30_Mizbeach", MAT_BRONZE(), rotation=(math.pi / 2, 0, 0))
+        cyl(f"{nom}_col", x, y, Z_BAT + 3.6, Z_BAT + 4.1, 1.2, "30_Mizbeach", MAT_BRONZE(), verts=24)
+        revolution(f"{nom}_kiyor", x, y, Z_BAT + 4.1, MEKHONA, "30_Mizbeach", MAT_BRONZE(), verts=32)
+        cyl(f"{nom}_eau", x, y, Z_BAT + 5.25, Z_BAT + 5.3, 1.7, "30_Mizbeach", MAT_EAU(), verts=32)
+# Beit HaMitba'haïm au nord : 8 piliers, 8 tables de marbre, 24 anneaux. Les
+# ninnasin portent « רְבִיעִית שֶׁל אֶרֶז עַל גַּבֵּיהֶן וְאֻנְקְלָיוֹת שֶׁל בַּרְזֶל הָיוּ קְבוּעִין בָּהֶן,
+# שְׁלֹשָׁה סְדָרִים » (Middot 3:5) : trois rangs de crochets de fer, sur les deux faces qui
+# regardent le rang — c'est là que pendent les bêtes.
 for i in range(8):
     x = MX1 - 3 - i * 3.7
     cyl(f"Pilier_{i}", x, 53.2, Z_AZ, Z_AZ + 3, 0.5, "30_Mizbeach")
-    box(f"Pilier_{i}_cedre", x - 0.7, x + 0.7, 52.5, 53.9, Z_AZ + 3, Z_AZ + 3.6, "30_Mizbeach", MAT_CEDRE())
+    box(f"Pilier_{i}_cedre", x - 0.7, x + 0.7, 52.5, 53.9, Z_AZ + 3, Z_AZ + 4.2, "30_Mizbeach", MAT_CEDRE())
+    for sens, face in ((-1, "O"), (1, "E")):
+        for rang, z in enumerate((Z_AZ + 3.25, Z_AZ + 3.6, Z_AZ + 3.95)):
+            crochet(f"Pilier_{i}_crochet_{face}{rang}", x + sens * 0.7, 53.2 + (rang - 1) * 0.35, z, sens, "30_Mizbeach")
     box(f"Table_marbre_{i}", x - 0.5, x + 0.5, 42, 44, Z_AZ, Z_AZ + 1.5, "30_Mizbeach", MAT_MARBRE())
 for r in range(4):
     for c in range(6):
@@ -1302,7 +1953,7 @@ for i in range(12):
     # « רוּם מַעֲלָה חֲצִי אַמָּה וְשִׁלְחָהּ אַמָּה » (Middot 3:6) : le giron fait une ama, pas
     # une demie — les douze marches occupent 12 des 22 amot qui séparent l'Oulam du
     # Mizbea'h, le reste est du plat.
-    box(f"Marche_Ulam_{i:02d}", BX_E + (12 - i) - 1, BX_E + (12 - i), -20, 20,
+    box(f"Marche_Ulam_{i:02d}", BX_E + (12 - i) - 1, BX_E + (12 - i), -11, 11,
         Z_AZ, Z_AZ + 0.5 * (i + 1), "40_Ulam")
 
 # --- Oulam : façade 100 large, ouverture 20 × 40 SANS portes (Middot 3:7)
@@ -1322,17 +1973,16 @@ EPAISSEUR_PLACAGE = 0.1   # amot : l'or est une feuille, la boîte doit rester v
 # Cinq poutres de chêne au-dessus de l'ouverture (Middot 3:7)
 for i in range(5):
     L = 22 + i * 2
-    box(f"Maltera_{i}", BX_E - 5.4, BX_E + 0.4, -L / 2, L / 2, Z_BAT + 41 + i * 2, Z_BAT + 42 + i * 2, "40_Ulam", MAT_CHENE())
+    box(f"Maltera_{i}", BX_E - 5.4, BX_E + 0.4, -L / 2, L / 2, Z_BAT + 41 + i * 2, Z_BAT + 42 + i * 2, "40_Ulam", MAT_CHENE_SCULPTE())
 # --- Rovadim : les bandeaux en saillie qui ceinturent les murs de l'Oulam de bas en
 #     haut (Rambam, Beit HaBe'hira 4:9). C'est la seule articulation que les sources
 #     donnent à cette façade, et elle est horizontale.
-#     PAS DE COLONNES. Aucune source n'en met sur la face du bâtiment : ni Middot 3:7-8
-#     et 4:6-7, ni le Rambam, ni Josèphe qui l'a vue et la décrit pierre à pierre
-#     (Guerre V, 5, 4 et 6 : les épaules, la porte sans battants, les plaques d'or, la
-#     pierre « exceeding white », les pointes du faîte — pas une colonne). Ya'hin et
-#     Boaz (I Rois 7:21) sont du premier Temple et Middot les ignore : les importer ici
-#     serait inventer. Les seuls fûts de la zone sont les כְּלוֹנָסוֹת de cèdre tendus
-#     du mur du Heikhal à celui de l'Oulam (Middot 3:8), qui sont dedans, pas devant.
+#     Aucune source du Second Temple ne met de colonne sur la face du bâtiment : ni Middot
+#     3:7-8 et 4:6-7, ni le Rambam, ni Josèphe qui l'a vue pierre à pierre (Guerre V, 5, 4
+#     et 6). Ya'hin et Boaz sont du Premier Temple, « עַל פְּנֵי הַהֵיכָל » (Divrei HaYamim II
+#     3:17) : le film les dresse devant la façade, de part et d'autre des marches (CHOIX,
+#     voir plus bas). Les fûts de l'Oulam sont les כְּלוֹנָסוֹת de cèdre tendus du mur du
+#     Heikhal à celui de l'Oulam (Middot 3:8).
 #     Le rovad du sommet emporte les 4 dernières amot du mur, où Middot 4:6 met le
 #     כִּיּוּר et la בֵּית דִּלְפָה de l'étage.
 #     Deux échelles d'horizontales, et elles se confirment : celle-ci, de 4 amot, et
@@ -1354,14 +2004,81 @@ for cote, y, sens in (("N", 50, 1), ("S", -50, -1)):
 box("Ulam_epaule_S", BX_E - 16, BX_E - 5, -50, -35, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_epaule_N", BX_E - 16, BX_E - 5, 35, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_plafond", BX_E - 16, BX_E - 5, -35, 35, Z_BAT + 40, Z_TOIT, "40_Ulam", MAT_CEDRE())
+# « כְּלוֹנָסוֹת שֶׁל אֶרֶז הָיוּ קְבוּעִין מִכָּתְלוֹ שֶׁל הֵיכָל לְכָתְלוֹ שֶׁל אוּלָם, כְּדֵי שֶׁלֹּא יִבְעַט »
+# (Middot 3:8) : les poutres rondes de cèdre tendues d'un mur à l'autre, sous le
+# plafond, et trois poutres en travers qui en font les caissons — le « coffered cedar
+# ceiling of the porch » du prompt 8, qui n'était qu'une dalle.
+for k, y in enumerate(plage(-31.5, 31.5, 7)):
+    cyl_between(f"Ulam_klonas_{k:02d}", (BX_E - 16, y, Z_BAT + 38.4), (BX_E - 5, y, Z_BAT + 38.4),
+                0.5, "40_Ulam", MAT_CEDRE(), verts=12)
+for k, x in enumerate((BX_E - 13.25, BX_E - 10.5, BX_E - 7.75)):
+    box(f"Ulam_plafond_poutre_{k}", x - 0.4, x + 0.4, -35, 35, Z_BAT + 39.1, Z_BAT + 40, "40_Ulam", MAT_CEDRE())
 # Deux tables de l'Oulam (marbre au nord... CHOIX : marbre à droite en entrant = nord ; or au sud)
 box("Ulam_table_marbre", -90, -88, 5.5, 6.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_MARBRE())
 box("Ulam_table_or", -90, -88, -6.5, -5.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_OR())
+# Ya'hin et Boaz (Melakhim I 7:15-22, 41-42 ; Divrei HaYamim II 3:15-17) : « וַיָּקֶם אֶת
+# הָעַמּוּדִים עַל פְּנֵי הַהֵיכָל, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאול » — devant la façade, de part et
+# d'autre des marches, sur le sol de l'Azara. Hauteur : CHOIX. Melakhim donne 18 amot de fût,
+# Divrei HaYamim II 3:15 en donne 35, dans une maison de 30 (Melakhim I 6:2) — les colonnes
+# montaient aux trois quarts. La façade fait 100 : même proportion, 70 de fût plus le
+# chapiteau de cinq (Melakhim 7:16), 75, au niveau des maltera'ot. Douze amot de tour, creux
+# de quatre doigts, chapiteaux en lys sur quatre amot, réseaux et sept chaînettes sur le
+# ventre, deux rangs de cent grenades. Ya'hin à droite (sud), Boaz à gauche.
+AMOUD_X, AMOUD_Y, AMOUD_R, AMOUD_H = BX_E + 3, 13.5, 12 / (2 * math.pi), 70
+KOTERET = [(AMOUD_R, 0.0), (2.25, 0.5), (2.4, 1.3), (2.3, 2.0), (1.95, 2.7), (2.15, 3.3), (2.8, 4.4), (3.05, 5.0),
+           (2.85, 5.0), (2.2, 4.3), (0.0, 3.6)]
+for nom, y in (("Yakhin", -AMOUD_Y), ("Boaz", AMOUD_Y)):
+    cyl(f"{nom}_base", AMOUD_X, y, Z_AZ, Z_AZ + 0.6, AMOUD_R + 0.4, "40_Ulam", MAT_BRONZE(), verts=48)
+    cyl(f"{nom}_fut", AMOUD_X, y, Z_AZ + 0.6, Z_AZ + AMOUD_H, AMOUD_R, "40_Ulam", MAT_BRONZE(), verts=48)
+    revolution(f"{nom}_koteret", AMOUD_X, y, Z_AZ + AMOUD_H, KOTERET, "40_Ulam", MAT_BRONZE(), verts=48)
+    for k in range(7):
+        tore(f"{nom}_sharsheret_{k}", AMOUD_X, y, Z_AZ + AMOUD_H + 0.55 + 0.2 * k, 2.42 - 0.03 * abs(k - 3), 0.05,
+             "40_Ulam", MAT_BRONZE())
+    for rang, z in enumerate((1.0, 1.6)):
+        for k in range(100):
+            a = 2 * math.pi * (k + 0.5 * rang) / 100
+            sphere(f"{nom}_rimon_{rang}{k:02d}", AMOUD_X + 2.45 * math.cos(a), y + 2.45 * math.sin(a),
+                   Z_AZ + AMOUD_H + z, 0.07, "40_Ulam", MAT_BRONZE(), segs=6)
+# La tablette d'or d'Hélène (Yoma 3:10), « שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ », d'où le kohen
+# copie la parasha. Sur l'or du mur est de l'Oulam, côté nord : CHOIX.
+TAVLA_X = BX_E - 16 + EPAISSEUR_PLACAGE   # le nu de l'or sur le mur est du Heikhal, HX_E plus bas
+box("Tavla_Helene", TAVLA_X, TAVLA_X + 0.08, 18.5, 21.5, Z_BAT + 5.5, Z_BAT + 7.5, "40_Ulam", MAT_OR())
+for k in range(8):
+    z = Z_BAT + 7.25 - 0.22 * k
+    box(f"Tavla_Helene_ligne_{k}", TAVLA_X + 0.08, TAVLA_X + 0.11, 18.75 + (0.35 if k == 7 else 0), 21.25,
+        z, z + 0.06, "40_Ulam", MAT_OR())
 # Vigne d'or suspendue devant l'entrée du Heikhal (Middot 3:8) : représentée par un tore
 # Remontée à 27 amot : à 23 elle enfermait la couronne d'Hélène dans son anneau, et
 # les deux ne faisaient plus qu'un objet au rendu du plan 8.
-tore("Vigne_or", -91.5, 0, Z_BAT + 27, 3, 0.3, "40_Ulam", MAT_OR(),
+# « גֶּפֶן שֶׁל זָהָב הָיְתָה עוֹמֶדֶת עַל פִּתְחוֹ שֶׁל הֵיכָל, וּמֻדְלָה עַל גַּבֵּי כְלוֹנָסוֹת, וְכָל מִי
+# שֶׁהוּא מִתְנַדֵּב עָלֶה אוֹ גַרְגִּיר אוֹ אֶשְׁכּוֹל, מֵבִיא וְתוֹלֶה בָהּ » (Middot 3:8) : une vigne
+# palissée sur des perches, où l'on suspend feuilles, grains et grappes. L'anneau nu
+# se stylisait en cerceau ; il porte maintenant ses deux perches jusqu'aux poutres du
+# plafond, vingt-quatre feuilles et douze grappes.
+VIGNE_X, VIGNE_Z, VIGNE_R = -91.5, Z_BAT + 27, 3
+tore("Vigne_or", VIGNE_X, 0, VIGNE_Z, VIGNE_R, 0.3, "40_Ulam", MAT_OR(),
      rotation=(0, math.pi / 2, 0))
+for s in (-1, 1):
+    cyl_between(f"Vigne_perche{s:+d}", (VIGNE_X, s * 3.6, VIGNE_Z - VIGNE_R - 0.3),
+                (VIGNE_X, s * 3.6, Z_BAT + 37.9), 0.14, "40_Ulam", MAT_OR(), verts=10)
+cyl_between("Vigne_traverse", (VIGNE_X, -3.6, VIGNE_Z + VIGNE_R + 0.5), (VIGNE_X, 3.6, VIGNE_Z + VIGNE_R + 0.5),
+            0.12, "40_Ulam", MAT_OR(), verts=10)
+GRAINS = ((0.08, 0.12, 0.0), (-0.08, -0.12, 0.0), (0.06, 0.0, -0.2), (-0.06, 0.1, -0.33),
+          (0.05, -0.1, -0.33), (0.0, 0.0, -0.5))
+for k in range(24):
+    phi = math.radians(7.5 + 15 * k)
+    radial, tangent = (math.sin(phi), -math.cos(phi)), (math.cos(phi), math.sin(phi))
+    cy, cz = VIGNE_R * radial[0], VIGNE_Z + VIGNE_R * radial[1]
+    x_feuille = VIGNE_X + 0.35
+    quad = [(x_feuille, cy + 0.28 * tangent[0] - 0.1 * radial[0], cz + 0.28 * tangent[1] - 0.1 * radial[1]),
+            (x_feuille, cy + 0.28 * tangent[0] + 0.5 * radial[0], cz + 0.28 * tangent[1] + 0.5 * radial[1]),
+            (x_feuille, cy - 0.28 * tangent[0] + 0.5 * radial[0], cz - 0.28 * tangent[1] + 0.5 * radial[1]),
+            (x_feuille, cy - 0.28 * tangent[0] - 0.1 * radial[0], cz - 0.28 * tangent[1] - 0.1 * radial[1])]
+    plaque(f"Vigne_feuille_{k:02d}", quad, 0.03, "40_Ulam", MAT_OR())
+    if k % 2 == 0:
+        for g, (gx, gy, gz) in enumerate(GRAINS):
+            sphere(f"Vigne_grappe_{k // 2:02d}_{g}", VIGNE_X + gx, cy + gy, cz - 0.45 + gz,
+                   0.13 - 0.012 * g, "40_Ulam", MAT_OR(), segs=6)
 # Couronne d'or de la reine Hélène, suspendue au-dessus de l'entrée du Heikhal
 # (Yoma 37a : « c'est par elle qu'on savait que le soleil s'était levé »). Le prompt
 # du plan 8 la décrivait sans qu'elle existe dans le blockout : ou le modèle
@@ -1369,7 +2086,19 @@ tore("Vigne_or", -91.5, 0, Z_BAT + 27, 3, 0.3, "40_Ulam", MAT_OR(),
 # La poser à -92,5 ne réglait rien : l'anneau de 2,4 amot s'enfonçait de 1,9 dans le
 # linteau (x -98..-92) et aucun rayon du plan 8 ne le touchait. Son centre doit donc
 # être à l'est de la face du mur d'au moins son rayon.
-tore("Couronne_Helene", -90.6, 0, Z_BAT + 22, 1.2, 0.15, "40_Ulam", MAT_OR())
+# Une נִבְרֶשֶׁת est suspendue : trois chaînes la pendent au bas de la vigne (CHOIX), et
+# elle est une couronne, pointes dressées, ce que l'anneau nu ne disait pas.
+COURONNE_X, COURONNE_Z, COURONNE_R = -90.6, Z_BAT + 22, 1.2
+tore("Couronne_Helene", COURONNE_X, 0, COURONNE_Z, COURONNE_R, 0.15, "40_Ulam", MAT_OR())
+for k in range(8):
+    a = 2 * math.pi * k / 8
+    cone(f"Couronne_Helene_pointe_{k}", COURONNE_X + COURONNE_R * math.cos(a), COURONNE_R * math.sin(a),
+         COURONNE_Z + 0.12, COURONNE_Z + 0.42, 0.07, 0.0, "40_Ulam", MAT_OR(), verts=6)
+for k in range(3):
+    a = math.radians(90 + 120 * k)
+    cyl_between(f"Couronne_Helene_chaine_{k}",
+                (COURONNE_X + COURONNE_R * math.cos(a), COURONNE_R * math.sin(a), COURONNE_Z + 0.1),
+                (VIGNE_X, 0, VIGNE_Z - VIGNE_R - 0.2), 0.025, "40_Ulam", MAT_OR(), verts=6)
 
 # --- Mur est du Heikhal (6 amot) avec porte 10 × 20, quatre portes plaquées d'or
 HX_E = BX_E - 16      # -92
@@ -1391,8 +2120,25 @@ KK0, KK1 = TR1, TR1 - 20                # Kodesh HaKodashim : -139 → -159
 ARON_Y_BAD = 1.38                       # les badim, hors des flancs de l'Arche (1,25 + anneau)
 ARON_Z_BAD = Z_BAT + 0.125 + 1.35       # à hauteur des anneaux, coins supérieurs de la caisse
 ARON_X_MACHTA = (KK0 + KK1) / 2 + 1.15  # la ma'hta entre les badim, au pied de la face est
-box("Corps_mur_N", BX_O, HK0, 10, 35, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
-box("Corps_mur_S", BX_O, HK0, -35, -10, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+# Les fenêtres hautes du Heikhal, « שְׁקוּפִים אֲטוּמִים » (Melakhim I 6:4 ; Mena'hot 86b :
+# étroites dedans, larges dehors, « qu'il émet la lumière et ne la reçoit pas »).
+# Elles étaient des boîtes de chaux noyées dans le mur, coplanaires avec ses deux
+# faces : un rectangle blanc qui clignotait sur l'or du plan 9a. Ce sont maintenant
+# de vraies baies, en deux épaisseurs — l'embrasure extérieure de 3 × 6, l'intérieure
+# de 1,2 × 4 — percées dans le mur ET dans le placage d'or.
+FENETRES_X = [HK0 - 6 - i * 9 for i in range(4)]
+FENETRE_EXT, FENETRE_INT = (3.0, Z_BAT + 30, Z_BAT + 36), (1.2, Z_BAT + 31, Z_BAT + 35)
+
+
+def baies_heikhal(largeur, zb, zh):
+    return [(x - largeur / 2, x + largeur / 2, zb, zh) for x in FENETRES_X]
+
+
+for cote, y_int, y_mi, y_ext in (("N", 10, 25, 35), ("S", -10, -25, -35)):
+    paroi_percee(f"Corps_mur_{cote}_ext", BX_O, HK0, *sorted((y_mi, y_ext)), Z_BAT, Z_TOIT,
+                 "50_Heikhal", MAT_MARBRE_HERODE(), baies_heikhal(*FENETRE_EXT))
+    paroi_percee(f"Corps_mur_{cote}_int", BX_O, HK0, *sorted((y_int, y_mi)), Z_BAT, Z_TOIT,
+                 "50_Heikhal", MAT_MARBRE_HERODE(), baies_heikhal(*FENETRE_INT))
 box("Corps_mur_O", BX_O, KK1, -35, 35, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
 box("Corps_plafond", KK1, HK0, -10, 10, Z_BAT + 40, Z_TOIT, "50_Heikhal", MAT_CEDRE())
 # --- « כָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת » (Middot 4:1 ; Rambam Beit
@@ -1405,9 +2151,33 @@ box("Corps_plafond", KK1, HK0, -10, 10, Z_BAT + 40, Z_TOIT, "50_Heikhal", MAT_CE
 #     Rien derrière les battants : c'est justement pour couvrir cette pierre nue que les
 #     portes intérieures se rabattent vers l'intérieur (Middot 4:1) — les faces de
 #     l'embrasure ne reçoivent donc aucune plaque.
-box("Heikhal_or_mur_N", HK1, HK0, 10 - EPAISSEUR_PLACAGE, 10, Z_BAT, Z_BAT + 40, "50_Heikhal", MAT_OR_PLAQUE())
-box("Heikhal_or_mur_S", HK1, HK0, -10, -10 + EPAISSEUR_PLACAGE, Z_BAT, Z_BAT + 40, "50_Heikhal", MAT_OR_PLAQUE())
+paroi_percee("Heikhal_or_mur_N", HK1, HK0, 10 - EPAISSEUR_PLACAGE, 10, Z_BAT, Z_BAT + 40,
+             "50_Heikhal", MAT_OR_PLAQUE(), baies_heikhal(*FENETRE_INT))
+paroi_percee("Heikhal_or_mur_S", HK1, HK0, -10, -10 + EPAISSEUR_PLACAGE, Z_BAT, Z_BAT + 40,
+             "50_Heikhal", MAT_OR_PLAQUE(), baies_heikhal(*FENETRE_INT))
 box("Heikhal_or_plafond", HK1, HK0, -10, 10, Z_BAT + 40 - EPAISSEUR_PLACAGE, Z_BAT + 40, "50_Heikhal", MAT_OR_PLAQUE())
+
+
+def lambris_or(piece, x0, x1, col, faces_bout):
+    """Ce qui articule une salle plaquée d'or : poutres de caissons sous le plafond,
+    corniche et plinthe le long des murs. Le lambris de cèdre (fiche §8b) est derrière
+    l'or, « כָּל הַבַּיִת טוּחַ בְּזָהָב » (Middot 4:1) : le relief est d'or lui aussi. Le
+    relevé du plan 9b finissait sur un plafond qui n'était qu'un aplat.
+    `faces_bout` : les faces est/ouest à ceinturer, (suffixe, xa, xb)."""
+    haut = Z_BAT + 40 - EPAISSEUR_PLACAGE
+    for k, x in enumerate(plage(x0 + 4, x1 - 2, 4)):
+        box(f"{piece}_caisson_poutre_{k:02d}", x - 0.5, x + 0.5, -10 + EPAISSEUR_PLACAGE, 10 - EPAISSEUR_PLACAGE,
+            Z_BAT + 39, haut, col, MAT_OR_PLAQUE())
+    for k, y in enumerate((-10 / 3, 10 / 3)):
+        box(f"{piece}_caisson_longrine_{k}", x0, x1, y - 0.4, y + 0.4, Z_BAT + 39.2, haut, col, MAT_OR_PLAQUE())
+    for cote, ya, yb in (("N", 10 - 0.5, 10 - EPAISSEUR_PLACAGE), ("S", -10 + EPAISSEUR_PLACAGE, -10 + 0.5)):
+        box(f"{piece}_corniche_{cote}", x0, x1, ya, yb, Z_BAT + 38, Z_BAT + 39, col, MAT_OR_PLAQUE())
+        box(f"{piece}_plinthe_{cote}", x0, x1, (ya + yb) / 2 - 0.15, (ya + yb) / 2 + 0.15, Z_BAT, Z_BAT + 0.8, col, MAT_OR_PLAQUE())
+    for suffixe, xa, xb in faces_bout:
+        box(f"{piece}_corniche_{suffixe}", xa, xb, -10 + 0.5, 10 - 0.5, Z_BAT + 38, Z_BAT + 39, col, MAT_OR_PLAQUE())
+
+
+lambris_or("Heikhal", HK1, HK0, "50_Heikhal", [("E", HK0 - 0.5, HK0 - EPAISSEUR_PLACAGE)])
 for cote, signe in (("S", -1), ("N", 1)):
     # côté Heikhal : la face ouest du mur est, sur la largeur de la nef (20 amot)
     box(f"Heikhal_or_est_{cote}", HK0 - EPAISSEUR_PLACAGE, HK0, signe * 5, signe * 10,
@@ -1436,14 +2206,17 @@ POURTOUR_TOIT = [
     ("nord_corps",  BX_O, HX_E,                       35 - MAAKE_EP, 35),
     ("ouest",       BX_O, BX_O + MAAKE_EP,            -35 + MAAKE_EP, 35 - MAAKE_EP),
 ]
+# Le kaleh orev est fait de pointes, pas d'un bandeau : « spikes with sharp points »
+# (Josèphe) — une lisse de bronze sur le maake, et une pointe par ama.
 for suffixe, xa, xb, ya, yb in POURTOUR_TOIT:
     box(f"Maake_{suffixe}", xa, xb, ya, yb, Z_TOIT, Z_TOIT + MAAKE_H, "50_Heikhal", MAT_MARBRE_HERODE())
-    box(f"Kaleh_orev_{suffixe}", xa, xb, ya, yb, Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_BRONZE())
-# Fenêtres hautes (repères pour l'éclairage) : 4 par côté, étroites dedans / larges dehors
-for i in range(4):
-    x = HK0 - 6 - i * 9
-    box(f"Fenetre_N_{i}", x - 1.5, x + 1.5, 10, 35, Z_BAT + 30, Z_BAT + 36, "50_Heikhal", MAT_CHAUX())
-    box(f"Fenetre_S_{i}", x - 1.5, x + 1.5, -35, -10, Z_BAT + 30, Z_BAT + 36, "50_Heikhal", MAT_CHAUX())
+    box(f"Kaleh_orev_{suffixe}", xa, xb, ya, yb, Z_TOIT + MAAKE_H, Z_TOIT + MAAKE_H + 0.15, "50_Heikhal", MAT_BRONZE())
+    long_x = (xb - xa) >= (yb - ya)
+    a0, a1 = (xa, xb) if long_x else (ya, yb)
+    for k, c in enumerate(plage(a0 + 0.5, a1 - 0.5, 1.0)):
+        px, py = (c, (ya + yb) / 2) if long_x else ((xa + xb) / 2, c)
+        cone(f"Kaleh_orev_{suffixe}_pointe_{k:03d}", px, py, Z_TOIT + MAAKE_H + 0.15, Z_FAITE,
+             0.12, 0.0, "50_Heikhal", MAT_BRONZE(), verts=6)
 
 # --- Ustensiles du Heikhal (Yoma 33b ; Menachot 98b) : dans les deux tiers ouest,
 #     à 2.5 amot des murs. Table au NORD, Menora au SUD, autel d'or entre les deux, vers l'est.
@@ -1452,27 +2225,36 @@ XU = -125
 TEFAH = 1 / 6
 YS0, YS1 = 6.5, 7.5
 Z_TABLE = Z_BAT + 1.5
-box("Shulchan", XU - 1, XU + 1, YS0, YS1, Z_BAT, Z_TABLE, "70_Kelim", MAT_OR())
 # Le'hem hapanim (Rambam Temidin 5:9 ; Mena'hot 94b, 96a) : pain 5 × 6 tefa'him, fond d'un tefa'h,
 # deux parois relevées de 7 etzbaot ; deux piles de 6 séparées de 2 tefa'him, 3 kanim entre les pains
 H_PAIN, PAS_PAIN = 7 / 4 * TEFAH, 2 * TEFAH
-for k in range(2):
-    x0 = XU - 1 + k * 7 * TEFAH
-    x1 = x0 + 5 * TEFAH
-    for p in range(6):
-        z = Z_TABLE + p * PAS_PAIN
-        box(f"Lechem_{k}{p}", x0, x1, YS0, YS1, z, z + TEFAH, "70_Kelim", MAT_CHAUX())
-        for cote, ya, yb in (("S", YS0, YS0 + 0.08), ("N", YS1 - 0.08, YS1)):
-            box(f"Lechem_{k}{p}_paroi_{cote}", x0, x1, ya, yb, z, z + H_PAIN, "70_Kelim", MAT_CHAUX())
-        if p < 5:   # kanim : 3 sous chaque pain sauf le premier, 2 sous le dernier (Rambam 3:15)
-            for q, xq in enumerate((x0 + 1 * TEFAH, x0 + 2.5 * TEFAH, x0 + 4 * TEFAH)[: 2 if p == 4 else 3]):
-                cyl_between(f"Kaneh_{k}{p}{q}", (xq, YS0 - 0.15, z + H_PAIN), (xq, YS1 + 0.15, z + H_PAIN), 0.03, "70_Kelim")
-    # snifim : montants d'or au sol de part et d'autre de la Table, dépassant les piles (Mena'hot 11:6 ; 94b)
-    Z_SNIF = Z_TABLE + 6 * PAS_PAIN + 0.3
-    for cote, y in (("S", YS0 - 0.1), ("N", YS1 + 0.1)):
-        box(f"Snif_{k}{cote}", (x0 + x1) / 2 - 0.08, (x0 + x1) / 2 + 0.08, y - 0.04, y + 0.04, Z_BAT, Z_SNIF, "70_Kelim", MAT_OR())
-    # bazikh d'encens posé sur la pile (Rambam 3:14)
-    cyl(f"Bazikh_{k}", (x0 + x1) / 2, (YS0 + YS1) / 2, Z_TABLE + 5 * PAS_PAIN + TEFAH, Z_TABLE + 5 * PAS_PAIN + TEFAH + 0.12, 0.15, "70_Kelim", MAT_OR())
+
+
+def shulchan(nom, x, avec_pain):
+    """Shoul'han 2 × 1 × 1.5, longueur E-O (Rambam Beit HaBe'hira 3:12), à 2,5 amot du mur nord (Yoma 33b)."""
+    box(nom, x - 1, x + 1, YS0, YS1, Z_BAT, Z_TABLE, "70_Kelim", MAT_OR())
+    if not avec_pain:
+        return
+    for k in range(2):
+        x0 = x - 1 + k * 7 * TEFAH
+        x1 = x0 + 5 * TEFAH
+        for p in range(6):
+            z = Z_TABLE + p * PAS_PAIN
+            box(f"Lechem_{k}{p}", x0, x1, YS0, YS1, z, z + TEFAH, "70_Kelim", MAT_CHAUX())
+            for cote, ya, yb in (("S", YS0, YS0 + 0.08), ("N", YS1 - 0.08, YS1)):
+                box(f"Lechem_{k}{p}_paroi_{cote}", x0, x1, ya, yb, z, z + H_PAIN, "70_Kelim", MAT_CHAUX())
+            if p < 5:   # kanim : 3 sous chaque pain sauf le premier, 2 sous le dernier (Rambam 3:15)
+                for q, xq in enumerate((x0 + 1 * TEFAH, x0 + 2.5 * TEFAH, x0 + 4 * TEFAH)[: 2 if p == 4 else 3]):
+                    cyl_between(f"Kaneh_{k}{p}{q}", (xq, YS0 - 0.15, z + H_PAIN), (xq, YS1 + 0.15, z + H_PAIN), 0.03, "70_Kelim")
+        # snifim : montants d'or au sol de part et d'autre de la Table, dépassant les piles (Mena'hot 11:6 ; 94b)
+        Z_SNIF = Z_TABLE + 6 * PAS_PAIN + 0.3
+        for cote, y in (("S", YS0 - 0.1), ("N", YS1 + 0.1)):
+            box(f"Snif_{k}{cote}", (x0 + x1) / 2 - 0.08, (x0 + x1) / 2 + 0.08, y - 0.04, y + 0.04, Z_BAT, Z_SNIF, "70_Kelim", MAT_OR())
+        # bazikh d'encens posé sur la pile (Rambam 3:14)
+        cyl(f"Bazikh_{k}", (x0 + x1) / 2, (YS0 + YS1) / 2, Z_TABLE + 5 * PAS_PAIN + TEFAH, Z_TABLE + 5 * PAS_PAIN + TEFAH + 0.12, 0.15, "70_Kelim", MAT_OR())
+
+
+shulchan("Shulchan", XU, avec_pain=True)
 # Mizbea'h HaZahav 1 × 1 × 2, au centre, légèrement vers l'est, quatre cornes (Ex 30:2)
 box("Mizbeach_Zahav", -119.5, -118.5, -0.5, 0.5, Z_BAT, Z_BAT + 2, "70_Kelim", MAT_OR())
 for ns, cy in (("S", -0.5), ("N", 0.5 - 0.15)):
@@ -1483,43 +2265,86 @@ YM = -7.5
 for i in range(3):
     box(f"Menora_marche_{i}", XU + 1.2 + i * 0.4, XU + 1.6 + i * 0.4, YM - 1.5, YM + 1.5,
         Z_BAT, Z_BAT + 0.3 * (3 - i), "70_Kelim")
-cyl("Menora_pied", XU, YM, Z_BAT, Z_BAT + 0.25, 0.5, "70_Kelim", MAT_OR())
-cyl_between("Menora_tige", (XU, YM, Z_BAT + 0.25), (XU, YM, Z_BAT + 3), 0.08, "70_Kelim")
+
+
+def gavia(nom, x, y, z, k=1.0):
+    """Coupe « comme des calices d'amande » (Shemot 25:33), évasée vers le haut."""
+    cone(f"{nom}_gavia", x, y, z, z + 0.14 * k, 0.03 * k, 0.09 * k, "70_Kelim", MAT_OR(), verts=10)
+
+
+def kaftor(nom, x, y, z, r=0.075):
+    sphere(f"{nom}_kaftor", x, y, z, r, "70_Kelim", MAT_OR(), segs=8)
+
+
+def perach(nom, x, y, z, k=1.0):
+    cone(f"{nom}_perach", x, y, z, z + 0.07 * k, 0.05 * k, 0.10 * k, "70_Kelim", MAT_OR(), verts=10)
+
+
 COUPE_Z = Z_BAT + 3            # lèvre de la coupe
 COUPE_HAUT = COUPE_Z + 0.15    # et son bord supérieur
-coupes = []                    # (suffixe, y) de chaque coupe, pour y poser sa flamme
-for k, h in enumerate([1.2, 1.6, 2.0]):
-    d = (3 - k) * 0.35 + 0.35   # écartement des branches
-    for s in (-1, 1):
-        cote = 'S' if s < 0 else 'N'
-        if MENORA_DROITE:
-            cyl_between(f"Menora_branche_{k}{cote}",
-                        (XU, YM, Z_BAT + h), (XU, YM + s * d, COUPE_Z), 0.06, "70_Kelim")
-        else:   # version "courbe" approximée en deux segments
-            cyl_between(f"Menora_branche_{k}{cote}a",
-                        (XU, YM, Z_BAT + h), (XU, YM + s * d, Z_BAT + h + 0.15), 0.06, "70_Kelim")
-            cyl_between(f"Menora_branche_{k}{cote}b",
-                        (XU, YM + s * d, Z_BAT + h + 0.15), (XU, YM + s * d, COUPE_Z), 0.06, "70_Kelim")
-        cyl(f"Menora_coupe_{k}{cote}", XU, YM + s * d, COUPE_Z, COUPE_HAUT, 0.12,
-            "70_Kelim", MAT_OR())
-        coupes.append((f"{k}{cote}", YM + s * d))
-cyl("Menora_coupe_centre", XU, YM, COUPE_Z, COUPE_HAUT, 0.12, "70_Kelim", MAT_OR())
-coupes.append(("centre", YM))
-# Flammes (lumières) : une petite lampe ponctuelle par coupe, 0,2 ama au-dessus de
-# son milieu. Les coupes se donnent ici en coordonnées et non en relisant leur objet :
-# un volume construit en bpy.data porte sa position dans son maillage, et son
-# `location` vaut zéro.
-for suffixe, y in coupes:
-    l = lampe(f"Menora_flamme_{suffixe}", 'POINT',
-              (m(XU), m(y), m((COUPE_Z + COUPE_HAUT) / 2 + 0.2)))
-    l.data.energy = 15
-    l.data.color = (1.0, 0.75, 0.4)
-    l.data.shadow_soft_size = m(0.05)
-    link_to(l, "70_Kelim")
+
+
+def menora(nom, x, y, allumee):
+    """Menora de 3 amot, sept branches dans le plan N-S ; `allumee` : ses sept lampes."""
+    # Pied à trois jambes (Rambam, Beit HaBe'hira 3:2 : « וְשָׁלֹשׁ רַגְלַיִם הָיוּ לָהּ ») ; le
+    # disque plein d'avant se lisait en socle de statue.
+    cyl(f"{nom}_pied", x, y, Z_BAT + 0.05, Z_BAT + 0.30, 0.16, "70_Kelim", MAT_OR(), verts=12)
+    for k in range(3):
+        a = math.radians(90 + 120 * k)
+        cyl_between(f"{nom}_jambe_{k}", (x, y, Z_BAT + 0.18), (x + 0.45 * math.cos(a), y + 0.45 * math.sin(a), Z_BAT + 0.04),
+                    0.05, "70_Kelim", MAT_OR(), verts=8)
+    cyl_between(f"{nom}_tige", (x, y, Z_BAT + 0.25), (x, y, Z_BAT + 3), 0.08, "70_Kelim")
+    # Coupes, boutons et fleurs (Shemot 25:31-36 ; Mena'hot 28b : 22 coupes, 11 boutons,
+    # 9 fleurs) : sur la tige, une coupe avec bouton et fleur sous les branches, un bouton
+    # sous chaque paire de branches, trois coupes en haut ; sur chaque branche trois
+    # coupes, un bouton, une fleur. La tige nue et ses six tubes se lisaient en râteau.
+    gavia(f"{nom}_tige_0", x, y, Z_BAT + 0.5)
+    kaftor(f"{nom}_tige_0", x, y, Z_BAT + 0.72)
+    perach(f"{nom}_tige_0", x, y, Z_BAT + 0.80)
+    for k, z in enumerate((2.3, 2.55, 2.8)):
+        gavia(f"{nom}_tige_{k + 1}", x, y, Z_BAT + z, 0.85)
+    kaftor(f"{nom}_tige_haut", x, y, Z_BAT + 2.22, 0.06)
+    perach(f"{nom}_tige_haut", x, y, Z_BAT + 2.93, 0.8)
+    coupes = []                    # (suffixe, y) de chaque coupe, pour y poser sa flamme
+    for k, h in enumerate([1.2, 1.6, 2.0]):
+        d = (3 - k) * 0.35 + 0.35   # écartement des branches
+        kaftor(f"{nom}_tige_branches_{k}", x, y, Z_BAT + h, 0.09)
+        for s in (-1, 1):
+            cote = 'S' if s < 0 else 'N'
+            for t, ornement in ((0.40, gavia), (0.58, gavia), (0.76, gavia), (0.88, kaftor), (0.95, perach)):
+                ornement(f"{nom}_branche_{k}{cote}_{t:.2f}", x, y + s * d * t, Z_BAT + h + (COUPE_Z - Z_BAT - h) * t,
+                         *(() if ornement is kaftor else (0.8,)))
+            if MENORA_DROITE:
+                cyl_between(f"{nom}_branche_{k}{cote}",
+                            (x, y, Z_BAT + h), (x, y + s * d, COUPE_Z), 0.06, "70_Kelim")
+            else:   # version "courbe" approximée en deux segments
+                cyl_between(f"{nom}_branche_{k}{cote}a",
+                            (x, y, Z_BAT + h), (x, y + s * d, Z_BAT + h + 0.15), 0.06, "70_Kelim")
+                cyl_between(f"{nom}_branche_{k}{cote}b",
+                            (x, y + s * d, Z_BAT + h + 0.15), (x, y + s * d, COUPE_Z), 0.06, "70_Kelim")
+            cyl(f"{nom}_coupe_{k}{cote}", x, y + s * d, COUPE_Z, COUPE_HAUT, 0.12, "70_Kelim", MAT_OR())
+            coupes.append((f"{k}{cote}", y + s * d))
+    cyl(f"{nom}_coupe_centre", x, y, COUPE_Z, COUPE_HAUT, 0.12, "70_Kelim", MAT_OR())
+    coupes.append(("centre", y))
+    if not allumee:
+        return
+    # Flammes (lumières) : une petite lampe ponctuelle par coupe, 0,2 ama au-dessus de
+    # son milieu. Les coupes se donnent ici en coordonnées et non en relisant leur objet :
+    # un volume construit en bpy.data porte sa position dans son maillage, et son
+    # `location` vaut zéro.
+    for suffixe, yc in coupes:
+        l = lampe(f"{nom}_flamme_{suffixe}", 'POINT', (m(x), m(yc), m((COUPE_Z + COUPE_HAUT) / 2 + 0.2)))
+        l.data.energy = 15
+        l.data.color = (1.0, 0.75, 0.4)
+        l.data.shadow_soft_size = m(0.05)
+        link_to(l, "70_Kelim")
+
+
+menora("Menora", XU, YM, allumee=True)
 
 # --- Les deux Parokhot (Yoma 5:1) : extérieure agrafée au SUD, intérieure au NORD
-box("Parokhet_ext", TR0 - 0.17, TR0, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_TISSU())
-box("Parokhet_int", TR1, TR1 + 0.17, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_TISSU())
+box("Parokhet_ext", TR0 - 0.17, TR0, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
+box("Parokhet_int", TR1, TR1 + 0.17, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
 empty("Parokhet_ext_agrafe_SUD", TR0, -9.5, Z_BAT + 20, "60_KodeshHakodashim")
 empty("Parokhet_int_agrafe_NORD", TR1, 9.5, Z_BAT + 20, "60_KodeshHakodashim")
 # Les badim de l'Arche pressent le rideau et se voient du Heikhal « comme deux seins »
@@ -1527,7 +2352,7 @@ empty("Parokhet_int_agrafe_NORD", TR1, 9.5, Z_BAT + 20, "60_KodeshHakodashim")
 # des barres, de part et d'autre de l'axe.
 for ns, y in (("N", ARON_Y_BAD), ("S", -ARON_Y_BAD)):
     sphere(f"Parokhet_ext_bosse_{ns}", TR0 - 0.15, y, ARON_Z_BAD, 0.45,
-           "60_KodeshHakodashim", MAT_TISSU())
+           "60_KodeshHakodashim", MAT_PAROKHET())
 
 # --- Kodesh HaKodashim : même placage. « כל הבית » ne s'arrête pas au Heikhal, et
 #     Melakhim I 6:20-22 dore explicitement le devir au Premier Temple. La pièce n'a
@@ -1537,6 +2362,112 @@ box("KhK_or_mur_N", KK1, KK0, 10 - EPAISSEUR_PLACAGE, 10, Z_BAT, Z_BAT + 40, "60
 box("KhK_or_mur_S", KK1, KK0, -10, -10 + EPAISSEUR_PLACAGE, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_OR_PLAQUE())
 box("KhK_or_mur_O", KK1, KK1 + EPAISSEUR_PLACAGE, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_OR_PLAQUE())
 box("KhK_or_plafond", KK1, KK0, -10, 10, Z_BAT + 40 - EPAISSEUR_PLACAGE, Z_BAT + 40, "60_KodeshHakodashim", MAT_OR_PLAQUE())
+lambris_or("KhK", KK1, KK0, "60_KodeshHakodashim", [("O", KK1 + EPAISSEUR_PLACAGE, KK1 + 0.5)])
+# « וְאֶת קַרְקַע הַבַּיִת צִפָּה זָהָב לִפְנִימָה וְלַחִיצוֹן » (Melakhim I 6:30) : le sol aussi, dans le
+# Heikhal et dans le Devir. Deux centièmes d'ama : les kelim s'y posent sans flotter.
+box("Heikhal_or_sol", HK1, HK0, -10, 10, Z_BAT, Z_BAT + 0.02, "50_Heikhal", MAT_OR_PLAQUE())
+box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim", MAT_OR_PLAQUE())
+
+
+# --- « וְאֵת כָּל קִירוֹת הַבַּיִת מֵסַב קָלַע פִּתּוּחֵי מִקְלְעוֹת כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים,
+#     מִלִּפְנִים וְלַחִיצוֹן » (Melakhim I 6:29) ; Ye'hezkel 41:18-19 donne l'ordre : « וְתִמֹרָה
+#     בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב ». Middot 4:1 dit l'or sans dire le motif :
+#     le relief est d'or, sur l'or, en deux registres, une fleur entre les deux ; un
+#     tiers d'ama de saillie — à six centièmes, il ne restait que les arêtes du biseau.
+#     Une paroi : (axe le long duquel court `u`, cote de la face, sens de la saillie).
+def _relief_boite(nom, paroi, u0, u1, z0, z1, d0, d1, col):
+    axe, c, sens = paroi
+    if axe == "x":
+        box(nom, u0, u1, c + sens * d0, c + sens * d1, z0, z1, col, MAT_OR_PLAQUE())
+    else:
+        box(nom, c + sens * d0, c + sens * d1, u0, u1, z0, z1, col, MAT_OR_PLAQUE())
+
+
+def _relief_plaque(nom, paroi, pts_uz, d0, epaisseur, col):
+    axe, c, sens = paroi
+
+    def p3(u, z):
+        return (u, c + sens * d0, z) if axe == "x" else (c + sens * d0, u, z)
+
+    quad = [p3(u, z) for u, z in pts_uz]
+    a, b, d = (Vector(q) for q in (quad[0], quad[1], quad[3]))
+    vers = Vector((0, sens, 0)) if axe == "x" else Vector((sens, 0, 0))
+    if (b - a).cross(d - a).dot(vers) < 0:
+        quad.reverse()
+    plaque(nom, quad, epaisseur, col, MAT_OR_PLAQUE())
+
+
+def _relief_sphere(nom, paroi, u, z, d, r, col):
+    axe, c, sens = paroi
+    x, y = (u, c + sens * d) if axe == "x" else (c + sens * d, u)
+    sphere(nom, x, y, z, r, col, MAT_OR_PLAQUE(), segs=10)
+
+
+def timora(nom, paroi, u, z0, h, col):
+    """« תִּמֹרָה » : tronc et sept palmes en éventail."""
+    _relief_boite(f"{nom}_tronc", paroi, u - 0.03 * h, u + 0.03 * h, z0, z0 + 0.58 * h, 0.01, 0.35, col)
+    for k, (angle, longueur) in enumerate(((90, 0.42), (65, 0.36), (115, 0.36), (40, 0.28), (140, 0.28), (18, 0.2), (162, 0.2))):
+        a = math.radians(angle)
+        du, dz = math.cos(a), math.sin(a)
+        L, w = longueur * h, 0.08 * h
+        base = (u, z0 + 0.55 * h)
+        milieu = (base[0] + du * L * 0.45, base[1] + dz * L * 0.45)
+        pts = [base, (milieu[0] - dz * w, milieu[1] + du * w), (base[0] + du * L, base[1] + dz * L),
+               (milieu[0] + dz * w, milieu[1] - du * w)]
+        _relief_plaque(f"{nom}_palme_{k}", paroi, pts, 0.02, 0.28, col)
+
+
+def keruv_relief(nom, paroi, u, z0, h, col):
+    """Keruv à deux visages (Ye'hezkel 41:19) : corps, deux têtes, deux ailes levées."""
+    _relief_boite(f"{nom}_corps", paroi, u - 0.06 * h, u + 0.06 * h, z0 + 0.06 * h, z0 + 0.62 * h, 0.01, 0.35, col)
+    for k, s in enumerate((-1, 1)):
+        _relief_sphere(f"{nom}_visage_{k}", paroi, u + s * 0.045 * h, z0 + 0.70 * h, 0.25, 0.07 * h, col)
+        pts = [(u + s * 0.06 * h, z0 + 0.58 * h), (u + s * 0.22 * h, z0 + 0.42 * h),
+               (u + s * 0.20 * h, z0 + 0.95 * h), (u + s * 0.09 * h, z0 + 0.80 * h)]
+        _relief_plaque(f"{nom}_aile_{k}", paroi, pts, 0.02, 0.28, col)
+
+
+def petur_tzitz(nom, paroi, u, z, r, col):
+    """« פְּטוּרֵי צִצִּים », fleur épanouie : six pétales autour d'un cœur."""
+    _relief_sphere(f"{nom}_coeur", paroi, u, z, 0.2, r * 0.3, col)
+    for k in range(6):
+        a = math.radians(60 * k)
+        du, dz = math.cos(a), math.sin(a)
+        pts = [(u, z), (u + du * r * 0.5 - dz * r * 0.28, z + dz * r * 0.5 + du * r * 0.28), (u + du * r, z + dz * r),
+               (u + du * r * 0.5 + dz * r * 0.28, z + dz * r * 0.5 - du * r * 0.28)]
+        _relief_plaque(f"{nom}_petale_{k}", paroi, pts, 0.01, 0.22, col)
+
+
+REGISTRES = ((Z_BAT + 2, 11), (Z_BAT + 19, 10))     # (bas, hauteur) — sous les fenêtres (31..35)
+PAROIS_OR = [
+    ("Heikhal_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), HK1, HK0, "50_Heikhal", (0, 1)),
+    ("Heikhal_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), HK1, HK0, "50_Heikhal", (0, 1)),
+    ("Heikhal_E_S", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -10, -5, "50_Heikhal", (0, 1)),
+    ("Heikhal_E_N", ("y", HK0 - EPAISSEUR_PLACAGE, -1), 5, 10, "50_Heikhal", (0, 1)),
+    ("Heikhal_E_linteau", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -5, 5, "50_Heikhal", (1,)),
+    ("KhK_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), KK1, KK0, "60_KodeshHakodashim", (0, 1)),
+    ("KhK_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), KK1, KK0, "60_KodeshHakodashim", (0, 1)),
+    ("KhK_O", ("y", KK1 + EPAISSEUR_PLACAGE, 1), -10, 10, "60_KodeshHakodashim", (0, 1)),
+]
+for nom, paroi, u0, u1, col, registres in PAROIS_OR:
+    n = max(1, round((u1 - u0) / 4.44))
+    pas = (u1 - u0) / n
+    for i in range(n):
+        u = u0 + pas * (i + 0.5)
+        for r in registres:
+            z0, h = REGISTRES[r]
+            motif = timora if (i + r) % 2 == 0 else keruv_relief
+            motif(f"Kir_{nom}_{i:02d}_{r}", paroi, u, z0, h, col)
+        if len(registres) == 2:
+            petur_tzitz(f"Kir_{nom}_{i:02d}_tzitz", paroi, u, Z_BAT + 16, 1.0, col)
+
+# « וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר » (Melakhim I 6:21) : des chaînes d'or tendues
+# devant le Devir. Trois chaînettes sous le plafond, de mur à mur, devant la parokhet.
+for k, (creux, z_haut) in enumerate(((3.0, 38.6), (4.5, 37.6), (6.0, 36.6))):
+    points = [(TR0 + 0.6, -9.8 + 19.6 * t, Z_BAT + z_haut - creux * (1 - (2 * t - 1) ** 2))
+              for t in (i / 24 for i in range(25))]
+    for i in range(24):
+        cyl_between(f"Devir_chaine_{k}_{i:02d}", points[i], points[i + 1], 0.06, "50_Heikhal", MAT_OR(), verts=6)
 
 # --- Kodesh HaKodashim : Even HaShetiya (3 doigts ≈ 0.125 ama, Yoma 5:2)
 KKC = (KK0 + KK1) / 2
@@ -1639,37 +2570,29 @@ for ns, sy in (("N", 1), ("S", -1)):
                 (TR1 + 0.05, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
 
 # ----------------------------------------------------------------------------
-# 75 — PROXYS DE SUJET, UNE COLLECTION PAR PLAN
-#   Volumes grossiers là où le sujet du plan n'est pas de l'architecture (kohanim,
-#   taureau, ma'hta). Ils ne visent pas la ressemblance : ils donnent aux passes
-#   Depth/Normal une structure stable, sans laquelle l'i2i réinvente le sujet à
+# 75 — FIGURES
+#   De quoi bâtir un corps debout : la silhouette et ce qui distingue sa tenue.
+#   Volumes grossiers, qui ne visent pas la ressemblance — ils donnent aux passes
+#   Depth/Normal une structure stable, sans laquelle l'i2i réinvente les gens à
 #   chaque image et le plan perd sa cohérence temporelle.
 #
-#   Une collection par plan, et non une seule pour tous : un sujet qui traîne dans
-#   le cadre d'un autre plan devient un objet inventé (la silhouette du plan 12 est
-#   ressortie en second candélabre au fond du Heikhal). Une collection unique
-#   obligeait à tout masquer d'un coup — et masquer les prosternés du plan 6 pour
-#   rendre le plan 1 vidait du même geste le Doukhan de ses Léviim. L'export ne
-#   montre que la collection du plan qu'il rend.
+#   La seule mise en scène que le blockout porte est la foule de la section 76 :
+#   l'état permanent du jour. Une figure de premier plan — un cohen au travail, une
+#   bête, un ustensile tenu — se pose dans une collection à soi, en appelant ces
+#   helpers depuis un script à part, pour que l'export puisse la masquer sans vider
+#   la cour.
 # ----------------------------------------------------------------------------
 H_HOMME = 3.65        # 1.75 m en amot
 
 
-def proxies_du_plan(numero, lettre="", frame=""):
-    """75_Plan05 pour tout le plan, 75_Plan05A pour une prise, 75_Plan05B_fin pour une frame."""
-    return f"75_Plan{numero:02d}{lettre}" + (f"_{frame}" if frame else "")
-
-
-# Tenues (fiche §12, bloc FIGURES de prompts_par_plan.md) : le peuple en habits
+# Tenues (fiche §12) : le peuple en habits
 # d'aujourd'hui, talith sur la tête ou non ; les Léviim en robe de lin unie ; les
 # cohanim dans les quatre vêtements blancs, coiffe plate (Yoma 7:5). Trois corps
 # différents, et pas trois teintes : à vingt amot le styliseur ne lit qu'une silhouette.
-AM, TALITH, LEVI, KOHEN, KOHEN_GADOL = "am", "talith", "levi", "kohen", "kohen_gadol"
+AM, TALITH, LEVI, KOHEN = "am", "talith", "levi", "kohen"
 TENUES_AM = (TALITH, TALITH, TALITH, AM, AM)
 
 def _etoffe(tenue, nom):
-    if tenue == KOHEN_GADOL:
-        return MAT_TEKHELET()
     if tenue in (LEVI, KOHEN):
         return MAT_LIN()
     return MAT_FOULE() if alea(nom, 6) < 0.6 else MAT_TALITH()
@@ -1688,68 +2611,6 @@ def _pieces_de_tenue(name, tenue, h, col):
                     0.61 * h, 0.655 * h, col, MAT_LIN())]
     return []
 
-def _pieces_bigdei_zahav(name, h, col):
-    """Les quatre vêtements du Cohen Gadol par-dessus le me'il (Yoma 7:5 ; Rambam Klei HaMikdash 9).
-
-    Bâti face à l'ouest comme toute silhouette : le dos est en +x. L'éphod est un
-    tablier tissé d'or pendu dans le dos, des coudes aux pieds, large comme le dos
-    d'épaule à épaule (9:9) ; ses deux bretelles montent aux épaules et portent les
-    deux pierres de shoham ; le 'heshev le ceint par-dessus le me'il (10:3) ; le
-    'hoshen, un zeret carré, pend sur la poitrine, tenu par deux chaînes d'or qui
-    passent sur les épaules (9:6-10). Au bas du me'il, clochettes d'or et grenades
-    alternées (9:4) ; celles que le tablier couvre ne sont pas bâties.
-    """
-    k = h / H_HOMME
-    prof = 0.26 * k
-    or_tisse = MAT_EPHOD()
-    pieces = [
-        # Enroulée à plat sur le crâne (Rambam 8:2), pas posée dessus : elle coiffe la
-        # sphère de la tête, le cordon du tsits passe sous son bord, les cheveux dessous.
-        cyl(f"{name}_mitsnefet", 0, 0, 0.94 * h, 1.012 * h, 0.088 * h, col, MAT_LIN(), verts=12),
-        box(f"{name}_ephod", 0.34 * k, 0.40 * k, -0.36 * k, 0.36 * k, 0.02 * h, 0.62 * h, col, or_tisse),
-        box(f"{name}_heshev", -prof - 0.06 * k, 0.42 * k, -0.40 * k, 0.40 * k, 0.60 * h, 0.65 * h, col, or_tisse),
-        box(f"{name}_hoshen", -prof - 0.08 * k, -prof - 0.02 * k, -0.25 * k, 0.25 * k,
-            0.62 * h, 0.62 * h + 0.5 * k, col, or_tisse),
-        box(f"{name}_tsits", -0.092 * h, -0.078 * h, -0.05 * h, 0.05 * h, 0.94 * h, 0.965 * h, col, MAT_OR()),
-        cyl(f"{name}_tsits_cordon", 0, 0, 0.925 * h, 0.937 * h, 0.086 * h, col, MAT_TEKHELET(), verts=12),
-    ]
-    # Quatre rangs de trois pierres, chacune carrée et sertie d'or (Ex. 28:17-20 ; Rambam 9:6),
-    # et un anneau d'or à chaque coin : les deux du haut reçoivent les chaînes, les deux du
-    # bas les cordons de tekhelet qui le lient à l'éphod (Ex. 28:28 ; Rambam 9:8).
-    for rang in range(4):
-        for colonne in range(3):
-            y = (colonne - 1) * 0.16 * k
-            z = 0.62 * h + 0.5 * k - (rang + 0.5) * 0.125 * k
-            pieces.append(box(f"{name}_even_{rang}{colonne}", -prof - 0.11 * k, -prof - 0.08 * k,
-                              y - 0.05 * k, y + 0.05 * k, z - 0.045 * k, z + 0.045 * k, col, MAT_SHOHAM()))
-    for s_y in (-1, 1):
-        for z in (0.62 * h + 0.03 * k, 0.62 * h + 0.47 * k):
-            pieces.append(sphere(f"{name}_tabaat{s_y:+d}_{z:.2f}", -prof - 0.05 * k, s_y * 0.25 * k, z,
-                                 0.025 * k, col, MAT_OR(), segs=6))
-    for s in (-1, 1):
-        y = s * 0.28 * k
-        pieces += [
-            box(f"{name}_bretelle_dos{s:+d}", 0.34 * k, 0.40 * k, y - 0.07 * k, y + 0.07 * k,
-                0.62 * h, 0.85 * h, col, or_tisse),
-            box(f"{name}_bretelle_epaule{s:+d}", -prof - 0.04 * k, 0.40 * k, y - 0.07 * k, y + 0.07 * k,
-                0.83 * h, 0.86 * h, col, or_tisse),
-            box(f"{name}_shoham{s:+d}", -0.06 * k, 0.06 * k, y - 0.06 * k, y + 0.06 * k,
-                0.86 * h, 0.90 * h, col, MAT_SHOHAM()),
-            box(f"{name}_chaine{s:+d}", -prof - 0.08 * k, -0.06 * k, y - 0.015 * k, y + 0.015 * k,
-                0.86 * h, 0.88 * h, col, MAT_OR()),
-        ]
-    rayon = 0.37 * k
-    for i in range(144):
-        angle = 2 * math.pi * i / 144
-        x, y = rayon * math.cos(angle), rayon * math.sin(angle)
-        if x > 0.30 * k:
-            continue
-        if i % 2 == 0:
-            pieces.append(sphere(f"{name}_paamon_{i:03d}", x, y, 0.04 * h, 0.04 * k, col, MAT_OR(), segs=6))
-        else:
-            pieces.append(sphere(f"{name}_rimon_{i:03d}", x, y, 0.04 * h, 0.045 * k, col, MAT_TEKHELET(), segs=6))
-    return pieces
-
 def silhouette(name, x, y, z0, col, tenue=KOHEN, h=H_HOMME, lacet=0.0):
     """Figure debout : robe, torse, épaules, bras, cou, tête, plus sa tenue.
 
@@ -1767,8 +2628,7 @@ def silhouette(name, x, y, z0, col, tenue=KOHEN, h=H_HOMME, lacet=0.0):
     ep, prof = 0.50 * k, 0.26 * k
     # Le me'il tombe droit « comme tous les manteaux » et n'a pas de manches (Rambam
     # Klei HaMikdash 9:3) : bras en lin de la kutonet, bas serré pour que l'éphod le frôle.
-    evasement = 0.36 * k if tenue == KOHEN_GADOL else 0.44 * k
-    manches = MAT_LIN() if tenue == KOHEN_GADOL else corps
+    evasement = 0.44 * k
     pieces = [
         cone(f"{name}_robe", 0, 0, 0, 0.52 * h, evasement, 0.32 * k, col, corps, verts=12),
         box(f"{name}_torse", -prof, prof, -0.34 * k, 0.34 * k, 0.50 * h, 0.83 * h, col, corps),
@@ -1778,9 +2638,8 @@ def silhouette(name, x, y, z0, col, tenue=KOHEN, h=H_HOMME, lacet=0.0):
     ]
     for s in (-1, 1):
         pieces.append(cyl(f"{name}_bras{s:+d}", 0, s * (ep - 0.11 * k), 0.50 * h,
-                          0.79 * h, 0.11 * k, col, manches, verts=8))
-    pieces += (_pieces_bigdei_zahav(name, h, col) if tenue == KOHEN_GADOL
-               else _pieces_de_tenue(name, tenue, h, col))
+                          0.79 * h, 0.11 * k, col, corps, verts=8))
+    pieces += _pieces_de_tenue(name, tenue, h, col)
     _poser(pieces, x, y, z0, lacet)
 
 def instrument_de_levi(nom, genre, x, y, z0, col):
@@ -1809,327 +2668,6 @@ def instrument_de_levi(nom, genre, x, y, z0, col):
             z0 + 1.85, z0 + haut, 0.04, col, bois, verts=6)
     box(f"{nom}_{genre}_joug", devant - 0.10, devant - 0.02, y - large - 0.01,
         y + large + 0.01, z0 + haut - 0.05, z0 + haut + 0.03, col, bois)
-
-def kohen_prosterne(name, x, y, z0, col, mat=None):
-    """Couché face contre terre, tête vers l'ouest."""
-    box(name, x - H_HOMME / 2, x + H_HOMME / 2, y - 0.55, y + 0.55,
-        z0, z0 + 0.45, col, mat or MAT_LIN())
-
-def kohen(name, x, y, z0, col):
-    """Un cohen seul, sujet d'un plan : la silhouette en tenue de service."""
-    silhouette(name, x, y, z0, col, KOHEN)
-
-def kohen_prosterne_de_pres(name, x, y, z0, col):
-    """Prosterné pour un plan rapproché : « הִשְׁתַּחֲוָאָה זוֹ פִּשּׁוּט יָדַיִם וְרַגְלַיִם » (Megillah 22b).
-
-    La dalle de `kohen_prosterne` suffit à 80 amot ; à dix, le styliseur y lit un banc.
-    Origine aux hanches, là où l'homme se tenait debout : le tronc s'allonge vers
-    l'ouest, tête et bras tendus devant, jambes tendues derrière.
-    """
-    lin = MAT_LIN()
-    box(f"{name}_tronc", x - 1.5, x, y - 0.5, y + 0.5, z0, z0 + 0.45, col, lin)
-    sphere(f"{name}_tete", x - 1.8, y, z0 + 0.28, 0.28, col, lin, segs=8)
-    for s in (-1, 1):
-        cyl_between(f"{name}_bras{s:+d}", (x - 1.35, y + s * 0.5, z0 + 0.3),
-                    (x - 2.5, y + s * 0.85, z0 + 0.12), 0.11, col, lin, verts=8)
-        cyl_between(f"{name}_jambe{s:+d}", (x, y + s * 0.25, z0 + 0.25),
-                    (x + 1.7, y + s * 0.4, z0 + 0.2), 0.15, col, lin, verts=8)
-
-def machta(name, x, y, z0, col, avec_braises=True, manche_vers=None):
-    """Ma'hta de Kippour : bassin d'or de trois kabin, manche long.
-
-    *Yoma* 4:4 tranche les trois choses qu'une image montre : elle est **d'or** ce
-    jour-là (« הַיּוֹם חוֹתֶה בְשֶׁל זָהָב »), elle tient **trois kabin** (« בְשֶׁל שְׁלשֶׁת קַבִּין »)
-    et son manche est **long** quand celui des autres jours est court (« בְּכָל יוֹם
-    הָיְתָה יָדָהּ קְצָרָה, וְהַיּוֹם אֲרֻכָּה ») — long pour que l'avant-bras en porte le poids.
-    Aucune source n'en donne le diamètre : le bassin est dimensionné sur sa
-    contenance, 3 kabin = 4,14 l = 0,037 ama³ (kav 1,38 l, Rav 'Haïm Naeh, comme
-    l'ama de la fiche §0). Le bassin d'avant en faisait 42 : une bassine de 53 cm de
-    large portée à bout de bras.
-
-    `manche_vers` : le point (amot) vers lequel le manche court — la main, puis
-    l'avant-bras. Par défaut plein est, pour la ma'hta posée seule.
-    """
-    revolution(f"{name}_bassin", x, y, z0,
-               [(0.20, 0.0), (0.25, 0.01), (0.27, 0.06), (0.29, 0.13), (0.32, 0.16),
-                (0.33, 0.175), (0.30, 0.175), (0.28, 0.15), (0.26, 0.06), (0.0, 0.03)],
-               col, MAT_OR(), verts=24)
-    bout = manche_vers or (x + 1.30, y, z0 + 0.09)
-    cyl_between(f"{name}_manche", (x, y, z0 + 0.09), bout, 0.045, col, MAT_OR(), verts=10)
-    px, py, pz = bout
-    dx, dy = px - x, py - y
-    d = math.hypot(dx, dy) or 1.0
-    cyl_between(f"{name}_collet", (x + 0.31 * dx / d, y + 0.31 * dy / d, z0 + 0.09),
-                (x + 0.40 * dx / d, y + 0.40 * dy / d, z0 + 0.09), 0.065, col, MAT_OR(), verts=10)
-    sphere(f"{name}_pommeau", px, py, pz, 0.07, col, MAT_OR(), segs=10)
-    if avec_braises:
-        cyl(f"{name}_braises", x, y, z0 + 0.11, z0 + 0.16, 0.255, col,
-            bpy.data.materials.get("Braise") or MAT_BRONZE(), verts=20)
-        l = lampe(f"{name}_lueur", 'POINT', (m(x), m(y), m(z0 + 0.5)))
-        l.data.energy = 8
-        l.data.color = (1.0, 0.45, 0.15)
-        l.data.shadow_soft_size = m(0.4)
-        link_to(l, col)
-
-def kaf(name, x, y, z0, col, avec_ketoret=True):
-    """Kaf : le bol d'or qui porte la ketoret, tenu dans la main gauche (*Yoma* 5:1).
-
-    *Tamid* 5:4 en donne la forme et la contenance : « וְהַכַּף דּוֹמֶה לְתַרְקַב גָּדוֹל שֶׁל
-    זָהָב, מַחֲזִיק שְׁלשֶׁת קַבִּים » — un grand récipient de mesure en or, trois kabin,
-    donc un bol **ouvert et rond**, pas une boîte. Le bazakh posé dedans et son
-    couvercle appartiennent au tamid de chaque jour ; à Kippour le Cohen Gadol y
-    verse ses deux poignées et la mesure du kaf est celle de ses mains (*Yoma* 5:1,
-    « הַגָּדוֹל לְפִי גָדְלוֹ… וְכָךְ הָיְתָה מִדָּתָהּ »), puis il en tient la **lèvre** du bout
-    des doigts pour en reverser la ketoret (Rambam, *Avodat Yom HaKippurim* 4:1) —
-    d'où la lèvre évasée, seule prise que la forme donne.
-
-    Un tronc de cône coiffé d'un anneau se rendait en tambour ; le bol est un profil
-    de révolution — pied, panse, lèvre — à paroi mince, et la ketoret un dôme, pas
-    une galette. Aucune source ne donne de manche : *Yoma* 5:1 y fait verser deux
-    poignées, c'est un récipient ouvert.
-    """
-    revolution(f"{name}_bol", x, y, z0,
-               [(0.10, 0.0), (0.19, 0.05), (0.235, 0.14), (0.24, 0.23), (0.27, 0.29),
-                (0.275, 0.31), (0.25, 0.31), (0.225, 0.27), (0.215, 0.14), (0.17, 0.05),
-                (0.0, 0.04)], col, MAT_OR(), verts=24)
-    if avec_ketoret:
-        revolution(f"{name}_ketoret", x, y, z0,
-                   [(0.20, 0.22), (0.21, 0.26), (0.19, 0.31), (0.14, 0.36),
-                    (0.07, 0.395), (0.0, 0.41)], col, MAT_KETORET(), verts=20)
-
-def _unite(v):
-    n = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]) or 1.0
-    return (v[0] / n, v[1] / n, v[2] / n)
-
-
-def _vers(depuis, cible):
-    return _unite((cible[0] - depuis[0], cible[1] - depuis[1], cible[2] - depuis[2]))
-
-
-def _repere(u):
-    """Trièdre autour d'un axe : `u`, la verticale redressée, et leur produit."""
-    w = _unite((-u[2] * u[0], -u[2] * u[1], 1 - u[2] * u[2]))
-    v = (u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0])
-    return w, v
-
-
-def _pas(point, *termes):
-    for direction, longueur in termes:
-        point = (point[0] + longueur * direction[0],
-                 point[1] + longueur * direction[1],
-                 point[2] + longueur * direction[2])
-    return point
-
-
-def main_poing(name, centre, vers, col):
-    """Poing fermé sur le manche de la ma'hta.
-
-    Le plan 10 est un gros plan sur les deux mains, et le blockout n'en donnait
-    aucune : l'avant-bras s'arrêtait net sur l'ustensile. Le styliseur devait donc
-    les inventer, sur 180 px de large, et rendait une moufle lisse sans un seul
-    doigt — six passes de retouche n'y ont rien changé. Le volume est bâti ici :
-    masse du poing le long du manche, quatre doigts en travers dessous, pouce au-
-    dessus. C'est ce qu'on voit d'une main fermée sur une barre, et c'est tout ce
-    qu'il faut pour que le modèle n'ait plus qu'à repeindre.
-
-    `vers` : le point vers lequel court le manche (le coude).
-    """
-    chair = MAT_CHAIR()
-    u = _vers(centre, vers)
-    w, v = _repere(u)
-    cyl_between(f"{name}_poing", _pas(centre, (u, -0.11)), _pas(centre, (u, 0.11)),
-                0.115, col, chair, verts=12)
-    for rang, le_long in enumerate((-0.087, -0.029, 0.029, 0.087)):
-        assise = _pas(centre, (u, le_long), (w, -0.080))
-        cyl_between(f"{name}_doigt{rang}", _pas(assise, (v, -0.090)), _pas(assise, (v, 0.090)),
-                    0.027, col, chair, verts=8)
-    cyl_between(f"{name}_pouce", _pas(centre, (u, -0.09), (w, 0.085)),
-                _pas(centre, (u, 0.07), (w, 0.075), (v, -0.04)), 0.034, col, chair, verts=8)
-
-
-def main_crochet(name, centre, vers, col):
-    """Main crochetée sur la lèvre du kaf, doigts par-dessus le bord.
-
-    Le kaf n'a pas de manche (*Tamid* 5:4 : « דּוֹמֶה לְתַרְקַב גָּדוֹל שֶׁל זָהָב », un récipient
-    de mesure ouvert) et le Rambam le fait tenir « שְׂפַת הַכַּף בְּרָאשֵׁי אֶצְבְּעוֹתָיו »
-    (*Avodat Yom HaKippurim* 4:1) — par la lèvre, du bout des doigts. C'est donc la
-    seule prise que la forme donne, et celle que le blockout doit montrer.
-
-    `centre` : le dos de la main, contre la panse ; `vers` : le centre du bol.
-    """
-    chair = MAT_CHAIR()
-    u = _vers(centre, vers)
-    w, v = _repere(u)
-    cyl_between(f"{name}_dos", _pas(centre, (u, -0.14)), _pas(centre, (u, 0.03)),
-                0.100, col, chair, verts=12)
-    for rang, en_travers in enumerate((-0.084, -0.028, 0.028, 0.084)):
-        assise = _pas(centre, (v, en_travers), (w, 0.02))
-        cyl_between(f"{name}_doigt{rang}", assise, _pas(assise, (u, 0.19), (w, -0.07)),
-                    0.026, col, chair, verts=8)
-    cyl_between(f"{name}_pouce", _pas(centre, (v, -0.10), (w, -0.03)),
-                _pas(centre, (v, -0.11), (u, 0.10), (w, -0.09)), 0.032, col, chair, verts=8)
-
-
-def taureau(name, x, y, z0, col, tete=(0, -1)):
-    """Par (~2.6 m au garrot compris). `tete` : direction unitaire de la tête (défaut : sud)."""
-    tx, ty = tete
-    px, py = -ty, tx          # axe transversal
-    def pt(a, t):             # a le long de l'axe tête, t en travers
-        return (x + a * tx + t * px, y + a * ty + t * py)
-    def boite(nm, a0, a1, t0, t1, z0_, z1_):
-        xs = [pt(a, t)[0] for a in (a0, a1) for t in (t0, t1)]
-        ys = [pt(a, t)[1] for a in (a0, a1) for t in (t0, t1)]
-        box(nm, min(xs), max(xs), min(ys), max(ys), z0_, z1_, col, MAT_BETE())
-    boite(f"{name}_tronc", -2.7, 2.7, -0.9, 0.9, z0 + 1.7, z0 + 3.6)
-    boite(f"{name}_tete", 2.7, 4.2, -0.6, 0.6, z0 + 2.4, z0 + 3.5)
-    for a in (-2.1, 2.1):
-        for t in (-0.65, 0.65):
-            cx, cy = pt(a, t)
-            cyl(f"{name}_patte_{a:+.0f}{t:+.0f}", cx, cy, z0, z0 + 1.7, 0.22, col, MAT_BETE(), verts=12)
-
-# --- CAM_05 : le par entre l'Oulam et le Mizbea'h (Yoma 3:8) — « רֹאשׁוֹ לַדָּרוֹם וּפָנָיו
-#     לַמַּעֲרָב, וְהַכֹּהֵן עוֹמֵד בַּמִּזְרָח וּפָנָיו לַמַּעֲרָב ». Le Kohen Gadol se tenait à l'OUEST de
-#     la tête, c'est-à-dire du mauvais côté ; il est à l'est, face à l'ouest, et reste
-#     donc de dos pour une caméra qui vient du nord-est.
-#     Tout le monde est sur les 10 amot de plat : les douze marches en prennent 12 sur
-#     les 22 (Middot 3:6), et les proxys avaient les pieds enfouis dedans.
-#     Le par et le Kohen Gadol servent les deux prises, 5a (l'aveu) et 5b (le Nom). Ce
-#     qui change entre elles, c'est le rang des cohanim : debout au 5a et au début du
-#     5b, couchés à la fin du 5b — « כּוֹרְעִים וּמִשְׁתַּחֲוִים וְנוֹפְלִים עַל פְּנֵיהֶם » à l'ouïe du Nom
-#     (Yoma 6:2). Le Kohen Gadol, lui, ne bouge pas : debout, les mains sur le par, il
-#     achève le Nom sur leur bénédiction et leur dit « תטהרו » (Rambam, Avodat Yom
-#     HaKippourim 2:7). Au 5b la rangée est doublée vers le nord, en profondeur de
-#     cadre, et la paire ouest recule d'une ama et demie : couché, un homme tendu fait
-#     quatre amot, et les mains du rang à x -63 entraient dans les marches.
-PLAN_05 = proxies_du_plan(5)
-taureau("Par_HaHatat", -61.5, 4, Z_AZ, PLAN_05, tete=(0, -1))
-kohen("KohenGadol_par", -59, 0.5, Z_AZ, PLAN_05)
-for nm, (x, y) in {"nord_O": (-63, 9), "nord_E": (-57, 9), "sud_O": (-63, -3), "sud_E": (-57, -3)}.items():
-    kohen(f"Kohen_par_{nm}", x, y, Z_AZ, proxies_du_plan(5, "A"))
-COHANIM_NOM = {f"{cote}_{rang}": (x, y)
-               for rang, y in (("sud", -3), ("nord", 9), ("nord2", 15), ("nord3", 21))
-               for cote, x in (("O", -61.5), ("E", -57))
-               if (cote, rang) != ("E", "sud")}   # il serait entre l'objectif et le Kohen Gadol
-for nm, (x, y) in COHANIM_NOM.items():
-    kohen(f"Kohen_nom_{nm}_debout", x, y, Z_AZ, proxies_du_plan(5, "B", "debut"))
-    kohen_prosterne_de_pres(f"Kohen_nom_{nm}_couche", x, y, Z_AZ, proxies_du_plan(5, "B", "fin"))
-
-# --- CAM_03 : le Kohen Gadol de dos devant la fenêtre du Beit Avtinas, table des épices
-# Tout est calé sur PORTE_MAYIM : la chambre a suivi la porte quand elle est passée
-# du milieu du mur sud à son extrémité est.
-PLAN_03 = proxies_du_plan(3)
-kohen("KohenGadol_Avtinas", PORTE_MAYIM, -76, Z_AZ + 26, PLAN_03)
-# La table court le long du mur ouest, pas en travers : posée face à la caméra elle
-# ne restait qu'un liseré au bas du cadre, et le pilon de la ketoret est le second
-# sujet du plan. Onze coupes — les onze épices de Keritot 6a — plus le mortier.
-# Collée au mur ouest (x -3,5..-1,5 depuis la porte) elle tombait au bord du cadre à
-# 28 mm : les coupes flottaient à demi hors champ. Décalée d'une ama vers l'axe.
-box("Avtinas_table", PORTE_MAYIM - 2.5, PORTE_MAYIM - 0.5, -78, -74, Z_AZ + 26, Z_AZ + 28, PLAN_03)
-for i in range(11):
-    cyl(f"Avtinas_coupe_{i:02d}", PORTE_MAYIM - 1.9 + 0.8 * (i % 2), -77.6 + 0.26 * i,
-        Z_AZ + 28, Z_AZ + 28.35, 0.28, PLAN_03, MAT_BRONZE(), verts=12)
-cyl("Avtinas_mortier", PORTE_MAYIM - 1.5, -74.6, Z_AZ + 28, Z_AZ + 28.8, 0.5, PLAN_03, verts=16)
-box("Avtinas_pilon", PORTE_MAYIM - 1.65, PORTE_MAYIM - 0.6, -74.85, -74.55,
-    Z_AZ + 28.8, Z_AZ + 29.1, PLAN_03)
-
-# --- CAM_06 : prosternation. Elle remplace la foule debout, donc elle en occupe
-# exactement l'emprise : les 11 amot de l'Ezrat Israël ET l'Ezrat Cohanim, sur toute
-# la largeur, puis l'Ezrat Nashim — « la prosternation concerne les deux cours »
-# (Yoma 6:2). Trente-trois silhouettes couchées sur trois colonnes tenaient lieu de
-# « toute l'Azara » : à 35 amot de haut et 80 de distance elles ne faisaient plus une
-# vague, mais trois traits sur un dallage vide.
-PLAN_06 = proxies_du_plan(6)
-for i, x in enumerate(plage(-20, -2, 2.2)):
-    for j, y in enumerate(plage(-66, 66, 2)):
-        if abs(y) < 4:      # l'allée de Nikanor reste dégagée (Middot 2:4)
-            continue
-        kohen_prosterne(f"Prosterne_Azara_{i:02d}{j:02d}", x, y, Z_AZ, PLAN_06)
-for i, x in enumerate(plage(12, 126, 5)):
-    for j, y in enumerate(plage(-66, 61, 5)):
-        if abs(y) < 6:
-            continue
-        kohen_prosterne(f"Prosterne_EzN_{i:02d}{j:02d}", x, y, Z_EZN, PLAN_06)
-
-# --- CAM_10 : le Kohen Gadol devant la parokhet extérieure, ma'hta et kaf aux mains
-# « נָטַל אֶת הַמַּחְתָּה בִּימִינוֹ וְאֶת הַכַּף בִּשְׂמֹאלוֹ » (Yoma 5:1) : la ma'hta à droite, le kaf
-# à gauche. Tourné vers l'ouest, sa droite est au nord — la ma'hta prend donc le y
-# haut. Le plan est un gros plan sur les mains, et le blockout n'en donnait aucune :
-# le torse s'arrêtait aux bras collés au tronc, le styliseur laissait le mannequin en
-# pierre et n'avait rien où peindre une main. Les deux avant-bras vont maintenant
-# jusqu'aux ustensiles, et le manche de la ma'hta court le long du droit, ce pour quoi
-# Yoma 4:4 le veut long. Il regarde l'ouest : poignets et ustensiles sont à x < -136,
-# devant lui — posés à l'est ils flottaient entre son dos et la caméra, et le
-# styliseur peignait des mains de face sur un homme de dos (seed 101002).
-PLAN_10 = proxies_du_plan(10)
-kohen("KohenGadol_seuil", -136, -8.5, Z_BAT, PLAN_10)
-COUDE_D, COUDE_G = (-136.0, -8.11, Z_BAT + 2.30), (-136.0, -8.89, Z_BAT + 2.30)
-# La vasque était posée contre le poignet et le poing, bâti sur le manche, passait
-# derrière sa lèvre. Deux corrections : elle recule de 0,35 ama le long du manche —
-# c'est à cela que sert le manche long de Kippour (*Yoma* 4:4) — et elle s'écarte au
-# nord. Reculer seule ne suffisait pas : la caméra regarde presque **le long du
-# manche** (produit scalaire −1,01 entre l'axe de vue et l'axe du manche), si bien
-# que la vasque se projetait pile sur le poing quelle que soit la distance. C'est
-# l'écart latéral, pas la distance, qui sépare deux objets alignés sur l'axe de vue.
-machta("Machta_mains", -137.31, -7.25, Z_BAT + 1.80, PLAN_10, manche_vers=COUDE_D)
-kaf("Kaf_mains", -136.65, -9.45, Z_BAT + 1.95, PLAN_10)
-# La manche s'arrête au poignet et la main prend la suite : bâtie jusqu'à l'ustensile,
-# elle y enterrait la main, qui ressortait en moufle. Les deux mains sont posées hors
-# des vasques — le poing sur le manche de la ma'hta, à l'aplomb du poignet ; la gauche
-# en dehors de la lèvre du kaf, ses doigts seuls passant par-dessus le bord.
-cyl_between("KohenGadol_seuil_avantbras_d", COUDE_D, (-136.36, -7.87, Z_BAT + 2.19),
-            0.12, PLAN_10, MAT_LIN(), verts=10)
-cyl_between("KohenGadol_seuil_avantbras_g", COUDE_G, (-136.30, -9.05, Z_BAT + 2.22),
-            0.12, PLAN_10, MAT_LIN(), verts=10)
-main_poing("Main_droite_machta", (-136.55, -7.749, Z_BAT + 2.13), COUDE_D, PLAN_10)
-main_crochet("Main_gauche_kaf", (-136.38, -9.09, Z_BAT + 2.25),
-             (-136.65, -9.45, Z_BAT + 2.25), PLAN_10)
-
-# --- CAM_11 : ma'hta posée sur la pierre, entre les deux badim, au pied de l'Arche
-#     (Yoma 5:1). Aucune figure ici (fiche 8e).
-machta("Machta_posee", ARON_X_MACHTA, 0, ZE, proxies_du_plan(11))
-
-# --- CAM_12 : franchissement de la parokhet intérieure, agrafée au NORD
-# Il porte les deux ustensiles jusqu'à l'Even HaShetiya (Yoma 5:1) : la fiche les
-# attend ici (§10, « Cohen Gadol et ma'hta, plans 10 et 12 »), le blockout n'avait
-# que la silhouette. Ustensiles devant lui, donc à l'ouest, côté caméra.
-PLAN_12 = proxies_du_plan(12)
-kohen("KohenGadol_passage", -139.6, 8, Z_BAT, PLAN_12)
-COUDE_P_D, COUDE_P_G = (-139.6, 8.39, Z_BAT + 2.30), (-139.6, 7.61, Z_BAT + 2.30)
-machta("Machta_passage", -140.15, 8.60, Z_BAT + 2.00, PLAN_12, manche_vers=COUDE_P_D)
-kaf("Kaf_passage", -140.15, 7.40, Z_BAT + 1.95, PLAN_12)
-cyl_between("KohenGadol_passage_avantbras_d", COUDE_P_D, (-139.95, 8.48, Z_BAT + 2.12),
-            0.12, PLAN_12, MAT_LIN(), verts=10)
-cyl_between("KohenGadol_passage_avantbras_g", COUDE_P_G, (-139.95, 7.52, Z_BAT + 2.12),
-            0.12, PLAN_12, MAT_LIN(), verts=10)
-
-# --- CAM_07C / CAM_07D : « il ôtait les habits de lin blanc et revêtait les habits d'or »
-# Le revêtement (Yoma 3:4, 7:3 : « ils lui apportaient les habits d'or et il s'habillait »),
-# derrière « un drap de lin fin tendu entre lui et le peuple » (Yoma 3:4, 3:6). Les
-# immersions et changements de Kippour se font sur le toit du Beit HaParva, au sud de
-# l'Azara (Middot 5:3 ; Yoma 3:3) — le blockout n'a pas la chambre : le poste est au sol,
-# côté sud, hors des rangs (x −40, y −60), et les deux gros plans ne montrent que lui et
-# le drap. Deux plans, deux collections, la même figure au même endroit, face à l'est :
-# 7c le 'hoshen de face cadré sous le menton, ses mains aux anneaux du bas où le cordon
-# de tekhelet le lie à l'éphod (Ex. 28:28) ; 7d le tsits noué à la nuque, de dos, ses
-# mains au nœud (Rambam Klei HaMikdash 9:2 ; 10:3). Le reste de la journée est en lin.
-VET_X, VET_Y = -40, -60
-for prise, cote_drap, coudes, mains in (
-        # 7c : mains aux anneaux du bas, à l'extérieur du 'hoshen (y ±0,25) et sous lui,
-        # là où le cordon descend vers le 'heshev — posées devant, elles cachaient le
-        # quatrième rang de pierres.
-        ("C", -1, ((VET_X, VET_Y - 0.39, Z_AZ + 2.22), (VET_X, VET_Y + 0.39, Z_AZ + 2.22)),
-                   ((VET_X + 0.36, VET_Y - 0.36, Z_AZ + 2.24), (VET_X + 0.36, VET_Y + 0.36, Z_AZ + 2.24))),
-        # 7d : coudes écartés, mains de part et d'autre de la nuque — serrés, les
-        # avant-bras couvraient toute la tête.
-        ("D", 1, ((VET_X + 0.10, VET_Y - 0.62, Z_AZ + 2.80), (VET_X + 0.10, VET_Y + 0.62, Z_AZ + 2.80)),
-                  ((VET_X - 0.30, VET_Y - 0.17, Z_AZ + 3.30), (VET_X - 0.30, VET_Y + 0.17, Z_AZ + 3.30)))):
-    plan = proxies_du_plan(7, prise)
-    silhouette(f"KohenGadol_vet_{prise}", VET_X, VET_Y, Z_AZ, plan, KOHEN_GADOL, lacet=math.pi)
-    box(f"Drap_lin_{prise}", VET_X + cote_drap * 1.8, VET_X + cote_drap * 1.9, VET_Y - 3, VET_Y + 3,
-        Z_AZ, Z_AZ + 5, plan, MAT_LIN())
-    for cote, coude, main in zip("gd", coudes, mains):
-        cyl_between(f"KohenGadol_vet_{prise}_avantbras_{cote}", coude, main, 0.12, plan, MAT_LIN(), verts=10)
-        sphere(f"KohenGadol_vet_{prise}_main_{cote}", *main, 0.10, plan, MAT_LIN(), segs=8)
 
 # ----------------------------------------------------------------------------
 # 76 — FOULE DE YOM KIPPOUR
@@ -2203,48 +2741,49 @@ def masse_foule(prefixe, xs, ys, z0, col=FL, ecart_axe=0.0):
             box(f"{prefixe}_{i:02d}{j:02d}", x, x + 5, y, y + 5, z0, z0 + h,
                 col, MAT_FOULE())
 
-# Le peuple : les 11 amot de l'Ezrat Israël (x -11..0), allée dégagée devant Nikanor.
-foule("Am_EzratIsrael", plage(-10, -2, 2), plage(-66, 66, 2), Z_AZ, TENUES_AM,
-      ecart_axe=4)
-# Les cohanim : les 11 amot suivantes (x -22..-11), en tenue de service. On s'arrête à
-# l'est du Doukhan (x -13.5) et on laisse l'ouest libre pour le service. Désordre et
-# lacet réduits, pas nuls : le service les range, il ne les aligne pas.
-foule("Kohen_EzratKohanim", plage(-20, -15, 2.5), plage(-63, 63, 3), Z_AZ,
-      (KOHEN,), desordre=1.2, lacet=0.2)
-# Débordement : Ezrat Nashim, puis la cour est du Har HaBayit. L'axe y = 0 reste
-# dégagé — c'est la ligne de mire de la para (Middot 2:4).
-# Pas de 5 pour des blocs de 5 : jointifs. Espacés d'une ama ils se lisaient en
-# caisses posées sur le dallage, et le plan 4 les prenait pour de la maçonnerie.
-masse_foule("Am_EzratNashim", plage(12, 127, 5), plage(-67, 62, 5), Z_EZN, ecart_axe=6)
-masse_foule("Am_HarHabayit", plage(157, 257, 5), plage(-67, 62, 5), Z_HAR, ecart_axe=10)
-# Les Léviim sur le Doukhan (3 marches, x -12..-13.5). « On ne descend pas au-dessous
-# de douze Léviim debout sur le Doukhan, et l'on ajoute sans limite » (Arakhin 2:6).
-# Chacun tient son instrument : jamais moins de neuf kinorot, de deux nevalim, et le
-# tziltzal seul (Arakhin 2:5, 2:3 ; Tamid 7:3) — neuf, deux et un font les douze.
-# En rang, sans lacet : c'est un chœur.
-INSTRUMENTS_DOUKHAN = ("kinor",) * 4 + ("nevel", "tziltzal", "nevel") + ("kinor",) * 5
-for i, genre in enumerate(INSTRUMENTS_DOUKHAN):
-    silhouette(f"Levi_{i:02d}", -12.6, -22 + i * 4, Z_AZ + 2.5, FL, LEVI)
-    instrument_de_levi(f"Levi_{i:02d}", genre, -12.6, -22 + i * 4, Z_AZ + 2.5, FL)
-# Les ketanim ne montent pas sur le Doukhan : ils se tiennent en bas, « la tête entre
-# les jambes des Léviim » (Arakhin 2:6, R. Eliézer ben Yaakov), et chantent sans
-# instrument (ibid.).
-for i in range(6):
-    silhouette(f"Levi_katan_{i:02d}", -10.4, -10 + i * 4, Z_AZ + 1, FL, LEVI, h=2.3)
-# Le portique sud est l'entrée des fidèles : « on entre par la droite » depuis les
-# portes de 'Houlda (Middot 1:3, 2:2). Deux masses de part et d'autre de l'axe de la
-# nef (y = -242.5), l'axe lui-même laissé libre — c'est là que passe CAM_02.
-# Trois rangs décalés par côté, et non une file unique : des figures isolées au pas
-# régulier le long d'une nef se lisent en rangée de bornes, quand des silhouettes qui
-# se recouvrent se lisent en foule (CAM_04). Le rang extérieur reste à 2,25 amot du
-# fût des colonnes (y = -250 et -235, rayon 1,5).
-for cote in (-1, 1):
-    for r, dy in enumerate((2.75, 4.0, 5.25)):
-        for i, x in enumerate(plage(-180 + r * 1.0, 256, 3)):
-            nom = f"Am_Portique_{cote:+d}_{r}_{i:03d}"
-            if alea(nom, 4) < 0.12:
-                continue
-            figurant(nom, x, -242.5 + cote * dy, Z_HAR, FL, TENUES_AM, desordre=1.2)
+if FOULE:
+    # Le peuple : les 11 amot de l'Ezrat Israël (x -11..0), allée dégagée devant Nikanor.
+    foule("Am_EzratIsrael", plage(-10, -2, 2), plage(-66, 66, 2), Z_AZ, TENUES_AM,
+          ecart_axe=4)
+    # Les cohanim : les 11 amot suivantes (x -22..-11), en tenue de service. On s'arrête à
+    # l'est du Doukhan (x -13.5) et on laisse l'ouest libre pour le service. Désordre et
+    # lacet réduits, pas nuls : le service les range, il ne les aligne pas.
+    foule("Kohen_EzratKohanim", plage(-20, -15, 2.5), plage(-63, 63, 3), Z_AZ,
+          (KOHEN,), desordre=1.2, lacet=0.2)
+    # Débordement : Ezrat Nashim, puis la cour est du Har HaBayit. L'axe y = 0 reste
+    # dégagé — c'est la ligne de mire de la para (Middot 2:4).
+    # Pas de 5 pour des blocs de 5 : jointifs. Espacés d'une ama ils se lisaient en
+    # caisses posées sur le dallage, et le plan 4 les prenait pour de la maçonnerie.
+    masse_foule("Am_EzratNashim", plage(12, 127, 5), plage(-67, 62, 5), Z_EZN, ecart_axe=6)
+    masse_foule("Am_HarHabayit", plage(157, 257, 5), plage(-67, 62, 5), Z_HAR, ecart_axe=10)
+    # Les Léviim sur le Doukhan (3 marches, x -12..-13.5). « On ne descend pas au-dessous
+    # de douze Léviim debout sur le Doukhan, et l'on ajoute sans limite » (Arakhin 2:6).
+    # Chacun tient son instrument : jamais moins de neuf kinorot, de deux nevalim, et le
+    # tziltzal seul (Arakhin 2:5, 2:3 ; Tamid 7:3) — neuf, deux et un font les douze.
+    # En rang, sans lacet : c'est un chœur.
+    INSTRUMENTS_DOUKHAN = ("kinor",) * 4 + ("nevel", "tziltzal", "nevel") + ("kinor",) * 5
+    for i, genre in enumerate(INSTRUMENTS_DOUKHAN):
+        silhouette(f"Levi_{i:02d}", -12.6, -22 + i * 4, Z_AZ + 2.5, FL, LEVI)
+        instrument_de_levi(f"Levi_{i:02d}", genre, -12.6, -22 + i * 4, Z_AZ + 2.5, FL)
+    # Les ketanim ne montent pas sur le Doukhan : ils se tiennent en bas, « la tête entre
+    # les jambes des Léviim » (Arakhin 2:6, R. Eliézer ben Yaakov), et chantent sans
+    # instrument (ibid.).
+    for i in range(6):
+        silhouette(f"Levi_katan_{i:02d}", -10.4, -10 + i * 4, Z_AZ + 1, FL, LEVI, h=2.3)
+    # Le portique sud est l'entrée des fidèles : « on entre par la droite » depuis les
+    # portes de 'Houlda (Middot 1:3, 2:2). Deux masses de part et d'autre de l'axe de la
+    # nef (y = -242.5), l'axe lui-même laissé libre — c'est là que passe CAM_02.
+    # Trois rangs décalés par côté, et non une file unique : des figures isolées au pas
+    # régulier le long d'une nef se lisent en rangée de bornes, quand des silhouettes qui
+    # se recouvrent se lisent en foule (CAM_04). Le rang extérieur reste à 2,25 amot du
+    # fût des colonnes (y = -250 et -235, rayon 1,5).
+    for cote in (-1, 1):
+        for r, dy in enumerate((2.75, 4.0, 5.25)):
+            for i, x in enumerate(plage(-180 + r * 1.0, 256, 3)):
+                nom = f"Am_Portique_{cote:+d}_{r}_{i:03d}"
+                if alea(nom, 4) < 0.12:
+                    continue
+                figurant(nom, x, -242.5 + cote * dy, Z_HAR, FL, TENUES_AM, desordre=1.2)
 
 # ----------------------------------------------------------------------------
 # BISEAU
@@ -2375,7 +2914,7 @@ sun.data.color = (1.0, 0.85, 0.65)
 sun.data.angle = math.radians(1.5)
 # Vise depuis l'est, 12° au-dessus de l'horizon (aube). Pour "jour" : passer à 30–35°.
 sun.rotation_euler = (math.radians(90 - 12), 0, math.radians(90 + 15))
-link_to(sun, "90_Cameras")
+link_to(sun, "91_Lumiere")
 ciel()
 (moteur_cycles if "--cycles" in sys.argv else moteur_eevee)()
 for vt in ('AgX', 'Filmic'):
@@ -2385,242 +2924,6 @@ for vt in ('AgX', 'Filmic'):
     except TypeError:
         continue
 
-# ----------------------------------------------------------------------------
-# CAMÉRAS — 20 plans, timecodes indicatifs (à recaler sur l'audio réel)
-#   (nom, durée s, focale mm, cam_debut, cam_fin, cible_debut, cible_fin)  — positions en amot
-# ----------------------------------------------------------------------------
-def orbite(cible, rayon, z, deg_debut, deg_fin, pas_deg=2):
-    """Points en amot d'un arc horizontal autour de cible : angle 0 = est, positif vers le nord."""
-    n = max(2, int(round(abs(deg_fin - deg_debut) / pas_deg)) + 1)
-    return [(cible[0] + rayon * math.cos(math.radians(a)),
-             cible[1] + rayon * math.sin(math.radians(a)), z)
-            for a in (deg_debut + (deg_fin - deg_debut) * i / (n - 1) for i in range(n))]
-
-# Le plan 1B tourne autour du Temple là où le plan 1 s'arrête : même cible, même
-# rayon (850 amot), même hauteur, donc sa première frame est la dernière du plan 1.
-# 30° vers le sud-est : la caméra quitte l'axe de la para (Middot 2:4) et découvre la
-# Stoa royale et le flanc sud de l'Azara, où le plan 2 va entrer.
-ORBITE_01B = orbite((-100, 0), 850, 105, 0, -30)
-
-# Une caméra dont le nom est dans TRAJECTOIRES suit le polygone donné (un keyframe par
-# point, à pas de temps constant) au lieu de la droite cam_debut → cam_fin.
-TRAJECTOIRES = {"CAM_01B_Orbite_SudEst": ORBITE_01B}
-
-SHOTS = [
-    # Le recouvrement entre la frame de début et la frame de fin est mesuré par
-    # beit_hamikdash_analyse_plans.py : c'est lui, et non la longueur de la course,
-    # qui décide si un i2v à deux frames peut tenir le plan. Sous 40 %, le modèle
-    # invente le trajet. Les valeurs ci-dessous sont réglées sur cette mesure.
-    #
-    # 50 amot de course ne changeaient l'échelle que de 5 % à 1000 amot de distance :
-    # invisible sur 12 s. 150 amot donnent 18 %, soit un vrai travelling lent.
-    # Le départ est ensuite reculé de 1000 à 1500 amot de la cible, le long de la même
-    # ligne de visée (z porté de 120 a 160 : le même angle de plongée, donc les mêmes
-    # cours et la même foule par-dessus les murs). La façade passe de 24 % à 16 % de la
-    # largeur du cadre au départ — le Temple s'ouvre dans son pays, pas dans son cadre —,
-    # l'arrivée ne bouge pas, et la course de 650 amot fait grossir le décor de x1,76
-    # sur les 12 s. Le 85 mm reste : c'est la fin du plan, à 850 amot, qu'il cadre.
-    # Caméra sur l'axe Heikhal-Nikanor (y = 0), la ligne de mire de la para adouma (Middot 2:4) :
-    # 100 amot au sud, l'autel (9 amot au sud de l'axe) se reprojetait sur l'ouverture de l'Oulam et
-    # la colonne de fumée semblait sortir de la porte. Sur l'axe, elle tombe au ras du montant sud.
-    # 50 mm depuis le mont des Oliviers ne donnait au Heikhal que 14 % de la largeur du
-    # cadre : géométriquement exact, mais le Temple s'y perd. 85 mm le porte à 24 % et
-    # garde les cours, la foule et la crête. Le plan 15 doit rester identique.
-    ("CAM_01_Ouverture_MontOliviers", 12, 85, (1400, 0, 160), (750, 0, 105), (-100, 0, 40), (-100, 0, 40)),
-    ("CAM_01B_Orbite_SudEst", 12, 85, ORBITE_01B[0], ORBITE_01B[-1], (-100, 0, 40), (-100, 0, 40)),
-    # Travelling dans la nef de la Stoa royale (colonnades y=-250 et y=-235) :
-    # l'axe de l'allée est y=-242.5, tout autre y met une colonne en travers du cadre.
-    # Les colonnes sont au pas de 10 depuis x = -202 : ouvrir à -190 collait la caméra
-    # à 2 amot d'un fût, qui remplissait le bord du cadre. On ouvre et on ferme à
-    # mi-travée.
-    # La course était de 280 amot : 134 m en 18 s, soit 7,5 m/s — une colonne toutes
-    # les 0,64 s et 1,8 largeur de cadre parcourue, d'où un recouvrement nul. Ramenée
-    # à 82 amot, l'allée défile encore franchement et les deux frames se recoupent.
-    ("CAM_02_Portique_Sud", 18, 28, (-187, -242.5, Z_HAR + 7), (-105, -242.5, Z_HAR + 7), (-110, -242.5, Z_HAR + 6), (-28, -242.5, Z_HAR + 6)),
-    # Intérieur du Beit Avtinas (sol à Z_AZ+26). Le personnage est à 7 puis 5.5 amot :
-    # à 28 mm il tient en pied sans dépasser un tiers du cadre.
-    # Depuis Sha'ar HaMayim la fenêtre ne donne plus que sur le ciel : le Sanctuaire est
-    # 38° hors de l'axe et l'appui masque la cour (README). Elle reste dans le cadre pour
-    # ce qu'elle est — une source de lumière derrière le Cohen Gadol —, et le sujet
-    # redevient la chambre. La caméra tient l'axe de la pièce : depuis l'angle sud-est
-    # elle collait la silhouette à 7 amot d'un 28 mm et la coupait au bord du cadre.
-    # Descendue à 2,8 amot du sol, elle a la table (dessus à 2 amot) en pleine hauteur
-    # d'image au lieu d'un liseré vu de dessus.
-    # 20 mm et non 28 : la chambre fait 8 x 10 amot, le plus grand recul possible est de
-    # 9,7 amot, et à 28 mm une silhouette de 3,65 amot y occupe les trois quarts de la
-    # hauteur du cadre. Le « petit dans le cadre » du découpage n'est pas atteignable
-    # dans une pièce de cette taille : à 20 mm, depuis l'angle sud-est, il en tient la
-    # moitié — un plan moyen, avec la table en fuyante et deux murs.
-    # Course divisée par deux le 6/09. À 2,5 amot d'avance depuis 8,5, la table —
-    # à 4 amot de l'objectif — balayait le cadre : premier plan à x1,37 contre x1,22
-    # pour le mur du fond, et l'i2v amplifiait encore (x1,42 / x1,18 mesurés). Le plan
-    # perdait son sujet par la gauche. À 1,25 amot : x1,15 et x1,10, le même mouvement
-    # sans que rien ne sorte du cadre.
-    ("CAM_03_Beit_Avtinas", 25, 20, (-9.5, -82.5, Z_AZ + 28.8), (-10, -81.75, Z_AZ + 28.8), (-12.5, -74.5, Z_AZ + 28.2), (-12.5, -74.5, Z_AZ + 28.2)),
-    # La grue partait du sol de l'Ezrat Nashim pour finir 22 amot plus haut en se
-    # rapprochant de 30 : le dallage et la foule du premier plan quittaient le cadre
-    # entièrement. Montée et approche réduites de moitié.
-    # Puis la course a été remontée au-dessus du sol de l'Azara. À Z_EZN + 3 l'objectif
-    # était 4,5 amot SOUS le seuil de Nikanor : le seuil masquait la cour entière —
-    # `Azara_sol` absent de `--voit 4` aux deux frames, et la baie ne cadrait que la
-    # façade de l'Oulam de 8 à 63 amot d'élévation, ce qui se lit en salle et pas en
-    # cour. Une occultation ne se corrige pas en visant plus bas : il faut passer le
-    # seuil, donc Z_AZ + 2.
-    # Le prix est mesuré, pas supposé : la foule de l'Ezrat Nashim a sa tête à Z_EZN +
-    # 3,9 = -3,6, donc toute caméra au-dessus du seuil la regarde de haut. `--foule 4`
-    # passe de 96 figures à 26, médiane 190 → 172 px. Les deux ne sont pas conciliables
-    # à cette focale : garder la foule à hauteur d'homme, c'est rester sous le seuil et
-    # perdre la cour. La cible descend de 25 à 8 pour récupérer le premier plan que la
-    # montée avait chassé du cadre.
-    ("CAM_04_Grue_EzratNashim", 25, 35, (60, 0, Z_AZ + 2), (40, 0, Z_AZ + 10), (-76, 0, 8), (-76, 0, 8)),
-    # Le par est entre l'Oulam et le Mizbea'h (Yoma 3:8) : depuis le Doukhan, l'autel de
-    # 10 amot le masque entièrement. Seule ligne de vue au sol : depuis le nord, au-dessus
-    # des anneaux, en rasant l'angle nord-ouest de l'autel (-54, 7).
-    ("CAM_05A_Doukhan_Taureau", 25, 40, (-38, 36, Z_AZ + 4), (-44, 33, Z_AZ + 4), (-61.5, 4, Z_AZ + 2.5), (-62.5, 4, Z_AZ + 2.5)),
-    # 5b : le Nom. Même lieu que le 5a, la caméra passe du nord au sud-est et descend à
-    # hauteur d'homme : l'autel ferme la droite du cadre, les douze marches montent à
-    # gauche, la cour file vers le nord au centre. Le Kohen Gadol est vu de dos, trois
-    # quarts droit — jamais de visage —, debout, les mains sur le par ; les cohanim
-    # tombent autour de lui à l'ouïe du Nom (Yoma 6:2) et lui seul reste debout (Rambam,
-    # Avodat Yom HaKippourim 2:7). Le poste est contraint : il n'y a que 5 amot entre le
-    # Kohen Gadol et le yesod (x -54), et le Kiyor est à (-59, -8) (Middot 3:6) — posée
-    # à (-56, -10) la caméra l'avait à 2 amot et un cohen debout en plein axe. Collée au
-    # yesod, à 3,8 amot de haut pour lire les corps au sol. Poussée d'une ama, cible fixe.
-    ("CAM_05B_Le_Nom", 15, 28, (-54.8, -7.5, Z_AZ + 3.8), (-55.2, -6.6, Z_AZ + 3.8), (-59.3, 2.5, Z_AZ + 2.0), (-59.3, 2.5, Z_AZ + 2.0)),
-    # Le plan signature ne montrait pas son sujet. Posée à 6 amot au-dessus du sol de
-    # l'Oulam, la caméra avait le Mizbea'h — 32 x 32 x 10, à 24 amot devant elle et à
-    # cheval sur l'axe (y -25..7) — exactement en travers : la ligne de visée passait
-    # sous son couronnement et toute la cour prosternée était derrière. Il faut 35 amot
-    # de hauteur pour raser l'angle nord-est de l'autel et rattraper le sol à Nikanor ;
-    # l'ouverture de l'Oulam en fait 40, la caméra y tient.
-    # Posée sur l'axe, elle avait ensuite la colonne de fumée — qui monte de l'autel à
-    # y -9 — droit au milieu du cadre, coupant en deux la cour prosternée. On se décale
-    # au bord nord de l'ouverture : l'autel et sa fumée passent dans le tiers droit du
-    # cadre, à leur vraie place au sud, et la cour occupe le reste.
-    ("CAM_06_Prosternation", 15, 20, (-78, 9, Z_BAT + 29), (-78, 9, Z_BAT + 29), (30, 6, Z_AZ), (30, 6, Z_AZ)),
-    # Plan 7 coupé en deux. D'un seul tenant, la cible passait de (-30, 50) à (-40, -35)
-    # alors que la caméra est à y = 39 : la visée traversait l'axe de la caméra et
-    # tournait de 142°, un travelling suivi d'un panoramique fouetté. Et la cible était
-    # à 11 amot pour 34 amot de course — le décor glissait de trois largeurs de cadre.
-    # 7a regarde le champ d'anneaux en fuyante au lieu de le traverser. Posée à
-    # 1,5 ama entre les anneaux (y 18..36) et les tables (y 42..44), la caméra les
-    # avait tous les deux à trois amot de part et d'autre : le sol du premier plan
-    # balayait 0,31 largeur de cadre par seconde, quatre cadres sur la durée du plan.
-    # Reculée au nord-est du champ et remontée à 4 amot, elle le prend en entier et en
-    # profondeur — piliers, puis tables, puis anneaux — au lieu de l'enjamber.
-    # Le poste est aussi contraint par la foule : à x -20..-15 se tiennent les cohanim
-    # et à x -10..-2 le peuple. Posée à x -8 elle était à l'intérieur d'une silhouette,
-    # objectif dans une tête, et ne voyait plus rien du tout.
-    ("CAM_07A_Beit_Mitbachaim", 13, 35, (-24, 62, Z_AZ + 4), (-30, 59, Z_AZ + 4), (-42, 34, Z_AZ + 2), (-42, 34, Z_AZ + 2)),
-    # 7b : la rampe ne se filme pas depuis le Beit HaMitba'haïm. Elle est au SUD de
-    # l'autel (Middot 3:3), l'autel fait 10 amot de haut et le poste du plan 7a est au
-    # nord : la même géométrie qui cache le taureau au plan 5 cache la rampe ici. On
-    # coupe, et on la prend depuis le sud, dans son axe, l'autel et la fumée au fond.
-    # Prise dans son axe, la rampe n'était qu'un plan incliné gris sans arête : on la
-    # regarde du sud-ouest, où elle monte en diagonale vers l'autel et la fumée. Le
-    # poste reste à l'ouest de x -22, hors des rangs du peuple et des cohanim.
-    # Dans l'axe de la rampe, basse, montant vers le couronnement de l'autel et la
-    # fumée. Trois cadrages ont été essayés (sud-ouest, est, trois quarts) : aucun ne
-    # détache la rampe, parce que le problème n'est pas le poste mais la matière —
-    # rampe chaulée contre autel chaulé sur dallage clair, en lumière ambiante plate,
-    # ne donne aucune arête. C'est le cas de la Stoa du plan 2 : le rendu couleur ne
-    # porte rien, la carte de profondeur si. Plan à styliser avec `--structure`.
-    ("CAM_07B_Rampe", 12, 35, (-38, -62, Z_AZ + 3), (-38, -57, Z_AZ + 3), (-38, -28, Z_AZ + 9), (-38, -28, Z_AZ + 9)),
-    # 7c : le 'hoshen. De face, 40 mm, cadré sous le menton : à 1,6 ama le cadre fait
-    # 1,44 × 0,81 amot, du 'heshev au bas du cou — jamais le visage — et le 'hoshen
-    # (un zeret) en prend 35 % de large ; à 2,26 il n'en prenait que 25 % et restait un
-    # bijou. Poussée de 0,2 ama (×1,14) sur les douze pierres.
-    ("CAM_07C_Hoshen", 8, 40, (VET_X + 1.94, VET_Y, Z_AZ + 2.66), (VET_X + 1.74, VET_Y, Z_AZ + 2.66), (VET_X + 0.34, VET_Y, Z_AZ + 2.56), (VET_X + 0.34, VET_Y, Z_AZ + 2.56)),
-    # 7d : le tsits. De dos, 40 mm, sur la nuque : mitsnefet enroulée à plat, cordon de
-    # tekhelet noué, ses deux mains au nœud ; le drap de lin au fond. Même poussée.
-    ("CAM_07D_Tsits", 8, 40, (VET_X - 2.4, VET_Y, Z_AZ + 3.5), (VET_X - 2.1, VET_Y, Z_AZ + 3.5), (VET_X - 0.2, VET_Y, Z_AZ + 3.38), (VET_X - 0.2, VET_Y, Z_AZ + 3.38)),
-    # 55 mm sur une cible à 7 amot finissait en aplat de parokhet. On monte les 12 marches
-    # et on révèle l'ouverture de 20 x 40, les malterot et la vigne d'or.
-    # La caméra divisait sa distance à la cible par 2,2 : à ce taux d'approche les deux
-    # frames ne partagent plus qu'un quart d'image. Course ramenée à 9 amot, cible fixe.
-    ("CAM_08_Ulam", 20, 28, (-58, 0, Z_AZ + 3), (-74, 0, Z_AZ + 11), (-91, 0, Z_BAT + 20), (-91, 0, Z_BAT + 20)),
-    # Le Heikhal fait 40 amot de haut pour 20 de large : à 24 mm aucune position ne cadre
-    # la hauteur et les kelim en même temps. Le plan tenait les deux par un relevé de
-    # cible de 33 amot, soit 56° de tilt pour 46° de champ vertical : la frame de fin ne
-    # montrait plus rien de la frame de début — un aplat de parokhet et de plafond, 7 %
-    # de recouvrement. Deux plans, une intention chacune.
-    # 9a : l'avancée sur l'axe, cible basse et fixe — porte, Shoul'han, Menora, autel d'or.
-    ("CAM_09A_Heikhal_Kelim", 13, 24, (-85, 0, Z_BAT + 5), (-105, 0, Z_BAT + 5), (-138, 0, Z_BAT + 5), (-138, 0, Z_BAT + 5)),
-    # 9b : le relevé seul, borné à 12 amot de cible. Le plafond entre quand même dans le
-    # cadre — à 33 amot de la parokhet, le haut du champ atteint Z_BAT + 38 — mais les
-    # deux frames gardent la moitié basse en commun.
-    ("CAM_09B_Heikhal_Parokhet", 12, 24, (-102, 0, Z_BAT + 6), (-107, 0, Z_BAT + 6), (-138, 0, Z_BAT + 6), (-138, 0, Z_BAT + 14)),
-    # 10 : dans l'axe du dos, pour que la ma'hta (droite, nord) et le kaf (gauche, sud)
-    # passent chacun d'un côté du torse une fois tenus devant lui ; à 3,4 amot les deux
-    # ustensiles remplissent les trois quarts de la largeur. Le kohen est à 1,5 ama du
-    # mur sud, qui entre ainsi à gauche du cadre. Poussée de 0,7 ama sur 20 s.
-    ("CAM_10_Mains_Machta", 20, 40, (-133.4, -8.5, Z_BAT + 2.9), (-134.08, -8.5, Z_BAT + 2.72), (-136.8, -8.55, Z_BAT + 2.0), (-136.8, -8.55, Z_BAT + 2.0)),
-    # Aucune figure dans le Kodesh HaKodashim (fiche 8e) : le sujet est l'Arche sur la
-    # pierre, la ma'hta à son pied. Caméra entre les deux badim, à la place du Cohen Gadol
-    # (Yoma 5:3), basse, quasi fixe ; 28 mm pour tenir les ailes des keruvim (4 amot au-dessus
-    # du sol) et la ma'hta au sol à 7,5 amot ; la fumée fera le reste en i2i.
-    ("CAM_11_Kodesh_HaKodashim", 25, 28, (-141.5, 0, Z_BAT + 1.8), (-142.5, 0, Z_BAT + 1.6), (-149, 0, Z_BAT + 2.0), (-149, 0, Z_BAT + 2.0)),
-    # Le traksin fait 1 ama (48 cm) : aucune caméra n'y tient. On se place dans le Kodesh
-    # HaKodashim et on filme le Kohen Gadol franchissant la parokhet intérieure, agrafée
-    # au nord. La caméra se déplaçait de 4 amot en travers pour une cible à 6 : la
-    # parallaxe emportait tout le cadre. Course latérale ramenée à 1,6 ama, cible fixe.
-    ("CAM_12_Entre_Parokhot", 25, 28, (-143, 1, Z_BAT + 4), (-142.5, -0.5, Z_BAT + 4), (-139.8, 7.5, Z_BAT + 2.5), (-139.8, 7.5, Z_BAT + 2.5)),
-    # Plan 13 coupé au seuil. Le recul allait de x -120 à -80 : la caméra traversait le
-    # mur est du Heikhal (-98..-92) et changeait de pièce en cours de plan. Une seule
-    # paire de frames ne décrit pas une traversée de porte ; la coupe se fait dans
-    # l'embrasure, là où le montage la voudrait de toute façon.
-    ("CAM_13A_Retour_Heikhal", 15, 40, (-120, 0, Z_BAT + 5), (-101, 0, Z_BAT + 5), (0, 0, Z_AZ + 20), (0, 0, Z_AZ + 20)),
-    ("CAM_13B_Retour_Oulam", 15, 40, (-98, 0, Z_BAT + 5), (-80, 0, Z_BAT + 5), (0, 0, Z_AZ + 20), (0, 0, Z_AZ + 20)),
-    # Plan 14 coupé en deux : la grue montait de 54 amot en reculant de 44 pendant que la
-    # cible balayait 70 amot vers l'est — trois révélations (l'Azara, l'Ezrat Nashim, la
-    # ville) dans un seul plan, et rien de commun entre ses deux bouts.
-    # 14a découvre l'Azara depuis le seuil de l'Oulam, cible fixe sur la cour.
-    # Départ relevé pour la même raison qu'au plan 6 : à 2 amot au-dessus du sol de
-    # l'Oulam la grue commençait derrière l'autel et ne découvrait rien.
-    ("CAM_14A_Grue_Azara", 15, 28, (-74, 0, Z_BAT + 14), (-60, 0, Z_AZ + 30), (40, 0, Z_AZ + 5), (40, 0, Z_AZ + 5)),
-    # 14b poursuit la montée. L'amplitude est bornée par ce qu'un mur cache : montant
-    # de 32 amot en balayant la cible de 50 vers l'est, la caméra passait au-dessus du
-    # mur du Har HaBayit et découvrait un sol que rien n'annonçait dans la frame de
-    # début — 3 % de couverture, tout à inventer. Une grue ne se décrit à deux frames
-    # que tant qu'elle ne franchit pas une ligne d'horizon.
-    ("CAM_14B_Grue_Ville", 15, 28, (-60, 0, Z_AZ + 30), (-46, 0, Z_AZ + 46), (40, 0, Z_AZ + 5), (55, 0, Z_AZ + 3)),
-    # Même axe que CAM_01 (boucle visuelle ouverture/fermeture).
-    ("CAM_15_Fermeture", 33, 85, (850, 0, 110), (850, 0, 110), (-100, 0, 40), (-100, 0, 40)),
-]
-
-frame = 1
-scene.frame_start = 1
-for (name, dur, focal, c0, c1, t0, t1) in SHOTS:
-    n = int(round(dur * FPS))
-    f0, f1 = frame, frame + n - 1
-    tgt = empty(name + "_cible", *t0)
-    cam = camera(name, tuple(m(c) for c in c0))
-    cam.data.lens = focal
-    cam.data.clip_end = 5000
-    cam.data.sensor_width = 36
-    link_to(cam, "90_Cameras")
-    con = cam.constraints.new('TRACK_TO')
-    con.target = tgt
-    con.track_axis = 'TRACK_NEGATIVE_Z'
-    con.up_axis = 'UP_Y'
-    # Keyframes de position (interpolation linéaire = mouvement constant)
-    for obj, points in ((cam, TRAJECTOIRES.get(name, [c0, c1])), (tgt, [t0, t1])):
-        for i, p in enumerate(points):
-            obj.location = tuple(m(c) for c in p)
-            obj.keyframe_insert("location", frame=round(f0 + (f1 - f0) * i / (len(points) - 1)))
-        for fc in fcurves_of(obj):
-            for kp in fc.keyframe_points:
-                kp.interpolation = 'LINEAR'
-    mk = scene.timeline_markers.new(name, frame=f0)
-    mk.camera = cam
-    cam["duree_s"] = dur
-    cam["frame_debut"] = f0
-    cam["frame_fin"] = f1
-    frame = f1 + 1
-
-scene.frame_end = frame - 1
-scene.camera = bpy.data.objects["CAM_01_Ouverture_MontOliviers"]
-scene.frame_set(1)
 
 # Passes utiles pour le conditionnement IA (profondeur, normales)
 vl = scene.view_layers[0]
@@ -2628,6 +2931,6 @@ vl.use_pass_z = True
 vl.use_pass_normal = True
 vl.use_pass_mist = True
 
-print(f"Blockout terminé : {len(bpy.data.objects)} objets, {len(SHOTS)} caméras, "
-      f"{scene.frame_end} images à {FPS} fps ({scene.frame_end / FPS:.0f} s).")
-print("Sélectionner une caméra dans la timeline via les marqueurs ; Ctrl+Numpad0 pour la rendre active.")
+print(f"Blockout terminé : {len(bpy.data.objects)} objets, "
+      f"{len(bpy.data.collections)} collections.")
+print("Aucune caméra : elles se posent avec beit_hamikdash_cameras.py, depuis cameras.json.")

@@ -38,9 +38,8 @@ l'information principale.
 4. **`references/corpus.md`** — quelle œuvre fait autorité sur quoi, et les sources
    non-juridiques (Josèphe, archéologie, Machon HaMikdash) avec leurs liens.
 
-Pour une question de mise en scène (« ce plan est-il juste ? »), ajouter
-`shot_list_seder_haavodah.md` et `prompts_par_plan.md` ; pour une question de
-géométrie construite, le skill `blender`.
+Pour une question de géométrie construite, le skill `blender` ; pour ce qu'un cadre
+montre vraiment, `beit_hamikdash_inspect.py -- --voit <plan>`.
 
 ## Lire les sources
 

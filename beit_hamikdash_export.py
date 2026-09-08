@@ -1,20 +1,26 @@
-"""Exporte les images clés des plans : planche de contrôle, ou fichiers de production.
+"""Exporte la première et la dernière image de chaque plan : planche, ou production.
 
-    # planche de contrôle des 20 plans, 640 x 360 + index HTML
+    # planche de contrôle, 640 x 360 + index HTML
     /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend \
-        -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py -- --planche
+        -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
+        -P beit_hamikdash_export.py -- --planche
 
     # fichiers de production : couleur + profondeur, 1920 x 1080
     /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend \
-        -P beit_hamikdash_blockout.py -P beit_hamikdash_export.py
+        -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
+        -P beit_hamikdash_export.py
 
     # un ou plusieurs plans seulement
-    ... -P beit_hamikdash_export.py -- CAM_09A_Heikhal_Kelim
+    ... -P beit_hamikdash_export.py -- CAM_03_Heikhal
 
-Les deux sorties viennent du même script parce qu'elles répondent à la même
-question — la première et la dernière image de chaque plan — et qu'elles doivent
-donc masquer exactement les mêmes objets. Séparées, la planche a dérivé du rendu de
-production : elle annonçait le plan 1 en 50 mm quand le blockout était passé à 85.
+Les plans exportés sont ceux que porte la scène — ceux de cameras.json, posés par
+beit_hamikdash_cameras.py — dans l'ordre de la timeline. Le script n'en tient aucune
+liste à lui, et les deux sorties viennent du même script : dupliquée, une liste
+dérive, et la planche a déjà annoncé un plan en 50 mm quand la scène était passée
+à 85.
+
+Les fichiers portent le nom de la caméra : `renders/blockout/<caméra>_debut.png`,
+`_fin.png` et leurs `_profondeur.png`. C'est ce que les scripts fal vont chercher.
 
 La carte de profondeur est normalisée 0-1, proche = blanc (convention ControlNet
 Depth). L'échelle est logarithmique : sur ces plans, un dégradé linéaire en mètres
@@ -30,24 +36,10 @@ Rejouable : le script reconstruit ses groupes de compositing et remesure les pla
 
 import math
 import os
-import re
 import sys
 
 import bpy
 import numpy as np
-
-CAMERAS = (
-    "CAM_01_Ouverture_MontOliviers", "CAM_01B_Orbite_SudEst", "CAM_02_Portique_Sud", "CAM_03_Beit_Avtinas",
-    "CAM_04_Grue_EzratNashim", "CAM_05A_Doukhan_Taureau", "CAM_05B_Le_Nom", "CAM_06_Prosternation",
-    "CAM_07A_Beit_Mitbachaim", "CAM_07B_Rampe", "CAM_07C_Hoshen", "CAM_07D_Tsits", "CAM_08_Ulam",
-    "CAM_09A_Heikhal_Kelim", "CAM_09B_Heikhal_Parokhet", "CAM_10_Mains_Machta",
-    "CAM_11_Kodesh_HaKodashim", "CAM_12_Entre_Parokhot",
-    "CAM_13A_Retour_Heikhal", "CAM_13B_Retour_Oulam",
-    "CAM_14A_Grue_Azara", "CAM_14B_Grue_Ville", "CAM_15_Fermeture",
-)
-# La foule de 76_Foule est debout. Le plan 6 la remplace par ses propres figures
-# prosternées, qui vivent dans la collection de sujet du plan.
-SANS_FOULE = ("CAM_06_Prosternation",)
 
 DOSSIER = "renders"
 SOUS_DOSSIER_BLOCKOUT = "blockout"   # rendus Blender 1920 x 1080 qui nourrissent l'i2i
@@ -68,58 +60,29 @@ def arguments():
     return sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 
 
-def cameras_demandees(args):
-    nommees = tuple(a for a in args if not a.startswith("--"))
-    return nommees or CAMERAS
+def cameras_de_la_scene(scene):
+    """Les caméras dans l'ordre de la timeline, pas dans celui de bpy.data."""
+    marqueurs = sorted((mk for mk in scene.timeline_markers if mk.camera),
+                       key=lambda mk: mk.frame)
+    return [mk.camera.name for mk in marqueurs]
 
 
-# --- visibilité par plan ------------------------------------------------------
-
-def prefixe_du_plan(nom):
-    """CAM_07A_Beit_Mitbachaim -> CAM_07A. C'est le nom des fichiers du plan."""
-    return "_".join(nom.split("_")[:2])
-
-
-SUJET = re.compile(r"^75_Plan(\d{2})([A-Z]?)(?:_(debut|fin))?$")
-
-
-def est_sujet_de(nom_collection, nom_camera, etiquette):
-    """75_Plan05 sert aux deux prises et aux deux frames du plan 5 ; 75_Plan05A à la
-    seule prise 5a ; 75_Plan05B_fin à la seule frame de fin de la prise 5b."""
-    trouve = SUJET.match(nom_collection)
-    if not trouve:
-        return False
-    numero, lettre, frame = trouve.groups()
-    prise = prefixe_du_plan(nom_camera).removeprefix("CAM_")
-    return (numero == prise[:2] and lettre in ("", prise[2:])
-            and frame in (None, etiquette))
+def cameras_demandees(scene, args):
+    connues = cameras_de_la_scene(scene)
+    if not connues:
+        raise SystemExit("Aucune caméra dans la scène : lancer beit_hamikdash_cameras.py "
+                         "avant l'export.")
+    nommees = [a for a in args if not a.startswith("--")]
+    for nom in nommees:
+        if nom not in connues:
+            raise SystemExit(f"Plan inconnu : {nom}. Connus : {', '.join(connues)}")
+    return nommees or connues
 
 
 def masquer(nom_collection, cacher):
     collection = bpy.data.collections.get(nom_collection)
     if collection:
         collection.hide_render = cacher
-
-
-def montrer_le_sujet(nom, etiquette):
-    """Ne laisse visibles que les proxys du plan rendu, à la frame rendue.
-
-    Un sujet qui traîne dans le cadre d'un autre plan devient un objet inventé : la
-    silhouette du plan 12, restée devant la parokhet, est ressortie en second
-    candélabre au fond du Heikhal. La foule, elle, est l'état permanent du jour et
-    reste en place — Léviim du Doukhan compris.
-    """
-    for collection in bpy.data.collections:
-        if collection.name.startswith("75_Plan"):
-            collection.hide_render = not est_sujet_de(collection.name, nom, etiquette)
-    masquer("76_Foule", nom in SANS_FOULE)
-
-
-def tout_montrer():
-    for collection in bpy.data.collections:
-        if collection.name.startswith("75_Plan"):
-            collection.hide_render = False
-    masquer("76_Foule", False)
 
 
 # --- compositing --------------------------------------------------------------
@@ -235,11 +198,23 @@ def valeurs_rouge(chemin):
     return tampon[0::canaux]
 
 
+PAYS = "01_Pays"   # collines, ville et oliviers : jusqu'à six mille amot de l'origine
+
+
 def plage_z(scene, groupe_z):
-    """(proche, lointain) en mètres, mesurés sur la passe Z du frame courant."""
+    """(proche, lointain) en mètres, mesurés sur la passe Z du frame courant.
+
+    Le pays est masqué le temps de la mesure : à trois kilomètres, il tirait la borne
+    lointaine des plans 1, 1b, 14b et 15 hors du Temple, et l'échelle log n'y laissait
+    plus qu'un cinquième de sa plage. Il reste dans la carte, écrêté au noir du fond.
+    """
     chemin = os.path.join(bpy.app.tempdir, "mesure_z.exr")
     format_exr(scene)
-    rendre_donnees(scene, groupe_z, chemin)
+    masquer(PAYS, True)
+    try:
+        rendre_donnees(scene, groupe_z, chemin)
+    finally:
+        masquer(PAYS, False)
     format_png(scene)
     z = valeurs_rouge(chemin)
     visibles = z[z < scene.camera.data.clip_end]
@@ -262,7 +237,7 @@ h1{{font-size:18px}}p{{color:#999;max-width:60em}}table{{border-collapse:collaps
 td{{padding:6px;vertical-align:top}}img{{width:420px;display:block;border:1px solid #444}}
 .n{{color:#fff;font-weight:600}}.m{{color:#999;font-size:12px}}</style>
 <h1>Beit HaMikdash — planche de contrôle, {nombre} plans (début / fin)</h1>
-<p>Rendue par <code>beit_hamikdash_export.py --planche</code> depuis le blockout courant.
+<p>Rendue par <code>beit_hamikdash_export.py --planche</code> depuis la scène courante.
 Le recouvrement début/fin de chaque plan se mesure avec
 <code>beit_hamikdash_analyse_plans.py</code>.</p>
 <table>
@@ -270,8 +245,8 @@ Le recouvrement début/fin de chaque plan se mesure avec
 """
 
 GABARIT_LIGNE = """<tr><td><div class='n'>{nom}</div><div class='m'>{focale:.0f} mm · {duree:.0f} s<br>frames {debut}–{fin}</div></td>
-<td><img src='{prefixe}_debut.png'><div class='m'>début</div></td>
-<td><img src='{prefixe}_fin.png'><div class='m'>fin</div></td>
+<td><img src='{nom}_debut.png'><div class='m'>début</div></td>
+<td><img src='{nom}_fin.png'><div class='m'>fin</div></td>
 </tr>
 """
 
@@ -286,7 +261,7 @@ def ecrire_index(dossier, plans):
 
 def ligne_de_plan(nom):
     cam = bpy.data.objects[nom]
-    return {"nom": nom, "prefixe": prefixe_du_plan(nom), "focale": cam.data.lens,
+    return {"nom": nom, "focale": cam.data.lens,
             "duree": cam["duree_s"], "debut": int(cam["frame_debut"]),
             "fin": int(cam["frame_fin"])}
 
@@ -294,8 +269,9 @@ def ligne_de_plan(nom):
 def exporter_planche(scene, dossier, noms):
     """Couleur seule, en 640 x 360, plus l'index HTML qui les met côte à côte.
 
-    L'index liste toujours les vingt plans, même quand on n'en re-rend qu'un :
-    une planche amputée de seize lignes n'est plus une planche de contrôle.
+    L'index liste toujours tous les plans de la scène, même quand on n'en re-rend
+    qu'un : une planche amputée de ses autres lignes n'est plus une planche de
+    contrôle.
     """
     os.makedirs(dossier, exist_ok=True)
     preparer_sortie(scene, LARGEUR_PLANCHE, HAUTEUR_PLANCHE)
@@ -304,14 +280,12 @@ def exporter_planche(scene, dossier, noms):
     for nom in noms:
         cam = bpy.data.objects[nom]
         scene.camera = cam
-        prefixe = prefixe_du_plan(nom)
         for etiquette, frame in frames_cles(cam):
-            montrer_le_sujet(nom, etiquette)
             scene.frame_set(frame)
             rendre(scene, couleur, transformation,
-                   os.path.join(dossier, f"{prefixe}_{etiquette}.png"))
-        print(f"{prefixe} : planche rendue", flush=True)
-    index = ecrire_index(dossier, [ligne_de_plan(n) for n in CAMERAS])
+                   os.path.join(dossier, f"{nom}_{etiquette}.png"))
+        print(f"{nom} : planche rendue", flush=True)
+    index = ecrire_index(dossier, [ligne_de_plan(n) for n in cameras_de_la_scene(scene)])
     print(f"index : {index}", flush=True)
 
 
@@ -326,18 +300,16 @@ def exporter_production(scene, dossier, noms):
     for nom in noms:
         cam = bpy.data.objects[nom]
         scene.camera = cam
-        prefixe = prefixe_du_plan(nom)
         for etiquette, frame in frames_cles(cam):
-            montrer_le_sujet(nom, etiquette)
             scene.frame_set(frame)
             proche, lointain = plage_z(scene, mesure)
             cam[f"profondeur_{etiquette}"] = (proche, lointain)
             regler_plage(profondeur, proche, lointain)
-            base = os.path.join(dossier, f"{prefixe}_{etiquette}")
+            base = os.path.join(dossier, f"{nom}_{etiquette}")
             rendre(scene, couleur, transformation, base + ".png")
             # Données, pas une image : aucune transformation d'affichage sur la profondeur.
             rendre_donnees(scene, profondeur, base + "_profondeur.png")
-            print(f"{prefixe}_{etiquette} : frame {frame}, profondeur "
+            print(f"{nom}_{etiquette} : frame {frame}, profondeur "
                   f"{proche} m → {lointain} m", flush=True)
     scene.compositing_node_group = couleur
     scene.view_settings.view_transform = transformation
@@ -347,7 +319,7 @@ def main():
     args = arguments()
     scene = bpy.context.scene
     racine = os.path.join(os.path.dirname(bpy.data.filepath), DOSSIER)
-    noms = cameras_demandees(args)
+    noms = cameras_demandees(scene, args)
     format_png(scene)
 
     if "--planche" in args:
@@ -355,7 +327,6 @@ def main():
     else:
         exporter_production(scene, os.path.join(racine, SOUS_DOSSIER_BLOCKOUT), noms)
 
-    tout_montrer()
     format_png(scene)
     # Le .blend ne doit pas repartir avec le chemin du dernier fichier rendu : tout
     # rendu d'animation lancé ensuite écrirait ses frames à côté, sous le nom de ce

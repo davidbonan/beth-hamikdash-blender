@@ -1,17 +1,20 @@
 """Stylise une frame clé d'un plan sur fal.ai : génération conditionnée par la profondeur.
 
-    python3 .claude/skills/fal-video/fal_image.py --plan 9 --frame debut
-    python3 .claude/skills/fal-video/fal_image.py --plan 9 --frame fin --modele pro-depth --seed 90901
+    python3 .claude/skills/fal-video/fal_image.py --camera CAM_03_Heikhal --frame debut \
+        --prompt "..."
 
-Le prompt est lu dans `prompts_par_plan.md` : bloc STYLE commun + ligne **Prompt** du
-plan ; la force i2i par défaut est la ligne **Force** du plan. Flux n'accepte aucun
-prompt négatif — le bloc NÉGATIF ne sert qu'au contrôle visuel après coup.
+Le prompt se donne en entier sur la ligne de commande : c'est lui qui décrit la
+matière, la lumière et les gens du cadre. Les modèles d'édition (`gpt2`, `nano*`,
+`seedream`, `flux2-pro`) repeignent le rendu Blender sans le recomposer ; les modèles
+`depth*` génèrent depuis la carte de profondeur. Flux n'accepte aucun prompt négatif :
+`--negatif` ne sert qu'aux endpoints qui en prennent un.
 
-Plusieurs valeurs de `--controle` génèrent autant de variantes **à seed identique** :
-seul le poids du conditionnement change, ce qui rend les variantes comparables.
+Deux frames d'un même plan se stylisent **à seed identique** : c'est ce qui donne à
+l'i2v deux images de la même matière. Plusieurs valeurs de `--controle` génèrent
+autant de variantes à seed identique, seul le poids du conditionnement changeant.
 
-Modèles (`--modele`), la famille édition mesurée sur les plans 1, 4 et 5, les
-`depth*` sur le plan 9 :
+Modèles (`--modele`), mesurés sur les extérieurs pour la famille édition et sur
+l'intérieur du Heikhal pour les `depth*` :
 
 - `gpt2` — `openai/gpt-image-2/edit`, défaut : le seul des six modèles d'édition à
   laisser plane une façade plane et à ne pas recomposer le cadre. Ni seed ni prompt
@@ -35,15 +38,11 @@ import argparse
 import json
 import os
 import random
-import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from fal_commun import (DOSSIER_IMAGES, RACINE, bloc_commun, camera_du_plan, figures_du_plan, champ, cle_api,
-                        numero_de_plan,
-                        genere, negatif_du_plan, section_plan, telecharge, televerse,
-                        texte_prompts)
+from fal_commun import RACINE, cle_api, genere, images_de_frame, telecharge, televerse
 
 DOSSIER_SORTIE = os.path.join(RACINE, "renders", "style")
 LARGEUR, HAUTEUR = 1920, 1080
@@ -126,7 +125,7 @@ def images_entree(reg):
     """Les images données au modèle d'édition.
 
     `structure` ajoute la carte de profondeur en seconde image. Utile là où le rendu
-    couleur ne porte plus rien : dans un couloir fermé comme la Stoa du plan 2, toutes
+    couleur ne porte plus rien : dans un couloir fermé comme la Stoa royale, toutes
     les surfaces du blockout sont blanches et l'ambiante les met au même gris — la
     colonnade est invisible en couleur alors qu'elle est nette en profondeur.
     """
@@ -235,60 +234,6 @@ MODELES = {
 }
 
 
-# --- plan ---------------------------------------------------------------------
-
-def force_du_plan(section, plan):
-    ligne = champ(section, "Force")
-    trouve = re.match(r"([0-9]+[.,][0-9]+)", ligne or "")
-    if not trouve:
-        raise SystemExit(f"Plan {plan} : ligne **Force** absente ou illisible")
-    return float(trouve.group(1).replace(",", "."))
-
-
-def lit_plan(plan, etiquette):
-    """(camera, {image, edition}, négatif complet, force i2i) pour une frame d'un plan.
-
-    `image` conditionne une génération (la profondeur porte la géométrie), `edition`
-    demande à un modèle d'édition de repeindre le blockout sans rien y déplacer.
-
-    Une frame dont le cadre ne montre plus la scène du plan (le tilt final du plan 9,
-    par exemple) a sa propre ligne **Prompt fin** : décrire les kelim quand ils sont
-    sortis du cadre revient à demander au modèle de les réinventer. **Édition fin** et
-    **Édition finale fin** suivent la même règle — au plan 8, la façade de marbre et le
-    plafond de cèdre que décrit **Édition** ont quitté le cadre à la fin.
-
-    Un plan dont le blockout laisse du vide autour de la scène (les extérieurs :
-    ciel, ville, vallée) ajoute une ligne **Édition** : sans elle, l'instruction
-    « ne rien ajouter » fait repeindre ce vide en aplat de ciel.
-    """
-    texte = texte_prompts()
-    section = section_plan(texte, plan)
-    prompt = champ(section, f"Prompt {etiquette}") or champ(section, "Prompt")
-    if not prompt:
-        raise SystemExit(f"Plan {plan} : ligne **Prompt** absente")
-    prompt = prompt.replace("STYLE +", bloc_commun(texte, "STYLE"), 1)
-    # Aucun modèle d'édition ne prend de prompt négatif : les interdits passent dans
-    # l'instruction, sinon le bloc NÉGATIF ne sert à rien.
-    negatif = negatif_du_plan(texte, section)
-    hors_scene = champ(section, f"Édition {etiquette}") or champ(section, "Édition")
-    # Qui est là et où : les deux blocs valent pour tout le film ; seule la tenue
-    # peut être reprise par une ligne **Figures** du plan (figures_du_plan).
-    qui = f'{figures_du_plan(texte, section)} {bloc_commun(texte, "PLACES")}'
-    # La contrainte d'un plan que le modèle lâche depuis le milieu de l'instruction
-    # se remet ici, juste avant le CADRAGE, seule place où elle tient encore.
-    finale = (champ(section, f"Édition finale {etiquette}")
-              or champ(section, "Édition finale"))
-    # CADRAGE en dernier : une contrainte de cadre placée au milieu se fait diluer.
-    edition = (f'{bloc_commun(texte, "ÉDITION")} {prompt}.'
-               f'{" " + hors_scene if hors_scene else ""}'
-               f' {qui}'
-               f' Never show any of these: {negatif}.'
-               f'{" " + finale if finale else ""}'
-               f' {bloc_commun(texte, "CADRAGE")}')
-    prompts = {"image": f'{prompt}. {qui}', "edition": edition}
-    return camera_du_plan(section), prompts, negatif, force_du_plan(section, plan)
-
-
 PHRASE_STRUCTURE = (
     " A second image is attached: the depth map of this very same frame, near in white"
     " and far in black. Read the geometry from it — every column, figure and edge is"
@@ -307,25 +252,19 @@ PHRASE_REFERENCE = (
 )
 
 
-def images_de_frame(camera, etiquette):
-    """(rendu couleur, carte de profondeur) de la frame `debut` ou `fin`."""
-    base = os.path.join(DOSSIER_IMAGES, f"{camera}_{etiquette}")
-    couleur, profondeur = base + ".png", base + "_profondeur.png"
-    for chemin in (couleur, profondeur):
-        if not os.path.exists(chemin):
-            raise SystemExit(f"Image absente : {chemin} — lancer beit_hamikdash_export_controlnet.py")
-    return couleur, profondeur
-
-
 def arguments():
     analyseur = argparse.ArgumentParser(description="Stylisation d'une frame clé sur fal.ai")
-    analyseur.add_argument("--plan", type=numero_de_plan, required=True,
-                           help="numéro de plan (1-15, avec la lettre pour un plan coupé : 9a)")
+    analyseur.add_argument("--camera", required=True,
+                           help="nom de la caméra, tel qu'il est dans cameras.json")
     analyseur.add_argument("--frame", choices=("debut", "fin"), default="debut")
+    analyseur.add_argument("--prompt", required=True,
+                           help="ce que le cadre doit devenir : matière, lumière, gens")
+    analyseur.add_argument("--negatif", default="",
+                           help="prompt négatif (general-depth seul en tient compte)")
     analyseur.add_argument("--modele", choices=sorted(MODELES), default="gpt2")
     analyseur.add_argument("--controle", type=float, nargs="+", default=[1.0],
                            help="poids du conditionnement ; une valeur = une variante")
-    analyseur.add_argument("--force", type=float, help="force i2i (défaut : ligne **Force** du plan)")
+    analyseur.add_argument("--force", type=float, default=0.85, help="force i2i (depth-i2i seul)")
     analyseur.add_argument("--seed", type=int, help="défaut : tirée au hasard, partagée par les variantes")
     analyseur.add_argument("--etapes", type=int, default=28, help="num_inference_steps")
     analyseur.add_argument("--guidage", type=float, default=3.5, help="guidance_scale")
@@ -343,23 +282,21 @@ def arguments():
 def main():
     args = arguments()
     modele = MODELES[args.modele]
-    camera, prompts, negatif, force_plan = lit_plan(args.plan, args.frame)
-    prompt = prompts[modele.get("prompt", "image")]
+    prompt = args.prompt
     if args.structure:
         prompt += PHRASE_STRUCTURE
     if args.reference:
         prompt += PHRASE_REFERENCE
-    force = args.force if args.force is not None else force_plan
     seed = args.seed if args.seed is not None else random.randint(1, 2**31 - 1)
-    couleur, profondeur = images_de_frame(camera, args.frame)
+    couleur, profondeur = images_de_frame(args.camera, args.frame)
 
-    print(f"plan {args.plan} · {camera} · frame {args.frame} · {args.modele} "
+    print(f"{args.camera} · frame {args.frame} · {args.modele} "
           f"· guidage {args.guidage} · seed {seed}")
     print(f"  couleur    : {os.path.relpath(couleur, RACINE)}")
     print(f"  profondeur : {os.path.relpath(profondeur, RACINE)}")
     print(f"  prompt     : {prompt}")
 
-    reglages = {"prompt": prompt, "negatif": negatif, "force": force, "seed": seed,
+    reglages = {"prompt": prompt, "negatif": args.negatif, "force": args.force, "seed": seed,
                 "etapes": args.etapes, "guidage": args.guidage,
                 "couleur": "<couleur>", "profondeur": "<profondeur>", "controle": args.controle[0],
                 "union": args.union, "structure": args.structure,
@@ -379,7 +316,7 @@ def main():
         resultat = genere(modele["endpoint"], modele["charge"](reglages), cle)
         if not resultat.get("images"):
             raise SystemExit(f"Réponse sans image : {json.dumps(resultat, ensure_ascii=False)[:400]}")
-        nom = (f"{camera}_{args.frame}_{args.modele}{'_ref' if args.reference else ''}"
+        nom = (f"{args.camera}_{args.frame}_{args.modele}{'_ref' if args.reference else ''}"
                f"_c{controle:.2f}_g{args.guidage:g}_seed{seed}.png")
         print(telecharge(resultat["images"][0]["url"], os.path.join(args.sortie, nom)), flush=True)
 

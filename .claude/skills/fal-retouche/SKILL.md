@@ -1,25 +1,26 @@
 ---
 name: fal-retouche
-description: Corrige un détail d'une image déjà générée (gpt-image-2 ou Nano Banana sur fal.ai) sans regénérer le reste du cadre — le hors-zone ressort pixel pour pixel identique. À utiliser dès qu'une image validée porte un défaut localisé : « corrige la Menora du plan 9 », « enlève la coupole du plan 1 », « retouche juste le visage au premier plan », « refais cette zone sans tout regénérer », « inpainting », « la façade est en or, remets-la en pierre ».
+description: Corrige un détail d'une image déjà générée (gpt-image-2 ou Nano Banana sur fal.ai) sans regénérer le reste du cadre — le hors-zone ressort pixel pour pixel identique. À utiliser dès qu'une image validée porte un défaut localisé : « corrige la Menora de cette frame », « enlève la coupole », « retouche juste le visage au premier plan », « refais cette zone sans tout regénérer », « inpainting », « la façade est en or, remets-la en pierre ».
 ---
 
 # Retouche ciblée
 
 `retouche.py` reprend **une zone** d'une image et laisse tout le reste intact. À
 utiliser après `fal-video/fal_image.py` : quand une frame stylisée est bonne à 95 %,
-la regénérer perd les 95 % — le modèle n'a aucune mémoire d'un appel à l'autre (le
-plan 1 est ressorti en marbre blanc puis tout en or à seed et prompt identiques).
+la regénérer perd les 95 % — le modèle n'a aucune mémoire d'un appel à l'autre : une
+même façade est ressortie en marbre blanc puis tout en or, à seed et prompt
+identiques.
 
 ```bash
 # 1. lire les coordonnées de la zone sur une copie quadrillée
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_09A_debut_….png --reperes
+python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_03_Heikhal_debut_….png --reperes
 
 # 2. vérifier la zone et l'instruction sans payer
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_09A_debut_….png \
+python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_03_Heikhal_debut_….png \
     --zone 38%,22%,18%,44% --instruction "la Menora a sept branches, pas neuf" --simulation
 
 # 3. générer
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_09A_debut_….png \
+python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_03_Heikhal_debut_….png \
     --zone 38%,22%,18%,44% --instruction "la Menora a sept branches, pas neuf"
 ```
 
@@ -62,7 +63,7 @@ masque.
 | `nano-pro` | `fal-ai/nano-banana-pro/edit` | 0,15 $ | non | oui |
 | `nano2` | `fal-ai/nano-banana-2/edit` | 0,08 $ | non | oui |
 
-Prix et caractère : voir la table complète du skill `fal-video`, mesurée sur les plans
+Prix et caractère : voir la table complète du skill `fal-video`, mesurée sur les cadres
 1, 4 et 5. `gpt2` y est retenu pour son verrou de cadrage — c'est aussi ce qu'on veut
 d'une retouche. `nano2` recompose (mur devenu pylône, taureau supprimé) : à ne sortir
 que si `gpt2` refuse la correction.
@@ -97,32 +98,32 @@ que la matière voulue (feuilles d'or martelé à joints et clous, dalles veiné
 dans la brume, grain, halo sur les flammes).
 
 ```bash
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_09B_debut_….png \
+python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_04_Parokhet_debut_….png \
     --methode plein --portee matiere --instruction "The gold walls are sheets of hammered gold nailed over cedar, …"
 ```
 
 Mesuré sur 9b puis 9a (`gpt2`) : parokhet ressortie motif pour motif, kelim en place, or
 martelé à clous, sol veiné, faisceau volumétrique. Sur la seconde frame d'une paire,
 passer la première en `--reference` pour que les deux se montent. Ce que la passe
-**amplifie** : un artefact déjà en germe (deux taches rondes sur le rideau du 9b) ressort
+**amplifie** : un artefact déjà en germe (deux taches rondes sur un rideau) ressort
 plus net — à reprendre ensuite en `detail` masqué.
 
 ## Raccorder un objet d'un plan à l'autre : `--reference`
 
-Rien dans `prompts_par_plan.md` ne fige le **dessin** d'une étoffe ou d'une façade : deux plans
-qui la décrivent avec les mêmes mots en sortent deux versions différentes. Mesuré sur la
-parokhet — quatre grandes ailes isolées sur indigo uni au plan 9a, trame d'aigles répétés sur
-larges bandes roses au plan 9b, à partir de la même ligne `**Prompt**`. C'est un faux raccord
-sur l'objet central de deux plans qui se suivent.
+Aucun prompt ne fige le **dessin** d'une étoffe ou d'une façade : deux plans qui la décrivent
+avec les mêmes mots en sortent deux versions différentes. Mesuré sur la parokhet — quatre
+grandes ailes isolées sur indigo uni d'un côté, trame d'aigles répétés sur larges bandes roses
+de l'autre, à partir du même prompt. C'est un faux raccord sur l'objet central de deux plans
+qui se suivent.
 
 `--reference` joint la frame validée en **seconde image** et demande d'en copier le dessin, la
 matière et les couleurs — rien d'autre : ni son cadrage, ni sa lumière, ni ses objets, que la
-zone corrigée garde de l'image en cours. La parokhet du 9b a été réalignée sur celle du 9a en
+zone corrigée garde de l'image en cours. La seconde parokhet a été réalignée sur la première en
 un seul passage.
 
 ```bash
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_09B_debut_….png \
-    --reference renders/style/CAM_09A_debut_gpt2_c1.00_g3.5_seed90902.png \
+python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_04_Parokhet_debut_….png \
+    --reference renders/style/CAM_03_Heikhal_debut_gpt2_c1.00_g3.5_seed30301.png \
     --zone 29%,0%,42%,75% --instruction "the curtain is rewoven with the very same design as the reference frame: …"
 ```
 
@@ -146,7 +147,7 @@ ajoute seul. Donc :
 
 ## Une main ne se retouche pas : elle se bâtit dans le blockout
 
-Mesuré six fois sur le plan 10, un gros plan sur les deux mains du Cohen Gadol. En
+Mesuré six fois sur un gros plan des deux mains du Cohen Gadol. En
 `masque`, la zone d'une main fait ~180 × 255 px dans un cadre de 1920 : `gpt2` y rend
 une **moufle lisse sans un seul doigt**, ou une masse enflée aussi large que l'objet
 tenu, et l'instruction la plus détaillée n'y change rien — trois passes, trois moufles.
@@ -177,7 +178,7 @@ reste lisible. Une chaîne déjà longue se renomme à la main avant de la repre
 
 Demander au modèle de **poser** un objet allongé (un manche, une tige, une lanière) et de le
 **raccorder** à ce qu'il tient est une correction de trop dans la même phrase : mesuré sur le
-manche de la ma'hta du plan 10, `gpt2` a rendu un beau jonc d'or à pommeau qui s'arrêtait au
+manche d'une ma'hta tenue en main, `gpt2` a rendu un beau jonc d'or à pommeau qui s'arrêtait au
 poignet sans jamais atteindre le bassin — une pièce flottante, lue comme un sceptre planté
 dans la ceinture. Deux passes rechaînées :
 

@@ -1,12 +1,14 @@
 """Mesure, plan par plan, ce qu'un i2v peut faire du couple (frame de début, frame de fin).
 
     /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend \
-        -P beit_hamikdash_blockout.py -P beit_hamikdash_analyse_plans.py
+        -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
+        -P beit_hamikdash_analyse_plans.py
 
 Un image-to-video à deux frames n'interpole que ce que les deux frames ont en
-commun. Quand elles ne partagent rien — le tilt du plan 9 finissait sur un aplat de
-parokhet — le modèle invente le trajet, et le plan est perdu avant d'être généré.
-Le recouvrement n'est pas jugeable à l'œil sur une planche : il se mesure.
+commun. Quand elles ne partagent rien — un relevé qui finit sur un aplat de parokhet,
+une grue qui passe au-dessus d'un mur — le modèle invente le trajet, et le plan est
+perdu avant d'être généré. Le recouvrement n'est pas jugeable à l'œil sur une
+planche : il se mesure. Les plans mesurés sont ceux de cameras.json.
 
 Méthode : on tire une grille de rayons à travers une frame, on garde les points de
 géométrie touchés, et on regarde ce que l'autre caméra en fait — dans son cadre, et
@@ -32,7 +34,7 @@ valeurs basses ensemble signalent un plan qui ne partage plus rien du tout.
 L'occultation est testée. Sans elle la mesure ment sur exactement les plans qu'elle
 devrait condamner : une grue qui se lève au-dessus d'un mur découvre un pays neuf
 dont chaque point tombait déjà dans le cône de la caméra de départ — mais derrière
-le mur. Le plan 14 passait ainsi à 100 % de couverture.
+le mur. Une grue passait ainsi à 100 % de couverture.
 """
 
 import math
