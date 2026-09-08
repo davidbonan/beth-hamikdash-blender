@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { habiller, attiser } from "./matieres.js";
 
@@ -47,6 +46,7 @@ const TRAITES = {
   "baba batra": "Bava Batra", "bava batra": "Bava Batra",
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
   "yerushalmi yoma": "Jerusalem Talmud Yoma",
+  pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim",
 };
 const OUVRAGES = {
   "rambam beit habehira": "Mishneh Torah, The Chosen Temple",
@@ -65,6 +65,7 @@ const OUVRAGES = {
   yehezkel: "Ezekiel",
   "rambam temidin": "Mishneh Torah, Daily Offerings and Additional Offerings",
   "rashi exode": "Rashi on Exodus", "rashi shemot": "Rashi on Exodus",
+  "rambam sur middot": "Rambam on Mishnah Middot",
 };
 
 const pele = (s) => (s || "").toLowerCase().normalize("NFD")
@@ -75,7 +76,7 @@ function lienSefaria(oeuvre, ref) {
   const direct = OUVRAGES[clef];
   if (direct) return url(`${direct} ${ref}`);
   const traite = TRAITES[clef.replace(/^(mishna|mishnah|talmud) /, "")];
-  if (!traite) return null;                       // Josèphe, archéologie : pas de cote Sefaria
+  if (!traite) return null;                       // archéologie, choix du projet : pas de cote Sefaria
   const folio = /^\d+[ab]$/.test((ref || "").trim());
   return url(`${folio ? traite : "Mishnah " + traite} ${ref}`);
 }
@@ -87,6 +88,15 @@ const url = (tref) => "https://www.sefaria.org/" +
 // ---------------------------------------------------------------------------
 const $ = (s) => document.querySelector(s);
 const etat = $("#etat"), jauge = $("#jauge i");
+
+// Une erreur de chargement laissait l'écran figé sur son dernier état sans rien dire :
+// le voile ne se lève qu'en fin de module, et un module qui jette ne lève rien.
+const echouer = (quoi) => {
+  etat.textContent = `échec : ${quoi}`;
+  etat.style.color = "#e0836a";
+};
+addEventListener("error", (e) => echouer(e.message || e.error));
+addEventListener("unhandledrejection", (e) => echouer(e.reason?.message || e.reason));
 
 async function json(chemin, obligatoire = true) {
   const r = await fetch(chemin);
@@ -134,9 +144,13 @@ scene.fog = new THREE.Fog(0xc9cec8, 120, 560);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-scene.add(new THREE.HemisphereLight(0xcddcec, 0x8a7d66, 0.75));
+// L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
+// recevait presque autant de lumière sans direction que de lumière du matin : le
+// calcaire y perdait sa teinte et le modelé avec, et les murs rendaient un aplat gris.
+// Le rapport compte plus que les niveaux — même arbitrage que le ciel du blockout.
+scene.add(new THREE.HemisphereLight(0xcddcec, 0x8a7d66, 0.42));
 // Matin, à l'est : l'axe de l'avoda, et la lumière qui creuse la façade de face.
-const soleil = new THREE.DirectionalLight(0xfff2dc, 1.9);
+const soleil = new THREE.DirectionalLight(0xfff2dc, 2.7);
 soleil.castShadow = true;
 soleil.shadow.mapSize.set(2048, 2048);
 soleil.shadow.bias = -0.0002;
@@ -146,7 +160,7 @@ soleil.shadow.normalBias = 0.04;
 // le Har HaBayit ne donnerait jamais.
 Object.assign(soleil.shadow.camera, { near: 1, far: 260, left: -40, right: 40, top: 40, bottom: -40 });
 scene.add(soleil, soleil.target);
-const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.35);  // rebond du ciel à l'ouest
+const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.22);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
@@ -213,7 +227,6 @@ gltf.scene.traverse((o) => {
 // ---------------------------------------------------------------------------
 // marche
 // ---------------------------------------------------------------------------
-const controls = new PointerLockControls(camera, document.body);
 const BAS = new THREE.Vector3(0, -1, 0);
 const versLeBas = new THREE.Raycaster();
 const versLAvant = new THREE.Raycaster();
@@ -243,11 +256,68 @@ function murDevant(depuis, piedsY, direction, distance) {
   return false;
 }
 
+// Le regard suit le glissé, pas le curseur : bouton relâché, la souris redevient
+// libre pour la barre du haut et la fiche.
+const SENSIBILITE = 0.0022;
+const TANGAGE_MAX = Math.PI / 2 - 0.02;
+const SEUIL_CLIC = 5;                     // px parcourus au-delà desquels c'est un glissé
+const toile = renderer.domElement;
+const regard = new THREE.Euler(0, 0, 0, "YXZ");
+const souris = new THREE.Vector2();
+let glisse = null, surLaToile = false;
+
+function tourner(dx, dy) {
+  regard.setFromQuaternion(camera.quaternion);
+  regard.y -= dx * SENSIBILITE;
+  regard.x = THREE.MathUtils.clamp(regard.x - dy * SENSIBILITE, -TANGAGE_MAX, TANGAGE_MAX);
+  regard.z = 0;
+  camera.quaternion.setFromEuler(regard);
+}
+
+toile.addEventListener("pointerdown", (e) => {
+  if (e.button !== 0) return;
+  glisse = { id: e.pointerId, x: e.clientX, y: e.clientY, parcours: 0 };
+  toile.setPointerCapture(e.pointerId);
+  toile.classList.add("tourne");
+});
+
+toile.addEventListener("pointermove", (e) => {
+  surLaToile = true;
+  souris.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  survol.style.left = `${e.clientX}px`;
+  survol.style.top = `${e.clientY + 20}px`;
+  if (!glisse || e.pointerId !== glisse.id) return;
+  const dx = e.clientX - glisse.x, dy = e.clientY - glisse.y;
+  glisse.x = e.clientX; glisse.y = e.clientY;
+  glisse.parcours += Math.abs(dx) + Math.abs(dy);
+  tourner(dx, dy);
+});
+
+function lacher(e) {
+  if (!glisse || e.pointerId !== glisse.id) return null;
+  const parcours = glisse.parcours;
+  glisse = null;
+  toile.classList.remove("tourne");
+  if (toile.hasPointerCapture(e.pointerId)) toile.releasePointerCapture(e.pointerId);
+  return parcours;
+}
+
+toile.addEventListener("pointerup", (e) => {
+  const parcours = lacher(e);
+  if (parcours === null || parcours >= SEUIL_CLIC) return;
+  if (vise) montrer(vise); else fermer();
+});
+toile.addEventListener("pointercancel", lacher);
+toile.addEventListener("pointerleave", () => { surLaToile = false; });
+toile.addEventListener("contextmenu", (e) => e.preventDefault());
+
 const touches = new Set();
 const AVANT = ["KeyW", "KeyZ", "ArrowUp"], ARRIERE = ["KeyS", "ArrowDown"];
 const GAUCHE = ["KeyA", "KeyQ", "ArrowLeft"], DROITE = ["KeyD", "ArrowRight"];
 const enfoncee = (l) => l.some((c) => touches.has(c));
+const dansLaBarre = () => !!document.activeElement?.closest?.("#barre, #fiche");
 addEventListener("keydown", (e) => {
+  if (dansLaBarre()) return;
   touches.add(e.code);
   if (e.code === "KeyV") basculerVol();
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
@@ -320,12 +390,11 @@ function poser(x, y, z, cap) {
 // interrogation
 // ---------------------------------------------------------------------------
 const viseur = new THREE.Raycaster();
-const CENTRE = new THREE.Vector2(0, 0);
-const reticule = $("#reticule"), survol = $("#survol");
+const survol = $("#survol");
 let vise = null;
 
 function conceptVise() {
-  viseur.setFromCamera(CENTRE, camera);
+  viseur.setFromCamera(souris, camera);
   viseur.far = 140;
   const touche = viseur.intersectObjects(obstacles, false);
   return touche.length ? touche[0].object.userData.concept || null : null;
@@ -376,7 +445,7 @@ aller.onchange = () => {
   const e = reperes.entrees.find((x) => x.id === aller.value);
   if (e) poser(e.position[0], e.position[1], e.position[2], e.cap);
   aller.value = "";
-  renderer.domElement.focus();
+  aller.blur();
 };
 
 const parZone = [...CONCEPTS.values()].sort((a, b) =>
@@ -396,20 +465,12 @@ chercher.onchange = () => {
   montrer(id);
   allerA(id);
   chercher.value = "";
+  chercher.blur();
 };
 
 // ---------------------------------------------------------------------------
 // boucle
 // ---------------------------------------------------------------------------
-const invite = $("#invite");
-invite.onclick = () => controls.lock();
-controls.addEventListener("lock", () => { invite.hidden = true; fermer(); });
-controls.addEventListener("unlock", () => { invite.hidden = false; touches.clear(); });
-renderer.domElement.addEventListener("click", () => {
-  if (!controls.isLocked) return;
-  if (vise) montrer(vise); else fermer();
-});
-
 addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
@@ -426,7 +487,7 @@ function basculerVol() {
     if (sol !== null) { piedsY = sol; camera.position.y = sol + OEIL; }
   }
 }
-$("#vol").onclick = () => { basculerVol(); renderer.domElement.focus(); };
+$("#vol").onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
 
 function allerA(id) {
   const e = reperes.entrees.find((x) => x.id === id);
@@ -467,12 +528,11 @@ function dessiner(dt) {
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(horloge.getDelta(), 0.1);
-  if (controls.isLocked) avancer(dt);
+  avancer(dt);
 
   if (++image % 4 === 0) {                        // le survol n'a pas besoin de 60 Hz
-    vise = controls.isLocked ? conceptVise() : null;
+    vise = surLaToile && !glisse ? conceptVise() : null;
     const c = vise && CONCEPTS.get(vise);
-    reticule.classList.toggle("vise", !!c);
     survol.classList.toggle("vu", !!c);
     if (c) survol.textContent = c.nom;
     position.textContent = `${(camera.position.x / AMA).toFixed(0)} · ` +
@@ -482,7 +542,6 @@ renderer.setAnimationLoop(() => {
 });
 
 $("#chargement").classList.add("parti");
-invite.hidden = false;
 
 // Points d'accroche de la vérification headless (cdp.py) : sans eux, impossible de
 // savoir depuis un terminal si la page a fini de charger ni ce qu'elle montre.
@@ -491,6 +550,13 @@ window.__cam = (x, y, z, cx, cy, cz) => {
   camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); piedsY = y - OEIL; dessiner(0);
 };
 window.__rendre = () => dessiner(0);
+window.__etat = () => {
+  const e = new THREE.Euler(0, 0, 0, "YXZ").setFromQuaternion(camera.quaternion);
+  const d = 180 / Math.PI;
+  return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
+           x: +camera.position.x.toFixed(3), z: +camera.position.z.toFixed(3),
+           piedsY: +piedsY.toFixed(3), vise, glisse: !!glisse };
+};
 window.__ombres = (actives) => {
   renderer.shadowMap.enabled = actives;
   scene.traverse((o) => { if (o.isMesh) o.material.needsUpdate = true; });

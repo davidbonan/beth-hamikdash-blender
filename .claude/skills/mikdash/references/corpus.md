@@ -35,9 +35,9 @@ Trois niveaux, à ne jamais mélanger dans une réponse.
 | **Tiferet Israël** (R. Israël Lipschitz) | **les plans dessinés** de Middot — la référence graphique classique | `Tiferet Yisrael on Mishnah Middot 2:1` |
 | **Tosfot Yom Tov** | commentaire dense sur Middot, résout les contradictions internes | `Tosafot Yom Tov on Mishnah Middot 2:1` |
 
-## 3. Historique, archéologie, reconstitutions (éclairent, ne tranchent pas)
+## 3. Reconstitutions et archéologie (éclairent, ne tranchent pas)
 
-- **Flavius Josèphe** — témoin oculaire du bâtiment hérodien, mais ses mesures **contredisent** souvent la Mishna (il décrit le Temple qu'il a vu, avec un œil de propagandiste romain). *Guerre des Juifs* V, ch. 5 : https://penelope.uchicago.edu/josephus/war-5.html · *Antiquités* XV, ch. 11 : https://penelope.uchicago.edu/josephus/ant-15.html (traduction Whiston, texte intégral).
+**Flavius Josèphe est hors corpus.** Le projet ne cite aucune source non juive sur le Temple : ne pas l'invoquer, même en appui d'une source du corpus. Ce qu'on allait y chercher s'y trouve — portiques de l'esplanade : *Pesa'him* 13b (« הַר הַבַּיִת סְטָיו כָּפוּל הָיָה… סְטָיו לִפְנִים מִסְּטָיו », et « גַּג הָאִיצְטְבָא » pour leur toit) ; cèdre des plafonds : *Melakhim I* 6:9 ; kaleh orev : Rambam sur *Middot* 4:6 ; taille des pierres de taille : *Melakhim I* 7:9-10.
 - **Machon HaMikdash / Temple Institute** — reconstitutions selon le Rambam, ustensiles réalisés, iconographie utilisable comme référence visuelle :
   - visite illustrée : https://templeinstitute.org/illustrated-tour-the-holy-temple/
   - l'autel : https://templeinstitute.org/the-altar/

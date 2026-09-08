@@ -112,12 +112,53 @@ def _noeud(mat, type_noeud, x, y=0):
     n.location = (x, y)
     return n
 
-def _position(mat):
-    """Position du point ombré, en mètres, dans le repère du monde. Une seule par matériau."""
+def _geometrie(mat):
+    """Le nœud Geometry du matériau — un seul, quel que soit le nombre de lecteurs."""
     for n in mat.node_tree.nodes:
         if n.bl_idname == "ShaderNodeNewGeometry":
-            return n.outputs["Position"]
-    return _noeud(mat, "ShaderNodeNewGeometry", -1500, 400).outputs["Position"]
+            return n
+    return _noeud(mat, "ShaderNodeNewGeometry", -2100, 400)
+
+def _position(mat):
+    """Position du point ombré, en mètres, dans le repère du monde."""
+    return _geometrie(mat).outputs["Position"]
+
+def _normale(mat):
+    """Normale du point ombré, dans le repère du monde."""
+    return _geometrie(mat).outputs["Normal"]
+
+def _calc(mat, operation, a, b=None, c=None):
+    """Nœud Math d'une ligne : chaque entrée est un nombre ou une sortie de nœud.
+
+    L'appareil ci-dessous fait une trentaine d'opérations, et les écrire nœud par nœud
+    noyait la formule sous la plomberie. Le placement est automatique : ces nœuds ne
+    sont jamais lus dans l'éditeur, c'est le code qui est la source.
+    """
+    rang = sum(1 for n in mat.node_tree.nodes if n.bl_idname == "ShaderNodeMath")
+    n = _noeud(mat, "ShaderNodeMath", -1900 + 150 * (rang % 9), -420 - 170 * (rang // 9))
+    n.operation = operation
+    for i, v in enumerate((a, b, c)):
+        if v is None:
+            continue
+        if isinstance(v, (int, float)):
+            n.inputs[i].default_value = v
+        else:
+            mat.node_tree.links.new(v, n.inputs[i])
+    return n.outputs[0]
+
+def _trainee(mat, largeur, longueur):
+    """Bruit étiré en Z : les coulures que la pluie laisse sur un parement, larges de
+    `largeur` amot et longues de `longueur`. Un bruit isotrope fait des taches, et une
+    tache sur un mur se lit en défaut de matière ; une coulure se lit en pierre."""
+    echelle = _noeud(mat, "ShaderNodeVectorMath", -1400, 480)
+    echelle.operation = "MULTIPLY"
+    echelle.inputs[1].default_value = (1 / m(largeur), 1 / m(largeur), 1 / m(longueur))
+    mat.node_tree.links.new(_position(mat), echelle.inputs[0])
+    bruit = _noeud(mat, "ShaderNodeTexNoise", -1200, 480)
+    bruit.inputs["Scale"].default_value = 1.0
+    bruit.inputs["Detail"].default_value = 4.0
+    mat.node_tree.links.new(echelle.outputs["Vector"], bruit.inputs["Vector"])
+    return bruit.outputs["Factor"]
 
 def _grain(mat, taille):
     """Bruit de surface dont le motif fait `taille` amot. Renvoie la sortie Factor."""
@@ -148,80 +189,249 @@ def material(name, rgb):
         _bsdf(mat).inputs["Roughness"].default_value = 0.7
     return mat
 
-ASSISE = 1.0      # hauteur d'une assise de taille, en amot
+# Appareil : le Temple est bâti d'אַבְנֵי גָזִית, et le Tanakh les mesure —
+# « וּמְיֻסָּד אֲבָנִים יְקָרוֹת אֲבָנִים גְּדֹלוֹת אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת »
+# (Melakhim I 7:10). Deux longueurs, pas une : le verset les nomme toutes les deux, et
+# l'assise en tire une. La pierre de 10 et celle de 8 valent aussi pour le Temple
+# lui-même, « וְלַחֲצַר בֵּית ה' הַפְּנִימִית וּלְאֻלָם הַבָּיִת » (7:12). Le module d'une ama qui
+# les précédait lisait en brique — quarante rangs sur la façade au lieu de dix blocs.
+# La HAUTEUR d'assise n'est dans aucune source : 2,5 amot est un CHOIX, la proportion
+# qu'appelle un bloc de 8 à 10 amot de long.
+PIERRE_LONG = (8.0, 10.0)   # Melakhim I 7:10 — l'assise tire l'une ou l'autre
+ASSISE = 2.5                # CHOIX : hauteur d'assise, hors source
+# Le bâtiment prend 2 amot pour que ses assises tombent juste sur les rovadim de
+# l'Oulam, qui vont par 4 (1 de nu + 3 de saillie, Rambam Beit HaBe'hira 4:9) : à 2,5,
+# la pierre et le bandeau battaient l'un contre l'autre sur toute la façade.
+ASSISE_BEIT = 2.0
+# La face est SCIÉE, pas rustiquée : « אֲבָנִים יְקָרֹת כְּמִדּוֹת גָּזִית מְגֹרָרוֹת בַּמְּגֵרָה
+# מִבַּיִת וּמִחוּץ » (Melakhim I 7:9). Tout le relief tient donc au joint et au liseré qui
+# le borde, jamais à un bossage éclaté. Largeur du liseré : CHOIX. À 0,35 ama il faisait
+# un cadre de dix-sept centimètres autour de chaque bloc, assez large pour se lire en
+# bordure rapportée ; 0,25 le ramène à un trait de ciseau.
+JOINT = 0.06
+LISERE = 0.25
 
-def _assises(mat):
-    """Découpe la surface en assises horizontales de `ASSISE` amot.
 
-    Renvoie (numéro d'assise, parité, facteur de teinte). La parité est le
-    « אבן יוצא ואבן נכנס » de *Baba Batra* 4a : une assise en léger débord, la suivante
-    en léger retrait. C'est ce jeu-là — pas un placage — qui a fait renoncer Hérode à
-    dorer le bâtiment, « cela ressemble aux vagues de la mer ».
+def _module(mat, coordonnee, taille):
+    """Découpe une coordonnée de monde en modules de `taille` amot (nombre ou nœud).
+
+    Renvoie (rang, distance au joint le plus proche, en amot). Le rang numérote les
+    modules — c'est lui qui tire la teinte d'une assise ou d'un bloc ; la distance
+    dessine le joint et le liseré.
+    """
+    metres = m(taille) if isinstance(taille, (int, float)) else _calc(mat, "MULTIPLY", taille, AMA)
+    rang = _calc(mat, "DIVIDE", coordonnee, metres)
+    reste = _calc(mat, "FRACT", rang)
+    bord = _calc(mat, "MINIMUM", reste, _calc(mat, "SUBTRACT", 1.0, reste))
+    return rang, _calc(mat, "MULTIPLY", bord, taille)
+
+
+def _parement(mat):
+    """Les trois lectures d'un point sur une face : sa hauteur, son abscisse LE LONG de
+    la face, et à quel point cette face est horizontale.
+
+    L'abscisse suit la normale — Y sur un mur tourné vers l'est ou l'ouest, X sur les
+    deux autres. Lue sur X partout, la trame des joints verticaux filerait dans
+    l'épaisseur des murs nord-sud au lieu d'en suivre le parement.
+    """
+    p = _noeud(mat, "ShaderNodeSeparateXYZ", -2100, 0)
+    mat.node_tree.links.new(_position(mat), p.inputs["Vector"])
+    n = _noeud(mat, "ShaderNodeSeparateXYZ", -2100, -200)
+    mat.node_tree.links.new(_normale(mat), n.inputs["Vector"])
+    vers_x = _calc(mat, "GREATER_THAN", _calc(mat, "ABSOLUTE", n.outputs["X"]),
+                   _calc(mat, "ABSOLUTE", n.outputs["Y"]))
+    u = _calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", p.outputs["Y"], p.outputs["X"]),
+              vers_x, p.outputs["X"])
+    return p.outputs["Z"], u, _calc(mat, "ABSOLUTE", n.outputs["Z"])
+
+
+def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
+    """Taille la surface en blocs de gazit et creuse leur joint et son liseré.
+
+    Deux reliefs, et c'est le profil du bloc : le joint, creusé ; le liseré ciselé qui
+    le borde, plat et en léger retrait ; entre les deux le champ de la pierre, scié
+    lisse (Melakhim I 7:9). Le liseré est ce qui donne le bloc, et le bloc l'échelle —
+    sans lui un mur de 100 amot n'a que des lignes horizontales et se lit en bardage.
+
+    La parité des assises reste le « אבן יוצא ואבן נכנס » de *Baba Batra* 4a : une assise
+    en léger débord, la suivante en retrait. C'est ce jeu-là — pas un placage — qui a
+    fait renoncer Hérode à dorer le bâtiment, « cela ressemble aux vagues de la mer ».
+
+    Renvoie (parité de l'assise, tirage de l'assise, tirage du bloc, masque du joint).
+    Le profil du relief ne sort pas : il ne sert qu'aux Bump, posés ici.
+    """
+    z, u, aplat = _parement(mat)
+    rang, ecart_z = _module(mat, z, assise)
+    numero = _calc(mat, "FLOOR", rang)
+    parite = _calc(mat, "MODULO", numero, 2.0)
+    tire_assise = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, 120)
+    tire_assise.noise_dimensions = '1D'
+    mat.node_tree.links.new(numero, tire_assise.inputs["W"])
+    # « אבני עשר אמות ואבני שמנה אמות » : l'assise tire sa longueur de bloc.
+    longue = _calc(mat, "GREATER_THAN", tire_assise.outputs["Value"], 0.5)
+    longueur = _calc(mat, "MULTIPLY_ADD", longue, longueurs[1] - longueurs[0], longueurs[0])
+    # Les joints verticaux se décalent d'une assise à la suivante : alignés, ils font
+    # un damier, que ne montre aucun appareil de pierre de taille.
+    decal = _calc(mat, "MULTIPLY", _calc(mat, "MULTIPLY_ADD", tire_assise.outputs["Value"], 0.37,
+                                         _calc(mat, "MULTIPLY", parite, 0.5)),
+                  _calc(mat, "MULTIPLY", longueur, AMA))
+    colonne, ecart_u = _module(mat, _calc(mat, "ADD", u, decal), longueur)
+    tire_bloc = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, -80)
+    tire_bloc.noise_dimensions = '2D'
+    grille = _noeud(mat, "ShaderNodeCombineXYZ", -1860, -80)
+    mat.node_tree.links.new(_calc(mat, "FLOOR", colonne), grille.inputs["X"])
+    mat.node_tree.links.new(numero, grille.inputs["Y"])
+    mat.node_tree.links.new(grille.outputs["Vector"], tire_bloc.inputs["Vector"])
+    # Une face horizontale — crête de mur, couronnement, marche — n'a ni assise ni
+    # joint : le pas y serait lu sur une coordonnée constante, et la face entière
+    # tomberait dans un joint ou dans aucun. On l'éloigne donc de tout joint.
+    loin = _calc(mat, "MULTIPLY", aplat, 10.0)
+    ecart = _calc(mat, "MINIMUM", _calc(mat, "ADD", ecart_z, loin),
+                  _calc(mat, "ADD", ecart_u, loin))
+    profil = _noeud(mat, "ShaderNodeValToRGB", -1200, -300)
+    portee = JOINT + LISERE + 0.15
+    rampe = profil.color_ramp
+    # Le liseré est en léger retrait, le champ à peine proéminent : 0,62 de la course
+    # est descendue dans le joint, et il ne reste que 0,32 pour la marche du bloc, soit
+    # un centimètre et demi. À 0,44 le bloc débordait de sept centimètres et le Bump
+    # cernait chaque pierre d'un jonc clair — un carrelage, pas un mur.
+    rampe.elements[0].position, rampe.elements[0].color = 0.0, (0.0, 0.0, 0.0, 1.0)
+    rampe.elements[1].position, rampe.elements[1].color = JOINT / portee, (0.62,) * 3 + (1.0,)
+    rampe.elements.new((JOINT + LISERE) / portee).color = (0.68,) * 3 + (1.0,)
+    rampe.elements.new((JOINT + LISERE + 0.06) / portee).color = (1.0, 1.0, 1.0, 1.0)
+    rapport = _calc(mat, "DIVIDE", ecart, portee)
+    mat.node_tree.links.new(rapport, profil.inputs["Factor"])
+    # Le JOINT seul, sans le liseré. Le profil sert au relief et court sur toute la
+    # bordure ; l'ombre, elle, doit s'arrêter au fond de la rainure — étalée sur le
+    # liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur.
+    creux = _noeud(mat, "ShaderNodeValToRGB", -1200, -520)
+    creux.color_ramp.elements[0].position = 0.0
+    creux.color_ramp.elements[1].position = JOINT * 1.6 / portee
+    mat.node_tree.links.new(rapport, creux.inputs["Factor"])
+    _creuser(mat, profil.outputs["Color"], 1.0, 0.10)
+    _creuser(mat, parite, 0.9, 0.05)
+    # Le grain reste dans le champ de la pierre et s'arrête au liseré, qui est ciselé.
+    _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.45), profil.outputs["Color"]), 0.8, 0.035)
+    # Piqûre du calcaire : le meleke est poreux, et sans elle la face sciée rend un
+    # plastique lisse dès que le soleil la prend de biais.
+    _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.10), profil.outputs["Color"]), 0.6, 0.012)
+    return parite, tire_assise.outputs["Value"], tire_bloc.outputs["Value"], creux.outputs["Color"]
+
+
+# Ce que devient la pierre au fond du joint : plus sombre, et PLUS CHAUDE. Le facteur
+# est plus bas dans le bleu que dans le rouge, donc la rainure vire vers l'ocre.
+OMBRE_JOINT = (0.50, 0.40, 0.29)
+
+
+def _ombre_du_joint(mat, teinte, creux):
+    """Creuse le joint d'une ombre chaude. Le bump oriente la surface, il ne la salit
+    pas, et à mille amot l'ombre propre du joint est tout ce qui reste de l'appareil.
+
+    Elle passait par un multiply vers le NOIR, sur toute la largeur du liseré : deux
+    défauts d'un coup. Sous AgX un calcaire assombri sans teinte vire au gris, et le
+    mur se retrouvait quadrillé de traits grisâtres — ce qu'aucun mur de pierre ne
+    fait. Un joint est de la pierre à l'ombre : il garde la couleur du bloc, en plus
+    sombre et plus chaud, et il tient dans la rainure. Le liseré, lui, est de la pierre
+    en plein soleil et ne perd rien.
     """
     liens = mat.node_tree.links
-    axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1500, 0)
-    liens.new(_position(mat), axe.inputs["Vector"])
-    rang = _noeud(mat, "ShaderNodeMath", -1340, 0)
-    rang.operation = "DIVIDE"
-    rang.inputs[1].default_value = m(ASSISE)
-    liens.new(axe.outputs["Z"], rang.inputs[0])
-    numero = _noeud(mat, "ShaderNodeMath", -1180, 120)
-    numero.operation = "FLOOR"
-    liens.new(rang.outputs[0], numero.inputs[0])
-    parite = _noeud(mat, "ShaderNodeMath", -1020, 240)
-    parite.operation = "MODULO"
-    parite.inputs[1].default_value = 2.0
-    liens.new(numero.outputs[0], parite.inputs[0])
-    tirage = _noeud(mat, "ShaderNodeTexWhiteNoise", -1020, 120)
-    tirage.noise_dimensions = '1D'
-    liens.new(numero.outputs[0], tirage.inputs["W"])
-    # Joint creusé au ras de chaque assise, puis le débord d'une assise sur deux.
-    joint = _noeud(mat, "ShaderNodeMath", -1180, -140)
-    joint.operation = "FRACT"
-    liens.new(rang.outputs[0], joint.inputs[0])
-    creux = _noeud(mat, "ShaderNodeValToRGB", -1020, -140)
-    creux.color_ramp.elements[0].position = 0.0
-    creux.color_ramp.elements[1].position = 0.07
-    liens.new(joint.outputs[0], creux.inputs["Factor"])
-    _creuser(mat, creux.outputs["Color"], 0.8, 0.06)
-    _creuser(mat, parite.outputs[0], 0.9, 0.05)
-    _creuser(mat, _grain(mat, 0.4), 0.6, 0.03)
-    return numero.outputs[0], parite.outputs[0], tirage.outputs["Value"]
+    sombre = _noeud(mat, "ShaderNodeMixRGB", -500, -40)
+    sombre.blend_type = "MULTIPLY"
+    sombre.inputs["Factor"].default_value = 1.0
+    sombre.inputs["Color2"].default_value = (*OMBRE_JOINT, 1.0)
+    liens.new(teinte, sombre.inputs["Color1"])
+    ombre = _noeud(mat, "ShaderNodeMixRGB", -340, 160)
+    liens.new(teinte, ombre.inputs["Color1"])
+    liens.new(sombre.outputs["Color"], ombre.inputs["Color2"])
+    liens.new(_calc(mat, "MULTIPLY_ADD", creux, -1.0, 1.0), ombre.inputs["Factor"])
+    return ombre.outputs["Color"]
 
 
-def pierre(name, rgb):
-    """Calcaire en assises, chacune tirée un peu plus claire ou plus sombre que sa
-    voisine — les « assises légèrement contrastées » de la fiche (§7), et la seule
-    chose qui donne une échelle à un mur de 100 amot vu de mille."""
+# Les quatre bancs du calcaire de Jérusalem, en écart multiplicatif sur la teinte de
+# base : le meleke n'est pas d'une couleur mais d'une bande. Ce n'est pas qu'une valeur
+# qui change d'un bloc au suivant, c'est la teinte — un mur dont les blocs ne diffèrent
+# qu'en clarté rend un aplat sali, jamais de la pierre.
+#
+# La bande va du crème pâle à l'ocre, JAMAIS au froid : dans chaque banc, rouge ≥ vert
+# ≥ bleu. Le banc le plus clair partait à (0,64 0,68 0,76), plus bleu que rouge : au
+# soleil il passait, mais à l'ombre — où la seule lumière est celle d'un ciel bleu — il
+# rendait du béton, et le pourtour se retrouvait tacheté de pierres grises.
+BANCS_CALCAIRE = ((0.82, 0.79, 0.74), (0.93, 0.90, 0.86),
+                  (1.04, 1.00, 0.94), (1.18, 1.09, 0.89))
+
+
+def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
+    """Calcaire en assises de blocs sciés.
+
+    Trois échelles de teinte, et il en faut trois. **Le bloc** d'abord : il tire son
+    banc dans `BANCS_CALCAIRE`, et c'est lui qui porte l'essentiel — dans un mur de
+    gazit, deux pierres voisines diffèrent plus que deux assises. **L'assise** ensuite,
+    d'un cheveu, pour que le lit se lise (les « assises légèrement contrastées » de la
+    fiche). **Une patine** de trente amot enfin, qui passe par-dessus l'appareil sans
+    en suivre le découpage : sans elle un mur reste un aplat quel que soit son
+    appareil, parce qu'à la distance où le film le voit l'œil ne lit que les grandes
+    taches.
+    """
     mat, neuf = _neuf(name, rgb)
     if not neuf:
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.78
-    _, parite, tirage = _assises(mat)
-    # La teinte suit d'abord la parité des assises, le tirage ne fait que la salir.
-    bruit = _noeud(mat, "ShaderNodeMath", -840, 60)
-    bruit.operation = "MULTIPLY"
-    bruit.inputs[1].default_value = 0.3
-    liens.new(tirage, bruit.inputs[0])
-    facteur = _noeud(mat, "ShaderNodeMath", -680, 160)
-    facteur.operation = "MULTIPLY_ADD"
-    facteur.inputs[1].default_value = 0.7
-    liens.new(parite, facteur.inputs[0])
-    liens.new(bruit.outputs[0], facteur.inputs[2])
-    CONTRASTE = 0.07
-    teinte = _noeud(mat, "ShaderNodeMixRGB", -500, 160)
-    teinte.inputs["Color1"].default_value = (*(c * (1 - CONTRASTE) for c in rgb), 1.0)
-    teinte.inputs["Color2"].default_value = (*(min(1.0, c * (1 + CONTRASTE)) for c in rgb), 1.0)
-    liens.new(facteur.outputs[0], teinte.inputs["Factor"])
-    liens.new(teinte.outputs["Color"], _bsdf(mat).inputs["Base Color"])
+    parite, _, bloc, creux = _appareil(mat, assise, longueurs)
+    teinte = _noeud(mat, "ShaderNodeValToRGB", -700, 160)
+    rampe = teinte.color_ramp
+    bancs = [tuple(min(1.0, c * e) for c, e in zip(rgb, banc)) + (1.0,)
+             for banc in BANCS_CALCAIRE]
+    pas = 1.0 / (len(bancs) - 1)
+    rampe.elements[0].position, rampe.elements[0].color = 0.0, bancs[0]
+    rampe.elements[1].position, rampe.elements[1].color = pas, bancs[1]
+    for k, couleur in enumerate(bancs[2:], start=2):
+        rampe.elements.new(pas * k).color = couleur
+    liens.new(_calc(mat, "MULTIPLY_ADD", parite, 0.10,
+                    _calc(mat, "MULTIPLY_ADD", _grain(mat, 30.0), 0.22,
+                          _calc(mat, "MULTIPLY", bloc, 0.68))), teinte.inputs["Factor"])
+    # Deux coulures, l'une de trois amot de large, l'autre d'une demie. Mesuré : sous
+    # AgX, un écart de teinte de 40 % entre deux blocs ne rendait que six centièmes à
+    # l'image tant que le soleil était à 4,0 — la courbe est presque plate là-haut, et
+    # tout le calcaire au soleil s'y plaçait. C'est ce qui a fait descendre le soleil à
+    # 2,2. La règle reste vraie même bien exposé : ce qui va vers le BAS se lit mieux
+    # que ce qui va vers le haut, et la pierre se donne d'abord par ses ombres.
+    salissure = _noeud(mat, "ShaderNodeMixRGB", -340, 320)
+    salissure.blend_type = "MULTIPLY"
+    salissure.inputs["Color2"].default_value = (0.0, 0.0, 0.0, 1.0)
+    liens.new(teinte.outputs["Color"], salissure.inputs["Color1"])
+    coulure = _noeud(mat, "ShaderNodeMapRange", -520, 320)
+    coulure.inputs["From Min"].default_value = 0.52
+    coulure.inputs["From Max"].default_value = 0.88
+    coulure.inputs["To Max"].default_value = 0.16
+    coulure.clamp = True
+    liens.new(_calc(mat, "MULTIPLY_ADD", _trainee(mat, 0.5, 9.0), 0.35,
+                    _calc(mat, "MULTIPLY", _trainee(mat, 3.0, 40.0), 0.65)),
+              coulure.inputs["Value"])
+    liens.new(coulure.outputs["Result"], salissure.inputs["Factor"])
+    # Moucheture d'une ama et demie. Le banc donne au bloc SA couleur, mais un bloc
+    # d'une seule couleur est un échantillon de nuancier : le calcaire est nué à
+    # l'intérieur de chaque pierre, à une échelle plus courte que la pierre.
+    mouchete = _noeud(mat, "ShaderNodeMixRGB", -180, 320)
+    mouchete.blend_type = "MULTIPLY"
+    mouchete.inputs["Color2"].default_value = (*OMBRE_JOINT, 1.0)
+    liens.new(salissure.outputs["Color"], mouchete.inputs["Color1"])
+    liens.new(_calc(mat, "MULTIPLY_ADD", _grain(mat, 0.45), 0.10,
+                    _calc(mat, "MULTIPLY", _grain(mat, 1.5), 0.22)), mouchete.inputs["Factor"])
+    # La rugosité se tire par bloc : deux pierres du même banc ne renvoient pas le même
+    # soleil rasant, et c'est le spéculaire — pas la teinte — qui les sépare à l'image.
+    liens.new(_calc(mat, "MULTIPLY_ADD", bloc, 0.18,
+                    _calc(mat, "MULTIPLY_ADD", _grain(mat, 0.35), 0.16, 0.62)),
+              _bsdf(mat).inputs["Roughness"])
+    liens.new(_ombre_du_joint(mat, mouchete.outputs["Color"], creux),
+              _bsdf(mat).inputs["Base Color"])
     return mat
 
 
 # Les trois marbres d'Hérode (Baba Batra 4a, Soucca 51b) : shesh, marmara, kuchla —
-# blanc, bleu-vert, jaune. Saturation très basse : Josèphe voyait de loin « une montagne
-# couverte de neige », pas une mosaïque.
-MARBRES_HERODE = ((0.93, 0.93, 0.91), (0.80, 0.86, 0.84), (0.92, 0.88, 0.76))
+# blanc, bleu-vert, jaune. Saturation très basse : ce que les Sages lui ont fait garder
+# contre l'or, c'est « כִּי אִידְווֹתָא דְיַמָּא », le moiré d'une mer — pas une mosaïque.
+MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.76, 0.85, 0.83), (0.92, 0.85, 0.62))
 
 
 def marbre_herode(name):
@@ -229,15 +439,20 @@ def marbre_herode(name):
 
     C'est la seule surface que les sources refusent explicitement de dorer : Hérode
     voulut la plaquer d'or et les Sages l'en dissuadèrent (*Baba Batra* 4a). Elle porte
-    donc la pierre, et l'or est réservé à ce que Josèphe et *Middot* 4:1 dorent — la
-    façade et tout l'intérieur.
+    donc la pierre, et l'or reste où *Middot* 4:1 le met — tout l'intérieur du Bayit.
+
+    Le marbre se tire par ASSISE et non par bloc — CHOIX : « בְּאַבְנֵי שֵׁישָׁא כּוּחְלָא
+    וּמַרְמְרָא » (*Soucca* 51b ; *Baba Batra* 4a) nomme les trois pierres sans dire
+    comment elles se répartissent. Par rangs entiers, elles font les vagues que les
+    Sages ont préférées à l'or ; tirées bloc à bloc, elles feraient une mosaïque. Le
+    tirage du bloc ne sert plus qu'à nuancer la teinte à l'intérieur du rang.
     """
     mat, neuf = _neuf(name, MARBRES_HERODE[0])
     if not neuf:
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.62   # marbre poli, pas calcaire
-    _, _, tirage = _assises(mat)
+    _, tire_assise, bloc, creux = _appareil(mat, ASSISE_BEIT)
     choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
     rampe = choix.color_ramp
     rampe.interpolation = 'CONSTANT'
@@ -246,8 +461,19 @@ def marbre_herode(name):
     rampe.elements[1].position = 1.0 / 3.0
     rampe.elements[1].color = (*MARBRES_HERODE[1], 1.0)
     rampe.elements.new(2.0 / 3.0).color = (*MARBRES_HERODE[2], 1.0)
-    liens.new(tirage, choix.inputs["Factor"])
-    liens.new(choix.outputs["Color"], _bsdf(mat).inputs["Base Color"])
+    liens.new(tire_assise, choix.inputs["Factor"])
+    veine = _noeud(mat, "ShaderNodeMixRGB", -500, 160)
+    veine.blend_type = "MULTIPLY"
+    veine.inputs["Factor"].default_value = 1.0
+    liens.new(choix.outputs["Color"], veine.inputs["Color1"])
+    nuance = _noeud(mat, "ShaderNodeValToRGB", -680, -40)
+    nuance.color_ramp.elements[0].color = (0.84, 0.85, 0.88, 1.0)
+    nuance.color_ramp.elements[1].color = (1.10, 1.08, 1.02, 1.0)
+    liens.new(_calc(mat, "MULTIPLY_ADD", _grain(mat, 24.0), 0.45,
+                    _calc(mat, "MULTIPLY", bloc, 0.55)), nuance.inputs["Factor"])
+    liens.new(nuance.outputs["Color"], veine.inputs["Color2"])
+    liens.new(_ombre_du_joint(mat, veine.outputs["Color"], creux),
+              _bsdf(mat).inputs["Base Color"])
     return mat
 
 
@@ -294,7 +520,12 @@ def dallage(name, rgb):
 
     Le joint fait 0,05 ama et les dalles ont toutes la même valeur : à 1,2 cm il
     disparaissait passé vingt amot, et il ne restait qu'un tirage de ±5 % par dalle —
-    des taches, que l'œil lisait en relief au lieu d'un pavage."""
+    des taches, que l'œil lisait en relief au lieu d'un pavage.
+
+    La valeur ne varie donc pas d'une dalle à l'autre, mais elle varie sur la cour :
+    une patine de vingt amot passe par-dessus le pavage sans en suivre le découpage.
+    C'est ce qui manquait pour que l'Azara cesse de rendre un aplat aux plans larges,
+    où une dalle de 3 amot ne fait plus deux pixels."""
     mat, neuf = _neuf(name, rgb)
     if not neuf:
         return mat
@@ -311,7 +542,12 @@ def dallage(name, rgb):
     dalles.inputs["Color2"].default_value = (*(min(1.0, c * 1.015) for c in rgb), 1.0)
     dalles.inputs["Mortar"].default_value = (*(c * 0.7 for c in rgb), 1.0)
     liens.new(_position(mat), dalles.inputs["Vector"])
-    liens.new(dalles.outputs["Color"], _bsdf(mat).inputs["Base Color"])
+    patine = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
+    patine.blend_type = "MULTIPLY"
+    patine.inputs["Color2"].default_value = (*OMBRE_JOINT, 1.0)
+    liens.new(dalles.outputs["Color"], patine.inputs["Color1"])
+    liens.new(_calc(mat, "MULTIPLY", _grain(mat, 20.0), 0.45), patine.inputs["Factor"])
+    liens.new(patine.outputs["Color"], _bsdf(mat).inputs["Base Color"])
     _creuser(mat, dalles.outputs["Factor"], 1.0, 0.08)
     _creuser(mat, _grain(mat, 0.3), 0.3, 0.01)
     return mat
@@ -355,8 +591,8 @@ def marbre(name, rgb):
     return mat
 
 def bois(name, rgb):
-    """Cèdre des plafonds et chêne des maltera'ot (Middot 3:7, Josèphe) : le fil court
-    le long de l'axe est-ouest, celui des poutres."""
+    """Cèdre des plafonds (« וַיִּסְפֹּן אֶת הַבַּיִת… בָּאֲרָזִים », Melakhim I 6:9) et chêne des
+    maltera'ot (Middot 3:7) : le fil court le long de l'axe est-ouest, celui des poutres."""
     mat, neuf = _neuf(name, rgb)
     if not neuf:
         return mat
@@ -600,12 +836,12 @@ def eau(name):
         _creuser(mat, _grain(mat, 0.25), 0.15, 0.003)
     return mat
 
-MAT_PIERRE = lambda: pierre("Pierre_claire", (0.85, 0.82, 0.74))
+MAT_PIERRE = lambda: pierre("Pierre_claire", (0.86, 0.71, 0.46))
 MAT_OR = lambda: metal("Or", (1.0, 0.76, 0.33), 0.3)
 MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
-MAT_SOL = lambda: dallage("Sol", (0.75, 0.72, 0.65))
+MAT_SOL = lambda: dallage("Sol", (0.78, 0.67, 0.49))
 MAT_LIN = lambda: etoffe("Lin_blanc", (0.88, 0.87, 0.83))     # bigdei lavan des kohanim
 MAT_MARBRE = lambda: marbre("Marbre_blanc", (0.93, 0.92, 0.89))
 MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
@@ -617,7 +853,16 @@ MAT_CHENE = lambda: bois("Chene", (0.36, 0.25, 0.15))
 MAT_CHENE_SCULPTE = lambda: bois_sculpte("Chene_sculpte", (0.36, 0.25, 0.15))
 MAT_PAROKHET = lambda: parokhet("Parokhet_tissee")
 MAT_TERRE = lambda: terre("Terre_Jerusalem")
-MAT_MAISON = lambda: _voiler(pierre("Maisons", (0.66, 0.59, 0.46)))   # la ville, deux tons sous le Temple
+# La ville, deux tons sous le Temple, et son appareil est domestique : le gazit de
+# huit à dix amot (Melakhim I 7:10) est celui de la maison du Roi et du Bayit, pas
+# celui d'une maison de Jérusalem. Assise et bloc au moellon.
+MAT_MAISON = lambda: _voiler(pierre("Maisons", (0.64, 0.55, 0.40), 0.8, (1.5, 2.5)))
+# Les colonnes des portiques : un tambour est UNE pierre, et n'a donc pas de joint
+# vertical. Une longueur de bloc énorme les supprime ; il ne reste que le lit d'un
+# tambour à l'autre. Sur un cylindre, le joint vertical était pire qu'inutile : la face
+# choisit son axe sur la normale (`_parement`), qui bascule quatre fois autour du fût,
+# et la trame sautait quatre fois par colonne.
+MAT_COLONNE = lambda: pierre("Pierre_colonne", (0.86, 0.71, 0.46), 1.4, (1e4, 1e4))
 MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)))
 MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
 MAT_EAU = lambda: eau("Eau_Kiyor")
@@ -728,10 +973,13 @@ def cone(name, x, y, z0, z1, r0, r1, col="20_Azara", mat=None, verts=32):
     return revolution(name, x, y, z0, [(r0, 0), (r1, z1 - z0)], col, mat, verts)
 
 def colonne(name, x, y, z0, z1, r, col="00_HarHabayit", mat=None):
-    """Colonne de portique : base, fût, chapiteau évasé (Josèphe, colonnades du Har
-    HaBayit). Un fût nu ne donnait ni assise au sol ni rupture de silhouette en haut
+    """Colonne de portique : base, fût, chapiteau évasé. « הַר הַבַּיִת סְטָיו כָּפוּל הָיָה…
+    סְטָיו לִפְנִים מִסְּטָיו » (Pesa'him 13b) — la colonnade double de l'esplanade ; le profil
+    est un CHOIX, la guemara n'en donne pas.
+    Un fût nu ne donnait ni assise au sol ni rupture de silhouette en haut
     de cadre — les deux choses qu'un travelling de colonnade (plan 2) fait voir
     défiler, et les deux qui entrent dans la passe Depth."""
+    mat = mat or MAT_COLONNE()
     cyl(f"{name}_base", x, y, z0, z0 + 1.0, r * 1.3, col, mat, verts=24)
     cyl(f"{name}_fut", x, y, z0 + 1.0, z1 - 2.0, r, col, mat)
     cone(f"{name}_chapiteau", x, y, z1 - 2.0, z1, r, r * 1.45, col, mat, verts=24)
@@ -786,6 +1034,28 @@ def wedge_ramp(name, x0, x1, y_bas, y_haut, z0, z1, col, mat=None):
              (x1, y_haut, z1), (x0, y_haut, z1)]
     faces = [[0, 1, 2, 3][::-1], [0, 1, 4, 5], [1, 2, 4], [3, 0, 5], [2, 3, 5, 4]]
     return mesh_from_pydata(name, verts, faces, col, mat)
+
+def rampe(name, x0, x1, y0, y1, z0, z1, montee, col, mat=None, epaisseur=1.0):
+    """Dalle inclinée d'épaisseur constante. `montee` : '+x', '-x', '+y' ou '-y'.
+
+    `wedge_ramp` fait un coin plein qui monte selon y — bon pour le kevesh, qui est un
+    remblai. La messiba est un plancher qui tourne : il lui faut une dalle, et les quatre
+    sens.
+    """
+    axe, sens = montee[1], 1 if montee[0] == "+" else -1
+    a0, a1 = (x0, x1) if axe == "x" else (y0, y1)
+
+    def zc(x, y):
+        t = ((x if axe == "x" else y) - a0) / (a1 - a0)
+        return z0 + (t if sens > 0 else 1 - t) * (z1 - z0)
+
+    coins = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    bas = [(x, y, zc(x, y)) for x, y in coins]
+    verts = bas + [(x, y, z + epaisseur) for x, y, z in bas]
+    faces = [[0, 1, 2, 3][::-1], [4, 5, 6, 7],
+             [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]
+    return mesh_from_pydata(name, verts, faces, col, mat)
+
 
 def mur_perce(name, x0, x1, y0, y1, z0, z1, col, portes, h_porte):
     """Mur droit percé d'ouvertures : segments pleins, plus un linteau sur chaque porte.
@@ -863,6 +1133,42 @@ def paroi_percee(name, x0, x1, y0, y1, z0, z1, col, mat, baies):
         pose(f"linteau_{k}", u0, u1, zh, z1)
         bord = u1
     pose("trumeau_fin", bord, a1, z0, z1)
+
+
+def dalle_percee(name, x0, x1, y0, y1, z0, z1, col, mat, tremies=()):
+    """Dalle horizontale percée de trémies `(tx0, tx1, ty0, ty1)`, disjointes en x.
+
+    `paroi_percee` ouvre des baies dans un mur debout ; il faut ici percer un plancher,
+    et les trous ne descendent pas jusqu'à un bord comme le fait une porte.
+    """
+    if not tremies:
+        box(name, x0, x1, y0, y1, z0, z1, col, mat)
+        return
+    bord = x0
+    for k, (tx0, tx1, ty0, ty1) in enumerate(sorted(tremies)):
+        if tx0 > bord:
+            box(f"{name}_bande_{k}", bord, tx0, y0, y1, z0, z1, col, mat)
+        if ty0 > y0:
+            box(f"{name}_sud_{k}", tx0, tx1, y0, ty0, z0, z1, col, mat)
+        if y1 > ty1:
+            box(f"{name}_nord_{k}", tx0, tx1, ty1, y1, z0, z1, col, mat)
+        bord = tx1
+    if x1 > bord:
+        box(f"{name}_bande_fin", bord, x1, y0, y1, z0, z1, col, mat)
+
+
+def couches_middot(name, x0, x1, y0, y1, zbas, col, tremies=()):
+    """Les cinq amot qui séparent deux niveaux du bâtiment (Middot 4:6).
+
+    אַמָּה כִּיּוּר, אַמָּתַיִם בֵּית דִּלְפָה, אַמָּה תִּקְרָה, אַמָּה מַעֲזִיבָה. Bartenura ad loc. : le כיור
+    est la poutre basse d'une ama, ciselée et dorée, d'où son nom ; le בית דלפה les deux
+    amot au-dessus, laissées vides pour recevoir le dégât d'eau (Rambam, Beit HaBe'hira
+    4:2, « שֶׁיִּכָּנֵס בּוֹ הַדֶּלֶף ») ; la תקרה les planches ; la מעזיבה le blocage qui les couvre
+    et fait le sol du niveau suivant.
+    """
+    dalle_percee(f"{name}_kiyour", x0, x1, y0, y1, zbas, zbas + 1, col, MAT_CEDRE(), tremies)
+    dalle_percee(f"{name}_tikra", x0, x1, y0, y1, zbas + 3, zbas + 4, col, MAT_CEDRE(), tremies)
+    dalle_percee(f"{name}_maaziva", x0, x1, y0, y1, zbas + 4, zbas + 5, col, MAT_MARBRE_HERODE(), tremies)
 
 
 def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, mat=None):
@@ -1073,6 +1379,22 @@ def couronnement(name, x0, x1, y0, y1, z, col, mat=None, saillie=0.5, reserve=()
             box(f"{name}_{j}", x0 - saillie, x1 + saillie, u0, u1, z - 0.5, z + 0.5, col, mat)
 
 
+def ceinture(name, x0, x1, y0, y1, epaisseur, z0, z1, col, mat=None, saillie=0.75):
+    """Bandeau en débord sur les quatre côtés d'une enceinte fermée.
+
+    `couronnement` couronne un mur seul, qu'il faut pouvoir interrompre là où un corps
+    de porte passe la crête ; ici les quatre côtés sont solidaires, et ce qui compte
+    est qu'ils s'aboutent au lieu de se recouvrir — deux boîtes coplanaires clignotent.
+    Les côtés sud et nord prennent les angles, les côtés est et ouest s'arrêtent contre
+    eux.
+    """
+    s = saillie
+    box(f"{name}_S", x0 - s, x1 + s, y0 - s, y0 + epaisseur + s, z0, z1, col, mat)
+    box(f"{name}_N", x0 - s, x1 + s, y1 - epaisseur - s, y1 + s, z0, z1, col, mat)
+    box(f"{name}_O", x0 - s, x0 + epaisseur + s, y0 + epaisseur, y1 - epaisseur, z0, z1, col, mat)
+    box(f"{name}_E", x1 - epaisseur - s, x1 + s, y0 + epaisseur, y1 - epaisseur, z0, z1, col, mat)
+
+
 def battants(name, x0, x1, y0, y1, z0, h, col, mat, largeur=10):
     """Deux vantaux rabattus dans l'embrasure d'une porte percée dans un mur — ouverts,
     comme ceux de Nikanor et du Heikhal. `x0..x1, y0..y1` : l'emprise de la baie dans
@@ -1246,9 +1568,11 @@ for i, y in enumerate(range(HY0 + 25, HY1 - 20, pas)):
 # Stoa royale au sud : seconde rangée de colonnes
 for i, x in enumerate(range(HX0 + 15, HX1 - 10, pas)):
     colonne(f"Stoa_sud_{i:03d}", x, HY0 + 30, Z_HAR, Z_HAR + H_PORTIQUE, 1.5)
-# Les portiques sont couverts (Josèphe, Guerre V, 5, 2 : plafonds de cèdre sur les
-# colonnades) : du mur à la rangée de colonnes, chapiteau compris. À ciel ouvert,
-# les colonnes se lisaient d'en haut en rangées de bornes sur le dallage.
+# Les portiques sont couverts : la guemara parle du « גַּג הָאִיצְטְבָא » (Pesa'him 13b), le
+# TOIT de la colonnade, sur lequel on posait les deux hallot — il y a donc un toit. Du
+# mur à la rangée de colonnes, chapiteau compris. À ciel ouvert, les colonnes se
+# lisaient d'en haut en rangées de bornes sur le dallage. Cèdre : CHOIX, c'est le bois
+# dont le Tanakh couvre le Bayit (Melakhim I 6:9).
 DEBORD_CHAPITEAU = 1.5 * 1.45 + 0.7
 for nm, xa, xb, ya, yb, zt in (
         ("nord", HX0 + 3, HX1 - 3, HY1 - 15 - DEBORD_CHAPITEAU, HY1 - 3, Z_HAR + H_PORTIQUE),
@@ -1260,9 +1584,9 @@ for nm, xa, xb, ya, yb, zt in (
 # Le dessus du plafond de la Stoa est de la pierre aussi : vu d'en haut (plans 1, 1b,
 # 15), un toit de cèdre faisait une bande brune de cinq cents amot.
 box("Stoa_sud_toit", HX0, HX1, HY0 + 13, HY0 + 32, Z_HAR + 27, Z_HAR + 27.6, "00_HarHabayit")
-# Plafond de la nef centrale de la Stoa (cèdre selon Josèphe). Sans lui la colonnade
-# est ouverte au ciel : CAM_02 ne filmait que du fond de monde entre des piliers, et
-# le « cedar ceiling » du prompt n'avait aucune géométrie à habiller.
+# Plafond de la nef centrale de la Stoa. Sans lui la colonnade est ouverte au ciel :
+# CAM_02 ne filmait que du fond de monde entre des piliers, et le plafond de cèdre du
+# prompt n'avait aucune géométrie à habiller.
 box("Stoa_sud_plafond", HX0, HX1, HY0 + 13, HY0 + 32, Z_HAR + 25, Z_HAR + 27,
     "00_HarHabayit", MAT_CEDRE())
 # Caissons : poutres au pas de la moitié d'une travée, deux sablières sur les axes de
@@ -1421,6 +1745,13 @@ box("EzratNashim_porte_est_linteau", EX1, EX1 + 5, -5, 5, Z_EZN + 20 - 0.01, Z_E
 # donne 10 × 20 à « tous les pesa'him et tous les shearim », mais une porte de 20 ne
 # tient pas dans un mur de 15 — la hauteur de ces murs n'est elle-même dans aucune
 # source.
+#
+# Elles restent DÉCOUVERTES, et c'est la seule chose ici qui ne soit pas un choix :
+# « וְלֹא הָיוּ מְקוֹרוֹת. וְכָךְ הֵם עֲתִידִים לִהְיוֹת » (Middot 2:5) — pas de toit, et pas
+# davantage dans le Temple à venir, qui est celui que le film bâtit. Ce qu'on peut leur
+# donner, c'est le couronnement de leurs murs : les quatre crêtes s'arrêtaient net et
+# se lisaient en boîtes découpées, ce que le reste de l'enceinte ne fait nulle part.
+H_LISHKA_EN = 15
 for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 - 40, 27.5, "S"),
                          ("Metzoraim_NO", EX0, 27.5, "S"), ("Shemanya_SO", EX0, -67.5, "N")):
     xb, yb = xa + 40, ya + 40
@@ -1428,10 +1759,12 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
                              (xa, xa + 2, ya, yb, "O"), (xb - 2, xb, ya, yb, "E")):
         nom = f"Lishkat_{nm}_{side}"
         if side == cour:
-            mur_perce(nom, a, b, c, d, Z_EZN, Z_EZN + 15, "10_EzratNashim",
+            mur_perce(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim",
                       [((a + b) / 2, 6)], 12)
         else:
-            box(nom, a, b, c, d, Z_EZN, Z_EZN + 15, "10_EzratNashim")
+            box(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim")
+    ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, 2,
+             Z_EZN + H_LISHKA_EN - 1.5, Z_EZN + H_LISHKA_EN + 0.5, "10_EzratNashim")
 # Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
 # entre les chambres d'angle — elle traversait leurs murs. Une dalle nue en l'air ne
 # se lisait pas : elle porte maintenant sur des colonnes et un garde-corps.
@@ -1960,8 +2293,7 @@ for i in range(12):
 box("Ulam_facade_S", BX_E - 5, BX_E, -50, -10, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_facade_N", BX_E - 5, BX_E, 10, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_facade_linteau", BX_E - 5, BX_E, -10, 10, Z_BAT + 40, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
-# --- La façade est n'est PAS dorée. Josèphe la voit couverte de plaques d'or (Guerre
-#     V, 5, 6) ; la guemara raconte l'inverse et c'est elle que le film suit : « סָבַר
+# --- La façade est n'est PAS dorée, et la guemara le raconte comme un refus : « סָבַר
 #     לְמִשְׁעֲיֵיהּ בְּדַהֲבָא, אֲמַרוּ לֵיהּ רַבָּנַן שַׁבְקֵיהּ דְּהָכִי שַׁפִּיר טְפֵי דְּמִיחֲזֵי כְּאִידַּוְּותָא דְיַמָּא » — Hérode
 #     voulut la plaquer d'or, les Sages l'en dissuadèrent, la pierre est plus belle
 #     ainsi, « comme les vagues de la mer » (Baba Batra 4a ; Soucca 51b). Ce qui fait
@@ -1977,12 +2309,11 @@ for i in range(5):
 # --- Rovadim : les bandeaux en saillie qui ceinturent les murs de l'Oulam de bas en
 #     haut (Rambam, Beit HaBe'hira 4:9). C'est la seule articulation que les sources
 #     donnent à cette façade, et elle est horizontale.
-#     Aucune source du Second Temple ne met de colonne sur la face du bâtiment : ni Middot
-#     3:7-8 et 4:6-7, ni le Rambam, ni Josèphe qui l'a vue pierre à pierre (Guerre V, 5, 4
-#     et 6). Ya'hin et Boaz sont du Premier Temple, « עַל פְּנֵי הַהֵיכָל » (Divrei HaYamim II
-#     3:17) : le film les dresse devant la façade, de part et d'autre des marches (CHOIX,
-#     voir plus bas). Les fûts de l'Oulam sont les כְּלוֹנָסוֹת de cèdre tendus du mur du
-#     Heikhal à celui de l'Oulam (Middot 3:8).
+#     La face du bâtiment ne porte aucune colonne : ni Middot 3:7-8 et 4:6-7, ni le
+#     Rambam n'en mettent une dehors.
+#     Ya'hin et Boaz sont dedans, dans l'Oulam, là où le Tanakh et ses commentateurs les
+#     posent (voir plus bas). Les fûts de l'Oulam sont les כְּלוֹנָסוֹת de cèdre tendus du mur
+#     du Heikhal à celui de l'Oulam (Middot 3:8).
 #     Le rovad du sommet emporte les 4 dernières amot du mur, où Middot 4:6 met le
 #     כִּיּוּר et la בֵּית דִּלְפָה de l'étage.
 #     Deux échelles d'horizontales, et elles se confirment : celle-ci, de 4 amot, et
@@ -2003,7 +2334,11 @@ for cote, y, sens in (("N", 50, 1), ("S", -50, -1)):
 # Épaules (Beit Ha'halifot) et intérieur de l'Oulam (11 profond)
 box("Ulam_epaule_S", BX_E - 16, BX_E - 5, -50, -35, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_epaule_N", BX_E - 16, BX_E - 5, 35, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
-box("Ulam_plafond", BX_E - 16, BX_E - 5, -35, 35, Z_BAT + 40, Z_TOIT, "40_Ulam", MAT_CEDRE())
+# Le plafond de l'Oulam porte les mêmes cinq amot (Middot 4:6, le bâtiment est un seul
+# bloc de 100). Au-dessus, plein : aucune source ne met de pièce là — les עליות sont sur la
+# Maison chez Rashi, et l'Oulam-tour de Radak est du Premier Temple (CHOIX de suivre Rashi).
+couches_middot("Ulam_plancher", BX_E - 16, BX_E - 5, -35, 35, Z_BAT + 40, "40_Ulam")
+box("Ulam_masse", BX_E - 16, BX_E - 5, -35, 35, Z_BAT + 45, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 # « כְּלוֹנָסוֹת שֶׁל אֶרֶז הָיוּ קְבוּעִין מִכָּתְלוֹ שֶׁל הֵיכָל לְכָתְלוֹ שֶׁל אוּלָם, כְּדֵי שֶׁלֹּא יִבְעַט »
 # (Middot 3:8) : les poutres rondes de cèdre tendues d'un mur à l'autre, sous le
 # plafond, et trois poutres en travers qui en font les caissons — le « coffered cedar
@@ -2016,29 +2351,46 @@ for k, x in enumerate((BX_E - 13.25, BX_E - 10.5, BX_E - 7.75)):
 # Deux tables de l'Oulam (marbre au nord... CHOIX : marbre à droite en entrant = nord ; or au sud)
 box("Ulam_table_marbre", -90, -88, 5.5, 6.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_MARBRE())
 box("Ulam_table_or", -90, -88, -6.5, -5.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_OR())
-# Ya'hin et Boaz (Melakhim I 7:15-22, 41-42 ; Divrei HaYamim II 3:15-17) : « וַיָּקֶם אֶת
-# הָעַמּוּדִים עַל פְּנֵי הַהֵיכָל, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאול » — devant la façade, de part et
-# d'autre des marches, sur le sol de l'Azara. Hauteur : CHOIX. Melakhim donne 18 amot de fût,
-# Divrei HaYamim II 3:15 en donne 35, dans une maison de 30 (Melakhim I 6:2) — les colonnes
-# montaient aux trois quarts. La façade fait 100 : même proportion, 70 de fût plus le
-# chapiteau de cinq (Melakhim 7:16), 75, au niveau des maltera'ot. Douze amot de tour, creux
-# de quatre doigts, chapiteaux en lys sur quatre amot, réseaux et sept chaînettes sur le
-# ventre, deux rangs de cent grenades. Ya'hin à droite (sud), Boaz à gauche.
-AMOUD_X, AMOUD_Y, AMOUD_R, AMOUD_H = BX_E + 3, 13.5, 12 / (2 * math.pi), 70
-KOTERET = [(AMOUD_R, 0.0), (2.25, 0.5), (2.4, 1.3), (2.3, 2.0), (1.95, 2.7), (2.15, 3.3), (2.8, 4.4), (3.05, 5.0),
-           (2.85, 5.0), (2.2, 4.3), (0.0, 3.6)]
+# Ya'hin et Boaz (Melakhim I 7:15-22 ; Yirmiyahou 52:21-23 ; Divrei HaYamim II 3:15-17).
+# Fût : 18 amot, donné trois fois et sans divergence — Melakhim I 7:15, Yirmiyahou 52:21,
+# Melakhim II 25:17. Les 35 amot de Divrei HaYamim II 3:15 ne sont pas la hauteur d'une
+# colonne mais la mesure des deux couchées au moment de la coulée, d'où « אֹרֶךְ » et non
+# « קוֹמָה » : 18 + 18 = 36, moins l'ama que les deux demi-fûts perdent dans les kotarot
+# (Radak et Rashi ad loc. ; Metsoudat David, « של שניהם יחד »).
+# Kotéret : 5 amot (Melakhim I 7:16 ; Divrei HaYamim II 3:15). Les 3 amot de Melakhim II
+# 25:17 sont les seules décorées — « שְׁתֵּי אַמּוֹת הַתַּחְתּוֹנוֹת שֶׁל כּוֹתָרוֹת הָיוּ שָׁווֹת לָעַמּוּד שֶׁלֹּא
+# הָיָה בָּהֶם צוּרָה, וְשָׁלֹשׁ עֶלְיוֹנוֹת הֵן נִפְרָדוֹת לַחוּץ מֻקָּפוֹת שְׂבָכִים » (Baraïta des 49 Middot, citée
+# par Radak sur 7:16). D'où le profil : 2 amot au nu du fût, 3 en saillie, et au sommet la
+# calotte de « מַעֲשֵׂה שׁוּשַׁן » qui coiffe le creux du fût (Metsoudat David sur 7:19-20).
+# Largeur : « כִּי הָעַמּוּדִים הָיוּ בְּרֹחַב אַרְבַּע אַמּוֹת » (Metsoudat David sur 7:19) — 4 amot, ce
+# que donne aussi le tour de 12 amot (Melakhim I 7:15 ; Yirmiyahou 52:21) au π de trois
+# d'Erouvin 76a. Élancement 4,5:1 : du bronze coulé, pas une tige.
+# Place : dans l'Oulam. « וַיָּקֶם אֶת הָעַמֻּדִים לְאֻלָם הַהֵיכָל » (7:21), que Radak lit « כְּמוֹ
+# בְּאוּלָם הַהֵיכָל », Ralbag « שֶׁהֱקִימָם בּוֹ », Metsoudat David « בָּאוּלָם שֶׁלִּפְנֵי הַהֵיכָל » et, sur
+# Divrei HaYamim II 3:15, « בַּחֲלַל הָאוּלָם ». Le « מַעֲשֵׂה שׁוּשַׁן בָּאוּלָם » de 7:19 dit la même
+# chose. Elles tiennent donc l'ouverture de 20 (Middot 3:7) par l'intérieur, face externe
+# au nu du jambage, 12 amot de passage au milieu : la ligne de mire du mont des Oliviers
+# vers la porte du Heikhal, large de 10, reste dégagée (Middot 2:4).
+# Ya'hin à droite, soit au sud, Boaz à gauche (Metsoudat David sur 7:21).
+AMOUD_X, AMOUD_Y, AMOUD_R, AMOUD_H = BX_E - 8.5, 8, 2, 18
+KOTERET = [(AMOUD_R, 0.0), (AMOUD_R, 2.0), (2.5, 2.35), (2.9, 3.0), (3.1, 3.8), (3.0, 4.4),
+           (2.55, 4.75), (AMOUD_R, 4.95), (1.15, 4.8), (0.0, 4.5)]
+# Sept chaînettes par kotéret (Melakhim I 7:17), posées sur les trois amot en saillie
+SHARSHEROT = ((2.45, 2.62), (2.75, 2.82), (3.05, 2.98), (3.35, 3.06),
+              (3.65, 3.14), (3.95, 3.14), (4.25, 3.08))
 for nom, y in (("Yakhin", -AMOUD_Y), ("Boaz", AMOUD_Y)):
-    cyl(f"{nom}_base", AMOUD_X, y, Z_AZ, Z_AZ + 0.6, AMOUD_R + 0.4, "40_Ulam", MAT_BRONZE(), verts=48)
-    cyl(f"{nom}_fut", AMOUD_X, y, Z_AZ + 0.6, Z_AZ + AMOUD_H, AMOUD_R, "40_Ulam", MAT_BRONZE(), verts=48)
-    revolution(f"{nom}_koteret", AMOUD_X, y, Z_AZ + AMOUD_H, KOTERET, "40_Ulam", MAT_BRONZE(), verts=48)
-    for k in range(7):
-        tore(f"{nom}_sharsheret_{k}", AMOUD_X, y, Z_AZ + AMOUD_H + 0.55 + 0.2 * k, 2.42 - 0.03 * abs(k - 3), 0.05,
-             "40_Ulam", MAT_BRONZE())
-    for rang, z in enumerate((1.0, 1.6)):
-        for k in range(100):
-            a = 2 * math.pi * (k + 0.5 * rang) / 100
-            sphere(f"{nom}_rimon_{rang}{k:02d}", AMOUD_X + 2.45 * math.cos(a), y + 2.45 * math.sin(a),
-                   Z_AZ + AMOUD_H + z, 0.07, "40_Ulam", MAT_BRONZE(), segs=6)
+    cyl(f"{nom}_fut", AMOUD_X, y, Z_BAT, Z_BAT + AMOUD_H, AMOUD_R, "40_Ulam", MAT_BRONZE(), verts=48)
+    revolution(f"{nom}_koteret", AMOUD_X, y, Z_BAT + AMOUD_H, KOTERET, "40_Ulam", MAT_BRONZE(), verts=48)
+    for k, (z, R) in enumerate(SHARSHEROT):
+        tore(f"{nom}_sharsheret_{k}", AMOUD_X, y, Z_BAT + AMOUD_H + z, R, 0.06, "40_Ulam", MAT_BRONZE())
+    # « וְהָרִמּוֹנִים מָאתַיִם טֻרִים סָבִיב » (7:20) : cent par rang, deux rangs, enfilés sur les
+    # chaînettes comme des perles — « חֲרוּזִים בִּשְׁנֵי טוּרִים » (Metsoudat David ad loc.)
+    for rang, k in enumerate((3, 5)):
+        z, R = SHARSHEROT[k]
+        for i in range(100):
+            a = 2 * math.pi * (i + 0.5 * rang) / 100
+            sphere(f"{nom}_rimon_{rang}{i:02d}", AMOUD_X + (R + 0.04) * math.cos(a), y + (R + 0.04) * math.sin(a),
+                   Z_BAT + AMOUD_H + z, 0.09, "40_Ulam", MAT_BRONZE(), segs=6)
 # La tablette d'or d'Hélène (Yoma 3:10), « שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ », d'où le kohen
 # copie la parasha. Sur l'or du mur est de l'Oulam, côté nord : CHOIX.
 TAVLA_X = BX_E - 16 + EPAISSEUR_PLACAGE   # le nu de l'or sur le mur est du Heikhal, HX_E plus bas
@@ -2140,11 +2492,31 @@ for cote, y_int, y_mi, y_ext in (("N", 10, 25, 35), ("S", -10, -25, -35)):
     paroi_percee(f"Corps_mur_{cote}_int", BX_O, HK0, *sorted((y_int, y_mi)), Z_BAT, Z_TOIT,
                  "50_Heikhal", MAT_MARBRE_HERODE(), baies_heikhal(*FENETRE_INT))
 box("Corps_mur_O", BX_O, KK1, -35, 35, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
-box("Corps_plafond", KK1, HK0, -10, 10, Z_BAT + 40, Z_TOIT, "50_Heikhal", MAT_CEDRE())
+# --- L'étage. Le corps montait plein de 46 à 96 ; Middot 4:5-6 y met une pièce.
+#     « וְגֹבַהּ שֶׁל עֲלִיָּה אַרְבָּעִים אַמָּה » (4:6), et le Rambam la dit bâtie : « וַעֲלִיָּה בְּנוּיָה
+#     עַל גַּבָּיו, גֹּבַהּ כְּתָלֶיהָ אַרְבָּעִים אַמָּה » (Beit HaBe'hira 4:2). Elle est praticable : porte
+#     au sud au bout de la מְסִבָּה, deux perches de cèdre pour monter sur son toit, une ligne
+#     de bornes au sol qui y rejoue la séparation d'en bas, et des trappes vers le Kodesh
+#     HaKodashim par où l'on descendait les ouvriers en caisses (4:5).
+#     Au-dessus du Heikhal et du Kodesh HaKodashim, pas de l'Oulam : c'est là que Middot 4:5
+#     la meuble, et Rashi (sur Divrei HaYamim II 3:4) met les עליות du Premier Temple
+#     au-dessus de la Maison — « מִקַּרְקָעִית הַבַּיִת עַד קֵרוּי עֲלִיָּה רִאשׁוֹנָה שְׁלֹשִׁים, וּמֵעֲלִיָּה
+#     לַעֲלִיָּה עַד גַּג הָעֶלְיוֹן תִּשְׁעִים ». Metsoudat David donne la même lecture en second.
+#     Radak les met dans l'Oulam seul : minorité, et sur le Premier Temple.
+Z_ETAGE_SOL = Z_BAT + 45            # 51 : sur la מעזיבה, les cinq amot de Middot 4:6
+Z_ETAGE_HAUT = Z_ETAGE_SOL + 40     # 91 : le haut de ses murs, puis les cinq amot du toit
+# Les לוּלִין percent le plancher au-dessus du Kodesh HaKodashim. Middot 4:5 n'en donne ni
+# le nombre ni la place : deux trémies de deux amot sur l'axe, CHOIX.
+LOULIN = [(KK1 + 6, KK1 + 8, -1, 1), (KK1 + 12, KK1 + 14, -1, 1)]
+couches_middot("Corps_plancher", KK1, HK0, -10, 10, Z_BAT + 40, "50_Heikhal", LOULIN)
+couches_middot("Corps_toit", KK1, HK0, -10, 10, Z_ETAGE_HAUT, "50_Heikhal")
+# « רָאשֵׁי פִסְפָּסִין מַבְדִּילִים בָּעֲלִיָּה בֵּין הַקֹּדֶשׁ לְבֵין קֹדֶשׁ הַקֳּדָשִׁים » (Middot 4:5) : la ligne
+# de bornes qui rejoue à l'étage l'ama de Traksin, restée en creux au-dessous.
+for k, y in enumerate(plage(-9.5, 9.5, 1.0)):
+    box(f"Pispassin_{k:02d}", TR1, TR0, y - 0.2, y + 0.2, Z_ETAGE_SOL, Z_ETAGE_SOL + 0.3,
+        "50_Heikhal", MAT_MARBRE_HERODE())
 # --- « כָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת » (Middot 4:1 ; Rambam Beit
-#     HaBe'hira 4:7 : « וכל ההיכל היה טפוח זהב חוץ ממקום אחורי הדלתות »). Josèphe le
-#     confirme du dehors : la porte « toute couverte d'or, ainsi que tout le mur autour
-#     d'elle » (Guerre V, 5).
+#     HaBe'hira 4:7 : « וכל ההיכל היה טפוח זהב חוץ ממקום אחורי הדלתות »).
 #     L'or est un PLACAGE sur la face intérieure, jamais la matière du mur : le corps du
 #     bâtiment reste en marbre apparent au-dehors (Baba Batra 4a), et une boîte ne porte
 #     pas deux matières.
@@ -2188,9 +2560,7 @@ for cote, signe in (("S", -1), ("N", 1)):
 box("Heikhal_or_est_linteau", HK0 - EPAISSEUR_PLACAGE, HK0, -5, 5, Z_BAT + 20, Z_BAT + 40, "50_Heikhal", MAT_OR_PLAQUE())
 box("Ulam_or_est_linteau", HX_E, HX_E + EPAISSEUR_PLACAGE, -5, 5, Z_BAT + 20, Z_BAT + 40, "40_Ulam", MAT_OR_PLAQUE())
 
-# --- Ligne de toit (Middot 4:6) : מַעֲקֶה de 3 amot, puis אַמָּה כָּלֵה עוֹרֵב — les pointes
-#     que Josèphe voit d'en bas, « on its top it had spikes with sharp points, to
-#     prevent any pollution of it by birds sitting upon it » (Guerre V, 5, 6). Les deux
+# --- Ligne de toit (Middot 4:6) : מַעֲקֶה de 3 amot, puis אַמָּה כָּלֵה עוֹרֵב. Les deux
 #     tiennent DANS les 100 amot : le garde-corps n'est pas posé sur un mur de 100, il
 #     est ce qui monte de 96 à 99. R. Yehouda (là-bas) ne compte pas le kaleh orev dans
 #     la mesure et donne 4 amot au maake ; le film suit le tana kama.
@@ -2206,17 +2576,25 @@ POURTOUR_TOIT = [
     ("nord_corps",  BX_O, HX_E,                       35 - MAAKE_EP, 35),
     ("ouest",       BX_O, BX_O + MAAKE_EP,            -35 + MAAKE_EP, 35 - MAAKE_EP),
 ]
-# Le kaleh orev est fait de pointes, pas d'un bandeau : « spikes with sharp points »
-# (Josèphe) — une lisse de bronze sur le maake, et une pointe par ama.
+# Le kaleh orev est une LAME, pas une rangée de pointes. Le Rambam le décrit sur place
+# (commentaire sur Middot 4:6) : « שֶׁהָיָה מַקִּיף הַהֵיכָל לְמַעְלָה מִן הַמַּעֲקֶה מֵאַרְבַּע רוּחוֹתָיו
+# בְּחֶשֶׁק שֶׁל בַּרְזֶל גֹּבַהּ אַמָּה חַד כְּמוֹ הַסַּיִף, כְּדֵי שֶׁלֹּא יֵשֵׁב עָלָיו שׁוּם עוֹף עַל הַהֵיכָל,
+# מִפְּנֵי שֶׁנֶּחְתָּכִים רַגְלָיו בְּאוֹתוֹ הַסַּיִף » — un cerclage de FER d'une ama, continu sur les
+# quatre côtés, affilé comme une épée. Le blockout en faisait une lisse de bronze
+# hérissée d'une pointe par ama — une lecture qui ne vient d'aucune source juive.
+# Le fil n'est pas modélisé : à 0,05 ama d'épaisseur la lame tient dans deux
+# pixels sur la façade entière, et l'affûtage est sous le pixel.
+LAME_EP = 0.10
 for suffixe, xa, xb, ya, yb in POURTOUR_TOIT:
     box(f"Maake_{suffixe}", xa, xb, ya, yb, Z_TOIT, Z_TOIT + MAAKE_H, "50_Heikhal", MAT_MARBRE_HERODE())
-    box(f"Kaleh_orev_{suffixe}", xa, xb, ya, yb, Z_TOIT + MAAKE_H, Z_TOIT + MAAKE_H + 0.15, "50_Heikhal", MAT_BRONZE())
-    long_x = (xb - xa) >= (yb - ya)
-    a0, a1 = (xa, xb) if long_x else (ya, yb)
-    for k, c in enumerate(plage(a0 + 0.5, a1 - 0.5, 1.0)):
-        px, py = (c, (ya + yb) / 2) if long_x else ((xa + xb) / 2, c)
-        cone(f"Kaleh_orev_{suffixe}_pointe_{k:03d}", px, py, Z_TOIT + MAAKE_H + 0.15, Z_FAITE,
-             0.12, 0.0, "50_Heikhal", MAT_BRONZE(), verts=6)
+    if (xb - xa) >= (yb - ya):
+        c = (ya + yb) / 2
+        box(f"Kaleh_orev_{suffixe}", xa, xb, c - LAME_EP / 2, c + LAME_EP / 2,
+            Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER())
+    else:
+        c = (xa + xb) / 2
+        box(f"Kaleh_orev_{suffixe}", c - LAME_EP / 2, c + LAME_EP / 2, ya, yb,
+            Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER())
 
 # --- Ustensiles du Heikhal (Yoma 33b ; Menachot 98b) : dans les deux tiers ouest,
 #     à 2.5 amot des murs. Table au NORD, Menora au SUD, autel d'or entre les deux, vers l'est.
@@ -2854,15 +3232,18 @@ def ciel():
     degrade.location = (-260, 0)
     rampe = degrade.color_ramp
     rampe.elements[0].position = 0.0
-    rampe.elements[0].color = (0.72, 0.73, 0.74, 1.0)     # brume
+    rampe.elements[0].color = (0.60, 0.66, 0.76, 1.0)     # brume
     rampe.elements[1].position = 1.0
-    rampe.elements[1].color = (0.33, 0.45, 0.68, 1.0)     # zénith
-    rampe.elements.new(0.35).color = (0.62, 0.68, 0.77, 1.0)
+    rampe.elements[1].color = (0.26, 0.40, 0.66, 1.0)     # zénith
+    rampe.elements.new(0.35).color = (0.46, 0.57, 0.73, 1.0)
     arbre.links.new(montee.outputs["Result"], degrade.inputs["Factor"])
     arbre.links.new(degrade.outputs["Color"], fond.inputs["Color"])
-    # Même niveau d'ambiance que le fond plat d'origine : l'exposition des plans déjà
-    # stylisés ne bouge pas.
-    fond.inputs["Strength"].default_value = 0.6
+    # Le ciel N'EST PAS un remplissage neutre. À 0,6 sur une brume presque blanche, il
+    # éclairait chaque face d'autant que le soleil, sans direction et sans couleur : le
+    # calcaire y perdait sa teinte, et le modelé avec. Baissé à 0,30 et bleui, il rend
+    # ce qu'un ciel fait — la lumière du soleil est chaude, son ombre est FROIDE, et
+    # c'est cet écart-là, pas l'appareil, qui fait lire une pierre comme de la pierre.
+    fond.inputs["Strength"].default_value = 0.30
 
 
 def moteur_eevee():
@@ -2909,7 +3290,12 @@ def moteur_cycles():
 
 
 sun = lampe("Soleil_AUBE_est", 'SUN', (m(200), m(-60), m(150)))
-sun.data.energy = 4.0
+# 3,2 et non 4,0 : à 4,0, ciel compris, le calcaire sortait à 0,77 sur l'épaule d'AgX,
+# où la courbe est presque plate — la pierre y perdait sa couleur (écart R-B de 5
+# centièmes, un gris) et l'écart entre deux blocs y était écrasé d'un facteur six. Le
+# mur n'est pas plus sombre pour autant : le ciel a baissé davantage, et la part du
+# soleil dans ce qui l'éclaire a donc monté. C'est ce rapport-là qui compte.
+sun.data.energy = 3.2
 sun.data.color = (1.0, 0.85, 0.65)
 sun.data.angle = math.radians(1.5)
 # Vise depuis l'est, 12° au-dessus de l'horizon (aube). Pour "jour" : passer à 30–35°.

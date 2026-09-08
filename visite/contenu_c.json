@@ -46,9 +46,11 @@
     "resume": "Les deux colonnes de bronze de Shlomo. Un fût creux surmonté d'un chapiteau (koteret) travaillé en lys, ceint de résilles et de chaînettes, et garni de deux rangs de cent grenades. Elles sont dressées « לְאֻלָם הַהֵיכָל » : dans l'Oulam, de chaque côté de la baie — pas devant la façade. Ya'hin à droite en entrant (sud), Boaz à gauche (nord).",
     "cotes": [
       "dix-huit amot de fût",
-      "douze amot de tour",
+      "douze amot de tour, soit quatre amot de large",
       "creux de quatre doigts",
-      "chapiteau de cinq amot, dont quatre « מַעֲשֵׂה שׁוֹשַׁן »",
+      "chapiteau de cinq amot : deux au nu du fût, trois en saillie",
+      "vingt-trois amot en tout",
+      "quatre amot de « מַעֲשֵׂה שׁוֹשַׁן » au sommet du chapiteau",
       "sept chaînettes (sharsherot) sur le ventre du chapiteau",
       "deux rangs de cent grenades par colonne",
       "Ya'hin au sud (à droite), Boaz au nord (à gauche)"
@@ -58,9 +60,13 @@
       {"oeuvre": "Melakhim I", "ref": "7:41-42", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:21", "citation": "לְאֻלָם הַהֵיכָל"},
       {"oeuvre": "Yirmeyahou", "ref": "52:21-23", "citation": ""},
-      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": ""}
+      {"oeuvre": "Melakhim II", "ref": "25:17", "citation": ""},
+      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": ""},
+      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:16", "citation": "שְׁתֵּי אַמּוֹת הַתַּחְתּוֹנוֹת שֶׁל כּוֹתָרוֹת הָיוּ שָׁווֹת לָעַמּוּד"},
+      {"oeuvre": "Radak", "ref": "sur Divrei HaYamim II 3:15", "citation": "עַל מִדַּת שְׁנֵי הָעַמּוּדִים הוּא אוֹמֵר"},
+      {"oeuvre": "Metsoudat David", "ref": "sur Melakhim I 7:19", "citation": "כִּי הָעַמּוּדִים הָיוּ בְּרֹחַב אַרְבַּע אַמּוֹת"}
     ],
-    "note": "Point d'arbitrage explicite du projet. La fiche technique (§ façade) et le README écrivent tous deux : « Ya'hin et Boaz (Melakhim I 7:21) sont du Premier Temple et Middot les ignore » — c'est l'argument qui interdit toute colonne sur la façade de l'Oulam. Leur ajout ne revient pas dessus : le README précise « לְאֻלָם הַהֵיכָל : dans l'Oulam, de chaque côté de la baie, derrière les jambages (Radak) — la façade reste sans colonnes, comme avant ». Leur présence dans ce Temple-ci relève du même principe de Menachot 98b que la Mer et les mekhonot."
+    "note": "Point d'arbitrage explicite du projet. La façade de l'Oulam reste sans colonne — fiche §8a — et Ya'hin et Boaz n'y reviennent pas : elles sont dedans, « לְאֻלָם הַהֵיכָל » lu « כְּמוֹ בְּאוּלָם הַהֵיכָל » par Radak, « שֶׁהֱקִימָם בּוֹ » par Ralbag, « בַּחֲלַל הָאוּלָם » par Metsoudat David. Leur présence dans ce Temple-ci relève du même principe de Menachot 98b que la Mer et les mekhonot. Cote à ne pas confondre : les trente-cinq amot de Divrei HaYamim II 3:15 mesurent les deux colonnes couchées au moment de la coulée, pas la hauteur d'une colonne (Radak, Rashi, Metsoudat David ad loc.) — les lire comme une élévation donne des colonnes trois fois trop hautes et trop fines."
   },
 
   "mukhni": {

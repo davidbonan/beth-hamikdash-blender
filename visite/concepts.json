@@ -319,6 +319,18 @@
       ]
     },
     {
+      "id": "aliyah",
+      "nom": "Aliyah (l'\u00e9tage)",
+      "zone": "heikhal",
+      "prefixes": [
+        "Corps_plancher_",
+        "Corps_toit_",
+        "Pispassin_",
+        "Ulam_plancher_",
+        "Ulam_masse"
+      ]
+    },
+    {
       "id": "kaleh_orev",
       "nom": "Kaleh Orev",
       "zone": "heikhal",

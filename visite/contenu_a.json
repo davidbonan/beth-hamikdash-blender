@@ -60,11 +60,10 @@
   "stoa_royale": {
     "he": "",
     "translit": "Stoa",
-    "resume": "Au sud du Har HaBayit, la Stoa royale est une longue colonnade — double ou triple — qui borde le mur. Elle vient de Josèphe et non de la Mishna : la fiche la traite comme décor de fond.",
+    "resume": "Au sud du Har HaBayit, une longue colonnade double borde le mur. La guemara la donne en principe — « le Har HaBayit était un stoa double, un stoa dans un stoa » (Pesa'him 13b) — et le film la traite comme décor de fond : le nombre de rangs, l'entraxe et le profil des colonnes sont des choix.",
     "cotes": [],
     "sources": [
-      {"oeuvre": "Josèphe Guerre", "ref": "V, 5", "citation": ""},
-      {"oeuvre": "Josèphe Antiquités", "ref": "XV, 11", "citation": ""}
+      {"oeuvre": "Pesachim", "ref": "13b", "citation": "הר הבית סטיו כפול היה… סטיו לפנים מסטיו"}
     ],
     "note": "Elle porte le plan 2 du film : travelling avant dans l'allée centrale de la double colonnade, vers l'est, avec le Soreg et les 12 marches du 'Heil au loin."
   },
@@ -72,11 +71,10 @@
   "portiques": {
     "he": "",
     "translit": "",
-    "resume": "Des portiques — des colonnades doubles — longent les murs est, nord et ouest du Har HaBayit. Comme la Stoa royale, ils sont décrits par Josèphe et traités comme décor de fond.",
+    "resume": "Des portiques — des colonnades doubles — longent les murs est, nord et ouest du Har HaBayit. « Le Har HaBayit était un stoa double » (Pesa'him 13b) ; la même page parle du « toit du stoa », sur lequel on posait les deux hallot, donc ils sont couverts. Décor de fond, comme la Stoa.",
     "cotes": [],
     "sources": [
-      {"oeuvre": "Josèphe Guerre", "ref": "V, 5", "citation": ""},
-      {"oeuvre": "Josèphe Antiquités", "ref": "XV, 11", "citation": ""}
+      {"oeuvre": "Pesachim", "ref": "13b", "citation": "על גג האיצטבא"}
     ],
     "note": "Aucune colonne de portique ne doit couper la ligne de mire est-ouest, que le mur est bas existe précisément pour dégager."
   },

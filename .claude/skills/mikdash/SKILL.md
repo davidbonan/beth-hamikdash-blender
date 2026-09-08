@@ -1,6 +1,6 @@
 ---
 name: mikdash
-description: Répond aux questions sur l'architecture du Beit HaMikdash et le service du Temple (seder haavodah) en citant la source exacte — Mishna Middot, Tamid, Yoma, Talmud, Rambam, Josèphe — plutôt que de mémoire. Banque de sources qui dit où trouver la cote, l'ustensile, le vêtement, l'ordre du service, qui se tient où. À utiliser dès qu'une question porte sur le Temple, ses dimensions, ses portes, ses chambres, ses ustensiles, ses cohanim ou son rituel — « quelle taille fait l'autel », « où est le kiyor », « que fait le Cohen Gadol à Kippour », « le peuple peut-il entrer dans l'Azara », « combien de Léviim sur le Doukhan », « vérifie cette source », « où c'est écrit ».
+description: Répond aux questions sur l'architecture du Beit HaMikdash et le service du Temple (seder haavodah) en citant la source exacte — Mishna Middot, Tamid, Yoma, Talmud, Rambam — plutôt que de mémoire. Banque de sources qui dit où trouver la cote, l'ustensile, le vêtement, l'ordre du service, qui se tient où. À utiliser dès qu'une question porte sur le Temple, ses dimensions, ses portes, ses chambres, ses ustensiles, ses cohanim ou son rituel — « quelle taille fait l'autel », « où est le kiyor », « que fait le Cohen Gadol à Kippour », « le peuple peut-il entrer dans l'Azara », « combien de Léviim sur le Doukhan », « vérifie cette source », « où c'est écrit ».
 ---
 
 # Beit HaMikdash — banque de sources
@@ -35,8 +35,8 @@ l'information principale.
    ne doit jamais montrer, §12 qui se tient où.
 2. **`references/index-thematique.md`** — la question → la michna exacte.
 3. **`sefaria.py`** — lire le texte, ne pas le citer de mémoire.
-4. **`references/corpus.md`** — quelle œuvre fait autorité sur quoi, et les sources
-   non-juridiques (Josèphe, archéologie, Machon HaMikdash) avec leurs liens.
+4. **`references/corpus.md`** — quelle œuvre fait autorité sur quoi, et les
+   reconstitutions modernes (Machon HaMikdash, archéologie) avec leurs liens.
 
 Pour une question de géométrie construite, le skill `blender` ; pour ce qu'un cadre
 montre vraiment, `beit_hamikdash_inspect.py -- --voit <plan>`.
@@ -71,13 +71,19 @@ désaccord connu, donner l'avis retenu **et** l'avis écarté, avec les deux sou
 
 - **Position du Mizbea'h** — décalé de 9 amot au sud selon *Middot* 5:1–2 ; R. Yehouda
   (*Zeva'him* 58b) le place au centre. Le film suit *Middot* (fiche §6).
-- **Mesures de Josèphe vs la Mishna** — Josèphe décrit ce qu'il a vu, la Mishna ce que
-  la halakha fixe. En cas de conflit sur une cote, **la Mishna décide** ; Josèphe reste
-  bon pour le décor urbain, les portiques et la façade.
+- **Josèphe est hors corpus** — décision du projet, pas un arbitrage entre avis : le
+  dépôt ne cite aucune source non juive sur le Temple. Ne pas le proposer, même en
+  appui. Ce qu'on allait y chercher, le corpus le donne : les portiques de l'esplanade
+  sont *Pesa'him* 13b (« הַר הַבַּיִת סְטָיו כָּפוּל הָיָה »), le cèdre des plafonds
+  *Melakhim I* 6:9, le kaleh orev le Rambam sur *Middot* 4:6, la taille des pierres de
+  taille *Melakhim I* 7:10.
 - **Rambam vs Raavad** sur *Beit HaBe'hira* — les *Hasagot HaRa'avad* sont la première
   chose à lire quand une reconstitution moderne ne colle pas au Rambam.
 - **Premier / Second / futur Temple** — Ézéchiel 40–43 et I Rois 6–7 ne décrivent pas
-  le bâtiment hérodien. Ne jamais importer leurs cotes ici sans le dire.
+  le même bâtiment que *Middot*. Le film construit le **troisième** : plan et cotes de
+  *Middot*, plus ce que le Premier Temple avait et que *Middot* ne répète pas (Ya'hin et
+  Boaz, l'Arche). Une cote du Premier Temple est donc utilisable, jamais en silence :
+  dire d'où elle vient, et si *Middot* dit autre chose sur la même pièce, *Middot* décide.
 - **Ama** — le projet fixe 0,48 m (fiche §0) ; les sources vont de 0,45 à 0,58 m. Une
   conversion en mètres est toujours une convention, pas une donnée de la Mishna.
 

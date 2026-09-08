@@ -13,7 +13,7 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 | Pourquoi le mur est est bas | *Middot* 2:4 | §1 |
 | Postes de garde (cohanim et Léviim) | *Middot* 1:1 ; *Tamid* 1:1 | §1 |
 | Soreg, 'Heil, leurs hauteurs | *Middot* 2:3 | §2 |
-| Portiques, Stoa royale, façade hérodienne | Josèphe *Guerre* V,5 ; *Antiquités* XV,11 | §1, §10 |
+| Portiques et Stoa de l'esplanade, leur toit | *Pesa'him* 13b | §1 |
 
 ## Ezrat Nashim, marches, porte de Nikanor
 
@@ -102,6 +102,7 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 
 | Question | Source primaire | Ligne du film |
 |---|---|---|
-| Pierre, marbre, dorure de la façade | *Sukkah* 51b ; *Baba Batra* 4a ; Josèphe *Guerre* V,5 | §0, §10 |
+| Pierre, marbre, dorure de la façade | *Sukkah* 51b ; *Baba Batra* 4a | §0, §10 |
+| Taille des pierres de taille, faces sciées | *Melakhim I* 7:9-12 ; 5:31 | §8 |
 | Blanchiment à la chaux (2×/an pour l'autel, 1×/an pour le Heikhal) | *Middot* 3:4 | §0 |
 | Ce qu'une image ne doit **jamais** montrer (coupole, Menora à 9 branches, escalier sur l'autel, Arche visible…) | — | **§9** |
