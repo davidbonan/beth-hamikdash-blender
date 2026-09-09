@@ -54,12 +54,13 @@ const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
   Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: GAZIT,
-  Or: METAL, Or_plaque: METAL, Bronze: METAL, Fer: METAL, Fer_lame: METAL,
+  Or: METAL, Or_plaque: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
+  Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Eau_Kiyor: EAU,
-  Chaux_blanche: ENDUIT, Sikra: ENDUIT,
+  Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE,
 };
 

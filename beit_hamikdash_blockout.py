@@ -934,6 +934,12 @@ MAT_PIERRE = lambda: pierre("Pierre_claire", CALCAIRE)
 MAT_MURAILLE = lambda: _exposer(pierre("Pierre_muraille", CALCAIRE))
 MAT_OR = lambda: metal("Or", (1.0, 0.76, 0.33), 0.3)
 MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
+# Le bronze de Nikanor n'est pas celui des ustensiles : tout l'argument de Middot 2:3
+# est qu'on ne l'a PAS dorée — « וְיֵשׁ אוֹמְרִים, מִפְּנֵי שֶׁנְּחֻשְׁתָּן מַצְהִיב », parce que son
+# cuivre tirait déjà sur l'or. Il se tient donc entre le bronze et l'or, et plus poli
+# que le bronze : c'est de sa lumière que vient l'argument.
+MAT_NEHOSHET = lambda: metal("Nehoshet_matzhiv", (0.86, 0.63, 0.29), 0.34)
+MAT_TERRE_CUITE = lambda: enduit("Terre_cuite", (0.46, 0.25, 0.16))
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
 # Le dallage est SOUS les murs en valeur, mais dans LEUR pierre : à 0,57 neutre il
@@ -1007,6 +1013,64 @@ def mesh_from_pydata(name, verts, faces, col, mat=None):
     me.from_pydata([tuple(m(c) for c in v) for v in verts], [], faces)
     me.update()
     return _objet(name, me, col, mat or MAT_PIERRE())
+
+POLICES_HEBREU = ("/System/Library/Fonts/SFHebrew.ttf",
+                  "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+                  "/System/Library/Fonts/ArialHB.ttc")
+
+def _police_hebreu():
+    for chemin in POLICES_HEBREU:
+        try:
+            return bpy.data.fonts.load(chemin)
+        except RuntimeError:
+            continue
+    print("AVERTISSEMENT : aucune police hébraïque installée — gravures ignorées.")
+    return None
+
+def _enrouler(me, rayon):
+    """Enroule un maillage plat autour d'un cylindre vertical tangent en son origine.
+
+    x court le long de la ligne, z porte l'épaisseur et regarde le lecteur : la ligne
+    s'incurve vers l'arrière et son milieu reste sur la surface.
+    """
+    for v in me.vertices:
+        a = v.co.x / rayon
+        v.co.x, v.co.z = (rayon + v.co.z) * math.sin(a), (rayon + v.co.z) * math.cos(a) - rayon
+
+
+def graver(inscriptions, col, mat=None, taille=0.10, saillie=0.02, courbure=None):
+    """Lettres hébraïques en relief, tournées vers l'ouest (amot).
+
+    `inscriptions` : suite de (nom, texte, x, y, z), le point étant le milieu de la
+    ligne, posé sur la surface à graver. Le corps est retourné parce que Blender pose
+    les glyphes de gauche à droite quel que soit le script.
+
+    `courbure` : rayon du support, quand il est rond. La ligne s'enroule alors autour
+    de lui — une ligne plate de deux tiers d'ama sur un tronc qui en fait un de large
+    décollerait de quatre centimètres à ses extrémités.
+    """
+    police = _police_hebreu()
+    if police is None:
+        return
+    textes = []
+    for nom, texte, x, y, z in inscriptions:
+        cu = bpy.data.curves.new(f"{nom}_texte", 'FONT')
+        cu.body, cu.font = texte[::-1], police
+        cu.size, cu.extrude = m(taille), m(saillie)
+        cu.align_x, cu.align_y = 'CENTER', 'CENTER'
+        o = _objet(f"{nom}_texte", cu, col, mat)
+        o.location = (m(x), m(y), m(z))
+        o.rotation_euler = (math.pi / 2, 0.0, -math.pi / 2)
+        textes.append((nom, o))
+    deps = bpy.context.evaluated_depsgraph_get()
+    for nom, o in textes:
+        me = bpy.data.meshes.new_from_object(o.evaluated_get(deps))
+        me.name = nom
+        if courbure is not None:
+            _enrouler(me, m(courbure))
+        matrice = o.matrix_world.copy()
+        bpy.data.objects.remove(o)
+        _objet(nom, me, col, None if me.materials else mat).matrix_world = matrice
 
 def _face(indices):
     """Face débarrassée de ses sommets répétés — pointes de cône et pôles de sphère."""
@@ -1552,6 +1616,13 @@ BANDEAU = ((0.00, 1.30, 1.00), (1.30, 1.70, 0.40))
 # mètres ; à 1,4, sous un soleil rasant, elle porte son ombre sur six amot de parement.
 SAILLIE_MOULURE = 1.4
 SAILLIE_BANDEAU = 0.8
+# Un filet d'or sur la face du larmier. AUCUNE SOURCE ne dore une corniche : c'est le
+# seul poste purement électif de l'enceinte, couvert par « וּמְפָאֲרִין אוֹתוֹ וּמְיַפִּין כְּפִי
+# כֹּחָן… לָטוּחַ אוֹתוֹ בְּזָהָב » (Rambam, Beit HaBe'hira 1:11). Il se coupe d'ici, et il faut
+# le garder mince : les six portes d'or de Middot 2:3 ne se lisent comme de l'or que
+# tant que l'or est rare dans le champ.
+FILET_OR = True
+FILET_PART, FILET_EPAISSEUR = 0.34, 0.05
 
 
 def _mitre(a, dehors, regle, p):
@@ -1567,7 +1638,7 @@ def _mitre(a, dehors, regle, p):
 
 
 def moulure(name, x0, x1, y0, y1, z, profil, col, mat=None, saillie=SAILLIE_MOULURE,
-            mitres=("libre", "libre"), cotes=(True, True), reserve=()):
+            mitres=("libre", "libre"), cotes=(True, True), reserve=(), filet=None):
     """Assises en débord au pied ou à la crête d'un mur, cotées par `profil` depuis `z`.
 
     Le blockout le disait déjà des lishkot de l'Azara — « posée en boîte nue, une lishka
@@ -1578,25 +1649,41 @@ def moulure(name, x0, x1, y0, y1, z, profil, col, mat=None, saillie=SAILLIE_MOUL
 
     `mitres` dit ce que rencontre chaque bout du grand côté (voir `_mitre`) ; `cotes`,
     de quelle face du mur la moulure sort — un mur de soutènement n'a pas le même sol
-    des deux côtés ; `reserve`, les intervalles du grand côté qu'elle saute.
+    des deux côtés ; `reserve`, les intervalles du grand côté qu'elle saute ; `filet`,
+    la matière d'un mince bandeau posé sur la face de l'assise la plus saillante.
     """
     long_x = (x1 - x0) >= (y1 - y0)
     a0, a1 = (x0, x1) if long_x else (y0, y1)
     bas, haut = z + min(zb for zb, _, _ in profil), z + max(zh for _, zh, _ in profil)
+    larmier = max(range(len(profil)), key=lambda k: profil[k][2])
     for i, (zb, zh, part) in enumerate(profil):
         p = saillie * part
         p0, p1 = (p if cotes[0] else 0.0), (p if cotes[1] else 0.0)
         u0, u1 = _mitre(a0, -1, mitres[0], p), _mitre(a1, 1, mitres[1], p)
-        for j, (v0, v1) in enumerate(_hors_reserve(u0, u1, z + zb, z + zh,
-                                                   [(r0, r1, bas, haut) for r0, r1 in reserve])):
+        morceaux = _hors_reserve(u0, u1, z + zb, z + zh,
+                                 [(r0, r1, bas, haut) for r0, r1 in reserve])
+        for j, (v0, v1) in enumerate(morceaux):
             if long_x:
                 box(f"{name}_{i}{j}", v0, v1, y0 - p0, y1 + p1, z + zb, z + zh, col, mat)
             else:
                 box(f"{name}_{i}{j}", x0 - p0, x1 + p1, v0, v1, z + zb, z + zh, col, mat)
+        if filet is None or i != larmier:
+            continue
+        e = FILET_EPAISSEUR
+        milieu, moitie = z + (zb + zh) / 2, (zh - zb) * FILET_PART / 2
+        for j, (v0, v1) in enumerate(morceaux):
+            for k, (sort, face) in enumerate(((cotes[0], y0 - p0 if long_x else x0 - p0),
+                                              (cotes[1], y1 + p1 if long_x else x1 + p1))):
+                if not sort:
+                    continue
+                bornes = ((v0, v1, face - e, face + e) if long_x else
+                          (face - e, face + e, v0, v1))
+                box(f"{name}_filet_{k}{j}", *bornes, milieu - moitie, milieu + moitie,
+                    col, filet)
 
 
 def ceinture(name, x0, x1, y0, y1, epaisseur, z, profil, col, mat=None,
-             saillie=SAILLIE_MOULURE):
+             saillie=SAILLIE_MOULURE, filet=None):
     """La moulure de `moulure`, mais sur les quatre côtés d'une enceinte fermée.
 
     Un mur seul se coupe là où un corps de porte passe la crête ; ici les quatre côtés
@@ -1604,12 +1691,40 @@ def ceinture(name, x0, x1, y0, y1, epaisseur, z, profil, col, mat=None,
     deux boîtes coplanaires clignotent. Les côtés sud et nord prennent les angles, les
     côtés est et ouest s'arrêtent contre eux.
     """
+    larmier = max(range(len(profil)), key=lambda k: profil[k][2])
     for i, (zb, zh, part) in enumerate(profil):
         p, e = saillie * part, epaisseur
         box(f"{name}_S{i}", x0 - p, x1 + p, y0 - p, y0 + e + p, z + zb, z + zh, col, mat)
         box(f"{name}_N{i}", x0 - p, x1 + p, y1 - e - p, y1 + p, z + zb, z + zh, col, mat)
         box(f"{name}_O{i}", x0 - p, x0 + e + p, y0 + e, y1 - e, z + zb, z + zh, col, mat)
         box(f"{name}_E{i}", x1 - e - p, x1 + p, y0 + e, y1 - e, z + zb, z + zh, col, mat)
+        if filet is None or i != larmier:
+            continue
+        # Le filet ne court que sur les faces EXTÉRIEURES : à l'intérieur d'une lishka
+        # à ciel ouvert, il n'y a personne pour le voir.
+        d = FILET_EPAISSEUR
+        milieu, moitie = z + (zb + zh) / 2, (zh - zb) * FILET_PART / 2
+        for suffixe, bornes in (
+                ("S", (x0 - p, x1 + p, y0 - p - d, y0 - p + d)),
+                ("N", (x0 - p, x1 + p, y1 + p - d, y1 + p + d)),
+                ("O", (x0 - p - d, x0 - p + d, y0 + e, y1 - e)),
+                ("E", (x1 + p - d, x1 + p + d, y0 + e, y1 - e))):
+            box(f"{name}_filet_{suffixe}", *bornes, milieu - moitie, milieu + moitie,
+                col, filet)
+
+
+def dalle_trouee(name, x0, x1, y0, y1, z0, z1, trou, col, mat=None):
+    """Dalle percée d'une ouverture rectangulaire : quatre boîtes qui l'entourent.
+
+    Le blockout ne fait aucune booléenne — chaque volume est posé en `bpy.data`. Une
+    cuve enterrée demande pourtant que le dallage ET le podium s'écartent d'elle, sinon
+    elle est pleine de pierre.
+    """
+    tx0, tx1, ty0, ty1 = trou
+    box(f"{name}_S", x0, x1, y0, ty0, z0, z1, col, mat)
+    box(f"{name}_N", x0, x1, ty1, y1, z0, z1, col, mat)
+    box(f"{name}_O", x0, tx0, ty0, ty1, z0, z1, col, mat)
+    box(f"{name}_E", tx1, x1, ty0, ty1, z0, z1, col, mat)
 
 
 def battants(name, x0, x1, y0, y1, z0, h, col, mat, largeur=10):
@@ -2011,8 +2126,71 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
         else:
             box(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim")
     ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, 2,
-             Z_EZN + H_LISHKA_EN, CORNICHE, "10_EzratNashim")
+             Z_EZN + H_LISHKA_EN, CORNICHE, "10_EzratNashim",
+             filet=MAT_OR() if FILET_OR else None)
     ceinture(f"Lishkat_{nm}_socle", xa, xb, ya, yb, 2, Z_EZN, SOCLE, "10_EzratNashim")
+# Ce que la Michna met DANS ces chambres. Elles étaient quatre boîtes vides : leurs
+# usages sont pourtant donnés un par un (Middot 2:5), et ce sont eux qui apportent à
+# l'Ezrat Nashim les quatre matières qu'elle n'a pas — l'eau, le bois, le feu, la terre
+# cuite. Les cotes du mobilier sont partout des CHOIX : aucune source ne les donne.
+#
+# NORD-EST, Lishkat HaEtzim : « הַכֹּהֲנִים בַּעֲלֵי מוּמִין מַתְלִיעִין הָעֵצִים, וְכָל עֵץ שֶׁנִּמְצָא
+# בּוֹ תּוֹלַעַת פָּסוּל מֵעַל גַּבֵּי הַמִּזְבֵּחַ ». Le bois trié est celui de la ma'arakha —
+# figuier, noyer et עֵץ שָׁמֶן (Tamid 2:3) —, d'où MAT_BOIS_MAARAKHA et pas le chêne clair.
+for _s, _x in enumerate((106.0, 118.0, 130.0)):
+    for _l in range(5):
+        _z = Z_EZN + 0.3 + _l * 0.62
+        for _k in range(5):
+            if _l % 2 == 0:
+                _y = 58.0 + _k * 0.65
+                cyl_between(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_x, _y, _z), (_x + 8, _y, _z),
+                            0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+            else:
+                _xk = _x + 0.6 + _k * 1.8
+                cyl_between(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_xk, 57.7, _z), (_xk, 60.9, _z),
+                            0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+# SUD-EST, Lishkat HaNezirim : « מְבַשְּׁלִין אֶת שַׁלְמֵיהֶן, וּמְגַלְּחִין אֶת שְׂעָרָן,
+# וּמְשַׁלְּחִים תַּחַת הַדּוּד » — le chaudron et son foyer. C'est le seul feu de l'Ezrat
+# Nashim en dehors de Simhat Beit HaShoeva.
+DOUD_X, DOUD_Y = 120.0, -48.0
+for _nm, _a, _b, _c, _d in (("S", -4, 4, -4, -3), ("N", -4, 4, 3, 4),
+                            ("O", -4, -3, -3, 3), ("E", 3, 4, -3, 3)):
+    box(f"Lishkat_Nezirim_SE_foyer_{_nm}", DOUD_X + _a, DOUD_X + _b, DOUD_Y + _c, DOUD_Y + _d,
+        Z_EZN, Z_EZN + 2.4, "10_EzratNashim")
+box("Lishkat_Nezirim_SE_braises", DOUD_X - 3, DOUD_X + 3, DOUD_Y - 3, DOUD_Y + 3,
+    Z_EZN + 0.1, Z_EZN + 0.5, "10_EzratNashim", braise("Braise"))
+revolution("Lishkat_Nezirim_SE_doud", DOUD_X, DOUD_Y, Z_EZN + 2.4,
+           [(0.0, 0.0), (1.8, 0.4), (2.6, 1.6), (2.7, 2.4), (2.5, 2.45),
+            (2.4, 1.7), (1.6, 0.5), (0.0, 0.15)], "10_EzratNashim", MAT_BRONZE(), verts=24)
+# NORD-OUEST, Lishkat HaMetzoraïm : la Michna ne lui donne qu'un nom, mais une autre
+# le meuble — « וְהַמְּצֹרָע טָבַל בְּלִשְׁכַּת הַמְּצֹרָעִים, בָּא וְעָמַד בְּשַׁעַר נִקָּנוֹר »
+# (Negaïm 14:8). C'est un mikvé, et la seule eau de la cour. Sa cote minimale est
+# « אַמָּה עַל אַמָּה בְּרוּם שָׁלֹשׁ אַמּוֹת » = quarante séa (Rambam, Mikvaot 4:1) ; les
+# 10 × 8 × 3 d'ici sont un CHOIX, comme la volée qui y descend — dont la marche reprend
+# le « רוּם מַעֲלָה חֲצִי אַמָּה וְשִׁלְחָהּ חֲצִי אַמָּה » de toutes les marches du Temple
+# (Middot 2:3).
+MIKVE = (19.0, 31.0, 48.0, 58.0)     # l'emprise que le dallage et le podium lui cèdent
+MIKVE_FOND, MIKVE_EAU = Z_EZN - 4.5, Z_EZN - 1.5
+for _nm, _a, _b, _c, _d in (("S", 0, 12, 0, 1), ("N", 0, 12, 9, 10),
+                            ("O", 0, 1, 1, 9), ("E", 11, 12, 1, 9)):
+    box(f"Lishkat_Metzoraim_NO_cuve_{_nm}", MIKVE[0] + _a, MIKVE[0] + _b,
+        MIKVE[2] + _c, MIKVE[2] + _d, Z_EZN - 5, Z_EZN, "10_EzratNashim")
+box("Lishkat_Metzoraim_NO_cuve_fond", *MIKVE, Z_EZN - 5, MIKVE_FOND, "10_EzratNashim")
+for _k in range(9):
+    box(f"Lishkat_Metzoraim_NO_marche_{_k}", MIKVE[0] + 1, MIKVE[1] - 1,
+        MIKVE[2] + 1, MIKVE[2] + 1 + 0.5 * (_k + 1), MIKVE_FOND, Z_EZN - 0.5 * _k,
+        "10_EzratNashim")
+box("Lishkat_Metzoraim_NO_eau", MIKVE[0] + 1, MIKVE[1] - 1, MIKVE[2] + 1, MIKVE[3] - 1,
+    MIKVE_FOND, MIKVE_EAU, "10_EzratNashim", MAT_EAU())
+# SUD-OUEST, Beit Shemanya : « שָׁם הָיוּ נוֹתְנִין יַיִן וָשֶׁמֶן » — mais c'est Abba Shaoul ;
+# R. Eliezer ben Yaakov dit « שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת ». Le film suit Abba Shaoul,
+# seul avis qui donne un contenu (fiche §3).
+JARRE = [(0.0, 0.0), (0.35, 0.06), (0.78, 0.7), (0.86, 1.3), (0.58, 2.0),
+         (0.34, 2.2), (0.44, 2.35), (0.36, 2.42), (0.0, 2.36)]
+for _r, (_y, _n) in enumerate(((-62.0, 10), (-59.4, 10), (-33.4, 9), (-30.8, 9))):
+    for _k in range(_n):
+        revolution(f"Lishkat_Shemanya_SO_jarre_{_r}{_k}", 10.5 + _k * 3.5, _y, Z_EZN,
+                   JARRE, "10_EzratNashim", MAT_TERRE_CUITE(), verts=14)
 # Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
 # entre les chambres d'angle — elle traversait leurs murs. Une dalle nue en l'air ne
 # se lisait pas : elle porte maintenant sur des colonnes et un garde-corps.
@@ -2032,23 +2210,42 @@ for nm, ya, yb, devant in (("nord", 64, 67.5, 64), ("sud", -67.5, -64, -64)):
 # dallage de l'Azara. Le bandeau n'est donc pas un ornement posé à mi-hauteur : c'est le
 # niveau de la galerie, lu du dehors. Seule la porte est interrompt les deux moulures
 # basses.
+OR_CORNICHE = MAT_OR() if FILET_OR else None
 for _ouvrage, _profil, _z, _s in (("socle", SOCLE, Z_EZN, SAILLIE_MOULURE),
                                   ("bandeau", BANDEAU, Z_AZ, SAILLIE_BANDEAU),
                                   ("couronnement", CORNICHE, Z_EZN + H_MUR_EN, SAILLIE_MOULURE)):
     _baie = () if _ouvrage == "couronnement" else [(-5, 5)]
+    _filet = OR_CORNICHE if _ouvrage == "couronnement" else None
     moulure(f"EzratNashim_{_ouvrage}_nord", EX0, EX1, 67.5, 72.5, _z, _profil, "10_EzratNashim",
-            saillie=_s, mitres=("deborde", "bute"))
+            saillie=_s, mitres=("deborde", "bute"), filet=_filet)
     moulure(f"EzratNashim_{_ouvrage}_sud", EX0, EX1, -72.5, -67.5, _z, _profil, "10_EzratNashim",
-            saillie=_s, mitres=("deborde", "bute"))
+            saillie=_s, mitres=("deborde", "bute"), filet=_filet)
     moulure(f"EzratNashim_{_ouvrage}_est", EX1, EX1 + 5, -72.5, 72.5, _z, _profil, "10_EzratNashim",
-            saillie=_s, mitres=("deborde", "deborde"), reserve=_baie)
+            saillie=_s, mitres=("deborde", "deborde"), reserve=_baie, filet=_filet)
 battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashim", MAT_OR())
+# « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב » (Middot 2:3) : la michna dit le
+# ŠAʿAR, pas ses vantaux — et elle dit deux michnayot plus haut que chaque שער avait sa
+# שְׁקוֹפָה. L'or déborde donc des battants sur les jambages et sur elle. ARBITRAGE : lire
+# « שער » comme la baie entière et non comme ses seules portes.
+for _cote, _ya, _yb in (("S", -5.8, -5.0), ("N", 5.0, 5.8)):
+    box(f"EzratNashim_porte_est_jambage_{_cote}", EX1 - 0.2, EX1, _ya, _yb,
+        Z_EZN, Z_EZN + H_MUR_EN - 2.2, "10_EzratNashim", MAT_OR())
+box("EzratNashim_porte_est_shkufa", EX1, EX1 + 5, -5, 5,
+    Z_EZN + H_MUR_EN - 0.3, Z_EZN + H_MUR_EN, "10_EzratNashim", MAT_OR())
 # Treize shofarot (Shekalim 6:5) : les troncs « en forme de shofar » — étroits en haut,
 # larges en bas, pour qu'on n'y glisse pas la main (Bartenura) — le long du mur est, de
 # part et d'autre de la porte. Bronze : CHOIX, la Mishna n'en dit pas la matière.
 SHOFAR = [(0.62, 0.0), (0.60, 0.12), (0.40, 0.60), (0.24, 1.35), (0.20, 1.55), (0.14, 1.55), (0.12, 1.2), (0.0, 1.1)]
+# « וְכָתוּב עֲלֵיהֶם » (Shekalim 6:5) : la destination de chaque tronc est écrite dessus,
+# et la michna en donne les treize libellés. Sans voyelles — la ponctuation est
+# postérieure au Temple. Lettres dorées sur le bronze : CHOIX.
+SHOFAROT = ["תקלין חדתין", "תקלין עתיקין", "קנין", "גוזלי עולה", "עצים", "לבונה",
+            "זהב לכפרת"] + ["לנדבה"] * 6
+_gravures = []
 for k, y in enumerate([-26.5 + 3.4 * i for i in range(7)] + [6.1 + 3.4 * i for i in range(6)]):
     revolution(f"Shofar_{k:02d}", EX1 - 1.4, y, Z_EZN, SHOFAR, "10_EzratNashim", MAT_BRONZE(), verts=20)
+    _gravures.append((f"Shofar_{k:02d}_gravure", SHOFAROT[k], EX1 - 1.894, y, Z_EZN + 0.35))
+graver(_gravures, "10_EzratNashim", MAT_OR(), taille=0.11, saillie=0.04, courbure=0.494)
 # Simhat Beit HaShoeva (Soucca 5:2-3 ; 52b) : « מְנוֹרוֹת שֶׁל זָהָב הָיוּ שָׁם, וְאַרְבָּעָה סְפָלִים
 # שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד » — cinquante amot de haut
 # (« תָּנָא גָּבְהָהּ שֶׁל מְנוֹרָה חֲמִשִּׁים אַמָּה », Soucca 52b), dans l'Ezrat Nashim. Quatre mâts
@@ -2108,9 +2305,10 @@ box("EzratIsrael_sol", X_DOUKHAN, AX1, AY0, AY1, Z_EZI - 1, Z_EZI, "20_Azara", M
 # rayon qui repart du dallage retombe aussitôt sur la face jumelle, et Cycles rendait
 # l'Azara et l'Ezrat Nashim en noir plein. Le podium de l'Ezrat Israël le faisait
 # déjà juste ; les deux autres montaient au ras de leur sol.
-box("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN - 1, "00_HarHabayit")
-box("EzratNashim_sol", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_EZN - 1, Z_EZN,
-    "10_EzratNashim", MAT_SOL())
+dalle_trouee("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN - 1,
+             MIKVE, "00_HarHabayit")
+dalle_trouee("EzratNashim_sol", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_EZN - 1, Z_EZN,
+             MIKVE, "10_EzratNashim", MAT_SOL())
 box("Podium_azara", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_EZN, Z_AZ - 1, "00_HarHabayit")
 box("Podium_ezrat_israel", X_DOUKHAN, AX1, AY0 - T, AY1 + T, Z_EZN, Z_EZI - 1, "00_HarHabayit")
 # Le seuil de Nikanor : le sol de l'Ezrat Israël continue dans l'épaisseur du mur, sinon la
@@ -2126,15 +2324,15 @@ box("Nikanor_linteau", AX1, AX1 + T, -5, 5, Z_EZI + 20, Z_AZ + H_MUR, "20_Azara"
 # 6, 13 et 14 finissaient sur deux vantaux de bronze là où le découpage demande
 # l'ouverture de l'Oulam au fond. Ils contredisaient aussi la ligne de mire de la
 # para adouma (Middot 2:4), que le mur est bas est fait pour dégager.
-box("Nikanor_porte_S", AX1 + 1, AX1 + 4.5, -5, -4.7, Z_EZI, Z_EZI + 20, "20_Azara", MAT_BRONZE())
-box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara", MAT_BRONZE())
+box("Nikanor_porte_S", AX1 + 1, AX1 + 4.5, -5, -4.7, Z_EZI, Z_EZI + 20, "20_Azara", MAT_NEHOSHET())
+box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara", MAT_NEHOSHET())
 # « שְׁנֵי פִשְׁפְּשִׁין הָיוּ לוֹ לְשַׁעַר נִיקָנוֹר, אֶחָד בִּימִינוֹ וְאֶחָד בִּשְׂמֹאלוֹ » (Middot 2:6) : deux
 # guichets de bronze de part et d'autre de la grande porte, côté Azara. Cote (3 × 8) :
 # CHOIX. Les vantaux sont posés sur le nu du mur — la baie n'est pas percée, et la face
 # est, dix amot au-dessus du sol de l'Ezrat Nashim, n'en reçoit pas.
 for cote, y0, y1 in (("S", -14.5, -11.5), ("N", 11.5, 14.5)):
-    box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + 8, "20_Azara", MAT_BRONZE())
-    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + 8, Z_EZI + 8.4, "20_Azara", MAT_BRONZE())
+    box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + 8, "20_Azara", MAT_NEHOSHET())
+    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + 8, Z_EZI + 8.4, "20_Azara", MAT_NEHOSHET())
 # Mur ouest
 box("Azara_mur_ouest", AX0 - T, AX0, AY0 - T, AY1 + T, Z_AZ, Z_AZ + H_MUR, "20_Azara")
 # Murs nord et sud avec trois portes chacun (10 × 20). Positions : CHOIX (Middot 1:4)
