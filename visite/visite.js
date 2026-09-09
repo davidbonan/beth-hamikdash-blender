@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { habiller, attiser, ETOFFES } from "./matieres.js";
+import { nappes } from "./nappes.js";
 import { chaine } from "./occlusion.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
@@ -207,10 +208,15 @@ addEventListener("resize", dimensionner);
 // modèle
 // ---------------------------------------------------------------------------
 const obstacles = [];
-const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
-  .loadAsync("./temple.glb", (e) => {
-    if (e.lengthComputable) jauge.style.width = `${(e.loaded / e.total) * 100}%`;
-  });
+// Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
+// attendre ensuite doublerait l'attente d'un visiteur en 4G.
+const [gltf, jeux] = await Promise.all([
+  new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+    .loadAsync("./temple.glb", (e) => {
+      if (e.lengthComputable) jauge.style.width = `${(e.loaded / e.total) * 100}%`;
+    }),
+  nappes(),
+]);
 etat.textContent = "préparation…";
 scene.add(gltf.scene);
 
@@ -237,7 +243,7 @@ gltf.scene.traverse((o) => {
   o.receiveShadow = true;
   if (!brut && !habillees.has(o.material.uuid)) {
     habillees.add(o.material.uuid);
-    habiller(o.material, horloges);
+    habiller(o.material, horloges, jeux);
     attiser(o.material);
   }
   obstacles.push(o);

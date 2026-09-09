@@ -66,11 +66,13 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/pilotage.js` | Les commandes : clavier au bureau, manche du pouce gauche et regard du pouce droit au doigt. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
-| `visite/matieres.js` | Les matières procédurales, relues en coordonnées de monde comme dans Blender. |
+| `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
+| `visite/nappes.js` | Les cinq jeux de scans, chargés dans la définition que le profil autorise. |
+| `visite/matieres/` | Les scans eux-mêmes, en 1024 et 512. Artefacts — `beit_hamikdash_nappes.py` les refabrique. |
 | `visite/occlusion.js` | La chaîne de rendu : passe de géométrie, occlusion ambiante, composition. |
 | `visite/concepts.json` | **La charnière.** Un concept par entrée : son identifiant, sa zone, et les préfixes de noms d'objets Blender qui lui appartiennent. |
 | `visite/contenu_a.json`, `_b`, `_c` | L'encyclopédie : résumé, cotes, sources. Trois fichiers parce qu'ils ont été relevés en trois passes ; le viewer les fusionne au chargement. |
-| `visite/temple.glb` | Géométrie exportée, compressée meshopt : 2,7 Mo pour 272 000 triangles. Artefact — se regénère. |
+| `visite/temple.glb` | Géométrie exportée, compressée meshopt : 6,7 Mo pour 746 000 triangles. Artefact — se regénère. |
 | `visite/reperes.json` | Emprise de chaque concept et points d'entrée. Artefact. |
 
 ```bash
@@ -96,10 +98,38 @@ dont elle parle ; en paysage, où c'est la hauteur qui manque, elle redevient un
 latéral. Le champ de vision est fixé à l'horizontale et non à la verticale : un champ
 vertical constant vaut 94° de large en 16/9 et 31° sur un téléphone tenu debout.
 
+**La matière.** Le blockout n'a pas d'UV — `export_texcoords=False` — et n'en aura pas :
+ses volumes sont refusionnés par concept à chaque export, et aucun dépliage n'y
+survivrait. Tout se pose donc sur la position de MONDE, en projection triplanaire, et
+sur le seul nom de la matière exportée. Trois couches se superposent : l'appareil est
+*écrit* — assises de 4 amot, joints creusés, rangées du dallage, tout ce qui a une cote
+et une source —, la nappe photographique porte le grain, et une seconde échelle cinq
+fois plus lente casse la répétition du carreau.
+
+La photo n'apporte jamais sa couleur, seulement son ÉCART : elle est appliquée en
+rapport à sa propre moyenne, et son chroma est bridé famille par famille. Sans ce frein,
+le dallage de l'Azara se couvrait des lichens verts du calcaire scanné. La teinte reste
+ce que Blender et les bancs du meleke ont décidé — c'est aussi ce qui fait qu'une
+retouche dans la scène ne demande jamais de retoucher une image.
+
+Cinq jeux, tous CC0, refabriqués par `beit_hamikdash_nappes.py` : *worn_rock_natural_01*,
+*beige_wall_001*, *hinoki_planks* et *rough_linen* de [Poly Haven](https://polyhaven.com),
+*Metal007* d'[ambientCG](https://ambientcg.com). 2,3 Mo en 1024 pour le bureau, 520 ko en
+512 pour le téléphone. L'or n'en tire que son terni : une feuille BATTUE a des creux, et
+une tôle scannée n'en a pas — le martelage est écrit, comme l'appareil.
+
+**Les arêtes.** Le blockout porte 5 561 chanfreins, que l'export jetait tous. Les six
+collections qu'on longe à bout de bras — Mizbea'h, Oulam, Heikhal, Kodesh HaKodashim,
+Aron, kelim — les gardent maintenant, à UN segment : une pierre de taille a un arêtier,
+pas un congé, et c'est aussi moitié moins cher. Le reste garde ses arêtes vives : à
+l'enceinte ou à la ville, on ne s'approche jamais assez pour que 3 cm se voient.
+La facture est de 272 000 à 746 000 triangles et de 2,7 à 6,7 Mo — mais 0,4 ms sur 8,7
+au rendu, mesuré ici : ce chanfrein coûte du poids, pas des images.
+
 **Le lien géométrie ↔ encyclopédie.** `concepts.json` déclare, pour chaque concept,
 les préfixes de noms d'objets qui le composent — le préfixe le plus long gagne. L'export
 fusionne tous les volumes d'un concept en **un seul maillage** portant son identifiant :
-les milliers de volumes du blockout deviennent 68 maillages, et le clic tombe sur *le Mizbea'h*
+les milliers de volumes du blockout deviennent 75 maillages, et le clic tombe sur *le Mizbea'h*
 plutôt que sur l'une des cinq boîtes qui font un mur percé.
 
 Corollaire, et c'est la seule discipline à tenir : **un volume ajouté au blockout dont le

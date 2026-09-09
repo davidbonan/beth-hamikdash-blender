@@ -34,6 +34,13 @@ AMA = 0.48
 COLLECTIONS = ("00_HarHabayit", "10_EzratNashim", "20_Azara", "30_Mizbeach", "40_Ulam",
                "50_Heikhal", "60_KodeshHakodashim", "65_Aron", "70_Kelim", "80_Lishkot")
 
+# Les collections qui gardent leur chanfrein. Ce sont celles qu'on longe à bout de bras :
+# une arête vive n'accroche aucune lumière, et c'est ce qui trahit le plus sûrement une
+# maquette. Ailleurs — l'enceinte, les cours, la ville — on ne s'approche jamais assez
+# pour que 3 cm se voient, et le chanfrein n'y serait qu'un tiers de fichier en plus.
+CHANFREIN = ("30_Mizbeach", "40_Ulam", "50_Heikhal", "60_KodeshHakodashim",
+             "65_Aron", "70_Kelim")
+
 # Points d'entrée, en amot, au niveau du sol — la hauteur d'œil est ajoutée par le
 # navigateur. `vers` est le cap en degrés, 180 = plein ouest, l'axe du parcours.
 REPERES = [
@@ -50,16 +57,21 @@ REPERES = [
 
 
 def comprimer(glb):
-    """Recompresse le .glb en place avec meshopt : 13,9 Mo deviennent 2,7 Mo.
+    """Recompresse le .glb en place avec meshopt.
 
     C'est la seule optimisation qui compte sur un téléphone en 4G, et l'export glTF de
     Blender ne sait pas la faire. `-kn` garde les noms de nœuds, qui sont le lien
     géométrie ↔ encyclopédie ; la quantification est portée à 16 bits parce que le
     placage d'or ne se tient qu'à 4,8 cm de la pierre qu'il couvre.
+
+    `-cc` plutôt que `-c` : l'hébergeur sert le .glb sans compression de transport —
+    `curl -I https://davidbonan.io/visite/temple.glb` ne renvoie aucun `content-encoding`
+    —, donc ce sont les octets du fichier qui voyagent, et un cinquième de moins vaut
+    l'encodage plus lent. Le décodeur, lui, est le même.
     """
     sortie = glb.with_suffix(".pack.glb")
     commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
-                "-c", "-kn", "-km", "-ke", "-vp", "16", "-vn", "12"]
+                "-cc", "-kn", "-km", "-ke", "-vp", "16", "-vn", "12"]
     try:
         subprocess.run(commande, check=True, capture_output=True, timeout=600)
     except (OSError, subprocess.SubprocessError) as erreur:
@@ -67,6 +79,36 @@ def comprimer(glb):
         print(f"\n  gltfpack indisponible, .glb laissé non compressé : {erreur}")
         return
     sortie.replace(glb)
+
+
+def chanfreiner(gardes):
+    """Cuit les chanfreins de près, jette les autres. À faire AVANT la fusion.
+
+    `object.join` ne garde que les modificateurs de l'objet actif : un chanfrein encore
+    en attente au moment de la fusion est perdu sans bruit. Et l'export ne peut pas s'en
+    charger non plus, puisqu'il vient après. Le maillage est donc remplacé ici par son
+    évaluation — ce que fait `modifier_apply`, sans son contexte ni sa lenteur.
+
+    Un seul segment : une pierre de taille a un ARÊTIER, pas un congé. Le blockout en
+    pose deux pour les passes Normal de l'i2i, ce qui arrondit — et double la facture.
+    """
+    proches = {o for nom in CHANFREIN if (c := bpy.data.collections.get(nom))
+               for o in c.objects if o in gardes}
+    deps = bpy.context.evaluated_depsgraph_get()
+    cuits = 0
+    for objet in gardes:
+        if not objet.modifiers:
+            continue
+        if objet not in proches:
+            objet.modifiers.clear()
+            continue
+        for modificateur in objet.modifiers:
+            if modificateur.type == "BEVEL":
+                modificateur.segments = 1
+        objet.data = bpy.data.meshes.new_from_object(objet.evaluated_get(deps))
+        objet.modifiers.clear()
+        cuits += 1
+    print(f"  {cuits} volumes chanfreinés, {len(gardes) - cuits} laissés vifs")
 
 
 def concepts():
@@ -150,6 +192,8 @@ def main():
             ident = "_non_classe"
         groupes.setdefault(ident, []).append(o)
 
+    chanfreiner(gardes)
+
     for mat in bpy.data.materials:
         aplatir(mat)
 
@@ -165,10 +209,8 @@ def main():
         export_format="GLB",
         export_extras=True,
         export_yup=True,
-        # Les 5 960 modificateurs Bevel du blockout adoucissent les arêtes pour les
-        # passes Normal de l'i2i ; les appliquer ici fait passer la scène de 132 000
-        # à 743 000 faces et le fichier de 5 à 76 Mo, pour un chanfrein de 3 cm
-        # invisible à hauteur d'homme. La visite prend donc la géométrie nue.
+        # `chanfreiner` a déjà cuit ce qui devait l'être et jeté le reste : il ne
+        # subsiste aucun modificateur à appliquer.
         export_apply=False,
         export_cameras=False,
         export_lights=False,

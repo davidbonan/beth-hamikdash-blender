@@ -22,6 +22,27 @@ const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT =
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil"]);
 
+// Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
+// et une ride se décrivent, elles ne se photographient pas à plat.
+const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "pierre", 10: "pierre", 11: "pierre",
+                   3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit" };
+// Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
+// rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
+// marbre, gazit scié — prend la même pierre que le reste, en moins appuyé : c'est cette
+// retenue-là qui sépare une paroi taillée d'un mur de carrière.
+// Le chroma est bas partout, et c'est le coeur de l'affaire : la photo apporte le
+// MODELÉ, pas sa couleur. Le calcaire scanné porte ses lichens et ses mousses ; sans ce
+// frein, le dallage de l'Azara s'en couvrait de piqûres vertes et jaunes. La teinte
+// reste ce que Blender et les bancs du calcaire ont décidé.
+const CARREAU = {
+  1: [2.4, 0.62, 0.28, 1.00, 0.55], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
+  3: [1.6, 0.34, 0.14, 0.60, 0.70],
+  4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
+  7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
+  9: [2.4, 0.58, 0.22, 0.72, 0.40], 10: [2.0, 0.75, 0.28, 0.90, 0.50],
+  11: [1.6, 0.85, 0.55, 1.00, 0.60],
+};
+
 const FAMILLES = {
   Pierre_claire: PIERRE, Sol: PIERRE, Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: GAZIT,
@@ -66,6 +87,9 @@ float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03) + 0.125 * br
 // Tout le relief de ce fichier tient au même principe : la hauteur est une fonction
 // écrite de la position dans le monde, et on la dérive à la main plutôt que de
 // demander à l'écran de le faire.
+// Les nappes font exception, et c'est le même raisonnement qui les y autorise : leur
+// dérivée ne pilote pas un seuil, elle choisit un niveau de mipmap. Là où elle explose,
+// la nappe se moyenne — ce qui est exactement ce qu'on veut d'elle.
 
 const float AMA = 0.48;
 const float JOINT = 0.06;      // largeur du joint entre deux blocs, en amot
@@ -213,6 +237,56 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   rugo = (tireBloc - 0.5) * 0.18 + (grain(P / (0.35 * AMA)) - 0.5) * 0.16;
 }
 
+#ifdef NAPPE
+uniform sampler2D uNappeN;
+uniform vec4 uCarreau;        // x carreaux/m, y couleur, z relief, w rugosité
+uniform float uChroma;
+#ifdef NAPPE_COULEUR
+uniform sampler2D uNappeC;    // rgb albédo, a rugosité
+uniform vec3 uMoyenne;
+uniform float uRugoMoy;
+#endif
+
+// Trois prises pondérées par la normale de monde. La puissance 8 annule le mélange dès
+// qu'on quitte l'arête d'un cube, et tout le blockout est en cubes : deux des trois
+// prises n'y pèsent rien. Elles sont prises quand même — un branchement les rendrait
+// plus chères que la texture qu'il évite, et la dérivée y deviendrait indéfinie.
+vec3 poidsTri(vec3 N){
+  vec3 w = pow(abs(N), vec3(8.0));
+  return w / max(w.x + w.y + w.z, 1e-5);
+}
+
+vec4 nappe(sampler2D carte, vec3 p, vec3 w){
+  return texture2D(carte, p.zy) * w.x + texture2D(carte, p.xz) * w.y
+       + texture2D(carte, p.xy) * w.z;
+}
+
+// La nappe ressort en PENTE de monde et pas en normale : le joint écrit et le grain
+// photographié sont alors deux gradients qui s'additionnent, au lieu de deux normales
+// qui se disputent la dernière. Une normale tangente (x, y, z) vient d'une hauteur dont
+// le gradient vaut -xy/z ; le plancher sur z borne ce que rend un texel presque couché.
+vec3 penteNappe(vec3 p, vec3 w){
+  vec3 x = texture2D(uNappeN, p.zy).xyz * 2.0 - 1.0;
+  vec3 y = texture2D(uNappeN, p.xz).xyz * 2.0 - 1.0;
+  vec3 z = texture2D(uNappeN, p.xy).xyz * 2.0 - 1.0;
+  vec2 sx = -x.xy / max(x.z, 0.2), sy = -y.xy / max(y.z, 0.2), sz = -z.xy / max(z.z, 0.2);
+  return vec3(0.0, sx.y, sx.x) * w.x + vec3(sy.x, 0.0, sy.y) * w.y
+       + vec3(sz.x, sz.y, 0.0) * w.z;
+}
+#endif
+
+// Ce que le temps fait à une paroi et qu'aucun blockout ne porte. La pluie de
+// Jérusalem tombe l'hiver et descend : elle laisse des TRAÎNÉES, pas des taches, et
+// c'est le seul vieillissement qui se lise en pierre plutôt qu'en défaut de matière.
+// D'où un bruit étiré quatorze fois sur la hauteur, et un seuil haut — une paroi
+// entièrement coulée serait sale, une paroi qui l'est par endroits est ancienne.
+void patiner(vec3 P, vec3 N, inout vec3 teinte, inout float rugo){
+  float debout = 1.0 - abs(N.y);
+  float trainee = smoothstep(0.54, 0.90, grain(P * vec3(2.6, 0.19, 2.6))) * debout;
+  teinte *= mix(vec3(1.0), OMBRE_JOINT, trainee * 0.22);
+  rugo += trainee * 0.10;
+}
+
 void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
   teinte = vec3(1.0); pente = vec3(0.0); rugo = 0.0;
   // Le détail se fond sur la distance à l'oeil. La borne a suivi l'appareil : des blocs
@@ -252,21 +326,31 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
     rugo = (v - 0.5) * 0.06;
   }
   else if (uFamille == 3) {                                   // métal battu au marteau
-    // Large et discret : l'or du Heikhal est une feuille martelée, pas du sable.
-    float g = grain(P * 5.0);
+    // La nappe apporte le terni et les éraflures, pas les creux : une tôle laminée n'en
+    // a pas. Or l'or du Heikhal est BATTU, et un creux de marteau ne se voit qu'au
+    // reflet — c'est là, et jamais dans la teinte, que se joue le métal.
+    // Le gradient se prend dans le plan de la face, pas sur les axes du monde : ces
+    // feuilles couvrent des murs verticaux autant que des dessus de table.
+    vec3 q = P * 6.0;
+    vec3 t1 = normalize(abs(N.y) > 0.7 ? vec3(1.0, 0.0, 0.0) : cross(N, vec3(0.0, 1.0, 0.0)));
+    vec3 t2 = cross(N, t1);
+    float e = 0.10;
+    float g = grain(q);
+    pente = ((grain(q + t1 * e) - g) * t1 + (grain(q + t2 * e) - g) * t2) * (0.055 / e);
     teinte = vec3(1.0 + (g - 0.5) * 0.05);
     rugo = (g - 0.5) * 0.10;
   }
   else if (uFamille == 4) {                                   // bois : fil étiré
+    // Le fil reste écrit — une planche de cèdre du Heikhal fait 20 amot de haut, et
+    // aucune nappe d'un mètre ne porte une veine de cette longueur.
     float f = grain(P * vec3(9.0, 1.1, 9.0));
-    float veine = fract(f * 7.0);
-    teinte = vec3(1.0 + (f - 0.5) * 0.18 - veine * 0.06);
+    teinte = vec3(1.0 + (f - 0.5) * 0.18 - fract(f * 7.0) * 0.06);
     rugo = (f - 0.5) * 0.10;
   }
-  else if (uFamille == 5) {                                   // étoffe : la trame
-    float trame = sin(P.x * 240.0) * sin(P.y * 240.0);
-    float duvet = grain(P * 45.0);
-    teinte = vec3(1.0 + trame * 0.045 + (duvet - 0.5) * 0.10);
+  else if (uFamille == 5) {                                   // étoffe
+    // La trame vient de la nappe : le sinus qui la portait valait 38 périodes au mètre
+    // et grésillait dès deux pas de recul, ce qu'aucun mipmap ne pouvait rattraper.
+    teinte = vec3(1.0 + (grain(P * 45.0) - 0.5) * 0.10);
     rugo = -0.03;
   }
   else if (uFamille == 6) {                                   // eau : ride lente
@@ -291,9 +375,35 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
     teinte = vec3(mix(1.0, 0.30, haut * (0.55 + 0.45 * s)));
     rugo = 0.06;
   }
+  // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
+  if (uFamille == 1 || uFamille == 9 || uFamille == 10 || uFamille == 11) {
+    patiner(P, N, teinte, rugo);
+  }
   teinte = mix(vec3(1.0), teinte, nettete);
   pente *= finesse;
   rugo *= nettete;
+  // La nappe passe APRÈS ces trois fondus, et n'en subit aucun : son fondu à elle est
+  // le mipmap, qui la ramène à sa moyenne — donc à un rapport de 1 — exactement quand
+  // elle cesse de tenir sous le pixel. L'y soumettre en plus l'effacerait à seize
+  // mètres, là où le grain de la pierre porte encore.
+#ifdef NAPPE
+  vec3 p = P * uCarreau.x;
+  vec3 w = poidsTri(N);
+  pente += penteNappe(p, w) * uCarreau.z;
+#ifdef NAPPE_COULEUR
+  vec4 c = nappe(uNappeC, p, w);
+#ifdef NAPPE_MACRO
+  // Une seconde échelle cinq fois plus lente, projetée à plat : ce sont des taches, pas
+  // du grain, et une seule prise suffit à les porter. C'est elle qui empêche l'œil de
+  // reconnaître le carreau et de voir un papier peint là où il y a de la pierre.
+  c.rgb *= mix(vec3(1.0), texture2D(uNappeC, p.xz * 0.2).rgb / uMoyenne, 0.35);
+#endif
+  vec3 rapport = c.rgb / uMoyenne;
+  rapport = mix(vec3(dot(rapport, vec3(0.2126, 0.7152, 0.0722))), rapport, uChroma);
+  teinte *= mix(vec3(1.0), rapport, uCarreau.y);
+  rugo += (c.a - uRugoMoy) * uCarreau.w;
+#endif
+#endif
 }
 `;
 
@@ -301,12 +411,29 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
  * Branche le calcul procédural sur une matière standard, sans la remplacer : le
  * modèle d'éclairage, les ombres et le tonemapping de three restent ceux d'origine.
  */
-export function habiller(materiau, horloges) {
+export function habiller(materiau, horloges, jeux) {
   const famille = FAMILLES[materiau.name];
   if (!famille) return;
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 } };
   materiau.userData.uniformes = uniformes;
   if (famille === EAU) horloges.push(uniformes.uTemps);
+
+  const jeu = jeux.get(NAPPE_DE[famille]);
+  if (jeu) {
+    const [cote, couleur, chroma, relief, rugosite] = CARREAU[famille];
+    uniformes.uNappeN = { value: jeu.normale };
+    uniformes.uCarreau = { value: new THREE.Vector4(1 / cote, couleur, relief, rugosite) };
+    uniformes.uChroma = { value: chroma };
+    if (jeu.couleur) {
+      uniformes.uNappeC = { value: jeu.couleur };
+      uniformes.uMoyenne = { value: jeu.moyenne };
+      uniformes.uRugoMoy = { value: jeu.rugosite };
+    }
+  }
+  const drapeaux = (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
+    + (jeu ? "#define NAPPE\n" : "")
+    + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
+    + (jeu?.couleur && PROFIL.nappes.macro ? "#define NAPPE_MACRO\n" : "");
 
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
@@ -317,8 +444,7 @@ export function habiller(materiau, horloges) {
                "vNMonde = normalize(mat3(modelMatrix) * objectNormal);");
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
-      .replace("#include <common>", "#include <common>\n"
-               + (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "") + COMMUN)
+      .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN)
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
       // La normale vient de l'attribut, pas des dérivées de la position : c'est elle
@@ -342,7 +468,7 @@ export function habiller(materiau, horloges) {
         #include <normal_fragment_maps>
         normal = normalize(normal - mat3(viewMatrix) * mPente);`);
   };
-  materiau.customProgramCacheKey = () => `mikdash-${famille}-${PROFIL.grainLeger ? 1 : 0}`;
+  materiau.customProgramCacheKey = () => `mikdash-${famille}-${drapeaux}`;
 }
 
 /** L'orge du feu : la braise éclaire, elle ne fait pas que rougeoyer. */
