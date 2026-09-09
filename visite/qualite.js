@@ -20,10 +20,14 @@ const leger = demande === "basse"
 // Les nappes sont servies en deux définitions : 1,8 Mo contre 428 ko, et surtout
 // 5,6 Mo de mémoire vidéo par carte contre 1,4. `macro` est la seconde échelle de
 // couleur, celle qui casse la répétition du carreau — trois prises de texture de plus.
+// `halo` absent = pas de passe du tout, et pas seulement une force nulle : les cinq
+// niveaux de flou de la passe sont alloués par son constructeur, qu'elle serve ou non.
 export const PROFIL = leger
   ? { dprMax: 1.5, echelleMin: 0.55, profondeurLog: false, grainLeger: true,
-      ombres: { taille: 1024, portee: 26, doux: false }, occlusion: 6,
-      nappes: { taille: 512, anisotropie: 4, macro: false } }
+      ombres: { taille: 1024, portee: 26, penombre: false }, occlusion: 6,
+      nappes: { taille: 512, anisotropie: 4, macro: false },
+      halo: { force: 0.16, rayon: 0.6, seuil: 1.6 } }
   : { dprMax: 2, echelleMin: 0.7, profondeurLog: true, grainLeger: false,
-      ombres: { taille: 2048, portee: 40, doux: true }, occlusion: 12,
-      nappes: { taille: 1024, anisotropie: 8, macro: true } };
+      ombres: { taille: 2048, portee: 40, penombre: true }, occlusion: 12,
+      nappes: { taille: 1024, anisotropie: 8, macro: true },
+      halo: { force: 0.20, rayon: 0.6, seuil: 1.6 } };

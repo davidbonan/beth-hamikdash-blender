@@ -14,10 +14,12 @@
  */
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
+import { SOLEIL } from "./ciel.js";
+import { assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
-      GAZIT = 9, TAMBOUR = 10, MAISON = 11;
+      GAZIT = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil"]);
@@ -25,6 +27,7 @@ export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil"]
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "pierre", 10: "pierre", 11: "pierre",
+                   13: "pierre", 14: "pierre",
                    3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
@@ -41,24 +44,38 @@ const CARREAU = {
   7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
   9: [2.4, 0.58, 0.22, 0.72, 0.40], 10: [2.0, 0.75, 0.28, 0.90, 0.50],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
+  // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
+  // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
+  // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
+  13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.62, 0.28, 1.00, 0.55],
 };
 
 const FAMILLES = {
-  Pierre_claire: PIERRE, Sol: PIERRE, Maisons: MAISON, Pierre_colonne: TAMBOUR,
+  Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
+  Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: GAZIT,
   Or: METAL, Or_plaque: METAL, Bronze: METAL, Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
+  Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Eau_Kiyor: EAU,
   Chaux_blanche: ENDUIT, Sikra: ENDUIT,
-  Chaux_noircie: SUIE, Braise: SUIE,
+  Chaux_noircie: SUIE, Braise: BRAISE,
 };
+
+// La braise sort du .glb en boîte rouge uniforme : sa couleur de base est celle que
+// Blender donnait à des charbons dont tout le reste — les fentes, la cendre, l'orge du
+// feu — venait de nœuds que glTF ne transporte pas. On lui rend un gris MOYEN, pas le
+// noir du charbon : la matière ne fait que multiplier, et sur un noir elle n'a plus de
+// place pour monter jusqu'à la cendre.
+const CHARBON = 0x6e6660, ORGE = 0xff5a12;
 
 const COMMUN = /* glsl */`
 varying vec3 vMonde;
 varying vec3 vNMonde;
 uniform int uFamille;
 uniform float uTemps;
+uniform vec3 uSoleil;
 
 float alea1(float p){ p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
 float alea3(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
@@ -78,6 +95,16 @@ float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03); }
 #else
 float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03) + 0.125 * bruit(p * 4.01); }
 #endif
+// Les octaves de grain somment à 0,875 — 0,75 sans la troisième —, et sa moyenne est
+// la moitié de ça. Un seuil écrit sur la valeur brute ne veut donc pas dire la même
+// chose d'un profil à l'autre : celui qui doit couper à un endroit précis de la
+// distribution le prend ici, sur une valeur ramenée à [0, 1].
+#ifdef GRAIN_LEGER
+#define GRAIN_PLEIN 0.75
+#else
+#define GRAIN_PLEIN 0.875
+#endif
+float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
 
 // Aucune dérivée d'écran dans ce fichier, et c'est délibéré. Aux angles rasants — un
 // mur vu presque par la tranche, ce qui est la moitié des cadres dans un couloir de
@@ -116,22 +143,39 @@ const float CREUX_DALLE = 0.015 * AMA;   // 7 mm : un lit de dalle, pas une rain
 // Ce que devient la pierre au fond du joint : plus sombre et PLUS CHAUDE. Multiplier
 // vers le noir suffisait à creuser, mais un calcaire assombri sans teinte vire au gris
 // et le mur se retrouvait quadrillé de traits grisâtres. Un joint est de la pierre à
-// l'ombre. Même valeur que OMBRE_JOINT dans le blockout.
-const vec3 OMBRE_JOINT = vec3(0.50, 0.40, 0.29);
+// l'ombre. Même valeur que OMBRE_JOINT dans le blockout — elle avait dérivé à
+// (0,50 0,40 0,29), un tiers plus sombre et deux fois plus saturée que le rendu : à ce
+// compte le joint cesse d'être une ombre et devient une matière, du mortier étalé
+// entre des blocs, et le mur rend un chantier plutôt qu'un parement.
+const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 // Creux du joint, en mètres : 0,62 de la course de profil sur 2 cm, soit des
 // versants à une trentaine de degrés — une rainure sciée, pas une gorge.
 const float CREUX_M = 0.020;
 
+// Ce que le feu laisse sur la chaux du Mizbea'h, en écart multiplicatif sur elle : le
+// blockout peint (0,20 0,18 0,165) sur une chaux exportée à (0,95 0,95 0,92) — la suie
+// est CHAUDE. Le gris neutre d'avant virait au bleu dès qu'il ne restait que le ciel
+// pour l'éclairer, et l'autel rendait une dalle de béton posée au milieu de l'Azara.
+const vec3 NOIR_SUIE = vec3(0.211, 0.189, 0.179);
+// Et ce qui n'a pas été pris : la cendre du feu, pas de la chaux neuve. Un blanc
+// affleurant entre les noirs mouchetait le dessus de points BLEUS — une face
+// horizontale sombre n'a que le ciel pour l'éclairer, et le ciel est bleu.
+const vec3 GRIS_CENDRE = vec3(0.62, 0.58, 0.53);
+
 // Les quatre bancs du calcaire de Jérusalem, en écart multiplicatif : le meleke n'est
-// pas d'une couleur mais d'une bande, du gris froid au doré. Mêmes valeurs que
+// pas d'une couleur mais d'une bande, du gris de cendre à l'ivoire. Mêmes valeurs que
 // BANCS_CALCAIRE du blockout — un mur dont les blocs ne diffèrent qu'en clarté rend un
 // aplat sali, jamais de la pierre.
-// La bande va du crème pâle à l'ocre, JAMAIS au froid : rouge ≥ vert ≥ bleu dans
-// chaque banc. Le plus clair partait plus bleu que rouge — au soleil il passait, mais à
-// l'ombre, où la seule lumière est celle d'un ciel bleu, il rendait du béton.
+// La bande ne va PLUS à l'ocre : le doré des assises d'Hérode est une patine de vingt
+// siècles, l'état d'une ruine et non d'un Temple en service, et il mettait le pourtour
+// dans la teinte du pays et de la ville — plus rien ne s'en détachait, à commencer par
+// l'or des six portes (Middot 2:3). Chaque banc reste plus chaud que froid en absolu,
+// rouge ≥ bleu : parti plus bleu que rouge, le plus clair rendait du béton à l'ombre,
+// où la seule lumière est celle d'un ciel bleu. Ce qui change d'un bloc au suivant,
+// c'est de combien il est chaud.
 vec3 banc(float t){
-  vec3 a = vec3(0.82, 0.79, 0.74), b = vec3(0.93, 0.90, 0.86),
-       c = vec3(1.04, 1.00, 0.94), d = vec3(1.18, 1.09, 0.89);
+  vec3 a = vec3(0.86, 0.87, 0.88), b = vec3(0.94, 0.94, 0.93),
+       c = vec3(1.02, 1.00, 0.97), d = vec3(1.10, 1.06, 0.98);
   t = clamp(t, 0.0, 1.0) * 3.0;
   return t < 1.0 ? mix(a, b, t) : (t < 2.0 ? mix(b, c, t - 1.0) : mix(c, d, t - 2.0));
 }
@@ -155,31 +199,40 @@ float ecart(float coord, float taille, out float rang, out float sens){
 // courte et longue : les deux longueurs de bloc, en amot, dont l'assise tire
 // l'une. Un tambour de colonne est UNE pierre : il les prend énormes toutes les deux,
 // ce qui supprime le joint vertical et ne laisse que le lit d'un tambour au suivant.
+// Le dallage en rangées. usure ressort avec la teinte parce qu'elle se lit DEUX fois :
+// la tache de vingt amot qui assombrit la dalle est le passage de la cour, et une dalle
+// foulée est aussi plus lustrée. Le dessus d'un mur prend la première et pas la seconde
+// — personne n'y marche.
+void dalles(vec3 P, out vec3 teinte, out vec3 pente, out float rugo, out float usure){
+  float g = grain(P * 7.0);
+  // Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
+  // s'empilent sur X et chacune court sur Z, d'un bout à l'autre de la cour.
+  float ligne, sensX, sensZ;
+  float dx = ecart(P.x, ROVAD_DALLE, ligne, sensX);
+  float num = floor(ligne);
+  float tireRang = alea1(num * 1.7 + 3.1);
+  float longueur = tireRang > 0.5 ? 10.0 : 8.0;   // Melakhim I 7:10, comme les murs
+  // Les joints en travers se décalent d'une rangée à la suivante : alignés, ils
+  // feraient une grille, et la rangée cesserait de se lire comme une rangée.
+  float v = P.z + (mod(num, 2.0) * 0.5 + tireRang * 0.37) * longueur * AMA;
+  float colonne;
+  float dz = ecart(v, longueur, colonne, sensZ);
+  float d = min(dx, dz);
+  float lit = clamp(d / JOINT_DALLE, 0.0, 1.0);
+  float tireDalle = alea3(vec3(floor(colonne), num, 0.0));
+  usure = grain(P / (20.0 * AMA));
+  teinte = vec3((1.0 + (g - 0.5) * 0.10) * (0.985 + tireDalle * 0.03) * mix(0.70, 1.0, lit))
+         * mix(vec3(1.0), OMBRE_JOINT, 0.45 * usure);
+  vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
+  pente = (d < JOINT_DALLE ? 1.0 / JOINT_DALLE : 0.0) * dir * (CREUX_DALLE / AMA);
+  rugo = (g - 0.5) * 0.10;
+}
+
 void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float longue,
               float debord, out vec3 teinte, out vec3 pente, out float rugo){
-  float g = grain(P * 7.0);
-  if (abs(N.y) > 0.7) {                       // dallage : les assises n'ont pas de sens à plat
-    // Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
-    // s'empilent sur X et chacune court sur Z, d'un bout à l'autre de la cour.
-    float ligne, sensX, sensZ;
-    float dx = ecart(P.x, ROVAD_DALLE, ligne, sensX);
-    float num = floor(ligne);
-    float tireRang = alea1(num * 1.7 + 3.1);
-    float longueur = tireRang > 0.5 ? 10.0 : 8.0;   // Melakhim I 7:10, comme les murs
-    // Les joints en travers se décalent d'une rangée à la suivante : alignés, ils
-    // feraient une grille, et la rangée cesserait de se lire comme une rangée.
-    float v = P.z + (mod(num, 2.0) * 0.5 + tireRang * 0.37) * longueur * AMA;
-    float colonne;
-    float dz = ecart(v, longueur, colonne, sensZ);
-    float d = min(dx, dz);
-    float lit = clamp(d / JOINT_DALLE, 0.0, 1.0);
-    float tireDalle = alea3(vec3(floor(colonne), num, 0.0));
-    float patine = grain(P / (20.0 * AMA));
-    teinte = vec3((1.0 + (g - 0.5) * 0.10) * (0.985 + tireDalle * 0.03) * mix(0.70, 1.0, lit))
-           * mix(vec3(1.0), OMBRE_JOINT, 0.45 * patine);
-    vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
-    pente = (d < JOINT_DALLE ? 1.0 / JOINT_DALLE : 0.0) * dir * (CREUX_DALLE / AMA);
-    rugo = (g - 0.5) * 0.10;
+  if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
+    float usure;
+    dalles(P, teinte, pente, rugo, usure);
     return;
   }
   float rang, sensZ, sensU;
@@ -219,7 +272,7 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   // Le JOINT seul, sans le liseré : l'ombre s'arrête au fond de la rainure. Étalée sur
   // le liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur ; le
   // liseré est de la pierre en plein soleil et ne doit rien perdre.
-  float creux = clamp(d / (JOINT * 1.6 * marche), 0.0, 1.0);
+  float creux = clamp(d / (JOINT * 1.15 * marche), 0.0, 1.0);
   // Une coulure, pas une tache : un bruit étiré à la verticale. Une tache sur un mur se
   // lit en défaut de matière ; une coulure se lit en pierre. Et une moucheture par-
   // dessus : le banc donne au bloc SA couleur, mais un bloc d'une seule couleur est un
@@ -235,6 +288,14 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   // La rugosité varie DANS le bloc, pas seulement d'un bloc à l'autre : sous un soleil
   // rasant c'est le lustre qui donne la surface, la teinte ne fait que la colorer.
   rugo = (tireBloc - 0.5) * 0.18 + (grain(P / (0.35 * AMA)) - 0.5) * 0.16;
+#ifndef GRAIN_LEGER
+  // « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (Melakhim I 7:9) : ces blocs sont SCIÉS, et une
+  // scie laisse sur le champ des stries parallèles de quelques centimètres de pas.
+  // Elles ne sont que du lustre — aucune profondeur, donc aucune pente : c'est au
+  // soleil rasant qu'un parement travaillé se sépare d'un aplat bruité, et la teinte
+  // n'y peut rien. Étirées quarante fois le long de la face pour rester des stries.
+  rugo += (grain(vec3(u * 0.7, P.y * 26.0, 0.0)) - 0.5) * 0.09;
+#endif
 }
 
 #ifdef NAPPE
@@ -280,15 +341,19 @@ vec3 penteNappe(vec3 p, vec3 w){
 // c'est le seul vieillissement qui se lise en pierre plutôt qu'en défaut de matière.
 // D'où un bruit étiré quatorze fois sur la hauteur, et un seuil haut — une paroi
 // entièrement coulée serait sale, une paroi qui l'est par endroits est ancienne.
-void patiner(vec3 P, vec3 N, inout vec3 teinte, inout float rugo){
+// force dit qui lave son parement : le Temple est en service et entretenu — le
+// Mizbea'h est blanchi deux fois l'an (Middot 3:4) —, et une enceinte entièrement
+// coulée s'y lit en ruine. La muraille des 500 amot et la ville la gardent entière.
+// Mêmes valeurs que COULURE_ENTRETENUE / COULURE_EXPOSEE du blockout.
+void patiner(vec3 P, vec3 N, float force, inout vec3 teinte, inout float rugo){
   float debout = 1.0 - abs(N.y);
-  float trainee = smoothstep(0.54, 0.90, grain(P * vec3(2.6, 0.19, 2.6))) * debout;
+  float trainee = smoothstep(0.54, 0.90, grain(P * vec3(2.6, 0.19, 2.6))) * debout * force;
   teinte *= mix(vec3(1.0), OMBRE_JOINT, trainee * 0.22);
   rugo += trainee * 0.10;
 }
 
-void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
-  teinte = vec3(1.0); pente = vec3(0.0); rugo = 0.0;
+void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec3 feu){
+  teinte = vec3(1.0); pente = vec3(0.0); rugo = 0.0; feu = vec3(1.0);
   // Le détail se fond sur la distance à l'oeil. La borne a suivi l'appareil : des blocs
   // de huit à dix amot tiennent à deux cents mètres, là où le module d'une ama
   // scintillait passé quarante et laissait la moitié des cadres en volumes gris.
@@ -298,7 +363,17 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
   // pixel se moyenne toute seule ; une normale, non — elle bascule d'un pixel au
   // suivant et la façade se met à grésiller de blocs noirs et blancs.
   float finesse = 1.0 - smoothstep(16.0, 65.0, loin);
-  if (uFamille == 1) { appareil(P, N, ASSISE, 1.0, 8.0, 10.0, DEBORD, teinte, pente, rugo); }
+  if (uFamille == 1 || uFamille == 14) {   // le pourtour, et la muraille des 500 amot
+    appareil(P, N, ASSISE, 1.0, 8.0, 10.0, DEBORD, teinte, pente, rugo);
+  }
+  else if (uFamille == 13) {          // le dallage des cours : rangées, et lustre
+    float usure;
+    dalles(P, teinte, pente, rugo, usure);
+    // Une dalle passée est plus sombre ET plus lisse. C'est ce lustre, et non la
+    // teinte, qui sépare une cour lavée d'une esplanade de grès ; même lecture qu'au
+    // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
+    rugo -= usure * 0.18;
+  }
   else if (uFamille == 11) {          // la ville : de la pierre de pays, pas du gazit
     appareil(P, N, 0.8, 1.0, 1.5, 2.5, DEBORD, teinte, pente, rugo);
   }
@@ -369,15 +444,65 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
     teinte = vec3(1.0 + (g - 0.5) * 0.20 + (fin - 0.5) * 0.09);
     rugo = (g - 0.5) * 0.12;
   }
+  else if (uFamille == 12) {                                  // gehalim : les braises
+    // Le charbon se lit à deux échelles : des morceaux qui se cassent, et le réseau de
+    // fentes où le rouge affleure entre eux. Le maillage ne porte que le tas.
+    // Un charbon fait la taille d'un poing, une fente celle d'un doigt : au mètre, le
+    // réseau se lisait en coulée de lave.
+    vec3 q = P * 15.0;
+    float e = 0.014;
+    pente = vec3(grain(q + vec3(e, 0.0, 0.0)) - grain(q - vec3(e, 0.0, 0.0)), 0.0,
+                 grain(q + vec3(0.0, 0.0, e)) - grain(q - vec3(0.0, 0.0, e))) * (0.13 / e);
+    // Le creux entre deux charbons, et la fente qui court sur l'un d'eux. La fente est
+    // une CRÊTE de bruit, pas un seuil : un seuil donne des plaques, une crête un trait.
+    float creux = 1.0 - smoothstep(0.34, 0.62, grainNorme(P * 8.0));
+    float fente = 1.0 - smoothstep(0.0, 0.06, abs(grainNorme(P * 21.0) - 0.5));
+    // En plein jour un bûcher est GRIS : la cendre en couvre la moitié, et le rouge ne
+    // sort qu'où une fente tombe dans un creux. Un charbon qui rougeoie sur toute sa
+    // surface est de la lave.
+    float cendre = smoothstep(0.40, 0.74, grainNorme(P * 2.4 + 31.0)) * smoothstep(0.0, 0.6, N.y);
+    teinte = mix(vec3(0.07 + 0.16 * grainNorme(q) + 0.06 * grainNorme(P * 44.0)),
+                 vec3(1.75, 1.66, 1.52), cendre);
+    rugo = 0.32 - fente * 0.20;
+    // Le tirage passe par le rewa'h entre les gzirin : la braise RESPIRE, lentement.
+    // Un clignotement rapide se lit en néon, pas en feu.
+    float souffle = 0.5 + 0.5 * bruit(P * 0.9 + vec3(0.0, uTemps * 0.5, 0.0));
+    float coeur = fente * creux * souffle * (1.0 - cendre);
+    feu = vec3(0.85 * coeur) * (vec3(1.0) + vec3(0.0, 0.5, 1.1) * coeur * coeur);
+  }
   else if (uFamille == 8) {                                   // chaux noircie par le feu
-    float s = grain(P * 4.0);
-    float haut = smoothstep(0.4, 2.6, P.y);
-    teinte = vec3(mix(1.0, 0.30, haut * (0.55 + 0.45 * s)));
-    rugo = 0.06;
+    // La bande du blockout, à l'ama près : enduit_noirci la pose de 7,5 à 10,5 amot,
+    // et le Mizbea'h en tire ce que la fiche lui demande — une masse blanche, noircie
+    // au sommet seulement (Middot 3:4 : il est blanchi deux fois l'an). Le seuil d'ici
+    // partait de 40 cm : il prenait le bloc haut ENTIER, du sovev aux kranot, et il ne
+    // restait plus un blanc sur l'autel pour dire qu'on l'entretient.
+    float montee = smoothstep(7.5 * AMA, 10.5 * AMA, P.y);
+    // Sur la paroi la suie ne monte pas en dégradé mais en LANGUES : un bruit étiré
+    // cinq fois sur la hauteur, puis seuillé. Un dégradé lisse n'a pas de bord, et sans
+    // bord il se lit pour ce qu'il est — un fondu, pas un dépôt de feu.
+    float langue = smoothstep(0.32, 0.76, grainNorme(P * vec3(2.6, 0.5, 2.6)));
+    float paroi = montee * (0.30 + 0.85 * langue);
+    // Le dessus est l'âtre : les ma'arakhot y brûlent à même la chaux, et le feu y prend
+    // tout. Le sovev est horizontal lui aussi, mais trois amot plus bas — la bande ne
+    // l'atteint pas, et c'est elle, pas la normale, qui décide qui est un âtre.
+    float dessus = smoothstep(0.5, 0.9, N.y) * smoothstep(0.30, 0.50, montee);
+    // L'âtre est PRIS PARTOUT, et ne varie qu'au décimètre : quinze mètres de dessus
+    // portés par une tache d'un mètre, c'est une photo agrandie et rien d'autre. Un feu
+    // qui brûle au même endroit toute l'année ne laisse pas de nuages, il laisse un
+    // fond noir que la cendre éclaircit d'un grain à l'autre.
+    float atre = dessus * clamp(0.84 + (grainNorme(P * 7.0) - 0.5) * 0.44, 0.0, 1.0);
+    float base = max(paroi, atre);
+    // La moucheture ne mord que là où il y a déjà de la suie : semée sur la chaux nette
+    // elle la salissait au lieu de la brûler.
+    float prise = clamp(base + (grainNorme(P * 26.0) - 0.5) * 0.26
+                             * smoothstep(0.02, 0.30, base), 0.0, 1.0);
+    teinte = mix(mix(vec3(1.0), GRIS_CENDRE, dessus), NOIR_SUIE, prise);
+    rugo = 0.06 + prise * 0.14;
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
-  if (uFamille == 1 || uFamille == 9 || uFamille == 10 || uFamille == 11) {
-    patiner(P, N, teinte, rugo);
+  if (uFamille == 11 || uFamille == 14) { patiner(P, N, 1.0, teinte, rugo); }
+  else if (uFamille == 1 || uFamille == 9 || uFamille == 10) {
+    patiner(P, N, 0.5, teinte, rugo);
   }
   teinte = mix(vec3(1.0), teinte, nettete);
   pente *= finesse;
@@ -414,9 +539,15 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
 export function habiller(materiau, horloges, jeux) {
   const famille = FAMILLES[materiau.name];
   if (!famille) return;
-  const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 } };
+  const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
+                      uSoleil: { value: SOLEIL } };
   materiau.userData.uniformes = uniformes;
-  if (famille === EAU) horloges.push(uniformes.uTemps);
+  if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
+  if (famille === BRAISE) {
+    materiau.color = new THREE.Color(CHARBON);
+    materiau.emissive = new THREE.Color(ORGE);
+    materiau.emissiveIntensity = 1.6;
+  }
 
   const jeu = jeux.get(NAPPE_DE[famille]);
   if (jeu) {
@@ -445,6 +576,8 @@ export function habiller(materiau, horloges, jeux) {
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
       .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN)
+      .replace("#include <shadowmap_pars_fragment>",
+               PROFIL.ombres.penombre ? assemblage() : "#include <shadowmap_pars_fragment>")
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
       // La normale vient de l'attribut, pas des dérivées de la position : c'est elle
@@ -453,12 +586,17 @@ export function habiller(materiau, horloges, jeux) {
       // chaque pixel changeait d'avis — la pierre grouillait.
       .replace("#include <clipping_planes_fragment>", /* glsl */`
         #include <clipping_planes_fragment>
-        vec3 mTeinte, mPente; float mRugo;
-        matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo);`)
+        vec3 mTeinte, mPente, mFeu; float mRugo;
+        matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);`)
       .replace("#include <color_fragment>",
                "#include <color_fragment>\ndiffuseColor.rgb *= mTeinte;")
       .replace("#include <roughnessmap_fragment>",
                "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + mRugo, 0.03, 1.0);")
+      // L'incandescence est une TEXTURE, pas une constante de matière : une braise dont
+      // chaque point rougeoie autant est une boîte orange, et c'est ce que la visite
+      // montrait. Ailleurs `mFeu` vaut 1 et l'émission reste celle de three.
+      .replace("#include <emissivemap_fragment>",
+               "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mFeu;")
       // Le joint se creuse pour la LUMIERE et pas seulement pour la couleur. Sans UV
       // ni tangentes, la voie ordinaire serait la derivee d'ecran, bannie ici parce
       // qu'elle explose aux angles rasants. Mais la hauteur est ici une fonction
@@ -466,15 +604,20 @@ export function habiller(materiau, horloges, jeux) {
       // qui ne depend pas du pixel voisin et ne grouille donc jamais.
       .replace("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
-        normal = normalize(normal - mat3(viewMatrix) * mPente);`);
+        normal = normalize(normal - mat3(viewMatrix) * mPente);`)
+      // Le voile n'a pas la meme couleur dans les deux moities du ciel. La brume
+      // diffuse vers l'avant : regardee dans l'axe du soleil elle est plus claire et
+      // ambree, regardee dos a lui elle est plus froide que le ciel qui la nourrit.
+      // C'est cet ecart qui fait lire une distance, bien plus que le voile lui-meme —
+      // un voile d'une seule teinte se lit en calque gris pose sur l'image.
+      .replace("#include <fog_fragment>", /* glsl */`
+        #ifdef USE_FOG
+          float versSoleil = dot(normalize(vMonde - cameraPosition), uSoleil) * 0.5 + 0.5;
+          vec3 voile = fogColor * mix(vec3(0.90, 0.94, 1.06), vec3(1.20, 1.08, 0.92),
+                                      versSoleil * versSoleil);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, voile,
+                                 smoothstep(fogNear, fogFar, vFogDepth));
+        #endif`);
   };
   materiau.customProgramCacheKey = () => `mikdash-${famille}-${drapeaux}`;
-}
-
-/** L'orge du feu : la braise éclaire, elle ne fait pas que rougeoyer. */
-export function attiser(materiau) {
-  if (materiau.name === "Braise") {
-    materiau.emissive = new THREE.Color(0xff5a12);
-    materiau.emissiveIntensity = 1.6;
-  }
 }

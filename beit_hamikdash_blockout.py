@@ -371,12 +371,25 @@ def _ombre_du_joint(mat, teinte, creux):
 # qui change d'un bloc au suivant, c'est la teinte — un mur dont les blocs ne diffèrent
 # qu'en clarté rend un aplat sali, jamais de la pierre.
 #
-# La bande va du crème pâle à l'ocre, JAMAIS au froid : dans chaque banc, rouge ≥ vert
-# ≥ bleu. Le banc le plus clair partait à (0,64 0,68 0,76), plus bleu que rouge : au
-# soleil il passait, mais à l'ombre — où la seule lumière est celle d'un ciel bleu — il
-# rendait du béton, et le pourtour se retrouvait tacheté de pierres grises.
-BANCS_CALCAIRE = ((0.82, 0.79, 0.74), (0.93, 0.90, 0.86),
-                  (1.04, 1.00, 0.94), (1.18, 1.09, 0.89))
+# La bande va du gris de cendre à l'ivoire, et NON à l'ocre. Le meleke fraîchement
+# scié est presque blanc ; le doré des assises d'Hérode est une patine de vingt
+# siècles, l'état d'une ruine et non d'un Temple en service. La bande ocre qui les
+# précédait (jusqu'à 1,18 0,99 0,89, écrêtée à 1,0 sur le rouge) mettait le pourtour
+# dans la teinte du pays et de la ville : l'enceinte, les maisons et la montagne ne se
+# séparaient plus, et l'or des six portes (Middot 2:3) n'avait plus rien contre quoi
+# être de l'or.
+# Un banc reste toutefois plus chaud que froid en absolu — rouge ≥ bleu partout : le
+# banc le plus clair est parti une fois à (0,64 0,68 0,76), plus bleu que rouge, et à
+# l'ombre, où la seule lumière est celle d'un ciel bleu, il rendait du béton. Ce qui
+# change d'un bloc au suivant, c'est de combien il est chaud.
+BANCS_CALCAIRE = ((0.86, 0.87, 0.88), (0.94, 0.94, 0.93),
+                  (1.02, 1.00, 0.97), (1.10, 1.06, 0.98))
+
+# Ce que la pluie laisse sur un parement, selon qu'on le lave ou non. Le Temple est en
+# service et entretenu — le Mizbea'h est blanchi deux fois l'an (Middot 3:4) —, et une
+# enceinte entièrement coulée s'y lit en ruine ; la muraille du Har HaBayit et la ville
+# ne sont lavées par personne et gardent la pleine coulure. `_exposer` fait la seconde.
+COULURE_ENTRETENUE, COULURE_EXPOSEE = 0.08, 0.16
 
 
 def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
@@ -420,9 +433,10 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
     salissure.inputs["Color2"].default_value = (0.0, 0.0, 0.0, 1.0)
     liens.new(teinte.outputs["Color"], salissure.inputs["Color1"])
     coulure = _noeud(mat, "ShaderNodeMapRange", -520, 320)
+    coulure.name = "Coulure"
     coulure.inputs["From Min"].default_value = 0.52
     coulure.inputs["From Max"].default_value = 0.88
-    coulure.inputs["To Max"].default_value = 0.16
+    coulure.inputs["To Max"].default_value = COULURE_ENTRETENUE
     coulure.clamp = True
     liens.new(_calc(mat, "MULTIPLY_ADD", _trainee(mat, 0.5, 9.0), 0.35,
                     _calc(mat, "MULTIPLY", _trainee(mat, 3.0, 40.0), 0.65)),
@@ -439,8 +453,14 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
                     _calc(mat, "MULTIPLY", _grain(mat, 1.5), 0.22)), mouchete.inputs["Factor"])
     # La rugosité se tire par bloc : deux pierres du même banc ne renvoient pas le même
     # soleil rasant, et c'est le spéculaire — pas la teinte — qui les sépare à l'image.
+    # S'y ajoute la scie : « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (Melakhim I 7:9), et une scie
+    # laisse sur le champ des stries parallèles de quatre centimètres de pas. Elles ne
+    # sont que du lustre, jamais un relief — un parement scié est plat. La constante
+    # descend de 0,62 à 0,575 pour que la moyenne, elle, ne bouge pas : c'est elle que
+    # `aplatir` emporte dans le .glb, et la visite ajoute ses écarts par-dessus.
     liens.new(_calc(mat, "MULTIPLY_ADD", bloc, 0.18,
-                    _calc(mat, "MULTIPLY_ADD", _grain(mat, 0.35), 0.16, 0.62)),
+                    _calc(mat, "MULTIPLY_ADD", _trainee(mat, 30.0, 0.08), 0.09,
+                          _calc(mat, "MULTIPLY_ADD", _grain(mat, 0.35), 0.16, 0.575))),
               _bsdf(mat).inputs["Roughness"])
     liens.new(_ombre_du_joint(mat, mouchete.outputs["Color"], creux),
               _bsdf(mat).inputs["Base Color"])
@@ -552,7 +572,18 @@ def dallage(name, rgb):
     if not neuf:
         return mat
     liens = mat.node_tree.links
-    _bsdf(mat).inputs["Roughness"].default_value = 0.85
+    # Une seule usure de vingt amot, lue deux fois : là où la cour est passée, la dalle
+    # est plus sombre ET plus lustrée. Le dallage était à 0,85 de rugosité, c'est-à-dire
+    # une terrasse de grès ; une dalle foulée pieds nus et lavée à l'eau du Sha'ar
+    # HaMayim rend son soleil, et c'est ce lustre — pas la teinte — qui la sépare d'une
+    # esplanade.
+    usure = _grain(mat, 20.0)
+    # La valeur par défaut de l'entrée reste lue quand un lien la recouvre : c'est elle
+    # que `aplatir` emporte dans le .glb (beit_hamikdash_visite.py). Elle vaut donc la
+    # moyenne du lien, sinon la visite garde un dallage mat que le rendu n'a plus.
+    _bsdf(mat).inputs["Roughness"].default_value = 0.51
+    liens.new(_calc(mat, "MULTIPLY_ADD", usure, -0.18, 0.60),
+              _bsdf(mat).inputs["Roughness"])
     p = _noeud(mat, "ShaderNodeSeparateXYZ", -2100, 0)
     liens.new(_position(mat), p.inputs["Vector"])
     # Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
@@ -595,7 +626,7 @@ def dallage(name, rgb):
     patine.blend_type = "MULTIPLY"
     patine.inputs["Color2"].default_value = (*OMBRE_JOINT, 1.0)
     liens.new(lit.outputs["Color"], patine.inputs["Color1"])
-    liens.new(_calc(mat, "MULTIPLY", _grain(mat, 20.0), 0.45), patine.inputs["Factor"])
+    liens.new(_calc(mat, "MULTIPLY", usure, 0.45), patine.inputs["Factor"])
     liens.new(patine.outputs["Color"], _bsdf(mat).inputs["Base Color"])
     _creuser(mat, joint.outputs["Color"], 1.0, CREUX_DALLE)
     _creuser(mat, _grain(mat, 0.3), 0.3, 0.01)
@@ -843,6 +874,11 @@ def _voiler(mat):
     liens.new(voile.outputs["Color"], entree)
     return mat
 
+def _exposer(mat):
+    """Rend à un parement la coulure entière : celui-là n'est lavé par personne."""
+    mat.node_tree.nodes["Coulure"].inputs["To Max"].default_value = COULURE_EXPOSEE
+    return mat
+
 def terre(name):
     """Collines de Jérusalem : calcaire affleurant et garrigue, en terrasses.
 
@@ -885,12 +921,29 @@ def eau(name):
         _creuser(mat, _grain(mat, 0.25), 0.15, 0.003)
     return mat
 
-MAT_PIERRE = lambda: pierre("Pierre_claire", (0.86, 0.79, 0.67))
+# Le calcaire du pourtour, crème presque neutre : c'est la couleur d'un meleke scié
+# de frais, et l'ocre lui vient des bancs (BANCS_CALCAIRE), pas de sa base.
+# Il reste SOUS les trois marbres du bâtiment (MARBRES_HERODE, 0,94 / 0,81 / 0,82) :
+# à 0,81, ses blocs les plus clairs montaient à 0,89 et le pourtour brillait autant
+# que le Bayit — l'échelle des blancs va de la chaux du Mizbea'h au dallage, et le
+# bâtiment ne doit jamais y perdre son rang.
+CALCAIRE = (0.75, 0.73, 0.70)
+MAT_PIERRE = lambda: pierre("Pierre_claire", CALCAIRE)
+# La muraille des 500 amot et son soubassement : même pierre que l'Azara, mais
+# personne ne la lave — elle garde la coulure entière.
+MAT_MURAILLE = lambda: _exposer(pierre("Pierre_muraille", CALCAIRE))
 MAT_OR = lambda: metal("Or", (1.0, 0.76, 0.33), 0.3)
 MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
-MAT_SOL = lambda: dallage("Sol", (0.78, 0.73, 0.66))
+# Le dallage est SOUS les murs en valeur, mais dans LEUR pierre : à 0,57 neutre il
+# rendait 62 % de la clarté du parement avec le quart de son chroma, et du côté froid
+# du gris — la moitié basse de chaque cadre y passait en dalle de béton sous des murs
+# finis. Le rovad est du même meleke que le mur, poli par les pieds et lavé : plus
+# sombre, plus chaud, jamais d'une autre roche. Son rang tient sans qu'on l'éteigne —
+# à plat sous un soleil de 20°, il ne reçoit déjà qu'un tiers de ce que prend le
+# parement, et c'est cette assiette-là qui lui cède la clarté du lin et de la chaux.
+MAT_SOL = lambda: dallage("Sol", (0.64, 0.60, 0.53))
 MAT_LIN = lambda: etoffe("Lin_blanc", (0.88, 0.87, 0.83))     # bigdei lavan des kohanim
 MAT_MARBRE = lambda: marbre("Marbre_blanc", (0.93, 0.92, 0.89))
 MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
@@ -900,18 +953,26 @@ MAT_OR_PLAQUE = lambda: metal("Or_plaque", (1.0, 0.76, 0.33), 0.4)
 MAT_CEDRE = lambda: bois("Cedre", (0.44, 0.25, 0.14))
 MAT_CHENE = lambda: bois("Chene", (0.36, 0.25, 0.15))
 MAT_CHENE_SCULPTE = lambda: bois_sculpte("Chene_sculpte", (0.36, 0.25, 0.15))
+# Le bûcher n'est PAS en chêne : « בְּמֻרְבִּיּוֹת שֶׁל תְּאֵנָה וְשֶׁל אֱגוֹז וְשֶׁל עֵץ שָׁמֶן »
+# (Tamid 2:3) — figuier, noyer, pin ; l'olivier et la vigne en sont exclus. Bois sec et
+# sombre, là où le chêne des maltera'ot est clair : le même chêne d'un bout à l'autre du
+# bûcher était ce qui le faisait lire en palette de bois neuf. Et il ne le reste pas :
+# le feu descend, d'où les trois tons du lit du bas au lit du dessus.
+MAT_BOIS_MAARAKHA = lambda: bois("Bois_maarakha", (0.17, 0.12, 0.074))
+MAT_BOIS_ROUSSI = lambda: bois("Bois_roussi", (0.125, 0.092, 0.062))
+MAT_BOIS_CHARBON = lambda: bois("Bois_charbon", (0.050, 0.040, 0.036))
 MAT_PAROKHET = lambda: parokhet("Parokhet_tissee")
 MAT_TERRE = lambda: terre("Terre_Jerusalem")
 # La ville, deux tons sous le Temple, et son appareil est domestique : le gazit de
 # huit à dix amot (Melakhim I 7:10) est celui de la maison du Roi et du Bayit, pas
 # celui d'une maison de Jérusalem. Assise et bloc au moellon.
-MAT_MAISON = lambda: _voiler(pierre("Maisons", (0.64, 0.55, 0.40), 0.8, (1.5, 2.5)))
+MAT_MAISON = lambda: _voiler(_exposer(pierre("Maisons", (0.64, 0.55, 0.40), 0.8, (1.5, 2.5))))
 # Les colonnes des portiques : un tambour est UNE pierre, et n'a donc pas de joint
 # vertical. Une longueur de bloc énorme les supprime ; il ne reste que le lit d'un
 # tambour à l'autre. Sur un cylindre, le joint vertical était pire qu'inutile : la face
 # choisit son axe sur la normale (`_parement`), qui bascule quatre fois autour du fût,
 # et la trame sautait quatre fois par colonne.
-MAT_COLONNE = lambda: pierre("Pierre_colonne", (0.86, 0.79, 0.67), 1.4, (1e4, 1e4))
+MAT_COLONNE = lambda: pierre("Pierre_colonne", CALCAIRE, 1.4, (1e4, 1e4))
 MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)))
 MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
 MAT_EAU = lambda: eau("Eau_Kiyor")
@@ -997,13 +1058,49 @@ def plaque(name, quad, epaisseur, col, mat=None):
              [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]
     return mesh_from_pydata(name, verts, faces, col, mat)
 
-def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32):
+def limbe(name, contour, base, axe, plan, taille, epaisseur, col, mat=None, courbure=0.0):
+    """Lame mince à contour libre : feuille, pétale, fleuron.
+
+    `contour` : un demi-profil (u le long de la nervure, v en travers, u croissant),
+    déplié symétriquement — une plaque, mais qui a le droit d'avoir des lobes.
+    `base` l'attache, `axe` la nervure, `plan` la face vers laquelle elle regarde,
+    `courbure` le creux en gouttière, au carré de l'écart à la nervure.
+    """
+    d = Vector(axe).normalized()
+    t = d.cross(Vector(plan)).normalized()
+    n = t.cross(d).normalized()
+    o = Vector(base)
+
+    def point(u, v):
+        return o + taille * (u * d + v * t + courbure * 4 * v * v * n)
+
+    lignes = [[point(u, j * v) for j in (-1, 0, 1)] for u, v in contour]
+    N = len(lignes)
+    verts = [tuple(p) for ligne in lignes for p in ligne]
+    verts += [tuple(p + n * epaisseur) for ligne in lignes for p in ligne]
+
+    def i(couche, k, j):
+        return couche * 3 * N + 3 * k + j
+
+    faces = []
+    for k in range(N - 1):
+        for j in (0, 1):
+            faces.append([i(0, k, j), i(0, k, j + 1), i(0, k + 1, j + 1), i(0, k + 1, j)][::-1])
+            faces.append([i(1, k, j), i(1, k, j + 1), i(1, k + 1, j + 1), i(1, k + 1, j)])
+        for j in (0, 2):
+            faces.append([i(0, k, j), i(0, k + 1, j), i(1, k + 1, j), i(1, k, j)])
+    return mesh_from_pydata(name, verts, faces, col, mat)
+
+def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32, capots=True):
     """Surface de révolution autour de la verticale passant par (x, y).
 
     `profil` : suite de (rayon, hauteur au-dessus de z0) en amot, parcourue dans
     l'ordre. Un rayon nul fait une pointe. Se lit paroi extérieure en montant puis,
     si elle redescend, paroi intérieure en descendant : c'est ce sens de parcours qui
     garde les normales tournées vers l'air, dehors comme dans le creux.
+
+    `capots=False` : profil refermé sur lui-même — un bandeau creux, ouvert en haut
+    comme en bas, que les deux disques d'extrémité boucheraient.
     """
     anneaux = [_cercle(x, y, r, verts) if r else [(x, y)] for r, _ in profil]
     sommets, debut = [], []
@@ -1011,9 +1108,9 @@ def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32):
         debut.append(len(sommets))
         sommets += [(px, py, z0 + dz) for px, py in anneau]
     faces = []
-    if len(anneaux[0]) > 1:
+    if capots and len(anneaux[0]) > 1:
         faces.append(list(range(verts))[::-1])
-    if len(anneaux[-1]) > 1:
+    if capots and len(anneaux[-1]) > 1:
         faces.append(list(range(debut[-1], debut[-1] + verts)))
     for a in range(len(profil) - 1):
         n0, n1 = len(anneaux[a]), len(anneaux[a + 1])
@@ -1112,7 +1209,7 @@ def rampe(name, x0, x1, y0, y1, z0, z1, montee, col, mat=None, epaisseur=1.0):
     return mesh_from_pydata(name, verts, faces, col, mat)
 
 
-def mur_perce(name, x0, x1, y0, y1, z0, z1, col, portes, h_porte):
+def mur_perce(name, x0, x1, y0, y1, z0, z1, col, portes, h_porte, mat=None):
     """Mur droit percé d'ouvertures : segments pleins, plus un linteau sur chaque porte.
 
     `portes` : liste de (centre, largeur) le long du grand côté du mur.
@@ -1126,9 +1223,9 @@ def mur_perce(name, x0, x1, y0, y1, z0, z1, col, portes, h_porte):
 
     def morceau(suffixe, u0, u1, zb, zh):
         if long_x:
-            box(f"{name}_{suffixe}", u0, u1, y0, y1, zb, zh, col)
+            box(f"{name}_{suffixe}", u0, u1, y0, y1, zb, zh, col, mat)
         else:
-            box(f"{name}_{suffixe}", x0, x1, u0, u1, zb, zh, col)
+            box(f"{name}_{suffixe}", x0, x1, u0, u1, zb, zh, col, mat)
 
     for k in range(0, len(bornes) - 1, 2):
         morceau(f"plein_{k // 2}", bornes[k], bornes[k + 1], z0, z1)
@@ -1502,6 +1599,21 @@ def cyl_between(name, p0, p1, r, col, mat=None, verts=16):
     o.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
     return o
 
+def chaine(name, p0, p1, R, col, mat=None, tube=None):
+    """Chaîne tendue entre deux points : maillons enfilés, un plan sur deux tourné."""
+    a, d = Vector(p0), Vector(p1) - Vector(p0)
+    axe1 = d.normalized().cross(Vector((1, 0, 0)))
+    if axe1.length < 1e-3:
+        axe1 = d.normalized().cross(Vector((0, 1, 0)))
+    axe1.normalize()
+    axe2 = d.normalized().cross(axe1)
+    n = max(1, int(d.length / (1.5 * R)))
+    for k in range(n):
+        p = a + d * ((k + 0.5) / n)
+        axe = axe1 if k % 2 else axe2
+        tore(f"{name}_{k:02d}", p.x, p.y, p.z, R, tube or R * 0.32, col, mat,
+             rotation=axe.to_track_quat('Z', 'Y').to_euler(), majeur=10, mineur=6)
+
 def _poser(pieces, x, y, z0, lacet):
     """Pièces bâties à l'origine, posées en (x, y, z0) amot et tournées de `lacet`
     autour de la verticale — silhouettes et keruvim."""
@@ -1529,6 +1641,13 @@ def fcurves_of(obj):
 def plage(debut, fin, pas):
     """Bornes incluses, pas fractionnaire — range() ne prend que des entiers."""
     return [debut + k * pas for k in range(int((fin - debut) / pas) + 1)]
+
+def courbe(p0, p1, p2, n):
+    """Bézier quadratique échantillonnée en n+1 points : le tracé d'une branche."""
+    return [tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t * t * c
+                  for a, b, c in zip(p0, p1, p2))
+            for t in (k / n for k in range(n + 1))]
+
 
 def alea(cle, k=0):
     """Suite déterministe dans [0, 1), tirée du nom : même scène à chaque construction.
@@ -1596,36 +1715,41 @@ box("HarHabayit_sol", HX0, HX1, HY0, HY1, Z_HAR - 1, Z_HAR, "00_HarHabayit", MAT
 H_HAR, H_HAR_EST = 30, 24
 P_HOULDA = [(-60, 20), (20, 20)]        # CHOIX : les deux portes du sud
 mur_perce("HarHabayit_mur_sud", HX0, HX1, HY0, HY0 + 3, Z_HAR, Z_HAR + H_HAR,
-          "00_HarHabayit", P_HOULDA, 20)
+          "00_HarHabayit", P_HOULDA, 20, MAT_MURAILLE())
 mur_perce("HarHabayit_mur_nord", HX0, HX1, HY1 - 3, HY1, Z_HAR, Z_HAR + H_HAR,
-          "00_HarHabayit", [(-100, 10)], 20)          # Tadi (CHOIX)
+          "00_HarHabayit", [(-100, 10)], 20, MAT_MURAILLE())      # Tadi (CHOIX)
 mur_perce("HarHabayit_mur_ouest", HX0, HX0 + 3, HY0, HY1, Z_HAR, Z_HAR + H_HAR,
-          "00_HarHabayit", [(0, 10)], 20)             # Kiponus (CHOIX)
+          "00_HarHabayit", [(0, 10)], 20, MAT_MURAILLE())         # Kiponus (CHOIX)
 mur_perce("HarHabayit_mur_est", HX1 - 3, HX1, HY0, HY1, Z_HAR, Z_HAR + H_HAR_EST,
-          "00_HarHabayit", [(0, 10)], 20)             # Sha'ar HaMizrahi, sur l'axe
+          "00_HarHabayit", [(0, 10)], 20, MAT_MURAILLE())         # Sha'ar HaMizrahi, sur l'axe
 # « שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה » (Middot 1:3) : le dessin de Suse au-dessus
 # de la porte est, tourné vers le mont des Oliviers. Un bas-relief : rempart et trois
 # tours crénelées, dans la pierre du mur.
 SHUSHAN_Z = Z_HAR + 20.4
-box("Shushan_plaque", HX1, HX1 + 0.15, -4.5, 4.5, SHUSHAN_Z, SHUSHAN_Z + 3.2, "00_HarHabayit")
-box("Shushan_rempart", HX1 + 0.15, HX1 + 0.35, -3.8, 3.8, SHUSHAN_Z + 0.3, SHUSHAN_Z + 1.3, "00_HarHabayit")
+box("Shushan_plaque", HX1, HX1 + 0.15, -4.5, 4.5, SHUSHAN_Z, SHUSHAN_Z + 3.2,
+    "00_HarHabayit", MAT_MURAILLE())
+box("Shushan_rempart", HX1 + 0.15, HX1 + 0.35, -3.8, 3.8, SHUSHAN_Z + 0.3, SHUSHAN_Z + 1.3,
+    "00_HarHabayit", MAT_MURAILLE())
 for k, y in enumerate((-3.0, 0.0, 3.0)):
     h = 2.6 if y == 0 else 2.0
-    box(f"Shushan_tour_{k}", HX1 + 0.15, HX1 + 0.4, y - 0.6, y + 0.6, SHUSHAN_Z + 0.3, SHUSHAN_Z + h, "00_HarHabayit")
+    box(f"Shushan_tour_{k}", HX1 + 0.15, HX1 + 0.4, y - 0.6, y + 0.6, SHUSHAN_Z + 0.3,
+        SHUSHAN_Z + h, "00_HarHabayit", MAT_MURAILLE())
     for j, yc in enumerate((y - 0.45, y, y + 0.45)):
         box(f"Shushan_tour_{k}_merlon_{j}", HX1 + 0.15, HX1 + 0.4, yc - 0.12, yc + 0.12,
-            SHUSHAN_Z + h, SHUSHAN_Z + h + 0.25, "00_HarHabayit")
+            SHUSHAN_Z + h, SHUSHAN_Z + h + 0.25, "00_HarHabayit", MAT_MURAILLE())
 # Crête des murs : merlons (CHOIX, appareil hérodien — les stylisations des plans 1 et
 # 14b crénelaient d'elles-mêmes cette enceinte, autant que le blockout le fixe).
 for nm, xa, xb, ya, yb, h in (("sud", HX0, HX1, HY0, HY0 + 3, H_HAR),
                               ("nord", HX0, HX1, HY1 - 3, HY1, H_HAR),
                               ("ouest", HX0, HX0 + 3, HY0 + 3, HY1 - 3, H_HAR),
                               ("est", HX1 - 3, HX1, HY0 + 3, HY1 - 3, H_HAR_EST)):
-    creneaux(f"HarHabayit_creneaux_{nm}", xa, xb, ya, yb, Z_HAR + h, "00_HarHabayit")
+    creneaux(f"HarHabayit_creneaux_{nm}", xa, xb, ya, yb, Z_HAR + h, "00_HarHabayit",
+             MAT_MURAILLE())
 # Murs de soutènement : l'esplanade est une terrasse bâtie au-dessus du Kidron et du
 # Tyropéon, ses murs descendent jusqu'au rocher. Sans lui, le pays passait sous le
 # dallage et l'esplanade flottait au-dessus de ses propres vallées.
-box("HarHabayit_soubassement", HX0, HX1, HY0, HY1, Z_ROCHE, Z_HAR - 1, "00_HarHabayit")
+box("HarHabayit_soubassement", HX0, HX1, HY0, HY1, Z_ROCHE, Z_HAR - 1, "00_HarHabayit",
+    MAT_MURAILLE())
 pas = 10
 # Le portique est est le seul bas, comme son mur (Middot 2:4) : colonnes et toit
 # tiennent sous la crête de 24 amot.
@@ -1860,9 +1984,13 @@ SHOFAR = [(0.62, 0.0), (0.60, 0.12), (0.40, 0.60), (0.24, 1.35), (0.20, 1.55), (
 for k, y in enumerate([-26.5 + 3.4 * i for i in range(7)] + [6.1 + 3.4 * i for i in range(6)]):
     revolution(f"Shofar_{k:02d}", EX1 - 1.4, y, Z_EZN, SHOFAR, "10_EzratNashim", MAT_BRONZE(), verts=20)
 # Simhat Beit HaShoeva (Soucca 5:2-3 ; 52b) : « מְנוֹרוֹת שֶׁל זָהָב הָיוּ שָׁם, וְאַרְבָּעָה סְפָלִים
-# שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד » — hauts de cinquante amot, dans
-# l'Ezrat Nashim. Quatre mâts (nombre : CHOIX, la Mishna dit « des menorot »), quatre
-# coupes et quatre échelles chacun, un barreau toutes les deux amot.
+# שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד » — cinquante amot de haut
+# (« תָּנָא גָּבְהָהּ שֶׁל מְנוֹרָה חֲמִשִּׁים אַמָּה », Soucca 52b), dans l'Ezrat Nashim. Quatre mâts
+# (nombre : CHOIX, la Mishna dit « des menorot »), quatre coupes et quatre échelles chacun.
+# Le barreau se prend tous les trois quarts d'ama et pas toutes les deux : à un mètre
+# d'écart on n'y monte pas, et une échelle qu'on ne peut pas gravir se lit en étai
+# d'échafaudage — or la guemara y fait justement monter des enfants avec trente log
+# d'huile, en opposant l'échelle raide au kevesh qui ne l'est pas (Soucca 52b).
 if CANDELABRES_SHOEVA:
     H_CANDELABRE = 50
     for k, (x, y) in enumerate(((EX0 + 30, -20), (EX0 + 30, 20), (EX1 - 30, -20), (EX1 - 30, 20))):
@@ -1882,7 +2010,7 @@ if CANDELABRES_SHOEVA:
             for s, cote in ((-1, "a"), (1, "b")):
                 cyl_between(f"{nom}_echelle_{j}_montant_{cote}", (pied[0] + s * lat[0], pied[1] + s * lat[1], pied[2]),
                             (haut[0] + s * lat[0], haut[1] + s * lat[1], haut[2]), 0.07, "10_EzratNashim", MAT_CEDRE(), verts=6)
-            for i, t in enumerate(plage(0.02, 0.98, 2.0 / (H_CANDELABRE - 1.5))):
+            for i, t in enumerate(plage(0.02, 0.98, 0.75 / (H_CANDELABRE - 1.5))):
                 px, py, pz = (pied[c] + (haut[c] - pied[c]) * t for c in range(3))
                 cyl_between(f"{nom}_echelle_{j}_barreau_{i:02d}", (px - lat[0], py - lat[1], pz), (px + lat[0], py + lat[1], pz),
                             0.04, "10_EzratNashim", MAT_CEDRE(), verts=6)
@@ -2266,20 +2394,75 @@ for nm, xa, xb, ya, yb in (("E", MX1 - 1, MX1 - 0.97, MY0 + 1, MY1 - 1), ("O", M
 # Quatre ma'arakhot le jour de Kippour (Rambam, Temidin ouMousafin 2:4 — l'avis de
 # R. Yossi, Yoma 4:6 ; le tana kama en compte trois) : la grande à l'est, celle de la
 # ketoret à l'angle sud-ouest (Tamid 2:4-5), la troisième pour entretenir le feu, la
-# quatrième pour les membres du tamid de la veille. Chacune : deux lits de bûches
-# croisées sous les braises. Une seule dalle noire de 16 amot se lisait en bassin.
+# quatrième pour les membres du tamid de la veille.
 MAARAKHOT = (("gedola", -36, -28, -13, -5), ("ketoret", -48, -45, -19, -16),
              ("kiyum", -48, -45, -4, -1), ("kippour", -42, -39, -19, -16))
+# « וְרֶוַח הָיָה בֵין הַגִּזְרִין, שֶׁהָיוּ מַצִּיתִין אֶת הָאֲלִיתָא מִשָּׁם » (Tamid 2:4 ; Rambam
+# Temidin ouMousafin 2:7) : les bûches ne sont PAS jointives. C'est ce vide-là qui fait
+# lire un bûcher — deux lits jointifs sous une dalle donnaient une palette sous un
+# matelas, ce que la visite montrait de près.
+R_GZIR, REWACH, PAS_LIT, LITS = 0.18, 0.15, 0.30, 3
+
+def braises(nom, x0, x1, y0, y1, z, col, mat, maille=0.42, relief=0.22):
+    """Bassin de gehalim : une nappe de charbons empilés, en un seul maillage.
+
+    Une boîte n'a pas de silhouette de braise, et aucune matière ne la lui rend : la
+    hauteur est donc dans la géométrie, tirée du nom pour que le tas soit le même à
+    chaque construction. Le bord garde la maille exacte — lui aussi déformé, le bassin
+    débordait sur les gzirin.
+    """
+    nx, ny = max(2, round((x1 - x0) / maille)), max(2, round((y1 - y0) / maille))
+    rang = nx + 1
+    place = lambda i, j: j * rang + i
+    haut, bas = [], []
+    for j in range(ny + 1):
+        for i in range(nx + 1):
+            cle = f"{nom}_{i}_{j}"
+            bord = i in (0, nx) or j in (0, ny)
+            derive = 0.0 if bord else maille * 0.45
+            x = x0 + (x1 - x0) * i / nx + (alea(cle, 1) - 0.5) * derive
+            y = y0 + (y1 - y0) * j / ny + (alea(cle, 2) - 0.5) * derive
+            haut.append((x, y, z + (0.0 if bord else relief * (0.2 + alea(cle, 3)))))
+            bas.append((x, y, z - 0.35))
+    n = len(haut)
+    faces = []
+    for j in range(ny):
+        for i in range(nx):
+            a, b, c, d = place(i, j), place(i + 1, j), place(i + 1, j + 1), place(i, j + 1)
+            faces += [[a, b, c, d], [n + d, n + c, n + b, n + a]]
+    for i in range(nx):
+        faces.append([place(i + 1, 0), place(i, 0), n + place(i, 0), n + place(i + 1, 0)])
+        faces.append([place(i, ny), place(i + 1, ny), n + place(i + 1, ny), n + place(i, ny)])
+    for j in range(ny):
+        faces.append([place(0, j), place(0, j + 1), n + place(0, j + 1), n + place(0, j)])
+        faces.append([place(nx, j + 1), place(nx, j), n + place(nx, j), n + place(nx, j + 1)])
+    return mesh_from_pydata(nom, haut + bas, faces, col, mat)
+
+def maarakha(nm, xa, xb, ya, yb):
+    """Trois lits de gzirin croisés, espacés, et le bassin de braises posé dedans."""
+    for lit in range(LITS):
+        z = Z_AZ + 9.0 + R_GZIR + lit * PAS_LIT
+        mat = (MAT_BOIS_MAARAKHA(), MAT_BOIS_ROUSSI(), MAT_BOIS_CHARBON())[min(lit, 2)]
+        long_x = lit % 2 == 0
+        (a0, a1), (b0, b1) = ((ya, yb), (xa, xb)) if long_x else ((xa, xb), (ya, yb))
+        pas = 2 * R_GZIR + REWACH
+        n = max(2, int((a1 - a0 - 2 * R_GZIR) / pas) + 1)
+        marge = (a1 - a0 - (n - 1) * pas) / 2
+        for k in range(n):
+            cle = f"Maarakha_{nm}_gzir_{lit}{k}"
+            c = a0 + marge + k * pas + (alea(cle, 1) - 0.5) * REWACH * 0.7
+            # Une bûche fendue n'a ni le diamètre ni la longueur de sa voisine, et le
+            # bout qui dépasse est ce qui distingue un bûcher d'un caillebotis.
+            d0, d1 = b0 - 0.55 * alea(cle, 2), b1 + 0.55 * alea(cle, 3)
+            zc = z + (alea(cle, 4) - 0.5) * 0.06
+            r = R_GZIR * (0.78 + 0.44 * alea(cle, 5))
+            p0, p1 = (((d0, c, zc), (d1, c, zc)) if long_x else ((c, d0, zc), (c, d1, zc)))
+            cyl_between(cle, p0, p1, r, "30_Mizbeach", mat, verts=10)
+    braises(f"Maarakha_{nm}_gehalim", xa + 0.3, xb - 0.3, ya + 0.3, yb - 0.3,
+            Z_AZ + 9.0 + R_GZIR * 1.4 + (LITS - 1) * PAS_LIT, "30_Mizbeach", braise("Braise"))
+
 for nm, xa, xb, ya, yb in MAARAKHOT:
-    for lit, (le_long, zb) in enumerate((("x", Z_AZ + 9.0), ("y", Z_AZ + 9.35))):
-        for k, c in enumerate(plage(0.15, 0.85, 0.35)):
-            if le_long == "x":
-                cyl_between(f"Maarakha_{nm}_buche_{lit}{k}", (xa, ya + (yb - ya) * c, zb + 0.18),
-                            (xb, ya + (yb - ya) * c, zb + 0.18), 0.17, "30_Mizbeach", MAT_CHENE(), verts=8)
-            else:
-                cyl_between(f"Maarakha_{nm}_buche_{lit}{k}", (xa + (xb - xa) * c, ya, zb + 0.18),
-                            (xa + (xb - xa) * c, yb, zb + 0.18), 0.17, "30_Mizbeach", MAT_CHENE(), verts=8)
-    box(f"Maarakha_{nm}", xa + 0.2, xb - 0.2, ya + 0.2, yb - 0.2, Z_AZ + 9.6, Z_AZ + 9.95, "30_Mizbeach", braise("Braise"))
+    maarakha(nm, xa, xb, ya, yb)
 # Le feu lui-même. La ma'arakha était une boîte noire sans source : la colonne de fumée
 # montait d'un autel éteint, et la rampe du plan 7b n'avait que la lumière du ciel — la
 # raison pour laquelle elle ne se détachait ni de l'autel ni du dallage.
@@ -2580,58 +2763,193 @@ for k in range(8):
     z = Z_BAT + 7.25 - 0.22 * k
     box(f"Tavla_Helene_ligne_{k}", TAVLA_X + 0.08, TAVLA_X + 0.11, 18.75 + (0.35 if k == 7 else 0), 21.25,
         z, z + 0.06, "40_Ulam", MAT_OR())
-# Vigne d'or suspendue devant l'entrée du Heikhal (Middot 3:8) : représentée par un tore
-# Remontée à 27 amot : à 23 elle enfermait la couronne d'Hélène dans son anneau, et
-# les deux ne faisaient plus qu'un objet au rendu du plan 8.
-# « גֶּפֶן שֶׁל זָהָב הָיְתָה עוֹמֶדֶת עַל פִּתְחוֹ שֶׁל הֵיכָל, וּמֻדְלָה עַל גַּבֵּי כְלוֹנָסוֹת, וְכָל מִי
-# שֶׁהוּא מִתְנַדֵּב עָלֶה אוֹ גַרְגִּיר אוֹ אֶשְׁכּוֹל, מֵבִיא וְתוֹלֶה בָהּ » (Middot 3:8) : une vigne
-# palissée sur des perches, où l'on suspend feuilles, grains et grappes. L'anneau nu
-# se stylisait en cerceau ; il porte maintenant ses deux perches jusqu'aux poutres du
-# plafond, vingt-quatre feuilles et douze grappes.
-VIGNE_X, VIGNE_Z, VIGNE_R = -91.5, Z_BAT + 27, 3
-tore("Vigne_or", VIGNE_X, 0, VIGNE_Z, VIGNE_R, 0.3, "40_Ulam", MAT_OR(),
-     rotation=(0, math.pi / 2, 0))
+# --- Gefen Zahav (Middot 3:8) : « גֶּפֶן שֶׁל זָהָב הָיְתָה עוֹמֶדֶת עַל פִּתְחוֹ שֶׁל הֵיכָל, וּמֻדְלָה עַל
+#     גַּבֵּי כְלוֹנָסוֹת. כָּל מִי שֶׁהוּא מִתְנַדֵּב עָלֶה, אוֹ גַרְגִּיר, אוֹ אֶשְׁכּוֹל, מֵבִיא וְתוֹלֶה בָהּ ».
+#     מֻדְלָה, c'est palissée : un cep, des perches, des sarments tendus dessus. L'anneau
+#     de tore ceint de vingt-quatre plaques radiales se lisait en rouage, et aucune
+#     source ne met de cercle ici.
+#     Ce que la michna donne d'autre, c'est le désordre : chacun apporte son or « כִּדְמוּת
+#     גַּרְגִּיר אוֹ עָלֶה אוֹ אֶשְׁכּוֹל » (Bartenura ad loc.) et l'accroche — donc des feuilles de
+#     tailles et d'inclinaisons différentes, des grappes inégales, jamais un pas régulier.
+#     Le poids d'or accumulé est ce que dit R. Eliezer b. Tsadok par ses trois cents
+#     kohanim (lashon havai, Bartenura ad loc. ; Houllin 90b).
+#     Le cep monte du sol de l'Oulam le long de la perche sud — CHOIX, la michna ne dit
+#     pas d'où il part. Les perches se posent hors des jambages de la porte de 10 et la
+#     vigne tient au-dessus du linteau : la ligne de mire du mont des Oliviers vers la
+#     porte du Heikhal (Middot 2:4) reste dégagée.
+CONTOUR_FEUILLE = [(0.00, 0.00), (0.03, 0.13), (0.11, 0.25), (0.20, 0.28), (0.26, 0.20),
+                   (0.34, 0.31), (0.45, 0.40), (0.54, 0.36), (0.58, 0.25), (0.66, 0.29),
+                   (0.78, 0.25), (0.90, 0.15), (1.00, 0.00)]
+
+
+def sarment(nom, points, r0, r1):
+    """Sarment : tronçons au rayon décroissant le long d'une polyligne, nœuds aux coudes."""
+    n = len(points) - 1
+    for k in range(n):
+        r = r0 + (r1 - r0) * (k + 1) / n
+        cyl_between(f"{nom}_{k:02d}", points[k], points[k + 1], r, "40_Ulam", MAT_OR(), verts=8)
+        if k % 3 == 1:
+            sphere(f"{nom}_noeud_{k:02d}", *points[k], r * 1.15, "40_Ulam", MAT_OR(), segs=6)
+    return points
+
+
+def _sur_sarment(points, t):
+    """Point et tangente à la fraction t d'une polyligne."""
+    k = min(int(t * (len(points) - 1)), len(points) - 2)
+    u = t * (len(points) - 1) - k
+    a, b = Vector(points[k]), Vector(points[k + 1])
+    return a + (b - a) * u, (b - a).normalized()
+
+
+def rameau(z, y0, y1, cle, n=16, ampli=0.55):
+    """Course d'un sarment le long d'un lit : il ondule autour de la traverse, il ne la double pas."""
+    return [(VIGNE_XL + 0.28 + 0.16 * math.sin(4.1 * t + 6 * alea(cle)),
+             y0 + (y1 - y0) * t,
+             z + ampli * math.sin(2.4 * math.pi * t + 6 * alea(cle, 1)))
+            for t in (k / n for k in range(n + 1))]
+
+
+def feuille_de_vigne(nom, attache, taille, cle):
+    """Feuille à cinq lobes et son pétiole, pliée en gouttière le long de la nervure."""
+    axe = Vector((0.45 + 0.5 * alea(cle, 1),
+                  1.7 * (alea(cle, 2) - 0.5),
+                  0.9 * (alea(cle, 3) - 0.62))).normalized()
+    base = Vector(attache) + axe * 0.3 * taille
+    plan = (axe.cross(Vector((0, 1, 0))) + Vector((0.6, 0, 0.4 * (alea(cle, 4) - 0.5)))).normalized()
+    cyl_between(f"{nom}_petiole", attache, tuple(base), 0.03, "40_Ulam", MAT_OR(), verts=5)
+    limbe(nom, CONTOUR_FEUILLE, tuple(base), tuple(axe), tuple(plan), taille, 0.022,
+          "40_Ulam", MAT_OR(), courbure=0.2)
+
+
+def grappe(nom, attache, longueur, cle, baies=28):
+    """Grappe : rafle courte et baies en cône serré, les plus grosses en haut."""
+    haut = Vector(attache) + Vector((0.1, 0, -0.22 * longueur))
+    cyl_between(f"{nom}_rafle", attache, tuple(haut), 0.05, "40_Ulam", MAT_OR(), verts=6)
+    for k in range(baies):
+        t = k / (baies - 1)
+        large = 0.22 * longueur * (1 - t) ** 0.65
+        a = 2.4 * k + 6 * alea(cle, k)
+        p = haut + Vector((0.6 * large * math.cos(a) * (0.4 + alea(cle, 40 + k)),
+                           large * math.sin(a),
+                           -0.78 * longueur * t))
+        sphere(f"{nom}_{k:02d}", p.x, p.y, p.z, 0.17 - 0.06 * t, "40_Ulam", MAT_OR(), segs=8)
+
+
+def vrille(nom, depart, rayon, longueur, cle, tours=2.5, n=14):
+    """Vrille : la spirale par où la vigne s'accroche — c'est elle qui la dit de loin."""
+    d = Vector((0.35 * (alea(cle) - 0.5), 0.5 * (alea(cle, 1) - 0.5), -1)).normalized()
+    u = d.cross(Vector((1, 0, 0))).normalized()
+    v = d.cross(u)
+    pts = []
+    for k in range(n + 1):
+        t = k / n
+        a = 2 * math.pi * tours * t
+        r = rayon * min(1.0, 3 * t)
+        pts.append(tuple(Vector(depart) + d * (longueur * t)
+                         + (u * (math.cos(a) - 1) + v * math.sin(a)) * r))
+    for k in range(n):
+        cyl_between(f"{nom}_{k:02d}", pts[k], pts[k + 1], 0.035, "40_Ulam", MAT_OR(), verts=5)
+
+
+VIGNE_X, VIGNE_Y = -91.5, 5.5        # devant le nu du mur est du Heikhal ; perches hors des jambages
+VIGNE_XL = VIGNE_X + 0.3             # les lits passent devant les perches
+VIGNE_LITS = (Z_BAT + 25, Z_BAT + 29.5, Z_BAT + 34)
+VIGNE_Z_HAUT = Z_BAT + 37.9          # sous les klonasot du plafond de l'Oulam
 for s in (-1, 1):
-    cyl_between(f"Vigne_perche{s:+d}", (VIGNE_X, s * 3.6, VIGNE_Z - VIGNE_R - 0.3),
-                (VIGNE_X, s * 3.6, Z_BAT + 37.9), 0.14, "40_Ulam", MAT_OR(), verts=10)
-cyl_between("Vigne_traverse", (VIGNE_X, -3.6, VIGNE_Z + VIGNE_R + 0.5), (VIGNE_X, 3.6, VIGNE_Z + VIGNE_R + 0.5),
-            0.12, "40_Ulam", MAT_OR(), verts=10)
-GRAINS = ((0.08, 0.12, 0.0), (-0.08, -0.12, 0.0), (0.06, 0.0, -0.2), (-0.06, 0.1, -0.33),
-          (0.05, -0.1, -0.33), (0.0, 0.0, -0.5))
-for k in range(24):
-    phi = math.radians(7.5 + 15 * k)
-    radial, tangent = (math.sin(phi), -math.cos(phi)), (math.cos(phi), math.sin(phi))
-    cy, cz = VIGNE_R * radial[0], VIGNE_Z + VIGNE_R * radial[1]
-    x_feuille = VIGNE_X + 0.35
-    quad = [(x_feuille, cy + 0.28 * tangent[0] - 0.1 * radial[0], cz + 0.28 * tangent[1] - 0.1 * radial[1]),
-            (x_feuille, cy + 0.28 * tangent[0] + 0.5 * radial[0], cz + 0.28 * tangent[1] + 0.5 * radial[1]),
-            (x_feuille, cy - 0.28 * tangent[0] + 0.5 * radial[0], cz - 0.28 * tangent[1] + 0.5 * radial[1]),
-            (x_feuille, cy - 0.28 * tangent[0] - 0.1 * radial[0], cz - 0.28 * tangent[1] - 0.1 * radial[1])]
-    plaque(f"Vigne_feuille_{k:02d}", quad, 0.03, "40_Ulam", MAT_OR())
-    if k % 2 == 0:
-        for g, (gx, gy, gz) in enumerate(GRAINS):
-            sphere(f"Vigne_grappe_{k // 2:02d}_{g}", VIGNE_X + gx, cy + gy, cz - 0.45 + gz,
-                   0.13 - 0.012 * g, "40_Ulam", MAT_OR(), segs=6)
-# Couronne d'or de la reine Hélène, suspendue au-dessus de l'entrée du Heikhal
-# (Yoma 37a : « c'est par elle qu'on savait que le soleil s'était levé »). Le prompt
-# du plan 8 la décrivait sans qu'elle existe dans le blockout : ou le modèle
-# l'inventait ailleurs, ou il ne la mettait pas. Middot n'en donne pas les cotes.
-# La poser à -92,5 ne réglait rien : l'anneau de 2,4 amot s'enfonçait de 1,9 dans le
-# linteau (x -98..-92) et aucun rayon du plan 8 ne le touchait. Son centre doit donc
-# être à l'est de la face du mur d'au moins son rayon.
-# Une נִבְרֶשֶׁת est suspendue : trois chaînes la pendent au bas de la vigne (CHOIX), et
-# elle est une couronne, pointes dressées, ce que l'anneau nu ne disait pas.
+    cyl_between(f"Vigne_perche{s:+d}", (VIGNE_X, s * VIGNE_Y, Z_BAT),
+                (VIGNE_X, s * VIGNE_Y, VIGNE_Z_HAUT), 0.16, "40_Ulam", MAT_OR(), verts=10)
+for k, z in enumerate(VIGNE_LITS):
+    cyl_between(f"Vigne_lit_{k}", (VIGNE_XL, -VIGNE_Y, z), (VIGNE_XL, VIGNE_Y, z),
+                0.13, "40_Ulam", MAT_OR(), verts=10)
+    for s in (-1, 1):
+        tore(f"Vigne_lien_{k}{s:+d}", VIGNE_X + 0.15, s * VIGNE_Y, z, 0.24, 0.05,
+             "40_Ulam", MAT_OR(), rotation=(0, math.pi / 2, 0), majeur=12, mineur=6)
+
+SARMENTS = [
+    sarment("Vigne_cep",
+            courbe((VIGNE_X + 0.4, -VIGNE_Y + 0.7, Z_BAT), (VIGNE_X + 0.9, -VIGNE_Y - 0.6, Z_BAT + 13),
+                   (VIGNE_XL + 0.1, -VIGNE_Y + 0.5, VIGNE_LITS[0]), 12), 0.55, 0.26),
+    sarment("Vigne_rameau_0", rameau(VIGNE_LITS[0], -VIGNE_Y + 0.5, VIGNE_Y - 0.4, "rameau0"), 0.24, 0.1),
+    sarment("Vigne_montant_S",
+            courbe((VIGNE_XL + 0.15, -4.4, VIGNE_LITS[0]), (VIGNE_XL + 0.7, -5.2, (VIGNE_LITS[0] + VIGNE_LITS[1]) / 2),
+                   (VIGNE_XL + 0.2, -4.5, VIGNE_LITS[1]), 8), 0.22, 0.14),
+    sarment("Vigne_rameau_1", rameau(VIGNE_LITS[1], -4.5, VIGNE_Y - 0.5, "rameau1"), 0.2, 0.09),
+    sarment("Vigne_montant_N",
+            courbe((VIGNE_XL + 0.2, 4.3, VIGNE_LITS[1]), (VIGNE_XL + 0.75, 5.2, (VIGNE_LITS[1] + VIGNE_LITS[2]) / 2),
+                   (VIGNE_XL + 0.2, 4.5, VIGNE_LITS[2]), 8), 0.18, 0.12),
+    sarment("Vigne_rameau_2", rameau(VIGNE_LITS[2], 4.5, -VIGNE_Y + 0.8, "rameau2", ampli=0.4), 0.17, 0.08),
+    sarment("Vigne_rameau_3",
+            courbe((VIGNE_XL + 0.3, -2.6, VIGNE_LITS[0] + 0.3), (VIGNE_XL + 0.9, -1.2, VIGNE_LITS[0] + 2.6),
+                   (VIGNE_XL + 0.35, 0.9, VIGNE_LITS[1] - 0.4), 9), 0.14, 0.07),
+    sarment("Vigne_rameau_4",
+            courbe((VIGNE_XL + 0.3, 2.2, VIGNE_LITS[1] + 0.2), (VIGNE_XL + 0.95, 3.4, VIGNE_LITS[1] + 2.5),
+                   (VIGNE_XL + 0.35, 1.6, VIGNE_LITS[2] - 0.3), 9), 0.13, 0.06),
+]
+# Les guirlandes : ce que la vigne fait retomber entre deux points d'un même lit, et
+# d'où pendent les grappes.
+GUIRLANDES = []
+for k, (lit, ya, yb) in enumerate(((0, -4.9, -2.3), (0, 2.2, 5.0),
+                                   (1, -4.4, -1.1), (1, -0.6, 2.5), (1, 3.0, 4.9),
+                                   (2, -4.1, -0.5), (2, 0.3, 4.3))):
+    z = VIGNE_LITS[lit]
+    creux = 1.2 + 1.3 * alea("guirlande", k)
+    GUIRLANDES.append(sarment(f"Vigne_guirlande_{k:02d}",
+                              courbe((VIGNE_XL + 0.15, ya, z), (VIGNE_XL + 0.75, (ya + yb) / 2, z - 2 * creux),
+                                     (VIGNE_XL + 0.15, yb, z), 10), 0.13, 0.09))
+for k, points in enumerate(GUIRLANDES):
+    for j, t in ((0, 0.5), (1, 0.22 + 0.12 * alea("grappe", k))):
+        p, _ = _sur_sarment(points, t)
+        grappe(f"Vigne_grappe_{k:02d}{j}", tuple(p), 1.0 + 1.2 * alea("grappe", 10 * k + j),
+               f"grappe{k}{j}")
+# La feuille et le fruit poussent sur le sarment de l'année, pas sur le vieux cep —
+# et une feuille sur le cep descendait sous le linteau, dans la mire de Middot 2:4.
+TIGES = SARMENTS[1:] + GUIRLANDES
+for k in range(54):
+    points = TIGES[(5 * k + k // len(TIGES)) % len(TIGES)]
+    p, _ = _sur_sarment(points, 0.06 + 0.88 * alea("feuille", k))
+    feuille_de_vigne(f"Vigne_feuille_{k:02d}", tuple(p), 0.8 + 0.7 * alea("feuille", 50 + k),
+                     f"feuille{k}")
+for k in range(9):
+    points = TIGES[(3 * k + 1) % len(TIGES)]
+    p, _ = _sur_sarment(points, 0.15 + 0.7 * alea("vrille", k))
+    vrille(f"Vigne_vrille_{k}", tuple(p), 0.14 + 0.08 * alea("vrille", 10 + k),
+           0.7 + 0.5 * alea("vrille", 20 + k), f"vrille{k}")
+
+# Couronne (נִבְרֶשֶׁת) d'or de la reine Hélène au-dessus de l'entrée du Heikhal (Yoma 3:10).
+# « בְּשָׁעָה שֶׁהַחַמָּה זוֹרַחַת נִיצוֹצוֹת יוֹצְאִין מִמֶּנָּה, וְהַכֹּל יוֹדְעִין שֶׁהִגִּיעַ זְמַן קְרִיאַת שְׁמַע »
+# (Yoma 37b) : ce qu'elle doit faire, c'est renvoyer le premier soleil pris par
+# l'ouverture est de l'Oulam. Un tore et huit cônes à six faces n'en renvoyaient rien ;
+# il faut un bandeau poli, des fleurons creux tournés vers l'est et des gouttes sous le
+# jonc. Middot n'en donne pas les cotes. Elle pend au premier lit de la vigne par trois
+# chaînes à maillons (CHOIX) : un cylindre tendu se lisait en tige.
 COURONNE_X, COURONNE_Z, COURONNE_R = -90.6, Z_BAT + 22, 1.2
-tore("Couronne_Helene", COURONNE_X, 0, COURONNE_Z, COURONNE_R, 0.15, "40_Ulam", MAT_OR())
-for k in range(8):
-    a = 2 * math.pi * k / 8
-    cone(f"Couronne_Helene_pointe_{k}", COURONNE_X + COURONNE_R * math.cos(a), COURONNE_R * math.sin(a),
-         COURONNE_Z + 0.12, COURONNE_Z + 0.42, 0.07, 0.0, "40_Ulam", MAT_OR(), verts=6)
+revolution("Couronne_Helene", COURONNE_X, 0, COURONNE_Z,
+           [(COURONNE_R - 0.14, 0.00), (COURONNE_R, 0.03), (COURONNE_R + 0.02, 0.12),
+            (COURONNE_R - 0.04, 0.34), (COURONNE_R + 0.06, 0.52), (COURONNE_R + 0.02, 0.58),
+            (COURONNE_R - 0.10, 0.55), (COURONNE_R - 0.06, 0.30), (COURONNE_R - 0.16, 0.10),
+            (COURONNE_R - 0.14, 0.00)],
+           "40_Ulam", MAT_OR(), verts=36, capots=False)
+CONTOUR_FLEURON = [(0.00, 0.00), (0.16, 0.15), (0.40, 0.21), (0.64, 0.18), (0.86, 0.10), (1.00, 0.00)]
+for k in range(12):
+    a = 2 * math.pi * k / 12
+    c, sn = math.cos(a), math.sin(a)
+    limbe(f"Couronne_Helene_fleuron_{k:02d}", CONTOUR_FLEURON,
+          (COURONNE_X + (COURONNE_R - 0.04) * c, (COURONNE_R - 0.04) * sn, COURONNE_Z + 0.5),
+          (0.3 * c, 0.3 * sn, 1), (c, sn, 0), 0.5 if k % 2 else 0.75, 0.03,
+          "40_Ulam", MAT_OR(), courbure=0.45)
+for k in range(12):
+    a = 2 * math.pi * (k + 0.5) / 12
+    x, y = COURONNE_X + (COURONNE_R - 0.06) * math.cos(a), (COURONNE_R - 0.06) * math.sin(a)
+    cyl_between(f"Couronne_Helene_goutte_{k:02d}_tige", (x, y, COURONNE_Z),
+                (x, y, COURONNE_Z - 0.16), 0.02, "40_Ulam", MAT_OR(), verts=5)
+    cone(f"Couronne_Helene_goutte_{k:02d}", x, y, COURONNE_Z - 0.30, COURONNE_Z - 0.14,
+         0.0, 0.075, "40_Ulam", MAT_OR(), verts=8)
 for k in range(3):
     a = math.radians(90 + 120 * k)
-    cyl_between(f"Couronne_Helene_chaine_{k}",
-                (COURONNE_X + COURONNE_R * math.cos(a), COURONNE_R * math.sin(a), COURONNE_Z + 0.1),
-                (VIGNE_X, 0, VIGNE_Z - VIGNE_R - 0.2), 0.025, "40_Ulam", MAT_OR(), verts=6)
+    y = (COURONNE_R - 0.02) * math.sin(a)
+    chaine(f"Couronne_Helene_chaine_{k}",
+           (COURONNE_X + (COURONNE_R - 0.02) * math.cos(a), y, COURONNE_Z + 0.45),
+           (VIGNE_XL, y, VIGNE_LITS[0]), 0.075, "40_Ulam", MAT_OR())
 
 # --- Mur est du Heikhal (6 amot) avec porte 10 × 20, quatre portes plaquées d'or
 HX_E = BX_E - 16      # -92

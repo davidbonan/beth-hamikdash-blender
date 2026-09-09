@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
-import { habiller, attiser, ETOFFES } from "./matieres.js";
+import { habiller, ETOFFES } from "./matieres.js";
 import { nappes } from "./nappes.js";
-import { chaine } from "./occlusion.js";
+import { chaine } from "./chaine.js";
+import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
+import { regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
 import { ZONES, panneau } from "./fiche.js";
@@ -89,85 +91,42 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true, powerPreference: "high-performance",
   logarithmicDepthBuffer: PROFIL.profondeurLog });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.62;
+renderer.toneMappingExposure = 0.68;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PROFIL.ombres.doux ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
+// Le profil lourd ne s'en sert pas : `ombres.js` y remplace la lecture de la carte
+// par une pénombre variable. Il reste le réglage du profil léger, qui garde celle-ci.
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-// Le brouillard porte la couleur du BAS du ciel, et pas une autre : accordé au dôme
-// il éloigne, désaccordé il salit. À 0xc9cec8 sur 120 m il repeignait en gris-vert
-// tout ce qui passait le milieu de l'esplanade, laquelle fait 500 amot de côté.
-scene.fog = new THREE.Fog(0xd8dcd4, 220, 900);
+scene.fog = BRUME;
 
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
 // calcaire y perdait sa teinte et le modelé avec, et les murs rendaient un aplat gris.
 // Le rapport compte plus que les niveaux — même arbitrage que le ciel du blockout.
-scene.add(new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.42));
-// Matin, à l'est : l'axe de l'avoda, et la lumière qui creuse la façade de face.
-const soleil = new THREE.DirectionalLight(0xfff2dc, 2.7);
-soleil.castShadow = true;
-soleil.shadow.mapSize.set(PROFIL.ombres.taille, PROFIL.ombres.taille);
-soleil.shadow.bias = -0.0002;
-soleil.shadow.normalBias = 0.04;
-// Fenêtre serrée : elle suit le visiteur, et 2048 texels sur 80 m donnent 4 cm de
-// résolution — assez fin pour l'arête d'une assise, ce qu'une fenêtre couvrant tout
-// le Har HaBayit ne donnerait jamais. Le profil léger rétrécit la fenêtre en même
-// temps que la carte, pour garder cette résolution-là.
-const PORTEE_OMBRE = PROFIL.ombres.portee;
-Object.assign(soleil.shadow.camera, { near: 1, far: 260, left: -PORTEE_OMBRE,
-  right: PORTEE_OMBRE, top: PORTEE_OMBRE, bottom: -PORTEE_OMBRE });
+// Elle descend une seconde fois, avec `ambiance` dans ciel.js : ce que ce réglage-ci
+// corrigeait pour les parements, il restait à le corriger pour tout ce qui est à plat.
+scene.add(new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.16));
+// Matin, à l'est : l'axe de l'avoda, et la lumière qui rase la façade. Plus bas sur
+// l'horizon, le soleil traverse plus d'atmosphère : il perd de la force et gagne de
+// l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
+const soleil = new THREE.DirectionalLight(0xffe0b4, 4.9);
+reglerOmbres(soleil);
 scene.add(soleil, soleil.target);
-const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.22);  // rebond du ciel à l'ouest
+const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.12);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
-// Un dôme dégradé plutôt qu'un aplat : sans horizon, le Har HaBayit flotte. Et le
-// soleil y est DESSINÉ : un ciel d'où vient une ombre franche sans qu'on voie d'où
-// elle vient se lit en éclairage de studio, pas en matin de Jérusalem.
-const SOLEIL = new THREE.Vector3(150, 125, 55);
-function domeCiel(rayon, haut = 0x4d7fb8, bas = 0xd8dcd4, sol = 0xa89c86, disque = 1.0) {
-  return new THREE.Mesh(
-    new THREE.SphereGeometry(rayon, 64, 32),
-    new THREE.ShaderMaterial({
-      side: THREE.BackSide, depthWrite: false, fog: false,
-      uniforms: { hautCiel: { value: new THREE.Color(haut) },
-                  basCiel: { value: new THREE.Color(bas) },
-                  solCiel: { value: new THREE.Color(sol) },
-                  dirSoleil: { value: SOLEIL.clone().normalize() },
-                  force: { value: disque } },
-      vertexShader: `varying vec3 vD; void main(){ vD = position;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-      fragmentShader: `uniform vec3 hautCiel, basCiel, solCiel, dirSoleil;
-        uniform float force; varying vec3 vD;
-        void main(){ vec3 d = normalize(vD); float h = d.y;
-          vec3 c = h > 0.0 ? mix(basCiel, hautCiel, pow(h, 0.55)) : mix(basCiel, solCiel, min(-h * 6.0, 1.0));
-          float s = max(dot(d, dirSoleil), 0.0);
-          // Trois portées : la moitié du ciel se réchauffe vers le soleil, le halo se
-          // resserre autour, le disque tient dans un demi-degré.
-          c += force * vec3(1.00, 0.84, 0.58) * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
-          c += force * vec3(1.00, 0.95, 0.86) * 2.2 * smoothstep(0.99993, 0.99998, s);
-          gl_FragColor = vec4(c, 1.0); }`,
-    }));
-}
+// Le soleil est posé loin devant la caméra, pas à sa hauteur : la fenêtre d'ombre le
+// suit, et il faut que ce qui la surplombe — la façade fait cinquante mètres — tienne
+// entre son `near` et son `far`.
+const RECUL_SOLEIL = 200;
 
-const ciel = domeCiel(760);
-ciel.frustumCulled = false;
+const ciel = domeVu(760);
 scene.add(ciel);
-
-// L'or est métallique : sans environnement à réfléchir, il rend noir. Cet
-// environnement est le dôme lui-même et pas une pièce neutre : une pièce grise
-// éclaire chaque face à l'ombre d'un gris sans teinte, et c'est ce qui rendait le
-// calcaire des faces nord couleur de béton.
-// Le dôme qui éclaire n'a pas les couleurs du dôme qu'on voit : il n'y a pas de
-// rebond dans cette scène, et sous un portique la seule lumière serait celle du bleu
-// du zénith — le dallage à l'ombre y virait au bleu franc. Le ciel de l'éclairage est
-// donc désaturé vers le haut, et sa moitié basse porte le calcaire ensoleillé de
-// l'esplanade, qui est le vrai rebond de tout ce qui est à l'ombre ici.
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(
-  new THREE.Scene().add(domeCiel(20, 0x8fa5bd, 0xe0d9c9, 0xc9b795, 0.0)), 0.04, 0.1, 200).texture;
+// L'or est métallique : sans environnement à réfléchir, il rend noir.
+scene.environment = environnement(renderer);
 
 // Le champ est fixé à l'HORIZONTALE, pas à la verticale. Un champ vertical constant
 // vaut 94° de large en 16/9 et 31° sur un téléphone tenu debout : on y visiterait le
@@ -244,7 +203,6 @@ gltf.scene.traverse((o) => {
   if (!brut && !habillees.has(o.material.uuid)) {
     habillees.add(o.material.uuid);
     habiller(o.material, horloges, jeux);
-    attiser(o.material);
   }
   obstacles.push(o);
   if (!TRAVERSABLES.has(o.userData.concept)) murs.push(o);
@@ -528,7 +486,7 @@ let image = 0;
 // carte figée serait illisible. Elle suit donc le visiteur.
 function suivreSoleil() {
   soleil.target.position.copy(camera.position);
-  soleil.position.copy(camera.position).add(SOLEIL);
+  soleil.position.copy(camera.position).addScaledVector(SOLEIL, RECUL_SOLEIL);
   soleil.target.updateMatrixWorld();
 }
 
