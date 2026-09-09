@@ -11,7 +11,8 @@ cible="$site/public/visite"
 mkdir -p "$cible"
 rsync -a --delete \
   --include='index.html' --include='apercu.jpg' --include='temple.glb' \
-  --include='*.js' --include='*.json' --exclude='*' \
+  --include='*.js' --include='*.json' \
+  --include='matieres/' --include='matieres/*.webp' --exclude='*' \
   "$source_dir/" "$cible/"
 
 # Servie à /visite, sans slash final, la page résoudrait ses "./" à la racine du site.
