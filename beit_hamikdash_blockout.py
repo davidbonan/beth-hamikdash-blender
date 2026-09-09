@@ -210,6 +210,12 @@ ASSISE = 4.0                # CHOIX : hauteur d'assise, hors source
 # bordure rapportée ; 0,25 le ramène à un trait de ciseau.
 JOINT = 0.06
 LISERE = 0.25
+# « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » (Baba Batra 4a ; Soucca 51b) : une assise déborde, la
+# suivante rentre. Le débord n'est chiffré nulle part — CHOIX. Il est plus fort sur le
+# bâtiment que sur l'enceinte parce que c'est de SA façade que parle la guemara : là, ce
+# relief est ce que les Sages ont préféré à l'or, et il doit porter la vague à lui seul.
+DEBORD_ASSISE = 0.05
+DEBORD_BATIMENT = 0.11
 
 # Le sol va en RANGÉES, pas en carreaux. « כָּל שׁוּרָה וְשׁוּרָה שֶׁל אַבְנֵי הָרִצְפָּה קְרוּיָה
 # רֹבֶד » (Bartenura sur Yoma 4:3), et on les COMPTE en sortant du Heikhal : Yoma 4:3
@@ -255,7 +261,7 @@ def _parement(mat):
     return p.outputs["Z"], u, _calc(mat, "ABSOLUTE", n.outputs["Z"])
 
 
-def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
+def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     """Taille la surface en blocs de gazit et creuse leur joint et son liseré.
 
     Deux reliefs, et c'est le profil du bloc : le joint, creusé ; le liseré ciselé qui
@@ -266,6 +272,8 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
     La parité des assises reste le « אבן יוצא ואבן נכנס » de *Baba Batra* 4a : une assise
     en léger débord, la suivante en retrait. C'est ce jeu-là — pas un placage — qui a
     fait renoncer Hérode à dorer le bâtiment, « cela ressemble aux vagues de la mer ».
+    D'où `debord`, plus fort sur le bâtiment que sur l'enceinte : c'est de SA façade que
+    parle la guemara, et c'est le relief qui doit y porter la vague, pas la teinte.
 
     Renvoie (parité de l'assise, tirage de l'assise, tirage du bloc, masque du joint).
     Le profil du relief ne sort pas : il ne sert qu'aux Bump, posés ici.
@@ -320,7 +328,7 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
     creux.color_ramp.elements[1].position = JOINT * 1.15 / portee
     mat.node_tree.links.new(rapport, creux.inputs["Factor"])
     _creuser(mat, profil.outputs["Color"], 1.0, 0.07)
-    _creuser(mat, parite, 0.9, 0.05)
+    _creuser(mat, parite, 0.9, debord)
     # Le grain reste dans le champ de la pierre et s'arrête au liseré, qui est ciselé.
     _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.45), profil.outputs["Color"]), 0.8, 0.035)
     # Piqûre du calcaire : le meleke est poreux, et sans elle la face sciée rend un
@@ -439,10 +447,14 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
     return mat
 
 
-# Les trois marbres d'Hérode (Baba Batra 4a, Soucca 51b) : shesh, marmara, kuchla —
-# blanc, bleu-vert, jaune. Saturation très basse : ce que les Sages lui ont fait garder
-# contre l'or, c'est « כִּי אִידְווֹתָא דְיַמָּא », le moiré d'une mer — pas une mosaïque.
-MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.76, 0.85, 0.83), (0.92, 0.85, 0.62))
+# Les trois marbres d'Hérode : « בְּאַבְנֵי כּוּחְלָא, שִׁישָׁא וּמַרְמְרָא » (Baba Batra 4a ; Soucca
+# 51b). Rashi les nomme sur place (*ad loc.*) et ce sont trois FROIDS : « שישא — שיש
+# ירוק », « מרמרא — שיש לבן », « כוחלא — שיש צבוע כעין כחול » — vert, blanc, bleu.
+# Aucune source ne met de jaune sur ce bâtiment ; le troisième marbre en portait un, et
+# c'est lui qui faisait lire la façade en assises de brique.
+# Saturation très basse : ce que les Sages lui ont fait garder contre l'or, c'est « כִּי
+# אִידְווֹתָא דְיַמָּא », le moiré d'une mer — pas une mosaïque.
+MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.81, 0.86, 0.86), (0.82, 0.88, 0.78))
 
 
 def marbre_herode(name):
@@ -463,7 +475,7 @@ def marbre_herode(name):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.62   # marbre poli, pas calcaire
-    _, tire_assise, bloc, creux = _appareil(mat)
+    _, tire_assise, bloc, creux = _appareil(mat, debord=DEBORD_BATIMENT)
     choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
     rampe = choix.color_ramp
     rampe.interpolation = 'CONSTANT'
@@ -904,6 +916,12 @@ MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)
 MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
 MAT_EAU = lambda: eau("Eau_Kiyor")
 MAT_FER = lambda: metal("Fer", (0.30, 0.29, 0.28), 0.6)            # crochets des ninnasin (Middot 3:5)
+# Le kaleh orev est du fer AFFÛTÉ — « חַד כְּמוֹ הַסַּיִף » (Rambam sur Middot 4:6), « חַד כְּמִין
+# סַיִף » (Bartenura ad loc.) : un tranchant est poli, et le fer voué au Temple sert à
+# cela (« בַּרְזֶל… לֹא יִפְחוֹת מֵאַמָּה עַל אַמָּה. לְמַאי חַזְיָא? … לְכָלְיָה עוֹרֵב », Mena'hot 107a).
+# Au fer forgé des crochets, l'ama du faîte se lisait en barre noire sur les cent amot
+# de la façade ; polie, elle prend le ciel et se lit en arête. La matière ne change pas.
+MAT_FER_LAME = lambda: metal("Fer_lame", (0.62, 0.62, 0.63), 0.18)
 MAT_SIKRA = lambda: material("Sikra", (0.55, 0.10, 0.06))          # le 'hout hasikra (Middot 3:1)
 
 # ----------------------------------------------------------------------------
@@ -2915,11 +2933,11 @@ for suffixe, xa, xb, ya, yb in POURTOUR_TOIT:
     if (xb - xa) >= (yb - ya):
         c = (ya + yb) / 2
         box(f"Kaleh_orev_{suffixe}", xa, xb, c - LAME_EP / 2, c + LAME_EP / 2,
-            Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER())
+            Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER_LAME())
     else:
         c = (xa + xb) / 2
         box(f"Kaleh_orev_{suffixe}", c - LAME_EP / 2, c + LAME_EP / 2, ya, yb,
-            Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER())
+            Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER_LAME())
 
 # --- Ustensiles du Heikhal (Yoma 33b ; Menachot 98b) : dans les deux tiers ouest,
 #     à 2.5 amot des murs. Table au NORD, Menora au SUD, autel d'or entre les deux, vers l'est.

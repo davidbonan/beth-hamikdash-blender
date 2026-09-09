@@ -25,7 +25,7 @@ export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil"]
 const FAMILLES = {
   Pierre_claire: PIERRE, Sol: PIERRE, Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: GAZIT,
-  Or: METAL, Or_plaque: METAL, Bronze: METAL, Fer: METAL,
+  Or: METAL, Or_plaque: METAL, Bronze: METAL, Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Eau_Kiyor: EAU,
@@ -74,6 +74,14 @@ const float LISERE = 0.25;     // liseré ciselé qui le borde
 // bâtiment. Une assise y vaut le pas d'un rovad de l'Oulam. Même valeur qu'ASSISE dans
 // le blockout — à 2 amot la façade portait cinquante lits et se lisait en brique.
 const float ASSISE = 4.0;
+// « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » (Baba Batra 4a ; Soucca 51b) : une assise déborde, la
+// suivante rentre. Le blockout le pose en bump sur la parité de l'assise (DEBORD_ASSISE,
+// DEBORD_BATIMENT) ; ici, sans dérivée d'écran, la marche se donne par le LIT — creusé
+// plus profond du côté de l'assise rentrante, presque plat du côté de celle qui déborde.
+// Deux encodages du même fait : la valeur n'est pas la même de part et d'autre, le
+// rapport entre le bâtiment et l'enceinte l'est.
+const float DEBORD = 0.16;           // enceinte et pourtour
+const float DEBORD_BATIMENT = 0.35;  // le bâtiment d'Hérode : c'est sa vague
 // Le sol va en RANGÉES, pas en carreaux : « כל שורה ושורה של אבני הרצפה קרויה רובד »
 // (Bartenura sur Yoma 4:3), et on les compte en sortant du Heikhal — Yoma 4:3 pose le
 // ממרס sur le quatrième rovad de l'Azara. Largeur « ורובד ארבע » (Middot 3:6). Mêmes
@@ -124,7 +132,7 @@ float ecart(float coord, float taille, out float rang, out float sens){
 // l'une. Un tambour de colonne est UNE pierre : il les prend énormes toutes les deux,
 // ce qui supprime le joint vertical et ne laisse que le lit d'un tambour au suivant.
 void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float longue,
-              out vec3 teinte, out vec3 pente, out float rugo){
+              float debord, out vec3 teinte, out vec3 pente, out float rugo){
   float g = grain(P * 7.0);
   if (abs(N.y) > 0.7) {                       // dallage : les assises n'ont pas de sens à plat
     // Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
@@ -177,12 +185,17 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   float dprofil = d < JOINT ? 0.62 / JOINT
                 : (d < JOINT + LISERE ? 0.06 / LISERE
                 : (d < JOINT + LISERE + 0.06 ? 0.32 / 0.06 : 0.0));
+  // La marche d'assise n'agit que sur le LIT : un joint vertical sépare deux blocs du
+  // même rang, qui affleurent. Les deux versants d'un même lit tombent dans des assises
+  // de parité opposée, donc dans des marches opposées — c'est cette dissymétrie-là qui
+  // se lit en débord, là où une rainure symétrique ne se lit qu'en trait.
+  float marche = dz < du ? 1.0 + (parite * 2.0 - 1.0) * debord : 1.0;
   vec3 dir = dz < du ? vec3(0.0, sensZ, 0.0) : axe * sensU;
-  pente = dprofil * dir * (CREUX_M / AMA);
+  pente = dprofil * marche * dir * (CREUX_M / AMA);
   // Le JOINT seul, sans le liseré : l'ombre s'arrête au fond de la rainure. Étalée sur
   // le liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur ; le
   // liseré est de la pierre en plein soleil et ne doit rien perdre.
-  float creux = clamp(d / (JOINT * 1.6), 0.0, 1.0);
+  float creux = clamp(d / (JOINT * 1.6 * marche), 0.0, 1.0);
   // Une coulure, pas une tache : un bruit étiré à la verticale. Une tache sur un mur se
   // lit en défaut de matière ; une coulure se lit en pierre. Et une moucheture par-
   // dessus : le banc donne au bloc SA couleur, mais un bloc d'une seule couleur est un
@@ -211,25 +224,27 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
   // pixel se moyenne toute seule ; une normale, non — elle bascule d'un pixel au
   // suivant et la façade se met à grésiller de blocs noirs et blancs.
   float finesse = 1.0 - smoothstep(16.0, 65.0, loin);
-  if (uFamille == 1) { appareil(P, N, ASSISE, 1.0, 8.0, 10.0, teinte, pente, rugo); }
+  if (uFamille == 1) { appareil(P, N, ASSISE, 1.0, 8.0, 10.0, DEBORD, teinte, pente, rugo); }
   else if (uFamille == 11) {          // la ville : de la pierre de pays, pas du gazit
-    appareil(P, N, 0.8, 1.0, 1.5, 2.5, teinte, pente, rugo);
+    appareil(P, N, 0.8, 1.0, 1.5, 2.5, DEBORD, teinte, pente, rugo);
   }
   else if (uFamille == 10) {          // tambour de colonne : pas de joint vertical
     // Sur un cylindre le joint vertical était pire qu'inutile : la face choisit son axe
     // sur la normale, qui bascule quatre fois autour du fût, et la trame sautait quatre
     // fois par colonne.
-    appareil(P, N, 1.4, 1.0, 1.0e4, 1.0e4, teinte, pente, rugo);
+    appareil(P, N, 1.4, 1.0, 1.0e4, 1.0e4, 0.0, teinte, pente, rugo);
   }
   else if (uFamille == 9) {           // le bâtiment : même assise, trois marbres
-    // « בְּאַבְנֵי שֵׁישָׁא כּוּחְלָא וּמַרְמְרָא » (Soucca 51b ; Baba Batra 4a). Le rang entier tire
-    // sa pierre — par bloc, les trois marbres feraient une mosaïque et non les vagues
-    // que les Sages ont préférées à l'or. Écarts relatifs au shesh, qui est la couleur
-    // de base exportée. L'assise vaut le pas d'un rovad de l'Oulam, qui va par 4.
-    appareil(P, N, ASSISE, 0.0, 8.0, 10.0, teinte, pente, rugo);
+    // « בְּאַבְנֵי כּוּחְלָא, שִׁישָׁא וּמַרְמְרָא » (Baba Batra 4a ; Soucca 51b). Rashi ad loc. les
+    // nomme, et ce sont trois FROIDS : « שישא — שיש ירוק », « מרמרא — שיש לבן », « כוחלא
+    // — שיש צבוע כעין כחול ». Le rang entier tire sa pierre — par bloc, les trois marbres
+    // feraient une mosaïque et non les vagues que les Sages ont préférées à l'or. Écarts
+    // relatifs au shesh, qui est la couleur de base exportée, et mêmes valeurs que
+    // MARBRES_HERODE du blockout. L'assise vaut le pas d'un rovad de l'Oulam, qui va par 4.
+    appareil(P, N, ASSISE, 0.0, 8.0, 10.0, DEBORD_BATIMENT, teinte, pente, rugo);
     float t = alea1(floor(P.y / (ASSISE * AMA)) * 1.7 + 3.1);
     teinte *= t < 0.3333 ? vec3(1.00, 1.00, 1.00)
-            : (t < 0.6667 ? vec3(0.81, 0.91, 0.93) : vec3(0.98, 0.91, 0.70));
+            : (t < 0.6667 ? vec3(0.86, 0.92, 0.97) : vec3(0.87, 0.95, 0.88));
   }
   else if (uFamille == 2) {                                   // marbre : veines lentes
     float v = grain(P * vec3(2.2, 5.0, 2.2) + grain(P * 1.1) * 2.0);
