@@ -41,18 +41,25 @@ COLLECTIONS = ("00_HarHabayit", "10_EzratNashim", "20_Azara", "30_Mizbeach", "40
 CHANFREIN = ("30_Mizbeach", "40_Ulam", "50_Heikhal", "60_KodeshHakodashim",
              "65_Aron", "70_Kelim")
 
-# Points d'entrée, en amot, au niveau du sol — la hauteur d'œil est ajoutée par le
-# navigateur. `vers` est le cap en degrés, 180 = plein ouest, l'axe du parcours.
+# Points d'entrée, en amot, au niveau du sol — Z_HAR, Z_EZN et Z_AZ du blockout — la hauteur d'œil est ajoutée par le
+# navigateur. Le cap est en degrés, 180 = plein ouest, l'axe du parcours ; le tangage
+# lève le regard au-dessus de l'horizon.
+#
+# L'Ezrat Nashim se prend à SA PORTE, à trois amot du mur est : c'est la vue sur
+# laquelle la visite s'ouvre. De là l'axe se lit d'un coup — les quatre menorot de
+# Simhat Beit HaShoeva, les quinze marches, Nicanor, puis la façade du Heikhal — et
+# six degrés de tangage suffisent à poser le toit du Heikhal sous le bord haut, ce que
+# l'horizontale, qui remplit la moitié basse de dallage, ne fait pas.
 REPERES = [
-    ("har_habayit",       "Har HaBayit, sur l'axe est",   250.0,   0.0, -13.5, 180),
-    ("ezrat_nashim",      "Ezrat Nashim",                  90.0,   0.0,  -7.5, 180),
-    ("quinze_marches",    "Pied des quinze marches",       26.0,   0.0,  -7.5, 180),
-    ("azara",             "Ezrat Israël",                 -14.0,   0.0,   0.0, 180),
-    ("mizbeach",          "Devant le Mizbea'h",           -17.0,  -9.0,   0.0, 180),
-    ("kiyor",             "Au Kiyor",                     -55.0,  -8.0,   0.0, 180),
-    ("oulam",             "Sous l'Oulam",                 -86.0,   0.0,   6.0, 180),
-    ("heikhal",           "Dans le Heikhal",             -112.0,   0.0,   6.0, 180),
-    ("kodesh_hakodashim", "Kodesh HaKodashim",           -143.0,   0.0,   6.0, 180),
+    ("har_habayit",       "Har HaBayit, sur l'axe est",   250.0,   0.0, -16.0, 180, 0),
+    ("ezrat_nashim",      "Ezrat Nashim",                 137.0,   0.0, -10.0, 180, 6),
+    ("quinze_marches",    "Pied des quinze marches",       26.0,   0.0, -10.0, 180, 0),
+    ("azara",             "Ezrat Israël",                 -14.0,   0.0,   0.0, 180, 0),
+    ("mizbeach",          "Devant le Mizbea'h",           -17.0,  -9.0,   0.0, 180, 0),
+    ("kiyor",             "Au Kiyor",                     -55.0,  -8.0,   0.0, 180, 0),
+    ("oulam",             "Sous l'Oulam",                 -86.0,   0.0,   6.0, 180, 0),
+    ("heikhal",           "Dans le Heikhal",             -112.0,   0.0,   6.0, 180, 0),
+    ("kodesh_hakodashim", "Kodesh HaKodashim",           -143.0,   0.0,   6.0, 180, 0),
 ]
 
 
@@ -229,8 +236,9 @@ def main():
     (DOSSIER / "reperes.json").write_text(json.dumps({
         "ama": AMA,
         "emprises": emprises,
-        "entrees": [{"id": i, "nom": n, "position": [x * AMA, z * AMA, -y * AMA], "cap": cap}
-                    for i, n, x, y, z, cap in REPERES],
+        "entrees": [{"id": i, "nom": n, "position": [x * AMA, z * AMA, -y * AMA],
+                     "cap": cap, "tangage": tangage}
+                    for i, n, x, y, z, cap, tangage in REPERES],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))

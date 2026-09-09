@@ -768,77 +768,84 @@ def bois_sculpte(name, rgb):
 # Les quatre matières de la parokhet (Shekalim 8:5 ; Rashi Ex. 26:31) : tekhelet,
 # argaman, tola'at shani, lin — à parts égales, et aucun fil d'or (Ex. 26:31).
 MATIERES_PAROKHET = ((0.10, 0.17, 0.48), (0.40, 0.08, 0.30), (0.55, 0.08, 0.08), (0.86, 0.84, 0.78))
-CHAMP_PAROKHET = 5.0      # hauteur d'un champ de couleur, en amot : 40 amot font 8 champs, 2 par matière
+NIMA = 20 / 72   # amot : les 72 נִימִין de Shekalim 8:5 réparties sur les 20 amot de large
+# La moyenne des quatre laines, et de combien un cordon s'en écarte. Les quatre teintes
+# pures, tirées cordon par cordon, rendaient une neige de télévision : à dix amot un
+# cordon fait un pixel, et quatre couleurs saturées tirées au sort par pixel ne se
+# fondent pas, elles crépitent. Un fil de 24 brins qui contient les quatre EST de la
+# couleur moyenne — ce qui change d'un fil à l'autre n'est que le dosage.
+MOYENNE_PAROKHET = tuple(sum(c[k] for c in MATIERES_PAROKHET) / 4 for k in range(3))
+ECART_PAROKHET = 0.18
+LONGUEUR_DOSAGE = 12   # en nimin : sur quelle longueur le dosage d'un cordon dérive
 
-def parokhet(name):
-    """Étoffe lourde et plate en champs larges des quatre matières, à parts égales.
+def parokhet(name, figure=False):
+    """Étoffe chinée des quatre matières, et non quatre bandes de couleur.
 
-    Un bleu uni se stylisait en rideau de velours à plis : la fiche (§8d) veut les
-    quatre couleurs « en champs larges, lin blanc compris », sans un fil d'or. Les
-    champs sont lus en Z du monde, donc les deux parokhot portent le même tissage.
-    Le relief du tissage — deux trames croisées — et une lisière sombre entre les
-    champs donnent à la passe Normal une surface de laine et non un aplat.
+    « וְעַל שִׁבְעִים וּשְׁתַּיִם נִימִין נֶאֱרֶגֶת, וְעַל כָּל נִימָא וְנִימָא עֶשְׂרִים וְאַרְבָּעָה חוּטִין »
+    (Shekalim 8:5), et Rashi Ex. 26:31 : « כָּל מִין וָמִין הָיָה כָפוּל בְּכָל חוּט וָחוּט שִׁשָּׁה
+    חוּטִין ». Les quatre laines sont retordues DANS chaque fil : le champ est un pourpre
+    changeant où les quatre teintes se lisent de près, pas un drapeau à quatre bandes —
+    huit champs de cinq amot rendaient un pavillon national en travers du Devir.
+
+    Un tirage uniforme par cordon donne les quatre laines à parts égales ; une rampe
+    posée sur un bruit les aurait pondérées par la loi du bruit. Le cordon des nimin,
+    large de 20/72 d'ama, donne au tissu son corps.
+
+    `figure=True` couche ce cordon et remonte le ton : c'est la seconde face d'un
+    maassé 'hoshev, « אֲרִיגָה שֶׁל שְׁתֵּי קִירוֹת » (Rashi, ibid.), la même laine lue par son
+    autre côté. C'est ce qui fait voir les créatures sans y mettre un fil d'or, qu'Ex.
+    26:31 ne donne pas.
     """
     mat, neuf = _neuf(name, MATIERES_PAROKHET[0])
     if not neuf:
         return mat
     liens = mat.node_tree.links
     bsdf = _bsdf(mat)
-    bsdf.inputs["Roughness"].default_value = 0.92
-    bsdf.inputs["Sheen Weight"].default_value = 0.4
-    bsdf.inputs["Sheen Roughness"].default_value = 0.5
-    axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1500, 0)
+    bsdf.inputs["Roughness"].default_value = 0.90
+    bsdf.inputs["Sheen Weight"].default_value = 0.50
+    bsdf.inputs["Sheen Roughness"].default_value = 0.45
+    bsdf.inputs["Specular IOR Level"].default_value = 0.2
+    axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1700, 0)
     liens.new(_position(mat), axe.inputs["Vector"])
-    rang = _noeud(mat, "ShaderNodeMath", -1340, 0)
-    rang.operation = "DIVIDE"
-    rang.inputs[1].default_value = m(CHAMP_PAROKHET)
-    liens.new(axe.outputs["Z"], rang.inputs[0])
-    numero = _noeud(mat, "ShaderNodeMath", -1180, 120)
-    numero.operation = "FLOOR"
-    liens.new(rang.outputs[0], numero.inputs[0])
-    matiere = _noeud(mat, "ShaderNodeMath", -1020, 120)
-    matiere.operation = "MODULO"
-    matiere.inputs[1].default_value = 4.0
-    liens.new(numero.outputs[0], matiere.inputs[0])
-    part = _noeud(mat, "ShaderNodeMath", -860, 120)
-    part.operation = "DIVIDE"
-    part.inputs[1].default_value = 4.0
-    liens.new(matiere.outputs[0], part.inputs[0])
-    choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
-    rampe = choix.color_ramp
-    rampe.interpolation = 'CONSTANT'
-    rampe.elements[0].position = 0.0
-    rampe.elements[0].color = (*MATIERES_PAROKHET[0], 1.0)
-    rampe.elements[1].position = 0.25
-    rampe.elements[1].color = (*MATIERES_PAROKHET[1], 1.0)
-    rampe.elements.new(0.5).color = (*MATIERES_PAROKHET[2], 1.0)
-    rampe.elements.new(0.75).color = (*MATIERES_PAROKHET[3], 1.0)
-    liens.new(part.outputs[0], choix.inputs["Factor"])
-    # Lisière : un liseré plus sombre au bord de chaque champ, là où la frise change.
-    lisiere = _noeud(mat, "ShaderNodeMath", -1180, -140)
-    lisiere.operation = "FRACT"
-    liens.new(rang.outputs[0], lisiere.inputs[0])
-    bord = _noeud(mat, "ShaderNodeValToRGB", -1020, -140)
-    bord.color_ramp.elements[0].position = 0.0
-    bord.color_ramp.elements[0].color = (0.55, 0.55, 0.55, 1.0)
-    bord.color_ramp.elements[1].position = 0.06
-    liens.new(lisiere.outputs[0], bord.inputs["Factor"])
-    teinte = _noeud(mat, "ShaderNodeMixRGB", -500, 160)
-    teinte.blend_type = 'MULTIPLY'
-    teinte.inputs["Factor"].default_value = 1.0
-    liens.new(choix.outputs["Color"], teinte.inputs["Color1"])
-    liens.new(bord.outputs["Color"], teinte.inputs["Color2"])
-    liens.new(teinte.outputs["Color"], bsdf.inputs["Base Color"])
-    _creuser(mat, bord.outputs["Color"], 0.6, 0.02)
-    for sens, k in (('Y', 0), ('Z', 1)):
-        trame = _noeud(mat, "ShaderNodeTexWave", -900, -500 - 220 * k)
-        trame.bands_direction = sens
-        trame.inputs["Scale"].default_value = 1.0 / m(0.04)
-        trame.inputs["Distortion"].default_value = 0.5
-        trame.inputs["Detail"].default_value = 1.0
-        liens.new(_position(mat), trame.inputs["Vector"])
-        _creuser(mat, trame.outputs["Factor"], 0.35, 0.004)
+    chaine, trame = ((axe.outputs["Y"], axe.outputs["Z"]) if not figure
+                     else (axe.outputs["Z"], axe.outputs["Y"]))
+    cellule = _noeud(mat, "ShaderNodeCombineXYZ", -1400, 0)
+    liens.new(_calc(mat, "FLOOR", _calc(mat, "DIVIDE", chaine, m(NIMA))), cellule.inputs["X"])
+    liens.new(_calc(mat, "FLOOR", _calc(mat, "DIVIDE", trame, m(NIMA * LONGUEUR_DOSAGE))),
+              cellule.inputs["Y"])
+    tirage = _noeud(mat, "ShaderNodeTexWhiteNoise", -1200, 0)
+    tirage.noise_dimensions = '2D'
+    liens.new(cellule.outputs["Vector"], tirage.inputs["Vector"])
+    laine = _noeud(mat, "ShaderNodeValToRGB", -1000, 0)
+    laine.color_ramp.interpolation = 'CONSTANT'
+    laine.color_ramp.elements[0].position = 0.0
+    laine.color_ramp.elements[0].color = (*MATIERES_PAROKHET[0], 1.0)
+    laine.color_ramp.elements[1].position = 0.25
+    laine.color_ramp.elements[1].color = (*MATIERES_PAROKHET[1], 1.0)
+    laine.color_ramp.elements.new(0.50).color = (*MATIERES_PAROKHET[2], 1.0)
+    laine.color_ramp.elements.new(0.75).color = (*MATIERES_PAROKHET[3], 1.0)
+    liens.new(tirage.outputs["Value"], laine.inputs["Factor"])
+    dosage = _noeud(mat, "ShaderNodeMixRGB", -840, 0)
+    dosage.inputs["Factor"].default_value = ECART_PAROKHET
+    dosage.inputs["Color1"].default_value = (*MOYENNE_PAROKHET, 1.0)
+    liens.new(laine.outputs["Color"], dosage.inputs["Color2"])
+    # Le jour d'une étoffe lourde : un champ d'un ton parfaitement égal se lit peint.
+    jour = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
+    jour.blend_type = 'MULTIPLY'
+    jour.inputs["Color2"].default_value = ((1.20, 1.16, 1.10, 1.0) if figure
+                                           else (0.72, 0.68, 0.72, 1.0))
+    liens.new(dosage.outputs["Color"], jour.inputs["Color1"])
+    liens.new(_grain(mat, 2.5), jour.inputs["Factor"])
+    liens.new(jour.outputs["Color"], bsdf.inputs["Base Color"])
+    for k, (sens, largeur, force, creux) in enumerate(((chaine, NIMA, 0.6, NIMA * 0.18),
+                                                       (trame, NIMA / 3, 0.4, NIMA * 0.07))):
+        cordon = _noeud(mat, "ShaderNodeMath", -900, -500 - 200 * k)
+        cordon.operation = "SINE"
+        liens.new(_calc(mat, "MULTIPLY", sens, 2 * math.pi / m(largeur)), cordon.inputs[0])
+        _creuser(mat, cordon.outputs[0], force, creux)
+    _creuser(mat, _grain(mat, 0.05), 0.4, 0.008)
     return mat
+
 
 BRUME = (0.72, 0.73, 0.74)           # la couleur du fond de ciel à l'horizon (voir `ciel`)
 VOILE_DEBUT, VOILE_FIN = 1500, 5500  # amot depuis l'origine : d'où le pays se fond dans la brume
@@ -968,6 +975,8 @@ MAT_BOIS_MAARAKHA = lambda: bois("Bois_maarakha", (0.17, 0.12, 0.074))
 MAT_BOIS_ROUSSI = lambda: bois("Bois_roussi", (0.125, 0.092, 0.062))
 MAT_BOIS_CHARBON = lambda: bois("Bois_charbon", (0.050, 0.040, 0.036))
 MAT_PAROKHET = lambda: parokhet("Parokhet_tissee")
+# Le fil couché des figures : même laine, tissage tourné (Rashi Ex. 26:31).
+MAT_PAROKHET_FIGURE = lambda: parokhet("Parokhet_figure", figure=True)
 MAT_TERRE = lambda: terre("Terre_Jerusalem")
 # La ville, deux tons sous le Temple, et son appareil est domestique : le gazit de
 # huit à dix amot (Melakhim I 7:10) est celui de la maison du Roi et du Bayit, pas
@@ -1154,6 +1163,93 @@ def limbe(name, contour, base, axe, plan, taille, epaisseur, col, mat=None, cour
         for j in (0, 2):
             faces.append([i(0, k, j), i(0, k + 1, j), i(1, k + 1, j), i(1, k, j)])
     return mesh_from_pydata(name, verts, faces, col, mat)
+
+# --- Relief d'une paroi -------------------------------------------------------------
+# « פִּתּוּחֵי מִקְלְעוֹת » (Melakhim I 6:29), et « וְצִפָּה זָהָב מְיֻשָּׁר עַל־הַמְּחֻקֶּה » (6:35) :
+# la figure est creusée, et l'or épouse le creusé. Une paroi se donne en (axe le long
+# duquel court `u`, cote de la face, sens de la saillie) ; tout ce qui suit se trace
+# dans le plan (u, z) de cette paroi et sort d'elle.
+
+def _repere(paroi):
+    """(point(u, z, saillie), direction de u, normale sortante) d'une paroi."""
+    axe, c, sens = paroi
+    if axe == "x":
+        return (lambda u, z, d: Vector((u, c + sens * d, z))), Vector((1, 0, 0)), Vector((0, sens, 0))
+    return (lambda u, z, d: Vector((c + sens * d, u, z))), Vector((0, 1, 0)), Vector((sens, 0, 0))
+
+
+def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None):
+    """Un contour libre tracé dans le plan de la paroi, sorti d'elle de `d0` à `d1`.
+
+    Une silhouette d'un seul tenant, et non un assemblage de plaques rectangulaires :
+    c'est le contour qui fait lire la figure, et c'est lui que la passe Normal donne au
+    styliseur. Le contour a le droit d'être concave — l'orientation se prend sur l'aire
+    entière, qu'un test au premier sommet donnerait à l'envers sur une corolle.
+    """
+    point, _, normale = _repere(paroi)
+    fond = [point(u, z, d0) for u, z in contour]
+    aire = Vector((0.0, 0.0, 0.0))
+    for k in range(1, len(fond) - 1):
+        aire += (fond[k] - fond[0]).cross(fond[k + 1] - fond[0])
+    if aire.dot(normale) < 0:
+        fond.reverse()
+    n = len(fond)
+    saillie = normale * (d1 - d0)
+    verts = [tuple(p) for p in fond] + [tuple(p + saillie) for p in fond]
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    faces += [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
+    return mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE())
+
+
+def _relief_limbe(nom, paroi, u, z, inclinaison, longueur, contour, epaisseur, col, mat=None,
+                  courbure=0.0):
+    """Une lame attachée en (u, z) et penchée de `inclinaison` degrés sur la verticale,
+    positive vers les u croissants : palme d'une timora, aile d'un keruv."""
+    point, du, normale = _repere(paroi)
+    a = math.radians(inclinaison)
+    axe = du * math.sin(a) + Vector((0.0, 0.0, 1.0)) * math.cos(a)
+    return limbe(nom, contour, point(u, z, 0.01), axe, normale, longueur, epaisseur,
+                 col, mat or MAT_OR_PLAQUE(), courbure)
+
+
+def _relief_bosse(nom, paroi, u, z, d, r, col, mat=None):
+    """Un bouton en relief : cœur d'un fleuron, pommeau, mufle."""
+    point, _, _ = _repere(paroi)
+    p = point(u, z, d)
+    return sphere(nom, p.x, p.y, p.z, r, col, mat or MAT_OR_PLAQUE(), segs=10)
+
+
+# Le profil d'une tête, museau vers +u, origine à l'attache du cou : crâne, nuque,
+# gorge, mâchoire, museau, chanfrein, front. Un ovale paramétré rendait deux pièces de
+# monnaie posées sur les épaules — une tête se lit à sa nuque et à son museau, pas à
+# son ovale.
+PROFIL_TETE = ((1.35, 0.10), (1.25, -0.15), (0.75, -0.30), (0.15, -0.42), (-0.55, -0.35),
+               (-0.90, 0.05), (-0.80, 0.55), (-0.35, 0.85), (0.35, 0.88), (0.90, 0.62),
+               (1.20, 0.35))
+
+
+def _profil_tete(u, z, taille, sens):
+    """Contour d'une tête de profil, museau vers `sens`, SANS AUCUN TRAIT.
+
+    Ye'hezkel 41:19 donne « פְּנֵי אָדָם » d'un côté et « פְּנֵי כְפִיר » de l'autre ; §9 de la
+    fiche interdit le visage humain. Une silhouette sans œil ni bouche tient les deux —
+    le verset est lu, aucun visage n'est figuré.
+    """
+    return [(u + sens * taille * du, z + taille * dz) for du, dz in PROFIL_TETE]
+
+
+def _profil_corolle(u, z, r, lobes=8):
+    """Contour d'une fleur épanouie : `lobes` pétales autour d'un cœur. Sert aussi de
+    crinière — une crinière de lion est une corolle."""
+    return [(u + rk * math.cos(a), z + rk * math.sin(a))
+            for a, rk in ((a, r * (0.60 + 0.40 * abs(math.cos(lobes * a / 2)) ** 0.65))
+                          for a in (2 * math.pi * k / (lobes * 8) for k in range(lobes * 8)))]
+
+
+# Demi-profils des lames, dépliés par `limbe` : le long de la nervure, puis en travers.
+PALME = ((0.0, 0.045), (0.16, 0.150), (0.48, 0.195), (0.78, 0.135), (1.0, 0.0))
+AILE = ((0.0, 0.100), (0.22, 0.215), (0.55, 0.240), (0.82, 0.155), (1.0, 0.0))
+
 
 def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32, capots=True):
     """Surface de révolution autour de la verticale passant par (x, y).
@@ -3683,16 +3779,99 @@ def menora(nom, x, y, allumee):
 
 menora("Menora", XU, YM, allumee=True)
 
-# --- Les deux Parokhot (Yoma 5:1) : extérieure agrafée au SUD, intérieure au NORD
-box("Parokhet_ext", TR0 - 0.17, TR0, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
-box("Parokhet_int", TR1, TR1 + 0.17, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
+# --- Les deux Parokhot (Yoma 5:1) : extérieure agrafée au SUD, intérieure au NORD.
+#     « אָרְכָּהּ אַרְבָּעִים אַמָּה וְרָחְבָּהּ עֶשְׂרִים אַמָּה », « עָבְיָהּ טֶפַח » (Shekalim 8:5).
+PAROKHET_EP = 1 / 6            # טפח : l'épaisseur que la michna donne à l'étoffe
+PAROKHET_CHAMP = (2.0, 38.0)   # bas et haut du champ figuré, en amot au-dessus de Z_BAT
+PAROKHET_RANGS, PAROKHET_COLONNES = 6, 4
+PAROKHET_SAILLIE = 0.12        # ce dont une figure TISSÉE bombe l'étoffe : 6 cm, pas un relief
+LISERE_PAROKHET = 0.9          # largeur de la lisière qui borde le champ
+
+
+def creature_ailee(nom, paroi, u, z0, h, col, mat):
+    """Créature ailée de la frise : corps dressé, deux ailes levées, tête de profil sans
+    traits, queue étalée. « כְּרֻבִים » de Ex. 26:31 vaut « צִיּוּרִין שֶׁל בְּרִיּוֹת » (Rashi)."""
+    e = PAROKHET_SAILLIE
+    corps = [(u - 0.11 * h, z0 + 0.06 * h), (u + 0.11 * h, z0 + 0.06 * h),
+             (u + 0.075 * h, z0 + 0.20 * h), (u + 0.055 * h, z0 + 0.42 * h),
+             (u + 0.105 * h, z0 + 0.58 * h), (u + 0.085 * h, z0 + 0.66 * h),
+             (u - 0.085 * h, z0 + 0.66 * h), (u - 0.105 * h, z0 + 0.58 * h),
+             (u - 0.055 * h, z0 + 0.42 * h), (u - 0.075 * h, z0 + 0.20 * h)]
+    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, e, col, mat)
+    _relief_profil(f"{nom}_tete", paroi, _profil_tete(u + 0.08 * h, z0 + 0.66 * h, 0.10 * h, 1),
+                   0.0, e * 0.9, col, mat)
+    _relief_profil(f"{nom}_queue", paroi,
+                   [(u - 0.06 * h, z0 + 0.10 * h), (u + 0.06 * h, z0 + 0.10 * h),
+                    (u + 0.20 * h, z0), (u - 0.20 * h, z0)], 0.0, e * 0.8, col, mat)
+    for sens in (-1, 1):
+        _relief_limbe(f"{nom}_aile_{'N' if sens > 0 else 'S'}", paroi, u + sens * 0.06 * h,
+                      z0 + 0.44 * h, sens * 74, 0.42 * h, AILE, e * 0.7, col, mat, courbure=0.12)
+
+
+def lion(nom, paroi, u, z0, h, col, mat):
+    """Le lion de la frise — « וּפְנֵי כְפִיר » (Ye'hezkel 41:19), et le lion du revers d'un
+    maassé 'hoshev (Yoma 72b). De profil, marchant vers les u croissants."""
+    e = PAROKHET_SAILLIE
+    corps = [(u - 0.44 * h, z0 + 0.30 * h), (u - 0.30 * h, z0 + 0.58 * h),
+             (u + 0.10 * h, z0 + 0.62 * h), (u + 0.34 * h, z0 + 0.56 * h),
+             (u + 0.40 * h, z0 + 0.34 * h), (u + 0.16 * h, z0 + 0.30 * h),
+             (u - 0.16 * h, z0 + 0.28 * h)]
+    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, e, col, mat)
+    for k, du in enumerate((-0.36, -0.22, 0.14, 0.28)):
+        _relief_profil(f"{nom}_patte_{k}", paroi,
+                       [(u + (du - 0.05) * h, z0), (u + (du + 0.05) * h, z0),
+                        (u + (du + 0.05) * h, z0 + 0.34 * h), (u + (du - 0.05) * h, z0 + 0.34 * h)],
+                       0.0, e * 0.8, col, mat)
+    _relief_profil(f"{nom}_criniere", paroi,
+                   _profil_corolle(u + 0.32 * h, z0 + 0.60 * h, 0.16 * h, 9), 0.0, e * 0.75, col, mat)
+    _relief_profil(f"{nom}_tete", paroi, _profil_tete(u + 0.34 * h, z0 + 0.58 * h, 0.11 * h, 1),
+                   0.0, e, col, mat)
+    _relief_profil(f"{nom}_queue", paroi,
+                   [(u - 0.44 * h, z0 + 0.50 * h), (u - 0.38 * h, z0 + 0.56 * h),
+                    (u - 0.44 * h, z0 + 0.80 * h), (u - 0.50 * h, z0 + 0.78 * h)],
+                   0.0, e * 0.7, col, mat)
+
+
+def frise_parokhet(nom, paroi, col):
+    """« מַעֲשֵׂה חֹשֵׁב יַעֲשֶׂה אֹתָהּ כְּרֻבִים » (Ex. 26:31) : créatures ailées et lions en
+    alternance, tissés dans les mêmes quatre laines — jamais d'or (le verset n'en liste
+    que quatre), jamais brodés, et sans un visage (§9). Un rideau nu se lisait en drap.
+    """
+    mat = MAT_PAROKHET_FIGURE()
+    z0, z1 = Z_BAT + PAROKHET_CHAMP[0], Z_BAT + PAROKHET_CHAMP[1]
+    rang, pas = (z1 - z0) / PAROKHET_RANGS, 20 / PAROKHET_COLONNES
+    for r in range(PAROKHET_RANGS):
+        for i in range(PAROKHET_COLONNES):
+            motif = creature_ailee if (i + r) % 2 == 0 else lion
+            motif(f"{nom}_frise_{r}{i}", paroi, -10 + pas * (i + 0.5),
+                  z0 + rang * (r + 0.10), rang * 0.80, col, mat)
+    L = LISERE_PAROKHET
+    for k, contour in enumerate((
+            [(-10, z0 - L), (10, z0 - L), (10, z0), (-10, z0)],
+            [(-10, z1), (10, z1), (10, z1 + L), (-10, z1 + L)],
+            [(-10, z0 - L), (-10 + L, z0 - L), (-10 + L, z1 + L), (-10, z1 + L)],
+            [(10 - L, z0 - L), (10, z0 - L), (10, z1 + L), (10 - L, z1 + L)])):
+        _relief_profil(f"{nom}_lisiere_{k}", paroi, contour, 0.0, PAROKHET_SAILLIE * 0.7, col, mat)
+
+
+box("Parokhet_ext", TR0 - PAROKHET_EP, TR0, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
+box("Parokhet_int", TR1, TR1 + PAROKHET_EP, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
 empty("Parokhet_ext_agrafe_SUD", TR0, -9.5, Z_BAT + 20, "60_KodeshHakodashim")
 empty("Parokhet_int_agrafe_NORD", TR1, 9.5, Z_BAT + 20, "60_KodeshHakodashim")
-# Les badim de l'Arche pressent le rideau et se voient du Heikhal « comme deux seins »
-# (Yoma 54a, Menachot 98b, Melakhim I 8:8) : deux demi-sphères de tissu, à la hauteur
-# des barres, de part et d'autre de l'axe.
+# La frise ne se pose que du côté que la caméra atteint : l'est pour l'extérieure (vue
+# du Heikhal), l'ouest pour l'intérieure (vue du Kodesh HaKodashim). Un maassé 'hoshev
+# en porte une AUTRE au revers — « נֶשֶׁר מִצַּד זֶה וְאַרְיֵה מִצַּד זֶה » (Yoma 72b) ; aucun plan
+# ne cadre ces deux faces-là, et elles ne sont pas modélisées.
+for cote, paroi in (("ext", ("y", TR0, 1)), ("int", ("y", TR1, -1))):
+    frise_parokhet(f"Parokhet_{cote}", paroi, "60_KodeshHakodashim")
+# Les badim de l'Arche pressent le rideau et se voient du Heikhal « כִּשְׁנֵי דַּדֵּי אִשָּׁה »
+# (Yoma 54a ; Mena'hot 98b ; Melakhim I 8:8) : l'étoffe se tend sur quelques amot, et
+# le bout de la barre la pointe au milieu de ce gonflement. Une demi-sphère seule ne
+# rendait qu'une pastille sombre sur le rideau.
 for ns, y in (("N", ARON_Y_BAD), ("S", -ARON_Y_BAD)):
-    sphere(f"Parokhet_ext_bosse_{ns}", TR0 - 0.15, y, ARON_Z_BAD, 0.45,
+    sphere(f"Parokhet_ext_tension_{ns}", TR0 - 1.55, y, ARON_Z_BAD, 1.8,
+           "60_KodeshHakodashim", MAT_PAROKHET())
+    sphere(f"Parokhet_ext_bosse_{ns}", TR0 + 0.16, y, ARON_Z_BAD, 0.36,
            "60_KodeshHakodashim", MAT_PAROKHET())
 
 # --- Kodesh HaKodashim : même placage. « כל הבית » ne s'arrête pas au Heikhal, et
@@ -3711,96 +3890,111 @@ box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim",
 
 
 # --- « וְאֵת כָּל קִירוֹת הַבַּיִת מֵסַב קָלַע פִּתּוּחֵי מִקְלְעוֹת כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים,
-#     מִלִּפְנִים וְלַחִיצוֹן » (Melakhim I 6:29) ; Ye'hezkel 41:18-19 donne l'ordre : « וְתִמֹרָה
-#     בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב ». Middot 4:1 dit l'or sans dire le motif :
-#     le relief est d'or, sur l'or, en deux registres, une fleur entre les deux ; un
-#     tiers d'ama de saillie — à six centièmes, il ne restait que les arêtes du biseau.
-#     Une paroi : (axe le long duquel court `u`, cote de la face, sens de la saillie).
-def _relief_boite(nom, paroi, u0, u1, z0, z1, d0, d1, col):
-    axe, c, sens = paroi
-    if axe == "x":
-        box(nom, u0, u1, c + sens * d0, c + sens * d1, z0, z1, col, MAT_OR_PLAQUE())
-    else:
-        box(nom, c + sens * d0, c + sens * d1, u0, u1, z0, z1, col, MAT_OR_PLAQUE())
+#     מִלִּפְנִים וְלַחִיצוֹן » (Melakhim I 6:29). Ye'hezkel 41:18-19 en donne l'ORDRE —
+#     « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב », chaque profil tourné vers la
+#     timora qui le jouxte — et 41:20 l'ÉTENDUE : « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח », du sol
+#     jusqu'au-dessus de l'entrée, qui fait 20 amot (Middot 4:1). Au-dessus, l'or reste
+#     nu jusqu'à la corniche. Deux registres flottant à mi-hauteur, un damier de motifs
+#     et des figures deux fois plus larges que leur pas ne sont dans aucune source :
+#     le mur rendait une mitraille d'éclats dorés (plan 9b).
+CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
+REGISTRES_KIR = 3         # registres de figures, séparés par des bandeaux de fleurons
+BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
+SAILLIE_KIR = 0.22        # saillie du relief : 11 cm. À 0,35 la figure se lisait en plaque
+                          # posée dessus, à 0,14 elle ne prenait plus la lumière rasante
+PAS_KIR = 4.44            # pas visé d'une figure, en amot
 
-
-def _relief_plaque(nom, paroi, pts_uz, d0, epaisseur, col):
-    axe, c, sens = paroi
-
-    def p3(u, z):
-        return (u, c + sens * d0, z) if axe == "x" else (c + sens * d0, u, z)
-
-    quad = [p3(u, z) for u, z in pts_uz]
-    a, b, d = (Vector(q) for q in (quad[0], quad[1], quad[3]))
-    vers = Vector((0, sens, 0)) if axe == "x" else Vector((sens, 0, 0))
-    if (b - a).cross(d - a).dot(vers) < 0:
-        quad.reverse()
-    plaque(nom, quad, epaisseur, col, MAT_OR_PLAQUE())
-
-
-def _relief_sphere(nom, paroi, u, z, d, r, col):
-    axe, c, sens = paroi
-    x, y = (u, c + sens * d) if axe == "x" else (c + sens * d, u)
-    sphere(nom, x, y, z, r, col, MAT_OR_PLAQUE(), segs=10)
+# Les palmes d'une timora : (inclinaison sur la verticale, longueur en part de la
+# hauteur). Sept est un CHOIX — la source ne les compte pas ; les deux dernières
+# retombent, ce qui est ce qui distingue un palmier d'un éventail.
+PALMES = ((0, 0.42), (30, 0.37), (-30, 0.37), (66, 0.30), (-66, 0.30), (106, 0.26), (-106, 0.26))
 
 
 def timora(nom, paroi, u, z0, h, col):
-    """« תִּמֹרָה » : tronc et sept palmes en éventail."""
-    _relief_boite(f"{nom}_tronc", paroi, u - 0.03 * h, u + 0.03 * h, z0, z0 + 0.58 * h, 0.01, 0.35, col)
-    for k, (angle, longueur) in enumerate(((90, 0.42), (65, 0.36), (115, 0.36), (40, 0.28), (140, 0.28), (18, 0.2), (162, 0.2))):
-        a = math.radians(angle)
-        du, dz = math.cos(a), math.sin(a)
-        L, w = longueur * h, 0.08 * h
-        base = (u, z0 + 0.55 * h)
-        milieu = (base[0] + du * L * 0.45, base[1] + dz * L * 0.45)
-        pts = [base, (milieu[0] - dz * w, milieu[1] + du * w), (base[0] + du * L, base[1] + dz * L),
-               (milieu[0] + dz * w, milieu[1] - du * w)]
-        _relief_plaque(f"{nom}_palme_{k}", paroi, pts, 0.02, 0.28, col)
+    """« תִּמֹרָה » : le palmier — fût annelé, couronne de sept palmes."""
+    fut, e = 0.58 * h, 0.052 * h
+    gauche, droite = [], []
+    for k in range(9):
+        z = z0 + fut * k / 8
+        w = e * (1.0 - 0.22 * k / 8) * (1.0 if k % 2 == 0 else 0.74)
+        gauche.append((u - w, z))
+        droite.append((u + w, z))
+    _relief_profil(f"{nom}_fut", paroi, gauche + droite[::-1], 0.0, SAILLIE_KIR, col)
+    for k, (inclinaison, longueur) in enumerate(PALMES):
+        _relief_limbe(f"{nom}_palme_{k}", paroi, u, z0 + fut * 0.94, inclinaison, longueur * h,
+                      PALME, SAILLIE_KIR * 0.45, col, courbure=0.10)
+    _relief_bosse(f"{nom}_coeur", paroi, u, z0 + fut * 0.97, SAILLIE_KIR * 0.35, 0.045 * h, col)
 
 
-def keruv_relief(nom, paroi, u, z0, h, col):
-    """Keruv à deux visages (Ye'hezkel 41:19) : corps, deux têtes, deux ailes levées."""
-    _relief_boite(f"{nom}_corps", paroi, u - 0.06 * h, u + 0.06 * h, z0 + 0.06 * h, z0 + 0.62 * h, 0.01, 0.35, col)
-    for k, s in enumerate((-1, 1)):
-        _relief_sphere(f"{nom}_visage_{k}", paroi, u + s * 0.045 * h, z0 + 0.70 * h, 0.25, 0.07 * h, col)
-        pts = [(u + s * 0.06 * h, z0 + 0.58 * h), (u + s * 0.22 * h, z0 + 0.42 * h),
-               (u + s * 0.20 * h, z0 + 0.95 * h), (u + s * 0.09 * h, z0 + 0.80 * h)]
-        _relief_plaque(f"{nom}_aile_{k}", paroi, pts, 0.02, 0.28, col)
+def keruv(nom, paroi, u, z0, h, col):
+    """« כְּרוּבִים » — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), et 41:19 tourne chaque
+    profil vers la timora qui le jouxte. Deux têtes SANS TRAITS, deux ailes levées."""
+    corps = [(u - 0.150 * h, z0), (u + 0.150 * h, z0),
+             (u + 0.105 * h, z0 + 0.10 * h), (u + 0.060 * h, z0 + 0.34 * h),
+             (u + 0.140 * h, z0 + 0.54 * h), (u + 0.120 * h, z0 + 0.62 * h),
+             (u - 0.120 * h, z0 + 0.62 * h), (u - 0.140 * h, z0 + 0.54 * h),
+             (u - 0.060 * h, z0 + 0.34 * h), (u - 0.105 * h, z0 + 0.10 * h)]
+    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, SAILLIE_KIR, col)
+    for sens in (-1, 1):
+        cote = "N" if sens > 0 else "S"
+        _relief_profil(f"{nom}_tete_{cote}", paroi,
+                       _profil_tete(u + sens * 0.100 * h, z0 + 0.62 * h, 0.095 * h, sens),
+                       0.0, SAILLIE_KIR * 0.85, col)
+        _relief_limbe(f"{nom}_aile_{cote}", paroi, u + sens * 0.075 * h, z0 + 0.52 * h,
+                      sens * 32, 0.40 * h, AILE, SAILLIE_KIR * 0.45, col, courbure=0.16)
 
 
 def petur_tzitz(nom, paroi, u, z, r, col):
-    """« פְּטוּרֵי צִצִּים », fleur épanouie : six pétales autour d'un cœur."""
-    _relief_sphere(f"{nom}_coeur", paroi, u, z, 0.2, r * 0.3, col)
-    for k in range(6):
-        a = math.radians(60 * k)
-        du, dz = math.cos(a), math.sin(a)
-        pts = [(u, z), (u + du * r * 0.5 - dz * r * 0.28, z + dz * r * 0.5 + du * r * 0.28), (u + du * r, z + dz * r),
-               (u + du * r * 0.5 + dz * r * 0.28, z + dz * r * 0.5 - du * r * 0.28)]
-        _relief_plaque(f"{nom}_petale_{k}", paroi, pts, 0.01, 0.22, col)
+    """« פְּטוּרֵי צִצִּים » : la fleur épanouie. Le verset la met au même rang que les
+    keruvim et les timorot — elle court donc en bandeau, elle n'est pas un bouton isolé."""
+    _relief_profil(f"{nom}_corolle", paroi, _profil_corolle(u, z, r), 0.0, SAILLIE_KIR * 0.55, col)
+    _relief_bosse(f"{nom}_coeur", paroi, u, z, SAILLIE_KIR * 0.5, r * 0.28, col)
 
 
-REGISTRES = ((Z_BAT + 2, 11), (Z_BAT + 19, 10))     # (bas, hauteur) — sous les fenêtres (31..35)
-PAROIS_OR = [
-    ("Heikhal_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), HK1, HK0, "50_Heikhal", (0, 1)),
-    ("Heikhal_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), HK1, HK0, "50_Heikhal", (0, 1)),
-    ("Heikhal_E_S", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -10, -5, "50_Heikhal", (0, 1)),
-    ("Heikhal_E_N", ("y", HK0 - EPAISSEUR_PLACAGE, -1), 5, 10, "50_Heikhal", (0, 1)),
-    ("Heikhal_E_linteau", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -5, 5, "50_Heikhal", (1,)),
-    ("KhK_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), KK1, KK0, "60_KodeshHakodashim", (0, 1)),
-    ("KhK_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), KK1, KK0, "60_KodeshHakodashim", (0, 1)),
-    ("KhK_O", ("y", KK1 + EPAISSEUR_PLACAGE, 1), -10, 10, "60_KodeshHakodashim", (0, 1)),
-]
-for nom, paroi, u0, u1, col, registres in PAROIS_OR:
-    n = max(1, round((u1 - u0) / 4.44))
+def bandeau_fleurons(nom, paroi, u0, u1, z, col):
+    """Un bandeau de fleurons en travers d'une paroi : ce qui tient les registres.
+    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser."""
+    _relief_profil(f"{nom}_listel", paroi,
+                   [(u0, z), (u1, z), (u1, z + BANDEAU_KIR), (u0, z + BANDEAU_KIR)],
+                   0.0, SAILLIE_KIR * 0.4, col)
+    n = max(1, round((u1 - u0) / PAS_KIR))
     pas = (u1 - u0) / n
     for i in range(n):
-        u = u0 + pas * (i + 0.5)
-        for r in registres:
-            z0, h = REGISTRES[r]
-            motif = timora if (i + r) % 2 == 0 else keruv_relief
-            motif(f"Kir_{nom}_{i:02d}_{r}", paroi, u, z0, h, col)
-        if len(registres) == 2:
-            petur_tzitz(f"Kir_{nom}_{i:02d}_tzitz", paroi, u, Z_BAT + 16, 1.0, col)
+        petur_tzitz(f"{nom}_fleuron_{i:02d}", paroi, u0 + pas * (i + 0.5), z + BANDEAU_KIR / 2,
+                    BANDEAU_KIR * 0.42, col)
+
+
+def champ_sculpte(nom, paroi, u0, u1, col):
+    """Le champ « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח » d'une paroi : des registres de keruvim et de
+    timorot en alternance stricte, séparés par des bandeaux de fleurons."""
+    z0, z1 = Z_BAT + CHAMP_KIR[0], Z_BAT + CHAMP_KIR[1]
+    registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_KIR
+    n = max(1, round((u1 - u0) / PAS_KIR))
+    pas = (u1 - u0) / n
+    for r in range(REGISTRES_KIR + 1):
+        bandeau_fleurons(f"Kir_{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
+    for r in range(REGISTRES_KIR):
+        for i in range(n):
+            motif = keruv if i % 2 == 0 else timora
+            motif(f"Kir_{nom}_{r}{i:02d}", paroi, u0 + pas * (i + 0.5),
+                  z0 + r * registre + BANDEAU_KIR, registre - BANDEAU_KIR, col)
+
+
+PAROIS_OR = [
+    ("Heikhal_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), HK1, HK0, "50_Heikhal"),
+    ("Heikhal_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), HK1, HK0, "50_Heikhal"),
+    ("Heikhal_E_S", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -10, -5, "50_Heikhal"),
+    ("Heikhal_E_N", ("y", HK0 - EPAISSEUR_PLACAGE, -1), 5, 10, "50_Heikhal"),
+    ("KhK_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), KK1, KK0, "60_KodeshHakodashim"),
+    ("KhK_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), KK1, KK0, "60_KodeshHakodashim"),
+    ("KhK_O", ("y", KK1 + EPAISSEUR_PLACAGE, 1), -10, 10, "60_KodeshHakodashim"),
+]
+for nom, paroi, u0, u1, col in PAROIS_OR:
+    champ_sculpte(nom, paroi, u0, u1, col)
+# Au-dessus de la baie du Heikhal, la paroi ne commence qu'à 20 amot : « עַד־מֵעַל
+# הַפֶּתַח » n'y laisse que le bandeau qui ferme le champ de part et d'autre.
+bandeau_fleurons("Kir_Heikhal_E_linteau", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -5, 5,
+                 Z_BAT + CHAMP_KIR[1] - BANDEAU_KIR, "50_Heikhal")
 
 # « וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר » (Melakhim I 6:21) : des chaînes d'or tendues
 # devant le Devir. Trois chaînettes sous le plafond, de mur à mur, devant la parokhet.

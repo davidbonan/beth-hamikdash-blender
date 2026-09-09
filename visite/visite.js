@@ -22,6 +22,10 @@ const RAYON = 0.38;       // demi-largeur du marcheur
 const MARCHE = 0.5 * 0.48; // 1/2 ama
 const MONTEE = 0.28;       // franchissable sans escalader
 const CHUTE = 0.60;        // au-delà, il n'y a pas de sol : le pas est refusé
+// Ce qu'un repère d'entrée peut manquer son sol, en plus ou en moins. Il donne sa
+// hauteur à la main, et la fenêtre de la marche est celle d'un pas : trois des neuf
+// étaient 2,5 amot au-dessus de leur dallage, et on s'y posait en l'air.
+const APLOMB = 1.5;
 const PAS = 3.4;          // m/s
 const COURSE = 2.4;       // multiplicateur
 const GARDE = 0.06;       // peau du rayon de garde, devant le marcheur
@@ -189,6 +193,10 @@ const [gltf, jeux] = await Promise.all([
 ]);
 etat.textContent = "préparation…";
 scene.add(gltf.scene);
+// Three ne calcule les matrices monde qu'au premier rendu, et un rayon ne les calcule
+// pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
+// aucun sol, et la visite s'ouvrait un mètre au-dessus du dallage.
+gltf.scene.updateMatrixWorld(true);
 
 const murs = [];                        // collision : les étoffes en sont exclues
 const horloges = [];                    // uniformes de temps à faire avancer
@@ -227,15 +235,21 @@ const BAS = new THREE.Vector3(0, -1, 0);
 const versLeBas = new THREE.Raycaster();
 const versLAvant = new THREE.Raycaster();
 
-function solEn(x, z, piedsY) {
-  versLeBas.set(new THREE.Vector3(x, piedsY + MONTEE, z), BAS);
-  versLeBas.far = MONTEE + CHUTE;
+const sonde = new THREE.Vector3();
+
+function solSous(origine, portee) {
+  versLeBas.set(origine, BAS);
+  versLeBas.far = portee;
   // Une face tournée vers le bas — le dessous d'un mur posé sur la dalle — n'est pas
   // un sol : sans ce filtre on marche à l'intérieur des murs.
   for (const t of versLeBas.intersectObjects(murs, false)) {
     if (!t.face || t.face.normal.y > 0.25) return t.point.y;
   }
   return null;
+}
+
+function solEn(x, z, piedsY) {
+  return solSous(sonde.set(x, piedsY + MONTEE, z), MONTEE + CHUTE);
 }
 
 // Le rayon de garde part AU-DESSUS de ce qui est franchissable. Plus bas, il heurtait
@@ -322,17 +336,18 @@ function avancer(dt) {
   piedsY = camera.position.y - OEIL;
 }
 
-function poser(x, y, z, cap) {
-  const sol = vol ? null : solEn(x, z, y + 0.3);
+function poser(x, y, z, visee) {
+  const sol = vol ? null : solSous(sonde.set(x, y + APLOMB, z), APLOMB * 2);
   piedsY = sol === null ? y : sol;
   camera.position.set(x, piedsY + OEIL, z);
   lisse.set(0, 0, 0);
   cible = null;
-  if (cap !== undefined) {
+  if (visee) {
     // Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du
     // parcours du Cohen Gadol. Le nord de Blender devient -Z une fois passé en Y-haut.
-    const a = THREE.MathUtils.degToRad(cap);
-    camera.lookAt(x + Math.cos(a) * 10, piedsY + OEIL, z - Math.sin(a) * 10);
+    const a = THREE.MathUtils.degToRad(visee.cap);
+    const t = THREE.MathUtils.degToRad(visee.tangage ?? 0);
+    camera.lookAt(x + Math.cos(a) * 10, piedsY + OEIL + Math.tan(t) * 10, z - Math.sin(a) * 10);
   }
   accorderRegard();
 }
@@ -443,8 +458,8 @@ for (const e of reperes.entrees) {
   aller.append(new Option(e.nom, e.id));
 }
 aller.onchange = () => {
-  const e = reperes.entrees.find((x) => x.id === aller.value);
-  if (e) fondu(() => poser(e.position[0], e.position[1], e.position[2], e.cap));
+  const id = aller.value;
+  fondu(() => allerA(id));
   aller.value = "";
   aller.blur();
 };
@@ -471,7 +486,7 @@ chercher.onchange = () => {
 
 function allerA(id) {
   const e = reperes.entrees.find((x) => x.id === id);
-  if (e) { poser(e.position[0], e.position[1], e.position[2], e.cap); return true; }
+  if (e) { poser(...e.position, e); return true; }
   const b = reperes.emprises[id];
   if (!b) return false;
   const centre = new THREE.Vector3(...b.min).add(new THREE.Vector3(...b.max)).multiplyScalar(0.5);
@@ -487,8 +502,10 @@ function allerA(id) {
 // boucle
 // ---------------------------------------------------------------------------
 const demande = new URLSearchParams(location.search).get("vue");
-const depart = reperes.entrees.find((e) => e.id === "azara") || reperes.entrees[0];
-poser(depart.position[0], depart.position[1], depart.position[2], depart.cap);
+// La visite s'ouvre à la porte de l'Ezrat Nashim : de l'Ezrat Israël, où elle
+// s'ouvrait, on est déjà au pied du Heikhal et on n'a rien monté.
+const depart = reperes.entrees.find((e) => e.id === "ezrat_nashim") || reperes.entrees[0];
+poser(...depart.position, depart);
 if (demande) allerA(demande);
 
 const horloge = new THREE.Clock();

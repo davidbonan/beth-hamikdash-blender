@@ -37,17 +37,26 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "pierre", 10: "pierre", 11: "pie
 // MODELÉ, pas sa couleur. Le calcaire scanné porte ses lichens et ses mousses ; sans ce
 // frein, le dallage de l'Azara s'en couvrait de piqûres vertes et jaunes. La teinte
 // reste ce que Blender et les bancs du calcaire ont décidé.
+// La COULEUR, elle, se règle à l'ombre et jamais au soleil, parce que la courbe ACES ne
+// la rend pas au même taux des deux côtés : à 0,68 d'exposition, un parement ensoleillé
+// est à 1,3 de linéaire, sur l'épaule, où un écart d'albédo ressort à 0,16 de sa force ;
+// le même parement à l'ombre est à 0,20, sur la partie droite, où il ressort à 0,65 —
+// quatre fois plus. Réglée à l'œil sur un mur au soleil, la nappe passait à 0,62 et
+// couvrait de salissures tout ce que le soleil ne touchait pas. Ce qui porte le
+// parement au soleil, ce n'est pas sa couleur mais son RELIEF : il monte d'autant que
+// la couleur descend, et il ne coûte rien à l'ombre, où une lumière de dôme sans
+// direction ne l'ombre pas.
 const CARREAU = {
-  1: [2.4, 0.62, 0.28, 1.00, 0.55], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
+  1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
   3: [1.6, 0.34, 0.14, 0.60, 0.70],
   4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
   7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
-  9: [2.4, 0.58, 0.22, 0.72, 0.40], 10: [2.0, 0.75, 0.28, 0.90, 0.50],
+  9: [2.4, 0.26, 0.22, 0.88, 0.48], 10: [2.0, 0.34, 0.28, 1.05, 0.58],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
   // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
-  13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.62, 0.28, 1.00, 0.55],
+  13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
 };
 
 const FAMILLES = {
