@@ -64,7 +64,9 @@
       "prefixes": [
         "EzratNashim_mur",
         "EzratNashim_sol",
-        "EzratNashim_couronnement"
+        "EzratNashim_couronnement",
+        "EzratNashim_socle",
+        "EzratNashim_bandeau"
       ]
     },
     {
@@ -138,7 +140,9 @@
       "prefixes": [
         "Azara_mur",
         "Azara_sol",
-        "Azara_couronnement"
+        "Azara_couronnement",
+        "Azara_socle",
+        "Azara_bandeau"
       ]
     },
     {
@@ -276,6 +280,14 @@
       "zone": "oulam",
       "prefixes": [
         "Couronne_Helene"
+      ]
+    },
+    {
+      "id": "sharsherot_oulam",
+      "nom": "Les chaînes d'or de l'Oulam",
+      "zone": "oulam",
+      "prefixes": [
+        "Ulam_sharsheret"
       ]
     },
     {

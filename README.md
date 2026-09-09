@@ -687,6 +687,20 @@ d'Hélène, sous lui, était un tore et huit cônes à six faces.
   sur deux tourné), `courbe` (bézier quadratique, le tracé d'un sarment ou d'une
   guirlande). `revolution(capots=False)` pour un bandeau creux, ouvert en haut comme en
   bas : les deux disques d'extrémité en faisaient un seau.
-- **Non fait : les שַׁרְשְׁרוֹת de l'Oulam.** La même michna (*Middot* 3:8) met des chaînes
-  d'or dans le plafond de l'Oulam, « שֶׁבָּהֶן פִּרְחֵי כְהֻנָּה עוֹלִין וְרוֹאִין אֶת הָעֲטָרֹת » — elles
-  ne sont pas modelées, et `chaine` existe maintenant pour les poser.
+- **Les שַׁרְשְׁרוֹת de l'Oulam sont posées.** « וְשַׁרְשְׁרוֹת שֶׁל זָהָב הָיוּ קְבוּעוֹת בְּתִקְרַת הָאוּלָם,
+  שֶׁבָּהֶן פִּרְחֵי כְהֻנָּה עוֹלִין וְרוֹאִין אֶת הָעֲטָרֹת » (*Middot* 3:8). R. Shemaya, cité par le Tossefot
+  Yom Tov (*ad loc.*), dit comment : « וְתוֹלוֹת לְמַטָּה בָּאוּלָם שֶׁאוֹחֲזִין בָּהֶן פִּרְחֵי כְהֻנָּה מְפַסְּגִין
+  וְעוֹלִין » — elles pendent dans le vide de l'Oulam et on y monte à la force des bras. Elles
+  descendent donc **à hauteur de main** (z 9,5), pas à mi-hauteur. Quatre chaînes sous la
+  poutre centrale du plafond (x −86,5), à y ±13 et ±24 : au-delà de la mire de *Middot* 2:4
+  et à l'écart des kotarot de Ya'hin et Boaz. Nombre et place : **CHOIX**. Concept
+  `sharsherot_oulam` dans la visite, avec sa notice.
+- **Une chaîne longue se paie en sommets.** 476 maillons à 10 × 6 segments ajoutaient 4 Mo
+  au `.glb` — plus que la vigne entière, pour un détail qu'on ne voit que dans l'Oulam.
+  Maillon plus gros (R 0,24) et moins facetté (8 × 5) : 396 maillons, +2,5 Mo, et à
+  hauteur d'œil la différence ne se lit pas. `chaine` prend `majeur`/`mineur` ; la
+  couronne garde les siens.
+- **Les עֲטָרֹת ne sont pas modelées.** Leur place est disputée : aux fenêtres de l'**aliyah
+  de l'Oulam** (Melekhet Shlomo *ad loc.*), étage que ce blockout ne bâtit pas (CHOIX de
+  suivre Rashi), ou aux **fenêtres du Heikhal** (Bartenura *ad loc.* ; Abravanel sur
+  *Zekharia* 6:14), qui ne se voient pas de l'Oulam.

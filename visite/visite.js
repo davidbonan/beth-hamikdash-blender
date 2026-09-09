@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import { habiller, ETOFFES } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { chaine } from "./chaine.js";
@@ -39,6 +40,16 @@ const LISSAGE_REGARD = 0.045;
 // pourtour, sans les ouvertures qu'il avait (Middot 2:3). S'y cogner, ce serait buter
 // sur un manque du modèle, pas sur l'architecture.
 const TRAVERSABLES = new Set(["parokhet", "chaines_devir", "soreg"]);
+
+// Un rayon de three teste la sphère puis la boîte englobantes du maillage, et sinon
+// TOUS ses triangles. Il ne borne pas ces deux tests par sa portée : un rayon de garde
+// de 18 cm tourné vers la vigne d'or de l'Oulam — 221 884 triangles à elle seule —
+// les essaie tous avant de les rejeter sur la distance. La marche tire jusqu'à trente
+// rayons par image, et c'est ce qu'on prend pour un manque de framerate. L'arbre les
+// ramène à quelques dizaines de triangles chacun ; il se construit une fois, au
+// chargement, et sert aussi au rayon qui interroge sous le curseur.
+THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 // ---------------------------------------------------------------------------
 // données
@@ -192,6 +203,7 @@ gltf.scene.traverse((o) => {
   }
   o.geometry.computeBoundingBox();
   o.geometry.computeBoundingSphere();
+  o.geometry.computeBoundsTree({ maxLeafTris: 24 });
   // Tout volume du blockout est une boîte fermée aux normales sortantes : ses faces
   // arrière ne sont jamais celles qu'on voit. Les afficher doublait le travail de
   // fragment, et faisait battre la face arrière du placage d'or contre la face avant
@@ -483,11 +495,23 @@ const horloge = new THREE.Clock();
 let image = 0;
 
 // L'ombre portée est une fenêtre de 110 amot ; à l'échelle du Har HaBayit une seule
-// carte figée serait illisible. Elle suit donc le visiteur.
+// carte figée serait illisible. Elle suit donc le visiteur — mais par sauts, pas à
+// chaque image : la refaire coûte une passe de géométrie entière, la troisième de
+// l'image après la principale et celle de l'occlusion, et la fenêtre fait cinquante
+// mètres de large quand on n'avance que d'une douzaine de centimètres par image, en
+// courant. Tant qu'on ne la rafraîchit pas, three garde aussi la matrice qui va avec :
+// carte et matrice restent d'accord, et l'ombre reste juste — elle est simplement
+// calculée depuis un pas en arrière.
+const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
+const PAS_OMBRE = PROFIL.ombres.portee / 10;
+
 function suivreSoleil() {
+  if (camera.position.distanceToSquared(ANCRE_OMBRE) < PAS_OMBRE * PAS_OMBRE) return;
+  ANCRE_OMBRE.copy(camera.position);
   soleil.target.position.copy(camera.position);
   soleil.position.copy(camera.position).addScaledVector(SOLEIL, RECUL_SOLEIL);
   soleil.target.updateMatrixWorld();
+  soleil.shadow.needsUpdate = true;
 }
 
 function dessiner(dt) {
@@ -500,6 +524,12 @@ function dessiner(dt) {
 // La définition ne se règle pas sur une image mais sur une moyenne, et les deux seuils
 // laissent un écart entre eux : accolés, l'échelle descendrait puis remonterait sans
 // fin, ce qui se voit bien plus qu'une image un peu douce.
+//
+// Le seuil de remontée se lit contre la SYNCHRONISATION VERTICALE, pas contre un idéal :
+// sur un écran à 60 Hz une image ne peut pas durer moins de 16,7 ms, quelle que soit
+// l'avance du GPU. Un seuil sous cette barre — 12 ms — ne pouvait donc jamais être
+// atteint : l'échelle descendait et ne remontait plus jamais, et c'est là qu'un
+// téléphone gagnait son flou définitif.
 const aide = $("#aide");
 let moyenne = 16, attente = 0, entame = false;
 
@@ -507,8 +537,8 @@ function ajusterEchelle(dt) {
   moyenne += (dt * 1000 - moyenne) * 0.05;
   if (++attente < 120) return;
   const precedente = echelle;
-  if (moyenne > 22) echelle = Math.max(PROFIL.echelleMin, echelle - 0.15);
-  else if (moyenne < 12) echelle = Math.min(1, echelle + 0.1);
+  if (moyenne > 26) echelle = Math.max(PROFIL.echelleMin, echelle - 0.15);
+  else if (moyenne < 18) echelle = Math.min(1, echelle + 0.1);
   if (echelle === precedente) return;
   attente = 0;
   dimensionner();
@@ -561,6 +591,7 @@ window.__etat = () => {
 };
 window.__ombres = (actives) => {
   renderer.shadowMap.enabled = actives;
+  soleil.shadow.needsUpdate = true;
   scene.traverse((o) => { if (o.isMesh) o.material.needsUpdate = true; });
   dessiner(0);
 };

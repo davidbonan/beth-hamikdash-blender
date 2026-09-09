@@ -152,15 +152,16 @@ const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 // versants à une trentaine de degrés — une rainure sciée, pas une gorge.
 const float CREUX_M = 0.020;
 
-// Ce que le feu laisse sur la chaux du Mizbea'h, en écart multiplicatif sur elle : le
-// blockout peint (0,20 0,18 0,165) sur une chaux exportée à (0,95 0,95 0,92) — la suie
-// est CHAUDE. Le gris neutre d'avant virait au bleu dès qu'il ne restait que le ciel
-// pour l'éclairer, et l'autel rendait une dalle de béton posée au milieu de l'Azara.
-const vec3 NOIR_SUIE = vec3(0.211, 0.189, 0.179);
-// Et ce qui n'a pas été pris : la cendre du feu, pas de la chaux neuve. Un blanc
-// affleurant entre les noirs mouchetait le dessus de points BLEUS — une face
-// horizontale sombre n'a que le ciel pour l'éclairer, et le ciel est bleu.
-const vec3 GRIS_CENDRE = vec3(0.62, 0.58, 0.53);
+// Ce que le feu laisse sur la chaux du Mizbea'h, en écart multiplicatif sur elle. La
+// suie est du CARBONE : elle n'a pas de couleur, et le blockout la peint chaude —
+// (0,20 0,18 0,165) sur une chaux exportée à (0,95 0,95 0,92), soit un rapport de
+// (0,211 0,189 0,179). Sur un clair cette chaleur passe ; sur un sombre, et sous le
+// soleil de l'Azara qui est chaud lui aussi, elle rend de la TERRE. Elle est donc
+// reprise neutre ici, et plus basse : un âtre est noir, pas gris de boue.
+const vec3 NOIR_SUIE = vec3(0.165, 0.165, 0.170);
+// La cendre de bois, elle, est claire et froide. C'est le contraste des deux — et non
+// le grain de l'un ou de l'autre — qui fait lire un lit de feu.
+const vec3 GRIS_CENDRE = vec3(0.42, 0.42, 0.43);
 
 // Les quatre bancs du calcaire de Jérusalem, en écart multiplicatif : le meleke n'est
 // pas d'une couleur mais d'une bande, du gris de cendre à l'ivoire. Mêmes valeurs que
@@ -477,27 +478,39 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     // partait de 40 cm : il prenait le bloc haut ENTIER, du sovev aux kranot, et il ne
     // restait plus un blanc sur l'autel pour dire qu'on l'entretient.
     float montee = smoothstep(7.5 * AMA, 10.5 * AMA, P.y);
-    // Sur la paroi la suie ne monte pas en dégradé mais en LANGUES : un bruit étiré
-    // cinq fois sur la hauteur, puis seuillé. Un dégradé lisse n'a pas de bord, et sans
-    // bord il se lit pour ce qu'il est — un fondu, pas un dépôt de feu.
-    float langue = smoothstep(0.32, 0.76, grainNorme(P * vec3(2.6, 0.5, 2.6)));
-    float paroi = montee * (0.30 + 0.85 * langue);
+    // Le bord du dépôt se RONGE, il ne se fond pas : on perturbe la frontière PUIS on
+    // la seuille, au lieu de multiplier le dépôt par un nuage. Multiplié, il rendait
+    // des bavures d'aérographe ; rongé, il rend une limite de suie.
+    float paroi = smoothstep(0.06, 0.62,
+                             montee + (grainNorme(P * vec3(3.2, 1.1, 3.2)) - 0.5) * 0.45);
     // Le dessus est l'âtre : les ma'arakhot y brûlent à même la chaux, et le feu y prend
     // tout. Le sovev est horizontal lui aussi, mais trois amot plus bas — la bande ne
     // l'atteint pas, et c'est elle, pas la normale, qui décide qui est un âtre.
     float dessus = smoothstep(0.5, 0.9, N.y) * smoothstep(0.30, 0.50, montee);
-    // L'âtre est PRIS PARTOUT, et ne varie qu'au décimètre : quinze mètres de dessus
-    // portés par une tache d'un mètre, c'est une photo agrandie et rien d'autre. Un feu
-    // qui brûle au même endroit toute l'année ne laisse pas de nuages, il laisse un
-    // fond noir que la cendre éclaircit d'un grain à l'autre.
-    float atre = dessus * clamp(0.84 + (grainNorme(P * 7.0) - 0.5) * 0.44, 0.0, 1.0);
-    float base = max(paroi, atre);
+    float prise = max(paroi, dessus);
+    // Le dessus n'est pas de la chaux salie, c'est un LIT DE CENDRE : elle s'y amasse en
+    // tas d'une demi-ama que le balai et le vent déplacent, et la suie ne se voit
+    // qu'entre eux. Le tas se prend au seuil SERRÉ d'un bruit brouillé par une octave
+    // fine : un seuil large redonne le nuage, et c'est le nuage qui se lisait en image
+    // agrandie. Ici le bord est net et déchiqueté — un bord de dépôt.
+    vec3 c = P * 3.0;
+    float cendre = smoothstep(0.54, 0.74,
+                              grainNorme(c) + (grainNorme(P * 13.0) - 0.5) * 0.5) * dessus;
+    // Et le tas a une ÉPAISSEUR : sa pente sort du même bruit, dérivé à la main. Sans
+    // elle, deux gris posés à plat restent une image, si fin qu'en soit le grain ; avec
+    // elle le soleil de l'Azara écrit le bord de chaque tas, et le dessus devient une
+    // matière. Le relief ne va pas sur la paroi : ce gradient est celui d'un plan.
+    float e = 0.06;
+    pente = vec3(grainNorme(c + vec3(e, 0.0, 0.0)) - grainNorme(c - vec3(e, 0.0, 0.0)), 0.0,
+                 grainNorme(c + vec3(0.0, 0.0, e)) - grainNorme(c - vec3(0.0, 0.0, e)))
+          * (0.20 / e) * dessus;
     // La moucheture ne mord que là où il y a déjà de la suie : semée sur la chaux nette
     // elle la salissait au lieu de la brûler.
-    float prise = clamp(base + (grainNorme(P * 26.0) - 0.5) * 0.26
-                             * smoothstep(0.02, 0.30, base), 0.0, 1.0);
-    teinte = mix(mix(vec3(1.0), GRIS_CENDRE, dessus), NOIR_SUIE, prise);
-    rugo = 0.06 + prise * 0.14;
+    float mouchete = grainNorme(P * 26.0) - 0.5;
+    float suie = clamp(prise * (0.90 + mouchete * 0.28), 0.0, 1.0);
+    teinte = mix(mix(vec3(1.0), NOIR_SUIE, suie),
+                 GRIS_CENDRE * (1.0 + mouchete * 0.30), cendre * 0.62);
+    rugo = 0.06 + suie * 0.16 + cendre * 0.10;
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
   if (uFamille == 11 || uFamille == 14) { patiner(P, N, 1.0, teinte, rugo); }

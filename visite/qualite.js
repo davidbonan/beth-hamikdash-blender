@@ -23,7 +23,7 @@ const leger = demande === "basse"
 // `halo` absent = pas de passe du tout, et pas seulement une force nulle : les cinq
 // niveaux de flou de la passe sont alloués par son constructeur, qu'elle serve ou non.
 export const PROFIL = leger
-  ? { dprMax: 1.5, echelleMin: 0.55, profondeurLog: false, grainLeger: true,
+  ? { dprMax: 1.5, echelleMin: 0.75, profondeurLog: false, grainLeger: true,
       ombres: { taille: 1024, portee: 26, penombre: false }, occlusion: 6,
       nappes: { taille: 512, anisotropie: 4, macro: false },
       halo: { force: 0.16, rayon: 0.6, seuil: 1.6 } }

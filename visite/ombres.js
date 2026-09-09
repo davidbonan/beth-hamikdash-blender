@@ -33,6 +33,9 @@ const RECHERCHE = 12.0;
 
 export function regler(soleil) {
   soleil.castShadow = true;
+  // La carte n'est plus refaite à chaque image : `suivreSoleil` la redemande quand la
+  // fenêtre a assez bougé pour que ça se voie.
+  soleil.shadow.autoUpdate = false;
   soleil.shadow.mapSize.set(PROFIL.ombres.taille, PROFIL.ombres.taille);
   soleil.shadow.bias = -0.0002;
   soleil.shadow.normalBias = 0.04;

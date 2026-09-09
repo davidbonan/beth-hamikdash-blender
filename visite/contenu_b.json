@@ -164,6 +164,24 @@
       }
     ]
   },
+  "sharsherot_oulam": {
+    "he": "שרשרות של זהב",
+    "translit": "Sharsherot shel zahav",
+    "resume": "Des chaînes d'or fixées dans les poutres du plafond de l'Oulam et pendantes dans le vide. Les jeunes cohanim s'y agrippaient et montaient à la force des bras, pour aller voir les couronnes que Zekharia fait garder « en mémorial dans le Sanctuaire ». Où ces couronnes étaient posées, les commentateurs ne s'accordent pas : aux fenêtres de l'étage de l'Oulam, ou à celles du Heikhal — elles ne sont pas modélisées ici.",
+    "cotes": [],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:8",
+        "citation": "וְשַׁרְשְׁרוֹת שֶׁל זָהָב הָיוּ קְבוּעוֹת בְּתִקְרַת הָאוּלָם, שֶׁבָּהֶן פִּרְחֵי כְהֻנָּה עוֹלִין וְרוֹאִין אֶת הָעֲטָרֹת"
+      },
+      {
+        "oeuvre": "Zekharia",
+        "ref": "6:14",
+        "citation": ""
+      }
+    ]
+  },
   "tables_oulam": {
     "he": "",
     "translit": "",

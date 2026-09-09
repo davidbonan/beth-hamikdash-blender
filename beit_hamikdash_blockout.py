@@ -1533,35 +1533,83 @@ def creneaux(name, x0, x1, y0, y1, z, col, mat=None, pas=4.0, large=2.0, haut=2.
             box(f"{name}_{k:03d}", x0, x1, c - large / 2, c + large / 2, z, z + haut, col, mat)
 
 
-def couronnement(name, x0, x1, y0, y1, z, col, mat=None, saillie=0.5, reserve=()):
-    """Assise de couronnement d'un mur : une ama qui déborde de `saillie` sur les deux
-    faces, à cheval sur la crête. Un mur qui s'arrête net se lit en boîte ; l'assise
-    qui déborde donne la ligne d'ombre qui fait le mur. `reserve` : intervalles du
-    grand côté que le couronnement saute — les corps de porte qui passent la crête."""
+# Profils des moulures, de bas en haut : (cote depuis la référence, cote suivante, part
+# de la saillie). PLUSIEURS assises et non une seule : un mur qui s'arrête net se lit en
+# boîte, et une assise unique en débord ne fait qu'élargir la boîte. Ce qu'on lit d'un
+# socle ou d'une corniche, ce sont leurs LIGNES D'OMBRE, et il en faut deux — l'assise
+# qui déborde le plus, puis celle qui se retire.
+# CORNICHE se réfère à la crête et monte d'une demi-ama au-dessus ; SOCLE se réfère au
+# sol où le mur se pose. Aucune source ne moulure l'enceinte : CHOIX, mais dans la
+# langue que les sources donnent au Temple — le כַּרְכֹּב du Mizbea'h (Middot 3:1), les
+# rovadim de l'Oulam (Rambam Beit HaBe'hira 4:9), l'assise en débord du Bayit
+# (« אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה », Baba Batra 4a).
+CORNICHE = ((-2.20, -1.55, 0.34), (-1.55, -0.30, 1.00), (-0.30, 0.60, 0.60))
+SOCLE = ((0.00, 1.90, 1.00), (1.90, 2.60, 0.42))
+BANDEAU = ((0.00, 1.30, 1.00), (1.30, 1.70, 0.40))
+# La saillie est calée sur celle des lishkot de l'Azara (LISHKA_DEBORD), et pour la même
+# raison : c'est la mesure au-dessous de laquelle une moulure cesse de jeter une ombre.
+# À 0,75 ama, la corniche se lisait encore en filet sale au sommet d'un mur de dix-sept
+# mètres ; à 1,4, sous un soleil rasant, elle porte son ombre sur six amot de parement.
+SAILLIE_MOULURE = 1.4
+SAILLIE_BANDEAU = 0.8
+
+
+def _mitre(a, dehors, regle, p):
+    """Où s'arrête un membre de moulure au bout d'un mur, selon ce qu'il y trouve.
+
+    Chaque assise déborde de sa propre valeur : le bout ne peut donc pas être chiffré
+    au point d'appel, sinon les membres les plus minces laissent une encoche à l'angle
+    et les plus larges un moignon en l'air.
+    """
+    return {"deborde": a + dehors * p,     # ce mur prend l'angle
+            "bute": a - dehors * p,        # il s'arrête contre la saillie de l'autre
+            "libre": a}[regle]             # il n'y a rien à cet angle
+
+
+def moulure(name, x0, x1, y0, y1, z, profil, col, mat=None, saillie=SAILLIE_MOULURE,
+            mitres=("libre", "libre"), cotes=(True, True), reserve=()):
+    """Assises en débord au pied ou à la crête d'un mur, cotées par `profil` depuis `z`.
+
+    Le blockout le disait déjà des lishkot de l'Azara — « posée en boîte nue, une lishka
+    ne se lit pas : à 750 amot elle n'a ni pied, ni sommet, ni ombre sur elle-même » —
+    et leur donnait socle, bandeau et corniche. L'enceinte et les cours n'en avaient
+    jamais eu : leurs murs s'arrêtaient sur une arête vive et sortaient de terre sans
+    pied, ce qui les faisait lire en gros œuvre non fini.
+
+    `mitres` dit ce que rencontre chaque bout du grand côté (voir `_mitre`) ; `cotes`,
+    de quelle face du mur la moulure sort — un mur de soutènement n'a pas le même sol
+    des deux côtés ; `reserve`, les intervalles du grand côté qu'elle saute.
+    """
     long_x = (x1 - x0) >= (y1 - y0)
     a0, a1 = (x0, x1) if long_x else (y0, y1)
-    for j, (u0, u1) in enumerate(_hors_reserve(a0, a1, z - 0.5, z + 0.5,
-                                               [(r0, r1, z - 1, z + 1) for r0, r1 in reserve])):
-        if long_x:
-            box(f"{name}_{j}", u0, u1, y0 - saillie, y1 + saillie, z - 0.5, z + 0.5, col, mat)
-        else:
-            box(f"{name}_{j}", x0 - saillie, x1 + saillie, u0, u1, z - 0.5, z + 0.5, col, mat)
+    bas, haut = z + min(zb for zb, _, _ in profil), z + max(zh for _, zh, _ in profil)
+    for i, (zb, zh, part) in enumerate(profil):
+        p = saillie * part
+        p0, p1 = (p if cotes[0] else 0.0), (p if cotes[1] else 0.0)
+        u0, u1 = _mitre(a0, -1, mitres[0], p), _mitre(a1, 1, mitres[1], p)
+        for j, (v0, v1) in enumerate(_hors_reserve(u0, u1, z + zb, z + zh,
+                                                   [(r0, r1, bas, haut) for r0, r1 in reserve])):
+            if long_x:
+                box(f"{name}_{i}{j}", v0, v1, y0 - p0, y1 + p1, z + zb, z + zh, col, mat)
+            else:
+                box(f"{name}_{i}{j}", x0 - p0, x1 + p1, v0, v1, z + zb, z + zh, col, mat)
 
 
-def ceinture(name, x0, x1, y0, y1, epaisseur, z0, z1, col, mat=None, saillie=0.75):
-    """Bandeau en débord sur les quatre côtés d'une enceinte fermée.
+def ceinture(name, x0, x1, y0, y1, epaisseur, z, profil, col, mat=None,
+             saillie=SAILLIE_MOULURE):
+    """La moulure de `moulure`, mais sur les quatre côtés d'une enceinte fermée.
 
-    `couronnement` couronne un mur seul, qu'il faut pouvoir interrompre là où un corps
-    de porte passe la crête ; ici les quatre côtés sont solidaires, et ce qui compte
-    est qu'ils s'aboutent au lieu de se recouvrir — deux boîtes coplanaires clignotent.
-    Les côtés sud et nord prennent les angles, les côtés est et ouest s'arrêtent contre
-    eux.
+    Un mur seul se coupe là où un corps de porte passe la crête ; ici les quatre côtés
+    sont solidaires, et ce qui compte est qu'ils s'aboutent au lieu de se recouvrir —
+    deux boîtes coplanaires clignotent. Les côtés sud et nord prennent les angles, les
+    côtés est et ouest s'arrêtent contre eux.
     """
-    s = saillie
-    box(f"{name}_S", x0 - s, x1 + s, y0 - s, y0 + epaisseur + s, z0, z1, col, mat)
-    box(f"{name}_N", x0 - s, x1 + s, y1 - epaisseur - s, y1 + s, z0, z1, col, mat)
-    box(f"{name}_O", x0 - s, x0 + epaisseur + s, y0 + epaisseur, y1 - epaisseur, z0, z1, col, mat)
-    box(f"{name}_E", x1 - epaisseur - s, x1 + s, y0 + epaisseur, y1 - epaisseur, z0, z1, col, mat)
+    for i, (zb, zh, part) in enumerate(profil):
+        p, e = saillie * part, epaisseur
+        box(f"{name}_S{i}", x0 - p, x1 + p, y0 - p, y0 + e + p, z + zb, z + zh, col, mat)
+        box(f"{name}_N{i}", x0 - p, x1 + p, y1 - e - p, y1 + p, z + zb, z + zh, col, mat)
+        box(f"{name}_O{i}", x0 - p, x0 + e + p, y0 + e, y1 - e, z + zb, z + zh, col, mat)
+        box(f"{name}_E{i}", x1 - e - p, x1 + p, y0 + e, y1 - e, z + zb, z + zh, col, mat)
 
 
 def battants(name, x0, x1, y0, y1, z0, h, col, mat, largeur=10):
@@ -1599,8 +1647,12 @@ def cyl_between(name, p0, p1, r, col, mat=None, verts=16):
     o.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
     return o
 
-def chaine(name, p0, p1, R, col, mat=None, tube=None):
-    """Chaîne tendue entre deux points : maillons enfilés, un plan sur deux tourné."""
+def chaine(name, p0, p1, R, col, mat=None, tube=None, majeur=10, mineur=6):
+    """Chaîne tendue entre deux points : maillons enfilés, un plan sur deux tourné.
+
+    Une chaîne longue se paie en sommets dans le .glb — un maillon plus gros et moins
+    facetté est ce qui la rend soutenable sur toute la hauteur de l'Oulam.
+    """
     a, d = Vector(p0), Vector(p1) - Vector(p0)
     axe1 = d.normalized().cross(Vector((1, 0, 0)))
     if axe1.length < 1e-3:
@@ -1612,7 +1664,7 @@ def chaine(name, p0, p1, R, col, mat=None, tube=None):
         p = a + d * ((k + 0.5) / n)
         axe = axe1 if k % 2 else axe2
         tore(f"{name}_{k:02d}", p.x, p.y, p.z, R, tube or R * 0.32, col, mat,
-             rotation=axe.to_track_quat('Z', 'Y').to_euler(), majeur=10, mineur=6)
+             rotation=axe.to_track_quat('Z', 'Y').to_euler(), majeur=majeur, mineur=mineur)
 
 def _poser(pieces, x, y, z0, lacet):
     """Pièces bâties à l'origine, posées en (x, y, z0) amot et tournées de `lacet`
@@ -1959,7 +2011,8 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
         else:
             box(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim")
     ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, 2,
-             Z_EZN + H_LISHKA_EN - 1.5, Z_EZN + H_LISHKA_EN + 0.5, "10_EzratNashim")
+             Z_EZN + H_LISHKA_EN, CORNICHE, "10_EzratNashim")
+    ceinture(f"Lishkat_{nm}_socle", xa, xb, ya, yb, 2, Z_EZN, SOCLE, "10_EzratNashim")
 # Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
 # entre les chambres d'angle — elle traversait leurs murs. Une dalle nue en l'air ne
 # se lisait pas : elle porte maintenant sur des colonnes et un garde-corps.
@@ -1973,9 +2026,22 @@ for nm, ya, yb, devant in (("nord", 64, 67.5, 64), ("sud", -67.5, -64, -64)):
                 "10_EzratNashim")
 # Couronnement des murs de l'Ezrat Nashim, et les battants d'or de sa porte est :
 # « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעֲרֵי נִיקָנוֹר » (Middot 2:3).
-couronnement("EzratNashim_couronnement_nord", EX0 - 0.5, EX1 - 0.5, 67.5, 72.5, Z_EZN + H_MUR_EN, "10_EzratNashim")
-couronnement("EzratNashim_couronnement_sud", EX0 - 0.5, EX1 - 0.5, -72.5, -67.5, Z_EZN + H_MUR_EN, "10_EzratNashim")
-couronnement("EzratNashim_couronnement_est", EX1, EX1 + 5, -72.5 - 0.5, 72.5 + 0.5, Z_EZN + H_MUR_EN, "10_EzratNashim")
+# Socle, bandeau et couronnement se posent aux mêmes bouts, avec les mêmes mitres, et
+# tombent ici tous les dix amot : le pied à Z_EZN, la crête vingt amot plus haut, et
+# entre les deux le plancher de la gezuztra (Middot 2:5), qui est de plain-pied avec le
+# dallage de l'Azara. Le bandeau n'est donc pas un ornement posé à mi-hauteur : c'est le
+# niveau de la galerie, lu du dehors. Seule la porte est interrompt les deux moulures
+# basses.
+for _ouvrage, _profil, _z, _s in (("socle", SOCLE, Z_EZN, SAILLIE_MOULURE),
+                                  ("bandeau", BANDEAU, Z_AZ, SAILLIE_BANDEAU),
+                                  ("couronnement", CORNICHE, Z_EZN + H_MUR_EN, SAILLIE_MOULURE)):
+    _baie = () if _ouvrage == "couronnement" else [(-5, 5)]
+    moulure(f"EzratNashim_{_ouvrage}_nord", EX0, EX1, 67.5, 72.5, _z, _profil, "10_EzratNashim",
+            saillie=_s, mitres=("deborde", "bute"))
+    moulure(f"EzratNashim_{_ouvrage}_sud", EX0, EX1, -72.5, -67.5, _z, _profil, "10_EzratNashim",
+            saillie=_s, mitres=("deborde", "bute"))
+    moulure(f"EzratNashim_{_ouvrage}_est", EX1, EX1 + 5, -72.5, 72.5, _z, _profil, "10_EzratNashim",
+            saillie=_s, mitres=("deborde", "deborde"), reserve=_baie)
 battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashim", MAT_OR())
 # Treize shofarot (Shekalim 6:5) : les troncs « en forme de shofar » — étroits en haut,
 # larges en bas, pour qu'on n'y glisse pas la main (Bartenura) — le long du mur est, de
@@ -2357,15 +2423,40 @@ for nm, x, cote in (("Korban", PORTE_KORBAN, "nord"), ("Bekhorot", PORTE_BEKHORO
 # Couronnement des murs de l'Azara : une assise en débord sur la crête, qui saute
 # les corps passant les 25 amot (Beit HaMoked, HaGazit, HaGola, et les terrasses
 # de Sha'ar HaNitzotz et de Sha'ar HaMayim).
-couronnement("Azara_couronnement_est", AX1, AX1 + T, AY0 - T - 0.5, AY1 + T + 0.5, Z_AZ + H_MUR, "20_Azara")
-couronnement("Azara_couronnement_ouest", AX0 - T, AX0, AY0 + 0.5, AY1 - 0.5, Z_AZ + H_MUR, "20_Azara")
-couronnement("Azara_couronnement_nord", AX0 - T - 0.5, AX1 - 0.5, AY1, AY1 + T, Z_AZ + H_MUR, "20_Azara",
-             reserve=[(PORTE_MOKED - 10.5, PORTE_MOKED + 10.5),
-                      (GAZIT_X0 - LISHKA_DEBORD, GAZIT_X1 + LISHKA_DEBORD),
-                      (GOLA_X0 - LISHKA_DEBORD, GOLA_X1 + LISHKA_DEBORD),
-                      (NZ_X0 - LISHKA_DEBORD, NZ_X1 + LISHKA_DEBORD)])
-couronnement("Azara_couronnement_sud", AX0 - T - 0.5, AX1 - 0.5, AY0 - T, AY0, Z_AZ + H_MUR, "20_Azara",
-             reserve=[(SM_X0 - LISHKA_DEBORD, SM_X1 + LISHKA_DEBORD)])
+moulure("Azara_couronnement_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ + H_MUR, CORNICHE, "20_Azara",
+        mitres=("deborde", "deborde"))
+moulure("Azara_couronnement_ouest", AX0 - T, AX0, AY0, AY1, Z_AZ + H_MUR, CORNICHE, "20_Azara",
+        mitres=("bute", "bute"))
+CORPS_NORD = [(PORTE_MOKED - 10.5, PORTE_MOKED + 10.5),
+              (GAZIT_X0 - LISHKA_DEBORD, GAZIT_X1 + LISHKA_DEBORD),
+              (GOLA_X0 - LISHKA_DEBORD, GOLA_X1 + LISHKA_DEBORD),
+              (NZ_X0 - LISHKA_DEBORD, NZ_X1 + LISHKA_DEBORD)]
+CORPS_SUD = [(SM_X0 - LISHKA_DEBORD, SM_X1 + LISHKA_DEBORD)]
+moulure("Azara_couronnement_nord", AX0 - T, AX1, AY1, AY1 + T, Z_AZ + H_MUR, CORNICHE, "20_Azara",
+        mitres=("deborde", "bute"), reserve=CORPS_NORD)
+moulure("Azara_couronnement_sud", AX0 - T, AX1, AY0 - T, AY0, Z_AZ + H_MUR, CORNICHE, "20_Azara",
+        mitres=("deborde", "bute"), reserve=CORPS_SUD)
+# Le socle ne se pose que du côté de la cour : dehors, ces murs soutiennent dix amot de
+# remblai et leur pied est sur la terrasse du 'Heil, pas sur le dallage de l'Azara. Il
+# saute les baies — une porte n'a pas de pied de mur en travers — et les corps bâtis.
+moulure("Azara_socle_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, SOCLE, "20_Azara",
+        mitres=("deborde", "deborde"), cotes=(True, False), reserve=[(-5, 5)])
+moulure("Azara_socle_ouest", AX0 - T, AX0, AY0, AY1, Z_AZ, SOCLE, "20_Azara",
+        mitres=("bute", "bute"), cotes=(False, True))
+for _nm, _y0, _y1, _cotes, _corps in (("nord", AY1, AY1 + T, (True, False), CORPS_NORD),
+                                      ("sud", AY0 - T, AY0, (False, True), CORPS_SUD)):
+    moulure(f"Azara_socle_{_nm}", AX0 - T, AX1, _y0, _y1, Z_AZ, SOCLE, "20_Azara",
+            mitres=("deborde", "bute"), cotes=_cotes,
+            reserve=_corps + [(p - 5, p + 5) for p in OUVERTURES[_nm]])
+# Face est, celle que l'Ezrat Nashim regarde : ce mur-là descend jusqu'à la terrasse du
+# 'Heil, et c'est là que son pied se pose. Trente-cinq amot de parement d'un seul tenant
+# se lisent en gros œuvre ; le bandeau y porte, comme dans l'Ezrat Nashim, le niveau du
+# dallage de l'Azara qui est derrière.
+moulure("Azara_socle_est_bas", AX1, AX1 + T, AY0 - T, AY1 + T, Z_EZN, SOCLE, "20_Azara",
+        mitres=("deborde", "deborde"), cotes=(False, True), reserve=[(-5, 5)])
+moulure("Azara_bandeau_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, BANDEAU, "20_Azara",
+        saillie=SAILLIE_BANDEAU, mitres=("deborde", "deborde"), cotes=(False, True),
+        reserve=[(-5, 5)])
 
 # ----------------------------------------------------------------------------
 # 30 — MIZBEA'H (Middot 3:1) + rampe + Kiyor + Beit HaMitba'haïm
@@ -2712,6 +2803,19 @@ for k, y in enumerate(plage(-31.5, 31.5, 7)):
                 0.5, "40_Ulam", MAT_CEDRE(), verts=12)
 for k, x in enumerate((BX_E - 13.25, BX_E - 10.5, BX_E - 7.75)):
     box(f"Ulam_plafond_poutre_{k}", x - 0.4, x + 0.4, -35, 35, Z_BAT + 39.1, Z_BAT + 40, "40_Ulam", MAT_CEDRE())
+# « וְשַׁרְשְׁרוֹת שֶׁל זָהָב הָיוּ קְבוּעוֹת בְּתִקְרַת הָאוּלָם, שֶׁבָּהֶן פִּרְחֵי כְהֻנָּה עוֹלִין וְרוֹאִין אֶת
+# הָעֲטָרֹת » (Middot 3:8) : fixées dans les poutres du plafond et pendantes dans le vide de
+# l'Oulam — « וְתוֹלוֹת לְמַטָּה בָּאוּלָם שֶׁאוֹחֲזִין בָּהֶן פִּרְחֵי כְהֻנָּה מְפַסְּגִין וְעוֹלִין » (R. Shemaya,
+# cité par le Tossefot Yom Tov ad loc.) : on s'y agrippe et on monte. Elles descendent donc
+# à hauteur de main, pas à mi-hauteur. Nombre et place : CHOIX — au-delà de y ±10 pour
+# laisser la mire de Middot 2:4, et à l'écart des kotarot de Ya'hin et Boaz.
+# Les עֲטָרוֹת de Zekharia 6:14 qu'on monte voir ne sont pas modelées : leur place est
+# disputée — aux fenêtres de l'aliyah de l'Oulam (Melekhet Shlomo ad loc.), étage que ce
+# blockout ne bâtit pas, ou aux fenêtres du Heikhal (Bartenura ad loc. ; Abravanel sur
+# Zekharia 6:14), qui ne sont pas visibles de l'Oulam.
+for k, y in enumerate((-24, -13, 13, 24)):
+    chaine(f"Ulam_sharsheret_{k}", (BX_E - 10.5, y, Z_BAT + 39.4), (BX_E - 10.5, y, Z_BAT + 3.5),
+           0.24, "40_Ulam", MAT_OR(), tube=0.075, majeur=8, mineur=5)
 # Deux tables de l'Oulam (marbre au nord... CHOIX : marbre à droite en entrant = nord ; or au sud)
 box("Ulam_table_marbre", -90, -88, 5.5, 6.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_MARBRE())
 box("Ulam_table_or", -90, -88, -6.5, -5.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_OR())
