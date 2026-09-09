@@ -1,7 +1,11 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { habiller, attiser } from "./matieres.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { habiller, attiser, ETOFFES } from "./matieres.js";
+import { chaine } from "./occlusion.js";
+import { PROFIL } from "./qualite.js";
+import { commandes } from "./pilotage.js";
+import { ZONES, panneau } from "./fiche.js";
 
 const AMA = 0.48;
 const OEIL = 1.75;        // H_HOMME de la fiche : 1,75 m
@@ -19,6 +23,11 @@ const COURSE = 2.4;       // multiplicateur
 const GARDE = 0.06;       // peau du rayon de garde, devant le marcheur
 const SOUS_PAS = 0.12;    // MARCHE - GARDE : le pas d'intégration qui ne saute rien
 const VOL = 9.0;          // m/s en vol libre
+// Le pas ne s'établit ni ne s'éteint d'un coup : une vitesse qui bascule de 0 à 3,4
+// m/s à l'image près se lit en saccade, et c'est elle qu'on prend pour un manque de
+// framerate. 0,09 s, c'est trente centimètres de glissé à l'arrêt — le pied qui se pose.
+const REPONSE = 0.09;
+const LISSAGE_REGARD = 0.045;
 
 // Une étoffe ne barre pas le passage. La parokhet en particulier : le Cohen Gadol la
 // franchit, et une visite qui s'arrête devant elle n'atteint jamais le Kodesh
@@ -27,61 +36,6 @@ const VOL = 9.0;          // m/s en vol libre
 // pourtour, sans les ouvertures qu'il avait (Middot 2:3). S'y cogner, ce serait buter
 // sur un manque du modèle, pas sur l'architecture.
 const TRAVERSABLES = new Set(["parokhet", "chaines_devir", "soreg"]);
-
-const ZONES = {
-  har_habayit: "Har HaBayit", ezrat_nashim: "Ezrat Nashim", azara: "Azara",
-  mizbeach: "Mizbea'h", oulam: "Oulam", heikhal: "Heikhal",
-  kodesh_hakodashim: "Kodesh HaKodashim", lishkot: "Lishkot",
-};
-
-// Sefaria distingue la michna du folio : `Middot 2:1` est une michna, `Yoma 54a` un
-// folio de guemara. Le nom du traité est le même, le préfixe non — d'où le test sur
-// la forme de la cote plutôt qu'une table à double entrée.
-const TRAITES = {
-  middot: "Middot", tamid: "Tamid", yoma: "Yoma", shekalim: "Shekalim",
-  soucca: "Sukkah", souccah: "Sukkah", sukkah: "Sukkah", succa: "Sukkah",
-  kelim: "Kelim", arakhin: "Arakhin", erakhin: "Arakhin",
-  zevahim: "Zevachim", zevachim: "Zevachim",
-  menahot: "Menachot", menachot: "Menachot",
-  "baba batra": "Bava Batra", "bava batra": "Bava Batra",
-  houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
-  "yerushalmi yoma": "Jerusalem Talmud Yoma",
-  pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim",
-};
-const OUVRAGES = {
-  "rambam beit habehira": "Mishneh Torah, The Chosen Temple",
-  "beit habehira": "Mishneh Torah, The Chosen Temple",
-  "rambam klei hamikdash": "Mishneh Torah, Vessels of the Sanctuary and Those Who Serve Therein",
-  "rambam biat hamikdash": "Mishneh Torah, Admission into the Sanctuary",
-  "melakhim i": "I Kings", "i rois": "I Kings", "rois i": "I Kings", "i melakhim": "I Kings",
-  "divrei hayamim ii": "II Chronicles", "ii chroniques": "II Chronicles",
-  yechezkel: "Ezekiel", ezechiel: "Ezekiel",
-  shemot: "Exodus", exode: "Exodus",
-  vayikra: "Leviticus", levitique: "Leviticus",
-  devarim: "Deuteronomy", deuteronome: "Deuteronomy",
-  bamidbar: "Numbers", nombres: "Numbers",
-  "i samuel": "I Samuel", "shmuel i": "I Samuel",
-  yirmeyahou: "Jeremiah", jeremie: "Jeremiah",
-  yehezkel: "Ezekiel",
-  "rambam temidin": "Mishneh Torah, Daily Offerings and Additional Offerings",
-  "rashi exode": "Rashi on Exodus", "rashi shemot": "Rashi on Exodus",
-  "rambam sur middot": "Rambam on Mishnah Middot",
-};
-
-const pele = (s) => (s || "").toLowerCase().normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "").replace(/['’.,]/g, "").replace(/\s+/g, " ").trim();
-
-function lienSefaria(oeuvre, ref) {
-  const clef = pele(oeuvre);
-  const direct = OUVRAGES[clef];
-  if (direct) return url(`${direct} ${ref}`);
-  const traite = TRAITES[clef.replace(/^(mishna|mishnah|talmud) /, "")];
-  if (!traite) return null;                       // archéologie, choix du projet : pas de cote Sefaria
-  const folio = /^\d+[ab]$/.test((ref || "").trim());
-  return url(`${folio ? traite : "Mishnah " + traite} ${ref}`);
-}
-const url = (tref) => "https://www.sefaria.org/" +
-  encodeURIComponent(tref.replace(/ /g, "_")).replace(/%2C/g, ",").replace(/%3A/g, ":");
 
 // ---------------------------------------------------------------------------
 // données
@@ -126,76 +80,137 @@ for (const c of fiche.concepts) {
 // ---------------------------------------------------------------------------
 // Profondeur logarithmique : le plaquage d'or du Heikhal est posé exactement sur la
 // pierre qu'il couvre, et la scène va du centimètre d'une flamme aux 240 m de
-// l'esplanade. Un tampon linéaire y fait clignoter les deux surfaces l'une dans l'autre.
+// l'esplanade. Un tampon linéaire y fait clignoter les deux surfaces l'une dans
+// l'autre. Elle écrit en revanche la profondeur depuis le nuanceur, ce qui prive les
+// GPU à tuiles de leur tri préalable : le profil léger s'en passe, et compte pour ça
+// sur le seul écart qui reste à départager, les 4,8 cm du placage.
 const renderer = new THREE.WebGLRenderer({
-  antialias: true, powerPreference: "high-performance", logarithmicDepthBuffer: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
+  antialias: true, powerPreference: "high-performance",
+  logarithmicDepthBuffer: PROFIL.profondeurLog });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.62;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = PROFIL.ombres.doux ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xc9cec8, 120, 560);
-
-// L'or est métallique : sans environnement à réfléchir, il rend noir.
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+// Le brouillard porte la couleur du BAS du ciel, et pas une autre : accordé au dôme
+// il éloigne, désaccordé il salit. À 0xc9cec8 sur 120 m il repeignait en gris-vert
+// tout ce qui passait le milieu de l'esplanade, laquelle fait 500 amot de côté.
+scene.fog = new THREE.Fog(0xd8dcd4, 220, 900);
 
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
 // calcaire y perdait sa teinte et le modelé avec, et les murs rendaient un aplat gris.
 // Le rapport compte plus que les niveaux — même arbitrage que le ciel du blockout.
-scene.add(new THREE.HemisphereLight(0xcddcec, 0x8a7d66, 0.42));
+scene.add(new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.42));
 // Matin, à l'est : l'axe de l'avoda, et la lumière qui creuse la façade de face.
 const soleil = new THREE.DirectionalLight(0xfff2dc, 2.7);
 soleil.castShadow = true;
-soleil.shadow.mapSize.set(2048, 2048);
+soleil.shadow.mapSize.set(PROFIL.ombres.taille, PROFIL.ombres.taille);
 soleil.shadow.bias = -0.0002;
 soleil.shadow.normalBias = 0.04;
 // Fenêtre serrée : elle suit le visiteur, et 2048 texels sur 80 m donnent 4 cm de
 // résolution — assez fin pour l'arête d'une assise, ce qu'une fenêtre couvrant tout
-// le Har HaBayit ne donnerait jamais.
-Object.assign(soleil.shadow.camera, { near: 1, far: 260, left: -40, right: 40, top: 40, bottom: -40 });
+// le Har HaBayit ne donnerait jamais. Le profil léger rétrécit la fenêtre en même
+// temps que la carte, pour garder cette résolution-là.
+const PORTEE_OMBRE = PROFIL.ombres.portee;
+Object.assign(soleil.shadow.camera, { near: 1, far: 260, left: -PORTEE_OMBRE,
+  right: PORTEE_OMBRE, top: PORTEE_OMBRE, bottom: -PORTEE_OMBRE });
 scene.add(soleil, soleil.target);
 const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.22);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
-// Un dôme dégradé plutôt qu'un aplat : sans horizon, le Har HaBayit flotte.
-const ciel = new THREE.Mesh(
-  new THREE.SphereGeometry(760, 32, 16),
-  new THREE.ShaderMaterial({
-    side: THREE.BackSide, depthWrite: false, fog: false,
-    uniforms: { hautCiel: { value: new THREE.Color(0x4d7fb8) },
-                basCiel: { value: new THREE.Color(0xd8dcd4) },
-                solCiel: { value: new THREE.Color(0xa89c86) } },
-    vertexShader: `varying vec3 vD; void main(){ vD = position;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-    fragmentShader: `uniform vec3 hautCiel, basCiel, solCiel; varying vec3 vD;
-      void main(){ float h = normalize(vD).y;
-        vec3 c = h > 0.0 ? mix(basCiel, hautCiel, pow(h, 0.55)) : mix(basCiel, solCiel, min(-h * 6.0, 1.0));
-        gl_FragColor = vec4(c, 1.0); }`,
-  }));
+// Un dôme dégradé plutôt qu'un aplat : sans horizon, le Har HaBayit flotte. Et le
+// soleil y est DESSINÉ : un ciel d'où vient une ombre franche sans qu'on voie d'où
+// elle vient se lit en éclairage de studio, pas en matin de Jérusalem.
+const SOLEIL = new THREE.Vector3(150, 125, 55);
+function domeCiel(rayon, haut = 0x4d7fb8, bas = 0xd8dcd4, sol = 0xa89c86, disque = 1.0) {
+  return new THREE.Mesh(
+    new THREE.SphereGeometry(rayon, 64, 32),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false, fog: false,
+      uniforms: { hautCiel: { value: new THREE.Color(haut) },
+                  basCiel: { value: new THREE.Color(bas) },
+                  solCiel: { value: new THREE.Color(sol) },
+                  dirSoleil: { value: SOLEIL.clone().normalize() },
+                  force: { value: disque } },
+      vertexShader: `varying vec3 vD; void main(){ vD = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform vec3 hautCiel, basCiel, solCiel, dirSoleil;
+        uniform float force; varying vec3 vD;
+        void main(){ vec3 d = normalize(vD); float h = d.y;
+          vec3 c = h > 0.0 ? mix(basCiel, hautCiel, pow(h, 0.55)) : mix(basCiel, solCiel, min(-h * 6.0, 1.0));
+          float s = max(dot(d, dirSoleil), 0.0);
+          // Trois portées : la moitié du ciel se réchauffe vers le soleil, le halo se
+          // resserre autour, le disque tient dans un demi-degré.
+          c += force * vec3(1.00, 0.84, 0.58) * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
+          c += force * vec3(1.00, 0.95, 0.86) * 2.2 * smoothstep(0.99993, 0.99998, s);
+          gl_FragColor = vec4(c, 1.0); }`,
+    }));
+}
+
+const ciel = domeCiel(760);
 ciel.frustumCulled = false;
 scene.add(ciel);
 
-const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 1400);
+// L'or est métallique : sans environnement à réfléchir, il rend noir. Cet
+// environnement est le dôme lui-même et pas une pièce neutre : une pièce grise
+// éclaire chaque face à l'ombre d'un gris sans teinte, et c'est ce qui rendait le
+// calcaire des faces nord couleur de béton.
+// Le dôme qui éclaire n'a pas les couleurs du dôme qu'on voit : il n'y a pas de
+// rebond dans cette scène, et sous un portique la seule lumière serait celle du bleu
+// du zénith — le dallage à l'ombre y virait au bleu franc. Le ciel de l'éclairage est
+// donc désaturé vers le haut, et sa moitié basse porte le calcaire ensoleillé de
+// l'esplanade, qui est le vrai rebond de tout ce qui est à l'ombre ici.
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(
+  new THREE.Scene().add(domeCiel(20, 0x8fa5bd, 0xe0d9c9, 0xc9b795, 0.0)), 0.04, 0.1, 200).texture;
+
+// Le champ est fixé à l'HORIZONTALE, pas à la verticale. Un champ vertical constant
+// vaut 94° de large en 16/9 et 31° sur un téléphone tenu debout : on y visiterait le
+// Temple par une paille. Le vertical est donc déduit du format, et seulement borné —
+// au-delà de 80° un portrait étroit tournerait au fisheye.
+const FOV_HORIZONTAL = 94;
+const FOV_VERTICAL = [50, 80];
+const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 900);
 // Une lampe discrète accrochée à la tête : sans elle le Heikhal, qui n'a pas de
 // fenêtre ouvrante dans le blockout, est une pièce noire.
 const lampe = new THREE.PointLight(0xffe9c4, 6, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
 
+// Le dôme est le seul objet qui n'entre pas dans la passe de géométrie : il enveloppe
+// la scène, et il l'occluerait tout entière.
+const rendu = chaine(renderer, scene, camera, [ciel]);
+
+// La résolution suit ce que la machine tient. Baisser la définition d'un tiers coûte
+// une image plus douce ; la garder coûte le mouvement, qui est ce qu'on est venu voir.
+const DPR = Math.min(devicePixelRatio, PROFIL.dprMax);
+let echelle = 1;
+
+function dimensionner() {
+  camera.aspect = innerWidth / innerHeight;
+  const vertical = THREE.MathUtils.radToDeg(
+    2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(FOV_HORIZONTAL) / 2) / camera.aspect));
+  camera.fov = THREE.MathUtils.clamp(vertical, FOV_VERTICAL[0], FOV_VERTICAL[1]);
+  camera.updateProjectionMatrix();
+  renderer.setPixelRatio(DPR * echelle);
+  renderer.setSize(innerWidth, innerHeight);
+  rendu.redimensionner(innerWidth, innerHeight);
+}
+dimensionner();
+addEventListener("resize", dimensionner);
+
 // ---------------------------------------------------------------------------
 // modèle
 // ---------------------------------------------------------------------------
 const obstacles = [];
-const gltf = await new GLTFLoader().loadAsync("./temple.glb", (e) => {
-  if (e.lengthComputable) jauge.style.width = `${(e.loaded / e.total) * 100}%`;
-});
+const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+  .loadAsync("./temple.glb", (e) => {
+    if (e.lengthComputable) jauge.style.width = `${(e.loaded / e.total) * 100}%`;
+  });
 etat.textContent = "préparation…";
 scene.add(gltf.scene);
 
@@ -212,7 +227,12 @@ gltf.scene.traverse((o) => {
   }
   o.geometry.computeBoundingBox();
   o.geometry.computeBoundingSphere();
-  o.material.side = THREE.DoubleSide;   // murs et voiles sont des boîtes fines
+  // Tout volume du blockout est une boîte fermée aux normales sortantes : ses faces
+  // arrière ne sont jamais celles qu'on voit. Les afficher doublait le travail de
+  // fragment, et faisait battre la face arrière du placage d'or contre la face avant
+  // de la pierre qu'il couvre, qui sont exactement coplanaires. Seules les étoffes,
+  // qu'on traverse, se regardent des deux côtés.
+  o.material.side = ETOFFES.has(o.material.name) ? THREE.DoubleSide : THREE.FrontSide;
   o.castShadow = true;
   o.receiveShadow = true;
   if (!brut && !habillees.has(o.material.uuid)) {
@@ -256,78 +276,13 @@ function murDevant(depuis, piedsY, direction, distance) {
   return false;
 }
 
-// Le regard suit le glissé, pas le curseur : bouton relâché, la souris redevient
-// libre pour la barre du haut et la fiche.
-const SENSIBILITE = 0.0022;
-const TANGAGE_MAX = Math.PI / 2 - 0.02;
-const SEUIL_CLIC = 5;                     // px parcourus au-delà desquels c'est un glissé
-const toile = renderer.domElement;
-const regard = new THREE.Euler(0, 0, 0, "YXZ");
-const souris = new THREE.Vector2();
-let glisse = null, surLaToile = false;
-
-function tourner(dx, dy) {
-  regard.setFromQuaternion(camera.quaternion);
-  regard.y -= dx * SENSIBILITE;
-  regard.x = THREE.MathUtils.clamp(regard.x - dy * SENSIBILITE, -TANGAGE_MAX, TANGAGE_MAX);
-  regard.z = 0;
-  camera.quaternion.setFromEuler(regard);
-}
-
-toile.addEventListener("pointerdown", (e) => {
-  if (e.button !== 0) return;
-  glisse = { id: e.pointerId, x: e.clientX, y: e.clientY, parcours: 0 };
-  toile.setPointerCapture(e.pointerId);
-  toile.classList.add("tourne");
-});
-
-toile.addEventListener("pointermove", (e) => {
-  surLaToile = true;
-  souris.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-  survol.style.left = `${e.clientX}px`;
-  survol.style.top = `${e.clientY + 20}px`;
-  if (!glisse || e.pointerId !== glisse.id) return;
-  const dx = e.clientX - glisse.x, dy = e.clientY - glisse.y;
-  glisse.x = e.clientX; glisse.y = e.clientY;
-  glisse.parcours += Math.abs(dx) + Math.abs(dy);
-  tourner(dx, dy);
-});
-
-function lacher(e) {
-  if (!glisse || e.pointerId !== glisse.id) return null;
-  const parcours = glisse.parcours;
-  glisse = null;
-  toile.classList.remove("tourne");
-  if (toile.hasPointerCapture(e.pointerId)) toile.releasePointerCapture(e.pointerId);
-  return parcours;
-}
-
-toile.addEventListener("pointerup", (e) => {
-  const parcours = lacher(e);
-  if (parcours === null || parcours >= SEUIL_CLIC) return;
-  if (vise) montrer(vise); else fermer();
-});
-toile.addEventListener("pointercancel", lacher);
-toile.addEventListener("pointerleave", () => { surLaToile = false; });
-toile.addEventListener("contextmenu", (e) => e.preventDefault());
-
-const touches = new Set();
-const AVANT = ["KeyW", "KeyZ", "ArrowUp"], ARRIERE = ["KeyS", "ArrowDown"];
-const GAUCHE = ["KeyA", "KeyQ", "ArrowLeft"], DROITE = ["KeyD", "ArrowRight"];
-const enfoncee = (l) => l.some((c) => touches.has(c));
-const dansLaBarre = () => !!document.activeElement?.closest?.("#barre, #fiche");
-addEventListener("keydown", (e) => {
-  if (dansLaBarre()) return;
-  touches.add(e.code);
-  if (e.code === "KeyV") basculerVol();
-  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
-});
-addEventListener("keyup", (e) => touches.delete(e.code));
-addEventListener("blur", () => touches.clear());
-
 let piedsY = 0;
 const avant = new THREE.Vector3(), droite = new THREE.Vector3();
 const HAUT = new THREE.Vector3(0, 1, 0), pas = new THREE.Vector3();
+// Le clavier, le pouce et le pilote automatique aboutissent tous à `voulu` : la marche
+// n'en connaît qu'un, et ses collisions valent donc pour les trois.
+const voulu = new THREE.Vector3(), lisse = new THREE.Vector3();
+let cible = null;
 
 // Le Temple ne se laisse pas traverser n'importe où : on monte à l'Ezrat Nashim par
 // les douze degrés du 'Heil, à l'Azara par les quinze marches, et l'autel se contourne.
@@ -335,115 +290,185 @@ const HAUT = new THREE.Vector3(0, 1, 0), pas = new THREE.Vector3();
 // d'où l'on a le droit de se tenir : le vol libre est là pour ça.
 let vol = false;
 
-function voler(dt) {
-  const long = (enfoncee(AVANT) ? 1 : 0) - (enfoncee(ARRIERE) ? 1 : 0);
-  const lat = (enfoncee(DROITE) ? 1 : 0) - (enfoncee(GAUCHE) ? 1 : 0);
-  const vert = (touches.has("Space") ? 1 : 0) - (touches.has("KeyC") ? 1 : 0);
-  if (!long && !lat && !vert) return;
+function vitesseVoulue() {
+  const vitesse = (vol ? VOL : PAS) * (manette.course ? COURSE : 1);
+  const manuel = Math.abs(manette.long) + Math.abs(manette.lat) + Math.abs(manette.vert);
+  if (manuel > 0.02) cible = null;
+  if (cible) {
+    voulu.copy(cible).sub(camera.position);
+    if (!vol) voulu.y = 0;
+    if (voulu.lengthSq() < (vol ? 1.4 : 0.36)) { cible = null; return voulu.set(0, 0, 0); }
+    return voulu.normalize().multiplyScalar(vitesse);
+  }
   camera.getWorldDirection(avant);
+  if (!vol) avant.y = 0;
+  avant.normalize();
   droite.crossVectors(avant, HAUT).normalize();
-  pas.set(0, 0, 0).addScaledVector(avant, long).addScaledVector(droite, lat).normalize()
-     .addScaledVector(HAUT, vert);
-  const vitesse = VOL * (touches.has("ShiftLeft") || touches.has("ShiftRight") ? COURSE : 1);
-  camera.position.addScaledVector(pas, vitesse * dt);
-  piedsY = camera.position.y - OEIL;
+  voulu.set(0, 0, 0).addScaledVector(avant, manette.long).addScaledVector(droite, manette.lat);
+  if (vol) voulu.addScaledVector(HAUT, manette.vert);
+  // La diagonale ne va pas plus vite que le droit devant, mais un pouce à mi-course
+  // marche à mi-vitesse : c'est la longueur qui est bridée, pas normalisée.
+  const force = Math.min(voulu.length(), 1);
+  return force < 1e-3 ? voulu.set(0, 0, 0) : voulu.normalize().multiplyScalar(vitesse * force);
 }
 
-function avancer(dt) {
-  if (vol) return voler(dt);
-  const long = (enfoncee(AVANT) ? 1 : 0) - (enfoncee(ARRIERE) ? 1 : 0);
-  const lat = (enfoncee(DROITE) ? 1 : 0) - (enfoncee(GAUCHE) ? 1 : 0);
-  if (!long && !lat) return;
-
-  camera.getWorldDirection(avant); avant.y = 0; avant.normalize();
-  droite.crossVectors(avant, HAUT).normalize();
-  pas.set(0, 0, 0).addScaledVector(avant, long).addScaledVector(droite, lat).normalize();
-
-  const vitesse = PAS * (touches.has("ShiftLeft") || touches.has("ShiftRight") ? COURSE : 1);
+function marcher(dt) {
+  pas.set(lisse.x, 0, lisse.z);
+  const vitesse = pas.length();
+  if (vitesse < 0.02) return;
+  pas.divideScalar(vitesse);
   // Le pas se découpe : à bas framerate un seul bond franchirait la garde.
   let reste = Math.min(vitesse * dt, 1.2);
   while (reste > 1e-4) {
     const distance = Math.min(reste, SOUS_PAS);
     reste -= distance;
-    if (murDevant(camera.position, piedsY, pas, distance)) return;
     const x = camera.position.x + pas.x * distance, z = camera.position.z + pas.z * distance;
-    const sol = solEn(x, z, piedsY);
-    if (sol === null) return;                      // le vide : on refuse le pas
+    const sol = murDevant(camera.position, piedsY, pas, distance) ? null : solEn(x, z, piedsY);
+    if (sol === null) {                            // un mur, ou le vide : le pas est refusé
+      lisse.set(0, 0, 0);                          // et l'élan avec, sinon il pousse contre
+      cible = null;
+      return;
+    }
     piedsY = sol;
     camera.position.set(x, sol + OEIL, z);
   }
+}
+
+function avancer(dt) {
+  vitesseVoulue();
+  lisse.lerp(voulu, 1 - Math.exp(-dt / REPONSE));
+  if (lisse.lengthSq() < 4e-4) {
+    lisse.set(0, 0, 0);
+    return;
+  }
+  if (!vol) return marcher(dt);
+  camera.position.addScaledVector(lisse, dt);
+  piedsY = camera.position.y - OEIL;
 }
 
 function poser(x, y, z, cap) {
   const sol = vol ? null : solEn(x, z, y + 0.3);
   piedsY = sol === null ? y : sol;
   camera.position.set(x, piedsY + OEIL, z);
+  lisse.set(0, 0, 0);
+  cible = null;
   if (cap !== undefined) {
     // Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du
     // parcours du Cohen Gadol. Le nord de Blender devient -Z une fois passé en Y-haut.
     const a = THREE.MathUtils.degToRad(cap);
     camera.lookAt(x + Math.cos(a) * 10, piedsY + OEIL, z - Math.sin(a) * 10);
   }
+  accorderRegard();
+}
+
+// ---------------------------------------------------------------------------
+// regard
+// ---------------------------------------------------------------------------
+// Le regard suit le glissé, pas le curseur : bouton relâché, la souris redevient
+// libre pour la barre du haut et la fiche. Il rejoint sa consigne au lieu d'y sauter :
+// à 45 ms le retard ne se sent pas, et le tremblement du doigt ne passe plus.
+const TANGAGE_MAX = Math.PI / 2 - 0.02;
+const regard = new THREE.Euler(0, 0, 0, "YXZ");
+const capVise = { lacet: 0, tangage: 0 };
+
+function tourner(dLacet, dTangage) {
+  capVise.lacet -= dLacet;
+  capVise.tangage = THREE.MathUtils.clamp(capVise.tangage - dTangage, -TANGAGE_MAX, TANGAGE_MAX);
+}
+
+// Après un `lookAt`, la consigne est ce que la caméra montre : sans ça le lissage
+// ramènerait aussitôt le regard là où il était avant le déplacement.
+function accorderRegard() {
+  regard.setFromQuaternion(camera.quaternion);
+  regard.z = 0;
+  capVise.lacet = regard.y;
+  capVise.tangage = regard.x;
+}
+
+function lisserRegard(dt) {
+  const k = 1 - Math.exp(-dt / LISSAGE_REGARD);
+  regard.y += (capVise.lacet - regard.y) * k;
+  regard.x += (capVise.tangage - regard.x) * k;
+  regard.z = 0;
+  camera.quaternion.setFromEuler(regard);
 }
 
 // ---------------------------------------------------------------------------
 // interrogation
 // ---------------------------------------------------------------------------
 const viseur = new THREE.Raycaster();
+const ecran = new THREE.Vector2();
 const survol = $("#survol");
-let vise = null;
+const { montrer, fermer } = panneau(CONCEPTS);
+let survole = null;
 
-function conceptVise() {
-  viseur.setFromCamera(souris, camera);
+const normaliser = (clientX, clientY) =>
+  ecran.set((clientX / innerWidth) * 2 - 1, -(clientY / innerHeight) * 2 + 1);
+
+function conceptSous(coords) {
+  viseur.setFromCamera(coords, camera);
   viseur.far = 140;
   const touche = viseur.intersectObjects(obstacles, false);
   return touche.length ? touche[0].object.userData.concept || null : null;
 }
 
-const corps = $("#corps"), panneau = $("#fiche");
-const echappe = (s) => String(s).replace(/[&<>"]/g, (c) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
-function montrer(id) {
-  const c = CONCEPTS.get(id);
-  if (!c) return;
-  const src = (c.sources || []).map((s) => {
-    const lien = lienSefaria(s.oeuvre, s.ref);
-    const tete = `${echappe(s.oeuvre)} ${echappe(s.ref)}`;
-    return `<li>${lien ? `<a href="${lien}" target="_blank" rel="noopener">${tete}</a>` : tete}` +
-           `${s.citation ? `<em>« ${echappe(s.citation)} »</em>` : ""}</li>`;
-  }).join("");
-
-  corps.innerHTML = `
-    <p class="zone">${echappe(ZONES[c.zone] || c.zone)}</p>
-    <h2>${echappe(c.nom)}</h2>
-    ${c.he ? `<p class="heb">${echappe(c.he)}</p>` : ""}
-    ${c.translit ? `<p class="translit">${echappe(c.translit)}</p>` : ""}
-    ${c.resume
-      ? `<p class="resume">${echappe(c.resume)}</p>`
-      : `<p class="vide">Cet élément est modélisé mais pas encore documenté : aucune
-         source n'a été relevée pour lui dans la fiche technique. Plutôt qu'une cote
-         plausible, la visite n'affiche rien.</p>`}
-    ${c.cotes?.length ? `<h3>Cotes</h3><ul class="cotes">${
-      c.cotes.map((x) => `<li>${echappe(x)}</li>`).join("")}</ul>` : ""}
-    ${src ? `<h3>Sources</h3><ul class="sources">${src}</ul>` : ""}
-    ${c.note ? `<p class="note"><b>Arbitrage du projet</b>${echappe(c.note)}</p>` : ""}`;
-  panneau.classList.add("ouverte");
+function interroger(clientX, clientY) {
+  const id = conceptSous(normaliser(clientX, clientY));
+  if (id) montrer(id); else fermer();
 }
 
-const fermer = () => panneau.classList.remove("ouverte");
-$("#fermer").onclick = fermer;
+// Le pilote automatique n'ouvre aucun passage : il pousse le marcheur vers le point
+// visé avec la même commande qu'un pouce, donc les mêmes murs l'arrêtent. Un point
+// qui n'a pas de sol sous lui — un mur, une corniche — ne se demande pas.
+function seRendreA(clientX, clientY) {
+  viseur.setFromCamera(normaliser(clientX, clientY), camera);
+  viseur.far = 120;
+  const [touche] = viseur.intersectObjects(murs, false);
+  if (!touche) return;
+  if (vol) { cible = touche.point.clone(); return; }
+  const sol = solEn(touche.point.x, touche.point.z, touche.point.y);
+  if (sol !== null) cible = new THREE.Vector3(touche.point.x, sol, touche.point.z);
+}
+
+// ---------------------------------------------------------------------------
+// commandes
+// ---------------------------------------------------------------------------
+const mode = $("#mode");
+function basculerVol() {
+  vol = !vol;
+  mode.textContent = vol ? "vol libre" : "à pied";
+  mode.classList.toggle("vole", vol);
+  manette.modeVol(vol);
+  cible = null;
+  if (!vol) {                                   // en reprenant pied, retrouver le sol
+    const sol = solEn(camera.position.x, camera.position.z, camera.position.y - OEIL + 0.3);
+    if (sol !== null) { piedsY = sol; camera.position.y = sol + OEIL; }
+  }
+}
+$("#vol").onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
+
+const manette = commandes(renderer.domElement, {
+  regarder: tourner, interroger, allerAu: seRendreA, basculerVol,
+});
 
 // ---------------------------------------------------------------------------
 // barre
 // ---------------------------------------------------------------------------
+const voile = $("#voile");
+// Une téléportation qui coupe net laisse le visiteur sans savoir d'où il vient. Le
+// délai est celui de la transition du voile, à l'aller seulement : on repart de noir.
+function fondu(action) {
+  voile.classList.add("noir");
+  setTimeout(() => { action(); voile.classList.remove("noir"); }, 170);
+}
+
 const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
 for (const e of reperes.entrees) {
   aller.append(new Option(e.nom, e.id));
 }
 aller.onchange = () => {
   const e = reperes.entrees.find((x) => x.id === aller.value);
-  if (e) poser(e.position[0], e.position[1], e.position[2], e.cap);
+  if (e) fondu(() => poser(e.position[0], e.position[1], e.position[2], e.cap));
   aller.value = "";
   aller.blur();
 };
@@ -463,31 +488,10 @@ chercher.onchange = () => {
   const id = chercher.value;
   if (!id) return;
   montrer(id);
-  allerA(id);
+  fondu(() => allerA(id));
   chercher.value = "";
   chercher.blur();
 };
-
-// ---------------------------------------------------------------------------
-// boucle
-// ---------------------------------------------------------------------------
-addEventListener("resize", () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-
-const mode = $("#mode");
-function basculerVol() {
-  vol = !vol;
-  mode.textContent = vol ? "vol libre" : "à pied";
-  mode.classList.toggle("vole", vol);
-  if (!vol) {                                   // en reprenant pied, retrouver le sol
-    const sol = solEn(camera.position.x, camera.position.z, camera.position.y - OEIL + 0.3);
-    if (sol !== null) { piedsY = sol; camera.position.y = sol + OEIL; }
-  }
-}
-$("#vol").onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
 
 function allerA(id) {
   const e = reperes.entrees.find((x) => x.id === id);
@@ -499,9 +503,13 @@ function allerA(id) {
   const recul = Math.min(60, Math.max(2.8, Math.max(taille.x, taille.y, taille.z) * 1.3));
   poser(centre.x + recul, centre.y + taille.y * 0.1, centre.z);
   camera.lookAt(centre);
+  accorderRegard();
   return true;
 }
 
+// ---------------------------------------------------------------------------
+// boucle
+// ---------------------------------------------------------------------------
 const demande = new URLSearchParams(location.search).get("vue");
 const depart = reperes.entrees.find((e) => e.id === "azara") || reperes.entrees[0];
 poser(depart.position[0], depart.position[1], depart.position[2], depart.cap);
@@ -512,7 +520,6 @@ let image = 0;
 
 // L'ombre portée est une fenêtre de 110 amot ; à l'échelle du Har HaBayit une seule
 // carte figée serait illisible. Elle suit donc le visiteur.
-const SOLEIL = new THREE.Vector3(150, 125, 55);
 function suivreSoleil() {
   soleil.target.position.copy(camera.position);
   soleil.position.copy(camera.position).add(SOLEIL);
@@ -523,18 +530,47 @@ function dessiner(dt) {
   for (const u of horloges) u.value += dt;
   suivreSoleil();
   ciel.position.copy(camera.position);
-  renderer.render(scene, camera);
+  rendu.rendre();
+}
+
+// La définition ne se règle pas sur une image mais sur une moyenne, et les deux seuils
+// laissent un écart entre eux : accolés, l'échelle descendrait puis remonterait sans
+// fin, ce qui se voit bien plus qu'une image un peu douce.
+const aide = $("#aide");
+let moyenne = 16, attente = 0, entame = false;
+
+function ajusterEchelle(dt) {
+  moyenne += (dt * 1000 - moyenne) * 0.05;
+  if (++attente < 120) return;
+  const precedente = echelle;
+  if (moyenne > 22) echelle = Math.max(PROFIL.echelleMin, echelle - 0.15);
+  else if (moyenne < 12) echelle = Math.min(1, echelle + 0.1);
+  if (echelle === precedente) return;
+  attente = 0;
+  dimensionner();
 }
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(horloge.getDelta(), 0.1);
+  lisserRegard(dt);
   avancer(dt);
+  ajusterEchelle(dt);
+
+  if (!entame && lisse.lengthSq() > 0.01) {       // le rappel a servi, il s'efface
+    entame = true;
+    aide.classList.add("parti");
+  }
 
   if (++image % 4 === 0) {                        // le survol n'a pas besoin de 60 Hz
-    vise = surLaToile && !glisse ? conceptVise() : null;
-    const c = vise && CONCEPTS.get(vise);
+    const p = manette.pointeur;
+    survole = p.survole && !manette.tourne ? conceptSous(ecran.set(p.x, p.y)) : null;
+    const c = survole && CONCEPTS.get(survole);
     survol.classList.toggle("vu", !!c);
-    if (c) survol.textContent = c.nom;
+    if (c) {
+      survol.textContent = c.nom;
+      survol.style.left = `${p.clientX}px`;
+      survol.style.top = `${p.clientY + 20}px`;
+    }
     position.textContent = `${(camera.position.x / AMA).toFixed(0)} · ` +
       `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} amot`;
   }
@@ -547,7 +583,8 @@ $("#chargement").classList.add("parti");
 // savoir depuis un terminal si la page a fini de charger ni ce qu'elle montre.
 window.__vue = (id) => { allerA(id); dessiner(0); };
 window.__cam = (x, y, z, cx, cy, cz) => {
-  camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); piedsY = y - OEIL; dessiner(0);
+  camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); piedsY = y - OEIL;
+  accorderRegard(); dessiner(0);
 };
 window.__rendre = () => dessiner(0);
 window.__etat = () => {
@@ -555,7 +592,8 @@ window.__etat = () => {
   const d = 180 / Math.PI;
   return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
            x: +camera.position.x.toFixed(3), z: +camera.position.z.toFixed(3),
-           piedsY: +piedsY.toFixed(3), vise, glisse: !!glisse };
+           piedsY: +piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
+           fov: +camera.fov.toFixed(1) };
 };
 window.__ombres = (actives) => {
   renderer.shadowMap.enabled = actives;

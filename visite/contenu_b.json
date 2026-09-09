@@ -233,22 +233,66 @@
     "translit": "Ta'im",
     "resume": "Trente-huit cellules réparties sur trois étages ceignent le Heikhal et le Kodesh HaKodashim : quinze au nord, quinze au sud, huit à l'ouest, reliées entre elles par des ouvertures. À l'angle nord-est, un escalier en spirale, la mesiba, monte vers le toit ; au sud-ouest, le Beit Horadat HaMayim évacue les eaux. L'étage supérieur, au-dessus du Heikhal, est vide : il a des trappes par lesquelles on descendait les ouvriers en cages fermées quand il fallait réparer le Kodesh HaKodashim.",
     "cotes": [
-      "38 cellules sur trois étages",
-      "15 au nord, 15 au sud, 8 à l'ouest",
-      "cellule de 6 amot dans le découpage est-ouest"
+      "38 cellules : 15 au nord, 15 au sud, 8 à l'ouest",
+      "nord et sud : cinq sur cinq, et cinq au-dessus ; ouest : trois sur trois, et deux au-dessus",
+      "la cellule s'élargit d'étage en étage : 5, puis 6, puis 7",
+      "le mur du Heikhal se retire d'une ama à chaque étage : 7, puis 6, puis 5",
+      "les six de mur et six de cellule du découpage de Middot 4:7 sont l'étage du milieu",
+      "trois ouvertures par cellule : à droite, à gauche, et vers celle du dessus",
+      "cinq ouvertures pour celle du coin nord-est : à droite, au-dessus, à la messiba, au pishpash, au Heikhal"
     ],
     "sources": [
       {
         "oeuvre": "Middot",
         "ref": "4:3",
-        "citation": ""
+        "citation": "וּשְׁלֹשִׁים וּשְׁמֹנָה תָאִים הָיוּ שָׁם"
       },
       {
         "oeuvre": "Middot",
-        "ref": "4:5",
-        "citation": ""
+        "ref": "4:4",
+        "citation": "הַתַּחְתּוֹנָה חָמֵשׁ, וְרֹבֶד שֵׁשׁ. וְהָאֶמְצָעִית שֵׁשׁ, וְרֹבֶד שֶׁבַע. וְהָעֶלְיוֹנָה שֶׁבַע"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:7",
+        "citation": "כֹּתֶל הַמְּסִבָּה חָמֵשׁ, וְהַמְּסִבָּה שָׁלֹשׁ, כֹּתֶל הַתָּא חָמֵשׁ, וְהַתָּא שֵׁשׁ"
+      },
+      {
+        "oeuvre": "Melakhim I",
+        "ref": "6:6",
+        "citation": "כִּי מִגְרָעוֹת נָתַן לַבַּיִת סָבִיב חוּצָה לְבִלְתִּי אֲחֹז בְּקִירוֹת הַבָּיִת"
       }
-    ]
+    ],
+    "note": "Ce que les sources ne donnent pas et qui est donc CHOIX : la hauteur d'un étage de cellules (les trois remplissent les quarante amot du rez), la longueur des cellules et l'épaisseur des refends."
+  },
+  "mesiba": {
+    "he": "מְסִבָּה",
+    "translit": "Messiba",
+    "resume": "La rampe tournante qui monte du coin nord-est jusqu'à la porte de l'étage. On y montait face à l'ouest, on longeait toute la face nord jusqu'à l'ouest, on se tournait vers le sud, on longeait toute la face ouest, puis vers l'est, et on marchait dans le sud jusqu'à la porte de l'étage, qui s'ouvre au sud. C'est aussi par elle qu'on montait sur les toits des cellules.",
+    "cotes": [
+      "3 amot de large, son mur 5, dans la bande nord",
+      "un seul circuit : nord, puis ouest, puis sud",
+      "au sud, la bande de 3 amot est celle du Beit Horadat HaMayim",
+      "arrivée au niveau du sol de l'étage, 51 amot au-dessus du dallage"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:5",
+        "citation": "וּמְסִבָּה הָיְתָה עוֹלָה מִקֶּרֶן מִזְרָחִית צְפוֹנִית לְקֶרֶן צְפוֹנִית מַעֲרָבִית, שֶׁבָּהּ הָיוּ עוֹלִים לְגַגּוֹת הַתָּאִים"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:7",
+        "citation": "כֹּתֶל הַמְּסִבָּה חָמֵשׁ, וְהַמְּסִבָּה שָׁלֹשׁ"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:3",
+        "citation": "וּבְקֶרֶן מִזְרָחִית צְפוֹנִית הָיוּ חֲמִשָּׁה פְתָחִים… וְאֶחָד לַמְּסִבָּה"
+      }
+    ],
+    "note": "Middot 4:7 bande le couloir au nord (3 amot, mur de 5) et au sud (les 3 amot du Beit Horadat HaMayim), mais à l'ouest les cent amot est-ouest sont pleines : aucune bande n'y est prévue alors que Middot 4:5 y fait passer la messiba. Les trois amot du couloir d'ouest sont donc prises sur les cinq du mur des ta'im, une ama de maçonnerie de chaque côté — CHOIX. La pente n'est donnée nulle part : elle est répartie sur les trois branches. La couverture du couloir non plus : huit amot au-dessus du haut de chaque branche."
   },
   "aliyah": {
     "he": "עֲלִיָּה",
@@ -288,7 +332,7 @@
         "citation": "מִקַּרְקָעִית הַבַּיִת עַד קֵרוּי עֲלִיָּה רִאשׁוֹנָה שְׁלֹשִׁים"
       }
     ],
-    "note": "Arbitrage : l'étage est creusé au-dessus du Heikhal et du Kodesh HaKodashim, pas au-dessus de l'Oulam. C'est là que Middot 4:5 le meuble, et Rashi (sur Divrei HaYamim II 3:4) met les aliyot du Premier Temple au-dessus de la Maison — trente amot jusqu'au plafond du premier étage, quatre-vingt-dix ensuite jusqu'au toit du haut ; Metsoudat David donne la même lecture en second. Radak, lui, préfère mettre les cent vingt amot de Divrei HaYamim II 3:4 sur l'Oulam seul, qui contiendrait les aliyot : lecture minoritaire, et sur le Premier Temple. Au-dessus de l'Oulam, le bâtiment reste plein. Le nombre et la place des loulin ne sont donnés par aucune source : deux trémies de deux amot sur l'axe sont un CHOIX. La messiba qui mène à la porte de l'étage, et les taim qu'elle dessert, ne sont pas encore creusés : le corps du bâtiment les porte en masse pleine."
+    "note": "Arbitrage : l'étage est creusé au-dessus du Heikhal et du Kodesh HaKodashim, pas au-dessus de l'Oulam. C'est là que Middot 4:5 le meuble, et Rashi (sur Divrei HaYamim II 3:4) met les aliyot du Premier Temple au-dessus de la Maison — trente amot jusqu'au plafond du premier étage, quatre-vingt-dix ensuite jusqu'au toit du haut ; Metsoudat David donne la même lecture en second. Radak, lui, préfère mettre les cent vingt amot de Divrei HaYamim II 3:4 sur l'Oulam seul, qui contiendrait les aliyot : lecture minoritaire, et sur le Premier Temple. Au-dessus de l'Oulam, le bâtiment reste plein. Le nombre et la place des loulin ne sont donnés par aucune source : deux trémies de deux amot sur l'axe sont un CHOIX. La messiba qui y mène et les taim qu'elle dessert sont creusés depuis."
   },
   "kaleh_orev": {
     "he": "כָּלֵה עוֹרֵב",

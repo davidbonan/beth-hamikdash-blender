@@ -413,6 +413,92 @@
     "note": "Emplacement tranché au nord, selon la girsa de Yoma 19a et celle du Rambam ; le texte imprimé de Middot 5:4 la met au sud. Tosfot Yom Tov sur Middot 5:3 préfère lui aussi le nord (« ונראה בעיני שגירסת הספר נשתבשה »)."
   },
 
+  "lishkat_hagola": {
+    "he": "לשכת הגולה",
+    "translit": "Lishkat HaGola",
+    "resume": "La chambre du puits. Un bassin y est creusé, une roue posée dessus, et c'est de là qu'on alimente en eau toute l'Azara. Deuxième des trois lishkot du nord, entre la Lishkat HaGazit à l'est et la Lishkat HaEtz, en second rang derrière elles ; le toit des trois est de même niveau.",
+    "cotes": [
+      "au nord, contre le mur, à l'ouest de la Lishkat HaGazit",
+      "un unique petah qui perce le mur et ouvre sur l'Azara",
+      "même hauteur de toit que HaGazit et HaEtz"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "5:4", "citation": "שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם לְכָל הָעֲזָרָה"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": ""}
+    ],
+    "note": "Emplacement tranché au nord avec HaGazit et HaEtz, selon la girsa de Yoma 19a et celle du Rambam ; le texte imprimé de Middot 5:4 met les trois au sud. Elle est bâtie sur la terrasse du 'Heil et ouverte sur le sacré : son intérieur est alors sanctifié, son toit ne l'est pas (Tosfot Yom Tov sur Middot 5:3, d'après Maaser Sheni 3:8) — sans conséquence pour un puits. Le petah qui perce le mur n'est pas une huitième porte de l'Azara : Middot 1:4 en compte sept, et ne compte que des she'arim."
+  },
+
+  "lishkat_haetz": {
+    "he": "לשכת העץ",
+    "translit": "Lishkat HaEtz",
+    "resume": "La troisième chambre du nord, en second rang derrière la Lishkat HaGazit et la Lishkat HaGola, le toit des trois au même niveau. Rabbi Eliézer ben Yaakov, qui décrit le Temple, dit d'elle : « j'ai oublié à quoi elle servait ».",
+    "cotes": [
+      "au nord, en retrait derrière HaGazit et HaGola",
+      "sur toute leur largeur",
+      "même hauteur de toit que les deux autres"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "5:4", "citation": "וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן, וְגַג שְׁלָשְׁתָּן שָׁוֶה"},
+      {"oeuvre": "Middot", "ref": "5:4", "citation": "אָמַר רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב, שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""}
+    ],
+    "note": "Le second rang la met entière hors du mur, sur la terrasse du 'Heil, alors que Middot 5:3 donne les six lishkot comme étant « dans l'Azara » : dans la cour, il ne reste que 17,5 amot entre le mur nord et le socle du Sanctuaire, pas de quoi loger un corps derrière un autre. Sa porte, faute d'usage connu, est un choix de la scène. Selon Abba Shaul (Middot 5:4) c'est la chambre du Cohen Gadol, et le Rambam (Beit HaBe'hira 5:17) l'identifie à la Lishkat Parhedrin : la scène ne suit pas cette identification et tient les deux chambres pour distinctes."
+  },
+
+  "lishkat_hamelach": {
+    "he": "לשכת המלח",
+    "translit": "Lishkat HaMelah",
+    "resume": "La chambre du sel : c'est là qu'on prend le sel dont on sale les korbanot. La plus orientale des trois chambres du mur sud.",
+    "cotes": [
+      "au sud, dans l'Azara, contre la face intérieure du mur",
+      "la plus orientale des trois, séparée des deux autres par Sha'ar HaBekhorot"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "5:3", "citation": "לִשְׁכַּת הַמֶּלַח, שָׁם הָיוּ נוֹתְנִים מֶלַח לַקָּרְבָּן"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": "שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה"}
+    ],
+    "note": "Emplacement tranché au sud avec HaParva et HaMedi'hin, selon la girsa de Yoma 19a et celle du Rambam ; le texte imprimé de Middot 5:3 met les trois au nord. L'ordre est-ouest suit Tosfot Yom Tov, qui le tire de l'absence de « semoukhin lamaarav » et l'appuie sur le schéma du commentaire du Rambam. Les x le long du mur sont un choix : aucune source n'en donne."
+  },
+
+  "lishkat_haparva": {
+    "he": "לשכת הפרוה",
+    "translit": "Lishkat HaParva",
+    "resume": "La chambre où l'on sale les peaux des korbanot. Sur son toit se trouve le bain rituel du Cohen Gadol : quatre des cinq immersions de Yom Kippour s'y font, un drap de lin tendu entre lui et le peuple.",
+    "cotes": [
+      "au sud, dans l'Azara, contre la face intérieure du mur",
+      "le bain rituel sur le toit, avec son maake",
+      "la mesiba de la Lishkat HaMedi'hin y débouche"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "5:3", "citation": "וְעַל גַּגָּהּ הָיָה בֵית הַטְּבִילָה לְכֹהֵן גָּדוֹל בְּיוֹם הַכִּפּוּרִים"},
+      {"oeuvre": "Yoma", "ref": "3:3", "citation": "חָמֵשׁ טְבִילוֹת… וְכֻלָּן בַּקֹּדֶשׁ עַל בֵּית הַפַּרְוָה, חוּץ מִזּוֹ בִלְבָד"},
+      {"oeuvre": "Yoma", "ref": "3:6", "citation": "הֱבִיאוּהוּ לְבֵית הַפַּרְוָה, וּבַקֹּדֶשׁ הָיְתָה"},
+      {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""}
+    ],
+    "note": "C'est cette chambre qui décide de l'emplacement des trois du sud, dans l'Azara et non sur la terrasse du 'Heil : la Mishna dit son toit « dans le sacré », et le toit d'un bâtiment élevé dans le hol n'est pas sanctifié même quand son intérieur l'est (Tosfot Yom Tov sur Middot 5:3, d'après Maaser Sheni 3:8). Le drap de lin et les marches de la cuve ne sont pas modélisés."
+  },
+
+  "lishkat_hamedichin": {
+    "he": "לשכת המדיחין",
+    "translit": "Lishkat HaMedi'hin",
+    "resume": "La chambre où l'on rince les entrailles des korbanot. De là part la mesiba, la montée en vis qui débouche sur le toit du Beit HaParva, là où le Cohen Gadol s'immerge. La plus occidentale des trois chambres du sud.",
+    "cotes": [
+      "au sud, dans l'Azara, contre la face intérieure du mur",
+      "accolée au Beit HaParva, à l'ouest de celui-ci",
+      "la mesiba engagée entre les deux corps, ronde et montant au toit de la Parva"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "5:3", "citation": "לִשְׁכַּת הַמְדִיחִין, שֶׁשָּׁם הָיוּ מְדִיחִין קִרְבֵי הַקֳּדָשִׁים. וּמִשָּׁם מְסִבָּה עוֹלָה לְגַג בֵּית הַפַּרְוָה"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": "שֶׁלֹּא יִתָּכֵן… שֶׁהַכֹּהֵן גָּדוֹל יַעֲלֶה לְבֵית טְבִילָתוֹ דֶּרֶךְ מָקוֹם שֶׁמְּדִיחִין בּוֹ"}
+    ],
+    "note": "Tosfot Yom Tov donne à cette chambre deux ouvertures sur l'Azara — celle du travail, et celle de la mesiba, du côté de la Parva, pour que le Cohen Gadol ne monte pas au bain par l'endroit où l'on rince les entrailles. La scène n'en modélise qu'une, la mesiba tenant lieu de seconde. Sa forme ronde est un choix : mesiba est une vis."
+  },
+
   "beit_hamoked": {
     "he": "בית המוקד",
     "translit": "Beit HaMoked",

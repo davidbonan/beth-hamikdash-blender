@@ -21,6 +21,7 @@ boîtes d'un mur percé.
 import json
 import pathlib
 import re
+import subprocess
 import sys
 import bpy
 
@@ -46,6 +47,26 @@ REPERES = [
     ("heikhal",           "Dans le Heikhal",             -112.0,   0.0,   6.0, 180),
     ("kodesh_hakodashim", "Kodesh HaKodashim",           -143.0,   0.0,   6.0, 180),
 ]
+
+
+def comprimer(glb):
+    """Recompresse le .glb en place avec meshopt : 13,9 Mo deviennent 2,7 Mo.
+
+    C'est la seule optimisation qui compte sur un téléphone en 4G, et l'export glTF de
+    Blender ne sait pas la faire. `-kn` garde les noms de nœuds, qui sont le lien
+    géométrie ↔ encyclopédie ; la quantification est portée à 16 bits parce que le
+    placage d'or ne se tient qu'à 4,8 cm de la pierre qu'il couvre.
+    """
+    sortie = glb.with_suffix(".pack.glb")
+    commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
+                "-c", "-kn", "-km", "-ke", "-vp", "16", "-vn", "12"]
+    try:
+        subprocess.run(commande, check=True, capture_output=True, timeout=600)
+    except (OSError, subprocess.SubprocessError) as erreur:
+        sortie.unlink(missing_ok=True)
+        print(f"\n  gltfpack indisponible, .glb laissé non compressé : {erreur}")
+        return
+    sortie.replace(glb)
 
 
 def concepts():
@@ -160,6 +181,8 @@ def main():
         export_skins=False,
         export_animations=False,
     )
+
+    comprimer(DOSSIER / "temple.glb")
 
     (DOSSIER / "reperes.json").write_text(json.dumps({
         "ama": AMA,

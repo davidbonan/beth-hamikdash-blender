@@ -195,14 +195,14 @@ def material(name, rgb):
 # l'assise en tire une. La pierre de 10 et celle de 8 valent aussi pour le Temple
 # lui-même, « וְלַחֲצַר בֵּית ה' הַפְּנִימִית וּלְאֻלָם הַבָּיִת » (7:12). Le module d'une ama qui
 # les précédait lisait en brique — quarante rangs sur la façade au lieu de dix blocs.
-# La HAUTEUR d'assise n'est dans aucune source : 2,5 amot est un CHOIX, la proportion
-# qu'appelle un bloc de 8 à 10 amot de long.
+# La HAUTEUR d'assise n'est dans aucune source : 4 amot est un CHOIX, et le même
+# partout. Le pas valait 2,5 pour l'enceinte et 2 pour le bâtiment — cinquante lits sur
+# les 100 amot de la façade, l'échelle d'un mur de brique. À 4, une assise vaut le pas
+# d'un rovad de l'Oulam (1 de nu + 3 de saillie, Rambam Beit HaBe'hira 4:9) : le haut
+# de chaque bandeau tombe sur un lit au lieu de battre contre lui, et le pas unique
+# rend la distinction enceinte / bâtiment inutile.
 PIERRE_LONG = (8.0, 10.0)   # Melakhim I 7:10 — l'assise tire l'une ou l'autre
-ASSISE = 2.5                # CHOIX : hauteur d'assise, hors source
-# Le bâtiment prend 2 amot pour que ses assises tombent juste sur les rovadim de
-# l'Oulam, qui vont par 4 (1 de nu + 3 de saillie, Rambam Beit HaBe'hira 4:9) : à 2,5,
-# la pierre et le bandeau battaient l'un contre l'autre sur toute la façade.
-ASSISE_BEIT = 2.0
+ASSISE = 4.0                # CHOIX : hauteur d'assise, hors source
 # La face est SCIÉE, pas rustiquée : « אֲבָנִים יְקָרֹת כְּמִדּוֹת גָּזִית מְגֹרָרוֹת בַּמְּגֵרָה
 # מִבַּיִת וּמִחוּץ » (Melakhim I 7:9). Tout le relief tient donc au joint et au liseré qui
 # le borde, jamais à un bossage éclaté. Largeur du liseré : CHOIX. À 0,35 ama il faisait
@@ -210,6 +210,16 @@ ASSISE_BEIT = 2.0
 # bordure rapportée ; 0,25 le ramène à un trait de ciseau.
 JOINT = 0.06
 LISERE = 0.25
+
+# Le sol va en RANGÉES, pas en carreaux. « כָּל שׁוּרָה וְשׁוּרָה שֶׁל אַבְנֵי הָרִצְפָּה קְרוּיָה
+# רֹבֶד » (Bartenura sur Yoma 4:3), et on les COMPTE en sortant du Heikhal : Yoma 4:3
+# pose le ממרס « עַל הָרֹבֶד הָרְבִיעִי שֶׁבָּעֲזָרָה ». Une rangée est donc une bande, et ses
+# joints courent nord-sud, en travers de l'axe du bâtiment. Largeur : « וְרֹבֶד אַרְבַּע »
+# (Middot 3:6, où Bartenura ad loc. glose le rovad en « שׁוּרַת הָרִצְפָּה »). La longueur
+# des dalles dans la rangée n'est nulle part : elles prennent celle des blocs de gazit.
+ROVAD_DALLE = 4.0
+JOINT_DALLE = 0.05          # le lit entre deux dalles
+CREUX_DALLE = 0.015         # 7 mm : un lit de dalle, pas une rainure
 
 
 def _module(mat, coordonnee, taille):
@@ -292,9 +302,10 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
     portee = JOINT + LISERE + 0.15
     rampe = profil.color_ramp
     # Le liseré est en léger retrait, le champ à peine proéminent : 0,62 de la course
-    # est descendue dans le joint, et il ne reste que 0,32 pour la marche du bloc, soit
-    # un centimètre et demi. À 0,44 le bloc débordait de sept centimètres et le Bump
-    # cernait chaque pierre d'un jonc clair — un carrelage, pas un mur.
+    # est descendue dans le joint, et il ne reste que 0,32 pour la marche du bloc, un
+    # centimètre au Bump de 0,07 — le creux est aussi profond que le joint est large.
+    # À 0,44 le bloc débordait assez pour que le Bump cerne chaque pierre d'un jonc
+    # clair — un carrelage, pas un mur.
     rampe.elements[0].position, rampe.elements[0].color = 0.0, (0.0, 0.0, 0.0, 1.0)
     rampe.elements[1].position, rampe.elements[1].color = JOINT / portee, (0.62,) * 3 + (1.0,)
     rampe.elements.new((JOINT + LISERE) / portee).color = (0.68,) * 3 + (1.0,)
@@ -306,9 +317,9 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
     # liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur.
     creux = _noeud(mat, "ShaderNodeValToRGB", -1200, -520)
     creux.color_ramp.elements[0].position = 0.0
-    creux.color_ramp.elements[1].position = JOINT * 1.6 / portee
+    creux.color_ramp.elements[1].position = JOINT * 1.15 / portee
     mat.node_tree.links.new(rapport, creux.inputs["Factor"])
-    _creuser(mat, profil.outputs["Color"], 1.0, 0.10)
+    _creuser(mat, profil.outputs["Color"], 1.0, 0.07)
     _creuser(mat, parite, 0.9, 0.05)
     # Le grain reste dans le champ de la pierre et s'arrête au liseré, qui est ciselé.
     _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.45), profil.outputs["Color"]), 0.8, 0.035)
@@ -320,7 +331,7 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG):
 
 # Ce que devient la pierre au fond du joint : plus sombre, et PLUS CHAUDE. Le facteur
 # est plus bas dans le bleu que dans le rouge, donc la rainure vire vers l'ocre.
-OMBRE_JOINT = (0.50, 0.40, 0.29)
+OMBRE_JOINT = (0.72, 0.66, 0.58)
 
 
 def _ombre_du_joint(mat, teinte, creux):
@@ -452,7 +463,7 @@ def marbre_herode(name):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.62   # marbre poli, pas calcaire
-    _, tire_assise, bloc, creux = _appareil(mat, ASSISE_BEIT)
+    _, tire_assise, bloc, creux = _appareil(mat)
     choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
     rampe = choix.color_ramp
     rampe.interpolation = 'CONSTANT'
@@ -514,41 +525,67 @@ def enduit_noirci(name, rgb, bande):
     return mat
 
 def dallage(name, rgb):
-    """Sol en dalles : c'est le joint, à la lumière rasante de l'aube, qui donne au
-    dallage sa fuyante — sans lui les cours sont un aplat et la perspective ne tient
-    qu'aux murs.
+    """Sol en rangées de dalles — ROVAD_DALLE plus haut pour la source.
 
-    Le joint fait 0,05 ama et les dalles ont toutes la même valeur : à 1,2 cm il
-    disparaissait passé vingt amot, et il ne restait qu'un tirage de ±5 % par dalle —
-    des taches, que l'œil lisait en relief au lieu d'un pavage.
+    C'est le joint, à la lumière rasante de l'aube, qui donne au dallage sa fuyante :
+    sans lui les cours sont un aplat et la perspective ne tient qu'aux murs.
 
-    La valeur ne varie donc pas d'une dalle à l'autre, mais elle varie sur la cour :
-    une patine de vingt amot passe par-dessus le pavage sans en suivre le découpage.
-    C'est ce qui manquait pour que l'Azara cesse de rendre un aplat aux plans larges,
-    où une dalle de 3 amot ne fait plus deux pixels."""
+    La valeur ne varie presque pas d'une dalle à l'autre — ±1,5 %, pas plus : à ±5 % il
+    ne restait que des taches, que l'œil lisait en relief au lieu d'un pavage. Ce qui
+    varie, c'est la COUR : une patine de vingt amot passe par-dessus le pavage sans en
+    suivre le découpage, et c'est elle qui empêche l'Azara de rendre un aplat aux plans
+    larges, où une dalle ne fait plus deux pixels.
+    """
     mat, neuf = _neuf(name, rgb)
     if not neuf:
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.85
-    dalles = _noeud(mat, "ShaderNodeTexBrick", -900, 0)
-    dalles.offset = 0.5
-    dalles.inputs["Scale"].default_value = 1.0
-    dalles.inputs["Brick Width"].default_value = m(3.0)
-    dalles.inputs["Row Height"].default_value = m(3.0)
-    dalles.inputs["Mortar Size"].default_value = m(0.05)
-    dalles.inputs["Mortar Smooth"].default_value = 0.25
-    dalles.inputs["Color1"].default_value = (*(c * 0.985 for c in rgb), 1.0)
-    dalles.inputs["Color2"].default_value = (*(min(1.0, c * 1.015) for c in rgb), 1.0)
-    dalles.inputs["Mortar"].default_value = (*(c * 0.7 for c in rgb), 1.0)
-    liens.new(_position(mat), dalles.inputs["Vector"])
+    p = _noeud(mat, "ShaderNodeSeparateXYZ", -2100, 0)
+    liens.new(_position(mat), p.inputs["Vector"])
+    # Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
+    # s'empilent donc sur X et chacune court sur Y, d'un bout à l'autre de la cour.
+    rang, ecart_x = _module(mat, p.outputs["X"], ROVAD_DALLE)
+    numero = _calc(mat, "FLOOR", rang)
+    tire_rang = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, 120)
+    tire_rang.noise_dimensions = '1D'
+    liens.new(numero, tire_rang.inputs["W"])
+    longue = _calc(mat, "GREATER_THAN", tire_rang.outputs["Value"], 0.5)
+    longueur = _calc(mat, "MULTIPLY_ADD", longue, PIERRE_LONG[1] - PIERRE_LONG[0],
+                     PIERRE_LONG[0])
+    # Les joints en travers se décalent d'une rangée à la suivante : alignés, ils
+    # feraient une grille, et la rangée cesserait de se lire comme une rangée.
+    decal = _calc(mat, "MULTIPLY",
+                  _calc(mat, "MULTIPLY_ADD", tire_rang.outputs["Value"], 0.37,
+                        _calc(mat, "MULTIPLY", _calc(mat, "MODULO", numero, 2.0), 0.5)),
+                  _calc(mat, "MULTIPLY", longueur, AMA))
+    colonne, ecart_y = _module(mat, _calc(mat, "ADD", p.outputs["Y"], decal), longueur)
+    joint = _noeud(mat, "ShaderNodeValToRGB", -1200, -300)
+    joint.color_ramp.elements[0].position = 0.0
+    joint.color_ramp.elements[1].position = 1.0
+    liens.new(_calc(mat, "DIVIDE", _calc(mat, "MINIMUM", ecart_x, ecart_y), JOINT_DALLE),
+              joint.inputs["Factor"])
+    tire_dalle = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, -80)
+    tire_dalle.noise_dimensions = '2D'
+    grille = _noeud(mat, "ShaderNodeCombineXYZ", -1860, -80)
+    liens.new(_calc(mat, "FLOOR", colonne), grille.inputs["X"])
+    liens.new(numero, grille.inputs["Y"])
+    liens.new(grille.outputs["Vector"], tire_dalle.inputs["Vector"])
+    dalle = _noeud(mat, "ShaderNodeValToRGB", -900, 0)
+    dalle.color_ramp.elements[0].color = (*(c * 0.985 for c in rgb), 1.0)
+    dalle.color_ramp.elements[1].color = (*(min(1.0, c * 1.015) for c in rgb), 1.0)
+    liens.new(tire_dalle.outputs["Value"], dalle.inputs["Factor"])
+    lit = _noeud(mat, "ShaderNodeMixRGB", -700, -160)
+    lit.inputs["Color1"].default_value = (*(c * 0.70 for c in rgb), 1.0)
+    liens.new(dalle.outputs["Color"], lit.inputs["Color2"])
+    liens.new(joint.outputs["Color"], lit.inputs["Factor"])
     patine = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
     patine.blend_type = "MULTIPLY"
     patine.inputs["Color2"].default_value = (*OMBRE_JOINT, 1.0)
-    liens.new(dalles.outputs["Color"], patine.inputs["Color1"])
+    liens.new(lit.outputs["Color"], patine.inputs["Color1"])
     liens.new(_calc(mat, "MULTIPLY", _grain(mat, 20.0), 0.45), patine.inputs["Factor"])
     liens.new(patine.outputs["Color"], _bsdf(mat).inputs["Base Color"])
-    _creuser(mat, dalles.outputs["Factor"], 1.0, 0.08)
+    _creuser(mat, joint.outputs["Color"], 1.0, CREUX_DALLE)
     _creuser(mat, _grain(mat, 0.3), 0.3, 0.01)
     return mat
 
@@ -836,12 +873,12 @@ def eau(name):
         _creuser(mat, _grain(mat, 0.25), 0.15, 0.003)
     return mat
 
-MAT_PIERRE = lambda: pierre("Pierre_claire", (0.86, 0.71, 0.46))
+MAT_PIERRE = lambda: pierre("Pierre_claire", (0.86, 0.79, 0.67))
 MAT_OR = lambda: metal("Or", (1.0, 0.76, 0.33), 0.3)
 MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
-MAT_SOL = lambda: dallage("Sol", (0.78, 0.67, 0.49))
+MAT_SOL = lambda: dallage("Sol", (0.78, 0.73, 0.66))
 MAT_LIN = lambda: etoffe("Lin_blanc", (0.88, 0.87, 0.83))     # bigdei lavan des kohanim
 MAT_MARBRE = lambda: marbre("Marbre_blanc", (0.93, 0.92, 0.89))
 MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
@@ -862,7 +899,7 @@ MAT_MAISON = lambda: _voiler(pierre("Maisons", (0.64, 0.55, 0.40), 0.8, (1.5, 2.
 # tambour à l'autre. Sur un cylindre, le joint vertical était pire qu'inutile : la face
 # choisit son axe sur la normale (`_parement`), qui bascule quatre fois autour du fût,
 # et la trame sautait quatre fois par colonne.
-MAT_COLONNE = lambda: pierre("Pierre_colonne", (0.86, 0.71, 0.46), 1.4, (1e4, 1e4))
+MAT_COLONNE = lambda: pierre("Pierre_colonne", (0.86, 0.79, 0.67), 1.4, (1e4, 1e4))
 MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)))
 MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
 MAT_EAU = lambda: eau("Eau_Kiyor")
@@ -1104,6 +1141,11 @@ LISHKA_PAREMENT = 2       # profondeur d'embrasure : en deçà, la baie n'est pa
 PORTE_SHAAR = (10, 20)
 PORTE_LISHKA = (8, 16)
 LISHKA_BAIE = 3           # largeur des fenêtres hautes
+# Écart entre deux corps voisins, pris de nu à nu : leurs socles se manquent alors
+# d'une ama. À corps plus rapprochés les deux débords s'interpénètrent et leurs faces
+# supérieures, coplanaires, clignotent — ce qui arrivait entre la Lishkat Parhedrin et
+# le corps de porte de Sha'ar HaMayim.
+ECART_LISHKA = 2 * LISHKA_DEBORD + 1
 MAAKE_H, MAAKE_EP = 3, 1.5
 ROVAD_H, ROVAD_HAUT = 3, 4    # hauteur d'un rovad, et celle du rovad du sommet
 ROVAD_NU, ROVAD_SAILLIE = 1, 1
@@ -1135,26 +1177,38 @@ def paroi_percee(name, x0, x1, y0, y1, z0, z1, col, mat, baies):
     pose("trumeau_fin", bord, a1, z0, z1)
 
 
-def dalle_percee(name, x0, x1, y0, y1, z0, z1, col, mat, tremies=()):
-    """Dalle horizontale percée de trémies `(tx0, tx1, ty0, ty1)`, disjointes en x.
+def dalle_percee(name, x0, x1, y0, y1, z0, z1, col, mat, tremies=(), alignees="x"):
+    """Dalle horizontale percée de trémies `(tx0, tx1, ty0, ty1)`.
 
     `paroi_percee` ouvre des baies dans un mur debout ; il faut ici percer un plancher,
     et les trous ne descendent pas jusqu'à un bord comme le fait une porte.
+    `alignees` dit sur quel axe les trémies se suivent — la dalle se coupe en bandes sur
+    cet axe, et chaque bande s'ouvre sur l'autre. Deux trémies qui se chevauchent sur
+    l'axe des bandes se recouvriraient : les distribuer sur l'axe où elles se suivent.
     """
     if not tremies:
         box(name, x0, x1, y0, y1, z0, z1, col, mat)
         return
-    bord = x0
-    for k, (tx0, tx1, ty0, ty1) in enumerate(sorted(tremies)):
-        if tx0 > bord:
-            box(f"{name}_bande_{k}", bord, tx0, y0, y1, z0, z1, col, mat)
-        if ty0 > y0:
-            box(f"{name}_sud_{k}", tx0, tx1, y0, ty0, z0, z1, col, mat)
-        if y1 > ty1:
-            box(f"{name}_nord_{k}", tx0, tx1, ty1, y1, z0, z1, col, mat)
-        bord = tx1
-    if x1 > bord:
-        box(f"{name}_bande_fin", bord, x1, y0, y1, z0, z1, col, mat)
+    en_x = alignees == "x"
+    a0, a1 = (x0, x1) if en_x else (y0, y1)
+    b0, b1 = (y0, y1) if en_x else (x0, x1)
+
+    def pose(suffixe, u0, u1, v0, v1):
+        if u1 - u0 <= 0 or v1 - v0 <= 0:
+            return
+        coord = (u0, u1, v0, v1) if en_x else (v0, v1, u0, u1)
+        box(f"{name}_{suffixe}", *coord, z0, z1, col, mat)
+
+    trous = sorted((t[0], t[1], t[2], t[3]) if en_x else (t[2], t[3], t[0], t[1])
+                   for t in tremies)
+    bord = a0
+    for k, (ta0, ta1, tb0, tb1) in enumerate(trous):
+        assert ta0 >= bord, f"{name}: trémies qui se chevauchent sur l'axe {alignees}"
+        pose(f"bande_{k}", bord, ta0, b0, b1)
+        pose(f"avant_{k}", ta0, ta1, b0, tb0)
+        pose(f"apres_{k}", ta0, ta1, tb1, b1)
+        bord = ta1
+    pose("bande_fin", bord, a1, b0, b1)
 
 
 def couches_middot(name, x0, x1, y0, y1, zbas, col, tremies=()):
@@ -1729,7 +1783,6 @@ for i in range(400):
 # 10 — EZRAT NASHIM (135 × 135), Middot 2:5
 # ----------------------------------------------------------------------------
 EX0, EX1 = 5, 140          # commence après le mur est de l'Azara (0..5)
-box("EzratNashim_sol", EX0, EX1, -67.5, 67.5, Z_EZN - 1, Z_EZN, "10_EzratNashim", MAT_SOL())
 H_MUR_EN = 20
 box("EzratNashim_mur_nord", EX0, EX1 + 5, 67.5, 72.5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
 box("EzratNashim_mur_sud", EX0, EX1 + 5, -72.5, -67.5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
@@ -1828,18 +1881,25 @@ for i in range(15):
 # ----------------------------------------------------------------------------
 AX0, AX1, AY0, AY1 = -187, 0, -67.5, 67.5
 X_DOUKHAN = AX1 - 13.5       # pied de la volée : marche d'une ama puis trois demies, sur 2,5 amot de large
-box("Azara_sol", AX0, X_DOUKHAN, AY0, AY1, Z_AZ - 1, Z_AZ, "20_Azara", MAT_SOL())
-box("EzratIsrael_sol", X_DOUKHAN, AX1, AY0, AY1, Z_EZI - 1, Z_EZI, "20_Azara", MAT_SOL())
 H_MUR = 25
 T = 5   # épaisseur des murs
+box("Azara_sol", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_AZ - 1, Z_AZ, "20_Azara", MAT_SOL())
+box("EzratIsrael_sol", X_DOUKHAN, AX1, AY0, AY1, Z_EZI - 1, Z_EZI, "20_Azara", MAT_SOL())
 # L'Azara et l'Ezrat Nashim sont des terrasses taillées dans le Har HaBayit, pas des
 # dalles posées en l'air : hors de leurs murs le sol retombe à Z_HAR. Sans la masse
 # qui les porte, les murs, les chambres d'angle et les quatre lishkot du pourtour
 # flottaient — 13,5 amot au-dessus du dallage, visible plein cadre au plan 1.
 # Deux blocs et non un : le mur est de l'Azara (x 0..5) descend déjà à Z_EZN, une
 # masse qui monterait à Z_AZ sous lui lui donnerait une face coplanaire.
-box("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN, "00_HarHabayit")
-box("Podium_azara", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_EZN, Z_AZ, "00_HarHabayit")
+# Chaque podium s'arrête UNE AMA sous sa terrasse, et le dallage fait sa croûte sur
+# toute son emprise, murs compris. Deux faces coplanaires ne se départagent pas : le
+# rayon qui repart du dallage retombe aussitôt sur la face jumelle, et Cycles rendait
+# l'Azara et l'Ezrat Nashim en noir plein. Le podium de l'Ezrat Israël le faisait
+# déjà juste ; les deux autres montaient au ras de leur sol.
+box("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN - 1, "00_HarHabayit")
+box("EzratNashim_sol", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_EZN - 1, Z_EZN,
+    "10_EzratNashim", MAT_SOL())
+box("Podium_azara", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_EZN, Z_AZ - 1, "00_HarHabayit")
 box("Podium_ezrat_israel", X_DOUKHAN, AX1, AY0 - T, AY1 + T, Z_EZN, Z_EZI - 1, "00_HarHabayit")
 # Le seuil de Nikanor : le sol de l'Ezrat Israël continue dans l'épaisseur du mur, sinon la
 # baie ouvre sur le vide entre ses deux vantaux.
@@ -1882,8 +1942,16 @@ PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -12       # nord, ouest ->
 # פָּתוּחַ בַּחוֹל » (Yoma 25a ; Rambam, Beit HaBe'hira 5:17). Celle qui donne sur l'Azara
 # perce donc le mur nord. Ce n'est pas une huitième porte : Middot 1:4 compte sept
 # **שערים**, et Yoma 25a appelle celles-ci des פתחים.
-GAZIT_X0, GAZIT_X1 = -52, -32
-OUVERTURES = {"nord": [PORTE_MOKED, PORTE_KORBAN, PORTE_NITZOTZ, (GAZIT_X0 + GAZIT_X1) / 2],
+# La Lishkat HaGola perce le mur pour la même raison : « וּמִשָּׁם מַסְפִּיקִים מַיִם לְכָל
+# הָעֲזָרָה » (Middot 5:4) — une chambre qui alimente toute la cour s'ouvre sur elle.
+# Les x du groupe du nord (Gazit, Gola, HaEtz) sont un CHOIX : voir plus bas, c'est la
+# seule portée de mur assez longue pour les trois. HaGazit est la plus orientale, les
+# lishkot se comptant d'est en ouest (Tosfot Yom Tov sur Middot 5:3, « מִדְּלֹא תְּנַן הָכָא
+# סְמוּכִין לַמַּעֲרָב… שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה »).
+GAZIT_X0, GAZIT_X1 = -158, -138
+GOLA_X0, GOLA_X1 = -182, -162
+PETAHIM = {(GAZIT_X0 + GAZIT_X1) / 2, (GOLA_X0 + GOLA_X1) / 2}
+OUVERTURES = {"nord": [PORTE_MOKED, PORTE_KORBAN, PORTE_NITZOTZ, *sorted(PETAHIM)],
               "sud": [PORTE_MAYIM, PORTE_BEKHOROT, PORTE_DELEK]}
 for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
     ouvertures = OUVERTURES[nm]
@@ -1895,8 +1963,8 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
         box(f"Azara_porte_{nm}_{p:+.0f}_linteau", p - 5, p + 5, y0, y1,
             Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
         # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
-        # ouverts dès l'aube (Tamid 3:7). Le פתח de HaGazit n'est pas un שער.
-        if p != (GAZIT_X0 + GAZIT_X1) / 2:
+        # ouverts dès l'aube (Tamid 3:7). Les פתחים de HaGazit et de HaGola n'en sont pas.
+        if p not in PETAHIM:
             battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
                      Z_AZ, 20, "20_Azara", MAT_OR())
 # Ezrat Israël → Ezrat Kohanim (Middot 2:6, R. Eliezer ben Yaakov) : « מַעֲלָה גְבוֹהָה אַמָּה
@@ -1918,6 +1986,12 @@ SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du 
 AXE_MUR_N = AY1 + T / 2
 NORD_Y1 = AY1 + T + SAILLIE
 NORD_Y0 = 2 * AXE_MUR_N - NORD_Y1     # symétrique du précédent par rapport à l'axe du mur
+# Second rang : la Lishkat HaEtz est « אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), donc en retrait
+# derrière HaGazit et HaGola. C'est la seule chose de tout le pourtour qui sorte des
+# douze amot de saillie, et c'est elle qui fixe désormais où se pose le soreg.
+ETZ_Y0 = NORD_Y1 + ECART_LISHKA
+ETZ_Y1 = ETZ_Y0 + SAILLIE
+POURTOUR_Y1 = ETZ_Y1 + LISHKA_DEBORD   # la face bâtie la plus saillante du complexe
 
 # Beit HaMoked : sur la porte nord la plus orientale, la troisième que compte
 # Middot 1:5. Il est à cheval sur la limite du sacré et non posé derrière le mur —
@@ -1926,24 +2000,52 @@ NORD_Y0 = 2 * AXE_MUR_N - NORD_Y1     # symétrique du précédent par rapport �
 # (Middot 1:7) et un couloir entre eux, le mur de l'Azara le traversant par sa propre
 # baie. CHOIX : ni la largeur (20 amot, comme les deux autres corps de porte) ni la
 # hauteur (30 au-dessus de l'Azara) n'ont de source ; la hauteur passe le mur de 25,
-# sans quoi les deux toits seraient coplanaires, et la largeur laisse la caméra du
-# plan 7a passer entre lui et la Lishkat HaGazit.
+# sans quoi les deux toits seraient coplanaires.
 lishka("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
        Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
 maake("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
       Z_AZ + 30, "80_Lishkot")
-# Lishkat HaGazit, même parti : à cheval, deux פתחים opposés (Yoma 25a).
-# OUVERT — le nord suit la girsa de Yoma 19a, celle du Rambam (Beit HaBe'hira 5:17)
-# et la préférence de Tosfot Yom Tov sur Middot 5:3, contre le texte imprimé de
-# Middot 5:4 qui met Gazit, Gola et Etz au SUD. Mais le même Rambam identifie
-# Lishkat HaEtz à la Lishkat Parhedrin, que la scène place au sud d'après le
-# Yerushalmi (voir plus bas) : les deux chambres, que Middot 5:4 veut du même côté
-# (« וְגַג שְׁלָשְׁתָּן שָׁוֶה »), sont ici de part et d'autre. La scène tient l'avis que le
-# Cohen Gadol avait DEUX lishkot — ce que Yoma 19a laisse ouvert (« וְלֹא יָדַעְנָא »
-# laquelle est au nord, laquelle au sud) — et non que Parhedrin = HaEtz.
+# --- Les trois lishkot du nord (Middot 5:3-4 ; Rambam, Beit HaBe'hira 5:17) : HaGazit,
+#     HaGola, HaEtz, « וְגַג שְׁלָשְׁתָּן שָׁוֶה » — un seul niveau de toit pour les trois, à 30
+#     au-dessus de l'Azara. Le groupe demande 44 amot de mur continu, et la portée à
+#     l'ouest de Sha'ar HaNitzotz est la seule qui les offre : à l'est, les escaliers de
+#     Sha'ar HaKorban et le Beit HaMoked ne laissent que 37,5. Aucune source ne donne
+#     ces x (CHOIX) ; l'ORDRE, lui, est tenu — d'est en ouest, HaGazit puis HaGola,
+#     HaEtz en second rang.
+#     OUVERT — le nord des trois suit la girsa de Yoma 19a, celle du Rambam et la
+#     préférence de Tosfot Yom Tov sur Middot 5:3 (« ונראה בעיני שגירסת הספר נשתבשה »),
+#     contre le texte imprimé de Middot 5:4 qui les met au SUD. Mais le même Rambam
+#     identifie Lishkat HaEtz à la Lishkat Parhedrin, que la scène place au sud d'après
+#     le Yerushalmi (voir plus bas) : la scène tient l'avis que le Cohen Gadol avait
+#     DEUX lishkot — ce que Yoma 19a laisse ouvert (« וְלֹא יָדַעְנָא » laquelle est au nord,
+#     laquelle au sud) — et non que Parhedrin = HaEtz.
+# Lishkat HaGazit, même parti que le Beit HaMoked : à cheval, deux פתחים opposés
+# (Yoma 25a).
 lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1,
        Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
 maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
+# Lishkat HaGola : « שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם
+# לְכָל הָעֲזָרָה » (Middot 5:4). Elle alimente la cour, elle s'ouvre donc dessus, et son
+# unique פתח perce le mur nord — pas une porte de plus au compte de Middot 1:4.
+# Elle reste posée sur la terrasse du 'Heil, sans enjamber la limite du sacré : rien ne
+# le dit d'elle, et ce n'est pas nécessaire. Bâtie dans le 'hol mais ouverte au קדש, son
+# intérieur est sanctifié et son toit ne l'est pas (Tosfot Yom Tov sur Middot 5:3,
+# d'après Maaser Sheni 3:8 : « גגותיהן לא נתקדשו כלל, אע"פ שתוכן קדש כשפתוחות לקדש »).
+# Sans conséquence pour un puits ; décisif pour le Beit HaParva, plus bas.
+lishka("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1,
+       Z_EZN, Z_AZ + 30, "80_Lishkot", [("S", *PORTE_SHAAR)])
+maake("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_AZ + 30, "80_Lishkot")
+# Lishkat HaEtz, en second rang : « וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), sur la
+# largeur des deux autres. Elle ne peut pas être dans l'Azara : entre le mur nord et le
+# socle du Sanctuaire il ne reste que 17,5 amot (135 − 100, moitié), et à l'est de
+# celui-ci le Beit HaMitba'haïm tient le terrain — pas de quoi loger un corps derrière
+# un autre. Elle est donc entière dans le 'hol, ce que la Mishna ne dit pas d'elle
+# (« שֵׁשׁ לְשָׁכוֹת הָיוּ בָעֲזָרָה », Middot 5:3) : c'est le prix du second rang, et il est
+# écrit ici. R. Eliezer ben Yaakov : « שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת » — sans usage connu,
+# pas d'ouverture connue non plus ; CHOIX, une porte sur le 'Heil.
+lishka("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1,
+       Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_LISHKA)])
+maake("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1, Z_AZ + 30, "80_Lishkot")
 
 # Sha'ar HaNitzotz, la porte nord la plus occidentale — le seul corps de porte que la
 # Mishna décrive en entier : « וּכְמִין אַכְסַדְרָה הָיָה, וַעֲלִיָּה בְנוּיָה עַל גַּבָּיו,
@@ -1981,12 +2083,14 @@ aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
        "80_Lishkot", ("nord", PORTE_MAYIM - 1.5, PORTE_MAYIM + 1.5))
 
 # « וסמוך ללשכתו היתה » (Yerushalmi Yoma 1:5) : la lishka du Cohen Gadol touche le
-# Beit Avtinas — donc à l'ouest de Sha'ar HaMayim, et non à l'ouest du mur sud.
-# Elle touche le corps de porte par les socles : à corps jointifs les deux socles se
-# recouvriraient sur leur débord, et deux faces supérieures coplanaires clignotent.
-lishka("Lishkat_Parhedrin", SM_X0 - 16, SM_X0 - 1, BA_Y0, BA_Y1,
+# Beit Avtinas — donc à l'ouest de Sha'ar HaMayim, et non à l'ouest du mur sud. Elle
+# s'en approche à ECART_LISHKA, ce qui laisse une ama d'air entre les deux socles :
+# à une seule, les débords s'interpénétraient et leurs faces supérieures, coplanaires,
+# clignotaient.
+PARHEDRIN_X1 = SM_X0 - ECART_LISHKA
+lishka("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1,
        Z_EZN, Z_AZ + 15, "80_Lishkot", [("S", *PORTE_LISHKA)])
-maake("Lishkat_Parhedrin", SM_X0 - 16, SM_X0 - 1, BA_Y0, BA_Y1, Z_AZ + 15, "80_Lishkot")
+maake("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1, Z_AZ + 15, "80_Lishkot")
 
 # Les deux lishkot de Sha'ar Nikanor, dans l'Ezrat Israël, de part et d'autre de la
 # porte est : « וּשְׁתֵּי לְשָׁכוֹת הָיוּ לוֹ, אַחַת מִימִינוֹ וְאַחַת מִשְּׂמֹאלוֹ, אַחַת לִשְׁכַּת
@@ -1998,14 +2102,71 @@ for nm, ny0, ny1 in (("Pinchas_HaMalbish", 5, 20), ("Osei_Chavitin", -20, -5)):
            "80_Lishkot", [("O", *PORTE_LISHKA)])
     maake(f"Lishkat_{nm}", -8, AX1, ny0, ny1, Z_AZ + 20, "80_Lishkot")
 
+# --- Les trois lishkot du sud (Middot 5:3) : HaMelah, HaParva, HaMedi'hin. Elles sont
+#     DANS l'Azara, contre la face intérieure du mur, et non sur la terrasse du 'Heil
+#     comme celles du nord. Ce n'est pas une inconséquence, c'est le Beit HaParva qui
+#     l'impose : « חָמֵשׁ טְבִילוֹת… וְכֻלָּן בַּקֹּדֶשׁ עַל בֵּית הַפַּרְוָה » (Yoma 3:3),
+#     « הֱבִיאוּהוּ לְבֵית הַפַּרְוָה, וּבַקֹּדֶשׁ הָיְתָה » (Yoma 3:6). Quatre des cinq immersions
+#     du Cohen Gadol se font sur son TOIT, et un toit bâti dans le 'hol n'est pas
+#     sanctifié quand bien même l'intérieur l'est (Tosfot Yom Tov sur Middot 5:3,
+#     d'après Maaser Sheni 3:8). Une Parva posée dehors mettrait l'avoda dans le 'hol.
+#     Les deux autres suivent : Medi'hin par la mesiba qui monte au toit de Parva, et
+#     Melah parce que Middot 5:3 les donne comme un même groupe.
+#     Ordre d'est en ouest — Melah, Parva, Medi'hin — Tosfot Yom Tov, ibid. : « וְכֵן
+#     רָאִיתִי בְּצִיּוּרוֹ שֶׁל פֵּירוּשׁ הָרַמְבַּ"ם שֶׁמְּסַדֵּר לִשְׁכַּת הַמֶּלַח סָמוּךְ לַמִּזְרָח ». Les x sont
+#     un CHOIX : aucune source n'en donne, et ce qui reste libre le long du mur sud est
+#     fixé par ses trois portes, par le kevesh et par la Mer. Melah est séparée des deux
+#     autres par Sha'ar HaBekhorot — rien ne demande que les trois se touchent, sauf
+#     Medi'hin et Parva, que la mesiba relie.
+SAILLIE_INT = 10          # profondeur des corps intérieurs. Au-delà, le débord du socle
+                          # mordrait sur le pied du kevesh : Rambam, Beit HaBe'hira 5:15,
+                          # « וּבֵין הַכֶּבֶשׁ וּלְכֹתֶל דְּרוֹמִי י"ב אַמָּה וּמֶחֱצָה ».
+H_LISHKA_INT = 22         # CHOIX : sous les 25 amot du mur, qui continue de se lire.
+SUD_INT = (AY0, AY0 + SAILLIE_INT)
+MELACH_X, PARVA_X, MEDICHIN_X = (-44, -26), (-92, -74), (-113, -96)
+for nm, (x0, x1) in (("HaMelach", MELACH_X), ("HaParva", PARVA_X), ("HaMedichin", MEDICHIN_X)):
+    lishka(f"Lishkat_{nm}", x0, x1, *SUD_INT, Z_AZ, Z_AZ + H_LISHKA_INT,
+           "80_Lishkot", [("N", *PORTE_LISHKA)])
+# Le bain rituel sur le toit du Beit HaParva — « וְעַל גַּגָּהּ הָיָה בֵית הַטְּבִילָה לְכֹהֵן
+# גָּדוֹל בְּיוֹם הַכִּפּוּרִים » (Middot 5:3). Maake parce que ce toit est un lieu de service
+# (Rambam, Rotzea'h 11:2). Le drap de bouts tendu entre lui et le peuple (Yoma 3:4)
+# n'est pas modélisé, non plus que les marches de la cuve : cote inventée, CHOIX.
+Z_TOIT_PARVA = Z_AZ + H_LISHKA_INT
+maake("Lishkat_HaParva", *PARVA_X, *SUD_INT, Z_TOIT_PARVA, "80_Lishkot")
+MIKVE_L, MIKVE_P, MIKVE_MARGELLE = 8, 6, 1        # cuve au centre du toit, margelle d'une ama
+MX_C, MY_C = sum(PARVA_X) / 2, sum(SUD_INT) / 2
+MKX0, MKX1 = MX_C - MIKVE_L / 2, MX_C + MIKVE_L / 2
+MKY0, MKY1 = MY_C - MIKVE_P / 2, MY_C + MIKVE_P / 2
+e = MIKVE_MARGELLE
+for cote, a, b, c, d in (("S", MKX0, MKX1, MKY0, MKY0 + e), ("N", MKX0, MKX1, MKY1 - e, MKY1),
+                         ("O", MKX0, MKX0 + e, MKY0 + e, MKY1 - e),
+                         ("E", MKX1 - e, MKX1, MKY0 + e, MKY1 - e)):
+    box(f"Mikve_Parva_margelle_{cote}", a, b, c, d, Z_TOIT_PARVA, Z_TOIT_PARVA + 2, "80_Lishkot")
+box("Mikve_Parva_eau", MKX0 + e, MKX1 - e, MKY0 + e, MKY1 - e,
+    Z_TOIT_PARVA, Z_TOIT_PARVA + 1.7, "80_Lishkot", MAT_EAU())
+# « וּמִשָּׁם מְסִבָּה עוֹלָה לְגַג בֵּית הַפַּרְוָה » (Middot 5:3 ; Rambam, Beit HaBe'hira 5:17) :
+# la montée part de la Lishkat HaMedi'hin et débouche sur le toit du Beit HaParva.
+# Tosfot Yom Tov (ibid.) la veut du côté de la Parva et à l'écart de l'endroit où l'on
+# rince les entrailles — « שֶׁלֹּא יִתָּכֵן… שֶׁהַכֹּהֵן גָּדוֹל יַעֲלֶה לְבֵית טְבִילָתוֹ דֶּרֶךְ מָקוֹם
+# שֶׁמְּדִיחִין בּוֹ ». D'où la tour engagée entre les deux corps, et ronde : מסיבה est une
+# vis, un escalier droit ne porterait pas ce nom.
+MESIBA_X = (MEDICHIN_X[1] + PARVA_X[0]) / 2
+MESIBA_Y = SUD_INT[1] + 1        # la tour engage les deux corps et ressort dans la cour
+cyl("Mesiba_Parva", MESIBA_X, MESIBA_Y, Z_AZ, Z_TOIT_PARVA + 1, 3.5, "80_Lishkot", verts=24)
+cyl("Mesiba_Parva_corniche", MESIBA_X, MESIBA_Y, Z_TOIT_PARVA - 1, Z_TOIT_PARVA + 0.5, 4,
+    "80_Lishkot", verts=24)
+
 # Soreg (10 tefa'him = 1.67 ama) et 'Heil. Middot 2:3 : « לִפְנִים מִמֶּנּוּ הַחֵיל, עֶשֶׂר
 # אַמּוֹת » — dix amot de dégagement, et les douze marches y sont. Le soreg se pose donc
 # à 10 amot de la face bâtie la plus saillante, corps de porte compris : mesuré depuis
-# le mur, il traversait le Beit HaMoked et le Beit Avtinas. Ses treize פרצות ont été
+# le mur, il traversait le Beit HaMoked et le Beit Avtinas. La face la plus saillante
+# est désormais celle de la Lishkat HaEtz, en second rang derrière HaGazit et HaGola —
+# d'où POURTOUR_Y1. Le soreg reste un rectangle : la dissymétrie du bâti ne passe pas
+# dans son tracé, elle se lit dans la largeur du 'Heil. Ses treize פרצות ont été
 # rebouchées (« חָזְרוּ וּגְדָרוּם »), il est donc continu.
 HEIL = 10
 SX0, SX1 = AX0 - T - HEIL, EX1 + 5 + HEIL
-SY0, SY1 = -(NORD_Y1 + HEIL), NORD_Y1 + HEIL
+SY0, SY1 = -(POURTOUR_Y1 + HEIL), POURTOUR_Y1 + HEIL
 # Un treillis de bois (Middot 2:3 ; fiche §2 : « séparation légère, pas un mur ») :
 # poteaux au pas de 3 amot et deux lisses. La lame pleine d'avant se lisait en muret.
 SOREG_H = 1.67
@@ -2030,13 +2191,13 @@ for nm, xa, xb, ya, yb in (("sud", SX0, SX1, SY0, SY0 + 0.2),
 # terrasse : les marches montent jusqu'au pied du podium. Les corps de porte et lishkot
 # du pourtour sont posés sur cette terrasse, leur porte sur le 'Heil s'ouvre dessus.
 HEIL_MARCHES = 12
-for cote, ya, yb in (("nord", AY1 + T, NORD_Y1), ("sud", -NORD_Y1, AY0 - T)):
+for cote, ya, yb in (("nord", AY1 + T, POURTOUR_Y1), ("sud", -POURTOUR_Y1, AY0 - T)):
     box(f"Heil_terrasse_{cote}", AX0 - T, SX1 - 4, ya, yb, Z_HAR, Z_EZN, "00_HarHabayit")
 for i in range(HEIL_MARCHES):
     z = Z_HAR + 0.5 * (i + 1)
     box(f"Heil_marche_nord_{i:02d}", SX0 + 4, SX1 - 4, SY1 - 4 - 0.5 * (i + 1), SY1 - 4 - 0.5 * i, Z_HAR, z, "00_HarHabayit")
     box(f"Heil_marche_sud_{i:02d}", SX0 + 4, SX1 - 4, SY0 + 4 + 0.5 * i, SY0 + 4 + 0.5 * (i + 1), Z_HAR, z, "00_HarHabayit")
-    box(f"Heil_marche_ouest_{i:02d}", SX0 + 4 + 0.5 * i, SX0 + 4 + 0.5 * (i + 1), -NORD_Y1, NORD_Y1, Z_HAR, z, "00_HarHabayit")
+    box(f"Heil_marche_ouest_{i:02d}", SX0 + 4 + 0.5 * i, SX0 + 4 + 0.5 * (i + 1), -POURTOUR_Y1, POURTOUR_Y1, Z_HAR, z, "00_HarHabayit")
 # De la terrasse aux portes latérales : dix amot, vingt marches de « רוּם מַעֲלָה חֲצִי אַמָּה
 # וְשִׁלְחָהּ חֲצִי אַמָּה » (Middot 2:3), sur la largeur de la baie. Devant les trois portes
 # sans corps de porte ; Moked, Nitzotz et Mayim montent dans leur bâtiment.
@@ -2048,12 +2209,14 @@ for nm, x, cote in (("Korban", PORTE_KORBAN, "nord"), ("Bekhorot", PORTE_BEKHORO
             ya, yb = AY0 - T - 0.5 * (k + 1), AY0 - T - 0.5 * k
         box(f"Escalier_{nm}_{k:02d}", x - 5, x + 5, ya, yb, Z_EZN, Z_AZ - 0.5 * k, "20_Azara")
 # Couronnement des murs de l'Azara : une assise en débord sur la crête, qui saute
-# les corps de porte passant les 25 amot (Beit HaMoked, HaGazit, et les terrasses
+# les corps passant les 25 amot (Beit HaMoked, HaGazit, HaGola, et les terrasses
 # de Sha'ar HaNitzotz et de Sha'ar HaMayim).
 couronnement("Azara_couronnement_est", AX1, AX1 + T, AY0 - T - 0.5, AY1 + T + 0.5, Z_AZ + H_MUR, "20_Azara")
 couronnement("Azara_couronnement_ouest", AX0 - T, AX0, AY0 + 0.5, AY1 - 0.5, Z_AZ + H_MUR, "20_Azara")
 couronnement("Azara_couronnement_nord", AX0 - T - 0.5, AX1 - 0.5, AY1, AY1 + T, Z_AZ + H_MUR, "20_Azara",
-             reserve=[(PORTE_MOKED - 10.5, PORTE_MOKED + 10.5), (GAZIT_X0 - 0.5, GAZIT_X1 + 0.5),
+             reserve=[(PORTE_MOKED - 10.5, PORTE_MOKED + 10.5),
+                      (GAZIT_X0 - LISHKA_DEBORD, GAZIT_X1 + LISHKA_DEBORD),
+                      (GOLA_X0 - LISHKA_DEBORD, GOLA_X1 + LISHKA_DEBORD),
                       (NZ_X0 - LISHKA_DEBORD, NZ_X1 + LISHKA_DEBORD)])
 couronnement("Azara_couronnement_sud", AX0 - T - 0.5, AX1 - 0.5, AY0 - T, AY0, Z_AZ + H_MUR, "20_Azara",
              reserve=[(SM_X0 - LISHKA_DEBORD, SM_X1 + LISHKA_DEBORD)])
@@ -2454,8 +2617,14 @@ for k in range(3):
 
 # --- Mur est du Heikhal (6 amot) avec porte 10 × 20, quatre portes plaquées d'or
 HX_E = BX_E - 16      # -92
+# « וּשְׁנֵי פִשְׁפָּשִׁין הָיוּ לוֹ לַשַּׁעַר הַגָּדוֹל, אֶחָד בַּצָּפוֹן וְאֶחָד בַּדָּרוֹם. שֶׁבַּדָּרוֹם, לֹא נִכְנַס
+# בּוֹ אָדָם מֵעוֹלָם… נָטַל אֶת הַמַּפְתֵּחַ וּפָתַח אֶת הַפִּשְׁפָּשׁ, וְנִכְנַס לְהַתָּא, וּמֵהַתָּא לַהֵיכָל »
+# (Middot 4:2) : deux guichets de part et d'autre du grand portail, ouvrant sur le tא du
+# coin. Celui du sud ne s'ouvre jamais (Yehezkel 44:2) ; il est bâti, pas percé.
+PISHPASH = (6, 8, Z_BAT, Z_BAT + 4)        # largeur et hauteur : CHOIX, Middot n'en donne pas
+paroi_percee("Heikhal_mur_est_N", HX_E - 6, HX_E, 5, 35, Z_BAT, Z_TOIT,
+             "50_Heikhal", MAT_PIERRE(), [PISHPASH])
 box("Heikhal_mur_est_S", HX_E - 6, HX_E, -35, -5, Z_BAT, Z_TOIT, "50_Heikhal")
-box("Heikhal_mur_est_N", HX_E - 6, HX_E, 5, 35, Z_BAT, Z_TOIT, "50_Heikhal")
 box("Heikhal_mur_est_linteau", HX_E - 6, HX_E, -5, 5, Z_BAT + 20, Z_TOIT, "50_Heikhal")
 if PORTES_HEIKHAL_OUVERTES:
     # Battants rabattus dans l'embrasure de 6 amot, contre les jambages.
@@ -2486,12 +2655,169 @@ def baies_heikhal(largeur, zb, zh):
     return [(x - largeur / 2, x + largeur / 2, zb, zh) for x in FENETRES_X]
 
 
-for cote, y_int, y_mi, y_ext in (("N", 10, 25, 35), ("S", -10, -25, -35)):
-    paroi_percee(f"Corps_mur_{cote}_ext", BX_O, HK0, *sorted((y_mi, y_ext)), Z_BAT, Z_TOIT,
-                 "50_Heikhal", MAT_MARBRE_HERODE(), baies_heikhal(*FENETRE_EXT))
-    paroi_percee(f"Corps_mur_{cote}_int", BX_O, HK0, *sorted((y_int, y_mi)), Z_BAT, Z_TOIT,
-                 "50_Heikhal", MAT_MARBRE_HERODE(), baies_heikhal(*FENETRE_INT))
-box("Corps_mur_O", BX_O, KK1, -35, 35, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+Y_INT, Y_TA, Y_MUR_TA, Y_MES, Y_EXT = 10, 22, 27, 30, 35
+X_TA_O = KK1 - 12                          # -171 : le nu extérieur des cellules d'ouest
+Z_ETAGE_SOL = Z_BAT + 45            # 51 : sur la מעזיבה, les cinq amot de Middot 4:6
+Z_ETAGE_HAUT = Z_ETAGE_SOL + 40     # 91 : le haut de ses murs, puis les cinq amot du toit
+# --- Messiba (Middot 4:5) : « וּמְסִבָּה הָיְתָה עוֹלָה מִקֶּרֶן מִזְרָחִית צְפוֹנִית לְקֶרֶן צְפוֹנִית
+#     מַעֲרָבִית, שֶׁבָּהּ הָיוּ עוֹלִים לְגַגּוֹת הַתָּאִים. הָיָה עוֹלֶה בַּמְּסִבָּה וּפָנָיו לַמַּעֲרָב. הָלַךְ עַל
+#     כָּל פְּנֵי הַצָּפוֹן, עַד שֶׁהוּא מַגִּיעַ לַמַּעֲרָב… וְהָפַךְ פָּנָיו לַדָּרוֹם… הָלַךְ כָּל פְּנֵי מַעֲרָב…
+#     וְהָפַךְ פָּנָיו לַמִּזְרָח. הָיָה מְהַלֵּךְ בַּדָּרוֹם, עַד שֶׁהוּא מַגִּיעַ לְפִתְחָהּ שֶׁל עֲלִיָּה »
+#     — un seul circuit, coin nord-est → nord → ouest → sud → la porte de l'étage.
+#     Middot 4:7 donne la bande du nord (מְסִבָּה 3, כֹּתֶל הַמְּסִבָּה 5) et celle du sud
+#     (בֵּית הוֹרָדַת הַמַּיִם 3), toutes deux laissées en creux ici. À l'OUEST la michna ne bande
+#     rien : les cent amot est-ouest sont pleines. Les trois amot du couloir d'ouest sont
+#     donc prises sur les cinq du כֹּתֶל הַתָּא, une ama de maçonnerie de chaque côté — CHOIX.
+#     La pente n'est donnée nulle part : elle se répartit sur les trois branches, CHOIX.
+MESIBA_L, MESIBA_EP = 3, 1
+X_MES_O0, X_MES_O1 = BX_O + 1, BX_O + 4        # le couloir d'ouest, dans le mur des ta'im
+X_PORTE_ALIYAH = -113                          # où la branche sud atteint le niveau de l'étage
+LEGS = (abs(BX_O - HK0), 2 * Y_MES, abs(X_PORTE_ALIYAH - BX_O))
+Z_MES = [Z_BAT]
+for L in LEGS:
+    Z_MES.append(Z_MES[-1] + (Z_ETAGE_SOL - Z_BAT) * L / sum(LEGS))
+PORTE_ALIYAH = (X_PORTE_ALIYAH, X_PORTE_ALIYAH + 3, Z_ETAGE_SOL, Z_ETAGE_SOL + 10)
+PORTE_TA = (HK0 - 4, HK0 - 2, Z_BAT, Z_BAT + 4)      # le ta du coin nord-est, CHOIX
+
+# --- Découpage nord-sud du corps (Middot 4:7) : « כֹּתֶל הַמְּסִבָּה חָמֵשׁ, וְהַמְּסִבָּה שָׁלֹשׁ,
+#     כֹּתֶל הַתָּא חָמֵשׁ, וְהַתָּא שֵׁשׁ, כֹּתֶל הַהֵיכָל שֵׁשׁ, וְתוֹכוֹ עֶשְׂרִים » puis le miroir au sud,
+#     où les trois amot sont בֵּית הוֹרָדַת הַמַּיִם — 70 en tout. Est-ouest, derrière le KhK, la
+#     même michna donne כֹּתֶל הַהֵיכָל שֵׁשׁ, הַתָּא שֵׁשׁ, כֹּתֶל הַתָּא חָמֵשׁ.
+#     Le blockout portait deux bandes pleines de quinze amot : ni ta'im, ni messiba.
+# --- Ta'im. « שְׁלֹשִׁים וּשְׁמֹנָה תָאִים הָיוּ שָׁם, חֲמִשָּׁה עָשָׂר בַּצָּפוֹן, חֲמִשָּׁה עָשָׂר בַּדָּרוֹם,
+#     וּשְׁמֹנָה בַּמַּעֲרָב. שֶׁבַּצָּפוֹן וְשֶׁבַּדָּרוֹם, חֲמִשָּׁה עַל גַּבֵּי חֲמִשָּׁה, וַחֲמִשָּׁה עַל גַּבֵּיהֶם.
+#     וְשֶׁבַּמַּעֲרָב, שְׁלֹשָׁה עַל גַּבֵּי שְׁלֹשָׁה, וּשְׁנַיִם עַל גַּבֵּיהֶם » (Middot 4:3) : 15 + 15 + 8.
+#     « הַתַּחְתּוֹנָה חָמֵשׁ, וְרֹבֶד שֵׁשׁ. וְהָאֶמְצָעִית שֵׁשׁ, וְרֹבֶד שֶׁבַע. וְהָעֶלְיוֹנָה שֶׁבַע » (4:4,
+#     qui le tire de Melakhim I 6:6) : la cellule s'élargit de 5 à 7 parce que le mur du
+#     Heikhal se retire d'une ama par étage (מִגְרָעוֹת, Melakhim I 6:6, « לְבִלְתִּי אֲחֹז
+#     בְּקִירוֹת הַבָּיִת »). Les six de mur et six de cellule de 4:7 sont l'étage du MILIEU.
+#     Ce que les sources ne donnent pas, et qui est donc CHOIX : la hauteur d'un étage
+#     (les trois remplissent les quarante amot du rez, 12 de vide et une de dalle, la
+#     dernière de deux), la longueur des cellules et l'épaisseur des refends.
+TA_VIDE = 12
+TA_ETAGES = ((Z_BAT, 5, 1), (Z_BAT + 13, 6, 1), (Z_BAT + 26, 7, 2))   # (sol, largeur, dalle)
+Z_TA_TOIT = Z_BAT + 40                     # 46 : le toit des ta'im, au niveau du plafond du rez
+TA_REFEND, TA_PORTE_L, TA_PORTE_H = 1, 2, 4
+TA_TREMIE = 2                              # « וְאֶחָד לַתָּא שֶׁעַל גַּבָּיו » (4:3)
+
+
+def travees(a0, a1, n, refend):
+    """Découpe le segment a0→a1 en n travées égales séparées de `refend`, dans son sens."""
+    sens = 1 if a1 > a0 else -1
+    L = (abs(a1 - a0) - (n - 1) * refend) / n
+    return [(a0 + sens * k * (L + refend), a0 + sens * (k * (L + refend) + L)) for k in range(n)]
+
+
+def refend(name, mince0, mince1, long0, long1, z0, mince_en, col, mat):
+    """Cloison entre deux ta'im, percée d'une porte au milieu (Middot 4:3).
+
+    `mince_en` dit sur quel axe la cloison est mince ; la porte s'ouvre sur l'autre.
+    """
+    c = (long0 + long1) / 2
+    demi = TA_PORTE_L / 2
+
+    def pose(suffixe, a, b, zb, zh):
+        if b - a <= 0:
+            return
+        if mince_en == "x":
+            box(f"{name}_{suffixe}", mince0, mince1, a, b, zb, zh, col, mat)
+        else:
+            box(f"{name}_{suffixe}", a, b, mince0, mince1, zb, zh, col, mat)
+
+    pose("a", min(long0, long1), c - demi, z0, z0 + TA_VIDE)
+    pose("b", c + demi, max(long0, long1), z0, z0 + TA_VIDE)
+    pose("linteau", c - demi, c + demi, z0 + TA_PORTE_H, z0 + TA_VIDE)
+
+
+for cote, sg in (("N", 1), ("S", -1)):
+    for etage, (z0, large, dalle) in enumerate(TA_ETAGES):
+        ep = 12 - large                                   # 7, 6, 5 : le mur se retire
+        ya, yb = sorted((sg * (Y_INT + ep), sg * Y_TA))
+        # « וּבְקֶרֶן מִזְרָחִית צְפוֹנִית הָיוּ חֲמִשָּׁה פְתָחִים… וְאֶחָד לַמְּסִבָּה, וְאֶחָד לַפִּשְׁפָּשׁ,
+        # וְאֶחָד לַהֵיכָל » (Middot 4:3) : le ta du coin nord-est perce le mur du Heikhal.
+        vers_heikhal = [PORTE_TA] if (cote, etage) == ("N", 0) else []
+        # Les fenêtres du Heikhal (Melakhim I 6:4) traversent le mur au troisième étage des
+        # ta'im, le seul dont la tranche couvre leur hauteur : étroites ici, larges dehors.
+        if z0 <= FENETRE_INT[1] and FENETRE_INT[2] <= z0 + TA_VIDE + dalle:
+            vers_heikhal = vers_heikhal + baies_heikhal(*FENETRE_INT)
+        paroi_percee(f"Corps_mur_HK_{cote}_{etage}", KK1, HK0,
+                     *sorted((sg * Y_INT, sg * (Y_INT + ep))),
+                     z0, z0 + TA_VIDE + dalle, "50_Heikhal", MAT_MARBRE_HERODE(), vers_heikhal)
+        cellules = travees(HK0, KK1, 5, TA_REFEND)
+        for k in range(4):
+            xb = cellules[k][1]
+            refend(f"Ta_{cote}_{etage}_refend_{k}", xb, xb - TA_REFEND, ya, yb, z0, "x",
+                   "50_Heikhal", MAT_MARBRE_HERODE())
+        dalle_percee(f"Ta_{cote}_{etage}_dalle", KK1, HK0, ya, yb, z0 + TA_VIDE,
+                     z0 + TA_VIDE + dalle, "50_Heikhal", MAT_CEDRE(),
+                     [(min(xa, xb) + 2, min(xa, xb) + 2 + TA_TREMIE, yb - 2 - TA_TREMIE, yb - 2)
+                      for xa, xb in cellules])
+# Ouest : trois cellules sur trois, deux au-dessus (Middot 4:3)
+for etage, (z0, large, dalle) in enumerate(TA_ETAGES):
+    ep = 12 - large
+    xa, xb = X_TA_O, KK1 - ep
+    n = 2 if etage == 2 else 3
+    box(f"Corps_mur_HK_O_{etage}", xb, KK1, -Y_TA, Y_TA, z0, z0 + TA_VIDE + dalle,
+        "50_Heikhal", MAT_MARBRE_HERODE())
+    cellules = travees(-Y_TA, Y_TA, n, TA_REFEND)
+    for k in range(n - 1):
+        yb_ = cellules[k][1]
+        refend(f"Ta_O_{etage}_refend_{k}", yb_, yb_ + TA_REFEND, xa, xb, z0, "y",
+               "50_Heikhal", MAT_MARBRE_HERODE())
+    dalle_percee(f"Ta_O_{etage}_dalle", xa, xb, -Y_TA, Y_TA, z0 + TA_VIDE,
+                 z0 + TA_VIDE + dalle, "50_Heikhal", MAT_CEDRE(),
+                 [(xa + 2, xa + 2 + TA_TREMIE, ya_ + 2, ya_ + 2 + TA_TREMIE) for ya_, _ in cellules],
+                 alignees="y")
+# Les murs qui enferment les ta'im, pleins sur toute la hauteur, et le toit des cellules
+for cote, sg in (("N", 1), ("S", -1)):
+    # Au sud la porte de l'étage traverse ; au nord, le ta du coin ouvre sur la messiba (4:3)
+    vers_mesiba = [PORTE_ALIYAH] if cote == "S" else [PORTE_TA]
+    passage = [PORTE_ALIYAH] if cote == "S" else []
+    paroi_percee(f"Corps_mur_TA_{cote}", X_MES_O1, HK0, *sorted((sg * Y_TA, sg * Y_MUR_TA)),
+                 Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE(),
+                 baies_heikhal(*FENETRE_EXT) + vers_mesiba)
+    paroi_percee(f"Corps_mur_{cote}_ext", BX_O, HK0, *sorted((sg * Y_MES, sg * Y_EXT)),
+                 Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE(), baies_heikhal(*FENETRE_EXT))
+    # Au-dessus du toit des ta'im, la bande redevient pleine jusqu'au mur du Heikhal
+    paroi_percee(f"Corps_masse_{cote}", KK1, HK0, *sorted((sg * Y_INT, sg * Y_TA)),
+                 Z_TA_TOIT + 5, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE(), passage)
+    couches_middot(f"Ta_toit_{cote}", KK1, HK0, *sorted((sg * Y_INT, sg * Y_TA)), Z_TA_TOIT,
+                   "50_Heikhal")
+# Le nu extérieur d'ouest court sans interruption ; le mur intérieur du couloir, lui,
+# s'ouvre là où les branches nord et sud de la messiba le traversent pour tourner.
+box("Corps_mur_TA_O_ext", BX_O, X_MES_O0, -Y_EXT, Y_EXT, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+# Ses bouts nord et sud sont déjà dans les murs extérieurs des bandes : seul le centre reste.
+box("Corps_mur_TA_O_int", X_MES_O1, X_TA_O, -Y_MUR_TA, Y_MUR_TA, Z_BAT, Z_TOIT,
+    "50_Heikhal", MAT_MARBRE_HERODE())
+box("Corps_masse_O", X_TA_O, KK1, -Y_TA, Y_TA, Z_TA_TOIT + 5, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+couches_middot("Ta_toit_O", X_TA_O, KK1, -Y_TA, Y_TA, Z_TA_TOIT, "50_Heikhal")
+rampe("Mesiba_nord", X_MES_O0, HK0, Y_MES - MESIBA_L, Y_MES, Z_MES[1], Z_MES[0], "+x",
+      "50_Heikhal", MAT_MARBRE_HERODE(), MESIBA_EP)
+rampe("Mesiba_ouest", X_MES_O0, X_MES_O1, -Y_MES, Y_MES, Z_MES[2], Z_MES[1], "+y",
+      "50_Heikhal", MAT_MARBRE_HERODE(), MESIBA_EP)
+rampe("Mesiba_sud", X_MES_O0, X_PORTE_ALIYAH, -Y_MES, -Y_MES + MESIBA_L, Z_MES[2], Z_MES[3], "+x",
+      "50_Heikhal", MAT_MARBRE_HERODE(), MESIBA_EP)
+# Le couloir est couvert : sans cela il ouvre une fente de quatre-vingt-dix amot sur le
+# ciel au flanc du bâtiment. La hauteur sous plafond n'est pas donnée : huit amot au-dessus
+# du haut de chaque branche, le reste plein jusqu'au toit — CHOIX.
+for nom, xa, xb, ya, yb, z in (
+        ("nord", X_MES_O0, HK0, Y_MES - MESIBA_L, Y_MES, Z_MES[1] + 8),
+        ("ouest", X_MES_O0, X_MES_O1, -Y_MES, Y_MES, Z_MES[2] + 8),
+        ("sud", X_MES_O0, X_PORTE_ALIYAH, -Y_MES, -Y_MES + MESIBA_L, Z_MES[3] + 8)):
+    box(f"Mesiba_{nom}_couverture", xa, xb, ya, yb, z, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+# Le bout est de la bande sud n'est pas la messiba mais בֵּית הוֹרָדַת הַמַּיִם (Middot 4:7) :
+# un canal, plein au-dessus. Les trois amot du palier restent ouvertes jusqu'à la porte.
+box("Beit_horadat_hamayim_masse", PORTE_ALIYAH[1], HK0, -Y_MES, -Y_MES + MESIBA_L,
+    Z_BAT + 6, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+box("Mesiba_palier", *PORTE_ALIYAH[:2], -Y_MES, -Y_MUR_TA,
+    PORTE_ALIYAH[3], Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+# « וּבְפִתְחָהּ שֶׁל עֲלִיָּה הָיוּ שְׁנֵי כְלוֹנָסוֹת שֶׁל אֶרֶז, שֶׁבָּהֶן הָיוּ עוֹלִין לְגַגָּהּ שֶׁל עֲלִיָּה »
+# (Middot 4:5) : deux perches de cèdre à la porte, et donc une trémie dans le toit au-dessus.
+for k, x in enumerate((X_PORTE_ALIYAH + 1, X_PORTE_ALIYAH + 2)):
+    cyl(f"Klonas_aliyah_{k}", x, -Y_INT + 1.5, Z_ETAGE_SOL, Z_ETAGE_HAUT + 1, 0.4,
+        "50_Heikhal", MAT_CEDRE(), verts=12)
+
+
 # --- L'étage. Le corps montait plein de 46 à 96 ; Middot 4:5-6 y met une pièce.
 #     « וְגֹבַהּ שֶׁל עֲלִיָּה אַרְבָּעִים אַמָּה » (4:6), et le Rambam la dit bâtie : « וַעֲלִיָּה בְּנוּיָה
 #     עַל גַּבָּיו, גֹּבַהּ כְּתָלֶיהָ אַרְבָּעִים אַמָּה » (Beit HaBe'hira 4:2). Elle est praticable : porte
@@ -2503,13 +2829,12 @@ box("Corps_mur_O", BX_O, KK1, -35, 35, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_H
 #     au-dessus de la Maison — « מִקַּרְקָעִית הַבַּיִת עַד קֵרוּי עֲלִיָּה רִאשׁוֹנָה שְׁלֹשִׁים, וּמֵעֲלִיָּה
 #     לַעֲלִיָּה עַד גַּג הָעֶלְיוֹן תִּשְׁעִים ». Metsoudat David donne la même lecture en second.
 #     Radak les met dans l'Oulam seul : minorité, et sur le Premier Temple.
-Z_ETAGE_SOL = Z_BAT + 45            # 51 : sur la מעזיבה, les cinq amot de Middot 4:6
-Z_ETAGE_HAUT = Z_ETAGE_SOL + 40     # 91 : le haut de ses murs, puis les cinq amot du toit
 # Les לוּלִין percent le plancher au-dessus du Kodesh HaKodashim. Middot 4:5 n'en donne ni
 # le nombre ni la place : deux trémies de deux amot sur l'axe, CHOIX.
 LOULIN = [(KK1 + 6, KK1 + 8, -1, 1), (KK1 + 12, KK1 + 14, -1, 1)]
 couches_middot("Corps_plancher", KK1, HK0, -10, 10, Z_BAT + 40, "50_Heikhal", LOULIN)
-couches_middot("Corps_toit", KK1, HK0, -10, 10, Z_ETAGE_HAUT, "50_Heikhal")
+couches_middot("Corps_toit", KK1, HK0, -10, 10, Z_ETAGE_HAUT, "50_Heikhal",
+               [(X_PORTE_ALIYAH + 0.5, X_PORTE_ALIYAH + 2.5, -Y_INT + 0.5, -Y_INT + 2.5)])
 # « רָאשֵׁי פִסְפָּסִין מַבְדִּילִים בָּעֲלִיָּה בֵּין הַקֹּדֶשׁ לְבֵין קֹדֶשׁ הַקֳּדָשִׁים » (Middot 4:5) : la ligne
 # de bornes qui rejoue à l'étage l'ama de Traksin, restée en creux au-dessous.
 for k, y in enumerate(plage(-9.5, 9.5, 1.0)):

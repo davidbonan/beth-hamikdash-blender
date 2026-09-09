@@ -315,17 +315,32 @@
       "zone": "heikhal",
       "prefixes": [
         "Corps_mur",
-        "Corps_plafond"
+        "Corps_masse",
+        "Corps_angle",
+        "Ta_N_",
+        "Ta_S_",
+        "Ta_O_"
+      ]
+    },
+    {
+      "id": "mesiba",
+      "nom": "Messiba (la rampe)",
+      "zone": "heikhal",
+      "prefixes": [
+        "Mesiba_",
+        "Beit_horadat_hamayim"
       ]
     },
     {
       "id": "aliyah",
-      "nom": "Aliyah (l'\u00e9tage)",
+      "nom": "Aliyah (l'étage)",
       "zone": "heikhal",
       "prefixes": [
         "Corps_plancher_",
         "Corps_toit_",
+        "Ta_toit_",
         "Pispassin_",
+        "Klonas_aliyah",
         "Ulam_plancher_",
         "Ulam_masse"
       ]
@@ -435,6 +450,48 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_HaGazit"
+      ]
+    },
+    {
+      "id": "lishkat_hagola",
+      "nom": "Lishkat HaGola",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_HaGola"
+      ]
+    },
+    {
+      "id": "lishkat_haetz",
+      "nom": "Lishkat HaEtz",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_HaEtz"
+      ]
+    },
+    {
+      "id": "lishkat_hamelach",
+      "nom": "Lishkat HaMelah",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_HaMelach"
+      ]
+    },
+    {
+      "id": "lishkat_haparva",
+      "nom": "Lishkat HaParva",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_HaParva",
+        "Mikve_Parva"
+      ]
+    },
+    {
+      "id": "lishkat_hamedichin",
+      "nom": "Lishkat HaMedi'hin",
+      "zone": "lishkot",
+      "prefixes": [
+        "Lishkat_HaMedichin",
+        "Mesiba_Parva"
       ]
     },
     {
