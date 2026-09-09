@@ -1,4 +1,4 @@
-import { readdirSync, existsSync } from 'node:fs'
+import { readdirSync, existsSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 
 const url = process.argv[2]
@@ -39,6 +39,16 @@ page.on('console', (m) => bruit.test(m.text()) || console.log('[console]', m.typ
 page.on('pageerror', (e) => console.log('[erreur]', String(e).slice(0, 300)))
 page.on('requestfailed', (r) => console.log('[echec]', r.url().slice(0, 120), r.failure()?.errorText))
 
+// La capture passe par CDP et non par `page.screenshot` : celle-ci attend une image
+// stable, et une scène qui rend en continu — quelques images par seconde sous
+// SwiftShader — ne lui en donne jamais. Elle expirait à trente secondes sur une page
+// pourtant prête, et emportait le code de sortie avec elle.
+async function capturer(chemin) {
+  const cdp = await page.context().newCDPSession(page)
+  const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' })
+  writeFileSync(chemin, Buffer.from(data, 'base64'))
+}
+
 let code = 0
 await page.goto(url, { waitUntil: 'load', timeout: 60000 })
 try {
@@ -53,7 +63,7 @@ try {
   code = 1
   console.log('BLOQUE :', (await page.textContent('#chargement').catch(() => '?')).trim())
 }
-await page.screenshot({ path: capture })
+await capturer(capture)
 console.log('capture', capture)
 await navigateur.close()
 process.exit(code)
