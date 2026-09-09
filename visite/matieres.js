@@ -22,7 +22,7 @@ const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT =
       GAZIT = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
-export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil"]);
+export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil"]);
 
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
@@ -67,7 +67,7 @@ const FAMILLES = {
   Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
-  Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
+  Parokhet_tissee: ETOFFE, Parokhet_figure: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Eau_Kiyor: EAU,
   Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE,

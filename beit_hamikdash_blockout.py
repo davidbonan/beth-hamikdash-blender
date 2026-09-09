@@ -23,7 +23,7 @@ import bpy
 import math
 import sys
 import zlib
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 # ----------------------------------------------------------------------------
 # PARAMÈTRES
@@ -796,7 +796,8 @@ def parokhet(name, figure=False):
     autre côté. C'est ce qui fait voir les créatures sans y mettre un fil d'or, qu'Ex.
     26:31 ne donne pas.
     """
-    mat, neuf = _neuf(name, MATIERES_PAROKHET[0])
+    mat, neuf = _neuf(name, tuple(min(1.0, c * (1.35 if figure else 1.0))
+                                 for c in MOYENNE_PAROKHET))
     if not neuf:
         return mat
     liens = mat.node_tree.links
@@ -1879,10 +1880,19 @@ def chaine(name, p0, p1, R, col, mat=None, tube=None, majeur=10, mineur=6):
 
 def _poser(pieces, x, y, z0, lacet):
     """Pièces bâties à l'origine, posées en (x, y, z0) amot et tournées de `lacet`
-    autour de la verticale — silhouettes et keruvim."""
+    autour de la verticale — silhouettes et keruvim.
+
+    La pose se COMPOSE avec ce que la pièce porte déjà. `cyl_between` oriente son
+    cylindre par `rotation_euler` : l'écraser couchait à la verticale, sur l'origine du
+    keruv, tous les membres bâtis avec lui — les bras du keruv ne se voyaient nulle part.
+    """
+    pose = Matrix.Translation((m(x), m(y), m(z0))) @ Matrix.Rotation(lacet, 4, 'Z')
     for piece in pieces:
-        piece.location = (m(x), m(y), m(z0))
-        piece.rotation_euler = (0, 0, lacet)
+        # La transformation propre se recompose à la main : `matrix_world` n'est
+        # recalculée qu'au rafraîchissement du graphe de dépendances, et vaut encore
+        # l'identité pour une pièce qu'on vient de poser.
+        propre = Matrix.Translation(piece.location) @ piece.rotation_euler.to_matrix().to_4x4()
+        piece.matrix_world = pose @ propre
 
 def fcurves_of(obj):
     """F-curves de l'action de obj. Blender <4.4 : action.fcurves ; >=4.4 : actions à slots."""
@@ -3926,7 +3936,7 @@ def timora(nom, paroi, u, z0, h, col):
     _relief_bosse(f"{nom}_coeur", paroi, u, z0 + fut * 0.97, SAILLIE_KIR * 0.35, 0.045 * h, col)
 
 
-def keruv(nom, paroi, u, z0, h, col):
+def keruv_grave(nom, paroi, u, z0, h, col):
     """« כְּרוּבִים » — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), et 41:19 tourne chaque
     profil vers la timora qui le jouxte. Deux têtes SANS TRAITS, deux ailes levées."""
     corps = [(u - 0.150 * h, z0), (u + 0.150 * h, z0),
@@ -3975,7 +3985,7 @@ def champ_sculpte(nom, paroi, u0, u1, col):
         bandeau_fleurons(f"Kir_{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
     for r in range(REGISTRES_KIR):
         for i in range(n):
-            motif = keruv if i % 2 == 0 else timora
+            motif = keruv_grave if i % 2 == 0 else timora
             motif(f"Kir_{nom}_{r}{i:02d}", paroi, u0 + pas * (i + 0.5),
                   z0 + r * registre + BANDEAU_KIR, registre - BANDEAU_KIR, col)
 
@@ -4019,41 +4029,70 @@ empty("Point_Machta_braises", ARON_X_MACHTA, 0, Z_BAT + 0.3, "60_KodeshHakodashi
 #     (Soucca 5b). Les badim courent jusqu'à la parokhet intérieure : c'est ce qui rend
 #     physiques « entre les deux badim » (Yoma 5:1, 5:3) et les bosses du rideau.
 H_KERUV = 10 / 6      # 10 tefa'him (Soucca 5b)
+# Demi-profil d'une penne, déplié par `limbe` : étroite à l'emplanture, large au tiers,
+# effilée au bout. Trois pennes par aile, décalées — une aile d'une seule plaque n'a pas
+# de plumage, et trois plaques plates n'ont pas d'aile.
+PENNE = ((0.0, 0.055), (0.16, 0.150), (0.44, 0.205), (0.70, 0.175), (0.89, 0.100), (1.0, 0.0))
 
-def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.29):
-    """Keruv de la kaporet, ligne Rashi + Yoma 54a-b : enfant (Soucca 5b) **agenouillé**
-    sur la kaporet, d'une pièce avec elle (miksha, Rashi Shemot 25:18), penché vers
-    l'autre keruv, bras tendus jusqu'à le toucher (« מעורים זה בזה », Yoma 54a), tête
-    inclinée vers la kaporet (Bava Batra 99a), deux ailes larges qui partent des
-    omoplates et montent en diagonale jusqu'à la hauteur des têtes, en dais sur la
-    kaporet (Rashi Shemot 25:20), chacune un éventail de trois plumes. Bâti à l'origine
-    face à l'ouest comme une silhouette, puis tourné vers le centre. `vers` : ±1, le
-    sens en y du centre de la kaporet ; `h`, `epaules` distinguent le garçon de la
-    fille (Yoma 54b). Une base conique se lisait en queue d'écailles, des ailes à plat
-    au-dessus de la tête en chapeau : d'où les jambes et les ailes qui partent du dos."""
+
+def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.26):
+    """Keruv de la kaporet : enfant (« כְּרַבְיָא », Soucca 5b) agenouillé, martelé d'une
+    pièce avec elle — « מִקְשָׁה », ni pieds ni socle (Rashi Shemot 25:18).
+
+    Ligne du film (§8h) : le garçon et la fille enlacés, « כְּמַעֲשֵׂה אִישׁ וְאִשְׁתּוֹ »
+    (Yoma 54a), bras tendus jusqu'à se toucher, tête inclinée vers la kaporet « comme
+    l'élève devant son maître » (Bava Batra 99a), et « פֹּרְשֵׂי כְנָפַיִם לְמַעְלָה סֹכְכִים
+    בְּכַנְפֵיהֶם עַל הַכַּפֹּרֶת » (Shemot 25:20) — les ailes montent du dos, se rejoignent en
+    dais au-dessus du milieu, et ne touchent pas le corps.
+
+    Bâti à l'origine, **-x vers l'autre keruv**, puis tourné : `vers` est le sens en y
+    du centre de la kaporet. `h` et `epaules` distinguent le garçon de la fille (Yoma 54b).
+
+    Une pile de boîtes surmontée d'une sphère et deux plaques plates en travers rendaient
+    un épouvantail : le membre se lit à son galbe, et l'aile à son plumage.
+    """
     or_ = MAT_OR()
-    hz = 0.30 * h          # hauteur des hanches, à genoux
-    pieces = [
-        box(f"{name}_torse", -0.20, 0.06, -0.17, 0.17, hz, hz + 0.36 * h, col, or_),
-        box(f"{name}_epaules", -0.28, -0.02, -epaules, epaules, hz + 0.30 * h, hz + 0.37 * h, col, or_),
-        cyl(f"{name}_cou", -0.22, 0, hz + 0.35 * h, hz + 0.42 * h, 0.07, col, or_, verts=8),
-        sphere(f"{name}_tete", -0.32, 0, hz + 0.47 * h, 0.105 * h, col, or_, segs=12),
-    ]
+    genou, hanche, epaule = 0.13 * h, 0.34 * h, 0.62 * h
+    pieces = []
     for s_ in (-1, 1):
-        yj = s_ * 0.13
-        pieces.append(box(f"{name}_cuisse{s_:+d}", -0.12, 0.18, yj - 0.08, yj + 0.08, 0.13 * h, hz + 0.02, col, or_))
-        pieces.append(box(f"{name}_jambe{s_:+d}", 0.06, 0.62, yj - 0.07, yj + 0.07, 0, 0.13 * h, col, or_))
-        pieces.append(cyl_between(f"{name}_bras{s_:+d}", (-0.18, s_ * (epaules - 0.06), hz + 0.32 * h),
-                                  (-0.78, s_ * 0.12, hz + 0.24 * h), 0.06, col, or_, verts=8))
-        yw = s_ * 0.14
-        for k in range(3):
-            xt, zt = -0.86 + 0.08 * k, h + 0.02 - 0.10 * k
-            yt = yw + s_ * (0.22 + 0.20 * k)
-            wr, wt = 0.16, 0.12
-            quad = [(0.08, yw - wr / 2, hz + 0.28 * h), (0.08, yw + wr / 2, hz + 0.28 * h),
-                    (xt, yt + wt / 2, zt), (xt, yt - wt / 2, zt)]
-            pieces.append(plaque(f"{name}_aile{s_:+d}_plume{k}", quad, 0.03, col, or_))
-    _poser(pieces, x, y, z0, -vers * math.pi / 2)   # face à l'ouest, tournée vers le centre
+        yj = s_ * 0.135
+        # Le tibié repose à plat sur la kaporet, le genou devant : c'est l'agenouillement.
+        pieces.append(cyl_between(f"{name}_tibia{s_:+d}", (0.14, yj, 0.075 * h), (0.66, yj, 0.070 * h),
+                                  0.075, col, or_, verts=10))
+        pieces.append(sphere(f"{name}_genou{s_:+d}", 0.14, yj, genou * 0.85, 0.085, col, or_, segs=8))
+        pieces.append(cyl_between(f"{name}_cuisse{s_:+d}", (0.16, yj, genou * 0.85), (-0.06, yj, hanche),
+                                  0.095, col, or_, verts=10))
+    pieces.append(sphere(f"{name}_bassin", -0.03, 0, hanche, 0.155, col, or_, segs=10))
+    # Le torse penche vers l'autre keruv, et c'est ce penchant qui porte tout le groupe.
+    pieces.append(cyl_between(f"{name}_torse", (-0.04, 0, hanche - 0.04), (-0.19, 0, epaule),
+                              0.145, col, or_, verts=12))
+    pieces.append(cyl_between(f"{name}_epaules", (-0.19, -epaules, epaule), (-0.19, epaules, epaule),
+                              0.085, col, or_, verts=10))
+    pieces.append(cyl_between(f"{name}_cou", (-0.21, 0, epaule + 0.01), (-0.27, 0, epaule + 0.10 * h),
+                              0.058, col, or_, verts=8))
+    # Tête d'enfant : large pour le corps, portée en avant — inclinée vers la kaporet.
+    pieces.append(sphere(f"{name}_tete", -0.31, 0, epaule + 0.16 * h, 0.125 * h, col, or_, segs=14))
+    for s_ in (-1, 1):
+        # Les bras vont droit devant, jusqu'à la main de l'autre keruv, au milieu.
+        main = (-0.80, s_ * 0.055, epaule - 0.10 * h)
+        pieces.append(cyl_between(f"{name}_bras{s_:+d}", (-0.19, s_ * (epaules - 0.03), epaule - 0.02),
+                                  (-0.50, s_ * 0.13, epaule - 0.09 * h), 0.062, col, or_, verts=8))
+        pieces.append(cyl_between(f"{name}_avantbras{s_:+d}", (-0.50, s_ * 0.13, epaule - 0.09 * h),
+                                  main, 0.052, col, or_, verts=8))
+        pieces.append(sphere(f"{name}_main{s_:+d}", *main, 0.072, col, or_, segs=8))
+        # L'aile part de l'omoplate, monte et vient au-dessus du milieu de la kaporet :
+        # les deux keruvim s'y rejoignent en dais, sans qu'aucune aile touche un corps.
+        emplanture = (-0.06, s_ * 0.115, epaule - 0.06 * h)
+        for k, (ecart, longueur, largeur) in enumerate(((0.00, 1.00, 1.00), (0.13, 0.82, 0.80),
+                                                        (0.24, 0.62, 0.62))):
+            cible = (-0.76 + 0.10 * k, s_ * (0.14 + 0.13 * k), epaule + 0.42 * h - 0.08 * h * k)
+            base = (emplanture[0] + 0.10 * ecart, emplanture[1] + s_ * 0.05 * ecart,
+                    emplanture[2] - 0.20 * ecart)
+            axe = tuple(c - b for c, b in zip(cible, base))
+            portee = math.dist(cible, base)
+            pieces.append(limbe(f"{name}_aile{s_:+d}_penne{k}", PENNE, base, axe, (0, s_, 0),
+                                portee * longueur, 0.028 * largeur, col, or_, courbure=0.16))
+    _poser(pieces, x, y, z0, -vers * math.pi / 2)   # -x vers l'autre keruv
 
 ARON = "65_Aron"
 ARON_X0, ARON_X1, ARON_Y = KKC - 0.75, KKC + 0.75, 1.25
