@@ -3160,8 +3160,9 @@ box("Beit_HaMoked_sol_ezrat_israel", X_DOUKHAN, MK_X1, MK_Y0, AY1 + T, Z_EZI - 1
     "80_Lishkot", MAT_SOL())
 # « אַרְבַּע לְשָׁכוֹת… כְּקִיטוֹנוֹת פְּתוּחוֹת לִטְרַקְלִין, שְׁתַּיִם בַּקֹּדֶשׁ וּשְׁתַּיִם בַּחֹל » (Middot 1:6) : quatre
 # chambrettes qui ouvrent sur la salle, deux de chaque côté de la limite, rangées le long
-# des murs est et ouest entre les deux vestibules des שערים. Cotes : CHOIX.
-KITON_L, KITON_P, KITON_H, CLOISON = 4.5, 5.5, 6, 0.5
+# des murs est et ouest entre les deux vestibules des שערים. Cotes : CHOIX. La profondeur laisse
+# au nord-ouest un palier derrière le puits : la première marche de la vis y est, contre la cloison.
+KITON_L, KITON_P, KITON_H, CLOISON = 4.5, 7, 6, 0.5
 KITONOT_Y = ((AXE_MUR_N - CLOISON - KITON_P, AXE_MUR_N - CLOISON),
              (AXE_MUR_N + CLOISON, AXE_MUR_N + CLOISON + KITON_P))
 KITONOT_Y0, KITONOT_Y1 = KITONOT_Y[0][0] - CLOISON, KITONOT_Y[1][1] + CLOISON
@@ -3852,21 +3853,22 @@ for nm, d in (("E", (1, 0)), ("N", (0, 1)), ("O", (-1, 0)), ("S", (0, -1))):
 # Les dix mekhonot (Melakhim I 7:27-39) : socles de bronze de 4 × 4 × 3 sur quatre roues
 # d'une ama et demie, panneaux à lions, bœufs et keruvim (ici : leurs cadres seulement),
 # et une cuve de quatre amot sur chacun. « חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף
-# הַבַּיִת מִשְּׂמֹאלוֹ » : sur l'épaule du bâtiment — la plateforme de 6 amot, à côté du corps.
+# הַבַּיִת מִשְּׂמֹאלוֹ » : sur l'épaule du bâtiment, à côté du corps, sur le sol de l'Azara —
+# l'אֹטֶם de 6 amot ne déborde pas le corps (Middot 4:7).
 MEKHONA = [(1.4, 0.0), (1.9, 0.25), (2.0, 0.9), (1.85, 1.35), (1.7, 1.35), (1.75, 0.9), (1.55, 0.35), (0.0, 0.2)]
 for cote, y in (("S", -42.5), ("N", 42.5)):
     for k, x in enumerate((-105, -120, -135, -150, -165)):
         nom = f"Mekhona_{cote}{k}"
-        box(f"{nom}_corps", x - 2, x + 2, y - 2, y + 2, Z_BAT + 0.9, Z_BAT + 3.6, "30_Mizbeach", MAT_BRONZE())
+        box(f"{nom}_corps", x - 2, x + 2, y - 2, y + 2, Z_AZ + 0.9, Z_AZ + 3.6, "30_Mizbeach", MAT_BRONZE())
         for face, (xa, xb, ya, yb) in (("E", (x + 2, x + 2.12, y - 1.8, y + 1.8)), ("O", (x - 2.12, x - 2, y - 1.8, y + 1.8)),
                                         ("N", (x - 1.8, x + 1.8, y + 2, y + 2.12)), ("S", (x - 1.8, x + 1.8, y - 2.12, y - 2))):
-            box(f"{nom}_cadre_{face}_bas", xa, xb, ya, yb, Z_BAT + 1.2, Z_BAT + 1.4, "30_Mizbeach", MAT_BRONZE())
-            box(f"{nom}_cadre_{face}_haut", xa, xb, ya, yb, Z_BAT + 3.1, Z_BAT + 3.3, "30_Mizbeach", MAT_BRONZE())
+            box(f"{nom}_cadre_{face}_bas", xa, xb, ya, yb, Z_AZ + 1.2, Z_AZ + 1.4, "30_Mizbeach", MAT_BRONZE())
+            box(f"{nom}_cadre_{face}_haut", xa, xb, ya, yb, Z_AZ + 3.1, Z_AZ + 3.3, "30_Mizbeach", MAT_BRONZE())
         for j, (rx, ry) in enumerate(((-1.3, -2.2), (1.3, -2.2), (-1.3, 2.2), (1.3, 2.2))):
-            tore(f"{nom}_roue_{j}", x + rx, y + ry, Z_BAT + 0.75, 0.62, 0.13, "30_Mizbeach", MAT_BRONZE(), rotation=(math.pi / 2, 0, 0))
-        cyl(f"{nom}_col", x, y, Z_BAT + 3.6, Z_BAT + 4.1, 1.2, "30_Mizbeach", MAT_BRONZE(), verts=24)
-        revolution(f"{nom}_kiyor", x, y, Z_BAT + 4.1, MEKHONA, "30_Mizbeach", MAT_BRONZE(), verts=32)
-        cyl(f"{nom}_eau", x, y, Z_BAT + 5.25, Z_BAT + 5.3, 1.7, "30_Mizbeach", MAT_EAU(), verts=32)
+            tore(f"{nom}_roue_{j}", x + rx, y + ry, Z_AZ + 0.75, 0.62, 0.13, "30_Mizbeach", MAT_BRONZE(), rotation=(math.pi / 2, 0, 0))
+        cyl(f"{nom}_col", x, y, Z_AZ + 3.6, Z_AZ + 4.1, 1.2, "30_Mizbeach", MAT_BRONZE(), verts=24)
+        revolution(f"{nom}_kiyor", x, y, Z_AZ + 4.1, MEKHONA, "30_Mizbeach", MAT_BRONZE(), verts=32)
+        cyl(f"{nom}_eau", x, y, Z_AZ + 5.25, Z_AZ + 5.3, 1.7, "30_Mizbeach", MAT_EAU(), verts=32)
 # Beit HaMitba'haïm au nord : 8 piliers, 8 tables de marbre, 24 anneaux. Les
 # ninnasin portent « רְבִיעִית שֶׁל אֶרֶז עַל גַּבֵּיהֶן וְאֻנְקְלָיוֹת שֶׁל בַּרְזֶל הָיוּ קְבוּעִין בָּהֶן,
 # שְׁלֹשָׁה סְדָרִים » (Middot 3:5) : trois rangs de crochets de fer, sur les deux faces qui
