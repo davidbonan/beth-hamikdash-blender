@@ -2,13 +2,13 @@
   "batiment": {
     "he": "בית",
     "translit": "Beit",
-    "resume": "Le Bâtiment proprement dit — Oulam, Heikhal et Kodesh HaKodashim sous un même toit. Vu de face, depuis l'est, c'est un bloc carré de 100 amot de large et de 100 de haut, soit environ 48 mètres sur 48. Mais le corps qui se tient derrière le vestibule n'a que 70 amot de large : « étroit derrière et large devant, comme un lion ». L'Oulam déborde donc de 15 amot de chaque côté, et ces deux débords s'appellent les épaules. L'extérieur n'est pas doré : c'est la pierre elle-même, marbre blanc, bleu-vert et jaune en assises alternées, une en débord une en retrait.",
+    "resume": "Le Bâtiment proprement dit — Oulam, Heikhal et Kodesh HaKodashim sous un même toit. Vu de face, depuis l'est, c'est un bloc carré de 100 amot de large et de 100 de haut, soit environ 48 mètres sur 48. Mais le corps qui se tient derrière le vestibule n'a que 70 amot de large : « étroit derrière et large devant, comme un lion ». L'Oulam déborde donc de 15 amot de chaque côté, et ces deux débords s'appelaient Beit HaHalifot : on y rangeait les couteaux. L'extérieur n'est pas doré : c'est la pierre elle-même, marbre blanc, vert et bleu en assises alternées, une en débord une en retrait.",
     "cotes": [
       "façade 100 amot de large × 100 de haut (≈ 48 × 48 m)",
       "corps arrière 70 amot de large",
       "l'Oulam déborde de 15 amot de chaque côté",
       "longueur totale est-ouest 100 amot : mur de l'Oulam 5, Oulam 11, mur du Heikhal 6, Heikhal 40, Amah Traksin 1, Kodesh HaKodashim 20, mur 6, cellule 6, mur 5",
-      "élévation : fondation 6, hauteur intérieure 40, plafond et décor ~5, étage supérieur 40, toit et parapet ~5, kaleh orev 1 — total 100"
+      "élévation : fondation 6, hauteur intérieure 40, plafond et décor ~5, étage supérieur 40, toit 5, maake 3, kaleh orev 1 — total 100"
     ],
     "sources": [
       {
@@ -52,17 +52,17 @@
         "citation": "אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת"
       }
     ],
-    "note": "Arbitrage du projet : la façade n'est PAS plaquée d'or. Hérode voulut la dorer, on lui conseilla de laisser la pierre visible car « cela ressemble aux vagues de la mer » (Baba Batra 4a ; Soucca 51b). L'or reste où les sources le mettent : à l'intérieur du Bayit, sur les portes du Heikhal, sur le mur du fond de l'Oulam, sur la vigne et sur la couronne d'Hélène. L'appareil : des blocs de dix et de huit amot, « אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת » (Melakhim I 7:10), aux faces sciées lisses dedans et dehors (7:9)."
+    "note": "Arbitrage du projet : la façade n'est PAS plaquée d'or. Hérode voulut la dorer, on lui conseilla de laisser la pierre visible car « cela ressemble aux vagues de la mer » (Baba Batra 4a ; Soucca 51b). L'or reste où les sources le mettent : à l'intérieur du Bayit, sur les portes du Heikhal, sur le mur du fond de l'Oulam, sur la vigne et sur la nivreshet d'Hélène. L'appareil : des blocs de dix et de huit amot, « אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת » (Melakhim I 7:10), aux faces sciées lisses dedans et dehors (7:9)."
   },
   "oulam": {
     "he": "אולם",
     "translit": "Oulam",
-    "resume": "Le vestibule, la première pièce du Bâtiment quand on vient de la cour. Il est très large et peu profond : 11 amot seulement d'est en ouest, mais 100 amot du nord au sud, puisqu'il déborde le corps du Temple de 15 amot de chaque côté. Sa façade est bandée, pas plate : des rovadim, des saillies horizontales en débord, la ceignent du bas jusqu'en haut, une ama de mur nu puis trois amot de saillie, la dernière saillie faisant quatre amot. Aucune colonne, aucun pilastre, aucun fronton : toute l'articulation donnée par les sources est horizontale.",
+    "resume": "Le vestibule, la première pièce du Bâtiment quand on vient de la cour. Il est très large et peu profond : 11 amot seulement d'est en ouest, mais 90 du nord au sud entre ses murs (100 hors œuvre), puisqu'il déborde le corps du Temple de 15 amot de chaque côté. Sa façade est bandée, pas plate : des rovadim, des saillies horizontales en débord, la ceignent du bas jusqu'en haut, une ama de mur nu puis un bandeau en saillie haut de trois amot, le dernier haut de quatre. Aucune colonne, aucun pilastre, aucun fronton : toute l'articulation donnée par les sources est horizontale.",
     "cotes": [
       "11 amot de profondeur (est-ouest) × 100 de large",
       "mur de l'Oulam 5 amot",
-      "débord de 15 amot de chaque côté (les épaules)",
-      "rovadim : 1 ama de nu, 3 amot de saillie, le rovad supérieur 4 amot"
+      "débord de 15 amot de chaque côté (Beit HaHalifot)",
+      "rovadim : 1 ama de nu, bandeau de 3 amot de haut, le rovad supérieur 4 amot"
     ],
     "sources": [
       {
@@ -78,7 +78,7 @@
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "4:9",
-        "citation": "וְכֵן סָבִיב לְכָתְלֵי הָאוּלָם מִלְּמַטָּה עַד לְמַעְלָה… אַמָּה אַחַת חָלָק וְרֹבֶד שָׁלֹשׁ אַמּוֹת… וְרֹבֶד הָעֶלְיוֹן רָחְבּוֹ אַרְבַּע"
+        "citation": "וְכֵן סָבִיב לְכָתְלֵי הָאוּלָם מִלְּמַטָּה עַד לְמַעְלָה… אַמָּה אַחַת חָלָק וְרֹבֶד שָׁלֹשׁ אַמּוֹת… וְרֹבֶד הָעֶלְיוֹן הָיָה רָחְבּוֹ אַרְבַּע"
       },
       {
         "oeuvre": "Baba Batra",
@@ -91,11 +91,11 @@
   "douze_marches_oulam": {
     "he": "",
     "translit": "",
-    "resume": "Entre le sol de l'Azara et le seuil de l'Oulam, douze marches. Chacune monte d'une demi-ama et offre une ama de giron, si bien qu'elles occupent douze des vingt-deux amot qui séparent l'autel de l'Oulam ; le reste est du plat. C'est là que les cohanim montent se tenir pour bénir le peuple — sur les marches, pas dans la cour.",
+    "resume": "Entre le sol de l'Azara et le seuil de l'Oulam, douze marches. Chacune monte d'une demi-ama ; le giron fait une ama, mais Middot 3:6 intercale des paliers de trois amot et en donne quatre à la dernière, si bien qu'elles occupent dix-neuf des vingt-deux amot qui séparent l'autel de l'Oulam ; le reste est du plat. C'est là que les cohanim montent se tenir pour bénir le peuple — sur les marches, pas dans la cour.",
     "cotes": [
       "douze marches",
-      "chaque marche : ½ ama de haut, 1 ama de giron",
-      "elles occupent 12 des 22 amot entre l'Oulam et le Mizbea'h"
+      "chaque marche : ½ ama de haut, 1 ama de giron, sauf trois paliers de 3, 3 et 4 amot",
+      "elles occupent 19 des 22 amot entre l'Oulam et le Mizbea'h"
     ],
     "sources": [
       {
@@ -136,7 +136,7 @@
         "citation": "tous les murs qui étaient là étaient hauts, sauf le mur oriental, car le cohen qui brûle la para se tient au sommet du mont des Oliviers, vise, et voit l'ouverture du Heikhal au moment de l'aspersion du sang"
       }
     ],
-    "note": "Contrainte de mise en scène : cet axe est-ouest doit rester dégagé — ni colonne de portique, ni foule en travers. Aucune porte fermée sur cet axe à l'heure du service."
+    "note": "Cet axe est-ouest reste dégagé — ni colonne de portique, ni foule en travers. Aucune porte fermée sur cet axe à l'heure du service."
   },
   "gefen_zahav": {
     "he": "גפן זהב",
@@ -154,12 +154,17 @@
   "couronne_helene": {
     "he": "נברשת",
     "translit": "Nivreshet",
-    "resume": "Une couronne d'or, la nivreshet, offerte par la reine Hélène et suspendue au-dessus de l'entrée du Heikhal. Elle reflétait le soleil levant.",
+    "resume": "Une lampe d'or, la nivreshet, offerte par la reine Hélène et suspendue au-dessus de l'entrée du Heikhal. Elle reflétait le soleil levant.",
     "cotes": [],
     "sources": [
       {
         "oeuvre": "Yoma",
         "ref": "3:10",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "37b",
         "citation": ""
       }
     ]
@@ -191,8 +196,8 @@
     ],
     "sources": [
       {
-        "oeuvre": "Middot",
-        "ref": "3:8",
+        "oeuvre": "Mena'hot",
+        "ref": "11:7",
         "citation": ""
       },
       {
@@ -205,7 +210,7 @@
   "heikhal": {
     "he": "היכל",
     "translit": "Heikhal",
-    "resume": "Le Saint : une salle de 40 amot d'est en ouest, 20 du nord au sud, et 40 de haut — environ 19 mètres sur 9,6, sous 19 mètres de plafond. C'est haut et étroit, presque une nef. Murs et plafond sont plaqués d'or, le plafond de cèdre à caissons, le sol de pierre. La lumière vient de fenêtres hautes, étroites à l'intérieur et larges à l'extérieur, dont on dit qu'elles émettaient la lumière plutôt qu'elles ne la recevaient. Le Cohen Gadol y marche vers l'ouest, la Table à sa droite au nord, la Menora à sa gauche au sud.",
+    "resume": "Le Saint : une salle de 40 amot d'est en ouest, 20 du nord au sud, et 40 de haut — environ 19 mètres sur 9,6, sous 19 mètres de plafond. C'est haut et étroit, presque une nef. Murs et plafond sont plaqués d'or, le plafond de cèdre à caissons, le sol plaqué d'or. La lumière vient de fenêtres hautes, étroites à l'intérieur et larges à l'extérieur, dont on dit qu'elles émettaient la lumière plutôt qu'elles ne la recevaient. Le Cohen Gadol y marche vers l'ouest, la Table à sa droite au nord, la Menora à sa gauche au sud.",
     "cotes": [
       "intérieur 40 amot (est-ouest) × 20 (nord-sud) × 40 de haut (≈ 19 × 9,6 × 19 m)",
       "mur du Heikhal 6 amot"
@@ -224,14 +229,14 @@
       {
         "oeuvre": "Mena'hot",
         "ref": "86b",
-        "citation": "émettant la lumière plutôt que la recevant"
+        "citation": "transparentes au-dedans, bouchées au-dehors : je n'ai pas besoin de lumière"
       }
     ]
   },
   "portes_heikhal": {
     "he": "דלתות ההיכל",
     "translit": "Daltot HaHeikhal",
-    "resume": "L'entrée du Heikhal mesure 20 amot de haut sur 10 de large et compte quatre portes : deux extérieures et deux intérieures, plaquées d'or. Devant l'entrée, plusieurs sources placent en outre un rideau, une parokhet extérieure. Pendant l'avoda elles sont ouvertes, les battants rabattus dans l'épaisseur de l'embrasure, contre les jambages.",
+    "resume": "L'entrée du Heikhal mesure 20 amot de haut sur 10 de large et compte quatre portes : deux extérieures et deux intérieures, plaquées d'or. Devant l'entrée, plusieurs sources placent en outre un rideau, une parokhet extérieure. Pendant l'avoda elles sont ouvertes, les battants extérieurs rabattus dans l'épaisseur de l'embrasure, les intérieurs dans le Heikhal, contre le mur.",
     "cotes": [
       "entrée 20 amot de haut × 10 de large",
       "quatre portes (deux extérieures, deux intérieures)",
@@ -244,12 +249,12 @@
         "citation": ""
       }
     ],
-    "note": "Choix de mise en scène : les portes sont modélisées ouvertes (`PORTES_HEIKHAL_OUVERTES = True`), battants rabattus dans l'embrasure. Fermées, elles bouchent les plans 8, 9 et 13. Règle du film : aucune porte fermée sur l'axe est-ouest à l'heure du service, ni Nikanor ni celles-ci."
+    "note": "Les portes sont modélisées ouvertes (`PORTES_HEIKHAL_OUVERTES = True`), battants extérieurs rabattus dans l'embrasure, intérieurs dans le Heikhal, à plat contre le mur est (Middot 4:1). Aucune porte fermée sur l'axe est-ouest à l'heure du service, ni Nikanor ni celles-ci."
   },
   "taim": {
     "he": "תאים",
     "translit": "Ta'im",
-    "resume": "Trente-huit cellules réparties sur trois étages ceignent le Heikhal et le Kodesh HaKodashim : quinze au nord, quinze au sud, huit à l'ouest, reliées entre elles par des ouvertures. À l'angle nord-est, un escalier en spirale, la mesiba, monte vers le toit ; au sud-ouest, le Beit Horadat HaMayim évacue les eaux. L'étage supérieur, au-dessus du Heikhal, est vide : il a des trappes par lesquelles on descendait les ouvriers en cages fermées quand il fallait réparer le Kodesh HaKodashim.",
+    "resume": "Trente-huit cellules réparties sur trois étages ceignent le Heikhal et le Kodesh HaKodashim : quinze au nord, quinze au sud, huit à l'ouest, reliées entre elles par des ouvertures. À l'angle nord-est, une rampe tournante, la messiba, monte vers l'étage et les toits des cellules ; au sud, le Beit Horadat HaMayim évacue les eaux. L'étage supérieur, au-dessus du Heikhal, est vide : il a des trappes par lesquelles on descendait les ouvriers en cages fermées quand il fallait réparer le Kodesh HaKodashim.",
     "cotes": [
       "38 cellules : 15 au nord, 15 au sud, 8 à l'ouest",
       "nord et sud : cinq sur cinq, et cinq au-dessus ; ouest : trois sur trois, et deux au-dessus",
@@ -336,7 +341,7 @@
       },
       {
         "oeuvre": "Rambam",
-        "ref": "Beit HaBe'hira 4:2",
+        "ref": "Beit HaBe'hira 4:3",
         "citation": "וַעֲלִיָּה בְּנוּיָה עַל גַּבָּיו גֹּבַהּ כְּתָלֶיהָ אַרְבָּעִים אַמָּה"
       },
       {
@@ -355,7 +360,7 @@
   "kaleh_orev": {
     "he": "כָּלֵה עוֹרֵב",
     "translit": "Kaleh Orev",
-    "resume": "Le tout dernier mètre du bâtiment : une ama de fer au faîte, pour empêcher les oiseaux de s'y poser. Le Rambam le décrit sur place — un cerclage de fer d'une ama qui entoure le Heikhal au-dessus du garde-corps sur ses quatre côtés, affilé comme une épée, si bien qu'aucun oiseau ne s'y pose, ses pattes y étant coupées. Une lame continue, donc, et non une rangée de pointes. Les cent amot de haut ne sont pas cent amot de mur : la maçonnerie s'arrête à 96, et les quatre dernières amot sont le garde-corps, pour trois, et ce dispositif anti-corbeaux, pour une.",
+    "resume": "Le tout dernier demi-mètre du bâtiment : une ama de fer au faîte, pour empêcher les oiseaux de s'y poser. Le Rambam le décrit sur place — un cerclage de fer d'une ama qui entoure le Heikhal au-dessus du garde-corps sur ses quatre côtés, affilé comme une épée, si bien qu'aucun oiseau ne s'y pose, ses pattes y étant coupées. Une lame continue, donc, et non une rangée de pointes. Les cent amot de haut ne sont pas cent amot de mur : la maçonnerie s'arrête à 96, et les quatre dernières amot sont le garde-corps, pour trois, et ce dispositif anti-corbeaux, pour une.",
     "cotes": [
       "1 ama",
       "le mur s'arrête à 96 amot ; les 4 dernières sont le maake (3) et le kaleh orev (1)"
@@ -372,7 +377,7 @@
         "citation": "בְּחֶשֶׁק שֶׁל בַּרְזֶל גֹּבַהּ אַמָּה חַד כְּמוֹ הַסַּיִף"
       }
     ],
-    "note": "Divergence : R. Yehouda (Middot 4:6) ne compte pas le kaleh orev et donne 4 amot au maake. Le film suit le tana kama."
+    "note": "Divergence : R. Yehouda (Middot 4:6) ne compte pas le kaleh orev et donne 4 amot au maake. La visite suit le tana kama."
   },
   "maake": {
     "he": "מַעֲקֶה",
@@ -389,7 +394,7 @@
         "citation": ""
       }
     ],
-    "note": "Divergence : R. Yehouda (Middot 4:6) donne 4 amot au maake et ne compte pas le kaleh orev. Le film suit le tana kama — 3 amot de maake, 1 de kaleh orev."
+    "note": "Divergence : R. Yehouda (Middot 4:6) donne 4 amot au maake et ne compte pas le kaleh orev. La visite suit le tana kama — 3 amot de maake, 1 de kaleh orev."
   },
   "menora": {
     "he": "מנורה",
@@ -419,7 +424,7 @@
         "citation": ""
       }
     ],
-    "note": "Arbitrage tranché : les branches sont DROITES, en diagonale (Rambam, Rashi), contre les branches courbes des représentations traditionnelles et de l'Arc de Titus. Le blockout ne résout pas la Menora — mesurée au plan 9a, elle tient sous 0,1 % du cadre —, donc ce choix vit dans les prompts et non dans la géométrie. Interdit à l'image : neuf branches (c'est une 'hanoukia), six ou huit."
+    "note": "Les branches sont DROITES, en diagonale (Rambam, Rashi), contre les branches courbes des représentations traditionnelles et de l'Arc de Titus. Jamais neuf branches (c'est une 'hanoukia), six ou huit."
   },
   "shulchan": {
     "he": "שולחן",
@@ -429,7 +434,7 @@
       "2 amot de long × 1 de large × 1,5 de haut",
       "à 2,5 amot du mur nord",
       "12 pains en deux piles de 6",
-      "pain de 5 × 6 tefa'him, 7 etzbaot de haut",
+      "pain de 10 × 5 tefa'him, relevé de 2 tefa'him de chaque côté de la Table, 7 etzbaot de haut",
       "piles séparées de 2 tefa'him, soit ≈ 2 amot de pile au-dessus de la Table",
       "28 tubes d'or (kanim), quatre montants (snifim) ≈ 3,6 amot",
       "deux coupes d'encens (bazikhin)"
@@ -480,7 +485,7 @@
   "mizbeach_hazahav": {
     "he": "מזבח הזהב",
     "translit": "Mizbea'h HaZahav",
-    "resume": "L'autel de l'encens, au centre du Heikhal entre la Table et la Menora, légèrement décalé vers l'est. Une ama sur une ama, deux amot de haut, en acacia plaqué d'or, avec quatre cornes et une bordure. À Yom Kippour, l'encens n'y est pas brûlé : il l'est dans le Kodesh HaKodashim. Ce jour-là, cet autel reçoit les aspersions de sang.",
+    "resume": "L'autel de l'encens, au centre du Heikhal entre la Table et la Menora, légèrement décalé vers l'est. Une ama sur une ama, deux amot de haut, en acacia plaqué d'or, avec quatre cornes et une bordure. À Yom Kippour, l'encens du matin et du soir y est brûlé comme chaque jour ; l'encens propre au jour, lui, l'est dans le Kodesh HaKodashim. Ce jour-là, cet autel reçoit les aspersions de sang.",
     "cotes": [
       "1 × 1 ama × 2 de haut"
     ],
@@ -506,7 +511,7 @@
         "citation": ""
       }
     ],
-    "note": "Divergence : Kelim 17:10 mesure cet autel en ama de 5 tefa'him — R. Meir et R. Yehouda d'accord (Mena'hot 97a) —, soit 0,83 × 0,83 × 1,67. Le film garde l'ama de 6. Interdit à l'image : du feu sur l'autel d'or à Kippour ; le feu est sur le grand autel extérieur."
+    "note": "Divergence : Kelim 17:10 mesure cet autel en ama de 5 tefa'him — R. Meir et R. Yehouda d'accord (Mena'hot 97a) —, soit 0,83 × 0,83 × 1,67. La visite garde l'ama de 6. L'autel d'or ne porte pas de flamme mais des braises apportées du grand autel extérieur, étalées pour l'encens (Tamid 6:2) — à Kippour comme chaque jour."
   },
   "parokhet": {
     "he": "פרוכת",
@@ -542,7 +547,7 @@
         "citation": ""
       },
       {
-        "oeuvre": "Yoma",
+        "oeuvre": "Rashi sur Yoma",
         "ref": "72b",
         "citation": "un aigle d'un côté, un lion de l'autre"
       },
@@ -562,12 +567,12 @@
         "citation": ""
       }
     ],
-    "note": "Deux parokhot parce que le doute sur l'appartenance de l'ama n'a pas été tranché : on couvre les deux lectures. Mise en scène : l'espace d'une ama, 48 cm, ne peut contenir aucune caméra sans rendre un aplat de tissu — l'entrée se filme depuis le Heikhal côté sud (plan 10), la sortie depuis le Kodesh HaKodashim côté nord (plan 12), en silhouette. Ligne du film : étoffe lourde et plate, sans plis de drapé, les quatre couleurs en champs larges, frise de créatures ailées et de lions tissée dans les laines, jamais en or, sans visage humain."
+    "note": "Deux parokhot parce que le doute sur l'appartenance de l'ama n'a pas été tranché : on couvre les deux lectures. Étoffe lourde et plate, sans plis de drapé, les quatre couleurs en champs larges, frise de créatures ailées et de lions tissée dans les laines, jamais en or, sans visage humain."
   },
   "kodesh_hakodashim": {
     "he": "קודש הקודשים",
     "translit": "Kodesh HaKodashim",
-    "resume": "Le Saint des Saints : un cube de 20 amot sur 20, sous 40 amot de haut, soit environ 9,6 mètres sur 9,6 et 19 de haut. Aucune lumière n'y entre ; le Cohen Gadol s'y éclaire à la braise de sa pelle. Au centre se dresse l'Even HaShetiya, et dessus l'Arche. Il pose la pelle à braises entre les deux barres de l'Arche et se tient là pour les aspersions. Une seule personne y entre, un seul jour de l'année, une seule heure : le Cohen Gadol, à Kippour, à l'heure du service.",
+    "resume": "Le Saint des Saints : une salle de 20 amot sur 20, sous 40 amot de haut, soit environ 9,6 mètres sur 9,6 et 19 de haut. Aucune lumière n'y entre ; le Cohen Gadol s'y éclaire à la braise de sa pelle. Au centre se dresse l'Even HaShetiya, et dessus l'Arche. Il pose la pelle à braises entre les deux barres de l'Arche et se tient là pour les aspersions. Une seule personne y entre pour le service, un seul jour de l'année : le Cohen Gadol, à Kippour.",
     "cotes": [
       "20 × 20 amot × 40 de haut (≈ 9,6 × 9,6 × 19 m)"
     ],
@@ -598,7 +603,7 @@
         "citation": ""
       }
     ],
-    "note": "Mise en scène : rien d'autre que l'Arche dans cet espace. Obscurité, or pris dans la lueur de la braise, fumée ; ne jamais y placer de figure humaine détaillée. Les murs plaqués d'or sont la tradition ; le film retient « pierre nue + or sombre », plus sobre."
+    "note": "Rien d'autre que l'Arche dans cet espace : obscurité, or pris dans la lueur de la braise, fumée, aucune figure humaine détaillée. Murs, plafond et sol sont plaqués d'or comme au Heikhal ; dans le noir, cet or ne rend que sous la braise."
   },
   "even_hashetiya": {
     "he": "אבן השתייה",
@@ -614,8 +619,8 @@
         "citation": ""
       },
       {
-        "oeuvre": "Shekalim",
-        "ref": "6:1–2",
+        "oeuvre": "Yoma",
+        "ref": "54b",
         "citation": ""
       },
       {
@@ -624,7 +629,7 @@
         "citation": ""
       }
     ],
-    "note": "Deux arbitrages. Position : le Rambam (Beit HaBe'hira 4:1) place la pierre « à l'ouest » du Kodesh HaKodashim ; la fiche la garde au centre, Yoma 5:2 ne fixant rien. Et la pierre nue de Yoma 5:2 décrit l'état d'après l'enlèvement de l'Arche : cet état est écarté, puisque le film montre le Temple à venir, Arche revenue à sa place."
+    "note": "Deux arbitrages. Position : le Rambam (Beit HaBe'hira 4:1) place la pierre « à l'ouest » du Kodesh HaKodashim ; la fiche la garde au centre, Yoma 5:2 ne fixant rien. Et la pierre nue de Yoma 5:2 décrit l'état d'après l'enlèvement de l'Arche : cet état est écarté, puisque la visite montre le Temple à venir, Arche revenue à sa place."
   },
   "aron": {
     "he": "ארון הברית",
@@ -635,7 +640,7 @@
       "trois caisses emboîtées (or, bois, or)",
       "quatre anneaux d'or aux coins supérieurs, deux par flanc",
       "2,5 amot entre les deux badim",
-      "badim ≈ 11 amot (choix du film : ils courent jusqu'à la parokhet intérieure)"
+      "badim ≈ 11 amot (choix du modèle : ils courent jusqu'à la parokhet intérieure)"
     ],
     "sources": [
       {
@@ -689,12 +694,12 @@
         "citation": "arrivé à l'Arche, il pose la ma'hta entre les deux badim"
       }
     ],
-    "note": "CHOIX DU PROJET : le Temple filmé est celui À VENIR, où l'Arche cachée sous le Temple est revenue à sa place (Yoma 54a ; Rambam Beit HaBe'hira 4:1). Le film ne fabrique pas d'Arche neuve — Jérémie 3:16 dit « on n'en fera pas une autre » — : il montre celle de Moïse, enfouie par Yoshiyahou et révélée. Divergence à faire valider par un rav. La longueur des badim n'est chiffrée nulle part : les faire courir jusqu'à la parokhet intérieure est une ligne du film, c'est elle qui rend physiques « entre les badim » et les bosses du rideau ; l'alternative écartée est celle de badim courts et de bosses miraculeuses (Bava Batra 99a)."
+    "note": "CHOIX DU PROJET : le Temple représenté est celui À VENIR, où l'Arche cachée sous le Temple est revenue à sa place (Yoma 54a ; Rambam Beit HaBe'hira 4:1). La visite ne fabrique pas d'Arche neuve — Jérémie 3:16 dit « on n'en fera pas une autre » — : elle montre celle de Moïse, enfouie par Yoshiyahou et révélée. Divergence à faire valider par un rav. La longueur des badim n'est chiffrée nulle part : les faire courir jusqu'à la parokhet intérieure est un choix du modèle, c'est lui qui rend physiques « entre les badim » et les bosses du rideau ; l'alternative écartée est celle de badim courts et de bosses miraculeuses (Bava Batra 99a)."
   },
   "kaporet": {
     "he": "כפורת",
     "translit": "Kaporet",
-    "resume": "Le couvercle de l'Arche : une plaque d'or pur de 2,5 amot sur 1,5, épaisse d'un tefa'h — caisse et couvercle font ensemble dix tefa'him. À ses deux bouts, au nord et au sud, deux keruvim, martelés dans la masse même du couvercle : ils en sortent, sans pieds ni socle. Ils ont un visage d'enfant, haut d'un tefa'h au moins, et mesurent dix tefa'him. Ils se font face, inclinés vers le couvercle comme l'élève devant son maître, les ailes déployées au niveau des têtes et un peu au-dessus, sans toucher le corps, formant un dais sur la kaporet.",
+    "resume": "Le couvercle de l'Arche : une plaque d'or pur de 2,5 amot sur 1,5, épaisse d'un tefa'h — caisse et couvercle font ensemble dix tefa'him. À ses deux bouts, au nord et au sud, deux keruvim, martelés dans la masse même du couvercle : ils en sortent, sans pieds ni socle. Ils ont un visage d'enfant, haut d'un tefa'h au moins, et mesurent dix tefa'him. Ils se font face, inclinés vers le couvercle et tournés de biais, comme l'élève qui prend congé de son maître, les ailes déployées au niveau des têtes et un peu au-dessus, sans toucher le corps, formant un dais sur la kaporet.",
     "cotes": [
       "2,5 × 1,5 amot d'or pur, un tefa'h d'épaisseur",
       "caisse + kaporet = 10 tefa'him",
@@ -736,7 +741,7 @@
       {
         "oeuvre": "Bava Batra",
         "ref": "99a",
-        "citation": "comme l'élève devant son maître"
+        "citation": "comme l'élève qui prend congé de son maître"
       },
       {
         "oeuvre": "Yoma",
@@ -744,7 +749,7 @@
         "citation": "comme un homme et sa compagne"
       }
     ],
-    "note": "CHOIX DU PROJET (Temple à venir, Arche à sa place). Ligne du film pour les keruvim : un garçon et une fille enlacés, bras tendus jusqu'à se toucher, ailes jointes au centre — le film suit Soucca 5b et Rashi (visages d'enfants) et leur applique l'enlacement de Yoma 54a–b, que la guemara rapporte au Premier Temple ou aux dessins des murs. Divergences écartées : le Rashbam (Ex. 25:18) y voit de grands oiseaux ; les keruvim de Salomon (I Rois 6:23–28), deux figures debout de 10 amot aux ailes de 20, tiennent du Premier Temple et ne sont pas modélisés. Jamais d'ange drapé ni de putto bouclé : c'est l'iconographie chrétienne."
+    "note": "CHOIX DU PROJET (Temple à venir, Arche à sa place). Pour les keruvim : un garçon et une fille enlacés, bras tendus jusqu'à se toucher, ailes jointes au centre — la visite suit Soucca 5b et Rashi (visages d'enfants) et leur applique l'enlacement de Yoma 54a–b, que la guemara rapporte au Premier Temple ou aux dessins des murs. Divergences écartées : le Rashbam (Ex. 25:18) y voit de grands oiseaux ; les keruvim de Salomon (I Rois 6:23–28), deux figures debout de 10 amot aux ailes de 20, tiennent du Premier Temple et ne sont pas modélisés. Jamais d'ange drapé ni de putto bouclé : c'est l'iconographie chrétienne."
   },
   "contenu_aron": {
     "he": "",
@@ -783,6 +788,6 @@
         "citation": ""
       }
     ],
-    "note": "CHOIX DU PROJET (Temple à venir, Arche revenue à sa place). Écarté : la tablette portant le Sefer Torah (Bava Batra 14b, avis de R. Yehouda). Et l'Arche reste fermée à l'image, jamais ouverte, aucune table de la Loi visible."
+    "note": "CHOIX DU PROJET (Temple à venir, Arche revenue à sa place). Écarté : la tablette portant le Sefer Torah (Bava Batra 14b, avis de R. Yehouda). Et l'Arche reste fermée, jamais ouverte, aucune table de la Loi visible."
   }
 }

@@ -42,7 +42,7 @@ Un dossier par étape du pipeline, et **rien à la racine de `renders/`** :
 | Dossier | Écrit par | Contenu |
 |---|---|---|
 | `renders/blockout/` | `beit_hamikdash_export.py` | couleur + profondeur 1920 × 1080, entrées de l'i2i |
-| `renders/planche/` | `beit_hamikdash_export.py -- --planche` | contrôle 640 × 360 + `planche.html` |
+| `renders/planche/` | `beit_hamikdash_export.py -- --planche` | contrôle 640 × 360 + `planche.html` + `planche.jpg` (mosaïque du README, versionnée) |
 | `renders/style/` | `fal_image.py` | images clés stylisées |
 | `renders/video/` | `fal_video.py` | mp4 |
 

@@ -51,15 +51,23 @@ CHANFREIN = ("30_Mizbeach", "40_Ulam", "50_Heikhal", "60_KodeshHakodashim",
 # six degrés de tangage suffisent à poser le toit du Heikhal sous le bord haut, ce que
 # l'horizontale, qui remplit la moitié basse de dallage, ne fait pas.
 REPERES = [
-    ("har_habayit",       "Har HaBayit, sur l'axe est",   250.0,   0.0, -16.0, 180, 0),
+    ("har_habayit",       "Har HaBayit, sur l'axe est",   185.0,   0.0, -16.0, 180, 0),
     ("ezrat_nashim",      "Ezrat Nashim",                 137.0,   0.0, -10.0, 180, 6),
     ("quinze_marches",    "Pied des quinze marches",       26.0,   0.0, -10.0, 180, 0),
     ("azara",             "Ezrat Israël",                 -14.0,   0.0,   0.0, 180, 0),
     ("mizbeach",          "Devant le Mizbea'h",           -17.0,  -9.0,   0.0, 180, 0),
-    ("kiyor",             "Au Kiyor",                     -55.0,  -8.0,   0.0, 180, 0),
+    ("kiyor",             "Au Kiyor",                     -55.0, -14.0,   0.0, 180, 0),
     ("oulam",             "Sous l'Oulam",                 -86.0,   0.0,   6.0, 180, 0),
     ("heikhal",           "Dans le Heikhal",             -112.0,   0.0,   6.0, 180, 0),
     ("kodesh_hakodashim", "Kodesh HaKodashim",           -143.0,   0.0,   6.0, 180, 0),
+]
+
+# Les creux sous l'Azara restent hors de « Aller à… » : le vol libre doit les trouver. Sans
+# ces points, « Un élément… » reculerait devant leur emprise enterrée et regarderait dehors.
+SOUTERRAINS = [
+    ("mesiba_bira",    -18.25,  70.0, -15.5, 270, 0),
+    ("beit_hatevila", -162.0,   38.0, -12.0, 146, 0),
+    ("shit",           -48.0,  -19.0,  -9.0, 225, 10),
 ]
 
 
@@ -239,6 +247,8 @@ def main():
         "entrees": [{"id": i, "nom": n, "position": [x * AMA, z * AMA, -y * AMA],
                      "cap": cap, "tangage": tangage}
                     for i, n, x, y, z, cap, tangage in REPERES],
+        "souterrains": [{"id": i, "position": [x * AMA, z * AMA, -y * AMA], "cap": cap, "tangage": tangage}
+                        for i, x, y, z, cap, tangage in SOUTERRAINS],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))

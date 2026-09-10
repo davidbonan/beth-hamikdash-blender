@@ -1,6 +1,6 @@
 """Exporte la première et la dernière image de chaque plan : planche, ou production.
 
-    # planche de contrôle, 640 x 360 + index HTML
+    # planche de contrôle, 640 x 360 + index HTML + mosaïque JPEG
     /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend \
         -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
         -P beit_hamikdash_export.py -- --planche
@@ -46,6 +46,8 @@ SOUS_DOSSIER_BLOCKOUT = "blockout"   # rendus Blender 1920 x 1080 qui nourrissen
 SOUS_DOSSIER_PLANCHE = "planche"     # planche de contrôle 640 x 360
 LARGEUR, HAUTEUR = 1920, 1080
 LARGEUR_PLANCHE, HAUTEUR_PLANCHE = 640, 360
+ECART_MOSAIQUE = 8
+FOND_MOSAIQUE = (0x1b / 255, 0x1b / 255, 0x1b / 255, 1.0)
 MARGE = 0.02             # 2 % de part et d'autre : évite de saturer les extrêmes
 
 GROUPE_COULEUR = "Comp_Couleur"
@@ -259,6 +261,38 @@ def ecrire_index(dossier, plans):
     return chemin
 
 
+def lire_pixels(chemin):
+    image = bpy.data.images.load(chemin)
+    largeur, hauteur = image.size
+    pixels = np.empty(largeur * hauteur * 4, dtype=np.float32)
+    image.pixels.foreach_get(pixels)
+    bpy.data.images.remove(image)
+    return np.flipud(pixels.reshape(hauteur, largeur, 4))
+
+
+def ecrire_mosaique(dossier, plans):
+    pas_x, pas_y = LARGEUR_PLANCHE + ECART_MOSAIQUE, HAUTEUR_PLANCHE + ECART_MOSAIQUE
+    largeur, hauteur = 2 * pas_x + ECART_MOSAIQUE, len(plans) * pas_y + ECART_MOSAIQUE
+    toile = np.empty((hauteur, largeur, 4), dtype=np.float32)
+    toile[:] = FOND_MOSAIQUE
+    for rang, nom in enumerate(plans):
+        y = ECART_MOSAIQUE + rang * pas_y
+        for colonne, etiquette in enumerate(("debut", "fin")):
+            vignette = os.path.join(dossier, f"{nom}_{etiquette}.png")
+            if not os.path.exists(vignette):
+                continue
+            x = ECART_MOSAIQUE + colonne * pas_x
+            toile[y:y + HAUTEUR_PLANCHE, x:x + LARGEUR_PLANCHE] = lire_pixels(vignette)
+    chemin = os.path.join(dossier, "planche.jpg")
+    image = bpy.data.images.new("planche_mosaique", largeur, hauteur)
+    image.pixels.foreach_set(np.flipud(toile).ravel())
+    image.filepath_raw = chemin
+    image.file_format = "JPEG"
+    image.save(quality=85)
+    bpy.data.images.remove(image)
+    return chemin
+
+
 def ligne_de_plan(nom):
     cam = bpy.data.objects[nom]
     return {"nom": nom, "focale": cam.data.lens,
@@ -267,11 +301,11 @@ def ligne_de_plan(nom):
 
 
 def exporter_planche(scene, dossier, noms):
-    """Couleur seule, en 640 x 360, plus l'index HTML qui les met côte à côte.
+    """Couleur seule, en 640 x 360, plus l'index HTML et la mosaïque JPEG du README.
 
-    L'index liste toujours tous les plans de la scène, même quand on n'en re-rend
-    qu'un : une planche amputée de ses autres lignes n'est plus une planche de
-    contrôle.
+    L'index et la mosaïque listent toujours tous les plans de la scène, même quand
+    on n'en re-rend qu'un : une planche amputée de ses autres lignes n'est plus une
+    planche de contrôle.
     """
     os.makedirs(dossier, exist_ok=True)
     preparer_sortie(scene, LARGEUR_PLANCHE, HAUTEUR_PLANCHE)
@@ -285,8 +319,10 @@ def exporter_planche(scene, dossier, noms):
             rendre(scene, couleur, transformation,
                    os.path.join(dossier, f"{nom}_{etiquette}.png"))
         print(f"{nom} : planche rendue", flush=True)
-    index = ecrire_index(dossier, [ligne_de_plan(n) for n in cameras_de_la_scene(scene)])
+    plans = cameras_de_la_scene(scene)
+    index = ecrire_index(dossier, [ligne_de_plan(n) for n in plans])
     print(f"index : {index}", flush=True)
+    print(f"mosaïque : {ecrire_mosaique(dossier, plans)}", flush=True)
 
 
 def exporter_production(scene, dossier, noms):

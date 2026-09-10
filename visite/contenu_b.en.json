@@ -1,0 +1,786 @@
+{
+  "batiment": {
+    "nom": "The Beit (the Building)",
+    "translit": "Beit",
+    "resume": "The Building itself — Ulam, Heikhal and Kodesh HaKodashim under one roof. Seen from the front, from the east, it is a square block 100 amot wide and 100 high, roughly 48 by 48 meters. But the body that stands behind the vestibule is only 70 amot wide: “narrow behind and wide in front, like a lion.” The Ulam therefore overhangs by 15 amot on each side, and these two overhangs were called Beit HaChalifot: the knives were stored there. The exterior is not gilded: it is the stone itself, white, green and blue marble in alternating courses, one projecting, one recessed.",
+    "cotes": [
+      "façade 100 amot wide × 100 high (≈ 48 × 48 m)",
+      "rear body 70 amot wide",
+      "the Ulam overhangs by 15 amot on each side",
+      "total east-west length 100 amot: wall of the Ulam 5, Ulam 11, wall of the Heikhal 6, Heikhal 40, Amah Traksin 1, Kodesh HaKodashim 20, wall 6, cell 6, wall 5",
+      "elevation: foundation 6, interior height 40, ceiling and decoration ~5, upper floor 40, roof 5, Ma'ake 3, Kaleh Orev 1 — total 100"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:1–7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:7",
+        "citation": "narrow behind and wide in front, like a lion"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:6",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:1",
+        "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "51b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Baba Batra",
+        "ref": "4a",
+        "citation": "אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה"
+      },
+      {
+        "oeuvre": "Melakhim I",
+        "ref": "7:9-10",
+        "citation": "אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת"
+      }
+    ],
+    "note": "Project decision: the façade is NOT gold-plated. Herod wanted to gild it, but was advised to leave the stone visible because “it resembles the waves of the sea” (Bava Batra 4a; Sukkah 51b). The gold stays where the sources put it: inside the Bayit, on the doors of the Heikhal, on the back wall of the Ulam, on the vine and on Helena's nivreshet. The masonry: blocks of ten and eight amot, “אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת” (I Kings 7:10), their faces sawn smooth inside and out (7:9)."
+  },
+  "oulam": {
+    "nom": "Ulam",
+    "translit": "Ulam",
+    "resume": "The vestibule, the first room of the Building as one comes from the courtyard. It is very wide and shallow: only 11 amot from east to west, but 90 from north to south between its walls (100 overall), since it overhangs the body of the Temple by 15 amot on each side. Its façade is banded, not flat: rovadim, horizontal projecting ledges, gird it from bottom to top — one ama of bare wall, then a projecting band three amot high, the topmost one four amot high. No column, no pilaster, no pediment: all the articulation given by the sources is horizontal.",
+    "cotes": [
+      "11 amot deep (east-west) × 100 wide",
+      "wall of the Ulam 5 amot",
+      "overhang of 15 amot on each side (Beit HaChalifot)",
+      "rovadim: 1 ama bare, band 3 amot high, the upper rovad 4 amot"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "3:8",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4:9",
+        "citation": "וְכֵן סָבִיב לְכָתְלֵי הָאוּלָם מִלְּמַטָּה עַד לְמַעְלָה… אַמָּה אַחַת חָלָק וְרֹבֶד שָׁלֹשׁ אַמּוֹת… וְרֹבֶד הָעֶלְיוֹן הָיָה רָחְבּוֹ אַרְבַּע"
+      },
+      {
+        "oeuvre": "Baba Batra",
+        "ref": "4a",
+        "citation": "אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה"
+      }
+    ],
+    "note": "Two points settled by the project. The projection of the rovad is nowhere given a figure: 1 ama is a CHOICE, set to the spacing of the maltera'ot. And no source puts a column in front of this building — neither Middot 3:7-8 and 4:6-7, nor the Rambam. The Kessef Mishneh specifies that the body of the Heikhal, unlike the Ulam, is not girded with rovadim."
+  },
+  "douze_marches_oulam": {
+    "nom": "The Twelve Steps of the Ulam",
+    "resume": "Between the floor of the Azara and the threshold of the Ulam, twelve steps. Each rises half an ama; the tread is one ama, but Middot 3:6 inserts landings of three amot and gives the top one four, so that they occupy nineteen of the twenty-two amot separating the altar from the Ulam; the rest is level ground. This is where the Kohanim go up to stand and bless the people — on the steps, not in the courtyard.",
+    "cotes": [
+      "twelve steps",
+      "each step: ½ ama high, 1 ama of tread, except three landings of 3, 3 and 4 amot",
+      "they occupy 19 of the 22 amot between the Ulam and the Mizbeach"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:6",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "7:2",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "5:1",
+        "citation": ""
+      }
+    ]
+  },
+  "petah_oulam": {
+    "nom": "Opening of the Ulam",
+    "translit": "Petach HaUlam",
+    "resume": "The opening of the Ulam: 40 amot high by 20 wide, and without any door. The Ulam never had one, so the interior remains visible from the courtyard. Above the opening run five oak beams, the maltera'ot, of increasing length, separated from one another by courses of stone — and carved, not bare. It is the last link in the sightline that starts from the Mount of Olives, crosses the Eastern Gate, the Gate of Nikanor, this opening, and runs to the door of the Heikhal.",
+    "cotes": [
+      "opening 40 amot high × 20 wide",
+      "five oak beams (maltera'ot) of increasing length",
+      "without doors"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:4",
+        "citation": "all the walls there were high, except the eastern wall, because the Kohen who burns the para stands atop the Mount of Olives, takes aim, and sees the opening of the Heikhal at the moment of the sprinkling of the blood"
+      }
+    ],
+    "note": "This east-west axis remains clear — no portico column, no crowd across it. No closed door on this axis at the hour of the service."
+  },
+  "gefen_zahav": {
+    "nom": "Gefen Zahav (the Golden Vine)",
+    "translit": "Gefen Zahav",
+    "resume": "A golden vine suspended on posts above the entrance of the Heikhal, at the back of the Ulam. It was not fixed: leaves and clusters that people offered were added to it.",
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:8",
+        "citation": ""
+      }
+    ]
+  },
+  "couronne_helene": {
+    "nom": "Helena's Nivreshet",
+    "translit": "Nivreshet",
+    "resume": "A golden lamp, the nivreshet, offered by Queen Helena and suspended above the entrance of the Heikhal. It reflected the rising sun.",
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "3:10",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "37b",
+        "citation": ""
+      }
+    ]
+  },
+  "sharsherot_oulam": {
+    "nom": "The Golden Chains of the Ulam",
+    "translit": "Sharsherot shel zahav",
+    "resume": "Golden chains fixed in the beams of the ceiling of the Ulam and hanging in the air. Young Kohanim would grab hold of them and climb by the strength of their arms, to go see the crowns that Zechariah has kept “as a memorial in the Sanctuary.” Where these crowns were placed, the commentators do not agree: at the windows of the upper floor of the Ulam, or at those of the Heikhal — they are not modeled here.",
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:8",
+        "citation": "וְשַׁרְשְׁרוֹת שֶׁל זָהָב הָיוּ קְבוּעוֹת בְּתִקְרַת הָאוּלָם, שֶׁבָּהֶן פִּרְחֵי כְהֻנָּה עוֹלִין וְרוֹאִין אֶת הָעֲטָרֹת"
+      },
+      {
+        "oeuvre": "Zekharia",
+        "ref": "6:14",
+        "citation": ""
+      }
+    ]
+  },
+  "tables_oulam": {
+    "nom": "The Two Tables of the Ulam",
+    "resume": "Two tables stand in the Ulam, near the entrance of the Heikhal. One is of marble: on it are placed the fresh loaves about to go in. The other is of gold: it receives the loaves that come out.",
+    "cotes": [
+      "two tables: one of marble, one of gold"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "11:7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "6:4",
+        "citation": ""
+      }
+    ]
+  },
+  "heikhal": {
+    "nom": "Heikhal",
+    "translit": "Heikhal",
+    "resume": "The Holy Place: a hall 40 amot from east to west, 20 from north to south, and 40 high — roughly 19 meters by 9.6, under a 19-meter ceiling. It is tall and narrow, almost a nave. Walls and ceiling are gold-plated, the ceiling of coffered cedar, the floor gold-plated. Light comes from high windows, narrow on the inside and wide on the outside, of which it is said that they emitted light rather than received it. The Kohen Gadol walks westward through it, the Table to his right in the north, the Menora to his left in the south.",
+    "cotes": [
+      "interior 40 amot (east-west) × 20 (north-south) × 40 high (≈ 19 × 9.6 × 19 m)",
+      "wall of the Heikhal 6 amot"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:1",
+        "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:6–7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "86b",
+        "citation": "transparent within, sealed without: I have no need of light"
+      }
+    ]
+  },
+  "portes_heikhal": {
+    "nom": "Gates of the Heikhal",
+    "translit": "Daltot HaHeikhal",
+    "resume": "The entrance of the Heikhal measures 20 amot high by 10 wide and has four doors: two outer and two inner, gold-plated. In front of the entrance, several sources further place a curtain, an outer parokhet. During the avoda they are open, the outer leaves folded back into the thickness of the embrasure, the inner ones into the Heikhal, against the wall.",
+    "cotes": [
+      "entrance 20 amot high × 10 wide",
+      "four doors (two outer, two inner)",
+      "embrasure of 6 amot"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:1",
+        "citation": ""
+      }
+    ],
+    "note": "The doors are modeled open (`PORTES_HEIKHAL_OUVERTES = True`), outer leaves folded back into the embrasure, inner leaves into the Heikhal, flat against the east wall (Middot 4:1). No closed door on the east-west axis at the hour of the service, neither Nikanor nor these."
+  },
+  "taim": {
+    "nom": "Ta'im (the Cells)",
+    "translit": "Ta'im",
+    "resume": "Thirty-eight cells arranged over three floors gird the Heikhal and the Kodesh HaKodashim: fifteen to the north, fifteen to the south, eight to the west, connected to one another by openings. At the northeast corner, a turning ramp, the Messiba, rises toward the upper floor and the roofs of the cells; to the south, the Beit Horadat HaMayim drains the water. The upper floor, above the Heikhal, is empty: it has hatches through which workers were lowered in closed cages when the Kodesh HaKodashim needed repair.",
+    "cotes": [
+      "38 cells: 15 to the north, 15 to the south, 8 to the west",
+      "north and south: five over five, and five above; west: three over three, and two above",
+      "the cell widens floor by floor: 5, then 6, then 7",
+      "the wall of the Heikhal recedes by one ama at each floor: 7, then 6, then 5",
+      "the six of wall and six of cell in the breakdown of Middot 4:7 are the middle floor",
+      "three openings per cell: to the right, to the left, and toward the one above",
+      "five openings for the one at the northeast corner: to the right, above, to the Messiba, to the pishpash, to the Heikhal"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:3",
+        "citation": "וּשְׁלֹשִׁים וּשְׁמֹנָה תָאִים הָיוּ שָׁם"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:4",
+        "citation": "הַתַּחְתּוֹנָה חָמֵשׁ, וְרֹבֶד שֵׁשׁ. וְהָאֶמְצָעִית שֵׁשׁ, וְרֹבֶד שֶׁבַע. וְהָעֶלְיוֹנָה שֶׁבַע"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:7",
+        "citation": "כֹּתֶל הַמְּסִבָּה חָמֵשׁ, וְהַמְּסִבָּה שָׁלֹשׁ, כֹּתֶל הַתָּא חָמֵשׁ, וְהַתָּא שֵׁשׁ"
+      },
+      {
+        "oeuvre": "Melakhim I",
+        "ref": "6:6",
+        "citation": "כִּי מִגְרָעוֹת נָתַן לַבַּיִת סָבִיב חוּצָה לְבִלְתִּי אֲחֹז בְּקִירוֹת הַבָּיִת"
+      }
+    ],
+    "note": "What the sources do not give, and is therefore a CHOICE: the height of a floor of cells (the three fill the forty amot of the ground floor), the length of the cells, and the thickness of the partition walls."
+  },
+  "mesiba": {
+    "nom": "Messiba (the Ramp)",
+    "translit": "Messiba",
+    "resume": "The turning ramp that rises from the northeast corner up to the door of the upper floor. One went up facing west, went the whole length of the north face to the west, turned south, went the whole length of the west face, then turned east, and walked along the south to the door of the upper floor, which opens to the south. It was also by this ramp that one went up onto the roofs of the cells.",
+    "cotes": [
+      "3 amot wide, its wall 5, in the north strip",
+      "a single circuit: north, then west, then south",
+      "to the south, the 3-ama strip is that of the Beit Horadat HaMayim",
+      "arrival at the level of the floor of the upper story, 51 amot above the pavement"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:5",
+        "citation": "וּמְסִבָּה הָיְתָה עוֹלָה מִקֶּרֶן מִזְרָחִית צְפוֹנִית לְקֶרֶן צְפוֹנִית מַעֲרָבִית, שֶׁבָּהּ הָיוּ עוֹלִים לְגַגּוֹת הַתָּאִים"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:7",
+        "citation": "כֹּתֶל הַמְּסִבָּה חָמֵשׁ, וְהַמְּסִבָּה שָׁלֹשׁ"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:3",
+        "citation": "וּבְקֶרֶן מִזְרָחִית צְפוֹנִית הָיוּ חֲמִשָּׁה פְתָחִים… וְאֶחָד לַמְּסִבָּה"
+      }
+    ],
+    "note": "Middot 4:7 bands the corridor to the north (3 amot, wall of 5) and to the south (the 3 amot of the Beit Horadat HaMayim), but to the west the hundred east-west amot are solid: no strip is provided there, even though Middot 4:5 routes the Messiba through it. The three amot of the west corridor are therefore taken from the five of the wall of the ta'im, one ama of masonry on each side — CHOICE. The slope is nowhere given: it is spread over the three branches. Nor is the covering of the corridor: eight amot above the top of each branch."
+  },
+  "aliyah": {
+    "nom": "Aliyah (the Upper Floor)",
+    "translit": "Aliyah",
+    "resume": "The upper floor of the building: forty amot of clear height above the Heikhal and the Kodesh HaKodashim, separated from the ground floor by five amot of flooring. This is not an attic — it is a room one enters: its door opens to the south, at the end of the Messiba, and two cedar poles are planted there to climb onto its roof. A line of markers replays on the floor the separation below between the Holy Place and the Holy of Holies, and hatches cut into the floor open onto the Kodesh HaKodashim: workers were lowered through them in closed crates, so that they would not feast their eyes on the Holy of Holies.",
+    "cotes": [
+      "40 amot high, from 51 to 91 above the pavement of the Azara",
+      "five amot of flooring: one ama of kiyour, two of beit dilfa left empty, one ama of tikra, one ama of maaziva",
+      "the same five amot above, then the Ma'ake (3) and the Kaleh Orev (1)",
+      "door to the south, at the end of the Messiba",
+      "two cedar poles at this door, for the roof"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:6",
+        "citation": "וְגֹבַהּ שֶׁל עֲלִיָּה אַרְבָּעִים אַמָּה"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:5",
+        "citation": "וְלוּלִין הָיוּ פְתוּחִין בָּעֲלִיָּה לְבֵית קֹדֶשׁ הַקֳּדָשִׁים"
+      },
+      {
+        "oeuvre": "Rambam",
+        "ref": "Beit HaBe'hira 4:3",
+        "citation": "וַעֲלִיָּה בְּנוּיָה עַל גַּבָּיו גֹּבַהּ כְּתָלֶיהָ אַרְבָּעִים אַמָּה"
+      },
+      {
+        "oeuvre": "Bartenura sur Middot",
+        "ref": "4:6",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rashi sur Divrei HaYamim II",
+        "ref": "3:4",
+        "citation": "מִקַּרְקָעִית הַבַּיִת עַד קֵרוּי עֲלִיָּה רִאשׁוֹנָה שְׁלֹשִׁים"
+      }
+    ],
+    "note": "Decision: the upper floor is hollowed out above the Heikhal and the Kodesh HaKodashim, not above the Ulam. This is where Middot 4:5 furnishes it, and Rashi (on II Chronicles 3:4) puts the aliyot of the First Temple above the House — thirty amot up to the ceiling of the first floor, ninety more up to the topmost roof; Metzudat David gives the same reading in second place. Radak, for his part, prefers to put the hundred and twenty amot of II Chronicles 3:4 on the Ulam alone, which would contain the aliyot: a minority reading, and about the First Temple. Above the Ulam, the building remains solid. The number and placement of the lulin is given by no source: two shafts of two amot on the axis are a CHOICE. The Messiba that leads there and the ta'im it serves are hollowed out accordingly."
+  },
+  "kaleh_orev": {
+    "nom": "Kaleh Orev",
+    "translit": "Kaleh Orev",
+    "resume": "The very last half-meter of the building: an ama of iron at the ridge, to keep birds from landing there. The Rambam describes it in place — an iron band one ama high that girds the Heikhal above the parapet on its four sides, sharp as a sword, so that no bird lands on it, its feet being cut off. A continuous blade, then, and not a row of spikes. The hundred amot of height are not a hundred amot of wall: the masonry stops at 96, and the last four amot are the parapet, for three, and this anti-crow device, for one.",
+    "cotes": [
+      "1 ama",
+      "the wall stops at 96 amot; the last 4 are the Ma'ake (3) and the Kaleh Orev (1)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:6",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam sur Middot",
+        "ref": "4:6",
+        "citation": "בְּחֶשֶׁק שֶׁל בַּרְזֶל גֹּבַהּ אַמָּה חַד כְּמוֹ הַסַּיִף"
+      }
+    ],
+    "note": "Divergence: R. Yehuda (Middot 4:6) does not count the Kaleh Orev and gives 4 amot to the Ma'ake. The tour follows the tana kama."
+  },
+  "maake": {
+    "nom": "Ma'ake (the Parapet)",
+    "translit": "Ma'ake",
+    "resume": "The parapet that lines the roof of the building, three amot above the wall, which itself stops at 96 amot. Its perimeter is not a rectangle: it steps in at the plane of the wall of the Heikhal, since the Ulam overhangs by 15 amot on each side.",
+    "cotes": [
+      "3 amot",
+      "set on a wall that stops at 96 amot"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:6",
+        "citation": ""
+      }
+    ],
+    "note": "Divergence: R. Yehuda (Middot 4:6) gives 4 amot to the Ma'ake and does not count the Kaleh Orev. The tour follows the tana kama — 3 amot of Ma'ake, 1 of Kaleh Orev."
+  },
+  "menora": {
+    "nom": "Menora",
+    "translit": "Menora",
+    "resume": "The pure gold candelabrum, hammered from a single piece, stands to the south of the Heikhal, two and a half amot from the wall, facing the Table. It is 18 tefachim high, that is three amot, about 1.44 meters. Seven branches, all in a single plane oriented north-south, adorned with 22 cups, 11 knobs and 9 flowers, on a base with three feet. In front of it, three stone steps, for the Kohen who comes to trim the wicks. Its seven flames are the only warm light in the room.",
+    "cotes": [
+      "18 tefachim (3 amot) high ≈ 1.44 m",
+      "seven branches",
+      "22 cups, 11 knobs, 9 flowers",
+      "2.5 amot from the south wall",
+      "three stone steps in front"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "33b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "98b–99a",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3",
+        "citation": ""
+      }
+    ],
+    "note": "The branches are STRAIGHT, on a diagonal (Rambam, Rashi), against the curved branches of traditional depictions and of the Arch of Titus. Never nine branches (that's a chanukia), six, or eight."
+  },
+  "shulchan": {
+    "nom": "Shulchan and the Lechem HaPanim",
+    "translit": "Shulchan",
+    "resume": "The Table stands to the north of the Heikhal, two and a half amot from the wall, in the western two-thirds of the room, facing the Menora. It measures 2 amot long, 1 wide, 1.5 high, in acacia wood gold-plated, with a rim, the zer. It bears the twelve showbreads, the Lechem HaPanim, arranged in two stacks of six that rise about two amot above it. The loaves are separated by 28 gold tubes, carried by four gold uprights set on the floor, which extend past the stacks and rise higher than the Menora. Two incense cups are set on the stacks.",
+    "cotes": [
+      "2 amot long × 1 wide × 1.5 high",
+      "2.5 amot from the north wall",
+      "12 loaves in two stacks of 6",
+      "loaf of 10 × 5 tefachim, turned up 2 tefachim on each side of the Table, 7 etzbaot high",
+      "stacks separated by 2 tefachim, that is ≈ 2 amot of stack above the Table",
+      "28 gold tubes (kanim), four uprights (snifim) ≈ 3.6 amot",
+      "two incense cups (bazikhin)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "33b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "98b–99a",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:14",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:15",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Temidin",
+        "ref": "5:9",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "96a",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "11:6",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "94b",
+        "citation": ""
+      }
+    ]
+  },
+  "mizbeach_hazahav": {
+    "nom": "Mizbeach HaZahav",
+    "translit": "Mizbeach HaZahav",
+    "resume": "The incense altar, at the center of the Heikhal between the Table and the Menora, slightly shifted toward the east. One ama by one ama, two amot high, in acacia wood gold-plated, with four horns and a rim. On Yom Kippur, the morning and afternoon incense is burned there as on every day; the incense proper to the day is burned in the Kodesh HaKodashim. On that day, this altar receives the blood sprinklings.",
+    "cotes": [
+      "1 × 1 ama × 2 high"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Exode",
+        "ref": "30:2",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Kelim",
+        "ref": "17:10",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "97a",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:5",
+        "citation": ""
+      }
+    ],
+    "note": "Divergence: Kelim 17:10 measures this altar in amot of 5 tefachim — R. Meir and R. Yehuda agree (Menachot 97a) — that is 0.83 × 0.83 × 1.67. The tour keeps the ama of 6. The golden altar bears no flame but embers brought from the great outer altar, spread out for the incense (Tamid 6:2) — on Kippur as on every day."
+  },
+  "parokhet": {
+    "nom": "The Two Parokhot",
+    "translit": "Parokhet",
+    "resume": "In the First Temple, a wall one ama thick, the Amah Traksin, separated the Holy Place from the Holy of Holies. In the Second, the Sages no longer knew whether this ama belonged to the Holy Place or to the Holy of Holies: so they hung TWO curtains, one ama apart, rather than decide. The outer curtain is fastened on the south, the inner one on the north: the Kohen Gadol enters from the south side, moves north along the one-ama space that separates them, and enters from the north — a path in an “S.” Each parokhet is 40 amot by 20, a tefach thick, woven of 72 threads of 24 strands, six of each of the four materials in equal parts: blue-purple, purple, scarlet and linen. No gold thread. The weave bears two different faces, “an eagle on one side, a lion on the other.” Two new ones were made each year. From the Heikhal, one sees the ends of the bars of the Ark pressing the cloth, like two breasts.",
+    "cotes": [
+      "two parokhot one ama apart",
+      "40 amot × 20",
+      "thickness of one tefach",
+      "72 threads of 24 strands, six of each of the four materials",
+      "two new ones each year",
+      "bulges of the badim at ≈ 1.5 ama from the floor, 1.38 ama on either side of the axis"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:1",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "4:7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "8:5",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rashi Exode",
+        "ref": "26:31",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "72b",
+        "citation": "an eagle on one side, a lion on the other"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "54a",
+        "citation": "like two breasts"
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "98b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "I Rois",
+        "ref": "8:8",
+        "citation": ""
+      }
+    ],
+    "note": "Two parokhot because the doubt over which side the ama belongs to was never settled: both readings are covered. Heavy, flat cloth, with no drapery folds, the four colors in broad fields, a frieze of winged creatures and lions woven into the wools, never in gold, with no human face."
+  },
+  "kodesh_hakodashim": {
+    "nom": "Kodesh HaKodashim",
+    "translit": "Kodesh HaKodashim",
+    "resume": "The Holy of Holies: a room 20 amot by 20, under 40 amot of height, that is roughly 9.6 meters by 9.6 and 19 high. No light enters it; the Kohen Gadol lights his way there by the embers of his fire-pan. At the center stands the Even HaShetiya, and on it the Ark. He sets the fire-pan of embers between the two bars of the Ark and stands there for the sprinklings. Only one person enters it for the service, one day of the year: the Kohen Gadol, at Kippur.",
+    "cotes": [
+      "20 × 20 amot × 40 high (≈ 9.6 × 9.6 × 19 m)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "4:1–7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:1",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:2",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:3",
+        "citation": ""
+      }
+    ],
+    "note": "Nothing but the Ark in this space: darkness, gold caught in the glow of the embers, smoke, no detailed human figure. Walls, ceiling and floor are gold-plated as in the Heikhal; in the dark, this gold shows only under the embers."
+  },
+  "even_hashetiya": {
+    "nom": "Even HaShetiya",
+    "translit": "Even HaShetiya",
+    "resume": "The foundation stone, at the center of the Kodesh HaKodashim, which rises three fingers above the floor. The Ark rests on it.",
+    "cotes": [
+      "rises three fingers above the floor"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:2",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "54b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4:1",
+        "citation": ""
+      }
+    ],
+    "note": "Two decisions. Position: the Rambam (Beit HaBechirah 4:1) places the stone “to the west” of the Kodesh HaKodashim; this entry keeps it at the center, since Yoma 5:2 fixes nothing. And the bare stone of Yoma 5:2 describes the state after the Ark was removed: that state is set aside, since the tour shows the Temple as it will be, with the Ark returned to its place."
+  },
+  "aron": {
+    "nom": "Aron HaBrit",
+    "translit": "Aron HaBrit",
+    "resume": "The Ark of the Covenant, set on the Even HaShetiya. A chest 2.5 amot by 1.5 and 1.5 high, in acacia wood gold-plated inside and out — three nested chests, gold, wood, gold — the gold smooth, without any engraving. The outer gold chest is taller than the others: its rim rises around the lid and overtops it a little, like a crown, the keter Torah. Its long side is oriented north-south, its two bars, the badim, run east-west. Four gold rings are fixed at the upper corners, near the lid, two per side; the badim are never removed from them, and 2.5 amot separate them — enough to let two bearers pass between them. The Ark stays closed, always.",
+    "cotes": [
+      "chest 2.5 × 1.5 × 1.5 amot",
+      "three nested chests (gold, wood, gold)",
+      "four gold rings at the upper corners, two per side",
+      "2.5 amot between the two badim",
+      "badim ≈ 11 amot (model's choice: they run to the inner parokhet)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Exode",
+        "ref": "25:10–11",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Exode",
+        "ref": "25:12",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Exode",
+        "ref": "25:13–15",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "72b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rashi Exode",
+        "ref": "25:12",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "98b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Klei HaMikdash",
+        "ref": "2:13",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4:1",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "54a",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:1",
+        "citation": "having arrived at the Ark, he sets the machta between the two badim"
+      }
+    ],
+    "note": "PROJECT CHOICE: the Temple depicted is the one TO COME, where the Ark hidden beneath the Temple has returned to its place (Yoma 54a; Rambam, Beit HaBechirah 4:1). The tour does not fabricate a new Ark — Jeremiah 3:16 says “they shall not make another” — it shows the one of Moses, buried by Yoshiyahu and revealed. Divergence to be validated by a rabbi. The length of the badim is nowhere given a figure: having them run to the inner parokhet is a choice of the model, and it is this that makes physical both “between the badim” and the bulges in the curtain; the alternative set aside is that of short badim and miraculous bulges (Bava Batra 99a)."
+  },
+  "kaporet": {
+    "nom": "Kaporet and the Keruvim",
+    "translit": "Kaporet",
+    "resume": "The lid of the Ark: a plate of pure gold 2.5 amot by 1.5, a tefach thick — chest and lid together make ten tefachim. At its two ends, north and south, two keruvim, hammered out of the very mass of the lid: they rise from it, with no feet or base. They have a child's face, at least a tefach high, and measure ten tefachim. They face each other, inclined toward the lid and turned aside, like a pupil taking leave of his master, wings spread at the level of the heads and a little above, without touching the body, forming a canopy over the kaporet.",
+    "cotes": [
+      "2.5 × 1.5 amot of pure gold, one tefach thick",
+      "chest + kaporet = 10 tefachim",
+      "two keruvim of 10 tefachim",
+      "face at least one tefach",
+      "ten tefachim of clear space under the wings"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Exode",
+        "ref": "25:17",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Exode",
+        "ref": "25:18–20",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "5a–b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "5b",
+        "citation": "כרביא"
+      },
+      {
+        "oeuvre": "Rashi Exode",
+        "ref": "25:18",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rashi Exode",
+        "ref": "25:20",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Bava Batra",
+        "ref": "99a",
+        "citation": "like a pupil taking leave of his master"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "54a–b",
+        "citation": "like a man and his companion"
+      }
+    ],
+    "note": "PROJECT CHOICE (Temple to come, Ark in its place). For the keruvim: a boy and a girl embracing, arms outstretched until they touch, wings joined at the center — the tour follows Sukkah 5b and Rashi (children's faces) and applies to them the embrace of Yoma 54a–b, which the gemara attributes to the First Temple or to the carvings on the walls. Divergences set aside: the Rashbam (Ex. 25:18) sees them as large birds; Solomon's keruvim (I Kings 6:23–28), two standing figures 10 amot tall with wings of 20, belong to the First Temple and are not modeled. Never a draped angel or a curly-haired putto: that is Christian iconography."
+  },
+  "contenu_aron": {
+    "nom": "What Accompanies the Aron",
+    "resume": "Four objects accompany the Ark: the jar of manna, of clay, the staff of Aharon with its almonds and blossoms, the flask of anointing oil, and the chest that the Philistines sent back with it. Note: this entry does not place them INSIDE the Ark but set IN FRONT of it, between the badim.",
+    "sources": [
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4:1",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Horayot",
+        "ref": "12a",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Exode",
+        "ref": "16:33",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "17:23",
+        "citation": ""
+      },
+      {
+        "oeuvre": "I Samuel",
+        "ref": "6:8",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Bava Batra",
+        "ref": "14b",
+        "citation": ""
+      }
+    ],
+    "note": "PROJECT CHOICE (Temple to come, Ark returned to its place). Set aside: the tablet bearing the Sefer Torah (Bava Batra 14b, view of R. Yehuda). And the Ark stays closed, never open, no tablet of the Law visible."
+  }
+}

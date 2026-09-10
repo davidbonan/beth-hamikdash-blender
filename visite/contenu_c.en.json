@@ -1,0 +1,194 @@
+{
+  "yam": {
+    "nom": "Yam (the Bronze Sea)",
+    "translit": "Yam Mutzak",
+    "resume": "The bronze Sea of Shlomo: a large basin resting on twelve bronze oxen, three facing each cardinal direction, their hindquarters toward the center. Its rim is worked “like the brim of a cup, in the shape of a lily flower,” and two rows of gourds run beneath it. The blockout places it at the southeast of the building, between the steps of the Ulam and the ramp of the Mizbeach, next to the Kiyor of the Mishna.",
+    "cotes": [
+      "ten amot from rim to rim",
+      "five amot high",
+      "thirty amot in circumference",
+      "two rows of gourds (peka'im) beneath the rim",
+      "twelve oxen, three facing each wind, “וְכָל אֲחֹרֵיהֶם בָּיְתָה” — all their hindquarters toward the center",
+      "rim “כְּמַעֲשֵׂה שְׂפַת כּוֹס פֶּרַח שׁוֹשָׁן”",
+      "at the southeast of the building: “מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב”"
+    ],
+    "sources": [
+      {"oeuvre": "Melakhim I", "ref": "7:23-26", "citation": ""},
+      {"oeuvre": "Melakhim I", "ref": "7:39", "citation": "מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב"},
+      {"oeuvre": "Divrei HaYamim II", "ref": "4:2-6", "citation": ""},
+      {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
+    ],
+    "note": "An element of the First Temple, assumed as such: the blockout's commentary states, “They are from the First Temple: Middot does not know them (CHOICE).” The principle of coexistence is set out by the README (§ “Jewish tradition only,” 8/09): “The principle is that of Menachot 98b, which arranges Shlomo's ten menorot and ten tables around those of Moshe: Shlomo's kelim coexist with those of the Mishna,” under the guideline “Priority to the First Temple (Tanakh), then to the Mishna where it is compatible.”"
+  },
+
+  "mekhonot": {
+    "nom": "The Ten Mekhonot",
+    "translit": "Mekhonot",
+    "resume": "The ten mobile bronze stands of Shlomo. Each rolls on four wheels and carries a basin. Five are arranged to the north, five to the south, “on the shoulder of the building” — in the blockout, the raised platform that runs along the body of the Bayit. Their panels bore lions, oxen and keruvim; in the blockout, only their frames are modeled.",
+    "cotes": [
+      "stands of 4 × 4 × 3 amot",
+      "four wheels of one and a half amot",
+      "a basin of four amot on each",
+      "five per side: “חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף הַבַּיִת מִשְּׂמֹאלוֹ”",
+      "panels with lions, oxen and keruvim"
+    ],
+    "sources": [
+      {"oeuvre": "Melakhim I", "ref": "7:27-39", "citation": "חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף הַבַּיִת מִשְּׂמֹאלוֹ"},
+      {"oeuvre": "Divrei HaYamim II", "ref": "4:14", "citation": ""},
+      {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
+    ],
+    "note": "Same arbitration as for the Sea: an element of the First Temple placed in the Temple of the Mishna under the principle of Menachot 98b (README, § “Jewish tradition only,” 8/09). The blockout notes that the figured panels are not modeled: “panels with lions, oxen and keruvim (here: their frames only).”"
+  },
+
+  "yakhin_boaz": {
+    "nom": "Yakhin and Boaz",
+    "translit": "Yakhin and Boaz",
+    "resume": "The two bronze columns of Shlomo. A hollow shaft topped by a capital (koteret) worked in lily-form, encircled with lattice-work and chainlets, and adorned with two rows of a hundred pomegranates. They stand “לְאֻלָם הַהֵיכָל”: inside the Ulam, on either side of the opening — not in front of the façade. Yakhin on the right of the House (south), Boaz on its left (north).",
+    "cotes": [
+      "eighteen amot of shaft",
+      "twelve amot in circumference, that is four amot wide",
+      "hollow, four fingers thick",
+      "capital of five amot: two flush with the shaft, three projecting",
+      "twenty-three amot in total",
+      "four amot of “מַעֲשֵׂה שׁוֹשַׁן” at the top of the capital",
+      "seven chainlets (sharsherot) on the bulge of the capital",
+      "two rows of a hundred pomegranates per column",
+      "Yakhin to the south (on the right), Boaz to the north (on the left)"
+    ],
+    "sources": [
+      {"oeuvre": "Melakhim I", "ref": "7:15-22", "citation": ""},
+      {"oeuvre": "Melakhim I", "ref": "7:41-42", "citation": ""},
+      {"oeuvre": "Melakhim I", "ref": "7:21", "citation": "לְאֻלָם הַהֵיכָל"},
+      {"oeuvre": "Yirmeyahou", "ref": "52:21-23", "citation": ""},
+      {"oeuvre": "Melakhim II", "ref": "25:17", "citation": ""},
+      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": ""},
+      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:16", "citation": "שְׁתֵּי אַמּוֹת הַתַּחְתּוֹנוֹת שֶׁל כּוֹתָרוֹת הָיוּ שָׁווֹת לָעַמּוּד"},
+      {"oeuvre": "Radak", "ref": "sur Divrei HaYamim II 3:15", "citation": "עַל מִדַּת שְׁנֵי הָעַמּוּדִים הוּא אוֹמֵר"},
+      {"oeuvre": "Metsoudat David", "ref": "sur Melakhim I 7:19", "citation": "כִּי הָעַמּוּדִים הָיוּ בְּרֹחַב אַרְבַּע אַמּוֹת"}
+    ],
+    "note": "An explicit point of arbitration for the project. The façade of the Ulam remains without a column — spec sheet §8a — and Yakhin and Boaz do not return there: they are inside, “לְאֻלָם הַהֵיכָל” read as “כְּמוֹ בְּאוּלָם הַהֵיכָל” by Radak, “שֶׁהֱקִימָם בּוֹ” by Ralbag, “בַּחֲלַל הָאוּלָם” by Metzudat David (on Divrei HaYamim II 3:15). Their presence in this Temple stems from the same principle of Menachot 98b as the Sea and the mekhonot. A measurement not to be confused with the height: the thirty-five amot of Divrei HaYamim II 3:15 measure the two columns lying down at the moment of casting, not the height of a single column (Radak, Rashi, Metzudat David ad loc.) — reading them as an elevation gives columns twice too tall and too thin."
+  },
+
+  "mukhni": {
+    "nom": "Mukhni of the Kiyor",
+    "translit": "Mukhni",
+    "resume": "The mechanism installed by Ben Katin at the edge of the Kiyor: a wheel and a chain that lower the basin into its well every evening, “so that its water not be disqualified by the night.” The blockout gives it a post, a crossbeam, a strut, a spoked wheel and a chain reaching to the edge of the basin.",
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁלֹּא יִהְיוּ מֵימָיו נִפְסָלִין בְּלִינָה"},
+      {"oeuvre": "Yoma", "ref": "37a", "citation": ""},
+      {"oeuvre": "Middot", "ref": "3:6", "citation": ""},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": ""},
+      {"oeuvre": "Tamid", "ref": "3:8", "citation": ""}
+    ],
+    "note": "No measurement is sourced: the blockout writes, “the shape is a CHOICE.” The sources say that the mechanism exists and what it is for; of its form they give only the wheel (“גִּילְגְּלָא דַּהֲוָה מְשַׁקְּעָא לֵיהּ,” Yoma 37a) and the wood (“קוֹל הָעֵץ,” Tamid 1:4). The technical spec sheet (§ Kiyor) mentions the same device: “Twelve taps (Ben Katin's improvement, Yoma 3:10) and a system (mukhni) to lower it into the well at night.” The thematic index of the mikdash skill files the question under “Kiyor: location, material, mechanism of the mukhni” with Middot 3:6; Tamid 1:4; 3:8; Yoma 3:10."
+  },
+
+  "magrefa": {
+    "nom": "Magrefa",
+    "translit": "Magrefa",
+    "resume": "When the kohanim reach the space between the Ulam and the Mizbeach, one of them takes the magrefa and throws it to the ground. In Jerusalem no one can hear his neighbour over it, and the crash serves as a signal: the kohanim come to bow down, the Levites to sing, and the head of the ma'amad stands the impure at the eastern gates (Tamid 5:6). It is a large utensil thrown to make a noise, shaped like an ash shovel (Bartenura, Tosafot Yom Tov, the Rosh). The model lays it on the ground where it falls.",
+    "cotes": [
+      "on the ground between the Ulam and the Mizbeach, where it is thrown",
+      "shaped like an ash shovel: a lid of thin metal, with a handle"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "5:6", "citation": "נָטַל אֶחָד אֶת הַמַּגְרֵפָה וְזוֹרְקָהּ בֵּין הָאוּלָם וְלַמִּזְבֵּחַ"},
+      {"oeuvre": "Bartenura", "ref": "Tamid 5:6", "citation": "כלי גדול שהיו זורקים אותו כדי להשמיע קול"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Tamid 5:6", "citation": "אבל היה זה בלי ספק כלי שלישי שמשמיע קול והיה גם צורתו כצורת מגריפה"},
+      {"oeuvre": "Rosh sur Tamid", "ref": "33a", "citation": "וכל זה היה עשוי כמין מגריפה"},
+      {"oeuvre": "Rashi Exode", "ref": "27:3", "citation": "מגרפות שנוטלים בהם הדשן, והן כמין כסוי הקדרה של מתכת דק ולו בית יד"},
+      {"oeuvre": "Arakhin", "ref": "10b-11a", "citation": "הִיא אַמָּה וּגְבוֹהָ אַמָּה, וְקַתָּא יוֹצָא הֵימֶנָּה, וַעֲשָׂרָה נְקָבִים הָיוּ בָּהּ"},
+      {"oeuvre": "Rashash", "ref": "Tamid 5:6", "citation": "פירוש הראב\"ד למסכת תמיד שכתב לעיל בפ\"ג דזאת שבכאן היא עצמה דלעיל"}
+    ],
+    "note": "It is not the magrefa of Arakhin — one ama by one ama, a handle, ten holes: that one is a musical instrument, which throwing would have broken (Tosafot Yom Tov). The Raavad, as reported by the Rashash, holds on the contrary that they are the same, and reads “throws it” as releasing all its sounds at once. The model follows Bartenura and Tosafot Yom Tov. Diameter, handle and bronze are choices."
+  },
+
+  "candelabres_shoeva": {
+    "nom": "Candelabra of Simchat Beit HaShoeva",
+    "translit": "Menorot shel zahav (Simchat Beit HaShoeva)",
+    "resume": "The great golden candelabra erected in the Ezrat Nashim for Simchat Beit HaShoeva. Each bears four golden cups (sefalim) at its top and four ladders by which one climbs to pour in the oil. They tower over the whole enclosure.",
+    "cotes": [
+      "fifty amot high",
+      "four golden cups (sefalim) at the top of each",
+      "four ladders for each",
+      "in the Ezrat Nashim"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "5:2-3", "citation": "מְנוֹרוֹת שֶׁל זָהָב הָיוּ שָׁם, וְאַרְבָּעָה סְפָלִים שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד"},
+      {"oeuvre": "Soucca", "ref": "52b", "citation": ""}
+    ],
+    "note": "Two acknowledged CHOICEs, both written into the repository. (1) The number: “Four poles (number: CHOICE, the Mishna says ‘menorot’)” (blockout). (2) The timing: “this is a Sukkot installation, left standing on the day of Kippur” (README) — a `CANDELABRES_SHOEVA = False` switch removes them from the blockout. The spacing of the ladder rungs (one every three-quarters of an ama) is geometry from the script, not a sourced measurement."
+  },
+
+  "shofarot": {
+    "nom": "The Thirteen Shofarot",
+    "translit": "Shelosha asar shofarot",
+    "resume": "Thirteen trunks “shaped like a shofar” — narrow at the top, wide at the bottom, so that no hand could be slipped in — lined up, in the blockout, along the east wall of the Ezrat Nashim, on either side of the gate.",
+    "cotes": [
+      "thirteen",
+      "narrow at the top, wide at the bottom, so that no hand could be slipped in",
+      "along the east wall of the Ezrat Nashim, on either side of the gate"
+    ],
+    "sources": [
+      {"oeuvre": "Shekalim", "ref": "6:5", "citation": ""},
+      {"oeuvre": "Bartenura", "ref": "sur Shekalim 6:1", "citation": ""}
+    ],
+    "note": "A discrepancy in reference within the repository: the blockout and the README write Shekalim 6:5, while the mikdash skill's corpus files “the 13 shofarot” under Shekalim 6:1. Both are correct: 6:1 counts the thirteen shofarot, 6:5 gives what is written on each. The material is a CHOICE: “Bronze: CHOICE, the Mishna does not give the material” (blockout)."
+  },
+
+  "sculptures_murs": {
+    "nom": "Wall Carvings: Keruvim, Palm Trees, Flowers",
+    "translit": "Keruvim, timorot u-peturei tzitzim",
+    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The blockout arranges them in three registers, from the floor up to 22 amot, separated by bands of flowers.",
+    "cotes": [
+      "three registers from the floor up to 22 amot, separated by bands of blossoming flowers",
+      "0.22 ama in relief",
+      "“וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב”: one timora between two keruvim",
+      "“וּשְׁנַיִם פָּנִים לַכְּרוּב”: two faces per keruv",
+      "on the walls of the Heikhal and the Kodesh HaKodashim, “מִלִּפְנִים וְלַחִיצוֹן”"
+    ],
+    "sources": [
+      {"oeuvre": "Melakhim I", "ref": "6:29", "citation": "וְאֵת כָּל קִירוֹת הַבַּיִת מֵסַב קָלַע פִּתּוּחֵי מִקְלְעוֹת כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים, מִלִּפְנִים וְלַחִיצוֹן"},
+      {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
+      {"oeuvre": "Middot", "ref": "4:1", "citation": ""}
+    ],
+    "note": "The blockout sets out the arbitration: “Above, the gold stays bare up to the cornice: two registers floating at mid-height are in no source” — the field from the floor to 22 amot comes from Ye'hezkel 41:20; its three registers and its 0.22 ama of relief are the project's own, the pattern comes from the Tanakh. The README adds that this relief “replaces the generic scrollwork pattern as ornament of the building (the maltera'ot keep theirs).” POINT TO FLAG: the technical spec sheet (§ prohibitions) still reads “No other statues or figurative reliefs (except the woven keruvim of the curtains)” — this line predates the addition and has not been updated. The detail of the reliefs (seven fronds per timora, eight petals per flower, two raised wings per keruv) is geometry from the script, without a sourced measurement."
+  },
+
+  "chaines_devir": {
+    "nom": "Chains before the Devir",
+    "translit": "Ratukot zahav",
+    "resume": "Golden chains stretched before the Devir, the Kodesh HaKodashim. In the blockout: three chainlets beneath the ceiling, stretched from one wall to the other, before the parokhet.",
+    "cotes": [
+      "three chainlets beneath the ceiling, wall to wall, before the parokhet (geometry of the blockout)"
+    ],
+    "sources": [
+      {"oeuvre": "Melakhim I", "ref": "6:21", "citation": "וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר"}
+    ],
+    "note": "The verse says that golden chains pass before the Devir, without giving their number or height: the three chainlets and their sag are the blockout's own design choice. An element of the First Temple, falling under the same guideline, “Priority to the First Temple (Tanakh), then to the Mishna where it is compatible” (README)."
+  },
+
+  "shaar_shushan": {
+    "nom": "Sha'ar Shushan",
+    "translit": "Sha'ar HaMizrachi — Shushan HaBira",
+    "resume": "The eastern gate of the Har HaBayit, on the axis of the Temple. Above it is depicted Shushan the capital, facing the Mount of Olives. The blockout renders it as a bas-relief in the stone of the wall: a rampart and three crenellated towers.",
+    "cotes": [
+      "above the east gate of the Har HaBayit, facing the Mount of Olives",
+      "a rampart and three crenellated towers (the blockout's design choice)"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "1:3", "citation": "שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה"}
+    ],
+    "note": "The technical spec sheet (§1) counts it among the five gates of the Mount: “East gate (Shushan) decorated with a depiction of Shushan.” The shape of the bas-relief — rampart and three towers — is not in the source: it is the blockout's design choice."
+  },
+
+  "tavla_helene": {
+    "nom": "Helena's Tablet",
+    "translit": "Tavla shel zahav",
+    "resume": "A golden tablet donated by Queen Helena, “on which the parasha of the sota is written”: it is from this that the Kohen copies out the passage. The blockout places it on the gold of the east wall of the Ulam, on the north side.",
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"}
+    ],
+    "note": "The placement is an explicit CHOICE of the blockout: “On the gold of the east wall of the Ulam, north side: CHOICE.” No measurement is sourced; the eight engraved lines are geometry from the script. Not to be confused with the other gift from the same queen, the nivreshet — a golden lamp (“מְנוֹרָה,” Bartenura) above the entrance to the Heikhal (Yoma 3:10; 37b), `Nivreshet_Helene` in the blockout."
+  }
+}

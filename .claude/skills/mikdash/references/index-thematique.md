@@ -34,6 +34,7 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 | Le Doukhan, ses trois marches d'½ ama | *Middot* 2:6 (R. Eliézer b. Yaakov) | §12 |
 | Les 7 portes de l'Azara, leurs noms et leur ordre | *Middot* 1:4–5 ; *Middot* 2:6 (liste de 13) | §5 |
 | Les lishkot : Gazit, Parhedrin, Beit HaMoked, Beit Avtinas, Parva, Bois, Exil | *Middot* 1:6–9 ; 5:3–4 ; *Tamid* 1:1 ; *Yoma* 1:1 | §5 |
+| La mesiba sous la bira, le Beit HaTevila (feu, beit kissé), la sainteté des tunnels | *Middot* 1:6, 1:9 ; *Tamid* 1:1 ; *Tamid* 27b ; Rambam *Beit HaBe'hira* 5:11, 8:7 ; Bartenura *ad loc.* ; R. Eliézer b. Yaakov (**écarté**) | §5 |
 | Les 13 prosternations, où elles se font | *Middot* 2:6 ; *Shekalim* 6:3 | §5 |
 | Qui entre où (les dix degrés de sainteté) | *Kelim* 1:6–9 ; Rambam *Biat HaMikdash* | §12 |
 | Nombre de Léviim sur le Doukhan, enfants Léviim | *Arakhin* 2:6 | §12 |
@@ -46,6 +47,7 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 | La rampe (kevesh) 32 × 16, ses pierres sans fer, l'interdiction des marches | *Middot* 3:3 ; 3:4 ; Ex. 20:23 ; Rambam *Beit HaBe'hira* 2 | §6 |
 | Emplacement du Mizbea'h, le décalage vers le sud | *Middot* 5:1–2 ; *Zeva'him* 58b (avis de R. Yehouda, **écarté**) | §6 |
 | Le sovev, le fil rouge (hout hasikra) | *Middot* 3:1 | §6 |
+| Les deux trous du yessod et l'amah vers le Kidron ; le shit, les shitin, la dalle à l'anneau | *Middot* 3:2–3 ; *Yoma* 5:6 ; *Meïla* 3:3 ; *Soucca* 4:9, 49a ; Rambam *Beit HaBe'hira* 2:11 ; Rambam et Bartenura sur *Middot* 3:3 ; Tiferet Israël (**écarté**) | §6 |
 | Kiyor : place, matière, mécanisme du mou'hni | *Middot* 3:6 ; *Tamid* 1:4 ; 3:8 ; *Yoma* 3:10 | §7 |
 | Beit HaMitba'haïm : anneaux, tables, colonnes | *Middot* 3:5 ; *Tamid* 3:5 | §7 |
 | Les douze marches entre l'Azara et l'Oulam | *Middot* 3:6 ; *Tamid* 7:2 | §7 |

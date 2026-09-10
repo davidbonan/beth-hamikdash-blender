@@ -12,7 +12,6 @@
  * reste de la chrominance. La normale est en convention OpenGL, vert vers le haut.
  */
 import * as THREE from "three";
-import { PROFIL } from "./qualite.js";
 
 // La moyenne LINÉAIRE de la nappe, et sa rugosité moyenne. La photo est appliquée en
 // RAPPORT à elles, jamais en remplacement : Blender garde le dernier mot sur la teinte
@@ -28,7 +27,6 @@ const JEUX = {
 };
 
 export async function nappes() {
-  const { taille, anisotropie } = PROFIL.nappes;
   const chargeur = new THREE.TextureLoader().setPath("./matieres/");
 
   const regler = (texture, espace) => {
@@ -36,15 +34,15 @@ export async function nappes() {
     texture.colorSpace = espace;
     // Un dallage vu en enfilade est le cas normal ici, pas l'exception : sans
     // anisotropie sa nappe se réduit en bouillie dès trois mètres.
-    texture.anisotropy = anisotropie;
+    texture.anisotropy = 8;
     return texture;
   };
 
   const jeux = new Map();
   await Promise.all(Object.entries(JEUX).map(async ([nom, jeu]) => {
     const [couleur, normale] = await Promise.all([
-      jeu.moyenne ? chargeur.loadAsync(`${nom}_c_${taille}.webp`) : null,
-      chargeur.loadAsync(`${nom}_n_${taille}.webp`),
+      jeu.moyenne ? chargeur.loadAsync(`${nom}_c_1024.webp`) : null,
+      chargeur.loadAsync(`${nom}_n_1024.webp`),
     ]);
     jeux.set(nom, {
       normale: regler(normale, THREE.NoColorSpace),

@@ -125,7 +125,7 @@ def images_entree(reg):
     """Les images données au modèle d'édition.
 
     `structure` ajoute la carte de profondeur en seconde image. Utile là où le rendu
-    couleur ne porte plus rien : dans un couloir fermé comme la Stoa royale, toutes
+    couleur ne porte plus rien : dans un couloir fermé comme la nef du portique sud, toutes
     les surfaces du blockout sont blanches et l'ambiante les met au même gris — la
     colonnade est invisible en couleur alors qu'elle est nette en profondeur.
     """

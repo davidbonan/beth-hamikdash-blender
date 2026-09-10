@@ -37,10 +37,10 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
   // ---- clavier ----
   const touches = new Set();
   const enfoncee = (liste) => liste.some((c) => touches.has(c));
-  const dansLaBarre = () => !!document.activeElement?.closest?.("#barre, #fiche");
+  const horsDeLaScene = () => !!document.activeElement?.closest?.("#barre, #fiche, #accueil");
 
   addEventListener("keydown", (e) => {
-    if (dansLaBarre()) return;
+    if (horsDeLaScene()) return;
     touches.add(e.code);
     if (e.code === "KeyV") basculerVol();
     if (CAPTEES.includes(e.code)) e.preventDefault();

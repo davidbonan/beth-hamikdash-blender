@@ -6,11 +6,9 @@
  * les sources. Un panneau de 400 px sur un téléphone recouvre le Temple entier, et
  * l'élément dont il parle avec.
  */
-export const ZONES = {
-  har_habayit: "Har HaBayit", ezrat_nashim: "Ezrat Nashim", azara: "Azara",
-  mizbeach: "Mizbea'h", oulam: "Oulam", heikhal: "Heikhal",
-  kodesh_hakodashim: "Kodesh HaKodashim", lishkot: "Lishkot",
-};
+import { langue, libelle, texte } from "./langue.js";
+
+export const nomDeZone = (zone) => libelle("zones", zone) ?? zone;
 
 // Sefaria distingue la michna du folio : `Middot 2:1` est une michna, `Yoma 54a` un
 // folio de guemara. Le nom du traité est le même, le préfixe non — d'où le test sur
@@ -43,6 +41,9 @@ const OUVRAGES = {
   yehezkel: "Ezekiel",
   "rambam temidin": "Mishneh Torah, Daily Offerings and Additional Offerings",
   "rashi exode": "Rashi on Exodus", "rashi shemot": "Rashi on Exodus",
+  "rashi sur yoma": "Rashi on Yoma",
+  "rashi sur pesachim": "Rashi on Pesachim",
+  "rosh sur tamid": "Commentary of the Rosh on Tamid",
   "rambam sur middot": "Rambam on Mishnah Middot",
 };
 
@@ -75,35 +76,47 @@ export function panneau(concepts) {
   const cadre = document.querySelector("#fiche");
   const corps = document.querySelector("#corps");
 
+  let affiche = null;
+
   const fermer = () => cadre.classList.remove("ouverte", "pleine");
+
+  function remplir(c) {
+    const src = (c.sources || []).map((s) => {
+      const lien = lienSefaria(s.oeuvre, s.ref);
+      const tete = `${echappe(libelle("oeuvres", s.oeuvre) ?? s.oeuvre)} <bdi>${echappe(s.ref)}</bdi>`;
+      const citation = texte("guillemet_ouvrant") + s.citation + texte("guillemet_fermant");
+      return `<li>${lien ? `<a href="${lien}" target="_blank" rel="noopener">${tete}</a>` : tete}` +
+             `${s.citation ? `<em>${echappe(citation)}</em>` : ""}</li>`;
+    }).join("");
+    // En hébreu le titre est déjà le nom hébreu, et la translittération ne sert à personne.
+    const nomSeul = langue() === "he";
+
+    corps.innerHTML = `
+      <p class="zone">${echappe(nomDeZone(c.zone))}</p>
+      <h2>${echappe(c.nom)}</h2>
+      ${c.he && !nomSeul ? `<p class="heb">${echappe(c.he)}</p>` : ""}
+      ${c.translit && !nomSeul ? `<p class="translit">${echappe(c.translit)}</p>` : ""}
+      ${c.resume
+        ? `<p class="resume">${echappe(c.resume)}</p>`
+        : `<p class="vide">${echappe(texte("non_documente"))}</p>`}
+      ${c.cotes?.length ? `<h3>${echappe(texte("cotes"))}</h3><ul class="cotes">${
+        c.cotes.map((x) => `<li>${echappe(x)}</li>`).join("")}</ul>` : ""}
+      ${src ? `<h3>${echappe(texte("sources"))}</h3><ul class="sources">${src}</ul>` : ""}
+      ${c.note ? `<p class="note"><b>${echappe(texte("arbitrage"))}</b>${echappe(c.note)}</p>` : ""}`;
+  }
 
   function montrer(id) {
     const c = concepts.get(id);
     if (!c) return;
-    const src = (c.sources || []).map((s) => {
-      const lien = lienSefaria(s.oeuvre, s.ref);
-      const tete = `${echappe(s.oeuvre)} ${echappe(s.ref)}`;
-      return `<li>${lien ? `<a href="${lien}" target="_blank" rel="noopener">${tete}</a>` : tete}` +
-             `${s.citation ? `<em>« ${echappe(s.citation)} »</em>` : ""}</li>`;
-    }).join("");
-
-    corps.innerHTML = `
-      <p class="zone">${echappe(ZONES[c.zone] || c.zone)}</p>
-      <h2>${echappe(c.nom)}</h2>
-      ${c.he ? `<p class="heb">${echappe(c.he)}</p>` : ""}
-      ${c.translit ? `<p class="translit">${echappe(c.translit)}</p>` : ""}
-      ${c.resume
-        ? `<p class="resume">${echappe(c.resume)}</p>`
-        : `<p class="vide">Cet élément est modélisé mais pas encore documenté : aucune
-           source n'a été relevée pour lui dans la fiche technique. Plutôt qu'une cote
-           plausible, la visite n'affiche rien.</p>`}
-      ${c.cotes?.length ? `<h3>Cotes</h3><ul class="cotes">${
-        c.cotes.map((x) => `<li>${echappe(x)}</li>`).join("")}</ul>` : ""}
-      ${src ? `<h3>Sources</h3><ul class="sources">${src}</ul>` : ""}
-      ${c.note ? `<p class="note"><b>Arbitrage du projet</b>${echappe(c.note)}</p>` : ""}`;
+    affiche = id;
+    remplir(c);
     cadre.scrollTop = 0;
     cadre.classList.remove("pleine");             // toujours rouvert sur l'aperçu
     cadre.classList.add("ouverte");
+  }
+
+  function rafraichir() {
+    if (affiche) remplir(concepts.get(affiche));
   }
 
   document.querySelector("#fermer").onclick = fermer;
@@ -145,5 +158,5 @@ export function panneau(concepts) {
   poignee.addEventListener("pointerup", lacher);
   poignee.addEventListener("pointercancel", lacher);
 
-  return { montrer, fermer };
+  return { montrer, fermer, rafraichir };
 }

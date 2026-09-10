@@ -2,7 +2,10 @@
 __pycache__/
 *.blend1
 .DS_Store
-renders/
+renders/*
+!renders/planche/
+renders/planche/*
+!renders/planche/planche.jpg
 audio/
 .venv/
 

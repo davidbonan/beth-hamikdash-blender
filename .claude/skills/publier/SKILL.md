@@ -18,6 +18,7 @@ Si le voisin manque : `git clone https://github.com/davidbonan/davidbonan.com ..
 
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # si le .blend a bougé
+python3 beit_hamikdash_traductions.py                          # doit répondre « traductions à jour »
 ./publier_visite.sh                                            # recopie dans ../davidbonan.com
 git add -u visite && git commit && git push                    # la source
 git -C ../davidbonan.com add public/visite
@@ -53,7 +54,7 @@ un asset manquant. Deux niveaux.
 
 ```bash
 curl -sIL https://davidbonan.io/visite | grep -i "^HTTP\|^location"
-for f in visite.js temple.glb concepts.json reperes.json; do
+for f in visite.js temple.glb concepts.json reperes.json textes.json; do
   curl -s -o /dev/null -w "$f %{http_code}\n" "https://davidbonan.io/visite/$f"
 done
 ```

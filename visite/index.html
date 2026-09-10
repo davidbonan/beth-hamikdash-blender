@@ -138,8 +138,54 @@
   #barre select:hover, #barre button:hover { border-color: var(--or); }
   #mode { font-size: 12px; letter-spacing: .04em; color: #9a9182; }
   #mode.vole { color: var(--or); }
-  #position { margin-left: auto; font-size: 12px; color: #9a9182;
+  #position { margin-inline-start: auto; font-size: 12px; color: #9a9182;
               font-variant-numeric: tabular-nums; }
+
+  /* ---- langue ---- */
+  .drapeau { display: block; width: 21px; height: 14px; border-radius: 2px;
+             box-shadow: 0 0 0 1px rgba(203,192,170,.25); }
+  #langue { position: relative; }
+  #barre #langue-courante { display: grid; place-items: center; align-self: stretch; }
+  #langue-menu {
+    position: absolute; top: calc(100% + 6px); inset-inline-start: 0; min-width: 150px;
+    display: flex; flex-direction: column; gap: 2px; padding: 4px; border-radius: 5px;
+    border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.94);
+  }
+  #barre #langue-menu button {
+    display: flex; align-items: center; gap: 10px; text-align: start;
+    border-color: transparent; background: none;
+  }
+  #barre #langue-menu button:hover { border-color: var(--or); }
+
+  #accueil {
+    position: fixed; inset: 0; z-index: 50; display: grid; place-content: center;
+    gap: 26px; padding-inline: 16px; text-align: center; color: var(--pierre);
+    background: #0d0c0b; transition: opacity .5s ease;
+  }
+  #accueil.parti { opacity: 0; pointer-events: none; }
+  #accueil .titre { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; }
+  #accueil .choix { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  #accueil button {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    min-width: 128px; padding: 18px 16px 14px; font: inherit; font-size: 16px;
+    color: #e8e0d0; background: rgba(20,18,16,.82); border: 1px solid rgba(203,192,170,.28);
+    border-radius: 6px; cursor: pointer; transition: border-color .15s ease, transform .15s ease;
+  }
+  #accueil button:hover, #accueil button:focus-visible { border-color: var(--or); outline: none; }
+  #accueil button:active { transform: scale(.97); }
+  #accueil .drapeau { width: 54px; height: 36px; }
+
+  /* La barre commence du côté où l'on lit : la fiche s'ouvre donc de l'autre, sans la couvrir. */
+  @media (min-width: 721px), (max-height: 520px) {
+    :root[dir="rtl"] #fiche {
+      right: auto; left: 0; border-left: 0; border-right: 1px solid var(--trait);
+      box-shadow: 12px 0 40px rgba(0,0,0,.35); transform: translateX(-101%);
+    }
+    :root[dir="rtl"] #fiche.ouverte { transform: none; }
+  }
+
+  :root[lang="he"] body { font-family: "Frank Ruehl", "Times New Roman", serif; }
+  :root[lang="he"] .zone, :root[lang="he"] h3 { letter-spacing: 0; }
 
   /* ---- fiche ---- */
   #fiche {
@@ -153,7 +199,7 @@
   #fiche.ouverte { transform: none; }
   #poignee { position: sticky; top: 0; z-index: 2; padding: 18px 0 4px; background: var(--pierre); }
   #fermer {
-    position: absolute; top: 14px; right: 0; width: 26px; height: 26px; padding: 0;
+    position: absolute; top: 14px; inset-inline-end: 0; width: 26px; height: 26px; padding: 0;
     font: inherit; font-size: 17px; line-height: 24px; color: var(--sourd);
     border: 1px solid var(--trait); border-radius: 4px; background: none; cursor: pointer;
   }
@@ -185,7 +231,8 @@
   .sources a:hover { border-bottom-color: var(--or); }
   .sources em { display: block; margin-top: 3px; font-size: 13px; color: var(--sourd); }
   .note { margin: 22px 0 0; padding: 12px 14px; font-size: 13.5px;
-          background: var(--pierre-creuse); border-left: 2px solid var(--or); border-radius: 0 4px 4px 0; }
+          background: var(--pierre-creuse); border-inline-start: 2px solid var(--or);
+          border-radius: 4px; border-start-start-radius: 0; border-end-start-radius: 0; }
   .note b { display: block; font-size: 11px; text-transform: uppercase;
             letter-spacing: .13em; color: var(--sourd); margin-bottom: 4px; }
 
@@ -226,7 +273,7 @@
       content: ""; display: block; width: 42px; height: 4px; margin: 0 auto 6px;
       border-radius: 2px; background: var(--trait);
     }
-    #fermer { top: 10px; right: 18px; width: 34px; height: 34px; line-height: 32px; font-size: 19px; }
+    #fermer { top: 10px; inset-inline-end: 18px; width: 34px; height: 34px; line-height: 32px; font-size: 19px; }
   }
 
   /* ---- téléphone couché : large et bas ---- */
@@ -246,21 +293,51 @@
     #fiche.ouverte, #fiche.ouverte.pleine { transform: none; }
     #poignee { margin: 0; padding: 16px 0 4px; cursor: default; touch-action: auto; }
     #poignee::before { content: none; }
-    #fermer { top: 12px; right: 0; }
+    #fermer { top: 12px; inset-inline-end: 0; }
   }
 </style>
 
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <symbol id="drapeau-fr" viewBox="0 0 3 2" preserveAspectRatio="xMidYMid slice">
+    <rect width="1" height="2" fill="#0055a4"/><rect x="1" width="1" height="2" fill="#fff"/>
+    <rect x="2" width="1" height="2" fill="#ef4135"/>
+  </symbol>
+  <symbol id="drapeau-he" viewBox="0 0 220 160" preserveAspectRatio="xMidYMid slice">
+    <rect width="220" height="160" fill="#fff"/>
+    <rect y="15" width="220" height="25" fill="#0038b8"/><rect y="120" width="220" height="25" fill="#0038b8"/>
+    <path d="M110 50 136 95H84ZM110 110 84 65H136Z" fill="none" stroke="#0038b8" stroke-width="5.5"/>
+  </symbol>
+  <symbol id="drapeau-en" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice">
+    <clipPath id="union-diagonales"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath>
+    <rect width="60" height="30" fill="#012169"/>
+    <path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/>
+    <path d="M0 0 60 30M60 0 0 30" clip-path="url(#union-diagonales)" stroke="#c8102e" stroke-width="4"/>
+    <path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/>
+    <path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6"/>
+  </symbol>
+</svg>
+
+<div id="accueil" hidden>
+  <p class="titre">Beit HaMikdash · <span lang="he">בית המקדש</span></p>
+  <div class="choix"></div>
+</div>
+
 <div id="chargement">
-  <h1>Beit HaMikdash</h1>
+  <h1 data-texte="lieu">Beit HaMikdash</h1>
   <div id="jauge"><i></i></div>
-  <p id="etat">chargement de la scène…</p>
+  <p id="etat" data-texte="chargement">chargement de la scène…</p>
 </div>
 
 <div id="barre">
-  <select id="aller"><option value="">Aller à…</option></select>
-  <select id="chercher"><option value="">Un élément…</option></select>
-  <button id="vol" title="Basculer marche / vol libre (V)">Vol libre</button>
-  <span id="mode">à pied</span>
+  <div id="langue">
+    <button id="langue-courante" type="button" title="Langue" aria-label="Langue" data-titre="langue"
+            aria-haspopup="true" aria-expanded="false"><svg class="drapeau" aria-hidden="true"><use href="#drapeau-fr"></use></svg></button>
+    <div id="langue-menu" hidden></div>
+  </div>
+  <select id="aller"><option value="" data-texte="aller">Aller à…</option></select>
+  <select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select>
+  <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="pied">À pied</button>
+  <span id="mode" class="vole" data-texte="en_vol">vol libre</span>
   <span id="position"></span>
 </div>
 
@@ -269,25 +346,25 @@
 <div id="manche"><i></i></div>
 
 <div id="vertical">
-  <button id="monter" title="Monter" aria-label="Monter">▲</button>
-  <button id="descendre" title="Descendre" aria-label="Descendre">▼</button>
+  <button id="monter" title="Monter" aria-label="Monter" data-titre="monter">▲</button>
+  <button id="descendre" title="Descendre" aria-label="Descendre" data-titre="descendre">▼</button>
 </div>
 
 <div id="aide">
-  <span class="au-clavier">Glisser pour tourner la tête · clic sur un élément pour l'interroger<br>
+  <span class="au-clavier" data-texte-html="aide_clavier">Glisser pour tourner la tête · clic sur un élément pour l'interroger<br>
         <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> ou les flèches pour marcher ·
         <kbd>Maj</kbd> pour courir<br>
-        <kbd>V</kbd> vol libre, puis <kbd>Espace</kbd> monter et <kbd>C</kbd> descendre</span>
-  <span class="au-doigt">Pouce gauche pour marcher, pousser plus loin pour courir<br>
+        <kbd>Espace</kbd> monter et <kbd>C</kbd> descendre · <kbd>V</kbd> à pied</span>
+  <span class="au-doigt"><span data-texte-html="aide_doigt">Pouce gauche pour marcher, pousser plus loin pour courir<br>
         Glisser à droite pour tourner la tête · toucher un élément pour l'interroger<br>
-        Toucher deux fois le sol pour s'y rendre
-        <span class="en-portrait"><br>Tourner l'appareil élargit le champ</span></span>
+        Toucher deux fois le sol pour s'y rendre</span>
+        <span class="en-portrait" data-texte-html="aide_portrait"><br>Tourner l'appareil élargit le champ</span></span>
 </div>
 
 <div id="voile"></div>
 
 <aside id="fiche">
-  <div id="poignee"><button id="fermer" title="Fermer" aria-label="Fermer">×</button></div>
+  <div id="poignee"><button id="fermer" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button></div>
   <div id="corps"></div>
 </aside>
 

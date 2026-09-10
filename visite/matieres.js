@@ -23,6 +23,32 @@ const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT =
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil"]);
+// Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
+export const HAUTEUR_IMAGE = { value: 1 };
+
+const PIXEL = /* glsl */`
+uniform float uHauteurImage;
+varying float vPixel;
+float pixelVu(vec3 p){
+  vec4 vue = modelViewMatrix * vec4(p, 1.0);
+  return 2.0 * -vue.z / (projectionMatrix[1][1] * uHauteurImage);
+}
+`;
+
+// Plus fin qu'un pixel, un fil tombe entre les échantillons et scintille : grossi à ¾ px de rayon, il s'éclaircit d'autant.
+const FIL = /* glsl */`
+#ifdef FIL
+uniform float uRayonFil;
+varying float vCouverture;
+vec3 grossirFil(vec3 p, vec3 n){
+  float pixel = pixelVu(p);
+  float rayonVu = max(uRayonFil, 0.75 * pixel);
+  vCouverture = uRayonFil / rayonVu;
+  vec3 dir = normalize(n);
+  return p + dir * (rayonVu - uRayonFil) / length(mat3(modelMatrix) * dir);
+}
+#endif
+`;
 
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
@@ -65,7 +91,7 @@ const FAMILLES = {
   Marbre_blanc: MARBRE, Marbre_Herode: GAZIT,
   Or: METAL, Or_plaque: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
   Fer: METAL, Fer_lame: METAL,
-  Cedre: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
+  Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
   Parokhet_tissee: ETOFFE, Parokhet_figure: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Peau: ETOFFE,
@@ -87,6 +113,7 @@ varying vec3 vNMonde;
 uniform int uFamille;
 uniform float uTemps;
 uniform vec3 uSoleil;
+varying float vPixel;
 
 float alea1(float p){ p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
 float alea3(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
@@ -116,6 +143,23 @@ float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03) + 0.125 * br
 #define GRAIN_PLEIN 0.875
 #endif
 float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
+// Une octave plus serrée que le pixel rend sa moyenne au lieu de scintiller.
+float octave(vec3 p, float largeur){ return mix(bruit(p), 0.5, smoothstep(0.5, 1.0, largeur)); }
+#ifdef GRAIN_LEGER
+float grain(vec3 p, float largeur){ return 0.5 * octave(p, largeur) + 0.25 * octave(p * 2.03, largeur * 2.03); }
+#else
+float grain(vec3 p, float largeur){
+  return 0.5 * octave(p, largeur) + 0.25 * octave(p * 2.03, largeur * 2.03)
+       + 0.125 * octave(p * 4.01, largeur * 4.01);
+}
+#endif
+
+// Posé par matiere() avant tout motif : ce que couvre le pixel au point ombré, sans dérivée d'écran.
+struct Regard { vec3 vue; float incidence; float pixel; };
+Regard regard;
+// Un plan vu de biais étire le pixel le long de la ligne de visée, pas en travers.
+float empreinte(vec3 axe){ float r = dot(regard.vue, axe) / regard.incidence; return regard.pixel * sqrt(1.0 + r * r); }
+float empreinteMax(){ return regard.pixel / regard.incidence; }
 
 // Aucune dérivée d'écran dans ce fichier, et c'est délibéré. Aux angles rasants — un
 // mur vu presque par la tranche, ce qui est la moitié des cadres dans un couloir de
@@ -238,6 +282,16 @@ float ecart(float coord, float taille, out float rang, out float sens){
   return min(f, 1.0 - f) * taille;
 }
 
+// Un joint plus fin que le pixel s'élargit jusqu'à lui en s'éclaircissant d'autant : un trait, pas un pointillé.
+float horsJoint(float d, float largeur, float pixel){
+  float l = max(largeur, pixel);
+  return 1.0 - (1.0 - clamp(d / l, 0.0, 1.0)) * largeur / l;
+}
+float penteRampe(float d, vec2 rampe, float pixel){
+  float l = max(rampe.y, pixel);
+  return d >= rampe.x && d < rampe.x + l ? 1.0 / l : 0.0;
+}
+
 // Appareil de gazit. Le Tanakh mesure ces pierres : « אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה
 // אַמּוֹת » (Melakhim I 7:10) — deux longueurs, l'assise en tire une —, et les dit sciées
 // lisses dedans et dehors, « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (7:9). Tout le relief tient
@@ -253,7 +307,7 @@ float ecart(float coord, float taille, out float rang, out float sens){
 // — personne n'y marche.
 void dalles(vec3 P, out vec3 teinte, out vec3 pente, out float rugo, out float usure,
             out vec4 photo){
-  float g = grain(P * 7.0);
+  float g = grain(P * 7.0, empreinteMax() * 7.0);
   // Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
   // s'empilent sur X et chacune court sur Z, d'un bout à l'autre de la cour.
   float ligne, sensX, sensZ;
@@ -267,13 +321,14 @@ void dalles(vec3 P, out vec3 teinte, out vec3 pente, out float rugo, out float u
   float colonne;
   float dz = ecart(v, longueur, colonne, sensZ);
   float d = min(dx, dz);
-  float lit = clamp(d / JOINT_DALLE, 0.0, 1.0);
+  float pixelX = empreinte(vec3(1.0, 0.0, 0.0)) / AMA, pixelZ = empreinte(vec3(0.0, 0.0, 1.0)) / AMA;
+  float lit = min(horsJoint(dx, JOINT_DALLE, pixelX), horsJoint(dz, JOINT_DALLE, pixelZ));
   float tireDalle = alea3(vec3(floor(colonne), num, 0.0));
   usure = grain(P / (20.0 * AMA));
   teinte = vec3((1.0 + (g - 0.5) * 0.10) * (0.985 + tireDalle * 0.03) * mix(0.70, 1.0, lit))
          * mix(vec3(1.0), OMBRE_JOINT, 0.45 * usure);
   vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
-  pente = (d < JOINT_DALLE ? 1.0 / JOINT_DALLE : 0.0) * dir * (CREUX_DALLE / AMA);
+  pente = penteRampe(d, vec2(0.0, JOINT_DALLE), dx < dz ? pixelX : pixelZ) * dir * (CREUX_DALLE / AMA);
   rugo = (g - 0.5) * 0.10;
   photo = vec4(vec3(tireDalle, tireRang, alea3(vec3(num, floor(colonne), 11.0))) * 13.0, 1.0);
 }
@@ -318,9 +373,10 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
                + 0.32 * clamp((d - JOINT - LISERE) / 0.06, 0.0, 1.0);
   // Ce profil est linéaire par morceaux : sa dérivée s'écrit. C'est elle qui creuse le
   // joint pour la lumière, là où la teinte seule ne faisait qu'un trait peint.
-  float dprofil = d < JOINT ? 0.62 / JOINT
-                : (d < JOINT + LISERE ? 0.06 / LISERE
-                : (d < JOINT + LISERE + 0.06 ? 0.32 / 0.06 : 0.0));
+  float pixelJoint = (dz < du ? empreinte(vec3(0.0, 1.0, 0.0)) : empreinte(axe)) / AMA;
+  float dprofil = 0.62 * penteRampe(d, vec2(0.0, JOINT), pixelJoint)
+                + 0.06 * penteRampe(d, vec2(JOINT, LISERE), pixelJoint)
+                + 0.32 * penteRampe(d, vec2(JOINT + LISERE, 0.06), pixelJoint);
   // La marche d'assise n'agit que sur le LIT : un joint vertical sépare deux blocs du
   // même rang, qui affleurent. Les deux versants d'un même lit tombent dans des assises
   // de parité opposée, donc dans des marches opposées — c'est cette dissymétrie-là qui
@@ -331,17 +387,17 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   // Le JOINT seul, sans le liseré : l'ombre s'arrête au fond de la rainure. Étalée sur
   // le liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur ; le
   // liseré est de la pierre en plein soleil et ne doit rien perdre.
-  float creux = clamp(d / (JOINT * 1.15 * marche), 0.0, 1.0);
+  float creux = horsJoint(d, JOINT * 1.15 * marche, pixelJoint);
   // Une coulure, pas une tache : un bruit étiré à la verticale. Une tache sur un mur se
   // lit en défaut de matière ; une coulure se lit en pierre. Et une moucheture par-
   // dessus : le banc donne au bloc SA couleur, mais un bloc d'une seule couleur est un
   // échantillon de nuancier — le calcaire est nué à l'intérieur de chaque pierre.
-  float coulure = 0.16 * smoothstep(0.52, 0.88, grain(vec3(P.x, P.y / 12.0, P.z) / (3.0 * AMA)));
+  float coulure = 0.16 * smoothstep(0.52, 0.88, grain(vec3(P.x, P.y / 12.0, P.z) / (3.0 * AMA), empreinteMax() / (3.0 * AMA)));
   // La moucheture DÉVIE autour d'une moyenne fixe : d'un bloc au suivant c'est son
   // motif qui change, jamais sa valeur. La teinte est l'affaire du banc, et cinq
   // finitions qui s'éclairciraient l'une l'autre rendraient cinq calcaires.
-  float mouchete = 0.14 + ((grain(P * vec3(1.0, taille.lit, 1.0) / (taille.pas * AMA)) - 0.5) * 0.22
-                         + (grain(P / (taille.fin * AMA)) - 0.5) * 0.10) * taille.force;
+  float mouchete = 0.14 + ((grain(P * vec3(1.0, taille.lit, 1.0) / (taille.pas * AMA), empreinteMax() * taille.lit / (taille.pas * AMA)) - 0.5) * 0.22
+                         + (grain(P / (taille.fin * AMA), empreinteMax() / (taille.fin * AMA)) - 0.5) * 0.10) * taille.force;
   // Le drapeau sépare les deux pierres du chantier : le calcaire du pourtour tire son
   // banc, le marbre du bâtiment ne tire qu'une nuance — sa couleur lui vient du rang.
   float f = parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + tireBloc * 0.68;
@@ -350,7 +406,7 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   teinte = mix(base * OMBRE_JOINT, base, creux);
   // La rugosité varie DANS le bloc, pas seulement d'un bloc à l'autre : sous un soleil
   // rasant c'est le lustre qui donne la surface, la teinte ne fait que la colorer.
-  rugo = (tireBloc - 0.5) * 0.18 + (grain(P / (0.35 * AMA)) - 0.5) * 0.16 + taille.lustre;
+  rugo = (tireBloc - 0.5) * 0.18 + (grain(P / (0.35 * AMA), empreinteMax() / (0.35 * AMA)) - 0.5) * 0.16 + taille.lustre;
 #ifndef GRAIN_LEGER
   // « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (Melakhim I 7:9) : ces blocs sont SCIÉS, et une
   // scie laisse sur le champ des stries parallèles de quelques centimètres de pas.
@@ -362,7 +418,7 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   // dans le même sens sont ce qui sépare un parement bâti d'une trame imprimée sur
   // tout le mur.
   vec2 scie = mix(vec2(0.7, 26.0), vec2(26.0, 0.7), taille.couche);
-  rugo += (grain(vec3(u * scie.x, P.y * scie.y, 0.0)) - 0.5) * taille.strie;
+  rugo += (grain(vec3(u * scie.x, P.y * scie.y, 0.0), max(empreinte(axe) * scie.x, empreinte(vec3(0.0, 1.0, 0.0)) * scie.y)) - 0.5) * taille.strie;
 #endif
   // Le carreau de la nappe se recale sur CHAQUE bloc. Photographié à plat et lu en
   // coordonnées de monde, le même éclat de calcaire revenait tous les 2,4 m sur toute
@@ -421,7 +477,7 @@ vec3 penteNappe(vec3 p, vec3 w){
 // Mêmes valeurs que COULURE_ENTRETENUE / COULURE_EXPOSEE du blockout.
 void patiner(vec3 P, vec3 N, float force, inout vec3 teinte, inout float rugo){
   float debout = 1.0 - abs(N.y);
-  float trainee = smoothstep(0.54, 0.90, grain(P * vec3(2.6, 0.19, 2.6))) * debout * force;
+  float trainee = smoothstep(0.54, 0.90, grain(P * vec3(2.6, 0.19, 2.6), empreinteMax() * 2.6)) * debout * force;
   teinte *= mix(vec3(1.0), OMBRE_JOINT, trainee * 0.22);
   rugo += trainee * 0.10;
 }
@@ -436,6 +492,9 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   // de huit à dix amot tiennent à deux cents mètres, là où le module d'une ama
   // scintillait passé quarante et laissait la moitié des cadres en volumes gris.
   float loin = distance(P, cameraPosition);
+  vec3 vue = (P - cameraPosition) / loin;
+  // Plancher d'incidence : vu par la tranche, un plan étirerait le pixel à l'infini.
+  regard = Regard(vue, max(abs(dot(N, vue)), 0.02), vPixel);
   float nettete = 1.0 - smoothstep(60.0, 200.0, loin);
   // Le relief se retire BIEN plus tôt que la couleur. Une teinte qui rétrécit sous le
   // pixel se moyenne toute seule ; une normale, non — elle bascule d'un pixel au
@@ -474,7 +533,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
             : (t < 0.6667 ? vec3(0.86, 0.92, 0.97) : vec3(0.87, 0.95, 0.88));
   }
   else if (uFamille == 2) {                                   // marbre : veines lentes
-    float v = grain(P * vec3(2.2, 5.0, 2.2) + grain(P * 1.1) * 2.0);
+    float v = grain(P * vec3(2.2, 5.0, 2.2) + grain(P * 1.1) * 2.0, empreinteMax() * 5.0);
     teinte = vec3(1.0 + (v - 0.5) * 0.13);
     rugo = (v - 0.5) * 0.06;
   }
@@ -488,22 +547,22 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     vec3 t1 = normalize(abs(N.y) > 0.7 ? vec3(1.0, 0.0, 0.0) : cross(N, vec3(0.0, 1.0, 0.0)));
     vec3 t2 = cross(N, t1);
     float e = 0.10;
-    float g = grain(q);
-    pente = ((grain(q + t1 * e) - g) * t1 + (grain(q + t2 * e) - g) * t2) * (0.055 / e);
+    float g = grain(q, empreinteMax() * 6.0);
+    pente = ((grain(q + t1 * e, empreinteMax() * 6.0) - g) * t1 + (grain(q + t2 * e, empreinteMax() * 6.0) - g) * t2) * (0.055 / e);
     teinte = vec3(1.0 + (g - 0.5) * 0.05);
     rugo = (g - 0.5) * 0.10;
   }
   else if (uFamille == 4) {                                   // bois : fil étiré
     // Le fil reste écrit — une planche de cèdre du Heikhal fait 20 amot de haut, et
     // aucune nappe d'un mètre ne porte une veine de cette longueur.
-    float f = grain(P * vec3(9.0, 1.1, 9.0));
+    float f = grain(P * vec3(9.0, 1.1, 9.0), empreinteMax() * 9.0);
     teinte = vec3(1.0 + (f - 0.5) * 0.18 - fract(f * 7.0) * 0.06);
     rugo = (f - 0.5) * 0.10;
   }
   else if (uFamille == 5) {                                   // étoffe
     // La trame vient de la nappe : le sinus qui la portait valait 38 périodes au mètre
     // et grésillait dès deux pas de recul, ce qu'aucun mipmap ne pouvait rattraper.
-    teinte = vec3(1.0 + (grain(P * 45.0) - 0.5) * 0.10);
+    teinte = vec3(1.0 + (grain(P * 45.0, empreinteMax() * 45.0) - 0.5) * 0.10);
     rugo = -0.03;
   }
   else if (uFamille == 6) {                                   // eau : ride lente
@@ -518,7 +577,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo = -0.02;
   }
   else if (uFamille == 7) {                                   // enduit à la chaux
-    float g = grain(P * 11.0), fin = grain(P * 47.0);
+    float g = grain(P * 11.0, empreinteMax() * 11.0), fin = grain(P * 47.0, empreinteMax() * 47.0);
     teinte = vec3(1.0 + (g - 0.5) * 0.20 + (fin - 0.5) * 0.09);
     rugo = (g - 0.5) * 0.12;
   }
@@ -608,14 +667,12 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   pente += penteNappe(pb, w) * (uCarreau.z * photo.w);
 #ifdef NAPPE_COULEUR
   vec4 c = nappe(uNappeC, pb, w);
-#ifdef NAPPE_MACRO
   // Une seconde échelle cinq fois plus lente, projetée à plat : ce sont des taches, pas
   // du grain, et une seule prise suffit à les porter. C'est elle qui empêche l'œil de
   // reconnaître le carreau et de voir un papier peint là où il y a de la pierre.
   // Elle se prend sur le carreau NON recalé : recalées bloc à bloc, ces taches-là
   // cesseraient d'être grandes et retomberaient au rang de moucheture.
   c.rgb *= mix(vec3(1.0), texture2D(uNappeC, p.xz * 0.2).rgb / uMoyenne, 0.35);
-#endif
   vec3 rapport = c.rgb / uMoyenne;
   rapport = mix(vec3(dot(rapport, vec3(0.2126, 0.7152, 0.0722))), rapport, uChroma);
   teinte *= mix(vec3(1.0), rapport, uCarreau.y);
@@ -633,7 +690,7 @@ export function habiller(materiau, horloges, jeux) {
   const famille = FAMILLES[materiau.name];
   if (!famille) return;
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
-                      uSoleil: { value: SOLEIL } };
+                      uSoleil: { value: SOLEIL }, uHauteurImage: HAUTEUR_IMAGE };
   materiau.userData.uniformes = uniformes;
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === BRAISE) {
@@ -654,21 +711,27 @@ export function habiller(materiau, horloges, jeux) {
       uniformes.uRugoMoy = { value: jeu.rugosite };
     }
   }
+  const rayonFil = materiau.userData.rayon;
+  if (rayonFil) {
+    uniformes.uRayonFil = { value: rayonFil };
+    materiau.transparent = true;
+  }
   const drapeaux = (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
-    + (jeu?.couleur && PROFIL.nappes.macro ? "#define NAPPE_MACRO\n" : "");
+    + (rayonFil ? "#define FIL\n" : "");
 
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
     nuanceur.vertexShader = nuanceur.vertexShader
-      .replace("#include <common>", "#include <common>\nvarying vec3 vMonde;\nvarying vec3 vNMonde;")
+      .replace("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;")
       .replace("#include <begin_vertex>",
-               "#include <begin_vertex>\nvMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\n" +
+               "#include <begin_vertex>\n#ifdef FIL\ntransformed = grossirFil(transformed, objectNormal);\n#endif\n" +
+               "vMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPixel = pixelVu(transformed);\n" +
                "vNMonde = normalize(mat3(modelMatrix) * objectNormal);");
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
-      .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN)
+      .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
       .replace("#include <shadowmap_pars_fragment>",
                PROFIL.ombres.penombre ? assemblage() : "#include <shadowmap_pars_fragment>")
       // Les maillages sont exportés sans normales : three les tire des dérivées.
@@ -682,7 +745,7 @@ export function habiller(materiau, horloges, jeux) {
         vec3 mTeinte, mPente, mFeu; float mRugo;
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);`)
       .replace("#include <color_fragment>",
-               "#include <color_fragment>\ndiffuseColor.rgb *= mTeinte;")
+               "#include <color_fragment>\ndiffuseColor.rgb *= mTeinte;\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
       .replace("#include <roughnessmap_fragment>",
                "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + mRugo, 0.03, 1.0);")
       // L'incandescence est une TEXTURE, pas une constante de matière : une braise dont

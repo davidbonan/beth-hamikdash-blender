@@ -16,6 +16,11 @@ retour sur l'Even HaShetiya — celle de Moïse, cachée sous le Temple et rév�
 54a ; Rambam *Beit HaBe'hira* 4:1), avec la kaporet et ses deux keruvim (fiche §8h) ;
 dans l'Oulam, **Ya'hin et Boaz** sont debout aux cotes de *Melakhim I* 7 (fiche §8a-bis).
 
+![Planche de contrôle : première et dernière image de chaque plan](renders/planche/planche.jpg)
+
+*Planche de contrôle — une ligne par plan de `cameras.json`, première image à gauche,
+dernière à droite.*
+
 ## Fichiers
 
 | Fichier | Rôle |
@@ -43,11 +48,12 @@ Un dossier par étape, et rien à la racine :
 | Dossier | Étape | Contenu |
 |---|---|---|
 | `renders/blockout/` | 1 | rendus Blender 1920 × 1080 : `<caméra>_{debut,fin}.png` et `..._profondeur.png`. Ce sont les entrées de l'i2i. |
-| `renders/planche/` | 1 | planche de contrôle 640 × 360 + `planche.html` : première et dernière image de chaque plan, avec focale et frames. |
+| `renders/planche/` | 1 | planche de contrôle 640 × 360 + `planche.html` : première et dernière image de chaque plan, avec focale et frames. `planche.jpg` les assemble en une mosaïque. |
 | `renders/style/` | 2 | images clés stylisées (`fal_image.py`). |
 | `renders/video/` | 4 | les mp4 (`fal_video.py`). |
 
-Le dossier est ignoré par git : ce sont des artefacts, ils se regénèrent.
+Le dossier est ignoré par git : ce sont des artefacts, ils se regénèrent. Seule
+exception, `renders/planche/planche.jpg`, versionnée pour s'afficher en tête de ce README.
 
 L'export **remet `render.filepath` à vide avant de sauvegarder** le .blend. Sans quoi
 n'importe quel rendu d'animation lancé ensuite déverse ses frames dans le dernier
@@ -67,15 +73,18 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
-| `visite/nappes.js` | Les cinq jeux de scans, chargés dans la définition que le profil autorise. |
-| `visite/matieres/` | Les scans eux-mêmes, en 1024 et 512. Artefacts — `beit_hamikdash_nappes.py` les refabrique. |
+| `visite/nappes.js` | Les cinq jeux de scans, chargés en 1024 sur toutes les machines. |
+| `visite/matieres/` | Les scans eux-mêmes, en 1024. Artefacts — `beit_hamikdash_nappes.py` les refabrique. |
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur. |
 | `visite/concepts.json` | **La charnière.** Un concept par entrée : son identifiant, sa zone, et les préfixes de noms d'objets Blender qui lui appartiennent. |
 | `visite/contenu_a.json`, `_b`, `_c` | L'encyclopédie : résumé, cotes, sources. Trois fichiers parce qu'ils ont été relevés en trois passes ; le viewer les fusionne au chargement. |
+| `visite/contenu_a.en.json`, `.he.json`… | Les traductions de l'encyclopédie, un miroir par fichier et par langue. Le français fait foi. En hébreu, une citation est le texte original relevé sur Sefaria, jamais une retraduction du français. |
+| `visite/textes.json` | Par langue : son nom, son sens d'écriture, les textes de l'interface, les zones, les points d'entrée et les titres des œuvres citées. |
+| `visite/langue.js` | La langue : le choix au premier passage, retenu dans le navigateur, et le sélecteur à drapeau de la barre. |
 | `visite/temple.glb` | Géométrie exportée, compressée meshopt : 6,7 Mo pour 746 000 triangles. Artefact — se regénère. |
-| `visite/reperes.json` | Emprise de chaque concept et points d'entrée. Artefact. |
+| `visite/reperes.json` | Emprise de chaque concept, points d'entrée du menu, et points des creux souterrains que seul « Un élément… » atteint. Artefact. |
 
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # regénère temple.glb
@@ -116,8 +125,8 @@ retouche dans la scène ne demande jamais de retoucher une image.
 
 Cinq jeux, tous CC0, refabriqués par `beit_hamikdash_nappes.py` : *worn_rock_natural_01*,
 *beige_wall_001*, *hinoki_planks* et *rough_linen* de [Poly Haven](https://polyhaven.com),
-*Metal007* d'[ambientCG](https://ambientcg.com). 2,3 Mo en 1024 pour le bureau, 520 ko en
-512 pour le téléphone. L'or n'en tire que son terni : une feuille BATTUE a des creux, et
+*Metal007* d'[ambientCG](https://ambientcg.com). 2,3 Mo en 1024, téléphone compris. L'or
+n'en tire que son terni : une feuille BATTUE a des creux, et
 une tôle scannée n'en a pas — le martelage est écrit, comme l'appareil.
 
 **Les arêtes.** Le blockout porte 5 561 chanfreins, que l'export jetait tous. Les six
@@ -209,6 +218,13 @@ Corollaire, et c'est la seule discipline à tenir : **un volume ajouté au block
 nom ne tombe sous aucun préfixe est versé dans `_non_classe`** et devient un maillage
 anonyme. L'export l'annonce en fin de course, groupé par racine de nom — cette liste est
 exactement ce qu'il reste à déclarer dans `concepts.json`.
+
+**Les langues.** Français, hébreu, anglais : choisies au premier passage, retenues dans
+le navigateur, changées au drapeau de la barre. Le français est la source, et la même
+discipline vaut pour lui : **tout changement dans `concepts.json` ou `contenu_*.json` se
+reporte dans les miroirs `.en` et `.he`**. `python3 beit_hamikdash_traductions.py` dit ce
+qui manque ou a dérivé — un concept nouveau, une cote ajoutée, une source changée — et
+sort en erreur tant qu'il en reste. Une langue non traduite retombe sur le français.
 
 **Ce que la visite ne prend pas.** Les 5 960 modificateurs Bevel (à appliquer, la scène
 passe de 132 000 à 743 000 faces et le fichier de 3,8 à 76 Mo, pour un chanfrein de 3 cm
@@ -575,7 +591,7 @@ ont fait corriger, si.
 - **Six portes à battants d'or.** « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעֲרֵי נִיקָנוֹר » (*Middot* 2:3 ; *Yoma* 3:10) : rabattus dans l'embrasure comme ceux de Nikanor et du Heikhal, ouverts dès l'aube (*Tamid* 3:7). Le פתח de HaGazit n'en a pas — ce n'est pas un שער. La porte est de l'Ezrat Nashim aussi.
 - **Soreg en treillis.** Poteaux au pas de 3 amot et deux lisses de bois : la lame pleine se lisait en muret, quand la fiche (§2) veut « une séparation légère, pas un mur ».
 - **Gezuztra sur colonnes.** La galerie des femmes (*Middot* 2:5 ; *Soucca* 51b) traversait les chambres d'angle et flottait : elle court maintenant entre elles, sur des colonnes, avec un garde-corps.
-- **Le yessod ne fait pas le tour.** « הַיְסוֹד הָיָה מְהַלֵּךְ עַל פְּנֵי כָל הַצָּפוֹן וְעַל פְּנֵי כָל הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת וּבַמִּזְרָח אַמָּה אַחַת » (*Middot* 3:1 ; fiche §6) : la base était bâtie sur les quatre côtés. Nord et ouest entiers, une ama à l'angle sud-ouest, une à l'angle nord-est, et le corps descend au sol sur les faces est et sud. Avec lui : le **'hout hasikra** à mi-hauteur (*Middot* 3:1), les **deux petites rampes** vers le sovev (à l'ouest) et vers le yessod (à l'est) (*Middot* 3:3 ; Rambam *Beit HaBe'hira* 2:14), et **quatre ma'arakhot** en lits de bûches croisées — Rambam *Temidin ouMousafin* 2:4 en compte quatre le jour de Kippour (l'avis de R. Yossi, *Yoma* 4:6 ; le tana kama trois) : la grande à l'est, celle de la ketoret à l'angle sud-ouest (*Tamid* 2:4-5), les deux autres où l'on veut. La colonne de fumée part de la grande.
+- **Le yessod ne fait pas le tour.** « הַיְסוֹד הָיָה מְהַלֵּךְ עַל פְּנֵי כָל הַצָּפוֹן וְעַל פְּנֵי כָל הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת וּבַמִּזְרָח אַמָּה אַחַת » (*Middot* 3:1 ; fiche §6) : la base était bâtie sur les quatre côtés. Nord et ouest entiers, une ama à l'angle sud-ouest, une à l'angle nord-est, et le corps descend au sol sur les faces est et sud. Avec lui : le **'hout hasikra** à mi-hauteur (*Middot* 3:1), les **deux petites rampes** vers le sovev (à l'ouest) et vers le yessod (à l'est) (*Middot* 3:3 ; Rambam *Beit HaBe'hira* 2:14), et **quatre ma'arakhot** en lits de bûches croisées — Rambam *Temidin ouMousafin* 2:4 en compte quatre le jour de Kippour (l'avis de R. Yossi, *Yoma* 4:6 ; R. Meir cinq, R. Yehouda trois) : la grande à l'est, celle de la ketoret à l'angle sud-ouest (*Tamid* 2:4-5), les deux autres où l'on veut. La colonne de fumée part de la grande.
 - **Kiyor à douze robinets.** Profil tourné sur son כַּן (Ex. 30:18), les « שְׁנֵים עָשָׂר דַּד » de Ben Katin (*Yoma* 3:10), l'eau dans la vasque.
 - **Les crochets des ninnasin.** « וְאֻנְקְלָיוֹת שֶׁל בַּרְזֶל הָיוּ קְבוּעִין בָּהֶן, שְׁלֹשָׁה סְדָרִים » (*Middot* 3:5) : trois rangs de crochets de fer sur les deux faces de chaque bloc de cèdre, qui monte à 1,2 ama pour les porter.
 - **Les fenêtres du Heikhal sont des baies.** Elles étaient des boîtes de chaux noyées dans le mur, coplanaires avec ses faces : un rectangle blanc qui clignotait sur l'or du plan 9a. « שְׁקוּפִים אֲטוּמִים », étroites dedans et larges dehors (*Mena'hot* 86b) : embrasure extérieure de 3 × 6, intérieure de 1,2 × 4, percées dans le mur **et** dans le placage d'or — les murs nord et sud du corps sont bâtis en deux épaisseurs, chacune par `paroi_percee`.
@@ -607,7 +623,7 @@ Consigne : embellir d'après les textes, **rien de l'archéologie hérodienne** 
 - **Les deux pishpeshim de Nikanor** (*Middot* 2:6), vantaux de bronze côté Azara seulement — la face est domine les marches de sept amot et demie.
 - **Le mukhni de Ben Katin** (*Yoma* 3:10 ; 37a) : potence, roue et chaîne au bord du Kiyor.
 - **La magrefa** (*Tamid* 5:6 ; *Arakhin* 10b) posée entre l'Oulam et l'autel.
-- **La tablette d'or d'Hélène** (*Yoma* 3:10) sur l'or du mur est de l'Oulam. Sa nivreshet existait déjà : c'est `Couronne_Helene` (*Yoma* 37a).
+- **La tablette d'or d'Hélène** (*Yoma* 3:10) sur l'or du mur est de l'Oulam. Sa nivreshet existait déjà : c'est `Nivreshet_Helene` (*Yoma* 37b).
 - **Le dessin de Shushan** (*Middot* 1:3) en bas-relief au-dessus de la porte est du Har HaBayit.
 - Écarté : les trois étages des ta'im (*Middot* 4:4) n'ont aucune expression extérieure sourcée ; les treize brèches du soreg ne sont plus visibles une fois réparées.
 
@@ -704,3 +720,66 @@ d'Hélène, sous lui, était un tore et huit cônes à six faces.
   de l'Oulam** (Melekhet Shlomo *ad loc.*), étage que ce blockout ne bâtit pas (CHOIX de
   suivre Rashi), ou aux **fenêtres du Heikhal** (Bartenura *ad loc.* ; Abravanel sur
   *Zekharia* 6:14), qui ne se voient pas de l'Oulam.
+
+### Revue des sources (10/09)
+
+La relecture des notices de la visite contre Sefaria a trouvé des écarts que le blockout
+portait aussi. Ils sont corrigés dans le script, la fiche et les trois langues de la visite.
+
+- **Les douze marches ont leurs rovadim.** « אַמָּה אַמָּה וְרֹבֶד שָׁלֹשׁ, וְאַמָּה אַמָּה וְרֹבֶד שָׁלֹשׁ.
+  וְהָעֶלְיוֹנָה, אַמָּה אַמָּה וְרֹבֶד אַרְבַּע » (*Middot* 3:6) : la 4e et la 7e font trois amot de
+  giron, la 12e quatre (Bartenura *ad loc.*). Les marches prennent **19** des 22 amot, pas
+  12, et il ne reste que 3 amot de plat au pied du Mizbea'h (`GIRONS_ULAM`). Le **Kiyor**
+  n'y tenait plus : il passe au sud de la volée (y −8 → −14), ce que « וּמָשׁוּךְ כְּלַפֵּי
+  הַדָּרוֹם » demandait déjà. Le repère « Au Kiyor » suit.
+- **La nivreshet est une lampe.** « מנורה », glose Bartenura sur *Yoma* 3:10, que Tosfot
+  Yom Tov rapproche de la « נברשתא » de Daniel 5:5. Le bandeau à fleurons devient une vasque
+  d'or bombée à douze becs, pendue aux mêmes trois chaînes. Forme : **CHOIX**. Les objets
+  s'appellent `Nivreshet_Helene` et le préfixe de `concepts.json` suit.
+- **Les portes de 'Houlda font 10 de large.** « כָּל הַפְּתָחִים וְהַשְּׁעָרִים שֶׁהָיוּ שָׁם, גָּבְהָן עֶשְׂרִים
+  אַמָּה, וְרָחְבָּן עֶשֶׂר אַמּוֹת, חוּץ מִשֶּׁל אוּלָם » (*Middot* 2:3) : elles en avaient 20.
+- **Le Heikhal a ses battants intérieurs.** « וְהַפְּנִימִיּוֹת נִפְתָּחוֹת לְתוֹךְ הַבַּיִת לְכַסּוֹת אַחַר
+  הַדְּלָתוֹת » (*Middot* 4:1) : deux vantaux sculptés à plat contre le mur est, dans le
+  Heikhal. Derrière eux, ni placage ni champ sculpté sur vingt amot — « שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב,
+  חוּץ מֵאַחַר הַדְּלָתוֹת » (*Middot* 4:1) ; le bandeau haut du champ court au-dessus.
+- **La magrefa qu'on jette est une pelle.** « כלי גדול שהיו זורקים אותו כדי להשמיע קול » (Bartenura
+  sur *Tamid* 5:6), « כלי שלישי שמשמיע קול והיה גם צורתו כצורת מגריפה » (Tosfot Yom Tov *ad loc.*) :
+  pas l'instrument à dix trous d'*Arakhin* 10b-11a, qui se serait brisé. La boîte à dix tuyaux
+  devient un couvercle de bronze à manche couché au sol, « כמין כסוי הקדרה של מתכת דק ולו בית
+  יד » (Rashi sur *Shemot* 27:3). Écarté : le Raavad, rapporté par le Rashash, qui les
+  identifie. Diamètre et manche : **CHOIX**.
+- **Le portique double fait le tour.** Ni le nom « Stoa royale » ni le second rang réservé au
+  sud ne viennent du corpus. « הַר הַבַּיִת סְטָיו כָּפוּל הָיָה… סְטָיו לִפְנִים מִסְּטָיו » (*Pesa'him* 13b), que
+  Rashi lit « האיצטבא סביב סביב מקפת ובתוך אותו הקף עוד אחר » : deux rangs en anneaux sur les
+  quatre côtés (`RANGS_PORTIQUE`), à 15 et 30 amot du mur. Plus de colonne devant les cinq
+  portes. `stoa_royale` fusionne dans le concept `portiques`, `Stoa_sud_*` devient
+  `Portique_sud_*`.
+- **L'Azara n'était pas à sa place sur l'esplanade.** « רֻבּוֹ מִן הַדָּרוֹם, שֵׁנִי לוֹ מִן הַמִּזְרָח, שְׁלִישִׁי לוֹ
+  מִן הַצָּפוֹן, מִעוּטוֹ מִן הַמַּעֲרָב » (*Middot* 2:1) se mesure du mur du Har HaBayit à celui de
+  l'Azara, « חומת העזרה » (Rambam et Bartenura *ad loc.*), l'Ezrat Nashim comptant dans l'est
+  (Tosfot Yom Tov). Le modèle donnait est 283 contre sud 197,5, et ne laissait à l'ouest que
+  12 amot entre le mur et le soreg — le rang de portique à 15 amot y était planté dans le
+  soreg. L'enceinte reste à 500 × 500 (`HX0, HX1 = -274, 226` ; `HY0, HY1 = -307, 193`) : sud
+  234,5, est 221, nord 120,5, ouest 82. Le bâtiment est centré d'est en ouest (81 amot devant
+  l'Ezrat Nashim, 82 derrière l'Azara) ; seul le nord-sud est décentré, comme l'ordre l'exige.
+  Écarté : R. Yehosef Ashkenazi (Melekhet Shelomoh), qui compte l'est depuis l'Ezrat Nashim —
+  avec 163 amot libres d'est en ouest à partager, il coince le Temple dans l'angle nord-ouest
+  (essayé : sud 265,5, est 110, nord 89,5, ouest 53). Le repère « Har HaBayit, sur l'axe est »
+  passe en x 185. Le relief suit `HX0`, `HX1`, `HY0` et `HY1`.
+- **Les keruvim sont tournés de biais.** « ומצודדים פניהם כתלמיד הנפטר מרבו » (*Bava Batra*
+  99a) : ni tout à fait l'un vers l'autre, ni tout à fait vers la Maison. 20° vers l'est
+  (`BIAIS_KERUV`, **CHOIX**), les mains se rejoignent toujours au milieu de la kaporet.
+- **Citations des commentaires.** Yam « מִכֶּתֶף » et non « עַל כֶּתֶף » (*Melakhim I* 7:39) ;
+  mekhonot « מִשְּׂמֹאלוֹ » ; l'aliyah bâtie est en *Beit HaBe'hira* **4:3** ; l'aigle et le lion
+  de la parokhet sont de **Rashi** sur *Yoma* 72b ; les fenêtres qui répandent la lumière
+  sont Rashi sur *Mena'hot* 86b, pas la guemara ; le pain de proposition fait 10 × 5
+  tefa'him, relevé sur la Table de 6.
+
+## Licence
+
+- **Code** — scripts Python, JavaScript, shell et `visite/index.html` : [MIT](LICENSE).
+- **Contenus** — `beit_hamikdash.blend`, `visite/temple.glb`, la fiche technique, ce README,
+  les textes de la visite (`visite/*.json`) et les images : [CC BY 4.0](LICENSE-CC-BY-4.0),
+  © 2026 David Bonan.
+- **Textures** de `visite/matieres/` : refabriquées depuis des jeux CC0 de Poly Haven et
+  ambientCG, elles restent CC0.

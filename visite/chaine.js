@@ -7,12 +7,10 @@
  *
  * L'anti-crénelage est ici et pas sur le moteur. `antialias: true` sur le
  * WebGLRenderer ne vaut que pour le tampon d'écran, dans lequel cette chaîne n'écrit
- * jamais : la scène va dans une cible hors écran, et le réglage n'avait donc aucun
- * effet — toute la visite sortait crénelée. Un multi-échantillonnage sur la cible du
- * composeur coûterait quatre fois ses 8 octets par pixel — 165 Mo sur un écran
- * retina —, et surtout il ne dirait rien du crénelage qui ne vient PAS de la
- * géométrie : ni celui de la passe d'occlusion, calculée en demi-résolution, ni celui
- * du disque solaire. Une passe finale les traite tous de la même façon.
+ * jamais : la scène va dans une cible hors écran. C'est donc cette cible qui est
+ * multi-échantillonnée, quatre prises par pixel pour les arêtes, les cordes et les
+ * échelons. Le FXAA final reprend ce que le MSAA ne voit pas : la passe d'occlusion,
+ * calculée en demi-résolution, et le disque solaire.
  *
  * OCCLUSION AMBIANTE.
  *
@@ -217,7 +215,8 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
 
   const teinteFond = new THREE.Color();
-  const composeur = new EffectComposer(renderer);
+  const composeur = new EffectComposer(renderer,
+    new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
   composeur.addPass(new RenderPass(scene, camera));
   const passeAO = new ShaderPass(OCCLUSION);
   passeAO.renderToScreen = false;

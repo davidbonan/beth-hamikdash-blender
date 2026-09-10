@@ -2,25 +2,27 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, ETOFFES } from "./matieres.js";
+import { habiller, ETOFFES, HAUTEUR_IMAGE } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { chaine } from "./chaine.js";
 import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
 import { regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
-import { ZONES, panneau } from "./fiche.js";
+import { nomDeZone, panneau } from "./fiche.js";
+import { LANGUE_SOURCE, ecrire, installerLangue, langue, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
 const OEIL = 1.75;        // H_HOMME de la fiche : 1,75 m
 const RAYON = 0.38;       // demi-largeur du marcheur
-// Les degrés du 'Heil, de Nikanor et de l'Oulam font tous 1/2 ama — 0,24 m — et
-// c'est cette valeur qui commande les trois suivantes. MONTEE doit la dépasser de
-// peu : la garde se place juste au-dessus, et sa portée doit rester plus courte
-// qu'une marche n'est profonde, sans quoi elle heurte la marche d'après avant qu'on
-// ait gravi celle d'avant.
+// Les degrés du 'Heil, de Nikanor et de l'Oulam font tous 1/2 ama — 0,24 m de haut
+// comme de giron. La garde se place juste au-dessus de MONTEE et ne porte qu'à une
+// peau : la première contremarche qu'elle voit est deux girons plus loin, jamais
+// celle qu'on s'apprête à gravir.
+// MONTEE suit la plus haute marche du parcours : celle d'une ama qui porte le Doukhan
+// (Middot 2:6), sur toute la largeur de la cour. À 0,28 m, l'Azara restait hors d'atteinte.
 const MARCHE = 0.5 * 0.48; // 1/2 ama
-const MONTEE = 0.28;       // franchissable sans escalader
+const MONTEE = AMA + 0.02;
 const CHUTE = 0.60;        // au-delà, il n'y a pas de sol : le pas est refusé
 // Ce qu'un repère d'entrée peut manquer son sol, en plus ou en moins. Il donne sa
 // hauteur à la main, et la fenêtre de la marche est celle d'un pas : trois des neuf
@@ -64,7 +66,7 @@ const etat = $("#etat"), jauge = $("#jauge i");
 // Une erreur de chargement laissait l'écran figé sur son dernier état sans rien dire :
 // le voile ne se lève qu'en fin de module, et un module qui jette ne lève rien.
 const echouer = (quoi) => {
-  etat.textContent = `échec : ${quoi}`;
+  etat.textContent = `${texte("echec")} ${quoi}`;
   etat.style.color = "#e0836a";
 };
 addEventListener("error", (e) => echouer(e.message || e.error));
@@ -79,19 +81,32 @@ async function json(chemin, obligatoire = true) {
   return r.json();
 }
 
-const [fiche, ...contenus] = await Promise.all([
+const FICHIERS_CONTENU = ["a", "b", "c"];
+const [textes, fiche, ...contenus] = await Promise.all([
+  json("./textes.json"),
   json("./concepts.json"),
-  json("./contenu_a.json", false),
-  json("./contenu_b.json", false),
-  json("./contenu_c.json", false),
+  ...FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.json`, false)),
 ]);
+installerLangue(textes);
 const reperes = await json("./reperes.json");
 
-const CONCEPTS = new Map();
-for (const c of fiche.concepts) {
-  const apport = contenus.find((x) => x && x[c.id]) || {};
-  CONCEPTS.set(c.id, { ...c, ...(apport[c.id] || {}) });
+const traductions = new Map();
+function contenusTraduits(code) {
+  if (!traductions.has(code)) {
+    traductions.set(code, Promise.all(FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.${code}.json`, false))));
+  }
+  return traductions.get(code);
 }
+
+const apport = (contenusDuFichier, id) => contenusDuFichier.find((x) => x && x[id])?.[id] || {};
+
+async function conceptsEn(code) {
+  const traduits = code === LANGUE_SOURCE ? [] : await contenusTraduits(code);
+  return new Map(fiche.concepts.map((c) =>
+    [c.id, { ...c, ...apport(contenus, c.id), ...apport(traduits, c.id) }]));
+}
+
+const CONCEPTS = await conceptsEn(langue());
 
 // ---------------------------------------------------------------------------
 // scène
@@ -103,7 +118,7 @@ for (const c of fiche.concepts) {
 // GPU à tuiles de leur tri préalable : le profil léger s'en passe, et compte pour ça
 // sur le seul écart qui reste à départager, les 4,8 cm du placage.
 const renderer = new THREE.WebGLRenderer({
-  antialias: true, powerPreference: "high-performance",
+  powerPreference: "high-performance",
   logarithmicDepthBuffer: PROFIL.profondeurLog });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.68;
@@ -171,8 +186,10 @@ function dimensionner() {
     2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(FOV_HORIZONTAL) / 2) / camera.aspect));
   camera.fov = THREE.MathUtils.clamp(vertical, FOV_VERTICAL[0], FOV_VERTICAL[1]);
   camera.updateProjectionMatrix();
-  renderer.setPixelRatio(DPR * echelle);
+  // Taille d'abord : sans largeur CSS, la toile vaut 300 px × DPR et élargit la page sur mobile.
   renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(DPR * echelle);
+  HAUTEUR_IMAGE.value = renderer.domElement.height;
   rendu.redimensionner(innerWidth, innerHeight);
 }
 dimensionner();
@@ -191,7 +208,7 @@ const [gltf, jeux] = await Promise.all([
     }),
   nappes(),
 ]);
-etat.textContent = "préparation…";
+ecrire(etat, "preparation");
 scene.add(gltf.scene);
 // Three ne calcule les matrices monde qu'au premier rendu, et un rayon ne les calcule
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
@@ -278,7 +295,7 @@ let cible = null;
 // les douze degrés du 'Heil, à l'Azara par les quinze marches, et l'autel se contourne.
 // C'est l'architecture, pas un défaut — mais un modèle se regarde aussi d'ailleurs que
 // d'où l'on a le droit de se tenir : le vol libre est là pour ça.
-let vol = false;
+let vol = true;
 
 function vitesseVoulue() {
   const vitesse = (vol ? VOL : PAS) * (manette.course ? COURSE : 1);
@@ -352,6 +369,16 @@ function poser(x, y, z, visee) {
   accorderRegard();
 }
 
+function atterrir() {
+  const { x, y, z } = camera.position;
+  // Une marche au-dessus de l'œil : en rasant la dalle en vol, il a pu passer dessous.
+  const sol = solSous(sonde.set(x, y + MONTEE, z), Infinity);
+  if (sol === null) return false;
+  piedsY = sol;
+  camera.position.y = sol + OEIL;
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // regard
 // ---------------------------------------------------------------------------
@@ -390,7 +417,7 @@ function lisserRegard(dt) {
 const viseur = new THREE.Raycaster();
 const ecran = new THREE.Vector2();
 const survol = $("#survol");
-const { montrer, fermer } = panneau(CONCEPTS);
+const { montrer, fermer, rafraichir } = panneau(CONCEPTS);
 let survole = null;
 
 const normaliser = (clientX, clientY) =>
@@ -424,23 +451,26 @@ function seRendreA(clientX, clientY) {
 // ---------------------------------------------------------------------------
 // commandes
 // ---------------------------------------------------------------------------
-const mode = $("#mode");
-function basculerVol() {
-  vol = !vol;
-  mode.textContent = vol ? "vol libre" : "à pied";
+const mode = $("#mode"), boutonVol = $("#vol");
+function afficherMode() {
+  ecrire(mode, vol ? "en_vol" : "a_pied");
   mode.classList.toggle("vole", vol);
+  ecrire(boutonVol, vol ? "pied" : "vol");
   manette.modeVol(vol);
-  cible = null;
-  if (!vol) {                                   // en reprenant pied, retrouver le sol
-    const sol = solEn(camera.position.x, camera.position.z, camera.position.y - OEIL + 0.3);
-    if (sol !== null) { piedsY = sol; camera.position.y = sol + OEIL; }
-  }
 }
-$("#vol").onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
+
+function basculerVol() {
+  if (vol && !atterrir()) return;
+  vol = !vol;
+  afficherMode();
+  cible = null;
+}
+boutonVol.onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
 
 const manette = commandes(renderer.domElement, {
   regarder: tourner, interroger, allerAu: seRendreA, basculerVol,
 });
+afficherMode();
 
 // ---------------------------------------------------------------------------
 // barre
@@ -454,8 +484,12 @@ function fondu(action) {
 }
 
 const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
-for (const e of reperes.entrees) {
-  aller.append(new Option(e.nom, e.id));
+
+function remplirAller() {
+  aller.replaceChildren(aller.options[0]);
+  for (const e of reperes.entrees) {
+    aller.append(new Option(libelle("entrees", e.id) ?? e.nom, e.id));
+  }
 }
 aller.onchange = () => {
   const id = aller.value;
@@ -464,16 +498,18 @@ aller.onchange = () => {
   aller.blur();
 };
 
-const parZone = [...CONCEPTS.values()].sort((a, b) =>
-  (ZONES[a.zone] || a.zone).localeCompare(ZONES[b.zone] || b.zone) || a.nom.localeCompare(b.nom, "fr"));
-let zoneCourante = null;
-for (const c of parZone) {
-  if (c.zone !== zoneCourante) {
-    zoneCourante = c.zone;
-    chercher.append(Object.assign(document.createElement("optgroup"),
-      { label: ZONES[c.zone] || c.zone }));
+function remplirChercher() {
+  const parZone = [...CONCEPTS.values()].sort((a, b) =>
+    nomDeZone(a.zone).localeCompare(nomDeZone(b.zone), langue()) || a.nom.localeCompare(b.nom, langue()));
+  chercher.replaceChildren(chercher.options[0]);
+  let zoneCourante = null;
+  for (const c of parZone) {
+    if (c.zone !== zoneCourante) {
+      zoneCourante = c.zone;
+      chercher.append(Object.assign(document.createElement("optgroup"), { label: nomDeZone(c.zone) }));
+    }
+    chercher.lastElementChild.append(new Option(c.nom, c.id));
   }
-  chercher.lastElementChild.append(new Option(c.nom, c.id));
 }
 chercher.onchange = () => {
   const id = chercher.value;
@@ -484,8 +520,20 @@ chercher.onchange = () => {
   chercher.blur();
 };
 
+async function accorderLangue(code) {
+  const traduits = await conceptsEn(code);
+  if (code !== langue()) return;                // un choix plus récent est passé pendant le chargement
+  for (const [id, concept] of traduits) CONCEPTS.set(id, concept);
+  remplirAller();
+  remplirChercher();
+  rafraichir();
+}
+suivreLangue(accorderLangue);
+// Le choix du premier passage tombe le plus souvent pendant le chargement du modèle.
+await accorderLangue(langue());
+
 function allerA(id) {
-  const e = reperes.entrees.find((x) => x.id === id);
+  const e = [...reperes.entrees, ...reperes.souterrains].find((x) => x.id === id);
   if (e) { poser(...e.position, e); return true; }
   const b = reperes.emprises[id];
   if (!b) return false;
@@ -583,7 +631,7 @@ renderer.setAnimationLoop(() => {
       survol.style.top = `${p.clientY + 20}px`;
     }
     position.textContent = `${(camera.position.x / AMA).toFixed(0)} · ` +
-      `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} amot`;
+      `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`;
   }
   dessiner(dt);
 });

@@ -7,9 +7,6 @@ La COULEUR porte la rugosité dans son canal alpha — l'alpha du WebP est codé
 à pleine définition, là où le bleu partirait en 4:2:0 avec le reste de la chrominance.
 La NORMALE est en convention OpenGL, vert vers le haut, celle qu'attend three.
 
-Deux définitions sont produites : 1024 pour le bureau, 512 pour le profil léger, qui
-n'y gagne pas seulement des octets mais quatre fois moins de mémoire vidéo.
-
 Le script imprime aussi la moyenne LINÉAIRE de chaque couleur et sa rugosité moyenne :
 ce sont les constantes de `visite/nappes.js`, et la nappe est appliquée en rapport à
 elles. Les recopier là-bas après avoir changé un scan, sinon la teinte dérive.
@@ -24,7 +21,7 @@ import urllib.request
 RACINE = pathlib.Path(__file__).resolve().parent
 SORTIE = RACINE / "visite" / "matieres"
 BRUT = SORTIE / ".scans"
-TAILLES = (1024, 512)
+TAILLE = 1024
 
 # Le calcaire est le meleke de Jérusalem : crème, piqué, sans veine. Les travertins
 # sciés, eux, se lisent en carrelage de salle de bain, et les roches de falaise en
@@ -91,31 +88,28 @@ def main():
 
     print("  À recopier dans visite/nappes.js :")
     for nom in (*POLY_HAVEN, *AMBIENT_CG):
-        for taille in TAILLES:
-            normale = BRUT / f"{nom}_normale_{taille}.png"
-            ffmpeg("-i", str(BRUT / f"{nom}_normale.jpg"), "-vf", f"scale={taille}:{taille}",
-                   "-frames:v", "1", str(normale))
-            subprocess.run(["cwebp", "-quiet", "-q", "88", "-m", "6", "-sharp_yuv",
-                            str(normale), "-o", str(SORTIE / f"{nom}_n_{taille}.webp")], check=True)
-            if nom in SANS_COULEUR:
-                continue
-            couleur = BRUT / f"{nom}_couleur_{taille}.png"
-            ffmpeg("-i", str(BRUT / f"{nom}_couleur.jpg"), "-i", str(BRUT / f"{nom}_rugosite.jpg"),
-                   "-filter_complex",
-                   f"[0:v]scale={taille}:{taille},format=rgb24[c];"
-                   f"[1:v]scale={taille}:{taille},format=gray[r];[c][r]alphamerge",
-                   "-frames:v", "1", str(couleur))
-            subprocess.run(["cwebp", "-quiet", "-q", "82", "-alpha_q", "72", "-m", "6",
-                            "-sharp_yuv", str(couleur),
-                            "-o", str(SORTIE / f"{nom}_c_{taille}.webp")], check=True)
-            if taille == 1024:
-                teinte, rugosite = moyenne(couleur)
-                print(f"  {nom}: {{ moyenne: [{teinte[0]:.4f}, {teinte[1]:.4f}, "
-                      f"{teinte[2]:.4f}], rugosite: {rugosite:.4f} }},")
+        normale = BRUT / f"{nom}_normale_{TAILLE}.png"
+        ffmpeg("-i", str(BRUT / f"{nom}_normale.jpg"), "-vf", f"scale={TAILLE}:{TAILLE}",
+               "-frames:v", "1", str(normale))
+        subprocess.run(["cwebp", "-quiet", "-q", "88", "-m", "6", "-sharp_yuv",
+                        str(normale), "-o", str(SORTIE / f"{nom}_n_{TAILLE}.webp")], check=True)
+        if nom in SANS_COULEUR:
+            continue
+        couleur = BRUT / f"{nom}_couleur_{TAILLE}.png"
+        ffmpeg("-i", str(BRUT / f"{nom}_couleur.jpg"), "-i", str(BRUT / f"{nom}_rugosite.jpg"),
+               "-filter_complex",
+               f"[0:v]scale={TAILLE}:{TAILLE},format=rgb24[c];"
+               f"[1:v]scale={TAILLE}:{TAILLE},format=gray[r];[c][r]alphamerge",
+               "-frames:v", "1", str(couleur))
+        subprocess.run(["cwebp", "-quiet", "-q", "82", "-alpha_q", "72", "-m", "6",
+                        "-sharp_yuv", str(couleur),
+                        "-o", str(SORTIE / f"{nom}_c_{TAILLE}.webp")], check=True)
+        teinte, rugosite = moyenne(couleur)
+        print(f"  {nom}: {{ moyenne: [{teinte[0]:.4f}, {teinte[1]:.4f}, "
+              f"{teinte[2]:.4f}], rugosite: {rugosite:.4f} }},")
 
-    poids = {t: sum(f.stat().st_size for f in SORTIE.glob(f"*_{t}.webp")) for t in TAILLES}
-    for taille, octets in poids.items():
-        print(f"\n  {taille} : {octets / 1e6:.2f} Mo")
+    octets = sum(f.stat().st_size for f in SORTIE.glob(f"*_{TAILLE}.webp"))
+    print(f"\n  {TAILLE} : {octets / 1e6:.2f} Mo")
 
 
 main()

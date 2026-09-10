@@ -38,23 +38,11 @@
       ]
     },
     {
-      "id": "stoa_royale",
-      "nom": "Stoa royale",
-      "zone": "har_habayit",
-      "prefixes": [
-        "Stoa_sud",
-        "Portique_sud",
-        "Portique_stoa"
-      ]
-    },
-    {
       "id": "portiques",
-      "nom": "Portiques est, nord et ouest",
+      "nom": "Portiques doubles",
       "zone": "har_habayit",
       "prefixes": [
-        "Portique_est",
-        "Portique_nord",
-        "Portique_ouest"
+        "Portique"
       ]
     },
     {
@@ -197,6 +185,14 @@
       ]
     },
     {
+      "id": "shit",
+      "nom": "Shit",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Shit_"
+      ]
+    },
+    {
       "id": "maarakhot",
       "nom": "Les ma'arakhot",
       "zone": "mizbeach",
@@ -276,10 +272,10 @@
     },
     {
       "id": "couronne_helene",
-      "nom": "Couronne d'Hélène",
+      "nom": "Nivreshet d'Hélène",
       "zone": "oulam",
       "prefixes": [
-        "Couronne_Helene"
+        "Nivreshet_Helene"
       ]
     },
     {
@@ -448,7 +444,7 @@
     },
     {
       "id": "contenu_aron",
-      "nom": "Ce que contient l'Aron",
+      "nom": "Ce qui accompagne l'Aron",
       "zone": "kodesh_hakodashim",
       "prefixes": [
         "Aron_mate",
@@ -512,6 +508,22 @@
       "zone": "lishkot",
       "prefixes": [
         "Beit_HaMoked"
+      ]
+    },
+    {
+      "id": "mesiba_bira",
+      "nom": "Mesiba sous la bira",
+      "zone": "lishkot",
+      "prefixes": [
+        "Mesiba_bira"
+      ]
+    },
+    {
+      "id": "beit_hatevila",
+      "nom": "Beit HaTevila",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaTevila"
       ]
     },
     {
