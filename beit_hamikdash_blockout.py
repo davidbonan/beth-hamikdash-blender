@@ -23,6 +23,7 @@ import bpy
 import math
 import sys
 import zlib
+from typing import NamedTuple
 from mathutils import Matrix, Vector
 
 # ----------------------------------------------------------------------------
@@ -1069,6 +1070,9 @@ MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 # que le bronze : c'est de sa lumière que vient l'argument.
 MAT_NEHOSHET = lambda: metal("Nehoshet_matzhiv", (0.86, 0.63, 0.29), 0.34)
 MAT_TERRE_CUITE = lambda: enduit("Terre_cuite", (0.46, 0.25, 0.16))
+MAT_SEL = lambda: enduit("Sel", (0.93, 0.93, 0.91))              # Lishkat HaMela'h (Middot 5:3)
+MAT_PEAU = lambda: etoffe("Peau", (0.40, 0.26, 0.16))            # peaux salées de la Parva (Middot 5:3)
+MAT_KETORET = lambda: enduit("Ketoret", (0.52, 0.38, 0.26))      # sammanim pilés (Keritot 6b)
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
 # Le dallage est SOUS les murs en valeur, mais dans LEUR pierre : à 0,57 neutre il
@@ -1721,54 +1725,90 @@ def couches_middot(name, x0, x1, y0, y1, zbas, col, tremies=()):
     dalle_percee(f"{name}_maaziva", x0, x1, y0, y1, zbas + 4, zbas + 5, col, MAT_MARBRE_HERODE(), tremies)
 
 
-def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, mat=None):
-    """Chambre du pourtour : socle, corps percé de baies, bandeau, corniche.
+class Porte(NamedTuple):
+    """Baie d'une lishka. `seuil` : le sol qu'elle dessert ; `centre` : sa cote le long de
+    la face, le milieu du mur par défaut ; `metal` : ce dont un שער a été changé."""
+    face: str
+    largeur: float
+    hauteur: float
+    seuil: float
+    centre: float | None = None
+    metal: bpy.types.Material | None = None
+
+
+def _bandes(x0, x1, y0, y1, dedans, dehors, adossee):
+    """Pourtour d'une emprise en bandes par face, de `dehors` hors du nu à `dedans` en retrait.
+
+    Les bandes est et ouest s'arrêtent entre celles du nord et du sud : prolongées, leurs
+    faces seraient coplanaires avec elles. La face `adossee` n'en reçoit pas, et ses deux
+    voisines s'arrêtent à son nu.
+    """
+    hors = {f: 0 if f == adossee else dehors for f in "OE"}
+    retrait = {f: 0 if f == adossee else dedans for f in "SN"}
+    bandes = {"S": (x0 - hors["O"], x1 + hors["E"], y0 - dehors, y0 + dedans),
+              "N": (x0 - hors["O"], x1 + hors["E"], y1 - dedans, y1 + dehors),
+              "O": (x0 - dehors, x0 + dedans, y0 + retrait["S"], y1 - retrait["N"]),
+              "E": (x1 - dedans, x1 + dehors, y0 + retrait["S"], y1 - retrait["N"])}
+    bandes.pop(adossee, None)
+    return bandes
+
+
+def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None):
+    """Chambre du pourtour, creuse : socle, murs percés de baies, bandeau, corniche qui la couvre.
 
     Posée en boîte nue, une lishka ne se lit pas : à 750 amot elle n'a ni pied, ni
     sommet, ni ombre sur elle-même, et le styliseur en fait un rocher. Les trois
     lignes en saillie donnent l'assise et le couronnement, les baies l'échelle.
 
-    `portes` : liste de `(face, largeur, hauteur)`, face parmi "S", "N", "O", "E".
-    Deux portes sur des faces opposées font une **traversée** et non deux culs-de-sac :
-    le noyau s'ouvre entre elles. C'est le Beit HaMoked, où l'on entre du 'Heil et
-    ressort dans l'Azara (Middot 1:7), et la Lishkat HaGazit, « חֶצְיָהּ בַּקֹּדֶשׁ
-    וְחֶצְיָהּ בַּחוֹל, שְׁנֵי פְתָחִים הָיוּ לָהּ » (Yoma 25a ; Rambam, Beit HaBe'hira 5:17).
+    `portes` : des `Porte`. Chacune s'ouvre à son seuil, et le socle s'ouvre avec elle
+    quand ce seuil est plus bas que lui. Le sol intérieur n'est pas bâti ici : il dépend
+    de ce que la chambre enjambe. `adossee` : la face collée à un mur d'enceinte, qui lui
+    sert de mur — ni parement, ni socle, ni saillie.
     """
     zs, zc = z0 + LISHKA_SOCLE, z1 - LISHKA_CORNICHE
-    debords = (x0 - LISHKA_DEBORD, x1 + LISHKA_DEBORD,
-               y0 - LISHKA_DEBORD, y1 + LISHKA_DEBORD)
-    portes = [(f, l, min(h, zc - zs - 4)) for f, l, h in portes]
-    z_bandeau = zs + max(h for _, _, h in portes) + 1
-    for suffixe, zb, zh in (("socle", z0, zs), ("corniche", zc, z1),
-                            ("bandeau", z_bandeau, z_bandeau + LISHKA_BANDEAU)):
-        box(f"{name}_{suffixe}", *debords, zb, zh, col, mat)
-
     d = LISHKA_PAREMENT
-    _noyau(name, x0 + d, x1 - d, y0 + d, y1 - d, zs, zc, col, mat, portes)
-    # Les parements est et ouest s'arrêtent avant les angles : sinon leurs faces
-    # extérieures seraient coplanaires avec celles des parements nord et sud.
+    portes = [p._replace(hauteur=min(p.hauteur, zc - p.seuil - LISHKA_BANDEAU - 1)) for p in portes]
+    z_bandeau = max((p.seuil + p.hauteur for p in portes), default=zs + PORTE_LISHKA[1]) + 1
+    murs = _bandes(x0, x1, y0, y1, d, 0, adossee)
+
+    def le_long(face, bornes):
+        return (bornes[0], bornes[1]) if face in "SN" else (bornes[2], bornes[3])
+
+    def centre(porte):
+        if porte.centre is not None:
+            return porte.centre
+        return sum(le_long(porte.face, murs[porte.face])) / 2
+
+    for face, bornes in _bandes(x0, x1, y0, y1, d, LISHKA_DEBORD, adossee).items():
+        passages = [(centre(p) - p.largeur / 2, centre(p) + p.largeur / 2, p.seuil, zs)
+                    for p in portes if p.face == face and p.seuil < zs]
+        paroi_percee(f"{name}_socle_{face}", *bornes, z0, zs, col, mat, passages)
+    pourtour = _bandes(x0, x1, y0, y1, 0, LISHKA_DEBORD, adossee)
+    for face, bornes in pourtour.items():
+        box(f"{name}_bandeau_{face}", *bornes, z_bandeau, z_bandeau + LISHKA_BANDEAU, col, mat)
+    enveloppe = [plus(b[i] for b in pourtour.values())
+                 for plus, i in ((min, 0), (max, 1), (min, 2), (max, 3))]
+    box(f"{name}_corniche", *enveloppe, zc, z1, col, mat)
+
     haut_bandeau = z_bandeau + LISHKA_BANDEAU
     z_baie0 = haut_bandeau + (zc - haut_bandeau) * 0.25
     z_baie1 = haut_bandeau + (zc - haut_bandeau) * 0.75
-    for face, bornes, a0, a1 in (("S", (x0, x1, y0, y0 + d), x0, x1),
-                                 ("N", (x0, x1, y1 - d, y1), x0, x1),
-                                 ("O", (x0, x0 + d, y0 + d, y1 - d), y0 + d, y1 - d),
-                                 ("E", (x1 - d, x1, y0 + d, y1 - d), y0 + d, y1 - d)):
+    for face, bornes in murs.items():
+        a0, a1 = le_long(face, bornes)
         baies = []
-        for f, larg, haut in portes:
-            if f == face:
-                c = (a0 + a1) / 2
-                baies.append((c - larg / 2, c + larg / 2, zs, zs + haut))
-                # Le cadre de la baie s'arrête sous le bandeau, qui lui sert de corniche
-                # et court sur toute la façade. Il est plus étroit que celui d'un שער de
-                # l'Azara : sur une face de vingt amot, un chambranle de trois mangerait
-                # le trumeau. L'or reste dehors — ces baies-ci ouvrent sur le 'Heil, et
-                # les six שערים que Middot 2:3 change en or sont dans le mur de l'Azara,
-                # que ces corps ne font qu'enjamber.
-                shaar(f"{name}_{face}_cadre",
-                      {"S": ("x", y0, -1), "N": ("x", y1, 1),
-                       "O": ("y", x0, -1), "E": ("y", x1, 1)}[face],
-                      c, zs, z_bandeau, d, col, mat, largeur=larg, hauteur=haut, cadre=2.0)
+        for p in portes:
+            if p.face != face:
+                continue
+            c = centre(p)
+            baies.append((c - p.largeur / 2, c + p.largeur / 2, max(p.seuil, zs), p.seuil + p.hauteur))
+            # Le cadre s'arrête sous le bandeau, qui lui sert de corniche et court sur toute
+            # la façade. Plus étroit que celui d'un שער de l'Azara : sur une face de vingt
+            # amot, un chambranle de trois mangerait le trumeau.
+            shaar(f"{name}_{face}_cadre",
+                  {"S": ("x", y0, -1), "N": ("x", y1, 1),
+                   "O": ("y", x0, -1), "E": ("y", x1, 1)}[face],
+                  c, p.seuil, min(z_bandeau, p.seuil + p.hauteur + 1), d, col, mat,
+                  metal=p.metal, largeur=p.largeur, hauteur=p.hauteur, cadre=min(2.0, p.largeur / 4))
         n = max(2, round((a1 - a0) / 12))
         for k in range(n) if z_baie1 - z_baie0 >= 2 else ():
             c = a0 + (a1 - a0) * (k + 0.5) / n
@@ -1779,26 +1819,23 @@ def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, mat=None):
         paroi_percee(f"{name}_{face}", *bornes, zs, zc, col, mat, baies)
 
 
-def _noyau(name, x0, x1, y0, y1, z0, z1, col, mat, portes):
-    """Masse intérieure de la lishka, ouverte d'un couloir si deux portes s'opposent."""
-    faces = {f: (l, h) for f, l, h in portes}
-    for couple, axe in ((("N", "S"), "x"), (("E", "O"), "y")):
-        if not faces.keys() >= set(couple):
-            continue
-        larg = min(faces[f][0] for f in couple)
-        haut = min(faces[f][1] for f in couple)
-        a0, a1 = (x0, x1) if axe == "x" else (y0, y1)
-        c = (a0 + a1) / 2
-        tranches = [("cote_0", a0, c - larg / 2, z0, z1),
-                    ("cote_1", c + larg / 2, a1, z0, z1),
-                    ("linteau", c - larg / 2, c + larg / 2, z0 + haut, z1)]
-        for suffixe, u0, u1, zb, zh in tranches:
-            if axe == "x":
-                box(f"{name}_noyau_{suffixe}", u0, u1, y0, y1, zb, zh, col, mat)
-            else:
-                box(f"{name}_noyau_{suffixe}", x0, x1, u0, u1, zb, zh, col, mat)
-        return
-    box(f"{name}_noyau", x0, x1, y0, y1, z0, z1, col, mat)
+DEGRE = 0.5   # « רוּם מַעֲלָה חֲצִי אַמָּה וְשִׁלְחָהּ חֲצִי אַמָּה » (Middot 2:3)
+
+
+def escalier(name, x0, x1, y0, y1, z_bas, z_haut, descente, col, mat=None):
+    """Volée de degrés d'une demi-ama sur l'emprise donnée, chacun plein jusqu'à `z_bas`.
+
+    `descente` : '+x', '-x', '+y' ou '-y', le sens où l'on descend. Le premier degré
+    affleure `z_haut`, le sol d'où l'on part ; le dernier est à un degré de `z_bas`.
+    """
+    axe, sens = descente[1], 1 if descente[0] == "+" else -1
+    a0, a1 = (x0, x1) if axe == "x" else (y0, y1)
+    n = round((z_haut - z_bas) / DEGRE)
+    pas, depart = (a1 - a0) / n, a0 if sens > 0 else a1
+    for k in range(n):
+        u0, u1 = sorted((depart + sens * pas * k, depart + sens * pas * (k + 1)))
+        emprise = (u0, u1, y0, y1) if axe == "x" else (x0, x1, u0, u1)
+        box(f"{name}_{k:02d}", *emprise, z_bas, z_haut - DEGRE * k, col, mat)
 
 
 def terrasse_de_porte(name, x0, x1, y0, y1, z, chambre, col, mat=None):
@@ -2824,9 +2861,11 @@ box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara"
 # guichets de bronze de part et d'autre de la grande porte, côté Azara. Cote (3 × 8) :
 # CHOIX. Les vantaux sont posés sur le nu du mur — la baie n'est pas percée, et la face
 # est, dix amot au-dessus du sol de l'Ezrat Nashim, n'en reçoit pas.
-for cote, y0, y1 in (("S", -14.5, -11.5), ("N", 11.5, 14.5)):
-    box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + 8, "20_Azara", MAT_NEHOSHET())
-    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + 8, Z_EZI + 8.4, "20_Azara", MAT_NEHOSHET())
+PISHPESHIM = (("S", -14.5, -11.5), ("N", 11.5, 14.5))
+H_PISHPESH = 8
+for cote, y0, y1 in PISHPESHIM:
+    box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + H_PISHPESH, "20_Azara", MAT_NEHOSHET())
+    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + H_PISHPESH, Z_EZI + H_PISHPESH + 0.4, "20_Azara", MAT_NEHOSHET())
 # Mur ouest
 box("Azara_mur_ouest", AX0 - T, AX0, AY0 - T, AY1 + T, Z_AZ, Z_AZ + H_MUR, "20_Azara")
 # Murs nord et sud avec trois portes chacun (10 × 20). Positions : CHOIX (Middot 1:4)
@@ -2843,10 +2882,10 @@ PORTE_DELEK, PORTE_BEKHOROT, PORTE_MAYIM = -120, -66, -12       # sud, ouest -> 
 PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -12       # nord, ouest -> est
 # La Lishkat HaGazit est à cheval sur la limite du sacré, avec deux ouvertures —
 # « חֶצְיָהּ בַּקֹּדֶשׁ וְחֶצְיָהּ בַּחוֹל… שְׁנֵי פְתָחִים הָיוּ לָהּ, אֶחָד פָּתוּחַ בַּקֹּדֶשׁ וְאֶחָד
-# פָּתוּחַ בַּחוֹל » (Yoma 25a ; Rambam, Beit HaBe'hira 5:17). Celle qui donne sur l'Azara
-# perce donc le mur nord. Ce n'est pas une huitième porte : Middot 1:4 compte sept
-# **שערים**, et Yoma 25a appelle celles-ci des פתחים.
-# La Lishkat HaGola perce le mur pour la même raison : « וּמִשָּׁם מַסְפִּיקִים מַיִם לְכָל
+# פָּתוּחַ בַּחוֹל » (Yoma 25a ; Rambam, Beit HaBe'hira 5:17). Elle enjambe
+# le mur, qui s'interrompt sur sa largeur. Ce ne sont pas des portes de plus : Middot 1:4
+# compte sept **שערים**, et Yoma 25a appelle celles-ci des פתחים.
+# La Lishkat HaGola, bâtie derrière le mur, le perce : « וּמִשָּׁם מַסְפִּיקִים מַיִם לְכָל
 # הָעֲזָרָה » (Middot 5:4) — une chambre qui alimente toute la cour s'ouvre sur elle.
 # Les x du groupe du nord (Gazit, Gola, HaEtz) sont un CHOIX : voir plus bas, c'est la
 # seule portée de mur assez longue pour les trois. HaGazit est la plus orientale, les
@@ -2854,12 +2893,18 @@ PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -12       # nord, ouest ->
 # סְמוּכִין לַמַּעֲרָב… שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה »).
 GAZIT_X0, GAZIT_X1 = -158, -138
 GOLA_X0, GOLA_X1 = -182, -162
-PETAHIM = {(GAZIT_X0 + GAZIT_X1) / 2, (GOLA_X0 + GOLA_X1) / 2}
-OUVERTURES = {"nord": [PORTE_MOKED, PORTE_KORBAN, PORTE_NITZOTZ, *sorted(PETAHIM)],
+MOKED_X0, MOKED_X1 = PORTE_MOKED - 10, PORTE_MOKED + 10
+PETAH_GOLA = (GOLA_X0 + GOLA_X1) / 2
+# Le Beit HaMoked et la Lishkat HaGazit enjambent le mur : il s'interrompt sur leur
+# largeur, et leurs baies sont dans leurs propres faces. Un mur qui les traverserait en
+# ferait deux culs-de-sac de dix amot.
+TRAVERSEES = {"nord": [(MOKED_X0, MOKED_X1), (GAZIT_X0, GAZIT_X1)], "sud": []}
+OUVERTURES = {"nord": [PORTE_KORBAN, PORTE_NITZOTZ, PETAH_GOLA],
               "sud": [PORTE_MAYIM, PORTE_BEKHOROT, PORTE_DELEK]}
 for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
     ouvertures = OUVERTURES[nm]
-    bornes = [AX0] + sum([[p - 5, p + 5] for p in sorted(ouvertures)], []) + [AX1]
+    coupures = sorted([(p - 5, p + 5) for p in ouvertures] + TRAVERSEES[nm])
+    bornes = [AX0] + [u for coupure in coupures for u in coupure] + [AX1]
     for k in range(0, len(bornes) - 1, 2):
         box(f"Azara_mur_{nm}_{k // 2}", bornes[k], bornes[k + 1], y0, y1,
             Z_AZ, Z_AZ + H_MUR, "20_Azara")
@@ -2871,28 +2916,13 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
         box(f"Azara_porte_{nm}_{p:+.0f}_linteau", p - 5, p + 5, y0, y1,
             Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
         # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
-        # ouverts dès l'aube (Tamid 3:7). Les פתחים de HaGazit et de HaGola n'en sont pas.
+        # ouverts dès l'aube (Tamid 3:7). Le פתח de HaGola n'en est pas un.
         shaar(f"Azara_porte_{nm}_{p:+.0f}", ("x", *face), p, Z_AZ, SOUS_CORNICHE, T,
-              "20_Azara", metal=None if p in PETAHIM else MAT_OR())
-        if p not in PETAHIM:
+              "20_Azara", metal=None if p == PETAH_GOLA else MAT_OR())
+        if p != PETAH_GOLA:
             battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
                      Z_AZ, 20, "20_Azara", MAT_OR())
-# Ezrat Israël → Ezrat Kohanim (Middot 2:6, R. Eliezer ben Yaakov) : « מַעֲלָה גְבוֹהָה אַמָּה
-# וְהַדּוּכָן נָתוּן עָלֶיהָ וּבוֹ שָׁלֹשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה, נִמְצֵאת עֶזְרַת כֹּהֲנִים גְּבוֹהָה
-# מֵעֶזְרַת יִשְׂרָאֵל שְׁתֵּי אַמּוֹת וּמֶחֱצָה ». Une volée qui monte vers l'ouest, sur toute la largeur :
-# la marche d'une ama, puis les trois demi-marches du Doukhan, la dernière affleurant la cour.
-# Les boîtes emboîtées d'avant faisaient un mur de 2,5 amot en travers de la porte.
-box("Marche_EzratIsrael_Cohanim", AX1 - 12, AX1 - 11, AY0, AY1, Z_EZI - 1, Z_EZI + 1, "20_Azara")
-for i in range(3):
-    box(f"Doukhan_{i}", AX1 - 12.5 - i * 0.5, AX1 - 12 - i * 0.5, AY0, AY1, Z_EZI - 1, Z_EZI + 1.5 + 0.5 * i, "20_Azara")
-
-# Chambres du pourtour — 80_Lishkot. Elles sont adossées aux murs de l'Azara mais
-# posées sur la terrasse du 'Heil (plus bas) : leur pied est à Z_EZN, dix amot sous le sol
-# de la cour qu'elles bordent. Les faire partir de Z_AZ les laissait en l'air. Middot 1:7 le dit
-# du Beit HaMoked : « אֶחָד פָּתוּחַ לַחֵיל וְאֶחָד פָּתוּחַ לָעֲזָרָה » — une porte à chaque
-# niveau, donc un bâtiment qui les enjambe.
-SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du Beit
-                      # Avtinas, imposée par le recul de CAM_03 à l'intérieur
+SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du Beit Avtinas
 AXE_MUR_N = AY1 + T / 2
 NORD_Y1 = AY1 + T + SAILLIE
 NORD_Y0 = 2 * AXE_MUR_N - NORD_Y1     # symétrique du précédent par rapport à l'axe du mur
@@ -2902,19 +2932,97 @@ NORD_Y0 = 2 * AXE_MUR_N - NORD_Y1     # symétrique du précédent par rapport �
 ETZ_Y0 = NORD_Y1 + ECART_LISHKA
 ETZ_Y1 = ETZ_Y0 + SAILLIE
 POURTOUR_Y1 = ETZ_Y1 + LISHKA_DEBORD   # la face bâtie la plus saillante du complexe
+# Ezrat Israël → Ezrat Kohanim (Middot 2:6, R. Eliezer ben Yaakov) : « מַעֲלָה גְבוֹהָה אַמָּה
+# וְהַדּוּכָן נָתוּן עָלֶיהָ וּבוֹ שָׁלֹשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה, נִמְצֵאת עֶזְרַת כֹּהֲנִים גְּבוֹהָה
+# מֵעֶזְרַת יִשְׂרָאֵל שְׁתֵּי אַמּוֹת וּמֶחֱצָה ». Une volée qui monte vers l'ouest, sur toute la largeur :
+# la marche d'une ama, puis les trois demi-marches du Doukhan, la dernière affleurant la cour.
+# Les boîtes emboîtées d'avant faisaient un mur de 2,5 amot en travers de la porte.
+# Au nord, la volée s'arrête au Beit HaMoked, qui avance de douze amot dans la cour.
+box("Marche_EzratIsrael_Cohanim", AX1 - 12, AX1 - 11, AY0, NORD_Y0, Z_EZI - 1, Z_EZI + 1, "20_Azara")
+for i in range(3):
+    box(f"Doukhan_{i}", AX1 - 12.5 - i * 0.5, AX1 - 12 - i * 0.5, AY0, NORD_Y0, Z_EZI - 1, Z_EZI + 1.5 + 0.5 * i, "20_Azara")
+
+# Chambres du pourtour — 80_Lishkot. Elles sont adossées aux murs de l'Azara mais
+# posées sur la terrasse du 'Heil (plus bas) : leur pied est à Z_EZN, dix amot sous le sol
+# de la cour qu'elles bordent. Les faire partir de Z_AZ les laissait en l'air. Middot 1:7 le dit
+# du Beit HaMoked : « אֶחָד פָּתוּחַ לַחֵיל וְאֶחָד פָּתוּחַ לָעֲזָרָה » — une porte à chaque
+# niveau, donc un bâtiment qui les enjambe.
 
 # Beit HaMoked : sur la porte nord la plus orientale, la troisième que compte
 # Middot 1:5. Il est à cheval sur la limite du sacré et non posé derrière le mur —
 # « אַרְבַּע לְשָׁכוֹת הָיוּ בְּבֵית הַמּוֹקֵד… שְׁתַּיִם בַּקֹּדֶשׁ וּשְׁתַּיִם בַּחֹל, וְרָאשֵׁי
 # פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל » (Middot 1:6). D'où deux שערים opposés
-# (Middot 1:7) et un couloir entre eux, le mur de l'Azara le traversant par sa propre
-# baie. CHOIX : ni la largeur (20 amot, comme les deux autres corps de porte) ni la
-# hauteur (30 au-dessus de l'Azara) n'ont de source ; la hauteur passe le mur de 25,
-# sans quoi les deux toits seraient coplanaires.
-lishka("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
-       Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
-maake("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
-      Z_AZ + 30, "80_Lishkot")
+# (Middot 1:7), et le mur de l'Azara s'interrompt sur sa largeur. CHOIX : ni la largeur
+# (20 amot, comme les deux autres corps de porte) ni la hauteur (30 au-dessus de l'Azara)
+# n'ont de source ; la hauteur passe le mur de 25, sans quoi les deux toits seraient
+# coplanaires.
+# La salle est au niveau de l'Azara, où ouvre le שער que Middot 2:3 change en or ; celui du
+# 'Heil est en haut de vingt degrés, comme Sha'ar HaKorban. CHOIX : pris dedans, ces degrés
+# couperaient la salle, et les quatre chambres de Middot 1:6 n'y tiendraient plus.
+lishka("Beit_HaMoked", MOKED_X0, MOKED_X1, NORD_Y0, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot",
+       [Porte("N", *PORTE_SHAAR, Z_AZ), Porte("S", *PORTE_SHAAR, Z_AZ, metal=MAT_OR())])
+battants("Beit_HaMoked_S_battants", PORTE_MOKED - 5, PORTE_MOKED + 5, NORD_Y0,
+         NORD_Y0 + LISHKA_PAREMENT, Z_AZ, PORTE_SHAAR[1], "80_Lishkot", MAT_OR())
+maake("Beit_HaMoked", MOKED_X0, MOKED_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
+escalier("Beit_HaMoked_escalier", PORTE_MOKED - 5, PORTE_MOKED + 5, NORD_Y1, NORD_Y1 + 10,
+         Z_EZN, Z_AZ, "+y", "80_Lishkot")
+MK_X0, MK_X1 = MOKED_X0 + LISHKA_PAREMENT, MOKED_X1 - LISHKA_PAREMENT
+MK_Y0, MK_Y1 = NORD_Y0 + LISHKA_PAREMENT, NORD_Y1 - LISHKA_PAREMENT
+# Le sol de la salle : la cour le donne jusqu'à la face extérieure du mur, sauf au-dessus de
+# l'Ezrat Israël, deux amot et demie plus bas ; au-delà, la terrasse du 'Heil est à dix amot.
+DESCENTE_TEVILA = (MK_X0, MK_X0 + 2, AY1 + T, AY1 + T + 3.5)
+dalle_percee("Beit_HaMoked_sol_hol", MK_X0, MK_X1, AY1 + T, MK_Y1, Z_EZN, Z_AZ, "80_Lishkot",
+             MAT_SOL(), [DESCENTE_TEVILA])
+box("Beit_HaMoked_sol_ezrat_israel", X_DOUKHAN, MK_X1, MK_Y0, AY1 + T, Z_EZI - 1, Z_AZ,
+    "80_Lishkot", MAT_SOL())
+# « אַרְבַּע לְשָׁכוֹת… כְּקִיטוֹנוֹת פְּתוּחוֹת לִטְרַקְלִין, שְׁתַּיִם בַּקֹּדֶשׁ וּשְׁתַּיִם בַּחֹל » (Middot 1:6) : quatre
+# chambrettes qui ouvrent sur la salle, deux de chaque côté de la limite, rangées le long
+# des murs est et ouest entre les deux vestibules des שערים. Cotes : CHOIX.
+KITON_L, KITON_P, KITON_H, CLOISON = 4.5, 5.5, 6, 0.5
+KITONOT_Y = ((AXE_MUR_N - CLOISON - KITON_P, AXE_MUR_N - CLOISON),
+             (AXE_MUR_N + CLOISON, AXE_MUR_N + CLOISON + KITON_P))
+KITONOT_Y0, KITONOT_Y1 = KITONOT_Y[0][0] - CLOISON, KITONOT_Y[1][1] + CLOISON
+for cote, mur, sens in (("O", MK_X0, 1), ("E", MK_X1, -1)):
+    salle = mur + sens * KITON_L
+    paroi_percee(f"Beit_HaMoked_kitonot_{cote}", *sorted((salle, salle + sens * CLOISON)),
+                 KITONOT_Y0, KITONOT_Y1, Z_AZ, Z_AZ + KITON_H, "80_Lishkot", None,
+                 [(sum(ky) / 2 - 1, sum(ky) / 2 + 1, Z_AZ, Z_AZ + KITON_H - 1) for ky in KITONOT_Y])
+    for k, (ya, yb) in enumerate(((KITONOT_Y0, KITONOT_Y[0][0]), (KITONOT_Y[0][1], KITONOT_Y[1][0]),
+                                  (KITONOT_Y[1][1], KITONOT_Y1))):
+        box(f"Beit_HaMoked_kitonot_{cote}_cloison_{k}", *sorted((mur, salle)), ya, yb,
+            Z_AZ, Z_AZ + KITON_H, "80_Lishkot")
+    box(f"Beit_HaMoked_kitonot_{cote}_plafond", *sorted((mur, salle + sens * CLOISON)),
+        KITONOT_Y0, KITONOT_Y1, Z_AZ + KITON_H, Z_AZ + KITON_H + CLOISON, "80_Lishkot")
+# Sud-ouest, « לִשְׁכַּת טְלָאֵי קָרְבָּן » : vide. Sud-est, « לִשְׁכַּת עוֹשֵׂי לֶחֶם הַפָּנִים » : une table.
+box("Beit_HaMoked_kiton_SE_table", MK_X1 - 3.5, MK_X1 - 1, KITONOT_Y[0][0] + 1,
+    KITONOT_Y[0][1] - 1, Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
+# Nord-est, « בָּהּ גָּנְזוּ בְנֵי חַשְׁמוֹנַאי אֶת אַבְנֵי הַמִּזְבֵּחַ שֶׁשִּׁקְּצוּם מַלְכֵי יָוָן » : les pierres entassées.
+for k, (dx, dy, dz) in enumerate(((0.0, 0.0, 0), (1.8, 0.1, 0), (0.3, 1.2, 0), (1.6, 1.3, 0),
+                                  (0.1, 0.3, 1), (1.6, 1.1, 1), (0.8, 0.8, 2))):
+    x, y = MK_X1 - 3.3 + dx, KITONOT_Y[1][1] - 3 + dy
+    box(f"Beit_HaMoked_kiton_NE_even_{k}", x, x + 1.4, y, y + 1, Z_AZ + dz, Z_AZ + dz + 1,
+        "80_Lishkot", MAT_CHAUX())
+# Nord-ouest, « בָּהּ יוֹרְדִים לְבֵית הַטְּבִילָה » : les degrés s'enfoncent vers la « מְסִבָּה הַהוֹלֶכֶת
+# תַּחַת הַבִּירָה » (Middot 1:9), qui n'est pas modélisée ; ils s'arrêtent à trois amot et demie.
+escalier("Beit_HaMoked_kiton_NO_descente", *DESCENTE_TEVILA, Z_AZ - 3.5, Z_AZ, "+y", "80_Lishkot")
+# « מֻקָּף רוֹבָדִין שֶׁל אֶבֶן » (Middot 1:8) — Bartenura : « אִצְטַבָּאוֹת… מְשֻׁקָּעוֹת בַּכֹּתֶל… כְּעֵין מַעֲלוֹת
+# זוֹ עַל זוֹ ». Deux gradins le long des murs, où dorment les anciens ; ils bordent les deux
+# vestibules, cotes CHOIX.
+for cote, mur, sens in (("O", MK_X0, 1), ("E", MK_X1, -1)):
+    for vestibule, va, vb in (("S", MK_Y0, KITONOT_Y0), ("N", KITONOT_Y1, MK_Y1)):
+        for rang, (saillie, zb, zh) in enumerate(((1.5, 0, 1), (0.75, 1, 2))):
+            box(f"Beit_HaMoked_rovad_{vestibule}{cote}_{rang}", *sorted((mur, mur + sens * saillie)),
+                va, vb, Z_AZ + zb, Z_AZ + zh, "80_Lishkot")
+# « מָקוֹם הָיָה שָׁם, אַמָּה עַל אַמָּה, וְטַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ » (Middot 1:9) :
+# la dalle sous laquelle pendent les clefs de l'Azara. Sa place, près du שער : CHOIX.
+TAVLA_X, TAVLA_Y = PORTE_MOKED, MK_Y0 + 3
+box("Beit_HaMoked_tavla", TAVLA_X - 0.5, TAVLA_X + 0.5, TAVLA_Y - 0.5, TAVLA_Y + 0.5,
+    Z_AZ, Z_AZ + 0.05, "80_Lishkot", MAT_MARBRE())
+tore("Beit_HaMoked_tavla_tabaat", TAVLA_X, TAVLA_Y, Z_AZ + 0.09, 0.2, 0.04, "80_Lishkot", MAT_FER())
+# « וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל » (Middot 1:6) : la limite tracée au sol de la salle,
+# sur l'axe du mur. Filet de marbre : CHOIX.
+box("Beit_HaMoked_rashei_pispasin", MK_X0 + KITON_L + CLOISON, MK_X1 - KITON_L - CLOISON,
+    AXE_MUR_N - 0.1, AXE_MUR_N + 0.1, Z_AZ, Z_AZ + 0.03, "80_Lishkot", MAT_MARBRE())
 # --- Les trois lishkot du nord (Middot 5:3-4 ; Rambam, Beit HaBe'hira 5:17) : HaGazit,
 #     HaGola, HaEtz, « וְגַג שְׁלָשְׁתָּן שָׁוֶה » — un seul niveau de toit pour les trois, à 30
 #     au-dessus de l'Azara. Le groupe demande 44 amot de mur continu, et la portée à
@@ -2929,11 +3037,31 @@ maake("Beit_HaMoked", PORTE_MOKED - 10, PORTE_MOKED + 10, NORD_Y0, NORD_Y1,
 #     le Yerushalmi (voir plus bas) : la scène tient l'avis que le Cohen Gadol avait
 #     DEUX lishkot — ce que Yoma 19a laisse ouvert (« וְלֹא יָדַעְנָא » laquelle est au nord,
 #     laquelle au sud) — et non que Parhedrin = HaEtz.
-# Lishkat HaGazit, même parti que le Beit HaMoked : à cheval, deux פתחים opposés
-# (Yoma 25a).
-lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1,
-       Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_SHAAR), ("S", *PORTE_SHAAR)])
+# Lishkat HaGazit, même parti que le Beit HaMoked : à cheval, la salle au niveau de la cour,
+# un פתח sur le sacré et un sur le 'hol (Yoma 25a). Celui du 'hol ne peut pas être au nord,
+# où la Lishkat HaEtz, « אֲחוֹרֵי שְׁתֵּיהֶן », est à une ama de son socle : il est à l'est, et
+# ses degrés descendent dans les cinq amot qui la séparent de Sha'ar HaNitzotz. CHOIX,
+# comme sa cote.
+PETAH_HOL_GAZIT = (4, 8)
+lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot",
+       [Porte("S", *PORTE_SHAAR, Z_AZ),
+        Porte("E", *PETAH_HOL_GAZIT, Z_AZ, centre=AY1 + T + PETAH_HOL_GAZIT[0] / 2)])
 maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
+box("Lishkat_HaGazit_sol_hol", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT, AY1 + T,
+    NORD_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL())
+# « וּבַחֵצִי שֶׁל חֹל הָיוּ הַסַּנְהֶדְרִין יוֹשְׁבִין » (Rambam, Beit HaBe'hira 5:17), « כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי
+# שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה » (Sanhedrin 4:3) : le demi-cercle dans la moitié nord, son diamètre
+# sur la limite du sacré. Seize amot de salle ne tiennent pas soixante et onze sièges sur
+# un seul rang : trois gradins, CHOIX.
+SANHEDRIN_X = (GAZIT_X0 + GAZIT_X1) / 2
+for rang in range(3):
+    r0, r1 = 3.2 + rang, 4.2 + rang
+    for k in range(12):
+        a0, a1 = math.pi * k / 12, math.pi * (k + 1) / 12
+        prism(f"Lishkat_HaGazit_sanhedrin_{rang}_{k:02d}",
+              [(SANHEDRIN_X + r * math.cos(a), AXE_MUR_N + r * math.sin(a))
+               for r, a in ((r0, a0), (r1, a0), (r1, a1), (r0, a1))],
+              Z_AZ, Z_AZ + 0.9 + 0.6 * rang, "80_Lishkot")
 # Lishkat HaGola : « שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם
 # לְכָל הָעֲזָרָה » (Middot 5:4). Elle alimente la cour, elle s'ouvre donc dessus, et son
 # unique פתח perce le mur nord — pas une porte de plus au compte de Middot 1:4.
@@ -2942,9 +3070,35 @@ maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Li
 # intérieur est sanctifié et son toit ne l'est pas (Tosfot Yom Tov sur Middot 5:3,
 # d'après Maaser Sheni 3:8 : « גגותיהן לא נתקדשו כלל, אע"פ שתוכן קדש כשפתוחות לקדש »).
 # Sans conséquence pour un puits ; décisif pour le Beit HaParva, plus bas.
-lishka("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1,
-       Z_EZN, Z_AZ + 30, "80_Lishkot", [("S", *PORTE_SHAAR)])
+lishka("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot", [],
+       adossee="S")
 maake("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_AZ + 30, "80_Lishkot")
+# Le בּוֹר au milieu du sol que la cour prolonge par le פתח, et le גַּלְגַּל posé dessus :
+# margelle, potence et roue sur le modèle du mukhni du Kiyor, formes CHOIX.
+BOR_X, BOR_Y = PETAH_GOLA, (AY1 + T + NORD_Y1 - LISHKA_PAREMENT) / 2
+dalle_percee("Lishkat_HaGola_sol", GOLA_X0 + LISHKA_PAREMENT, GOLA_X1 - LISHKA_PAREMENT, AY1 + T,
+             NORD_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL(),
+             [(BOR_X - 1.5, BOR_X + 1.5, BOR_Y - 1.5, BOR_Y + 1.5)])
+cyl("Lishkat_HaGola_bor_eau", BOR_X, BOR_Y, Z_EZN, Z_EZN + 2, 1.5, "80_Lishkot", MAT_EAU(), verts=24)
+revolution("Lishkat_HaGola_bor_margelle", BOR_X, BOR_Y, Z_AZ,
+           [(2.4, 0.0), (2.4, 1.1), (2.2, 1.3), (1.4, 1.3), (1.2, 1.1), (1.2, -0.3)],
+           "80_Lishkot", verts=24, capots=False)
+GALGAL_Z = Z_AZ + 4.6
+for s in (-1, 1):
+    cyl(f"Lishkat_HaGola_galgal_poteau_{s:+d}", BOR_X, BOR_Y + s * 2.8, Z_AZ, GALGAL_Z + 0.4, 0.22,
+        "80_Lishkot", MAT_CEDRE(), verts=12)
+cyl_between("Lishkat_HaGola_galgal_essieu", (BOR_X, BOR_Y - 2.8, GALGAL_Z), (BOR_X, BOR_Y + 2.8, GALGAL_Z),
+            0.07, "80_Lishkot", MAT_FER(), verts=8)
+tore("Lishkat_HaGola_galgal", BOR_X, BOR_Y, GALGAL_Z, 0.9, 0.1, "80_Lishkot", MAT_CEDRE(),
+     rotation=(math.pi / 2, 0, 0))
+for k in range(6):
+    a = math.pi * k / 6
+    cyl_between(f"Lishkat_HaGola_galgal_rayon_{k}",
+                (BOR_X + 0.85 * math.cos(a), BOR_Y, GALGAL_Z + 0.85 * math.sin(a)),
+                (BOR_X - 0.85 * math.cos(a), BOR_Y, GALGAL_Z - 0.85 * math.sin(a)),
+                0.04, "80_Lishkot", MAT_CEDRE(), verts=6)
+cyl_between("Lishkat_HaGola_galgal_corde", (BOR_X + 0.9, BOR_Y, GALGAL_Z), (BOR_X + 0.9, BOR_Y, Z_EZN + 2.5),
+            0.04, "80_Lishkot", MAT_CHENE(), verts=6)
 # Lishkat HaEtz, en second rang : « וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), sur la
 # largeur des deux autres. Elle ne peut pas être dans l'Azara : entre le mur nord et le
 # socle du Sanctuaire il ne reste que 17,5 amot (135 − 100, moitié), et à l'est de
@@ -2954,7 +3108,7 @@ maake("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_AZ + 30, "80_Lishk
 # écrit ici. R. Eliezer ben Yaakov : « שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת » — sans usage connu,
 # pas d'ouverture connue non plus ; CHOIX, une porte sur le 'Heil.
 lishka("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1,
-       Z_EZN, Z_AZ + 30, "80_Lishkot", [("N", *PORTE_LISHKA)])
+       Z_EZN, Z_AZ + 30, "80_Lishkot", [Porte("N", *PORTE_LISHKA, Z_EZN)])
 maake("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1, Z_AZ + 30, "80_Lishkot")
 
 # Sha'ar HaNitzotz, la porte nord la plus occidentale — le seul corps de porte que la
@@ -2964,8 +3118,20 @@ maake("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1, Z_AZ + 30, "80_Lishkot
 # (Middot 1:1 ; Tamid 1:1), et son aliyah regarde l'Azara.
 NZ_X0, NZ_X1 = PORTE_NITZOTZ - 10, PORTE_NITZOTZ + 10
 NZ_Y0, NZ_Y1, NZ_Z0 = AY1 + T, NORD_Y1, Z_AZ + 25
-lishka("Beit_ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, Z_EZN, NZ_Z0,
-       "80_Lishkot", [("N", *PORTE_SHAAR)])
+# La porte de l'Azara est au niveau de la cour, celle du 'Heil dix amot plus bas : le corps
+# de porte est une cage d'escalier, ses vingt degrés sur toute sa largeur.
+lishka("Beit_ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, Z_EZN, NZ_Z0, "80_Lishkot",
+       [Porte("N", *PORTE_SHAAR, Z_EZN)], adossee="S")
+escalier("Beit_ShaarHaNitzotz_escalier", NZ_X0 + LISHKA_PAREMENT, NZ_X1 - LISHKA_PAREMENT,
+         NZ_Y0, NZ_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "+y", "80_Lishkot")
+# Les degrés du פתח de 'hol de la Lishkat HaGazit, entre elle et ce corps de porte, à deux
+# dixièmes de son socle : jointifs, leurs faces se confondraient.
+GAZIT_PALIER_Y = AY1 + T + PETAH_HOL_GAZIT[0]
+GAZIT_DEGRES_X1 = NZ_X0 - LISHKA_DEBORD - 0.2
+box("Lishkat_HaGazit_palier", GAZIT_X1, GAZIT_DEGRES_X1, AY1 + T, GAZIT_PALIER_Y, Z_EZN, Z_AZ,
+    "80_Lishkot", MAT_SOL())
+escalier("Lishkat_HaGazit_escalier", GAZIT_X1, GAZIT_DEGRES_X1, GAZIT_PALIER_Y, GAZIT_PALIER_Y + 10,
+         Z_EZN, Z_AZ, "+y", "80_Lishkot")
 terrasse_de_porte("ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, NZ_Z0,
                   (PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5), "80_Lishkot")
 aliyah("BeitHaNitzotz", PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5, NZ_Y0, NZ_Y1, NZ_Z0, 12,
@@ -2973,24 +3139,61 @@ aliyah("BeitHaNitzotz", PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5, NZ_Y0, NZ_Y1, NZ_Z
 
 # Beit Avtinas : l'aliyah du corps de porte de Sha'ar HaMayim — la plus ORIENTALE des
 # trois portes du sud —, creuse, murs d'une ama, fenêtre 3 x 4 au nord sur l'Azara.
-# C'est l'intérieur filmé par CAM_03. Source : Yerushalmi Yoma 1:5 (halakha)
+# Source : Yerushalmi Yoma 1:5 (halakha)
 # « על גבי שער המים היתה וסמוך ללשכתו היתה » — elle était au-dessus de Sha'ar HaMayim
 # et contre sa lishka (celle du Cohen Gadol). Le Bavli Yoma 19a laisse la question
 # ouverte (« ולא ידענא ») et sa baraïta situe la première tevila « בחול, על גבי שער
 # המים, ובצד לשכתו » ; on suit le Yerushalmi, explicite.
 # « על גבי » se prend au mot : la chambre est le haut d'un bâtiment de porte, et il
 # fallait le bâtir. Sans lui elle pendait à 38,5 amot au-dessus du dallage, collée à
-# la face sud du mur, sans rien dessous — le bloc qui flottait au plan 1. Le corps est
-# modelé plein : la baie franchie reste celle du mur de l'Azara.
+# la face sud du mur, sans rien dessous — le bloc qui flottait au plan 1. Son rez-de-
+# chaussée est la cage d'escalier de la porte, comme à Sha'ar HaNitzotz.
 BA_X0, BA_X1 = PORTE_MAYIM - 5, PORTE_MAYIM + 5
 BA_Y0, BA_Y1, BA_Z0 = AY0 - T - SAILLIE, AY0 - T, Z_AZ + 25
 SM_X0, SM_X1 = PORTE_MAYIM - 10, PORTE_MAYIM + 10
-lishka("Beit_ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, Z_EZN, BA_Z0,
-       "80_Lishkot", [("S", *PORTE_SHAAR)])
+lishka("Beit_ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, Z_EZN, BA_Z0, "80_Lishkot",
+       [Porte("S", *PORTE_SHAAR, Z_EZN)], adossee="N")
+escalier("Beit_ShaarHaMayim_escalier", SM_X0 + LISHKA_PAREMENT, SM_X1 - LISHKA_PAREMENT,
+         BA_Y0 + LISHKA_PAREMENT, BA_Y1, Z_EZN, Z_AZ, "-y", "80_Lishkot")
+# La baie déborde sur l'Ezrat Israël : sous le mur, le podium laisserait un trou au pied des degrés.
+box("Beit_ShaarHaMayim_seuil", X_DOUKHAN, PORTE_MAYIM + 5, AY0 - T, AY0, Z_EZI - 1, Z_AZ,
+    "80_Lishkot", MAT_SOL())
 terrasse_de_porte("ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, BA_Z0,
                   (BA_X0, BA_X1), "80_Lishkot")
 aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
        "80_Lishkot", ("nord", PORTE_MAYIM - 1.5, PORTE_MAYIM + 1.5))
+# « היו מחזירין אותה למכתשת… וכשהוא שוחק אומר הדק היטב » (Keritot 6b), « מכתשת של בית אבטינס »
+# (Avot deRabbi Natan 41:12) ; les sammanim pesés « במשקל מכוון », chacun pilé à part (Rambam
+# Klei HaMikdash 2:2, 2:5). Table, balance, bols, formes et matières : CHOIX.
+AV_X0, AV_X1, AV_Y0, AV_Z = BA_X0 + 1, BA_X1 - 1, BA_Y0 + 1, BA_Z0 + 1
+box("BeitAvtinas_table", AV_X0 + 0.2, AV_X0 + 2.2, AV_Y0 + 2, AV_Y0 + 8, AV_Z, AV_Z + 1.5,
+    "80_Lishkot", MAT_MARBRE())
+for k in range(11):
+    x, y = AV_X0 + 0.7, AV_Y0 + 2.5 + 0.5 * k
+    revolution(f"BeitAvtinas_sam_{k:02d}", x, y, AV_Z + 1.5,
+               [(0.0, 0.0), (0.16, 0.0), (0.21, 0.2), (0.17, 0.2), (0.0, 0.07)],
+               "80_Lishkot", MAT_TERRE_CUITE(), verts=16)
+    cone(f"BeitAvtinas_sam_{k:02d}_poudre", x, y, AV_Z + 1.64, AV_Z + 1.78, 0.12, 0.03,
+         "80_Lishkot", MAT_KETORET(), verts=16)
+BAL_X, BAL_Y, BAL_Z = AV_X0 + 1.6, AV_Y0 + 7, AV_Z + 2.8
+cyl("BeitAvtinas_moznayim_pied", BAL_X, BAL_Y, AV_Z + 1.5, BAL_Z, 0.05, "80_Lishkot",
+    MAT_BRONZE(), verts=12)
+cyl_between("BeitAvtinas_moznayim_fleau", (BAL_X, BAL_Y - 0.6, BAL_Z), (BAL_X, BAL_Y + 0.6, BAL_Z),
+            0.03, "80_Lishkot", MAT_BRONZE(), verts=8)
+for s in (-1, 1):
+    y = BAL_Y + 0.6 * s
+    cyl_between(f"BeitAvtinas_moznayim_corde_{s:+d}", (BAL_X, y, BAL_Z), (BAL_X, y, BAL_Z - 0.85),
+                0.01, "80_Lishkot", MAT_BRONZE(), verts=6)
+    revolution(f"BeitAvtinas_moznayim_plateau_{s:+d}", BAL_X, y, BAL_Z - 0.95,
+               [(0.0, 0.0), (0.3, 0.1), (0.26, 0.1), (0.0, 0.03)], "80_Lishkot", MAT_BRONZE(), verts=16)
+MORT_X, MORT_Y = (AV_X0 + AV_X1) / 2, AV_Y0 + 4
+revolution("BeitAvtinas_makhteshet", MORT_X, MORT_Y, AV_Z,
+           [(0.0, 0.0), (0.75, 0.0), (0.85, 1.3), (0.7, 1.3), (0.5, 0.45), (0.0, 0.4)],
+           "80_Lishkot", MAT_BRONZE())
+cone("BeitAvtinas_ketoret", MORT_X, MORT_Y, AV_Z + 0.4, AV_Z + 0.95, 0.5, 0.12, "80_Lishkot",
+     MAT_KETORET())
+cyl_between("BeitAvtinas_eli", (MORT_X + 0.1, MORT_Y, AV_Z + 0.7),
+            (MORT_X + 0.45, MORT_Y + 0.35, AV_Z + 2.9), 0.12, "80_Lishkot", MAT_BRONZE(), verts=12)
 
 # « וסמוך ללשכתו היתה » (Yerushalmi Yoma 1:5) : la lishka du Cohen Gadol touche le
 # Beit Avtinas — donc à l'ouest de Sha'ar HaMayim, et non à l'ouest du mur sud. Elle
@@ -2999,7 +3202,7 @@ aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
 # clignotaient.
 PARHEDRIN_X1 = SM_X0 - ECART_LISHKA
 lishka("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1,
-       Z_EZN, Z_AZ + 15, "80_Lishkot", [("S", *PORTE_LISHKA)])
+       Z_EZN, Z_AZ + 15, "80_Lishkot", [Porte("S", *PORTE_LISHKA, Z_EZN)], adossee="N")
 maake("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1, Z_AZ + 15, "80_Lishkot")
 
 # Les deux lishkot de Sha'ar Nikanor, dans l'Ezrat Israël, de part et d'autre de la
@@ -3007,10 +3210,49 @@ maake("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1, Z_AZ +
 # פִּנְחָס הַמַּלְבִּישׁ, וְאַחַת לִשְׁכַּת עוֹשֵׂי חֲבִתִּין » (Middot 1:4 ; Rambam, Beit
 # HaBe'hira 5:17). CHOIX : Pin'has au nord (la droite de qui entre), leur cote et leur
 # hauteur, qu'aucune source ne donne. Elles s'ouvrent à l'ouest, sur la cour.
-for nm, ny0, ny1 in (("Pinchas_HaMalbish", 5, 20), ("Osei_Chavitin", -20, -5)):
-    lishka(f"Lishkat_{nm}", -8, AX1, ny0, ny1, Z_EZI, Z_AZ + 20,
-           "80_Lishkot", [("O", *PORTE_LISHKA)])
-    maake(f"Lishkat_{nm}", -8, AX1, ny0, ny1, Z_AZ + 20, "80_Lishkot")
+LISHKA_NIKANOR_X0 = -8
+LISHKOT_NIKANOR = {"Pinchas_HaMalbish": (5, 20), "Osei_Chavitin": (-20, -5)}
+for nm, (ny0, ny1) in LISHKOT_NIKANOR.items():
+    lishka(f"Lishkat_{nm}", LISHKA_NIKANOR_X0, AX1, ny0, ny1, Z_EZI, Z_AZ + 20, "80_Lishkot",
+           [Porte("O", *PORTE_LISHKA, Z_EZI)], adossee="E")
+    maake(f"Lishkat_{nm}", LISHKA_NIKANOR_X0, AX1, ny0, ny1, Z_AZ + 20, "80_Lishkot")
+# « וּפִנְחָס עַל הַמַּלְבּוּשׁ » (Shekalim 5:1), et « שִׁשָּׁה וְתִשְׁעִים חַלּוֹן הָיוּ בַּמִּקְדָּשׁ לְהָנִיחַ בָּהֶן
+# הַבְּגָדִים… וְכֻלָּן סְתוּמוֹת » (Rambam, Klei HaMikdash 8:8). Le Rambam ne dit pas où : la scène en
+# garnit la chambre de Pin'has, sur ce que ses murs tiennent autour du guichet de Nikanor.
+# Placards fermés d'une ama : CHOIX.
+CHALON, PAS_CHALON = 1.0, 1.35
+PC_X0 = LISHKA_NIKANOR_X0 + LISHKA_PAREMENT
+PC_Y0, PC_Y1 = (LISHKOT_NIKANOR["Pinchas_HaMalbish"][0] + LISHKA_PAREMENT,
+                LISHKOT_NIKANOR["Pinchas_HaMalbish"][1] - LISHKA_PAREMENT)
+for r in range(6):
+    z = Z_EZI + 0.6 + PAS_CHALON * r
+    for k in range(4):
+        x = PC_X0 + 0.6 + PAS_CHALON * k
+        box(f"Lishkat_Pinchas_HaMalbish_chalon_S{r}{k}", x, x + CHALON, PC_Y0, PC_Y0 + 0.15,
+            z, z + CHALON, "80_Lishkot", MAT_CEDRE())
+        box(f"Lishkat_Pinchas_HaMalbish_chalon_N{r}{k}", x, x + CHALON, PC_Y1 - 0.15, PC_Y1,
+            z, z + CHALON, "80_Lishkot", MAT_CEDRE())
+    for k in range(8):
+        y = PC_Y0 + 0.4 + PAS_CHALON * k
+        devant_guichet = any(y < b + 0.3 and y + CHALON > a - 0.3 for _, a, b in PISHPESHIM)
+        if devant_guichet and z < Z_EZI + H_PISHPESH + 0.4:
+            continue
+        box(f"Lishkat_Pinchas_HaMalbish_chalon_E{r}{k}", AX1 - 0.15, AX1, y, y + CHALON,
+            z, z + CHALON, "80_Lishkot", MAT_CEDRE())
+# « חביתי כהן גדול לישתן ועריכתן ואפייתן בפנים » (Mena'hot 11:3), « עַל־מַחֲבַת בַּשֶּׁמֶן תֵּעָשֶׂה »
+# (Vayikra 6:14), « וְהַמַּחֲבַת אֵין לָהּ כִּסּוּי » (Mena'hot 5:8) : la table où l'on pétrit, le foyer
+# et la ma'havat plate posée sur ses braises. Formes et cotes : CHOIX.
+OC_Y0, OC_Y1 = (LISHKOT_NIKANOR["Osei_Chavitin"][0] + LISHKA_PAREMENT,
+                LISHKOT_NIKANOR["Osei_Chavitin"][1] - LISHKA_PAREMENT)
+box("Lishkat_Osei_Chavitin_foyer", AX1 - 2.4, AX1 - 0.2, OC_Y0 + 0.4, OC_Y0 + 2.6,
+    Z_EZI, Z_EZI + 1.1, "80_Lishkot")
+box("Lishkat_Osei_Chavitin_braises", AX1 - 2.2, AX1 - 0.4, OC_Y0 + 0.6, OC_Y0 + 2.4,
+    Z_EZI + 1.1, Z_EZI + 1.25, "80_Lishkot", braise("Braise"))
+revolution("Lishkat_Osei_Chavitin_machvat", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.25,
+           [(0.0, 0.0), (0.85, 0.0), (0.9, 0.1), (0.84, 0.1), (0.0, 0.04)],
+           "80_Lishkot", MAT_BRONZE(), verts=24)
+box("Lishkat_Osei_Chavitin_table", AX1 - 1.6, AX1 - 0.2, OC_Y1 - 4, OC_Y1 - 1,
+    Z_EZI, Z_EZI + 1.5, "80_Lishkot", MAT_MARBRE())
 
 # --- Les trois lishkot du sud (Middot 5:3) : HaMelah, HaParva, HaMedi'hin. Elles sont
 #     DANS l'Azara, contre la face intérieure du mur, et non sur la terrasse du 'Heil
@@ -3034,9 +3276,43 @@ SAILLIE_INT = 10          # profondeur des corps intérieurs. Au-delà, le débo
 H_LISHKA_INT = 22         # CHOIX : sous les 25 amot du mur, qui continue de se lire.
 SUD_INT = (AY0, AY0 + SAILLIE_INT)
 MELACH_X, PARVA_X, MEDICHIN_X = (-44, -26), (-92, -74), (-113, -96)
+# La Lishkat HaMela'h ouvre à l'est : le pied du kevesh passe à une ama de son socle
+# (Rambam, Beit HaBe'hira 5:15), et une porte nord ne donnait que sur le talus. Six amot,
+# la face n'en ayant que huit entre le mur de l'Azara et le parement nord : CHOIX.
+PORTES_SUD = {"HaMelach": Porte("E", 6, PORTE_LISHKA[1], Z_AZ),
+              "HaParva": Porte("N", *PORTE_LISHKA, Z_AZ),
+              "HaMedichin": Porte("N", *PORTE_LISHKA, Z_AZ)}
 for nm, (x0, x1) in (("HaMelach", MELACH_X), ("HaParva", PARVA_X), ("HaMedichin", MEDICHIN_X)):
-    lishka(f"Lishkat_{nm}", x0, x1, *SUD_INT, Z_AZ, Z_AZ + H_LISHKA_INT,
-           "80_Lishkot", [("N", *PORTE_LISHKA)])
+    lishka(f"Lishkat_{nm}", x0, x1, *SUD_INT, Z_AZ, Z_AZ + H_LISHKA_INT, "80_Lishkot",
+           [PORTES_SUD[nm]], adossee="S")
+# Ce que Middot 5:3 met dans chacune ; formes et cotes du mobilier : CHOIX.
+# HaMela'h, « שָׁם הָיוּ נוֹתְנִים מֶלַח לַקָּרְבָּן » : le sel en tas contre le mur.
+for k in range(4):
+    cle = f"Lishkat_HaMelach_sel_{k}"
+    cone(cle, MELACH_X[0] + LISHKA_PAREMENT + 1.6 + 3 * k, SUD_INT[0] + 1.7, Z_AZ,
+         Z_AZ + 1.2 + 0.5 * alea(cle, 1), 1.1 + 0.4 * alea(cle), 0.2, "80_Lishkot", MAT_SEL(), verts=16)
+# HaParva, « שָׁם הָיוּ מוֹלְחִין עוֹרוֹת קָדָשִׁים » : les peaux empilées sur une banquette, et le sel.
+PV_X0, PV_X1 = PARVA_X[0] + LISHKA_PAREMENT, PARVA_X[1] - LISHKA_PAREMENT
+box("Lishkat_HaParva_banquette", PV_X0 + 1, PV_X1 - 3, SUD_INT[0], SUD_INT[0] + 2.5,
+    Z_AZ, Z_AZ + 1, "80_Lishkot")
+for pile in range(3):
+    for couche in range(6):
+        cle = f"Lishkat_HaParva_peau_{pile}{couche}"
+        x = PV_X0 + 1.6 + 3.2 * pile + (alea(cle) - 0.5) * 0.4
+        y = SUD_INT[0] + 0.3 + (alea(cle, 1) - 0.5) * 0.3
+        box(cle, x, x + 2.4, y, y + 1.9, Z_AZ + 1 + 0.09 * couche, Z_AZ + 1.08 + 0.09 * couche,
+            "80_Lishkot", MAT_PEAU())
+cone("Lishkat_HaParva_sel", PV_X1 - 2, SUD_INT[0] + 5, Z_AZ, Z_AZ + 1.1, 1.3, 0.2,
+     "80_Lishkot", MAT_SEL(), verts=16)
+# HaMedi'hin, « שֶׁשָּׁם הָיוּ מְדִיחִין קִרְבֵי הַקֳּדָשִׁים » : une auge d'eau contre le mur, deux tables.
+MD_X0, MD_X1 = MEDICHIN_X[0] + LISHKA_PAREMENT, MEDICHIN_X[1] - LISHKA_PAREMENT
+AUGE = (MD_X0 + 2, MD_X1 - 2, SUD_INT[0] + 0.5, SUD_INT[0] + 1.7)
+dalle_trouee("Lishkat_HaMedichin_auge", MD_X0 + 1.5, MD_X1 - 1.5, SUD_INT[0], SUD_INT[0] + 2.2,
+             Z_AZ, Z_AZ + 1.2, AUGE, "80_Lishkot")
+box("Lishkat_HaMedichin_auge_eau", *AUGE, Z_AZ, Z_AZ + 0.9, "80_Lishkot", MAT_EAU())
+for cote, xa in (("O", MD_X0), ("E", MD_X1 - 1.5)):
+    box(f"Lishkat_HaMedichin_table_{cote}", xa, xa + 1.5, SUD_INT[0] + 3.5, SUD_INT[0] + 7,
+        Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
 # Le bain rituel sur le toit du Beit HaParva — « וְעַל גַּגָּהּ הָיָה בֵית הַטְּבִילָה לְכֹהֵן
 # גָּדוֹל בְּיוֹם הַכִּפּוּרִים » (Middot 5:3). Maake parce que ce toit est un lieu de service
 # (Rambam, Rotzea'h 11:2). Le drap de bouts tendu entre lui et le peuple (Yoma 3:4)
@@ -3110,14 +3386,13 @@ for i in range(HEIL_MARCHES):
     box(f"Heil_marche_ouest_{i:02d}", SX0 + 4 + 0.5 * i, SX0 + 4 + 0.5 * (i + 1), -POURTOUR_Y1, POURTOUR_Y1, Z_HAR, z, "00_HarHabayit")
 # De la terrasse aux portes latérales : dix amot, vingt marches de « רוּם מַעֲלָה חֲצִי אַמָּה
 # וְשִׁלְחָהּ חֲצִי אַמָּה » (Middot 2:3), sur la largeur de la baie. Devant les trois portes
-# sans corps de porte ; Moked, Nitzotz et Mayim montent dans leur bâtiment.
+# sans corps de porte ; Nitzotz et Mayim montent dans le leur, et le Beit HaMoked a les
+# siens devant sa porte du 'Heil.
 for nm, x, cote in (("Korban", PORTE_KORBAN, "nord"), ("Bekhorot", PORTE_BEKHOROT, "sud"), ("Delek", PORTE_DELEK, "sud")):
-    for k in range(20):
-        if cote == "nord":
-            ya, yb = AY1 + T + 0.5 * k, AY1 + T + 0.5 * (k + 1)
-        else:
-            ya, yb = AY0 - T - 0.5 * (k + 1), AY0 - T - 0.5 * k
-        box(f"Escalier_{nm}_{k:02d}", x - 5, x + 5, ya, yb, Z_EZN, Z_AZ - 0.5 * k, "20_Azara")
+    if cote == "nord":
+        escalier(f"Escalier_{nm}", x - 5, x + 5, AY1 + T, AY1 + T + 10, Z_EZN, Z_AZ, "+y", "20_Azara")
+    else:
+        escalier(f"Escalier_{nm}", x - 5, x + 5, AY0 - T - 10, AY0 - T, Z_EZN, Z_AZ, "-y", "20_Azara")
 # Couronnement des murs de l'Azara : une assise en débord sur la crête, qui saute
 # les corps passant les 25 amot (Beit HaMoked, HaGazit, HaGola, et les terrasses
 # de Sha'ar HaNitzotz et de Sha'ar HaMayim).
