@@ -23,6 +23,7 @@ const JEUX = {
   enduit: { moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
   bois: { moyenne: [0.3205, 0.1855, 0.0867], rugosite: 0.9154 },
   metal: { moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
+  marbre: { moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
   etoffe: {},
 };
 

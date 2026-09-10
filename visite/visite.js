@@ -10,7 +10,8 @@ import { regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
-import { LANGUE_SOURCE, ecrire, installerLangue, langue, libelle, suivreLangue, texte } from "./langue.js";
+import { initiation } from "./initiation.js";
+import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
 const OEIL = 1.75;        // H_HOMME de la fiche : 1,75 m
@@ -295,7 +296,7 @@ let cible = null;
 // les douze degrés du 'Heil, à l'Azara par les quinze marches, et l'autel se contourne.
 // C'est l'architecture, pas un défaut — mais un modèle se regarde aussi d'ailleurs que
 // d'où l'on a le droit de se tenir : le vol libre est là pour ça.
-let vol = true;
+let vol = false;
 
 function vitesseVoulue() {
   const vitesse = (vol ? VOL : PAS) * (manette.course ? COURSE : 1);
@@ -392,6 +393,7 @@ const capVise = { lacet: 0, tangage: 0 };
 function tourner(dLacet, dTangage) {
   capVise.lacet -= dLacet;
   capVise.tangage = THREE.MathUtils.clamp(capVise.tangage - dTangage, -TANGAGE_MAX, TANGAGE_MAX);
+  noterRegard(Math.abs(dLacet) + Math.abs(dTangage));
 }
 
 // Après un `lookAt`, la consigne est ce que la caméra montre : sans ça le lissage
@@ -415,6 +417,7 @@ function lisserRegard(dt) {
 // interrogation
 // ---------------------------------------------------------------------------
 const viseur = new THREE.Raycaster();
+const PORTEE = 140;       // ce qu'un clic peut interroger
 const ecran = new THREE.Vector2();
 const survol = $("#survol");
 const { montrer, fermer, rafraichir } = panneau(CONCEPTS);
@@ -425,14 +428,19 @@ const normaliser = (clientX, clientY) =>
 
 function conceptSous(coords) {
   viseur.setFromCamera(coords, camera);
-  viseur.far = 140;
+  viseur.far = PORTEE;
   const touche = viseur.intersectObjects(obstacles, false);
   return touche.length ? touche[0].object.userData.concept || null : null;
 }
 
 function interroger(clientX, clientY) {
   const id = conceptSous(normaliser(clientX, clientY));
-  if (id) montrer(id); else fermer();
+  if (!id) {
+    fermer();
+    return;
+  }
+  montrer(id);
+  noterInterrogation();
 }
 
 // Le pilote automatique n'ouvre aucun passage : il pousse le marcheur vers le point
@@ -446,6 +454,53 @@ function seRendreA(clientX, clientY) {
   if (vol) { cible = touche.point.clone(); return; }
   const sol = solEn(touche.point.x, touche.point.z, touche.point.y);
   if (sol !== null) cible = new THREE.Vector3(touche.point.x, sol, touche.point.z);
+}
+
+// L'initiation désigne un élément réellement à l'écran : « touchez un élément » ne dit
+// rien à qui ne sait pas encore ce qui s'interroge. La marque reste accrochée à son
+// point du monde, et on en cherche une autre quand il sort du cadre ou passe derrière
+// un mur. Seul un élément documenté se montre : la première fiche n'est pas un manque.
+const SONDES = [[0, 0], [0.3, 0], [-0.3, 0], [0, -0.3], [0.3, -0.3], [-0.3, -0.3], [0.6, 0], [-0.6, 0]];
+const CADRE = 0.85;
+const RECONTROLE = 15;     // images entre deux contrôles, ou deux recherches vaines
+const montre = { id: null, point: new THREE.Vector3(), images: 0, prochaineRecherche: 0 };
+const projete = new THREE.Vector3();
+
+function reperer() {
+  viseur.far = PORTEE;
+  for (const [x, y] of SONDES) {
+    viseur.setFromCamera(ecran.set(x, y), camera);
+    const [touche] = viseur.intersectObjects(obstacles, false);
+    const id = touche?.object.userData.concept;
+    if (id && CONCEPTS.get(id)?.resume) {
+      montre.id = id;
+      montre.point.copy(touche.point);
+      return;
+    }
+  }
+  montre.id = null;
+}
+
+function projeter(point) {
+  projete.copy(point).project(camera);
+  return projete.z < 1 && Math.abs(projete.x) < CADRE && Math.abs(projete.y) < CADRE;
+}
+
+function elementAMontrer() {
+  const image = ++montre.images;
+  const toujoursVu = montre.id !== null && projeter(montre.point) &&
+    (image % RECONTROLE !== 0 || conceptSous(ecran.set(projete.x, projete.y)) === montre.id);
+  if (!toujoursVu) {
+    if (image < montre.prochaineRecherche) return null;
+    reperer();
+    if (montre.id === null || !projeter(montre.point)) {
+      montre.id = null;
+      montre.prochaineRecherche = image + RECONTROLE;
+      return null;
+    }
+  }
+  return { nom: CONCEPTS.get(montre.id).nom,
+           clientX: ((projete.x + 1) / 2) * innerWidth, clientY: ((1 - projete.y) / 2) * innerHeight };
 }
 
 // ---------------------------------------------------------------------------
@@ -464,8 +519,14 @@ function basculerVol() {
   vol = !vol;
   afficherMode();
   cible = null;
+  if (vol) noterEnvol();
 }
 boutonVol.onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
+
+const { lancerInitiation, initiationSuivie, noterRegard, noterDeplacement, noterInterrogation,
+        noterEnvol, noterAltitude } = initiation({
+  elementAMontrer, estEnVol: () => vol, revenirAPied: () => { if (vol) basculerVol(); },
+});
 
 const manette = commandes(renderer.domElement, {
   regarder: tourner, interroger, allerAu: seRendreA, basculerVol,
@@ -550,9 +611,9 @@ function allerA(id) {
 // boucle
 // ---------------------------------------------------------------------------
 const demande = new URLSearchParams(location.search).get("vue");
-// La visite s'ouvre à la porte de l'Ezrat Nashim : de l'Ezrat Israël, où elle
-// s'ouvrait, on est déjà au pied du Heikhal et on n'a rien monté.
-const depart = reperes.entrees.find((e) => e.id === "ezrat_nashim") || reperes.entrees[0];
+// La visite s'ouvre au-delà du Soreg, dans l'axe de la porte orientale : le 'Heil et
+// la porte de l'Ezrat Nashim se franchissent à pied, avant tout le reste.
+const depart = reperes.entrees.find((e) => e.id === "face_porte_est") || reperes.entrees[0];
 poser(...depart.position, depart);
 if (demande) allerA(demande);
 
@@ -597,6 +658,8 @@ function dessiner(dt) {
 // téléphone gagnait son flou définitif.
 const aide = $("#aide");
 let moyenne = 16, attente = 0, entame = false;
+// Mesuré autour de la marche seule : un saut du menu n'est pas un pas.
+const avantLePas = new THREE.Vector3();
 
 function ajusterEchelle(dt) {
   moyenne += (dt * 1000 - moyenne) * 0.05;
@@ -612,7 +675,10 @@ function ajusterEchelle(dt) {
 renderer.setAnimationLoop(() => {
   const dt = Math.min(horloge.getDelta(), 0.1);
   lisserRegard(dt);
+  avantLePas.copy(camera.position);
   avancer(dt);
+  noterDeplacement(camera.position.distanceTo(avantLePas));
+  if (vol) noterAltitude(camera.position.y - avantLePas.y);
   ajusterEchelle(dt);
 
   if (!entame && lisse.lengthSq() > 0.01) {       // le rappel a servi, il s'efface
@@ -637,6 +703,18 @@ renderer.setAnimationLoop(() => {
 });
 
 $("#chargement").classList.add("parti");
+
+// Au premier passage l'initiation remplace le rappel des commandes ; le « ? » la rejoue.
+function commencerInitiation() {
+  aide.classList.add("parti");
+  lancerInitiation();
+}
+$("#rejouer").onclick = (e) => { e.currentTarget.blur(); commencerInitiation(); };
+if (!initiationSuivie()) {
+  aide.classList.add("parti");
+  // Le voile du chargement finit de se lever avant qu'on s'adresse au visiteur.
+  langueChoisie.then(() => setTimeout(commencerInitiation, 700));
+}
 
 // Points d'accroche de la vérification headless (cdp.py) : sans eux, impossible de
 // savoir depuis un terminal si la page a fini de charger ni ce qu'elle montre.

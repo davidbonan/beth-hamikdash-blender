@@ -70,6 +70,7 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/index.html` | La page. Aucune dépendance locale : three.js est chargé depuis un CDN. |
 | `visite/visite.js` | Scène, marche, collisions, regard, désignation. |
 | `visite/pilotage.js` | Les commandes : clavier au bureau, manche du pouce gauche et regard du pouce droit au doigt. |
+| `visite/initiation.js` | Les premiers pas : regarder, avancer, quitter le sol, monter et redescendre, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis le « ? » de la barre. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
@@ -83,6 +84,7 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/contenu_a.en.json`, `.he.json`… | Les traductions de l'encyclopédie, un miroir par fichier et par langue. Le français fait foi. En hébreu, une citation est le texte original relevé sur Sefaria, jamais une retraduction du français. |
 | `visite/textes.json` | Par langue : son nom, son sens d'écriture, les textes de l'interface, les zones, les points d'entrée et les titres des œuvres citées. |
 | `visite/langue.js` | La langue : le choix au premier passage, retenu dans le navigateur, et le sélecteur à drapeau de la barre. |
+| `visite/memoire.js` | Ce que le navigateur retient d'une visite à l'autre — la langue, l'initiation suivie —, sans casser quand le stockage est refusé. |
 | `visite/temple.glb` | Géométrie exportée, compressée meshopt : 6,7 Mo pour 746 000 triangles. Artefact — se regénère. |
 | `visite/reperes.json` | Emprise de chaque concept, points d'entrée du menu, et points des creux souterrains que seul « Un élément… » atteint. Artefact. |
 
@@ -123,9 +125,9 @@ le dallage de l'Azara se couvrait des lichens verts du calcaire scanné. La tein
 ce que Blender et les bancs du meleke ont décidé — c'est aussi ce qui fait qu'une
 retouche dans la scène ne demande jamais de retoucher une image.
 
-Cinq jeux, tous CC0, refabriqués par `beit_hamikdash_nappes.py` : *worn_rock_natural_01*,
+Six jeux, tous CC0, refabriqués par `beit_hamikdash_nappes.py` : *worn_rock_natural_01*,
 *beige_wall_001*, *hinoki_planks* et *rough_linen* de [Poly Haven](https://polyhaven.com),
-*Metal007* d'[ambientCG](https://ambientcg.com). 2,3 Mo en 1024, téléphone compris. L'or
+*Metal007* et *Marble001* d'[ambientCG](https://ambientcg.com). 2,3 Mo en 1024, téléphone compris. L'or
 n'en tire que son terni : une feuille BATTUE a des creux, et
 une tôle scannée n'en a pas — le martelage est écrit, comme l'appareil.
 
@@ -387,6 +389,7 @@ redessiner chaque arête à chaque image.
 | `dallage` | dallage en **rangées** de 4 amot (*rovadim*), dalles de 8 ou 10 dedans, joint creux — c'est le joint, en lumière rasante, qui donne la fuyante des cours |
 | `metal` | or et bronze **vraiment métalliques**, rugosité brouillée au bruit (l'or du Temple est martelé, pas poli) |
 | `marbre` | veiné, pour les huit tables du Beit HaMitba'haïm et celle de l'Oulam |
+| `marbre_herode` | le corps du bâtiment : trois marbres tirés par assise (*Baba Batra* 4a), **poli**, joint serré sans liseré ciselé, veines qui sautent d'un bloc au suivant (CHOIX) |
 | `bois` | cèdre des plafonds (*Melakhim I* 6:9), chêne des maltera'ot (*Middot* 3:7) |
 | `etoffe` | bigdei lavan, laine de la foule (quand `FOULE` est vrai) |
 | `parokhet` | les deux rideaux : **quatre matières à parts égales en champs de 5 amot** lus en Z du monde — tekhelet, argaman, tola'at shani, lin (*Shekalim* 8:5), lisière sombre entre les champs, relief de deux trames croisées ; aucun fil d'or (Ex. 26:31). Le bleu uni se stylisait en velours à plis |
@@ -539,7 +542,7 @@ ont fait corriger, si.
   → **Pas d'or** : le corps du bâtiment vu du dehors — murs nord, sud, ouest, et les épaules — en marbre d'Hérode.
   → **Pas d'or derrière les battants**, et c'est structurant : les faces de l'embrasure ne portent aucune plaque, ce qui est précisément la raison pour laquelle les portes intérieures se rabattent vers l'intérieur.
   L'or est modélisé en **plaques rapportées de 0,1 ama** sur la face intérieure, jamais comme matière du mur : une boîte ne porte qu'une matière, et dorer le mur du Heikhal aurait doré son extérieur, ce que *Baba Batra* interdit. Le sol reste en pierre (fiche §8b), non tranché par ces sources.
-- **Le marbre d'Hérode est une géométrie, pas une couleur.** « Une assise en débord, une en retrait » (*Baba Batra* 4a) : les assises alternent en relief une sur deux, et la teinte est tirée par assise entre les trois marbres (*shesh*, *marmara*, *kuchla* — blanc, bleu-vert, jaune) à saturation très basse. C'est ce jeu de relief, et non un placage, qui fait « les vagues de la mer » ; et c'est lui qui entre dans la passe Normal.
+- **Le marbre d'Hérode est une géométrie, pas une couleur.** « Une assise en débord, une en retrait » (*Baba Batra* 4a) : les assises alternent en relief une sur deux, et la teinte est tirée par assise entre les trois marbres (*shesh*, *marmara*, *kuchla* — vert, blanc, bleu selon Rashi) à saturation très basse. C'est ce jeu de relief, et non un placage, qui fait « les vagues de la mer » ; et c'est lui qui entre dans la passe Normal. Sa face, elle, est celle d'un marbre et non d'un calcaire scié : polie, veinée, sans liseré, sans stries de scie, sans moucheture ni coulure.
 - **La pierre fait huit ou dix amot, pas une.** « וּמְיֻסָּד אֲבָנִים יְקָרוֹת אֲבָנִים גְּדֹלוֹת אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת » (*Melakhim I* 7:10), et ces pierres valent pour l'enceinte comme pour le bâtiment (7:12). Le module d'une ama qui les précédait donnait quarante rangs sur la façade au lieu de dix blocs, et se lisait en brique. Les faces sont **sciées lisses** (7:9, « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ ») : tout le relief tient au joint et au liseré qui le borde, jamais à un bossage éclaté. La HAUTEUR d'assise n'est dans aucune source — **4 amot**, un CHOIX, le même pour l'enceinte et le bâtiment : une assise y vaut le pas d'un rovad de l'Oulam.
 - **Le calcaire n'est pas d'une couleur mais d'une bande**, et c'est le BLOC qui tire son banc, pas l'assise : dans un mur de gazit deux pierres voisines diffèrent plus que deux assises. `BANCS_CALCAIRE` va du gris cendré à l'ocre. Par-dessus, deux échelles de moucheture — un bloc d'une seule couleur est un échantillon de nuancier, pas une pierre.
 - **Le ciel n'est pas un remplissage.** C'est lui qui faisait l'aplat : une brume presque blanche à 0,6 sur tout l'hémisphère éclairait chaque face d'autant que le soleil, sans direction et sans couleur. Mesuré sur `CAM_02` : le mur sortait à 0,77 en display avec un écart R-B de 5 centièmes — un gris —, et baisser le soleil seul n'y changeait presque rien. Ciel à **0,30** et bleui, soleil à **3,2** : le même mur sort à 0,71 avec un écart R-B de 12 centièmes et un écart-type de modelé passé de 0,054 à 0,088. La lumière du soleil est chaude, son ombre est FROIDE, et c'est cet écart-là — pas l'appareil — qui fait lire une pierre comme de la pierre. Même arbitrage dans la visite (`HemisphereLight` 0,75 → 0,30, soleil 1,9 → 3,1).

@@ -73,7 +73,8 @@
   }
   #aide.parti { opacity: 0; }
   #aide span { font-size: 12.5px; line-height: 1.8; color: #a9a094; }
-  #aide .au-doigt, #aide .en-portrait { display: none; }
+  /* Le rappel et l'initiation disent chaque geste au clavier et au doigt : l'écran choisit. */
+  .au-doigt, .en-portrait { display: none; }
   kbd {
     font: inherit; font-size: 12px; padding: 1px 6px; border: 1px solid #4a453e;
     border-radius: 3px; background: #201d1a; color: #c8bfae;
@@ -140,6 +141,7 @@
   #mode.vole { color: var(--or); }
   #position { margin-inline-start: auto; font-size: 12px; color: #9a9182;
               font-variant-numeric: tabular-nums; }
+  #barre #rejouer { min-width: 32px; font-weight: 600; }
 
   /* ---- langue ---- */
   .drapeau { display: block; width: 21px; height: 14px; border-radius: 2px;
@@ -236,16 +238,157 @@
   .note b { display: block; font-size: 11px; text-transform: uppercase;
             letter-spacing: .13em; color: var(--sourd); margin-bottom: 4px; }
 
+  /* ---- initiation ---- */
+  /* Sous la barre et la fiche : la carte accompagne ce qu'on fait, elle n'empêche rien.
+     Elle seule prend le doigt ; les démonstrations le laissent passer à la scène. */
+  #initiation {
+    position: fixed; inset: 0; z-index: 18; pointer-events: none; transition: opacity .4s ease;
+  }
+  #initiation.parti { opacity: 0; }
+  #initiation .carte {
+    position: absolute; top: calc(64px + var(--marge-haut)); inset-inline: 0; margin-inline: auto;
+    width: min(420px, calc(100vw - 32px)); padding: 12px 18px;
+    border: 1px solid rgba(203,192,170,.22); border-radius: 8px;
+    background: rgba(13,12,11,.8); backdrop-filter: blur(4px); box-shadow: 0 12px 32px rgba(0,0,0,.35);
+    color: #e8e0d0; text-align: center; pointer-events: auto;
+    transition: border-color .25s ease; animation: paraitre .45s ease both;
+  }
+  #initiation .carte.reussie { border-color: var(--or); }
+  #initiation .reussie h2::after { content: " ✓"; color: var(--or); }
+  #initiation .points { display: flex; justify-content: center; gap: 6px; margin: 0 0 8px; }
+  #initiation .points i {
+    width: 6px; height: 6px; border-radius: 3px; background: #4a453e;
+    transition: width .3s ease, background-color .3s ease;
+  }
+  #initiation .points i.courante { width: 18px; background: #c8bfae; }
+  #initiation .points i.faite { background: var(--or); }
+  #initiation section { animation: paraitre .35s ease both; }
+  #initiation h2 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  #initiation section p { margin: 4px 0 0; font-size: 14px; color: #b3aa9b; }
+  #initiation .pied { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+  #initiation .progres { flex: 1; height: 3px; border-radius: 2px; background: #2a2724; overflow: hidden; }
+  #initiation .progres i { display: block; width: 0; height: 100%; background: var(--or); transition: width .2s ease; }
+  #initiation .finie .pied { justify-content: center; }
+  #initiation .finie .progres { display: none; }
+  #initiation .passer {
+    font: inherit; font-size: 13px; padding: 5px 12px; color: #c8bfae; background: none;
+    border: 1px solid rgba(203,192,170,.28); border-radius: 4px; cursor: pointer;
+  }
+  #initiation .passer:hover { border-color: var(--or); color: #f0e9da; }
+  #initiation .finie .passer { padding: 7px 22px; color: #f3efe6; background: var(--or); border-color: var(--or); }
+  @keyframes paraitre { from { opacity: 0; transform: translateY(6px); } }
+
+  /* Le geste se montre là où il se fait ; dès qu'on le fait, la démonstration s'efface.
+     `:has` a sa règle à lui : un navigateur qui l'ignore jetterait la liste entière. */
+  #initiation .geste { position: absolute; inset: 0; transition: opacity .3s ease; }
+  #initiation.agit .geste { opacity: 0; }
+  body:has(canvas.tourne) #initiation [data-geste="regarder"] { opacity: 0; }
+  body:has(#manche.vu) #initiation [data-geste="avancer"] { opacity: 0; }
+  #initiation .doigt {
+    position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+    background: rgba(240,233,218,.38); border: 1px solid rgba(240,233,218,.75);
+    box-shadow: 0 0 0 7px rgba(240,233,218,.1), 0 4px 14px rgba(0,0,0,.3);
+  }
+  /* Une rainure sombre, pas un trait : sur le dallage clair du matin, un trait ne se voit pas. */
+  #initiation .sillage {
+    position: absolute; width: 188px; height: 56px; margin: -28px 0 0 -94px; border-radius: 28px;
+    background: rgba(13,12,11,.36); border: 1px solid rgba(240,233,218,.22); backdrop-filter: blur(2px);
+  }
+  #initiation .sillage::before, #initiation .sillage::after {
+    position: absolute; top: 0; font-size: 24px; line-height: 52px; color: rgba(240,233,218,.7);
+  }
+  #initiation .sillage::before { content: "‹"; left: 12px; }
+  #initiation .sillage::after { content: "›"; right: 12px; }
+  #initiation .curseur {
+    position: absolute; width: 20px; height: 30px; margin: -6px 0 0 -3px;
+    fill: #f3efe6; stroke: #1b1815; stroke-width: 1.2; filter: drop-shadow(0 3px 6px rgba(0,0,0,.45));
+  }
+  #initiation [data-geste="regarder"] .au-clavier { --x: 50%; }
+  #initiation [data-geste="regarder"] .au-doigt { --x: min(74%, calc(100% - 110px)); }
+  #initiation [data-geste="regarder"] :is(.doigt, .sillage, .curseur) { left: var(--x); top: 58%; }
+  #initiation [data-geste="regarder"] :is(.doigt, .curseur) { animation: balayer 2.6s ease-in-out infinite; }
+  @keyframes balayer { 0%, 100% { transform: translateX(-62px); } 50% { transform: translateX(62px); } }
+
+  #initiation .manche-fantome {
+    position: absolute; left: max(80px, 24%); top: 70%; width: 116px; height: 116px;
+    margin: -58px 0 0 -58px; border: 1px dashed rgba(203,192,170,.6); border-radius: 50%;
+    background: rgba(13,12,11,.3);
+  }
+  #initiation .manche-fantome .doigt { left: 50%; top: 50%; animation: pousser 2.4s ease-in-out infinite; }
+  @keyframes pousser {
+    0%, 12% { transform: none; opacity: 0; }
+    22% { transform: none; opacity: 1; }
+    60%, 80% { transform: translateY(-46px); opacity: 1; }
+    100% { transform: translateY(-46px); opacity: 0; }
+  }
+  #initiation .touches {
+    position: absolute; left: 50%; top: 60%; display: grid; grid-template-columns: repeat(3, 44px);
+    gap: 6px; direction: ltr; transform: translate(-50%, -50%);
+  }
+  #initiation .touches-vol {
+    position: absolute; left: 50%; top: 60%; display: flex; gap: 10px; direction: ltr;
+    transform: translate(-50%, -50%);
+  }
+  #initiation .touches-vol kbd { min-width: 44px; padding: 0 12px; }
+  #initiation .touches-vol kbd:first-child { min-width: 132px; animation: appuyer 2.8s ease-in-out infinite; }
+  #initiation .touches-vol kbd:last-child { animation: appuyer 2.8s ease-in-out 1.4s infinite; }
+  #initiation :is(.touches, .touches-vol) kbd {
+    display: grid; place-items: center; height: 44px; padding: 0; font-size: 17px;
+    border-bottom-width: 3px; border-radius: 5px; background: rgba(32,29,26,.92);
+  }
+  #initiation .touches kbd:first-child { grid-column: 2; animation: appuyer 1.4s ease-in-out infinite; }
+  #initiation .touches kbd:not(:first-child) { grid-row: 2; }
+  @keyframes appuyer {
+    0%, 35%, 100% { transform: none; border-bottom-width: 3px; }
+    45%, 85% { transform: translateY(2px); border-bottom-width: 1px; border-color: var(--or); color: #f0e9da; }
+  }
+
+  #initiation .cible { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity .25s ease; }
+  #initiation .cible.vue { opacity: 1; }
+  #initiation .cible::before, #initiation .cible::after {
+    content: ""; position: absolute; left: -28px; top: -28px; width: 56px; height: 56px;
+    border: 2px solid rgba(240,233,218,.9); border-radius: 50%; animation: onde 1.8s ease-out infinite;
+  }
+  #initiation .cible::after { animation-delay: .9s; }
+  #initiation .cible i {
+    position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%;
+    background: #f3efe6; box-shadow: 0 0 0 3px rgba(154,107,31,.7);
+  }
+  #initiation .cible .nom {
+    position: absolute; top: 38px; left: 0; transform: translateX(-50%); padding: 4px 11px;
+    border-radius: 3px; background: rgba(13,12,11,.78); color: #f0e9da; font-size: 13px; white-space: nowrap;
+  }
+  @keyframes onde { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+
+  /* Ce que l'étape fait toucher hors de la scène — un bouton de la barre, les flèches du
+     vol — bat là où il est, plutôt qu'une flèche qui le montrerait de loin. */
+  #barre .designe, #vertical.designe button {
+    border-color: var(--or); animation: signaler 1.6s ease-out infinite;
+  }
+  /* Une fiche ouverte par mégarde ne doit pas cacher le geste demandé. */
+  #vertical.designe { z-index: 26; }
+  @keyframes signaler {
+    from { box-shadow: 0 0 0 0 rgba(217,164,65,.8); }
+    to { box-shadow: 0 0 0 14px rgba(217,164,65,0); }
+  }
+
+  @media (max-height: 520px) {
+    /* Couchée, la barre passe ses boutons sur deux lignes : la carte descend d'autant. */
+    #initiation .carte { top: calc(72px + var(--marge-haut)); padding: 8px 14px; }
+    #initiation h2 { font-size: 16px; }
+    #initiation section p { font-size: 13px; }
+  }
+
   /* ---- au doigt ---- */
   @media (hover: none) and (pointer: coarse) {
     #survol { display: none; }
     #aide { left: 50%; right: auto; transform: translateX(-50%); max-width: 92vw;
             text-align: center; bottom: calc(16px + var(--marge-bas)); }
-    #aide .au-clavier { display: none; }
-    #aide .au-doigt { display: inline; }
+    .au-clavier { display: none; }
+    .au-doigt { display: revert; }
   }
   @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-    #aide .en-portrait { display: inline; }
+    .en-portrait { display: revert; }
   }
 
   /* ---- petit écran : la fiche devient un tiroir ---- */
@@ -336,9 +479,11 @@
   </div>
   <select id="aller"><option value="" data-texte="aller">Aller à…</option></select>
   <select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select>
-  <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="pied">À pied</button>
-  <span id="mode" class="vole" data-texte="en_vol">vol libre</span>
+  <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="vol">Vol libre</button>
+  <span id="mode" data-texte="a_pied">à pied</span>
   <span id="position"></span>
+  <button id="rejouer" type="button" title="Revoir les premiers pas" aria-label="Revoir les premiers pas"
+          data-titre="initiation_titre">?</button>
 </div>
 
 <div id="survol"></div>
@@ -354,11 +499,65 @@
   <span class="au-clavier" data-texte-html="aide_clavier">Glisser pour tourner la tête · clic sur un élément pour l'interroger<br>
         <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> ou les flèches pour marcher ·
         <kbd>Maj</kbd> pour courir<br>
-        <kbd>Espace</kbd> monter et <kbd>C</kbd> descendre · <kbd>V</kbd> à pied</span>
+        <kbd>V</kbd> vol libre, puis <kbd>Espace</kbd> monter et <kbd>C</kbd> descendre</span>
   <span class="au-doigt"><span data-texte-html="aide_doigt">Pouce gauche pour marcher, pousser plus loin pour courir<br>
         Glisser à droite pour tourner la tête · toucher un élément pour l'interroger<br>
         Toucher deux fois le sol pour s'y rendre</span>
         <span class="en-portrait" data-texte-html="aide_portrait"><br>Tourner l'appareil élargit le champ</span></span>
+</div>
+
+<div id="initiation" hidden>
+  <div class="geste" data-geste="regarder" hidden>
+    <div class="au-clavier"><i class="sillage"></i><svg class="curseur" viewBox="0 0 14 21" aria-hidden="true"><path d="M1 1v16l4-3.6 3 6.8 2.6-1.1-3-6.7H13z"/></svg></div>
+    <div class="au-doigt"><i class="sillage"></i><i class="doigt"></i></div>
+  </div>
+  <div class="geste" data-geste="avancer" hidden>
+    <div class="au-clavier"><div class="touches" data-texte-html="initiation_touches"><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd></div></div>
+    <div class="au-doigt"><div class="manche-fantome"><i class="doigt"></i></div></div>
+  </div>
+  <div class="geste" data-geste="interroger" hidden>
+    <div class="cible"><i></i><span class="nom"></span></div>
+  </div>
+  <div class="geste" data-geste="monter" hidden>
+    <div class="au-clavier"><div class="touches-vol" data-texte-html="initiation_touches_vol"><kbd>Espace</kbd><kbd>C</kbd></div></div>
+  </div>
+
+  <div class="carte" role="status" aria-live="polite">
+    <p class="points" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></p>
+    <section data-etape="regarder" hidden>
+      <h2 data-texte="initiation_regarder">Regarder autour de soi</h2>
+      <p class="au-clavier" data-texte-html="initiation_regarder_souris"></p>
+      <p class="au-doigt" data-texte-html="initiation_regarder_doigt"></p>
+    </section>
+    <section data-etape="avancer" hidden>
+      <h2 data-texte="initiation_avancer">Avancer</h2>
+      <p class="au-clavier" data-texte-html="initiation_avancer_clavier"></p>
+      <p class="au-doigt" data-texte-html="initiation_avancer_doigt"></p>
+    </section>
+    <section data-etape="interroger" hidden>
+      <h2 data-texte="initiation_interroger">Découvrir un élément</h2>
+      <p class="au-clavier" data-texte-html="initiation_interroger_souris"></p>
+      <p class="au-doigt" data-texte-html="initiation_interroger_doigt"></p>
+    </section>
+    <section data-etape="voler" hidden>
+      <h2 data-texte="initiation_voler">Quitter le sol</h2>
+      <p class="au-clavier" data-texte-html="initiation_voler_clavier"></p>
+      <p class="au-doigt" data-texte-html="initiation_voler_doigt"></p>
+    </section>
+    <section data-etape="monter" hidden>
+      <h2 data-texte="initiation_monter">Monter et redescendre</h2>
+      <p class="au-clavier" data-texte-html="initiation_monter_clavier"></p>
+      <p class="au-doigt" data-texte-html="initiation_monter_doigt"></p>
+    </section>
+    <section data-etape="fin" hidden>
+      <h2 data-texte="initiation_fin">À vous de visiter</h2>
+      <p><span data-texte="initiation_fin_texte"></span><span class="en-portrait" data-texte-html="aide_portrait"></span></p>
+    </section>
+    <div class="pied">
+      <div class="progres"><i></i></div>
+      <button class="passer" type="button" data-texte="initiation_passer">Passer</button>
+    </div>
+  </div>
 </div>
 
 <div id="voile"></div>

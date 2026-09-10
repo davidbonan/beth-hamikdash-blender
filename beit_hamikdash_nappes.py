@@ -2,7 +2,7 @@
 
     python3 beit_hamikdash_nappes.py
 
-Cinq jeux, tous CC0 : quatre de Poly Haven, un d'ambientCG. Deux fichiers par jeu.
+Six jeux, tous CC0 : quatre de Poly Haven, deux d'ambientCG. Deux fichiers par jeu.
 La COULEUR porte la rugosité dans son canal alpha — l'alpha du WebP est codé à part et
 à pleine définition, là où le bleu partirait en 4:2:0 avec le reste de la chrominance.
 La NORMALE est en convention OpenGL, vert vers le haut, celle qu'attend three.
@@ -28,7 +28,8 @@ TAILLE = 1024
 # lichen. L'étoffe n'a pas de couleur : celle du lin et du tekhelet est dictée.
 POLY_HAVEN = {"pierre": "worn_rock_natural_01", "enduit": "beige_wall_001",
               "bois": "hinoki_planks", "etoffe": "rough_linen"}
-AMBIENT_CG = {"metal": "Metal007"}
+# Le marbre d'Hérode : un blanc nuageux à veines fines, qui reste du marbre à cent amot.
+AMBIENT_CG = {"metal": "Metal007", "marbre": "Marble001"}
 SANS_COULEUR = ("etoffe",)
 
 

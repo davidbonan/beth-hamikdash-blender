@@ -92,7 +92,6 @@ const OCCLUSION = {
     vec3 positionVue(vec2 uv, float z){
       return vec3((uv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0) * z, -z);
     }
-    float alea(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 
     // Ce que voit UNE prise : rien si elle sort du cadre ou tombe sur le ciel, sinon la
     // part d'horizon que la scène lui bouche, atténuée quand ce qui la bouche est trop
@@ -113,12 +112,11 @@ const OCCLUSION = {
       if (g.a <= 0.0) { gl_FragColor = vec4(1.0); return; }   // le ciel n'occlut rien
       vec3 P = positionVue(vUv, g.a);
       vec3 N = normalize(g.rgb * 2.0 - 1.0);
-      // Le repère tangent est arbitraire autour de la normale : il est tourné par
-      // pixel, ce qui échange le bruit de bande contre un bruit fin que le flou de la
-      // passe suivante avale.
+      // Le repère tangent est arbitraire autour de la normale : il tourne sur un motif de
+      // 4 × 4 pixels, que le flou 4 × 4 de la composition moyenne exactement.
       vec3 T = normalize(abs(N.z) < 0.9 ? cross(vec3(0.0, 0.0, 1.0), N) : cross(vec3(0.0, 1.0, 0.0), N));
       vec3 B = cross(N, T);
-      float tour = alea(gl_FragCoord.xy);
+      float tour = (mod(floor(gl_FragCoord.x), 4.0) * 4.0 + mod(floor(gl_FragCoord.y), 4.0)) / 16.0;
       // Les deux rayons partagent leurs directions : la seconde échelle ne coûte qu'une
       // prise de plus par direction, pas un second parcours de l'hémisphère.
       float occ = 0.0, occFin = 0.0;
@@ -150,14 +148,14 @@ const COMPOSITION = {
     uniform vec2 uPas;
     varying vec2 vUv;
     void main(){
-      // L'occlusion est calculée en demi-résolution et bruitée par pixel : la moyenne
-      // sur neuf voisins est ce qui la rend lisible. Elle n'est pas guidée par la
-      // profondeur — à ce rayon, le débord tient dans deux pixels.
+      // Un tirage au hasard par pixel laisse, après neuf voisins, un grain qui marbre tout
+      // ce que seul le ciel éclaire. Seize voisins couvrent le motif de rotation entier.
+      // Pas de guidage par la profondeur : le débord tient dans deux texels.
       vec2 ao = vec2(0.0);
-      for (int y = -1; y <= 1; y++)
-        for (int x = -1; x <= 1; x++)
+      for (int y = -2; y <= 1; y++)
+        for (int x = -2; x <= 1; x++)
           ao += texture2D(tAO, vUv + vec2(float(x), float(y)) * uPas).rg;
-      ao /= 9.0;
+      ao /= 16.0;
       vec4 c = texture2D(tDiffuse, vUv);
       gl_FragColor = vec4(c.rgb * ao.x * ao.y, c.a);
     }`,

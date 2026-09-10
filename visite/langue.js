@@ -1,9 +1,14 @@
+import { lireRetenu, retenir } from "./memoire.js";
+
 const CLEF = "visite.langue";
 export const LANGUE_SOURCE = "fr";
 
 let textes = null;
 let courante = LANGUE_SOURCE;
 const suiveurs = [];
+let signalerChoix;
+// Tant que l'accueil demande la langue, rien d'autre ne doit s'adresser au visiteur.
+export const langueChoisie = new Promise((resoudre) => { signalerChoix = resoudre; });
 
 export const langue = () => courante;
 // Avant `installerLangue`, une erreur de chargement doit encore pouvoir s'afficher.
@@ -14,14 +19,6 @@ export const suivreLangue = (suiveur) => suiveurs.push(suiveur);
 export function ecrire(element, clef) {
   element.dataset.texte = clef;
   element.textContent = texte(clef);
-}
-
-function langueRetenue() {
-  try { return localStorage.getItem(CLEF); } catch { return null; }
-}
-
-function retenirLangue(code) {
-  try { localStorage.setItem(CLEF, code); } catch { /* stockage refusé : le choix ne vaut que pour cette visite */ }
 }
 
 function traduirePage() {
@@ -39,7 +36,7 @@ function traduirePage() {
 }
 
 function choisirLangue(code) {
-  retenirLangue(code);
+  retenir(CLEF, code);
   if (code === courante) return;
   courante = code;
   traduirePage();
@@ -88,15 +85,16 @@ function accueillir() {
     bouton.blur();
     choisirLangue(bouton.dataset.langue);
     accueil.classList.add("parti");
+    signalerChoix();
   };
 }
 
 export function installerLangue(tous) {
   textes = tous;
-  const retenue = langueRetenue();
+  const retenue = lireRetenu(CLEF);
   const connue = retenue !== null && Object.hasOwn(textes, retenue);
   if (connue) courante = retenue;
   traduirePage();
   brancherSelecteur();
-  if (!connue) accueillir();
+  if (connue) signalerChoix(); else accueillir();
 }

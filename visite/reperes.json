@@ -987,6 +987,17 @@
       "tangage": 0
     },
     {
+      "id": "face_porte_est",
+      "nom": "Face à la porte orientale",
+      "position": [
+        79.2,
+        -7.68,
+        -0.0
+      ],
+      "cap": 180,
+      "tangage": 8
+    },
+    {
       "id": "ezrat_nashim",
       "nom": "Ezrat Nashim",
       "position": [

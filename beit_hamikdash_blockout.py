@@ -170,6 +170,16 @@ def _grain(mat, taille):
     mat.node_tree.links.new(_position(mat), bruit.inputs["Vector"])
     return bruit.outputs["Factor"]
 
+def _veines(mat, pas, origine):
+    """Veinage du marbre, bandes diagonales distordues de `pas` amot. Renvoie la sortie Factor."""
+    veines = _noeud(mat, "ShaderNodeTexWave", -900, 0)
+    veines.bands_direction = 'DIAGONAL'
+    veines.inputs["Scale"].default_value = 1.0 / m(pas)
+    veines.inputs["Distortion"].default_value = 12.0
+    veines.inputs["Detail"].default_value = 3.0
+    mat.node_tree.links.new(origine, veines.inputs["Vector"])
+    return veines.outputs["Factor"]
+
 def _creuser(mat, hauteur, force, profondeur):
     """Empile un Bump sur l'entrée Normal du Principled. Chaînable : le relief fin se
     pose par-dessus le relief large sans l'écraser.
@@ -224,6 +234,27 @@ LISERE = 0.25
 # relief est ce que les Sages ont préféré à l'or, et il doit porter la vague à lui seul.
 DEBORD_ASSISE = 0.05
 DEBORD_BATIMENT = 0.11
+# Le marbre est poli jusqu'à l'arête : pas de liseré ciselé, un joint serré — CHOIX.
+JOINT_MARBRE = 0.03
+LISERE_MARBRE = 0.05
+
+
+class Appareil(NamedTuple):
+    assise: float
+    longueurs: tuple[float, float]
+    debord: float
+    joint: float
+    lisere: float
+
+
+class Bloc(NamedTuple):
+    """Ce que `_tailler` lit en un point. `champ` vaut 0 au fond du joint, 1 sur la face."""
+    parite: bpy.types.NodeSocket
+    tire_assise: bpy.types.NodeSocket
+    tire_bloc: bpy.types.NodeSocket
+    tire_fini: bpy.types.NodeSocket
+    creux: bpy.types.NodeSocket
+    champ: bpy.types.NodeSocket
 
 # Le sol va en RANGÉES, pas en carreaux. « כָּל שׁוּרָה וְשׁוּרָה שֶׁל אַבְנֵי הָרִצְפָּה קְרוּיָה
 # רֹבֶד » (Bartenura sur Yoma 4:3), et on les COMPTE en sortant du Heikhal : Yoma 4:3
@@ -246,9 +277,7 @@ CREUX_DALLE = 0.015         # 7 mm : un lit de dalle, pas une rainure
 # וּמִחוּץ » (Melakhim I 7:9) — ces faces sont SCIÉES, dedans et dehors. Ce qui change
 # d'un bloc au suivant est le banc dont il sort et le lit sur lequel il est passé sous
 # la scie, jamais l'outil.
-# La PREMIÈRE est le parement d'avant, et reste la référence : le marbre d'Hérode la
-# garde sur tous ses blocs — `marbre_herode` ne tire pas, et le bâtiment ne bouge donc
-# pas d'un texel.
+# La PREMIÈRE est le parement d'avant, et reste la référence.
 FINITIONS = (
     #  pas   lit  force couche  fin   strie relief lustre
     (1.5,  1.0,  1.00,  0.0,  0.45, 0.090, 1.00,  0.00),   # sciée debout
@@ -345,24 +374,21 @@ def _parement(mat):
     return p.outputs["Z"], u, _calc(mat, "ABSOLUTE", n.outputs["Z"])
 
 
-def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
-    """Taille la surface en blocs de gazit et creuse leur joint et son liseré.
+def _tailler(mat, appareil):
+    """Taille la surface en blocs et creuse leur joint et son liseré.
 
-    Deux reliefs, et c'est le profil du bloc : le joint, creusé ; le liseré ciselé qui
-    le borde, plat et en léger retrait ; entre les deux le champ de la pierre, scié
-    lisse (Melakhim I 7:9). Le liseré est ce qui donne le bloc, et le bloc l'échelle —
-    sans lui un mur de 100 amot n'a que des lignes horizontales et se lit en bardage.
+    Deux reliefs, et c'est le profil du bloc : le joint, creusé ; le liseré qui le
+    borde, plat et en léger retrait ; entre les deux le champ de la pierre. Le liseré
+    est ce qui donne le bloc, et le bloc l'échelle — sans lui un mur de 100 amot n'a que
+    des lignes horizontales et se lit en bardage.
 
     La parité des assises reste le « אבן יוצא ואבן נכנס » de *Baba Batra* 4a : une assise
     en léger débord, la suivante en retrait. C'est ce jeu-là — pas un placage — qui a
     fait renoncer Hérode à dorer le bâtiment, « cela ressemble aux vagues de la mer ».
     D'où `debord`, plus fort sur le bâtiment que sur l'enceinte : c'est de SA façade que
     parle la guemara, et c'est le relief qui doit y porter la vague, pas la teinte.
-
-    Renvoie (parité de l'assise, tirage de l'assise, tirage du bloc, masque du joint,
-    tirage de la finition). Le profil du relief ne sort pas : il ne sert qu'aux Bump,
-    posés ici.
     """
+    assise, longueurs, _, joint, lisere = appareil
     z, u, aplat = _parement(mat)
     rang, ecart_z = _module(mat, z, assise)
     numero = _calc(mat, "FLOOR", rang)
@@ -402,7 +428,7 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     ecart = _calc(mat, "MINIMUM", _calc(mat, "ADD", ecart_z, loin),
                   _calc(mat, "ADD", ecart_u, loin))
     profil = _noeud(mat, "ShaderNodeValToRGB", -1200, -300)
-    portee = JOINT + LISERE + 0.15
+    portee = joint + lisere + 0.15
     rampe = profil.color_ramp
     # Le liseré est en léger retrait, le champ à peine proéminent : 0,62 de la course
     # est descendue dans le joint, et il ne reste que 0,32 pour la marche du bloc, un
@@ -410,9 +436,9 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     # À 0,44 le bloc débordait assez pour que le Bump cerne chaque pierre d'un jonc
     # clair — un carrelage, pas un mur.
     rampe.elements[0].position, rampe.elements[0].color = 0.0, (0.0, 0.0, 0.0, 1.0)
-    rampe.elements[1].position, rampe.elements[1].color = JOINT / portee, (0.62,) * 3 + (1.0,)
-    rampe.elements.new((JOINT + LISERE) / portee).color = (0.68,) * 3 + (1.0,)
-    rampe.elements.new((JOINT + LISERE + 0.06) / portee).color = (1.0, 1.0, 1.0, 1.0)
+    rampe.elements[1].position, rampe.elements[1].color = joint / portee, (0.62,) * 3 + (1.0,)
+    rampe.elements.new((joint + lisere) / portee).color = (0.68,) * 3 + (1.0,)
+    rampe.elements.new((joint + lisere + 0.06) / portee).color = (1.0, 1.0, 1.0, 1.0)
     rapport = _calc(mat, "DIVIDE", ecart, portee)
     mat.node_tree.links.new(rapport, profil.inputs["Factor"])
     # Le JOINT seul, sans le liseré. Le profil sert au relief et court sur toute la
@@ -420,17 +446,12 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     # liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur.
     creux = _noeud(mat, "ShaderNodeValToRGB", -1200, -520)
     creux.color_ramp.elements[0].position = 0.0
-    creux.color_ramp.elements[1].position = JOINT * 1.15 / portee
+    creux.color_ramp.elements[1].position = joint * 1.15 / portee
     mat.node_tree.links.new(rapport, creux.inputs["Factor"])
     _creuser(mat, profil.outputs["Color"], 1.0, 0.07)
-    _creuser(mat, parite, 0.9, debord)
-    # Le grain reste dans le champ de la pierre et s'arrête au liseré, qui est ciselé.
-    _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.45), profil.outputs["Color"]), 0.8, 0.035)
-    # Piqûre du calcaire : le meleke est poreux, et sans elle la face sciée rend un
-    # plastique lisse dès que le soleil la prend de biais.
-    _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.10), profil.outputs["Color"]), 0.6, 0.012)
-    return (parite, tire_assise.outputs["Value"], tire_bloc.outputs["Value"],
-            creux.outputs["Color"], tire_fini.outputs["Value"])
+    _creuser(mat, parite, 0.9, appareil.debord)
+    return Bloc(parite, tire_assise.outputs["Value"], tire_bloc.outputs["Value"],
+                tire_fini.outputs["Value"], creux.outputs["Color"], profil.outputs["Color"])
 
 
 # Ce que devient la pierre au fond du joint : plus sombre, et PLUS CHAUDE. Le facteur
@@ -505,7 +526,13 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.78
-    parite, _, bloc, creux, fini = _appareil(mat, assise, longueurs)
+    appareil = Appareil(assise, longueurs, DEBORD_ASSISE, JOINT, LISERE)
+    parite, _, bloc, fini, creux, champ = _tailler(mat, appareil)
+    # Le grain reste dans le champ de la pierre et s'arrête au liseré, qui est ciselé.
+    _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.45), champ), 0.8, 0.035)
+    # Piqûre du calcaire : le meleke est poreux, et sans elle la face sciée rend un
+    # plastique lisse dès que le soleil la prend de biais.
+    _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.10), champ), 0.6, 0.012)
     teinte = _noeud(mat, "ShaderNodeValToRGB", -700, 160)
     rampe = teinte.color_ramp
     bancs = [tuple(min(1.0, c * e) for c, e in zip(rgb, banc)) + (1.0,)
@@ -595,6 +622,13 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
 # Saturation très basse : ce que les Sages lui ont fait garder contre l'or, c'est « כִּי
 # אִידְווֹתָא דְיַמָּא », le moiré d'une mer — pas une mosaïque.
 MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.81, 0.86, 0.86), (0.82, 0.88, 0.78))
+APPAREIL_HERODE = Appareil(ASSISE, PIERRE_LONG, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE)
+RUGOSITE_MARBRE = 0.30
+# Le veinage n'est dans aucune source — CHOIX : chaque bloc sort d'une autre tranche de carrière.
+PAS_VEINE_HERODE = 6.0
+SEUIL_VEINE = 0.95
+VEINE_MARBRE = (0.84, 0.86, 0.88)
+DECALAGE_VEINE = 40.0
 
 
 def marbre_herode(name):
@@ -602,7 +636,8 @@ def marbre_herode(name):
 
     C'est la seule surface que les sources refusent explicitement de dorer : Hérode
     voulut la plaquer d'or et les Sages l'en dissuadèrent (*Baba Batra* 4a). Elle porte
-    donc la pierre, et l'or reste où *Middot* 4:1 le met — tout l'intérieur du Bayit.
+    donc le marbre, poli et veiné, et l'or reste où *Middot* 4:1 le met — tout
+    l'intérieur du Bayit.
 
     Le marbre se tire par ASSISE et non par bloc — CHOIX : « בְּאַבְנֵי שֵׁישָׁא כּוּחְלָא
     וּמַרְמְרָא » (*Soucca* 51b ; *Baba Batra* 4a) nomme les trois pierres sans dire
@@ -614,10 +649,7 @@ def marbre_herode(name):
     if not neuf:
         return mat
     liens = mat.node_tree.links
-    _bsdf(mat).inputs["Roughness"].default_value = 0.62   # marbre poli, pas calcaire
-    # Le marbre ne tire pas de finition : ses trois pierres se posent par assises
-    # entières et sa face est reprise jusqu'au poli — il n'y a pas cinq mains dessus.
-    _, tire_assise, bloc, creux, _ = _appareil(mat, debord=DEBORD_BATIMENT)
+    _, tire_assise, bloc, _, creux, _ = _tailler(mat, APPAREIL_HERODE)
     choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
     rampe = choix.color_ramp
     rampe.interpolation = 'CONSTANT'
@@ -627,19 +659,45 @@ def marbre_herode(name):
     rampe.elements[1].color = (*MARBRES_HERODE[1], 1.0)
     rampe.elements.new(2.0 / 3.0).color = (*MARBRES_HERODE[2], 1.0)
     liens.new(tire_assise, choix.inputs["Factor"])
-    veine = _noeud(mat, "ShaderNodeMixRGB", -500, 160)
-    veine.blend_type = "MULTIPLY"
-    veine.inputs["Factor"].default_value = 1.0
-    liens.new(choix.outputs["Color"], veine.inputs["Color1"])
+    teinte = _noeud(mat, "ShaderNodeMixRGB", -500, 160)
+    teinte.blend_type = "MULTIPLY"
+    teinte.inputs["Factor"].default_value = 1.0
+    liens.new(choix.outputs["Color"], teinte.inputs["Color1"])
     nuance = _noeud(mat, "ShaderNodeValToRGB", -680, -40)
     nuance.color_ramp.elements[0].color = (0.84, 0.85, 0.88, 1.0)
     nuance.color_ramp.elements[1].color = (1.10, 1.08, 1.02, 1.0)
     liens.new(_calc(mat, "MULTIPLY_ADD", _grain(mat, 24.0), 0.45,
                     _calc(mat, "MULTIPLY", bloc, 0.55)), nuance.inputs["Factor"])
-    liens.new(nuance.outputs["Color"], veine.inputs["Color2"])
-    liens.new(_ombre_du_joint(mat, veine.outputs["Color"], creux),
+    liens.new(nuance.outputs["Color"], teinte.inputs["Color2"])
+    veinee = _noeud(mat, "ShaderNodeMixRGB", -340, 320)
+    veinee.blend_type = "MULTIPLY"
+    veinee.inputs["Color2"].default_value = (*VEINE_MARBRE, 1.0)
+    liens.new(teinte.outputs["Color"], veinee.inputs["Color1"])
+    liens.new(_veine_par_bloc(mat, tire_assise, bloc), veinee.inputs["Factor"])
+    liens.new(_ombre_du_joint(mat, veinee.outputs["Color"], creux),
               _bsdf(mat).inputs["Base Color"])
+    _bsdf(mat).inputs["Roughness"].default_value = RUGOSITE_MARBRE
+    liens.new(_calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", bloc, 0.5), 0.06, RUGOSITE_MARBRE),
+              _bsdf(mat).inputs["Roughness"])
     return mat
+
+
+def _veine_par_bloc(mat, tire_assise, tire_bloc):
+    """Masque des veines, 1 au coeur d'une veine : le motif saute d'un bloc au suivant."""
+    liens = mat.node_tree.links
+    tranche = _noeud(mat, "ShaderNodeCombineXYZ", -1400, 700)
+    liens.new(_calc(mat, "MULTIPLY", tire_bloc, m(DECALAGE_VEINE)), tranche.inputs["X"])
+    liens.new(_calc(mat, "MULTIPLY", tire_assise, m(DECALAGE_VEINE)), tranche.inputs["Y"])
+    origine = _noeud(mat, "ShaderNodeVectorMath", -1200, 700)
+    origine.operation = "ADD"
+    liens.new(_position(mat), origine.inputs[0])
+    liens.new(tranche.outputs["Vector"], origine.inputs[1])
+    coeur = _noeud(mat, "ShaderNodeMapRange", -700, 700)
+    coeur.interpolation_type = "SMOOTHSTEP"
+    coeur.inputs["From Min"].default_value = SEUIL_VEINE
+    coeur.inputs["From Max"].default_value = 1.0
+    liens.new(_veines(mat, PAS_VEINE_HERODE, origine.outputs["Vector"]), coeur.inputs["Value"])
+    return coeur.outputs["Result"]
 
 
 def _enduire(mat):
@@ -779,16 +837,10 @@ def marbre(name, rgb):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.28
-    veines = _noeud(mat, "ShaderNodeTexWave", -900, 0)
-    veines.bands_direction = 'DIAGONAL'
-    veines.inputs["Scale"].default_value = 1.0 / m(2.5)
-    veines.inputs["Distortion"].default_value = 12.0
-    veines.inputs["Detail"].default_value = 3.0
-    liens.new(_position(mat), veines.inputs["Vector"])
     filet = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
     filet.inputs["Color1"].default_value = (*rgb, 1.0)
     filet.inputs["Color2"].default_value = (*(c * 0.72 for c in rgb), 1.0)
-    liens.new(veines.outputs["Factor"], filet.inputs["Factor"])
+    liens.new(_veines(mat, 2.5, _position(mat)), filet.inputs["Factor"])
     liens.new(filet.outputs["Color"], _bsdf(mat).inputs["Base Color"])
     return mat
 
@@ -2063,21 +2115,30 @@ def moulure(name, x0, x1, y0, y1, z, profil, col, mat=None, saillie=SAILLIE_MOUL
 
 
 def ceinture(name, x0, x1, y0, y1, epaisseur, z, profil, col, mat=None,
-             saillie=SAILLIE_MOULURE, filet=None):
+             saillie=SAILLIE_MOULURE, filet=None, baies=None):
     """La moulure de `moulure`, mais sur les quatre côtés d'une enceinte fermée.
 
     Un mur seul se coupe là où un corps de porte passe la crête ; ici les quatre côtés
     sont solidaires, et ce qui compte est qu'ils s'aboutent au lieu de se recouvrir —
     deux boîtes coplanaires clignotent. Les côtés sud et nord prennent les angles, les
     côtés est et ouest s'arrêtent contre eux.
+
+    `baies` : `{face: [(u0, u1), …]}`, ce que la moulure laisse libre le long d'une face.
+    Un socle qui court devant une porte la rehausse d'autant, et en fait une fenêtre.
     """
+    baies = baies or {}
     larmier = max(range(len(profil)), key=lambda k: profil[k][2])
     for i, (zb, zh, part) in enumerate(profil):
         p, e = saillie * part, epaisseur
-        box(f"{name}_S{i}", x0 - p, x1 + p, y0 - p, y0 + e + p, z + zb, z + zh, col, mat)
-        box(f"{name}_N{i}", x0 - p, x1 + p, y1 - e - p, y1 + p, z + zb, z + zh, col, mat)
-        box(f"{name}_O{i}", x0 - p, x0 + e + p, y0 + e, y1 - e, z + zb, z + zh, col, mat)
-        box(f"{name}_E{i}", x1 - e - p, x1 + p, y0 + e, y1 - e, z + zb, z + zh, col, mat)
+        for face, bornes in (("S", (x0 - p, x1 + p, y0 - p, y0 + e + p)),
+                             ("N", (x0 - p, x1 + p, y1 - e - p, y1 + p)),
+                             ("O", (x0 - p, x0 + e + p, y0 + e, y1 - e)),
+                             ("E", (x1 - e - p, x1 + p, y0 + e, y1 - e))):
+            if face not in baies:
+                box(f"{name}_{face}{i}", *bornes, z + zb, z + zh, col, mat)
+                continue
+            paroi_percee(f"{name}_{face}{i}", *bornes, z + zb, z + zh, col, mat,
+                         [(u0, u1, z + zb, z + zh) for u0, u1 in baies[face]])
         if filet is None or i != larmier:
             continue
         # Le filet ne court que sur les faces EXTÉRIEURES : à l'intérieur d'une lishka
@@ -2734,7 +2795,9 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
     ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, 2,
              Z_EZN + H_LISHKA_EN, CORNICHE, "10_EzratNashim",
              filet=MAT_OR() if FILET_OR else None)
-    ceinture(f"Lishkat_{nm}_socle", xa, xb, ya, yb, 2, Z_EZN, SOCLE, "10_EzratNashim")
+    milieu = (xa + xb) / 2 if cour in "SN" else (ya + yb) / 2
+    ceinture(f"Lishkat_{nm}_socle", xa, xb, ya, yb, 2, Z_EZN, SOCLE, "10_EzratNashim",
+             baies={cour: [(milieu - 3, milieu + 3)]})
 # Ce que la Michna met DANS ces chambres. Elles étaient quatre boîtes vides : leurs
 # usages sont pourtant donnés un par un (Middot 2:5), et ce sont eux qui apportent à
 # l'Ezrat Nashim les quatre matières qu'elle n'a pas — l'eau, le bois, le feu, la terre
@@ -2793,9 +2856,14 @@ box("Lishkat_Metzoraim_NO_eau", MIKVE[0] + 1, MIKVE[1] - 1, MIKVE[2] + 1, MIKVE[
 # seul avis qui donne un contenu (fiche §3).
 JARRE = [(0.0, 0.0), (0.35, 0.06), (0.78, 0.7), (0.86, 1.3), (0.58, 2.0),
          (0.34, 2.2), (0.44, 2.35), (0.36, 2.42), (0.0, 2.36)]
-for _r, (_y, _n) in enumerate(((-62.0, 10), (-59.4, 10), (-33.4, 9), (-30.8, 9))):
+PORTE_SHEMANYA_X, PANSE_JARRE = EX0 + 20, max(r for r, _ in JARRE)
+for _r, (_y, _n, _devant_porte) in enumerate(((-62.0, 10, False), (-59.4, 10, False),
+                                              (-33.4, 9, True), (-30.8, 9, True))):
     for _k in range(_n):
-        revolution(f"Lishkat_Shemanya_SO_jarre_{_r}{_k}", 10.5 + _k * 3.5, _y, Z_EZN,
+        _x = 10.5 + _k * 3.5
+        if _devant_porte and abs(_x - PORTE_SHEMANYA_X) < 3 + PANSE_JARRE:
+            continue
+        revolution(f"Lishkat_Shemanya_SO_jarre_{_r}{_k}", _x, _y, Z_EZN,
                    JARRE, "10_EzratNashim", MAT_TERRE_CUITE(), verts=14)
 # Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
 # entre les chambres d'angle — elle traversait leurs murs. Une dalle nue en l'air ne

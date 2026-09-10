@@ -37,7 +37,7 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
   // ---- clavier ----
   const touches = new Set();
   const enfoncee = (liste) => liste.some((c) => touches.has(c));
-  const horsDeLaScene = () => !!document.activeElement?.closest?.("#barre, #fiche, #accueil");
+  const horsDeLaScene = () => !!document.activeElement?.closest?.("#barre, #fiche, #accueil, #initiation");
 
   addEventListener("keydown", (e) => {
     if (horsDeLaScene()) return;

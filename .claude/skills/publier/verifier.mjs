@@ -35,7 +35,11 @@ const navigateur = await chromium.launch({
 })
 const page = await navigateur.newPage({ viewport: { width: 1280, height: 800 } })
 // Sans langue retenue, l'écran du choix de langue recouvrirait la capture.
-await page.addInitScript(() => localStorage.setItem('visite.langue', 'fr'))
+// Même raison pour la carte de l'initiation, posée sur le haut de l'image.
+await page.addInitScript(() => {
+  localStorage.setItem('visite.langue', 'fr')
+  localStorage.setItem('visite.initiation', 'suivie')
+})
 const bruit = /GL Driver Message|GPU stall/
 page.on('console', (m) => bruit.test(m.text()) || console.log('[console]', m.type(), m.text().slice(0, 200)))
 page.on('pageerror', (e) => console.log('[erreur]', String(e).slice(0, 300)))

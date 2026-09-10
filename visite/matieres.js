@@ -19,7 +19,7 @@ import { assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
-      GAZIT = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14;
+      MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil"]);
@@ -52,7 +52,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
-const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "pierre", 10: "pierre", 11: "pierre",
+const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
                    13: "pierre", 14: "pierre",
                    3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
@@ -77,7 +77,8 @@ const CARREAU = {
   3: [1.6, 0.34, 0.14, 0.60, 0.70],
   4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
   7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
-  9: [2.4, 0.26, 0.22, 0.88, 0.48], 10: [2.0, 0.34, 0.28, 1.05, 0.58],
+  // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
+  9: [2.4, 1.00, 0.35, 0.15, 1.00], 10: [2.0, 0.34, 0.28, 1.05, 0.58],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
@@ -88,7 +89,7 @@ const CARREAU = {
 const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
   Maisons: MAISON, Pierre_colonne: TAMBOUR,
-  Marbre_blanc: MARBRE, Marbre_Herode: GAZIT,
+  Marbre_blanc: MARBRE, Marbre_Herode: MARBRE_HERODE,
   Or: METAL, Or_plaque: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
   Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
@@ -176,6 +177,8 @@ float empreinteMax(){ return regard.pixel / regard.incidence; }
 const float AMA = 0.48;
 const float JOINT = 0.06;      // largeur du joint entre deux blocs, en amot
 const float LISERE = 0.25;     // liseré ciselé qui le borde
+// Le marbre est poli jusqu'à l'arête, sans liseré ciselé. Même valeur que LISERE_MARBRE du blockout.
+const float LISERE_MARBRE = 0.05;
 // Hauteur d'assise, hors source : 4 amot, un CHOIX, et le même pour l'enceinte et le
 // bâtiment. Une assise y vaut le pas d'un rovad de l'Oulam. Même valeur qu'ASSISE dans
 // le blockout — à 2 amot la façade portait cinquante lits et se lisait en brique.
@@ -260,7 +263,7 @@ struct Finition {
 Finition finition(float t){
   int k = int(t * 5.0);
   // Sciée debout : le parement que tout le blockout portait, et qui reste la référence
-  // — les quatre autres se lisent CONTRE lui. C'est aussi celle que prend le marbre.
+  // — les quatre autres se lisent CONTRE lui.
   if (k <= 0) return Finition(1.5, 1.0, 1.00, 0.0, 0.45, 0.090, 1.00,  0.00);
   // Sciée couchée : même outil, le bloc tourné sur son lit — les stries traversent.
   if (k == 1) return Finition(1.7, 1.0, 1.05, 1.0, 0.50, 0.075, 0.85, -0.03);
@@ -333,61 +336,66 @@ void dalles(vec3 P, out vec3 teinte, out vec3 pente, out float rugo, out float u
   photo = vec4(vec3(tireDalle, tireRang, alea3(vec3(num, floor(colonne), 11.0))) * 13.0, 1.0);
 }
 
-void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float longue,
-              float debord, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
-  if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
-    float usure;
-    dalles(P, teinte, pente, rugo, usure, photo);
-    return;
-  }
+// assise, longueurs courte et longue de bloc, débord, joint et liseré : tout en amot.
+struct Appareil { float assise; float courte; float longue; float debord; float joint; float lisere; };
+// Ce que tailler() lit en un point : les tirages du bloc, la pente de son joint et le masque du creux.
+struct Bloc { float num; float parite; float tireAssise; float tireBloc; float tireFini;
+              float u; vec3 axe; vec3 pente; float creux; };
+
+Bloc tailler(vec3 P, vec3 N, Appareil a){
+  Bloc b;
   float rang, sensZ, sensU;
-  float dz = ecart(P.y, assise, rang, sensZ);
-  float num = floor(rang);
-  float parite = mod(num, 2.0);
-  float tireAssise = alea1(num * 1.7 + 3.1);
-  float longueur = tireAssise > 0.5 ? longue : courte;
-  vec3 axe = abs(N.x) > abs(N.z) ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-  float u = dot(P, axe);                          // la face décide de l'axe des joints
+  float dz = ecart(P.y, a.assise, rang, sensZ);
+  b.num = floor(rang);
+  b.parite = mod(b.num, 2.0);
+  b.tireAssise = alea1(b.num * 1.7 + 3.1);
+  float longueur = b.tireAssise > 0.5 ? a.longue : a.courte;
+  b.axe = abs(N.x) > abs(N.z) ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+  b.u = dot(P, b.axe);                            // la face décide de l'axe des joints
   // Les joints verticaux se décalent d'une assise à la suivante : alignés, ils font un
   // damier, que ne montre aucun appareil de pierre de taille.
-  u += (parite * 0.5 + tireAssise * 0.37) * longueur * AMA;
+  b.u += (b.parite * 0.5 + b.tireAssise * 0.37) * longueur * AMA;
   float colonne;
-  float du = ecart(u, longueur, colonne, sensU);
-  float tireBloc = alea3(vec3(floor(colonne), num, 0.0));
+  float du = ecart(b.u, longueur, colonne, sensU);
+  b.tireBloc = alea3(vec3(floor(colonne), b.num, 0.0));
   // La finition se tire À PART du banc. Sur le même tirage, la pierre la plus claire
   // serait toujours la plus piquée : les cinq finitions se liraient en cinq calcaires,
   // et le mur retomberait dans le nuancier qu'on cherche à quitter.
-  float tireFini = alea3(vec3(floor(colonne) + 19.0, num + 7.0, 3.0));
-  // Le marbre du bâtiment ne tire pas : ses trois pierres se posent par assises
-  // entières et sa face est reprise jusqu'au poli, il n'y a pas cinq mains dessus.
-  // Il garde donc la première finition sur tous ses blocs — celle que ce fichier
-  // portait avant, si bien que le bâtiment ne bouge pas d'un texel.
-  Finition taille = finition(calcaire > 0.5 ? tireFini : 0.0);
+  b.tireFini = alea3(vec3(floor(colonne) + 19.0, b.num + 7.0, 3.0));
   float d = min(dz, du);
   // Le profil du bloc, en trois pentes : le joint, le liseré presque plat, le champ.
   // 0,62 de la course descend dans le joint, et il ne reste que 0,32 pour la marche du
   // bloc — une pierre sciée n'est proéminente que d'un cheveu. Plus haut, le relief
   // cernait chaque bloc d'un jonc clair et le mur rendait un carrelage.
-  float profil = 0.62 * clamp(d / JOINT, 0.0, 1.0)
-               + 0.06 * clamp((d - JOINT) / LISERE, 0.0, 1.0)
-               + 0.32 * clamp((d - JOINT - LISERE) / 0.06, 0.0, 1.0);
   // Ce profil est linéaire par morceaux : sa dérivée s'écrit. C'est elle qui creuse le
   // joint pour la lumière, là où la teinte seule ne faisait qu'un trait peint.
-  float pixelJoint = (dz < du ? empreinte(vec3(0.0, 1.0, 0.0)) : empreinte(axe)) / AMA;
-  float dprofil = 0.62 * penteRampe(d, vec2(0.0, JOINT), pixelJoint)
-                + 0.06 * penteRampe(d, vec2(JOINT, LISERE), pixelJoint)
-                + 0.32 * penteRampe(d, vec2(JOINT + LISERE, 0.06), pixelJoint);
+  float pixelJoint = (dz < du ? empreinte(vec3(0.0, 1.0, 0.0)) : empreinte(b.axe)) / AMA;
+  float dprofil = 0.62 * penteRampe(d, vec2(0.0, a.joint), pixelJoint)
+                + 0.06 * penteRampe(d, vec2(a.joint, a.lisere), pixelJoint)
+                + 0.32 * penteRampe(d, vec2(a.joint + a.lisere, 0.06), pixelJoint);
   // La marche d'assise n'agit que sur le LIT : un joint vertical sépare deux blocs du
   // même rang, qui affleurent. Les deux versants d'un même lit tombent dans des assises
   // de parité opposée, donc dans des marches opposées — c'est cette dissymétrie-là qui
   // se lit en débord, là où une rainure symétrique ne se lit qu'en trait.
-  float marche = dz < du ? 1.0 + (parite * 2.0 - 1.0) * debord : 1.0;
-  vec3 dir = dz < du ? vec3(0.0, sensZ, 0.0) : axe * sensU;
-  pente = dprofil * marche * dir * (CREUX_M / AMA);
+  float marche = dz < du ? 1.0 + (b.parite * 2.0 - 1.0) * a.debord : 1.0;
+  vec3 dir = dz < du ? vec3(0.0, sensZ, 0.0) : b.axe * sensU;
+  b.pente = dprofil * marche * dir * (CREUX_M / AMA);
   // Le JOINT seul, sans le liseré : l'ombre s'arrête au fond de la rainure. Étalée sur
   // le liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur ; le
   // liseré est de la pierre en plein soleil et ne doit rien perdre.
-  float creux = horsJoint(d, JOINT * 1.15 * marche, pixelJoint);
+  b.creux = horsJoint(d, a.joint * 1.15 * marche, pixelJoint);
+  return b;
+}
+
+void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
+  if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
+    float usure;
+    dalles(P, teinte, pente, rugo, usure, photo);
+    return;
+  }
+  Bloc b = tailler(P, N, a);
+  Finition taille = finition(b.tireFini);
+  pente = b.pente;
   // Une coulure, pas une tache : un bruit étiré à la verticale. Une tache sur un mur se
   // lit en défaut de matière ; une coulure se lit en pierre. Et une moucheture par-
   // dessus : le banc donne au bloc SA couleur, mais un bloc d'une seule couleur est un
@@ -398,15 +406,12 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   // finitions qui s'éclairciraient l'une l'autre rendraient cinq calcaires.
   float mouchete = 0.14 + ((grain(P * vec3(1.0, taille.lit, 1.0) / (taille.pas * AMA), empreinteMax() * taille.lit / (taille.pas * AMA)) - 0.5) * 0.22
                          + (grain(P / (taille.fin * AMA), empreinteMax() / (taille.fin * AMA)) - 0.5) * 0.10) * taille.force;
-  // Le drapeau sépare les deux pierres du chantier : le calcaire du pourtour tire son
-  // banc, le marbre du bâtiment ne tire qu'une nuance — sa couleur lui vient du rang.
-  float f = parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + tireBloc * 0.68;
-  vec3 base = (calcaire > 0.5 ? banc(f) : mix(vec3(0.84, 0.85, 0.88), vec3(1.10, 1.08, 1.02), clamp(f, 0.0, 1.0)))
-            * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0));
-  teinte = mix(base * OMBRE_JOINT, base, creux);
+  float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
+  vec3 base = banc(f) * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0));
+  teinte = mix(base * OMBRE_JOINT, base, b.creux);
   // La rugosité varie DANS le bloc, pas seulement d'un bloc à l'autre : sous un soleil
   // rasant c'est le lustre qui donne la surface, la teinte ne fait que la colorer.
-  rugo = (tireBloc - 0.5) * 0.18 + (grain(P / (0.35 * AMA), empreinteMax() / (0.35 * AMA)) - 0.5) * 0.16 + taille.lustre;
+  rugo = (b.tireBloc - 0.5) * 0.18 + (grain(P / (0.35 * AMA), empreinteMax() / (0.35 * AMA)) - 0.5) * 0.16 + taille.lustre;
 #ifndef GRAIN_LEGER
   // « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (Melakhim I 7:9) : ces blocs sont SCIÉS, et une
   // scie laisse sur le champ des stries parallèles de quelques centimètres de pas.
@@ -418,14 +423,51 @@ void appareil(vec3 P, vec3 N, float assise, float calcaire, float courte, float 
   // dans le même sens sont ce qui sépare un parement bâti d'une trame imprimée sur
   // tout le mur.
   vec2 scie = mix(vec2(0.7, 26.0), vec2(26.0, 0.7), taille.couche);
-  rugo += (grain(vec3(u * scie.x, P.y * scie.y, 0.0), max(empreinte(axe) * scie.x, empreinte(vec3(0.0, 1.0, 0.0)) * scie.y)) - 0.5) * taille.strie;
+  rugo += (grain(vec3(b.u * scie.x, P.y * scie.y, 0.0), max(empreinte(b.axe) * scie.x, empreinte(vec3(0.0, 1.0, 0.0)) * scie.y)) - 0.5) * taille.strie;
 #endif
   // Le carreau de la nappe se recale sur CHAQUE bloc. Photographié à plat et lu en
   // coordonnées de monde, le même éclat de calcaire revenait tous les 2,4 m sur toute
   // la façade : c'est cette récurrence-là, bien plus qu'une teinte, qui faisait lire
   // une image répétée. Le saut tombe dans le joint, où la dérivée d'écran explose sur
   // un pixel — c'est le fond de la rainure, et il est déjà à l'ombre.
-  photo = vec4(vec3(tireBloc, tireAssise, tireFini) * 13.0, taille.relief);
+  photo = vec4(vec3(b.tireBloc, b.tireAssise, b.tireFini) * 13.0, taille.relief);
+}
+
+// Le veinage n'est dans aucune source — CHOIX. Mêmes valeurs que _veines et _veine_par_bloc du blockout.
+const float PAS_VEINE_HERODE = 6.0;
+const float SEUIL_VEINE = 0.95;
+const float VEINE_MOYENNE = 0.0981;   // le masque moyenné sur une période : ce que rend une veine sous le pixel
+const vec3 VEINE_MARBRE = vec3(0.84, 0.86, 0.88);
+const float DECALAGE_VEINE = 40.0;
+
+// L'onde diagonale distordue du nœud Wave de Blender, 1 au coeur d'une veine.
+float veine(vec3 P, float pas){
+  vec3 q = P / (pas * AMA);
+  float n = dot(q, vec3(10.0)) + 12.0 * (grainNorme(q) * 2.0 - 1.0);
+  float coeur = smoothstep(SEUIL_VEINE, 1.0, 0.5 + 0.5 * sin(n - 1.5708));
+  float phaseSousPixel = empreinteMax() / (pas * AMA) * 40.0;
+  return mix(coeur, VEINE_MOYENNE, smoothstep(0.8, 2.5, phaseSousPixel));
+}
+
+void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
+  if (abs(N.y) > 0.7) {
+    float usure;
+    dalles(P, teinte, pente, rugo, usure, photo);
+    return;
+  }
+  Bloc b = tailler(P, N, Appareil(ASSISE, 8.0, 10.0, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE));
+  pente = b.pente;
+  // « בְּאַבְנֵי כּוּחְלָא, שִׁישָׁא וּמַרְמְרָא » (Baba Batra 4a ; Soucca 51b), trois FROIDS selon Rashi,
+  // tirés par assise entière : mêmes écarts au shesh que MARBRES_HERODE du blockout.
+  vec3 marbre = b.tireAssise < 0.3333 ? vec3(1.00, 1.00, 1.00)
+              : (b.tireAssise < 0.6667 ? vec3(0.86, 0.92, 0.97) : vec3(0.87, 0.95, 0.88));
+  float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
+  vec3 nuance = mix(vec3(0.84, 0.85, 0.88), vec3(1.10, 1.08, 1.02), clamp(f, 0.0, 1.0));
+  vec3 tranche = vec3(b.tireBloc, b.tireAssise, 0.0) * DECALAGE_VEINE * AMA;
+  vec3 base = nuance * marbre * mix(vec3(1.0), VEINE_MARBRE, veine(P + tranche, PAS_VEINE_HERODE));
+  teinte = mix(base * OMBRE_JOINT, base, b.creux);
+  rugo = (b.tireBloc - 0.5) * 0.06;
+  photo = vec4(vec3(b.tireBloc, b.tireAssise, b.tireFini) * 13.0, 1.0);
 }
 
 #ifdef NAPPE
@@ -501,7 +543,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   // suivant et la façade se met à grésiller de blocs noirs et blancs.
   float finesse = 1.0 - smoothstep(16.0, 65.0, loin);
   if (uFamille == 1 || uFamille == 14) {   // le pourtour, et la muraille des 500 amot
-    appareil(P, N, ASSISE, 1.0, 8.0, 10.0, DEBORD, teinte, pente, rugo, photo);
+    appareil(P, N, Appareil(ASSISE, 8.0, 10.0, DEBORD, JOINT, LISERE), teinte, pente, rugo, photo);
   }
   else if (uFamille == 13) {          // le dallage des cours : rangées, et lustre
     float usure;
@@ -512,25 +554,16 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo -= usure * 0.18;
   }
   else if (uFamille == 11) {          // la ville : de la pierre de pays, pas du gazit
-    appareil(P, N, 0.8, 1.0, 1.5, 2.5, DEBORD, teinte, pente, rugo, photo);
+    appareil(P, N, Appareil(0.8, 1.5, 2.5, DEBORD, JOINT, LISERE), teinte, pente, rugo, photo);
   }
   else if (uFamille == 10) {          // tambour de colonne : pas de joint vertical
     // Sur un cylindre le joint vertical était pire qu'inutile : la face choisit son axe
     // sur la normale, qui bascule quatre fois autour du fût, et la trame sautait quatre
     // fois par colonne.
-    appareil(P, N, 1.4, 1.0, 1.0e4, 1.0e4, 0.0, teinte, pente, rugo, photo);
+    appareil(P, N, Appareil(1.4, 1.0e4, 1.0e4, 0.0, JOINT, LISERE), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 9) {           // le bâtiment : même assise, trois marbres
-    // « בְּאַבְנֵי כּוּחְלָא, שִׁישָׁא וּמַרְמְרָא » (Baba Batra 4a ; Soucca 51b). Rashi ad loc. les
-    // nomme, et ce sont trois FROIDS : « שישא — שיש ירוק », « מרמרא — שיש לבן », « כוחלא
-    // — שיש צבוע כעין כחול ». Le rang entier tire sa pierre — par bloc, les trois marbres
-    // feraient une mosaïque et non les vagues que les Sages ont préférées à l'or. Écarts
-    // relatifs au shesh, qui est la couleur de base exportée, et mêmes valeurs que
-    // MARBRES_HERODE du blockout. L'assise vaut le pas d'un rovad de l'Oulam, qui va par 4.
-    appareil(P, N, ASSISE, 0.0, 8.0, 10.0, DEBORD_BATIMENT, teinte, pente, rugo, photo);
-    float t = alea1(floor(P.y / (ASSISE * AMA)) * 1.7 + 3.1);
-    teinte *= t < 0.3333 ? vec3(1.00, 1.00, 1.00)
-            : (t < 0.6667 ? vec3(0.86, 0.92, 0.97) : vec3(0.87, 0.95, 0.88));
+  else if (uFamille == 9) {           // le bâtiment : trois marbres, polis et veinés
+    marbreHerode(P, N, teinte, pente, rugo, photo);
   }
   else if (uFamille == 2) {                                   // marbre : veines lentes
     float v = grain(P * vec3(2.2, 5.0, 2.2) + grain(P * 1.1) * 2.0, empreinteMax() * 5.0);
@@ -650,7 +683,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
   if (uFamille == 11 || uFamille == 14) { patiner(P, N, 1.0, teinte, rugo); }
-  else if (uFamille == 1 || uFamille == 9 || uFamille == 10) {
+  else if (uFamille == 1 || uFamille == 10) {
     patiner(P, N, 0.5, teinte, rugo);
   }
   teinte = mix(vec3(1.0), teinte, nettete);

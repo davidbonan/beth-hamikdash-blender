@@ -45,13 +45,16 @@ CHANFREIN = ("30_Mizbeach", "40_Ulam", "50_Heikhal", "60_KodeshHakodashim",
 # navigateur. Le cap est en degrés, 180 = plein ouest, l'axe du parcours ; le tangage
 # lève le regard au-dessus de l'horizon.
 #
-# L'Ezrat Nashim se prend à SA PORTE, à trois amot du mur est : c'est la vue sur
-# laquelle la visite s'ouvre. De là l'axe se lit d'un coup — les quatre menorot de
-# Simhat Beit HaShoeva, les quinze marches, Nicanor, puis la façade du Heikhal — et
-# six degrés de tangage suffisent à poser le toit du Heikhal sous le bord haut, ce que
-# l'horizontale, qui remplit la moitié basse de dallage, ne fait pas.
+# La visite s'ouvre dix amot au-delà du Soreg, dans l'axe de la porte orientale : le
+# visiteur franchit le Soreg, gravit les douze marches du 'Heil et passe la porte à pied.
+#
+# L'Ezrat Nashim se prend à SA PORTE, à trois amot du mur est. De là l'axe se lit d'un
+# coup — les quatre menorot de Simhat Beit HaShoeva, les quinze marches, Nicanor, puis la
+# façade du Heikhal — et six degrés de tangage suffisent à poser le toit du Heikhal sous
+# le bord haut, ce que l'horizontale, qui remplit la moitié basse de dallage, ne fait pas.
 REPERES = [
     ("har_habayit",       "Har HaBayit, sur l'axe est",   185.0,   0.0, -16.0, 180, 0),
+    ("face_porte_est",    "Face à la porte orientale",    165.0,   0.0, -16.0, 180, 8),
     ("ezrat_nashim",      "Ezrat Nashim",                 137.0,   0.0, -10.0, 180, 6),
     ("quinze_marches",    "Pied des quinze marches",       26.0,   0.0, -10.0, 180, 0),
     ("azara",             "Ezrat Israël",                 -14.0,   0.0,   0.0, 180, 0),
