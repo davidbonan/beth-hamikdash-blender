@@ -171,11 +171,18 @@ def _grain(mat, taille):
 
 def _creuser(mat, hauteur, force, profondeur):
     """Empile un Bump sur l'entrée Normal du Principled. Chaînable : le relief fin se
-    pose par-dessus le relief large sans l'écraser."""
+    pose par-dessus le relief large sans l'écraser.
+
+    `force` est un nombre ou une sortie de nœud, comme les entrées de `_calc` : la
+    porosité d'un bloc se tire avec sa finition, elle ne s'écrit pas.
+    """
     liens = mat.node_tree.links
     bsdf = _bsdf(mat)
     bosse = _noeud(mat, "ShaderNodeBump", -260, -160 * len(bsdf.inputs["Normal"].links) - 160)
-    bosse.inputs["Strength"].default_value = force
+    if isinstance(force, (int, float)):
+        bosse.inputs["Strength"].default_value = force
+    else:
+        liens.new(force, bosse.inputs["Strength"])
     bosse.inputs["Distance"].default_value = m(profondeur)
     liens.new(hauteur, bosse.inputs["Height"])
     for lien in list(bsdf.inputs["Normal"].links):
@@ -228,6 +235,82 @@ JOINT_DALLE = 0.05          # le lit entre deux dalles
 CREUX_DALLE = 0.015         # 7 mm : un lit de dalle, pas une rainure
 
 
+# Cinq FINITIONS de taille, tirées par bloc, et la même table que `finition` dans
+# visite/matieres.js. Un mur de gazit n'est pas taillé d'une seule main : les pierres
+# sortent de bancs différents et passent sous la scie dans le sens où elles se
+# présentent. `BANCS_CALCAIRE` donne à un bloc sa COULEUR, ceci lui donne son MOTIF —
+# et c'est le motif qui manquait : un parement dont toutes les pierres se moucheturent
+# au même pas se lit en papier peint, aussi large que soit sa bande de teintes.
+# Aucune n'est un bossage éclaté : « אֲבָנִים יְקָרֹת כְּמִדּוֹת גָּזִית מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת
+# וּמִחוּץ » (Melakhim I 7:9) — ces faces sont SCIÉES, dedans et dehors. Ce qui change
+# d'un bloc au suivant est le banc dont il sort et le lit sur lequel il est passé sous
+# la scie, jamais l'outil.
+# La PREMIÈRE est le parement d'avant, et reste la référence : le marbre d'Hérode la
+# garde sur tous ses blocs — `marbre_herode` ne tire pas, et le bâtiment ne bouge donc
+# pas d'un texel.
+FINITIONS = (
+    #  pas   lit  force couche  fin   strie relief lustre
+    (1.5,  1.0,  1.00,  0.0,  0.45, 0.090, 1.00,  0.00),   # sciée debout
+    (1.7,  1.0,  1.05,  1.0,  0.50, 0.075, 0.85, -0.03),   # sciée couchée : stries en travers
+    (0.9,  1.0,  1.55,  0.0,  0.22, 0.030, 1.60,  0.10),   # piquée : le meleke vacuolaire
+    (2.2,  1.0,  0.70,  1.0,  0.32, 0.130, 0.95,  0.02),   # layée au ciseau, en peigne serré
+    (2.6,  5.0,  1.45,  0.0,  0.60, 0.045, 1.10, -0.04),   # à banc : la pierre est LITÉE
+)
+
+def _finition(mat, tire, colonnes, y):
+    """Trois colonnes de `FINITIONS`, aiguillées par le tirage du bloc.
+
+    Une rampe CONSTANT à cinq marches est l'aiguillage d'un arbre de nœuds : les trois
+    valeurs voyagent dans les trois canaux d'une couleur, et un Separate les reprend.
+
+    Une couleur de rampe ÉCRÊTE le négatif — mesuré : (-0,04 2,6 5,0) y devient
+    (0,0 2,6 5,0), le haut passe et le bas non. Une colonne qui descend sous zéro, comme
+    le lustre d'un parement poli, y monte donc en bloc et en redescend à la sortie.
+    """
+    liens = mat.node_tree.links
+    plancher = min(0.0, min(fini[c] for fini in FINITIONS for c in colonnes))
+    aiguillage = _noeud(mat, "ShaderNodeValToRGB", -1020, y)
+    rampe = aiguillage.color_ramp
+    rampe.interpolation = 'CONSTANT'
+    marche = 1.0 / len(FINITIONS)
+    for k, fini in enumerate(FINITIONS):
+        element = rampe.elements[k] if k < 2 else rampe.elements.new(marche * k)
+        element.position = marche * k
+        element.color = tuple(fini[c] - plancher for c in colonnes) + (1.0,)
+    liens.new(tire, aiguillage.inputs["Factor"])
+    separe = _noeud(mat, "ShaderNodeSeparateColor", -860, y)
+    liens.new(aiguillage.outputs["Color"], separe.inputs["Color"])
+    return [_calc(mat, "ADD", separe.outputs[c], plancher)
+            for c in ("Red", "Green", "Blue")]
+
+
+def _grain_tire(mat, pas, lit=None):
+    """`_grain`, mais dont le pas — et son étirement sur la verticale — sont TIRÉS.
+
+    `_grain` fige sa taille dans le nœud ; ici elle vient de la finition du bloc, et
+    deux pierres voisines ne se moucheturent donc pas au même pas. `lit` comprime ce
+    pas sur Z : une pierre LITÉE montre ses strates en bandes en travers de la face.
+    """
+    liens = mat.node_tree.links
+    empiles = sum(1 for n in mat.node_tree.nodes if n.bl_idname == "ShaderNodeTexNoise")
+    bruit = _noeud(mat, "ShaderNodeTexNoise", -1200, 260 + 220 * empiles)
+    bruit.inputs["Detail"].default_value = 6.0
+    liens.new(_calc(mat, "DIVIDE", 1.0 / AMA, pas), bruit.inputs["Scale"])
+    if lit is None:
+        liens.new(_position(mat), bruit.inputs["Vector"])
+        return bruit.outputs["Factor"]
+    strates = _noeud(mat, "ShaderNodeCombineXYZ", -1560, 260 + 220 * empiles)
+    strates.inputs["X"].default_value = 1.0
+    strates.inputs["Y"].default_value = 1.0
+    liens.new(lit, strates.inputs["Z"])
+    etire = _noeud(mat, "ShaderNodeVectorMath", -1400, 260 + 220 * empiles)
+    etire.operation = "MULTIPLY"
+    liens.new(_position(mat), etire.inputs[0])
+    liens.new(strates.outputs["Vector"], etire.inputs[1])
+    liens.new(etire.outputs["Vector"], bruit.inputs["Vector"])
+    return bruit.outputs["Factor"]
+
+
 def _module(mat, coordonnee, taille):
     """Découpe une coordonnée de monde en modules de `taille` amot (nombre ou nœud).
 
@@ -275,8 +358,9 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     D'où `debord`, plus fort sur le bâtiment que sur l'enceinte : c'est de SA façade que
     parle la guemara, et c'est le relief qui doit y porter la vague, pas la teinte.
 
-    Renvoie (parité de l'assise, tirage de l'assise, tirage du bloc, masque du joint).
-    Le profil du relief ne sort pas : il ne sert qu'aux Bump, posés ici.
+    Renvoie (parité de l'assise, tirage de l'assise, tirage du bloc, masque du joint,
+    tirage de la finition). Le profil du relief ne sort pas : il ne sert qu'aux Bump,
+    posés ici.
     """
     z, u, aplat = _parement(mat)
     rang, ecart_z = _module(mat, z, assise)
@@ -300,6 +384,16 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     mat.node_tree.links.new(_calc(mat, "FLOOR", colonne), grille.inputs["X"])
     mat.node_tree.links.new(numero, grille.inputs["Y"])
     mat.node_tree.links.new(grille.outputs["Vector"], tire_bloc.inputs["Vector"])
+    # La finition se tire À PART du banc. Sur le même tirage, la pierre la plus claire
+    # serait toujours la plus piquée : les cinq finitions se liraient en cinq calcaires,
+    # et le mur retomberait dans le nuancier qu'on cherche à quitter.
+    tire_fini = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, -280)
+    tire_fini.noise_dimensions = '2D'
+    decale = _noeud(mat, "ShaderNodeCombineXYZ", -1860, -280)
+    mat.node_tree.links.new(_calc(mat, "ADD", _calc(mat, "FLOOR", colonne), 19.0),
+                            decale.inputs["X"])
+    mat.node_tree.links.new(_calc(mat, "ADD", numero, 7.0), decale.inputs["Y"])
+    mat.node_tree.links.new(decale.outputs["Vector"], tire_fini.inputs["Vector"])
     # Une face horizontale — crête de mur, couronnement, marche — n'a ni assise ni
     # joint : le pas y serait lu sur une coordonnée constante, et la face entière
     # tomberait dans un joint ou dans aucun. On l'éloigne donc de tout joint.
@@ -334,7 +428,8 @@ def _appareil(mat, assise=ASSISE, longueurs=PIERRE_LONG, debord=DEBORD_ASSISE):
     # Piqûre du calcaire : le meleke est poreux, et sans elle la face sciée rend un
     # plastique lisse dès que le soleil la prend de biais.
     _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.10), profil.outputs["Color"]), 0.6, 0.012)
-    return parite, tire_assise.outputs["Value"], tire_bloc.outputs["Value"], creux.outputs["Color"]
+    return (parite, tire_assise.outputs["Value"], tire_bloc.outputs["Value"],
+            creux.outputs["Color"], tire_fini.outputs["Value"])
 
 
 # Ce que devient la pierre au fond du joint : plus sombre, et PLUS CHAUDE. Le facteur
@@ -409,7 +504,7 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.78
-    parite, _, bloc, creux = _appareil(mat, assise, longueurs)
+    parite, _, bloc, creux, fini = _appareil(mat, assise, longueurs)
     teinte = _noeud(mat, "ShaderNodeValToRGB", -700, 160)
     rampe = teinte.color_ramp
     bancs = [tuple(min(1.0, c * e) for c, e in zip(rgb, banc)) + (1.0,)
@@ -442,25 +537,49 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
                     _calc(mat, "MULTIPLY", _trainee(mat, 3.0, 40.0), 0.65)),
               coulure.inputs["Value"])
     liens.new(coulure.outputs["Result"], salissure.inputs["Factor"])
-    # Moucheture d'une ama et demie. Le banc donne au bloc SA couleur, mais un bloc
-    # d'une seule couleur est un échantillon de nuancier : le calcaire est nué à
-    # l'intérieur de chaque pierre, à une échelle plus courte que la pierre.
+    # Moucheture. Le banc donne au bloc SA couleur, mais un bloc d'une seule couleur est
+    # un échantillon de nuancier : le calcaire est nué à l'intérieur de chaque pierre, à
+    # une échelle plus courte que la pierre. Ce pas-là est TIRÉ (`FINITIONS`) — c'est lui
+    # qui sépare le motif d'une pierre du motif de sa voisine, et il DÉVIE autour d'une
+    # moyenne fixe : la teinte reste l'affaire du banc, et cinq finitions qui
+    # s'éclairciraient l'une l'autre rendraient cinq calcaires au lieu de cinq tailles.
+    pas, lit, force = _finition(mat, fini, (0, 1, 2), 620)
+    fin, strie, couche = _finition(mat, fini, (4, 5, 3), 840)
+    relief, lustre, _ = _finition(mat, fini, (6, 7, 7), 1060)   # trois canaux, deux colonnes
+    grain_fin = _grain_tire(mat, fin)
     mouchete = _noeud(mat, "ShaderNodeMixRGB", -180, 320)
     mouchete.blend_type = "MULTIPLY"
     mouchete.inputs["Color2"].default_value = (*OMBRE_JOINT, 1.0)
     liens.new(salissure.outputs["Color"], mouchete.inputs["Color1"])
-    liens.new(_calc(mat, "MULTIPLY_ADD", _grain(mat, 0.45), 0.10,
-                    _calc(mat, "MULTIPLY", _grain(mat, 1.5), 0.22)), mouchete.inputs["Factor"])
+    liens.new(_calc(mat, "ADD", 0.14, _calc(mat, "MULTIPLY", force,
+                    _calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", grain_fin, 0.5), 0.10,
+                          _calc(mat, "MULTIPLY", _calc(mat, "SUBTRACT",
+                                                       _grain_tire(mat, pas, lit), 0.5), 0.22)))),
+              mouchete.inputs["Factor"])
+    # La porosité du bloc, au pas de sa moucheture fine : le meleke vacuolaire la porte
+    # jusqu'à la face, la pierre sciée fin l'a presque effacée. C'est ce que la visite
+    # fait prendre à sa nappe (`Finition.relief`) ; ici c'est un creux de plus.
+    _creuser(mat, grain_fin, _calc(mat, "MULTIPLY", relief, 0.30), 0.010)
     # La rugosité se tire par bloc : deux pierres du même banc ne renvoient pas le même
     # soleil rasant, et c'est le spéculaire — pas la teinte — qui les sépare à l'image.
     # S'y ajoute la scie : « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (Melakhim I 7:9), et une scie
     # laisse sur le champ des stries parallèles de quatre centimètres de pas. Elles ne
-    # sont que du lustre, jamais un relief — un parement scié est plat. La constante
-    # descend de 0,62 à 0,575 pour que la moyenne, elle, ne bouge pas : c'est elle que
-    # `aplatir` emporte dans le .glb, et la visite ajoute ses écarts par-dessus.
-    liens.new(_calc(mat, "MULTIPLY_ADD", bloc, 0.18,
-                    _calc(mat, "MULTIPLY_ADD", _trainee(mat, 30.0, 0.08), 0.09,
-                          _calc(mat, "MULTIPLY_ADD", _grain(mat, 0.35), 0.16, 0.575))),
+    # sont que du lustre, jamais un relief — un parement scié est plat. Leur SENS est
+    # tiré avec la finition : les unes traversent la face, les autres la descendent, et
+    # deux voisins qui ne les portent pas dans le même sens sont ce qui sépare un
+    # parement bâti d'une trame imprimée sur tout le mur.
+    # Les stries sont maintenant CENTRÉES avant d'être dosées — leur force varie d'un
+    # bloc à l'autre, et non centrées elles auraient déplacé la moyenne avec elle. La
+    # constante remonte donc de 0,575 à 0,62 : c'est la moyenne que `aplatir` emporte
+    # dans le .glb, et la visite ajoute ses écarts par-dessus.
+    en_travers = _trainee(mat, 30.0, 0.08)
+    de_haut_en_bas = _trainee(mat, 0.08, 30.0)
+    scie = _calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", de_haut_en_bas, en_travers),
+                 couche, en_travers)
+    liens.new(_calc(mat, "ADD", lustre,
+                    _calc(mat, "MULTIPLY_ADD", bloc, 0.18,
+                          _calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", scie, 0.5), strie,
+                                _calc(mat, "MULTIPLY_ADD", _grain(mat, 0.35), 0.16, 0.62)))),
               _bsdf(mat).inputs["Roughness"])
     liens.new(_ombre_du_joint(mat, mouchete.outputs["Color"], creux),
               _bsdf(mat).inputs["Base Color"])
@@ -495,7 +614,9 @@ def marbre_herode(name):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.62   # marbre poli, pas calcaire
-    _, tire_assise, bloc, creux = _appareil(mat, debord=DEBORD_BATIMENT)
+    # Le marbre ne tire pas de finition : ses trois pierres se posent par assises
+    # entières et sa face est reprise jusqu'au poli — il n'y a pas cinq mains dessus.
+    _, tire_assise, bloc, creux, _ = _appareil(mat, debord=DEBORD_BATIMENT)
     choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
     rampe = choix.color_ramp
     rampe.interpolation = 'CONSTANT'
@@ -1251,6 +1372,105 @@ def _profil_corolle(u, z, r, lobes=8):
 PALME = ((0.0, 0.045), (0.16, 0.150), (0.48, 0.195), (0.78, 0.135), (1.0, 0.0))
 AILE = ((0.0, 0.100), (0.22, 0.215), (0.55, 0.240), (0.82, 0.155), (1.0, 0.0))
 
+# --- Les trois figures gravées du Bayit, et le palmier de tous ses jambages :
+#     « כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים » (Melakhim I 6:29 pour les parois, 6:32 et 6:35
+#     pour les vantaux). Ye'hezkel 41:18-19 donne l'ORDRE dans lequel elles alternent —
+#     « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב », chaque profil tourné vers la
+#     timora qui le jouxte.
+#     La timora ne sert pas qu'au Bayit : « וְתִמֹרִים אֶל־אֵילָיו, אֶחָד מִפּוֹ וְאֶחָד מִפּוֹ »
+#     (Ye'hezkel 40:26, 31, 34, 37) en met une sur CHAQUE jambage de porte, et c'est le
+#     seul ornement que les sources donnent aux baies des cours. D'où sa place ici, dans
+#     la bibliothèque, et non dans la section du Heikhal où elle est née.
+BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
+SAILLIE_KIR = 0.22        # saillie du relief : 11 cm. À 0,35 la figure se lisait en plaque
+                          # posée dessus, à 0,14 elle ne prenait plus la lumière rasante
+PAS_KIR = 4.44            # pas visé d'une figure, en amot
+
+# Les palmes d'une timora : (inclinaison sur la verticale, longueur en part de la
+# hauteur). Sept est un CHOIX — la source ne les compte pas ; les deux dernières
+# retombent, ce qui est ce qui distingue un palmier d'un éventail.
+PALMES = ((0, 0.42), (30, 0.37), (-30, 0.37), (66, 0.30), (-66, 0.30), (106, 0.26), (-106, 0.26))
+
+
+def timora(nom, paroi, u, z0, h, col, mat=None):
+    """« תִּמֹרָה » : le palmier — fût annelé, couronne de sept palmes.
+
+    Sur l'or du Bayit elle est dorée et `mat` reste vide ; sur le jambage d'une porte
+    du Har HaBayit, que nulle source ne dore, elle se taille dans la pierre du mur.
+    """
+    fut, e = 0.58 * h, 0.052 * h
+    gauche, droite = [], []
+    for k in range(9):
+        z = z0 + fut * k / 8
+        w = e * (1.0 - 0.22 * k / 8) * (1.0 if k % 2 == 0 else 0.74)
+        gauche.append((u - w, z))
+        droite.append((u + w, z))
+    _relief_profil(f"{nom}_fut", paroi, gauche + droite[::-1], 0.0, SAILLIE_KIR, col, mat)
+    for k, (inclinaison, longueur) in enumerate(PALMES):
+        _relief_limbe(f"{nom}_palme_{k}", paroi, u, z0 + fut * 0.94, inclinaison, longueur * h,
+                      PALME, SAILLIE_KIR * 0.45, col, mat, courbure=0.10)
+    _relief_bosse(f"{nom}_coeur", paroi, u, z0 + fut * 0.97, SAILLIE_KIR * 0.35, 0.045 * h,
+                  col, mat)
+
+
+def keruv_grave(nom, paroi, u, z0, h, col):
+    """« כְּרוּבִים » — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), et 41:19 tourne chaque
+    profil vers la timora qui le jouxte. Deux têtes SANS TRAITS, deux ailes levées."""
+    corps = [(u - 0.150 * h, z0), (u + 0.150 * h, z0),
+             (u + 0.105 * h, z0 + 0.10 * h), (u + 0.060 * h, z0 + 0.34 * h),
+             (u + 0.140 * h, z0 + 0.54 * h), (u + 0.120 * h, z0 + 0.62 * h),
+             (u - 0.120 * h, z0 + 0.62 * h), (u - 0.140 * h, z0 + 0.54 * h),
+             (u - 0.060 * h, z0 + 0.34 * h), (u - 0.105 * h, z0 + 0.10 * h)]
+    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, SAILLIE_KIR, col)
+    for sens in (-1, 1):
+        cote = "N" if sens > 0 else "S"
+        _relief_profil(f"{nom}_tete_{cote}", paroi,
+                       _profil_tete(u + sens * 0.100 * h, z0 + 0.62 * h, 0.095 * h, sens),
+                       0.0, SAILLIE_KIR * 0.85, col)
+        _relief_limbe(f"{nom}_aile_{cote}", paroi, u + sens * 0.075 * h, z0 + 0.52 * h,
+                      sens * 32, 0.40 * h, AILE, SAILLIE_KIR * 0.45, col, courbure=0.16)
+
+
+def petur_tzitz(nom, paroi, u, z, r, col):
+    """« פְּטוּרֵי צִצִּים » : la fleur épanouie. Le verset la met au même rang que les
+    keruvim et les timorot — elle court donc en bandeau, elle n'est pas un bouton isolé."""
+    _relief_profil(f"{nom}_corolle", paroi, _profil_corolle(u, z, r), 0.0, SAILLIE_KIR * 0.55, col)
+    _relief_bosse(f"{nom}_coeur", paroi, u, z, SAILLIE_KIR * 0.5, r * 0.28, col)
+
+
+def bandeau_fleurons(nom, paroi, u0, u1, z, col):
+    """Un bandeau de fleurons en travers d'une paroi : ce qui tient les registres.
+    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser."""
+    _relief_profil(f"{nom}_listel", paroi,
+                   [(u0, z), (u1, z), (u1, z + BANDEAU_KIR), (u0, z + BANDEAU_KIR)],
+                   0.0, SAILLIE_KIR * 0.4, col)
+    n = max(1, round((u1 - u0) / PAS_KIR))
+    pas = (u1 - u0) / n
+    for i in range(n):
+        petur_tzitz(f"{nom}_fleuron_{i:02d}", paroi, u0 + pas * (i + 0.5), z + BANDEAU_KIR / 2,
+                    BANDEAU_KIR * 0.42, col)
+
+
+REGISTRES_VANTAIL = 3     # figures empilées sur un vantail : « תמרה בין כרוב לכרוב »
+
+
+def vantail_sculpte(nom, paroi, u0, u1, z0, z1, col):
+    """« כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים » sur un vantail, et de l'or par-dessus le creusé —
+    « וְצִפָּה זָהָב מְיֻשָּׁר עַל הַמְּחֻקֶּה » (Melakhim I 6:32 et 6:35). Ye'hezkel 41:25 le redit
+    des portes du Heikhal, « כַּאֲשֶׁר עֲשׂוּיִם לַקִּירוֹת » : les mêmes figures que les parois.
+
+    Un vantail est haut et étroit là où une paroi est large : la file de figures y monte
+    au lieu de courir. Ce qui tient, c'est l'ALTERNANCE — « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב »
+    (Ye'hezkel 41:18), une timora entre deux keruvim, quel que soit le sens de la file.
+    """
+    registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_VANTAIL
+    for r in range(REGISTRES_VANTAIL + 1):
+        bandeau_fleurons(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
+    for r in range(REGISTRES_VANTAIL):
+        motif = keruv_grave if r % 2 == 0 else timora
+        motif(f"{nom}_{r}", paroi, (u0 + u1) / 2, z0 + r * registre + BANDEAU_KIR,
+              registre - BANDEAU_KIR, col)
+
 
 def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32, capots=True):
     """Surface de révolution autour de la verticale passant par (x, y).
@@ -1539,6 +1759,16 @@ def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, mat=None):
             if f == face:
                 c = (a0 + a1) / 2
                 baies.append((c - larg / 2, c + larg / 2, zs, zs + haut))
+                # Le cadre de la baie s'arrête sous le bandeau, qui lui sert de corniche
+                # et court sur toute la façade. Il est plus étroit que celui d'un שער de
+                # l'Azara : sur une face de vingt amot, un chambranle de trois mangerait
+                # le trumeau. L'or reste dehors — ces baies-ci ouvrent sur le 'Heil, et
+                # les six שערים que Middot 2:3 change en or sont dans le mur de l'Azara,
+                # que ces corps ne font qu'enjamber.
+                shaar(f"{name}_{face}_cadre",
+                      {"S": ("x", y0, -1), "N": ("x", y1, 1),
+                       "O": ("y", x0, -1), "E": ("y", x1, 1)}[face],
+                      c, zs, z_bandeau, d, col, mat, largeur=larg, hauteur=haut, cadre=2.0)
         n = max(2, round((a1 - a0) / 12))
         for k in range(n) if z_baie1 - z_baie0 >= 2 else ():
             c = a0 + (a1 - a0) * (k + 0.5) / n
@@ -1840,6 +2070,111 @@ def battants(name, x0, x1, y0, y1, z0, h, col, mat, largeur=10):
         box(f"{name}_N", u0, u1, y1 - 0.3, y1, z0, z0 + h, col, mat)
 
 
+EPAISSEUR_PLACAGE = 0.1   # amot : l'or est une feuille, la boîte doit rester visible
+
+# Encadrement d'un שער. Ce que les sources donnent à une porte du Temple, et rien de
+# plus : un LINTEAU — « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם הָיוּ לָהֶן שְׁקוֹפוֹת » (Middot 2:3), et c'est
+# la michna qui exclut l'arc, pas une règle de style ; l'OR sur toute la baie — « כָּל
+# הַשְּׁעָרִים… נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעַר נִקָּנוֹר » (2:3), lu comme la baie entière
+# et non ses seuls vantaux (ARBITRAGE, fiche §3) ; et une TIMORA par jambage —
+# « וְתִמֹרִים אֶל־אֵילָיו, אֶחָד מִפּוֹ וְאֶחָד מִפּוֹ » (Ye'hezkel 40:26, 31, 34, 37), le seul
+# ornement que le corpus pose sur une baie de cour.
+# Le chambranle et sa corniche sont un CHOIX, dans la langue des moulures de l'enceinte
+# et couverts par « וּמְפָאֲרִין אוֹתוֹ וּמְיַפִּין כְּפִי כֹּחָן » (Rambam, Beit HaBe'hira 1:11).
+# Ils sont ce qui manquait : une baie percée dans un nu de vingt-cinq amot n'est pas
+# une porte, c'est un trou — rien n'y dit où l'on entre, et les six portes d'or de
+# Middot 2:3 ne se voyaient pas mieux que les trumeaux entre elles.
+CHAMBRANLE = 3.0          # largeur du jambage bâti, en amot
+# Ce dont un chambranle de `CHAMBRANLE` de large sort du parement. Il part de
+# `SAILLIE_MOULURE`, pour la raison qui y est chiffrée — au-dessous, un ressaut ne jette
+# plus d'ombre sur un mur de dix-sept mètres et redevient un filet sale ; mesuré ici, à
+# 0,7 ama le chambranle de Nikanor était bâti et INVISIBLE, un jambage étant vertical et
+# n'ayant que sa saillie pour se donner. Et il en sort un rien de PLUS, parce qu'il
+# traverse le socle et le bandeau du mur : à saillie égale, sa face et la leur se
+# disputeraient le même plan sur toute la hauteur du jambage.
+CHAMBRANLE_NU = SAILLIE_MOULURE + 0.3
+CHAMBRANLE_LISERE = 0.5   # le filet qui le borde, et sa seconde ligne d'ombre
+# La corniche qui couronne le chambranle sort plus que lui, comme le larmier d'un mur
+# sort de son nu et pour la même raison : c'est le ressaut le plus fort qui porte
+# l'ombre, et une porte qui n'en jette pas ne se voit pas du fond de la cour.
+CHAMBRANLE_CORNICHE = 1.7        # sa hauteur, quand la place au-dessus de la baie le permet
+# Hauteur du palmier, en part de la largeur du jambage : ses palmes s'ouvrent sur un peu
+# plus d'une demi-hauteur, et c'est le jambage qui doit les contenir — sur le cadre
+# étroit d'un corps de porte, une timora à cote fixe débordait sur le nu du mur.
+TIMORA_SUR_CADRE = 2.0
+
+
+def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
+          largeur=10, hauteur=20, cadre=CHAMBRANLE):
+    """L'encadrement bâti d'une porte : chambranle, corniche, timorim, or de la baie.
+
+    `paroi` : (axe, cote de la face, sens de la saillie) — la face EXTÉRIEURE, celle
+    qu'on regarde en arrivant, dans le repère de `_repere`. Tout le bâti SORT du nu :
+    une pièce rapportée dont la face arrière est au nu du mur tourne le dos à celle du
+    mur, et les deux ne se disputent pas le même plan ; posée à cheval, elle
+    clignoterait sur toute sa longueur.
+    `sommet` : la cote où le cadre s'arrête — sous le couronnement du mur, qu'il ne doit
+    pas traverser. `ebrasement` : la profondeur que l'or de CETTE face tapisse dans la
+    baie ; une porte cadrée des deux côtés en donne la moitié à chacune, et les deux
+    plaques s'aboutent au milieu du mur au lieu de se recouvrir. `metal` : ce dont ce
+    שער « a été changé » (Middot 2:3) — l'or partout, le bronze à Nikanor, rien pour un
+    פתח de chambre, qui n'est pas un שער.
+    """
+    axe, cote, sens = paroi
+    demi, haut = largeur / 2, z0 + hauteur
+    corniche = min(CHAMBRANLE_CORNICHE, (sommet - haut) * 0.55)
+    tete = sommet - corniche
+    # La saillie suit la largeur du chambranle : un cadre étroit qui sortirait autant
+    # qu'un large serait un boudin, et c'est celui d'un corps de porte qui le montrait.
+    nu = CHAMBRANLE_NU * cadre / CHAMBRANLE
+
+    def pose(suffixe, u0, u1, zb, zh, d0, d1, matiere=None):
+        bornes = ((u0, u1, cote + sens * d0, cote + sens * d1) if axe == "x" else
+                  (cote + sens * d0, cote + sens * d1, u0, u1))
+        if abs(u1 - u0) > 1e-6 and zh - zb > 1e-6:
+            box(f"{nom}_{suffixe}", *sorted(bornes[:2]), *sorted(bornes[2:]), zb, zh,
+                col, mat if matiere is None else matiere)
+
+    # Le chambranle : deux jambages et la traverse qui les joint, puis le liseré qui les
+    # borde. Une seule assise en débord n'élargirait que la baie ; ce qui fait lire un
+    # cadre, ce sont ses DEUX lignes d'ombre — la même règle qu'aux corniches de
+    # l'enceinte, et la même raison : sous un demi-pied de ressaut, un soleil rasant
+    # n'écrit plus rien.
+    for nommage, large, saillie in (("cadre", cadre, nu),
+                                    ("lisere", cadre + CHAMBRANLE_LISERE, nu * 0.45)):
+        for face, sortie in (("O", -1), ("E", 1)):
+            pose(f"{nommage}_jambage_{face}", centre + sortie * demi,
+                 centre + sortie * (demi + large), z0, tete, 0.0, saillie)
+        pose(f"{nommage}_traverse", centre - demi, centre + demi, haut, tete, 0.0, saillie)
+    # Le larmier puis la couvertine qui se retire : les deux mêmes lignes d'ombre qu'aux
+    # corniches de l'enceinte, et tout tient SOUS `sommet` — au-dessus commence le
+    # couronnement du mur, qui sort davantage et avalerait ce qui monterait dedans.
+    debord = cadre + CHAMBRANLE_LISERE + 0.4
+    pose("corniche_larmier", centre - demi - debord, centre + demi + debord,
+         tete, sommet - 0.35, 0.0, nu * 1.5)
+    pose("corniche_couvertine", centre - demi - debord + 0.3, centre + demi + debord - 0.3,
+         sommet - 0.35, sommet, 0.0, nu * 1.1)
+    # « וְתִמֹרִים אֶל־אֵילָיו » : le palmier se pose sur la face du jambage, pas sur le nu du
+    # mur — c'est de l'איל que parle le verset. Il se dore avec le שער, et reste de la
+    # pierre du mur là où aucune source ne met d'or.
+    jambage = (axe, cote + sens * nu, sens)
+    palmier = min(cadre * TIMORA_SUR_CADRE, hauteur * 0.4)
+    for face, sortie in (("O", -1), ("E", 1)):
+        timora(f"{nom}_timora_{face}", jambage, centre + sortie * (demi + cadre / 2),
+               z0 + (hauteur - palmier) / 2, palmier, col, metal or mat)
+    if metal is None:
+        return
+    # L'or prend l'ÉBRASEMENT, sur toute l'épaisseur du mur, et la שקופה avec lui : la
+    # michna dit le שער, et deux michnayot plus haut elle donne à chaque שער sa שקופה.
+    # Posé sur la seule face extérieure il ne se voyait que de face ; c'est dans
+    # l'embrasure qu'on le regarde, et de toute la cour.
+    e = EPAISSEUR_PLACAGE
+    for face, sortie in (("O", -1), ("E", 1)):
+        pose(f"or_jambage_{face}", centre + sortie * demi, centre + sortie * (demi - e),
+             z0, haut, 0.0, -ebrasement, metal)
+    pose("or_shkufa", centre - demi, centre + demi, haut - e, haut, 0.0, -ebrasement, metal)
+
+
 def crochet(name, x, y, z, sens, col):
     """Crochet de fer des ninnasin : une tige horizontale qui sort du bloc de cèdre,
     relevée au bout. `sens` : ±1, le côté en x où il sort."""
@@ -1986,15 +2321,44 @@ box("HarHabayit_sol", HX0, HX1, HY0, HY1, Z_HAR - 1, Z_HAR, "00_HarHabayit", MAT
 # l'aspersion. La ligne de mire passe donc par la porte est, Nikanor et l'Oulam — tous
 # centrés sur y = 0 — et rien ne doit s'y trouver.
 H_HAR, H_HAR_EST = 30, 24
-P_HOULDA = [(-60, 20), (20, 20)]        # CHOIX : les deux portes du sud
-mur_perce("HarHabayit_mur_sud", HX0, HX1, HY0, HY0 + 3, Z_HAR, Z_HAR + H_HAR,
-          "00_HarHabayit", P_HOULDA, 20, MAT_MURAILLE())
-mur_perce("HarHabayit_mur_nord", HX0, HX1, HY1 - 3, HY1, Z_HAR, Z_HAR + H_HAR,
-          "00_HarHabayit", [(-100, 10)], 20, MAT_MURAILLE())      # Tadi (CHOIX)
-mur_perce("HarHabayit_mur_ouest", HX0, HX0 + 3, HY0, HY1, Z_HAR, Z_HAR + H_HAR,
-          "00_HarHabayit", [(0, 10)], 20, MAT_MURAILLE())         # Kiponus (CHOIX)
-mur_perce("HarHabayit_mur_est", HX1 - 3, HX1, HY0, HY1, Z_HAR, Z_HAR + H_HAR_EST,
-          "00_HarHabayit", [(0, 10)], 20, MAT_MURAILLE())         # Sha'ar HaMizrahi, sur l'axe
+MUR_HAR = 3                             # épaisseur de l'enceinte
+TADI_X, KIPONUS_Y, MIZRAHI_Y = -100, 0, 0
+# Les cinq portes, et l'enceinte percée pour elles. `paroi` est la face de l'ESPLANADE :
+# c'est de là qu'on les voit, le revers d'un mur de soutènement tombant sur le Kidron ou
+# sur la ville. Aucune source ne dore ces שערים-là — Middot 2:3 parle des portes que le
+# Temple a fait changer en or, et la fiche ne les compte pas ici : leur cadre et leurs
+# timorim se taillent dans la pierre du mur.
+PORTES_HAR = (
+    ("sud", (HX0, HX1, HY0, HY0 + 3), ("x", HY0 + 3, 1), H_HAR,
+     [("Houlda_ouest", -60, 20), ("Houlda_est", 20, 20)]),
+    ("nord", (HX0, HX1, HY1 - 3, HY1), ("x", HY1 - 3, -1), H_HAR,
+     [("Tadi", TADI_X, 10)]),
+    ("ouest", (HX0, HX0 + 3, HY0, HY1), ("y", HX0 + 3, 1), H_HAR,
+     [("Kiponus", KIPONUS_Y, 10)]),
+    ("est", (HX1 - 3, HX1, HY0, HY1), ("y", HX1 - 3, -1), H_HAR_EST,
+     [("Mizrahi", MIZRAHI_Y, 10)]),
+)
+for _nm, _bornes, _paroi, _h, _portes in PORTES_HAR:
+    mur_perce(f"HarHabayit_mur_{_nm}", *_bornes, Z_HAR, Z_HAR + _h,
+              "00_HarHabayit", [(c, l) for _, c, l in _portes], 20, MAT_MURAILLE())
+    for _porte, _c, _l in _portes:
+        shaar(f"HarHabayit_porte_{_porte}", _paroi, _c, Z_HAR, Z_HAR + _h - 3, MUR_HAR,
+              "00_HarHabayit", MAT_MURAILLE(), largeur=_l)
+# « חוּץ מִשַּׁעַר טָדִי, שֶׁהָיוּ שָׁם שְׁתֵּי אֲבָנִים מֻטּוֹת זוֹ עַל גַּב זוֹ » (Middot 2:3) : la seule
+# tête de baie du Temple qui ne soit pas une שְׁקוֹפָה. Deux dalles penchées l'une contre
+# l'autre, et non un arc — la michna les compte, et elles se rejoignent sur l'axe. Elles
+# se posent DANS la baie, sous le plein du mur : ce qu'on voit en passant est le triangle
+# qu'elles laissent. La pente et la portée du sommet sont un CHOIX ; le nombre et
+# l'appui l'un sur l'autre ne le sont pas.
+TADI_NAISSANCE, TADI_APPUI = 12, 0.3
+for _sens in (-1, 1):
+    _cote = "O" if _sens < 0 else "E"
+    _relief_profil(f"HarHabayit_porte_Tadi_pierre_{_cote}", ("x", HY1, 1),
+                   [(TADI_X + _sens * 5, Z_HAR + TADI_NAISSANCE),
+                    (TADI_X + _sens * 5, Z_HAR + 20),
+                    (TADI_X + _sens * TADI_APPUI, Z_HAR + 20),
+                    (TADI_X + _sens * TADI_APPUI, Z_HAR + 20 - 0.6)],
+                   -MUR_HAR, 0.0, "00_HarHabayit", MAT_MURAILLE())
 # « שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה » (Middot 1:3) : le dessin de Suse au-dessus
 # de la porte est, tourné vers le mont des Oliviers. Un bas-relief : rempart et trois
 # tours crénelées, dans la pierre du mur.
@@ -2198,12 +2562,17 @@ for i in range(400):
 # 10 — EZRAT NASHIM (135 × 135), Middot 2:5
 # ----------------------------------------------------------------------------
 EX0, EX1 = 5, 140          # commence après le mur est de l'Azara (0..5)
-H_MUR_EN = 20
+# « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן שְׁקוֹפוֹת » (Middot 2:3) : chaque שער a son linteau, et
+# la même michna donne vingt amot à la baie. Un mur de vingt n'en laisse donc AUCUN —
+# la porte est n'avait plus qu'un linteau d'un centième d'ama, ce qui est un artefact de
+# modèle et non une porte. Aucune source ne donne la hauteur de ce mur : il prend celle
+# de l'Azara, qui est le premier nombre disponible qui laisse la michna tenir.
+H_MUR_EN = 25
 box("EzratNashim_mur_nord", EX0, EX1 + 5, 67.5, 72.5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
 box("EzratNashim_mur_sud", EX0, EX1 + 5, -72.5, -67.5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
 box("EzratNashim_mur_est_S", EX1, EX1 + 5, -72.5, -5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
 box("EzratNashim_mur_est_N", EX1, EX1 + 5, 5, 72.5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
-box("EzratNashim_porte_est_linteau", EX1, EX1 + 5, -5, 5, Z_EZN + 20 - 0.01, Z_EZN + H_MUR_EN, "10_EzratNashim")
+box("EzratNashim_porte_est_linteau", EX1, EX1 + 5, -5, 5, Z_EZN + 20, Z_EZN + H_MUR_EN, "10_EzratNashim")
 # Quatre chambres d'angle 40 × 40, sans toit (murs de 2 amot) — « ולא היו מקורות »
 # (Middot 2:5, qui les rattache aux « חצרות קטורות » d'Ezekiel 46:21-22). Affectations
 # par angle : Middot 2:5. CHOIX : la Mishna ne décrit aucune porte, seulement des
@@ -2229,6 +2598,14 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
         if side == cour:
             mur_perce(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim",
                       [((a + b) / 2, 6)], 12)
+            # Un פתח de chambre n'est pas un שער : Middot 2:3 ne le change pas en or, et
+            # il ne reçoit qu'un cadre de pierre, à l'échelle de sa baie de six.
+            shaar(f"{nom}_cadre",
+                  {"S": ("x", c, -1), "N": ("x", d, 1),
+                   "O": ("y", a, -1), "E": ("y", b, 1)}[side],
+                  (a + b) / 2, Z_EZN,
+                  Z_EZN + H_LISHKA_EN + min(zb for zb, _, _ in CORNICHE), 2,
+                  "10_EzratNashim", largeur=6, hauteur=12, cadre=1.5)
         else:
             box(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim")
     ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, 2,
@@ -2333,11 +2710,12 @@ battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashi
 # ŠAʿAR, pas ses vantaux — et elle dit deux michnayot plus haut que chaque שער avait sa
 # שְׁקוֹפָה. L'or déborde donc des battants sur les jambages et sur elle. ARBITRAGE : lire
 # « שער » comme la baie entière et non comme ses seules portes.
-for _cote, _ya, _yb in (("S", -5.8, -5.0), ("N", 5.0, 5.8)):
-    box(f"EzratNashim_porte_est_jambage_{_cote}", EX1 - 0.2, EX1, _ya, _yb,
-        Z_EZN, Z_EZN + H_MUR_EN - 2.2, "10_EzratNashim", MAT_OR())
-box("EzratNashim_porte_est_shkufa", EX1, EX1 + 5, -5, 5,
-    Z_EZN + H_MUR_EN - 0.3, Z_EZN + H_MUR_EN, "10_EzratNashim", MAT_OR())
+# C'est la porte par laquelle le peuple entre : elle se cadre des deux côtés, en venant
+# du 'Heil comme en la regardant de la cour.
+for _cote, _nu, _sens in (("est", EX1 + 5, 1), ("ouest", EX1, -1)):
+    shaar(f"EzratNashim_porte_{_cote}", ("y", _nu, _sens), 0, Z_EZN,
+          Z_EZN + H_MUR_EN + min(zb for zb, _, _ in CORNICHE), 2.5,
+          "10_EzratNashim", metal=MAT_OR())
 # Treize shofarot (Shekalim 6:5) : les troncs « en forme de shofar » — étroits en haut,
 # larges en bas, pour qu'on n'y glisse pas la main (Bartenura) — le long du mur est, de
 # part et d'autre de la porte. Bronze : CHOIX, la Mishna n'en dit pas la matière.
@@ -2398,6 +2776,9 @@ AX0, AX1, AY0, AY1 = -187, 0, -67.5, 67.5
 X_DOUKHAN = AX1 - 13.5       # pied de la volée : marche d'une ama puis trois demies, sur 2,5 amot de large
 H_MUR = 25
 T = 5   # épaisseur des murs
+# Un cadre de porte s'arrête sous le couronnement du mur : au-dessus, c'est le larmier
+# qui sort le plus et lui qui porte l'ombre. `CORNICHE` se cote depuis la crête.
+SOUS_CORNICHE = Z_AZ + H_MUR + min(zb for zb, _, _ in CORNICHE)
 box("Azara_sol", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_AZ - 1, Z_AZ, "20_Azara", MAT_SOL())
 box("EzratIsrael_sol", X_DOUKHAN, AX1, AY0, AY1, Z_EZI - 1, Z_EZI, "20_Azara", MAT_SOL())
 # L'Azara et l'Ezrat Nashim sont des terrasses taillées dans le Har HaBayit, pas des
@@ -2430,6 +2811,13 @@ box("Nikanor_linteau", AX1, AX1 + T, -5, 5, Z_EZI + 20, Z_AZ + H_MUR, "20_Azara"
 # 6, 13 et 14 finissaient sur deux vantaux de bronze là où le découpage demande
 # l'ouverture de l'Oulam au fond. Ils contredisaient aussi la ligne de mire de la
 # para adouma (Middot 2:4), que le mur est bas est fait pour dégager.
+# Le שער de Nikanor se regarde des DEUX côtés, et c'est le seul du Temple dans ce cas :
+# de l'Ezrat Nashim par les quinze marches, et de toute l'Azara par la mire est-ouest
+# que Middot 2:4 dégage. Son encadrement est celui des six autres ; ce qui l'en sépare
+# est son métal — « חוּץ מִשַּׁעֲרֵי נִיקָנוֹר… מִפְּנֵי שֶׁנְּחֻשְׁתָּן מַצְהִיב » (Middot 2:3).
+for _cote, _nu, _sens in (("est", AX1 + T, 1), ("ouest", AX1, -1)):
+    shaar(f"Nikanor_{_cote}", ("y", _nu, _sens), 0, Z_EZI, SOUS_CORNICHE, T / 2,
+          "20_Azara", metal=MAT_NEHOSHET())
 box("Nikanor_porte_S", AX1 + 1, AX1 + 4.5, -5, -4.7, Z_EZI, Z_EZI + 20, "20_Azara", MAT_NEHOSHET())
 box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara", MAT_NEHOSHET())
 # « שְׁנֵי פִשְׁפְּשִׁין הָיוּ לוֹ לְשַׁעַר נִיקָנוֹר, אֶחָד בִּימִינוֹ וְאֶחָד בִּשְׂמֹאלוֹ » (Middot 2:6) : deux
@@ -2475,11 +2863,17 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
     for k in range(0, len(bornes) - 1, 2):
         box(f"Azara_mur_{nm}_{k // 2}", bornes[k], bornes[k + 1], y0, y1,
             Z_AZ, Z_AZ + H_MUR, "20_Azara")
+    # Le cadre se pose du côté de la COUR : dehors, ces murs soutiennent dix amot de
+    # remblai et leur pied est sur la terrasse du 'Heil — c'est aussi de ce côté-là que
+    # le mur porte son socle et son couronnement.
+    face = (AY1, -1) if nm == "nord" else (AY0, 1)
     for p in ouvertures:
         box(f"Azara_porte_{nm}_{p:+.0f}_linteau", p - 5, p + 5, y0, y1,
             Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
         # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
         # ouverts dès l'aube (Tamid 3:7). Les פתחים de HaGazit et de HaGola n'en sont pas.
+        shaar(f"Azara_porte_{nm}_{p:+.0f}", ("x", *face), p, Z_AZ, SOUS_CORNICHE, T,
+              "20_Azara", metal=None if p in PETAHIM else MAT_OR())
         if p not in PETAHIM:
             battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
                      Z_AZ, 20, "20_Azara", MAT_OR())
@@ -3060,7 +3454,6 @@ box("Ulam_facade_linteau", BX_E - 5, BX_E, -10, 10, Z_BAT + 40, Z_TOIT, "40_Ulam
 #     alternées, une en débord une en retrait, déjà dans MAT_MARBRE_HERODE.
 #     L'or reste où les sources le mettent : dedans (Middot 4:1), sur les portes, sur
 #     la vigne et sur la couronne d'Hélène.
-EPAISSEUR_PLACAGE = 0.1   # amot : l'or est une feuille, la boîte doit rester visible
 # Cinq poutres de chêne au-dessus de l'ouverture (Middot 3:7)
 for i in range(5):
     L = 22 + i * 2
@@ -3371,9 +3764,15 @@ paroi_percee("Heikhal_mur_est_N", HX_E - 6, HX_E, 5, 35, Z_BAT, Z_TOIT,
 box("Heikhal_mur_est_S", HX_E - 6, HX_E, -35, -5, Z_BAT, Z_TOIT, "50_Heikhal")
 box("Heikhal_mur_est_linteau", HX_E - 6, HX_E, -5, 5, Z_BAT + 20, Z_TOIT, "50_Heikhal")
 if PORTES_HEIKHAL_OUVERTES:
-    # Battants rabattus dans l'embrasure de 6 amot, contre les jambages.
-    box("Heikhal_porte_S", HX_E - 5, HX_E - 0.3, -5, -4.7, Z_BAT, Z_BAT + 20, "50_Heikhal", MAT_OR())
-    box("Heikhal_porte_N", HX_E - 5, HX_E - 0.3, 4.7, 5, Z_BAT, Z_BAT + 20, "50_Heikhal", MAT_OR())
+    # Battants rabattus dans l'embrasure de 6 amot, contre les jambages. Ils portent les
+    # figures que les versets leur donnent — « וְקָלַע כְּרוּבִים וְתִמֹרוֹת וּפְטֻרֵי צִצִּים וְצִפָּה
+    # זָהָב » (Melakhim I 6:35 ; Ye'hezkel 41:25) : c'est le seul vantail du Temple que le
+    # corpus sculpte, et il était une plaque d'or nue.
+    for _cote, _y, _sens in (("S", -4.7, 1), ("N", 4.7, -1)):
+        box(f"Heikhal_porte_{_cote}", HX_E - 5, HX_E - 0.3, _y - 0.3 * _sens, _y,
+            Z_BAT, Z_BAT + 20, "50_Heikhal", MAT_OR())
+        vantail_sculpte(f"Heikhal_porte_{_cote}_figure", ("x", _y, _sens),
+                        HX_E - 4.7, HX_E - 0.6, Z_BAT + 0.6, Z_BAT + 19.4, "50_Heikhal")
 else:
     box("Heikhal_porte_S", HX_E - 0.6, HX_E - 0.3, -5, -0.3, Z_BAT, Z_BAT + 20, "50_Heikhal", MAT_OR())
     box("Heikhal_porte_N", HX_E - 0.6, HX_E - 0.3, 0.3, 5, Z_BAT, Z_BAT + 20, "50_Heikhal", MAT_OR())
@@ -3899,79 +4298,12 @@ box("Heikhal_or_sol", HK1, HK0, -10, 10, Z_BAT, Z_BAT + 0.02, "50_Heikhal", MAT_
 box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim", MAT_OR_PLAQUE())
 
 
-# --- « וְאֵת כָּל קִירוֹת הַבַּיִת מֵסַב קָלַע פִּתּוּחֵי מִקְלְעוֹת כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים,
-#     מִלִּפְנִים וְלַחִיצוֹן » (Melakhim I 6:29). Ye'hezkel 41:18-19 en donne l'ORDRE —
-#     « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב », chaque profil tourné vers la
-#     timora qui le jouxte — et 41:20 l'ÉTENDUE : « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח », du sol
-#     jusqu'au-dessus de l'entrée, qui fait 20 amot (Middot 4:1). Au-dessus, l'or reste
-#     nu jusqu'à la corniche. Deux registres flottant à mi-hauteur, un damier de motifs
-#     et des figures deux fois plus larges que leur pas ne sont dans aucune source :
-#     le mur rendait une mitraille d'éclats dorés (plan 9b).
+# --- Le champ sculpté d'une paroi du Bayit. Son ÉTENDUE est Ye'hezkel 41:20 —
+#     « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח », du sol jusqu'au-dessus de l'entrée, qui fait 20 amot
+#     (Middot 4:1). Au-dessus, l'or reste nu jusqu'à la corniche : deux registres
+#     flottant à mi-hauteur ne sont dans aucune source.
 CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
 REGISTRES_KIR = 3         # registres de figures, séparés par des bandeaux de fleurons
-BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
-SAILLIE_KIR = 0.22        # saillie du relief : 11 cm. À 0,35 la figure se lisait en plaque
-                          # posée dessus, à 0,14 elle ne prenait plus la lumière rasante
-PAS_KIR = 4.44            # pas visé d'une figure, en amot
-
-# Les palmes d'une timora : (inclinaison sur la verticale, longueur en part de la
-# hauteur). Sept est un CHOIX — la source ne les compte pas ; les deux dernières
-# retombent, ce qui est ce qui distingue un palmier d'un éventail.
-PALMES = ((0, 0.42), (30, 0.37), (-30, 0.37), (66, 0.30), (-66, 0.30), (106, 0.26), (-106, 0.26))
-
-
-def timora(nom, paroi, u, z0, h, col):
-    """« תִּמֹרָה » : le palmier — fût annelé, couronne de sept palmes."""
-    fut, e = 0.58 * h, 0.052 * h
-    gauche, droite = [], []
-    for k in range(9):
-        z = z0 + fut * k / 8
-        w = e * (1.0 - 0.22 * k / 8) * (1.0 if k % 2 == 0 else 0.74)
-        gauche.append((u - w, z))
-        droite.append((u + w, z))
-    _relief_profil(f"{nom}_fut", paroi, gauche + droite[::-1], 0.0, SAILLIE_KIR, col)
-    for k, (inclinaison, longueur) in enumerate(PALMES):
-        _relief_limbe(f"{nom}_palme_{k}", paroi, u, z0 + fut * 0.94, inclinaison, longueur * h,
-                      PALME, SAILLIE_KIR * 0.45, col, courbure=0.10)
-    _relief_bosse(f"{nom}_coeur", paroi, u, z0 + fut * 0.97, SAILLIE_KIR * 0.35, 0.045 * h, col)
-
-
-def keruv_grave(nom, paroi, u, z0, h, col):
-    """« כְּרוּבִים » — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), et 41:19 tourne chaque
-    profil vers la timora qui le jouxte. Deux têtes SANS TRAITS, deux ailes levées."""
-    corps = [(u - 0.150 * h, z0), (u + 0.150 * h, z0),
-             (u + 0.105 * h, z0 + 0.10 * h), (u + 0.060 * h, z0 + 0.34 * h),
-             (u + 0.140 * h, z0 + 0.54 * h), (u + 0.120 * h, z0 + 0.62 * h),
-             (u - 0.120 * h, z0 + 0.62 * h), (u - 0.140 * h, z0 + 0.54 * h),
-             (u - 0.060 * h, z0 + 0.34 * h), (u - 0.105 * h, z0 + 0.10 * h)]
-    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, SAILLIE_KIR, col)
-    for sens in (-1, 1):
-        cote = "N" if sens > 0 else "S"
-        _relief_profil(f"{nom}_tete_{cote}", paroi,
-                       _profil_tete(u + sens * 0.100 * h, z0 + 0.62 * h, 0.095 * h, sens),
-                       0.0, SAILLIE_KIR * 0.85, col)
-        _relief_limbe(f"{nom}_aile_{cote}", paroi, u + sens * 0.075 * h, z0 + 0.52 * h,
-                      sens * 32, 0.40 * h, AILE, SAILLIE_KIR * 0.45, col, courbure=0.16)
-
-
-def petur_tzitz(nom, paroi, u, z, r, col):
-    """« פְּטוּרֵי צִצִּים » : la fleur épanouie. Le verset la met au même rang que les
-    keruvim et les timorot — elle court donc en bandeau, elle n'est pas un bouton isolé."""
-    _relief_profil(f"{nom}_corolle", paroi, _profil_corolle(u, z, r), 0.0, SAILLIE_KIR * 0.55, col)
-    _relief_bosse(f"{nom}_coeur", paroi, u, z, SAILLIE_KIR * 0.5, r * 0.28, col)
-
-
-def bandeau_fleurons(nom, paroi, u0, u1, z, col):
-    """Un bandeau de fleurons en travers d'une paroi : ce qui tient les registres.
-    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser."""
-    _relief_profil(f"{nom}_listel", paroi,
-                   [(u0, z), (u1, z), (u1, z + BANDEAU_KIR), (u0, z + BANDEAU_KIR)],
-                   0.0, SAILLIE_KIR * 0.4, col)
-    n = max(1, round((u1 - u0) / PAS_KIR))
-    pas = (u1 - u0) / n
-    for i in range(n):
-        petur_tzitz(f"{nom}_fleuron_{i:02d}", paroi, u0 + pas * (i + 0.5), z + BANDEAU_KIR / 2,
-                    BANDEAU_KIR * 0.42, col)
 
 
 def champ_sculpte(nom, paroi, u0, u1, col):

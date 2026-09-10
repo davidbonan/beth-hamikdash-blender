@@ -616,5 +616,52 @@
     "sources": [
       {"oeuvre": "Middot", "ref": "1:4", "citation": ""}
     ]
+  },
+
+  "portes_houlda": {
+    "he": "שני שערי חולדה",
+    "translit": "Sha'arei 'Houlda",
+    "resume": "Les deux portes du sud, « qui servaient à l'entrée et à la sortie » : c'est par elles que le peuple monte au Har HaBayit et en redescend. La michna ne dit ni leur largeur ni où elles s'ouvrent dans le mur. Comme toute porte du Temple, elles sont couvertes d'un linteau et non d'un arc, et chacun de leurs jambages porte une timora.",
+    "cotes": [
+      "deux portes, au sud",
+      "20 × 20 amot et leur abscisse : CHOIX, la michna ne les cote pas",
+      "un palmier par jambage, comme à toutes les portes"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "1:3", "citation": "les deux portes de 'Houlda au sud, qui servaient à l'entrée et à la sortie."},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "toutes les portes qui étaient là avaient des linteaux."},
+      {"oeuvre": "Ye'hezkel", "ref": "40:26", "citation": "et des palmiers, un d'un côté et un de l'autre, sur ses jambages."}
+    ]
+  },
+
+  "shaar_tadi": {
+    "he": "שער טדי",
+    "translit": "Sha'ar Tadi",
+    "resume": "La porte du nord, « qui ne servait à rien ». C'est pourtant la seule porte de tout le Temple dont la tête ne soit pas un linteau : au lieu d'une shkoufa posée en travers, deux pierres penchées l'une sur l'autre s'appuient au sommet et laissent passer un triangle. La michna les compte, et c'est cette exception qui la fait citer.",
+    "cotes": [
+      "au nord, hors service",
+      "deux pierres penchées au lieu d'un linteau",
+      "10 × 20 amot ; sa pente et sa portée au sommet sont un CHOIX"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "1:3", "citation": "Tadi au nord ne servait à rien."},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "sauf la porte de Tadi, où il y avait deux pierres penchées l'une sur l'autre."}
+    ],
+    "note": "Ce n'est pas un arc : la michna dit deux pierres, et elles se rejoignent en angle."
+  },
+
+  "shaar_kiponus": {
+    "he": "שער קיפונוס",
+    "translit": "Sha'ar Kiponus",
+    "resume": "La porte de l'ouest, elle aussi « pour l'entrée et la sortie ». La michna ne lui donne que son nom, son côté et son usage ; sa cote et sa place dans le mur sont un choix. Linteau et jambages à timorot comme partout ailleurs.",
+    "cotes": [
+      "à l'ouest, entrée et sortie",
+      "10 × 20 amot : CHOIX",
+      "un palmier par jambage"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "1:3", "citation": "Kiponus à l'ouest servait à l'entrée et à la sortie."},
+      {"oeuvre": "Ye'hezkel", "ref": "40:26", "citation": ""}
+    ]
   }
 }

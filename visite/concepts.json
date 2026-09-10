@@ -659,7 +659,32 @@
       "nom": "Sha'ar Shushan",
       "zone": "har_habayit",
       "prefixes": [
-        "Shushan_"
+        "Shushan_",
+        "HarHabayit_porte_Mizrahi"
+      ]
+    },
+    {
+      "id": "portes_houlda",
+      "nom": "Portes de 'Houlda",
+      "zone": "har_habayit",
+      "prefixes": [
+        "HarHabayit_porte_Houlda"
+      ]
+    },
+    {
+      "id": "shaar_tadi",
+      "nom": "Sha'ar Tadi",
+      "zone": "har_habayit",
+      "prefixes": [
+        "HarHabayit_porte_Tadi"
+      ]
+    },
+    {
+      "id": "shaar_kiponus",
+      "nom": "Sha'ar Kiponus",
+      "zone": "har_habayit",
+      "prefixes": [
+        "HarHabayit_porte_Kiponus"
       ]
     }
   ]
