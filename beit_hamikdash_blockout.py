@@ -21,6 +21,7 @@ Les choix entre avis divergents sont signalés par "# CHOIX".
 
 import bpy
 import math
+import pathlib
 import sys
 import zlib
 from typing import NamedTuple
@@ -170,16 +171,6 @@ def _grain(mat, taille):
     mat.node_tree.links.new(_position(mat), bruit.inputs["Vector"])
     return bruit.outputs["Factor"]
 
-def _veines(mat, pas, origine):
-    """Veinage du marbre, bandes diagonales distordues de `pas` amot. Renvoie la sortie Factor."""
-    veines = _noeud(mat, "ShaderNodeTexWave", -900, 0)
-    veines.bands_direction = 'DIAGONAL'
-    veines.inputs["Scale"].default_value = 1.0 / m(pas)
-    veines.inputs["Distortion"].default_value = 12.0
-    veines.inputs["Detail"].default_value = 3.0
-    mat.node_tree.links.new(origine, veines.inputs["Vector"])
-    return veines.outputs["Factor"]
-
 def _creuser(mat, hauteur, force, profondeur):
     """Empile un Bump sur l'entrée Normal du Principled. Chaînable : le relief fin se
     pose par-dessus le relief large sans l'écraser.
@@ -213,14 +204,16 @@ def material(name, rgb):
 # l'assise en tire une. La pierre de 10 et celle de 8 valent aussi pour le Temple
 # lui-même, « וְלַחֲצַר בֵּית ה' הַפְּנִימִית וּלְאֻלָם הַבָּיִת » (7:12). Le module d'une ama qui
 # les précédait lisait en brique — quarante rangs sur la façade au lieu de dix blocs.
-# La HAUTEUR d'assise n'est dans aucune source : 4 amot est un CHOIX, et le même
-# partout. Le pas valait 2,5 pour l'enceinte et 2 pour le bâtiment — cinquante lits sur
-# les 100 amot de la façade, l'échelle d'un mur de brique. À 4, une assise vaut le pas
-# d'un rovad de l'Oulam (1 de nu + 3 de saillie, Rambam Beit HaBe'hira 4:9) : le haut
-# de chaque bandeau tombe sur un lit au lieu de battre contre lui, et le pas unique
-# rend la distinction enceinte / bâtiment inutile.
+# La HAUTEUR d'assise n'est dans aucune source : c'est un CHOIX. Le pas valait 2,5 pour
+# l'enceinte et 2 pour le bâtiment — cinquante lits sur les 100 amot de la façade,
+# l'échelle d'un mur de brique. À 4, une assise vaut le pas d'un rovad de l'Oulam (1 de
+# nu + 3 de saillie, Rambam Beit HaBe'hira 4:9) : le haut de chaque bandeau tombe sur un
+# lit au lieu de battre contre lui. Le bâtiment prend le double : à 4, ses vingt-cinq
+# lits le lisaient en carrelage ; à 8, un bandeau sur deux tombe encore sur un lit, et
+# aucun lit ne traverse une saillie.
 PIERRE_LONG = (8.0, 10.0)   # Melakhim I 7:10 — l'assise tire l'une ou l'autre
 ASSISE = 4.0                # CHOIX : hauteur d'assise, hors source
+ASSISE_HERODE = 8.0         # CHOIX : le bâtiment, deux pas de rovad
 # La face est SCIÉE, pas rustiquée : « אֲבָנִים יְקָרֹת כְּמִדּוֹת גָּזִית מְגֹרָרוֹת בַּמְּגֵרָה
 # מִבַּיִת וּמִחוּץ » (Melakhim I 7:9). Tout le relief tient donc au joint et au liseré qui
 # le borde, jamais à un bossage éclaté. Largeur du liseré : CHOIX. À 0,35 ama il faisait
@@ -234,9 +227,10 @@ LISERE = 0.25
 # relief est ce que les Sages ont préféré à l'or, et il doit porter la vague à lui seul.
 DEBORD_ASSISE = 0.05
 DEBORD_BATIMENT = 0.11
-# Le marbre est poli jusqu'à l'arête : pas de liseré ciselé, un joint serré — CHOIX.
-JOINT_MARBRE = 0.03
-LISERE_MARBRE = 0.05
+# Le marbre est poli jusqu'à l'arête : pas de liseré, et un joint serré — CHOIX. Au
+# joint du calcaire, ses blocs quadrillaient la façade de traits.
+JOINT_MARBRE = 0.02
+LISERE_MARBRE = 0.0
 
 
 class Appareil(NamedTuple):
@@ -622,13 +616,14 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
 # Saturation très basse : ce que les Sages lui ont fait garder contre l'or, c'est « כִּי
 # אִידְווֹתָא דְיַמָּא », le moiré d'une mer — pas une mosaïque.
 MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.81, 0.86, 0.86), (0.82, 0.88, 0.78))
-APPAREIL_HERODE = Appareil(ASSISE, PIERRE_LONG, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE)
+APPAREIL_HERODE = Appareil(ASSISE_HERODE, PIERRE_LONG, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE)
 RUGOSITE_MARBRE = 0.30
-# Le veinage n'est dans aucune source — CHOIX : chaque bloc sort d'une autre tranche de carrière.
-PAS_VEINE_HERODE = 6.0
-SEUIL_VEINE = 0.95
-VEINE_MARBRE = (0.84, 0.86, 0.88)
-DECALAGE_VEINE = 40.0
+# Le scan Marble001 que fabrique beit_hamikdash_nappes.py. Mêmes réglages que CARREAU[9] de
+# visite/matieres.js, et mêmes moyennes que le jeu `marbre` de visite/nappes.js.
+NAPPE_MARBRE = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "marbre_c_1024.webp"
+COTE_NAPPE_MARBRE = 4.8                  # mètres : un carreau par bloc de 10 amot, sans répétition
+COULEUR_NAPPE_MARBRE, CHROMA_NAPPE_MARBRE, RUGOSITE_NAPPE_MARBRE = 1.0, 0.35, 1.0
+MOYENNE_NAPPE_MARBRE, RUGOSITE_MOYENNE_NAPPE_MARBRE = (0.7442, 0.7243, 0.6827), 0.1722
 
 
 def marbre_herode(name):
@@ -649,7 +644,7 @@ def marbre_herode(name):
     if not neuf:
         return mat
     liens = mat.node_tree.links
-    _, tire_assise, bloc, _, creux, _ = _tailler(mat, APPAREIL_HERODE)
+    _, tire_assise, bloc, fini, creux, _ = _tailler(mat, APPAREIL_HERODE)
     choix = _noeud(mat, "ShaderNodeValToRGB", -680, 160)
     rampe = choix.color_ramp
     rampe.interpolation = 'CONSTANT'
@@ -664,40 +659,70 @@ def marbre_herode(name):
     teinte.inputs["Factor"].default_value = 1.0
     liens.new(choix.outputs["Color"], teinte.inputs["Color1"])
     nuance = _noeud(mat, "ShaderNodeValToRGB", -680, -40)
-    nuance.color_ramp.elements[0].color = (0.84, 0.85, 0.88, 1.0)
-    nuance.color_ramp.elements[1].color = (1.10, 1.08, 1.02, 1.0)
+    # L'assise porte la vague ; d'un bloc au suivant, à peine une nuance, sinon la façade tourne au patchwork.
+    nuance.color_ramp.elements[0].color = (0.97, 0.97, 0.98, 1.0)
+    nuance.color_ramp.elements[1].color = (1.03, 1.02, 1.00, 1.0)
     liens.new(_calc(mat, "MULTIPLY_ADD", _grain(mat, 24.0), 0.45,
                     _calc(mat, "MULTIPLY", bloc, 0.55)), nuance.inputs["Factor"])
     liens.new(nuance.outputs["Color"], teinte.inputs["Color2"])
-    veinee = _noeud(mat, "ShaderNodeMixRGB", -340, 320)
-    veinee.blend_type = "MULTIPLY"
-    veinee.inputs["Color2"].default_value = (*VEINE_MARBRE, 1.0)
-    liens.new(teinte.outputs["Color"], veinee.inputs["Color1"])
-    liens.new(_veine_par_bloc(mat, tire_assise, bloc), veinee.inputs["Factor"])
-    liens.new(_ombre_du_joint(mat, veinee.outputs["Color"], creux),
+    photo, ecart_rugosite = _nappe_par_bloc(mat, bloc, fini)
+    marbre = _noeud(mat, "ShaderNodeMixRGB", -340, 320)
+    marbre.blend_type = "MULTIPLY"
+    marbre.inputs["Factor"].default_value = 1.0
+    liens.new(teinte.outputs["Color"], marbre.inputs["Color1"])
+    liens.new(photo, marbre.inputs["Color2"])
+    liens.new(_ombre_du_joint(mat, marbre.outputs["Color"], creux),
               _bsdf(mat).inputs["Base Color"])
     _bsdf(mat).inputs["Roughness"].default_value = RUGOSITE_MARBRE
-    liens.new(_calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", bloc, 0.5), 0.06, RUGOSITE_MARBRE),
+    liens.new(_calc(mat, "ADD", ecart_rugosite,
+                    _calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", bloc, 0.5), 0.06, RUGOSITE_MARBRE)),
               _bsdf(mat).inputs["Roughness"])
     return mat
 
 
-def _veine_par_bloc(mat, tire_assise, tire_bloc):
-    """Masque des veines, 1 au coeur d'une veine : le motif saute d'un bloc au suivant."""
+def _nappe_par_bloc(mat, tire_bloc, tire_fini):
+    """Le scan du marbre en projection boîte, recalé sur chaque bloc comme `photo` dans matieres.js.
+
+    Renvoie (rapport de couleur à la moyenne du scan, écart de rugosité à sa moyenne).
+    """
     liens = mat.node_tree.links
-    tranche = _noeud(mat, "ShaderNodeCombineXYZ", -1400, 700)
-    liens.new(_calc(mat, "MULTIPLY", tire_bloc, m(DECALAGE_VEINE)), tranche.inputs["X"])
-    liens.new(_calc(mat, "MULTIPLY", tire_assise, m(DECALAGE_VEINE)), tranche.inputs["Y"])
-    origine = _noeud(mat, "ShaderNodeVectorMath", -1200, 700)
-    origine.operation = "ADD"
-    liens.new(_position(mat), origine.inputs[0])
-    liens.new(tranche.outputs["Vector"], origine.inputs[1])
-    coeur = _noeud(mat, "ShaderNodeMapRange", -700, 700)
-    coeur.interpolation_type = "SMOOTHSTEP"
-    coeur.inputs["From Min"].default_value = SEUIL_VEINE
-    coeur.inputs["From Max"].default_value = 1.0
-    liens.new(_veines(mat, PAS_VEINE_HERODE, origine.outputs["Vector"]), coeur.inputs["Value"])
-    return coeur.outputs["Result"]
+    carreau = _noeud(mat, "ShaderNodeVectorMath", -1400, 900)
+    carreau.operation = "SCALE"
+    carreau.inputs["Scale"].default_value = 1.0 / COTE_NAPPE_MARBRE
+    liens.new(_position(mat), carreau.inputs[0])
+    # Deux tirages du bloc sur chaque plan : celui de l'assise alignait la même veine sur tout le rang.
+    tranche = _noeud(mat, "ShaderNodeCombineXYZ", -1400, 1100)
+    liens.new(_calc(mat, "MULTIPLY", tire_bloc, 13.0), tranche.inputs["X"])
+    liens.new(_calc(mat, "MULTIPLY", _calc(mat, "ADD", tire_bloc, tire_fini), 13.0), tranche.inputs["Y"])
+    liens.new(_calc(mat, "MULTIPLY", tire_fini, 13.0), tranche.inputs["Z"])
+    recale = _noeud(mat, "ShaderNodeVectorMath", -1200, 900)
+    recale.operation = "ADD"
+    liens.new(carreau.outputs["Vector"], recale.inputs[0])
+    liens.new(tranche.outputs["Vector"], recale.inputs[1])
+    scan = _noeud(mat, "ShaderNodeTexImage", -1000, 900)
+    scan.image = bpy.data.images.load(str(NAPPE_MARBRE), check_existing=True)
+    scan.image.alpha_mode = "CHANNEL_PACKED"
+    scan.projection = "BOX"
+    scan.projection_blend = 0.1
+    liens.new(recale.outputs["Vector"], scan.inputs["Vector"])
+    rapport = _noeud(mat, "ShaderNodeMixRGB", -800, 900)
+    rapport.blend_type = "DIVIDE"
+    rapport.inputs["Factor"].default_value = 1.0
+    rapport.inputs["Color2"].default_value = (*MOYENNE_NAPPE_MARBRE, 1.0)
+    liens.new(scan.outputs["Color"], rapport.inputs["Color1"])
+    gris = _noeud(mat, "ShaderNodeRGBToBW", -650, 1000)
+    liens.new(rapport.outputs["Color"], gris.inputs["Color"])
+    bride = _noeud(mat, "ShaderNodeMixRGB", -500, 900)
+    bride.inputs["Factor"].default_value = CHROMA_NAPPE_MARBRE
+    liens.new(gris.outputs["Val"], bride.inputs["Color1"])
+    liens.new(rapport.outputs["Color"], bride.inputs["Color2"])
+    dose = _noeud(mat, "ShaderNodeMixRGB", -350, 900)
+    dose.inputs["Factor"].default_value = COULEUR_NAPPE_MARBRE
+    dose.inputs["Color1"].default_value = (1.0, 1.0, 1.0, 1.0)
+    liens.new(bride.outputs["Color"], dose.inputs["Color2"])
+    ecart = _calc(mat, "MULTIPLY", _calc(mat, "SUBTRACT", scan.outputs["Alpha"], RUGOSITE_MOYENNE_NAPPE_MARBRE),
+                  RUGOSITE_NAPPE_MARBRE)
+    return dose.outputs["Color"], ecart
 
 
 def _enduire(mat):
@@ -837,10 +862,16 @@ def marbre(name, rgb):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.28
+    veines = _noeud(mat, "ShaderNodeTexWave", -900, 0)
+    veines.bands_direction = 'DIAGONAL'
+    veines.inputs["Scale"].default_value = 1.0 / m(2.5)
+    veines.inputs["Distortion"].default_value = 12.0
+    veines.inputs["Detail"].default_value = 3.0
+    liens.new(_position(mat), veines.inputs["Vector"])
     filet = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
     filet.inputs["Color1"].default_value = (*rgb, 1.0)
     filet.inputs["Color2"].default_value = (*(c * 0.72 for c in rgb), 1.0)
-    liens.new(_veines(mat, 2.5, _position(mat)), filet.inputs["Factor"])
+    liens.new(veines.outputs["Factor"], filet.inputs["Factor"])
     liens.new(filet.outputs["Color"], _bsdf(mat).inputs["Base Color"])
     return mat
 
@@ -4014,7 +4045,9 @@ H_BAT = 100
 Z_FAITE = Z_AZ + H_BAT              # 100 : le faîte, pointes comprises
 Z_TOIT = Z_FAITE - MAAKE_H - 1      # 96 : là où s'arrête le mur
 # Plateforme (sol surélevé de 6 amot) et 12 marches devant l'Oulam
-box("Batiment_socle", BX_O, BX_E, -50, 50, Z_AZ, Z_BAT, "40_Ulam")
+# L'אֹטֶם suit le plan du bâtiment, « צַר מֵאֲחוֹרָיו וְרָחָב מִלְּפָנָיו » (Middot 4:7) : 100 sous l'Oulam, 70 derrière.
+box("Batiment_socle_oulam", BX_E - 16, BX_E, -50, 50, Z_AZ, Z_BAT, "40_Ulam", MAT_MARBRE_HERODE())
+box("Batiment_socle_corps", BX_O, BX_E - 16, -35, 35, Z_AZ, Z_BAT, "40_Ulam", MAT_MARBRE_HERODE())
 # « רוּם מַעֲלָה חֲצִי אַמָּה, וְשִׁלְחָהּ אַמָּה. אַמָּה אַמָּה וְרֹבֶד שָׁלֹשׁ, וְאַמָּה אַמָּה וְרֹבֶד שָׁלֹשׁ.
 # וְהָעֶלְיוֹנָה, אַמָּה אַמָּה וְרֹבֶד אַרְבַּע » (Middot 3:6) : le giron fait une ama, sauf trois
 # rovadim. Bartenura ad loc. les compte depuis le bas — la 4e et la 7e de trois amot, la
@@ -4335,9 +4368,9 @@ HX_E = BX_E - 16      # -92
 # coin. Celui du sud ne s'ouvre jamais (Yehezkel 44:2) ; il est bâti, pas percé.
 PISHPASH = (6, 8, Z_BAT, Z_BAT + 4)        # largeur et hauteur : CHOIX, Middot n'en donne pas
 paroi_percee("Heikhal_mur_est_N", HX_E - 6, HX_E, 5, 35, Z_BAT, Z_TOIT,
-             "50_Heikhal", MAT_PIERRE(), [PISHPASH])
-box("Heikhal_mur_est_S", HX_E - 6, HX_E, -35, -5, Z_BAT, Z_TOIT, "50_Heikhal")
-box("Heikhal_mur_est_linteau", HX_E - 6, HX_E, -5, 5, Z_BAT + 20, Z_TOIT, "50_Heikhal")
+             "50_Heikhal", MAT_MARBRE_HERODE(), [PISHPASH])
+box("Heikhal_mur_est_S", HX_E - 6, HX_E, -35, -5, Z_BAT, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
+box("Heikhal_mur_est_linteau", HX_E - 6, HX_E, -5, 5, Z_BAT + 20, Z_TOIT, "50_Heikhal", MAT_MARBRE_HERODE())
 if PORTES_HEIKHAL_OUVERTES:
     # « הַחִיצוֹנוֹת נִפְתָּחוֹת לְתוֹךְ הַפֶּתַח לְכַסּוֹת עָבְיוֹ שֶׁל כֹּתֶל, וְהַפְּנִימִיּוֹת נִפְתָּחוֹת לְתוֹךְ
     # הַבַּיִת לְכַסּוֹת אַחַר הַדְּלָתוֹת » (Middot 4:1) : les battants extérieurs rabattus dans

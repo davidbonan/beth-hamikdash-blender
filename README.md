@@ -389,7 +389,7 @@ redessiner chaque arête à chaque image.
 | `dallage` | dallage en **rangées** de 4 amot (*rovadim*), dalles de 8 ou 10 dedans, joint creux — c'est le joint, en lumière rasante, qui donne la fuyante des cours |
 | `metal` | or et bronze **vraiment métalliques**, rugosité brouillée au bruit (l'or du Temple est martelé, pas poli) |
 | `marbre` | veiné, pour les huit tables du Beit HaMitba'haïm et celle de l'Oulam |
-| `marbre_herode` | le corps du bâtiment : trois marbres tirés par assise (*Baba Batra* 4a), **poli**, joint serré sans liseré ciselé, veines qui sautent d'un bloc au suivant (CHOIX) |
+| `marbre_herode` | le corps du bâtiment : **assises** de 8 amot (CHOIX), trois marbres tirés par assise (*Baba Batra* 4a), **poli**, sans liseré ciselé, veiné par le scan *Marble001* recalé sur chaque bloc — le même que la visite (CHOIX) |
 | `bois` | cèdre des plafonds (*Melakhim I* 6:9), chêne des maltera'ot (*Middot* 3:7) |
 | `etoffe` | bigdei lavan, laine de la foule (quand `FOULE` est vrai) |
 | `parokhet` | les deux rideaux : **quatre matières à parts égales en champs de 5 amot** lus en Z du monde — tekhelet, argaman, tola'at shani, lin (*Shekalim* 8:5), lisière sombre entre les champs, relief de deux trames croisées ; aucun fil d'or (Ex. 26:31). Le bleu uni se stylisait en velours à plis |

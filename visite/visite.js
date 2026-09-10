@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, ETOFFES, HAUTEUR_IMAGE } from "./matieres.js";
+import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { chaine } from "./chaine.js";
 import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
@@ -123,6 +123,7 @@ const renderer = new THREE.WebGLRenderer({
   logarithmicDepthBuffer: PROFIL.profondeurLog });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.68;
+EXPOSITION.value = renderer.toneMappingExposure;
 renderer.shadowMap.enabled = true;
 // Le profil lourd ne s'en sert pas : `ombres.js` y remplace la lecture de la carte
 // par une pénombre variable. Il reste le réglage du profil léger, qui garde celle-ci.

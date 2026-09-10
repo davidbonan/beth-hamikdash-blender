@@ -23,8 +23,12 @@ const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT =
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil"]);
+// Les matières dont le grain passe par `temperance` : la pierre et le marbre.
+const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
+// Exposition du tonemapping, tenue à jour par visite.js.
+export const EXPOSITION = { value: 1 };
 
 const PIXEL = /* glsl */`
 uniform float uHauteurImage;
@@ -70,15 +74,15 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pie
 // quatre fois plus. Réglée à l'œil sur un mur au soleil, la nappe passait à 0,62 et
 // couvrait de salissures tout ce que le soleil ne touchait pas. Ce qui porte le
 // parement au soleil, ce n'est pas sa couleur mais son RELIEF : il monte d'autant que
-// la couleur descend, et il ne coûte rien à l'ombre, où une lumière de dôme sans
-// direction ne l'ombre pas.
+// la couleur descend. Ni l'un ni l'autre ne sort plus à l'ombre qu'au soleil : c'est
+// l'affaire de `temperance`, qui ne laisse pas la courbe les grossir.
 const CARREAU = {
   1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
   3: [1.6, 0.34, 0.14, 0.60, 0.70],
   4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
   7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
   // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
-  9: [2.4, 1.00, 0.35, 0.15, 1.00], 10: [2.0, 0.34, 0.28, 1.05, 0.58],
+  9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.0, 0.34, 0.28, 1.05, 0.58],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
@@ -144,6 +148,25 @@ float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03) + 0.125 * br
 #define GRAIN_PLEIN 0.875
 #endif
 float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
+
+#ifdef TEMPERE
+// Un écart de matière ne sort pas à l'écran au même taux partout sur la courbe ACES :
+// une paroi à l'ombre, vers 0,3 de linéaire, le rend deux fois plus fort qu'un
+// parement au soleil, vers 1,3. Réglés au soleil, veines et relief salissaient donc
+// tout ce qu'il ne touche pas. temperance() est l'exposant qui ramène un rapport de
+// matière, à cette clarté-là, au contraste qu'il a au soleil.
+uniform float uExposition;
+const float CLARTE_SOLEIL = 1.3;
+float ecranACES(float L){
+  float v = L * uExposition / 0.6;
+  v = (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081);
+  return pow(clamp(v, 0.0, 1.0), 1.0 / 2.2);
+}
+float contrasteEcran(float L){ return ecranACES(L * 1.1) - ecranACES(L / 1.1); }
+float temperance(float clarte){
+  return clamp(contrasteEcran(CLARTE_SOLEIL) / max(contrasteEcran(clarte), 1e-4), 0.0, 1.0);
+}
+#endif
 // Une octave plus serrée que le pixel rend sa moyenne au lieu de scintiller.
 float octave(vec3 p, float largeur){ return mix(bruit(p), 0.5, smoothstep(0.5, 1.0, largeur)); }
 #ifdef GRAIN_LEGER
@@ -177,12 +200,17 @@ float empreinteMax(){ return regard.pixel / regard.incidence; }
 const float AMA = 0.48;
 const float JOINT = 0.06;      // largeur du joint entre deux blocs, en amot
 const float LISERE = 0.25;     // liseré ciselé qui le borde
-// Le marbre est poli jusqu'à l'arête, sans liseré ciselé. Même valeur que LISERE_MARBRE du blockout.
-const float LISERE_MARBRE = 0.05;
-// Hauteur d'assise, hors source : 4 amot, un CHOIX, et le même pour l'enceinte et le
-// bâtiment. Une assise y vaut le pas d'un rovad de l'Oulam. Même valeur qu'ASSISE dans
-// le blockout — à 2 amot la façade portait cinquante lits et se lisait en brique.
+// Le marbre est poli jusqu'à l'arête, sans liseré, et ses blocs se touchent presque : un joint
+// de calcaire y quadrillait la façade de traits. Mêmes valeurs que JOINT_MARBRE et LISERE_MARBRE du blockout.
+const float JOINT_MARBRE = 0.02;
+const float LISERE_MARBRE = 0.0;
+// Hauteur d'assise, hors source : 4 amot, un CHOIX. Une assise y vaut le pas d'un rovad
+// de l'Oulam. Même valeur qu'ASSISE dans le blockout — à 2 amot la façade portait
+// cinquante lits et se lisait en brique.
 const float ASSISE = 4.0;
+// Le bâtiment en prend deux : à 4, ses vingt-cinq lits le lisaient en carrelage. Même
+// valeur qu'ASSISE_HERODE du blockout.
+const float ASSISE_HERODE = 8.0;
 // « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » (Baba Batra 4a ; Soucca 51b) : une assise déborde, la
 // suivante rentre. Le blockout le pose en bump sur la parité de l'assise (DEBORD_ASSISE,
 // DEBORD_BATIMENT) ; ici, sans dérivée d'écran, la marche se donne par le LIT — creusé
@@ -433,41 +461,25 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   photo = vec4(vec3(b.tireBloc, b.tireAssise, b.tireFini) * 13.0, taille.relief);
 }
 
-// Le veinage n'est dans aucune source — CHOIX. Mêmes valeurs que _veines et _veine_par_bloc du blockout.
-const float PAS_VEINE_HERODE = 6.0;
-const float SEUIL_VEINE = 0.95;
-const float VEINE_MOYENNE = 0.0981;   // le masque moyenné sur une période : ce que rend une veine sous le pixel
-const vec3 VEINE_MARBRE = vec3(0.84, 0.86, 0.88);
-const float DECALAGE_VEINE = 40.0;
-
-// L'onde diagonale distordue du nœud Wave de Blender, 1 au coeur d'une veine.
-float veine(vec3 P, float pas){
-  vec3 q = P / (pas * AMA);
-  float n = dot(q, vec3(10.0)) + 12.0 * (grainNorme(q) * 2.0 - 1.0);
-  float coeur = smoothstep(SEUIL_VEINE, 1.0, 0.5 + 0.5 * sin(n - 1.5708));
-  float phaseSousPixel = empreinteMax() / (pas * AMA) * 40.0;
-  return mix(coeur, VEINE_MOYENNE, smoothstep(0.8, 2.5, phaseSousPixel));
-}
-
 void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
   if (abs(N.y) > 0.7) {
     float usure;
     dalles(P, teinte, pente, rugo, usure, photo);
     return;
   }
-  Bloc b = tailler(P, N, Appareil(ASSISE, 8.0, 10.0, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE));
+  Bloc b = tailler(P, N, Appareil(ASSISE_HERODE, 8.0, 10.0, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE));
   pente = b.pente;
   // « בְּאַבְנֵי כּוּחְלָא, שִׁישָׁא וּמַרְמְרָא » (Baba Batra 4a ; Soucca 51b), trois FROIDS selon Rashi,
   // tirés par assise entière : mêmes écarts au shesh que MARBRES_HERODE du blockout.
   vec3 marbre = b.tireAssise < 0.3333 ? vec3(1.00, 1.00, 1.00)
               : (b.tireAssise < 0.6667 ? vec3(0.86, 0.92, 0.97) : vec3(0.87, 0.95, 0.88));
+  // L'assise porte la vague ; d'un bloc au suivant, à peine une nuance, sinon la façade tourne au patchwork.
   float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
-  vec3 nuance = mix(vec3(0.84, 0.85, 0.88), vec3(1.10, 1.08, 1.02), clamp(f, 0.0, 1.0));
-  vec3 tranche = vec3(b.tireBloc, b.tireAssise, 0.0) * DECALAGE_VEINE * AMA;
-  vec3 base = nuance * marbre * mix(vec3(1.0), VEINE_MARBRE, veine(P + tranche, PAS_VEINE_HERODE));
+  vec3 base = marbre * mix(vec3(0.97, 0.97, 0.98), vec3(1.03, 1.02, 1.00), clamp(f, 0.0, 1.0));
   teinte = mix(base * OMBRE_JOINT, base, b.creux);
   rugo = (b.tireBloc - 0.5) * 0.06;
-  photo = vec4(vec3(b.tireBloc, b.tireAssise, b.tireFini) * 13.0, 1.0);
+  // Deux tirages du bloc sur chaque plan : celui de l'assise alignait la même veine sur tout le rang.
+  photo = vec4(vec3(b.tireBloc, b.tireFini, b.tireBloc + b.tireFini) * 13.0, 1.0);
 }
 
 #ifdef NAPPE
@@ -723,7 +735,8 @@ export function habiller(materiau, horloges, jeux) {
   const famille = FAMILLES[materiau.name];
   if (!famille) return;
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
-                      uSoleil: { value: SOLEIL }, uHauteurImage: HAUTEUR_IMAGE };
+                      uSoleil: { value: SOLEIL }, uHauteurImage: HAUTEUR_IMAGE,
+                      uExposition: EXPOSITION };
   materiau.userData.uniformes = uniformes;
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === BRAISE) {
@@ -750,6 +763,7 @@ export function habiller(materiau, horloges, jeux) {
     materiau.transparent = true;
   }
   const drapeaux = (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
+    + (MINERAUX.has(famille) ? "#define TEMPERE\n" : "")
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
     + (rayonFil ? "#define FIL\n" : "");
@@ -778,7 +792,34 @@ export function habiller(materiau, horloges, jeux) {
         vec3 mTeinte, mPente, mFeu; float mRugo;
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);`)
       .replace("#include <color_fragment>",
-               "#include <color_fragment>\ndiffuseColor.rgb *= mTeinte;\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
+               "#include <color_fragment>\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
+      // La teinte d'un minéral se pose APRÈS l'éclairage : son exposant dépend de la
+      // clarté reçue. Le relief, lui, se tempère sur la lumière du ciel seule — celle
+      // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
+      .replace("#include <lights_fragment_end>", /* glsl */`
+        #ifdef TEMPERE
+          const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
+          vec3 cielPlat = getAmbientLightIrradiance(ambientLightColor);
+          #if NUM_HEMI_LIGHTS > 0
+            for (int i = 0; i < NUM_HEMI_LIGHTS; i++)
+              cielPlat += getHemisphereLightIrradiance(hemisphereLights[i], nonPerturbedNormal);
+          #endif
+          #if defined(USE_ENVMAP) && defined(STANDARD) && defined(ENVMAP_TYPE_CUBE_UV)
+            cielPlat += getIBLIrradiance(nonPerturbedNormal);
+          #endif
+          float mTemperance = temperance(dot(reflectedLight.directDiffuse
+                                             + cielPlat * BRDF_Lambert(material.diffuseColor), LUMA));
+          float mReliefCiel = pow(dot(irradiance + iblIrradiance, LUMA) / dot(cielPlat, LUMA),
+                                  mTemperance - 1.0);
+          irradiance *= mReliefCiel;
+          iblIrradiance *= mReliefCiel;
+        #endif
+        #include <lights_fragment_end>
+        #ifdef TEMPERE
+          vec3 mTeinteVue = pow(mTeinte, vec3(mTemperance));
+          reflectedLight.directDiffuse *= mTeinteVue;
+          reflectedLight.indirectDiffuse *= mTeinteVue;
+        #endif`)
       .replace("#include <roughnessmap_fragment>",
                "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + mRugo, 0.03, 1.0);")
       // L'incandescence est une TEXTURE, pas une constante de matière : une braise dont
