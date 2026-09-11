@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les six scripts
+## Les sept scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -31,6 +31,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
+| `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
 seule commande. Ce qui suit sert quand on veut les lancer soi-même.
@@ -105,8 +106,16 @@ que l'architecture : 9 178 objets contre 18 913.
 
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_plan.py [-- heikhal sous_terrain]
 open visite/index.html
 ```
+
+Le plan se rend à part, ~20 s pour les cinq cadrages : une caméra orthographique au-dessus
+de chacun, tranchée à la hauteur `coupe` pour le Heikhal et les souterrains. Les caméras
+du film sont liées aux repères de la timeline ; le script les en détache, sinon le rendu
+prendrait le plan du film au lieu du plan du dessus. Pour les souterrains, `caches` retire
+sol, podium, Heil et relief, `plancher` coupe tout sous le fond des tunnels : ils sortent
+sur fond transparent, et la visite pose dessous le plan `dessous` (l'Azara) pâli.
 
 Ce script **lit** le .blend sauvegardé : il fusionne les volumes par concept — les
 milliers de volumes de dix collections deviennent 68 maillages — et écrit `visite/temple.glb`

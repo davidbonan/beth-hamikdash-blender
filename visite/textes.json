@@ -67,7 +67,8 @@
       "oulam": "Oulam",
       "heikhal": "Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
-      "lishkot": "Lishkot"
+      "lishkot": "Lishkot",
+      "sous_terrain": "Souterrains"
     }
   },
   "he": {
@@ -138,7 +139,8 @@
       "oulam": "האולם",
       "heikhal": "ההיכל",
       "kodesh_hakodashim": "קודש הקודשים",
-      "lishkot": "הלשכות"
+      "lishkot": "הלשכות",
+      "sous_terrain": "המחילות"
     },
     "entrees": {
       "har_habayit": "הר הבית, על הציר המזרחי",
@@ -271,7 +273,8 @@
       "oulam": "Ulam",
       "heikhal": "Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
-      "lishkot": "Lishkot"
+      "lishkot": "Lishkot",
+      "sous_terrain": "Underground"
     },
     "entrees": {
       "har_habayit": "Har HaBayit, on the east axis",

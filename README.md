@@ -72,7 +72,8 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/pilotage.js` | Les commandes : clavier au bureau, manche du pouce gauche et regard du pouce droit au doigt. |
 | `visite/initiation.js` | Les premiers pas : regarder, avancer, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis le « ? » de la barre. Quitter le sol, monter et redescendre s'apprennent à part, la première fois qu'on demande le vol libre. |
 | `visite/cadrage.js` | D'où un élément tient entier dans le champ de l'écran : le recul le long d'un cap, borné. |
-| `visite/plan.js` | Le plan tiré des emprises : minicarte qui suit le visiteur, plan entier dont chaque lieu et chaque entrée se touchent pour s'y rendre. |
+| `visite/plan.js` | Le plan : minicarte qui suit le visiteur sur l'image de sa zone, plan entier dont chaque lieu et chaque entrée se touchent pour s'y rendre. |
+| `visite/plan.json`, `visite/plans/` | Le Temple vu du dessus, une image par cadrage — Har HaBayit, Ezrat Nashim, Azara, Heikhal en coupe, souterrains — et l'emprise en mètres de chacune. Artefacts — `beit_hamikdash_plan.py` les rend depuis le .blend. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |

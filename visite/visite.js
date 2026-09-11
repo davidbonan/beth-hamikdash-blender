@@ -91,7 +91,7 @@ const [textes, fiche, ...contenus] = await Promise.all([
   ...FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.json`, false)),
 ]);
 installerLangue(textes);
-const reperes = await json("./reperes.json");
+const [reperes, { cadrages: CADRAGES_DU_PLAN }] = await Promise.all([json("./reperes.json"), json("./plan.json")]);
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
   [id, new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max))]));
 
@@ -717,7 +717,7 @@ const LIEUX = fiche.concepts.filter((c) => c.lieu && EMPRISES.has(c.id)).map((c)
 const lieuEn = (point) => LIEUX.find((id) => EMPRISES.get(id).containsPoint(point)) ?? null;
 
 const planMiddot = plan({
-  emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS,
+  cadrages: CADRAGES_DU_PLAN, emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS,
   entrees: reperes.entrees.map((e) => ({ ...e, position: piedsDe(e) })),
   allerLieu: (id) => fondu(() => allerElement(id)),
   allerEntree: (id) => fondu(() => allerVers(id)),
@@ -833,7 +833,7 @@ renderer.setAnimationLoop(() => {
       ? `${(camera.position.x / AMA).toFixed(0)} · ` +
         `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
       : (lieu ? CONCEPTS.get(lieu).nom : "");
-    planMiddot.suivre(camera.position, camera.getWorldDirection(direction));
+    planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieu);
   }
   dessiner(dt);
 });

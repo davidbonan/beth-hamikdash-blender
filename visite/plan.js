@@ -2,16 +2,13 @@ import { nomDeZone } from "./fiche.js";
 import { libelle } from "./langue.js";
 
 const SVG = "http://www.w3.org/2000/svg";
-const FENETRE_MINI = 110;      // mètres de terrain montrés autour du visiteur
-const COUR = 1500;             // m² : au-delà, un lieu se dessine en cour
-const MARGE = 6;               // mètres autour d'un cadrage
 const TAILLE_ETIQUETTE = 13;   // px
 const RAYON_ENTREE = 6;        // px
+const LONGUEUR_VISITEUR = 18;  // px, la flèche du plan entier
 const HAUTEUR_ETAGE = 10;      // mètres : un lieu qui commence plus haut est à l'étage
-const CADRAGES = {
-  har_habayit: ["sol_har_habayit"],
-  azara: ["azara", "porte_est_ezrat_nashim"],
-};
+const PART_MINI = 0.5;         // du plus petit côté de la zone, ce que la minicarte montre autour du visiteur
+const FENETRE_MINI_MIN = 28;   // mètres
+const FLECHE = "M 1 0 L -0.6 0.65 L -0.3 0 L -0.6 -0.65 Z";
 
 const noeud = (nom, attributs = {}) => {
   const n = document.createElementNS(SVG, nom);
@@ -20,72 +17,128 @@ const noeud = (nom, attributs = {}) => {
 };
 
 const surface = (b) => (b.max.x - b.min.x) * (b.max.z - b.min.z);
+const largeurDe = (cadrage) => cadrage.max[0] - cadrage.min[0];
+const hauteurDe = (cadrage) => cadrage.max[1] - cadrage.min[1];
+const englobe = (b, autre) => surface(autre) < surface(b)
+  && b.min.x <= (autre.min.x + autre.max.x) / 2 && (autre.min.x + autre.max.x) / 2 <= b.max.x
+  && b.min.z <= (autre.min.z + autre.max.z) / 2 && (autre.min.z + autre.max.z) / 2 <= b.max.z;
+const contient = (cadrage, x, z) =>
+  x >= cadrage.min[0] && x <= cadrage.max[0] && z >= cadrage.min[1] && z <= cadrage.max[1];
 
-export function plan({ emprises, lieux, entrees, concepts, allerLieu, allerEntree }) {
+export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, allerEntree }) {
   const bouton = document.querySelector("#minicarte");
   const fenetre = document.querySelector("#plan");
   const mini = bouton.querySelector("svg");
   const entier = fenetre.querySelector("svg");
-  const choixCadrage = fenetre.querySelectorAll("[data-cadrage]");
-  let cadrage = "har_habayit";
+  const choix = fenetre.querySelector(".cadrages");
+  let ici = cadrages[0];
+  let pose = null;
 
-  const parSurface = lieux.filter((id) => emprises.has(id))
-    .sort((a, b) => surface(emprises.get(b)) - surface(emprises.get(a)));
+  const souterrains = new Set(cadrages.filter((c) => c.coupe < 0).flatMap((c) => c.lieux));
+  // Du plus petit au plus grand : le premier cadrage de plein air qui contient le visiteur est le plus détaillé.
+  const pleinAir = cadrages.filter((c) => !c.lieux)
+    .sort((a, b) => largeurDe(a) * hauteurDe(a) - largeurDe(b) * hauteurDe(b));
   const nomDe = (id) => concepts.get(id)?.nom ?? id;
   const nomHebreu = (id) => concepts.get(id)?.he || nomDe(id);
 
-  function dessiner(svg) {
+  // Une coupe dit ce qu'elle tranche ; en plein air, ce qui se voit d'en haut et tient tout entier dans le cadre.
+  function lieuxDe(cadrage) {
+    const ids = cadrage.lieux ?? lieux.filter((id) => {
+      const b = emprises.get(id);
+      return !souterrains.has(id) && b.min.y <= HAUTEUR_ETAGE
+        && contient(cadrage, b.min.x, b.min.z) && contient(cadrage, b.max.x, b.max.z);
+    });
+    return ids.filter((id) => emprises.has(id))
+      .sort((a, b) => surface(emprises.get(b)) - surface(emprises.get(a)));
+  }
+
+  const entreesDe = (cadrage) => entrees.filter((e) => (cadrage.lieux
+    ? cadrage.lieux.includes(e.id)
+    : !souterrains.has(e.id) && contient(cadrage, e.position[0], e.position[2])));
+
+  const cadrageDe = (position, lieu) => cadrages.find((c) => c.lieux?.includes(lieu))
+    ?? pleinAir.find((c) => contient(c, position.x, position.z)) ?? pleinAir.at(-1);
+
+  const image = (cadrage, classe) => noeud("image", {
+    href: cadrage.image, x: cadrage.min[0], y: cadrage.min[1], class: classe,
+    width: largeurDe(cadrage), height: hauteurDe(cadrage), preserveAspectRatio: "none" });
+
+  // Une coupe souterraine ne montre que ses tunnels : le plan de surface, pâli, les situe.
+  function dessinerFond(svg, cadrage) {
+    const visiteur = noeud("g", { class: "visiteur" });
+    visiteur.append(noeud("path", { d: FLECHE }));
+    const dessous = cadrages.find((c) => c.id === cadrage.dessous);
+    svg.replaceChildren(...(dessous ? [image(dessous, "dessous")] : []), image(cadrage, "fond"), visiteur);
+    svg.dataset.cadrage = cadrage.id;
+  }
+
+  function dessinerPlan(cadrage) {
+    dessinerFond(entier, cadrage);
     const groupeLieux = noeud("g", { class: "lieux" });
     const etiquettes = noeud("g", { class: "etiquettes" });
-    for (const id of parSurface) {
+    for (const id of lieuxDe(cadrage)) {
       const b = emprises.get(id);
       const rect = noeud("rect", {
-        x: b.min.x, y: b.min.z, width: b.max.x - b.min.x, height: b.max.z - b.min.z,
-        class: surface(b) > COUR ? "cour" : "batiment", "data-lieu": id });
+        x: b.min.x, y: b.min.z, width: b.max.x - b.min.x, height: b.max.z - b.min.z, "data-lieu": id });
       rect.append(noeud("title"));
       groupeLieux.append(rect);
       etiquettes.append(noeud("text", {
         x: (b.min.x + b.max.x) / 2, y: (b.min.z + b.max.z) / 2, "data-lieu": id, lang: "he" }));
     }
     const groupeEntrees = noeud("g", { class: "entrees" });
-    for (const e of entrees) {
-      const [x, , z] = e.position;
-      const point = noeud("circle", { cx: x, cy: z, r: 3, "data-entree": e.id });
+    for (const e of entreesDe(cadrage)) {
+      const point = noeud("circle", { cx: e.position[0], cy: e.position[2], "data-entree": e.id });
       point.append(noeud("title"));
       groupeEntrees.append(point);
     }
-    const visiteur = noeud("g", { class: "visiteur" });
-    visiteur.append(noeud("path", { d: "M 7 0 L -4 4.5 L -2 0 L -4 -4.5 Z" }));
-    svg.replaceChildren(groupeLieux, groupeEntrees, etiquettes, visiteur);
+    entier.querySelector(".visiteur").before(groupeLieux, groupeEntrees, etiquettes);
+    entier.setAttribute("viewBox", `${cadrage.min[0]} ${cadrage.min[1]} ${largeurDe(cadrage)} ${hauteurDe(cadrage)}`);
+    nommer();
   }
 
-  function nommer(svg) {
-    for (const rect of svg.querySelectorAll("rect[data-lieu]")) rect.firstChild.textContent = nomDe(rect.dataset.lieu);
-    for (const point of svg.querySelectorAll("[data-entree]")) {
+  function nommer() {
+    for (const rect of entier.querySelectorAll("rect[data-lieu]")) rect.firstChild.textContent = nomDe(rect.dataset.lieu);
+    for (const point of entier.querySelectorAll("[data-entree]")) {
       const e = entrees.find((x) => x.id === point.dataset.entree);
       point.firstChild.textContent = libelle("entrees", e.id) ?? e.nom;
     }
-    for (const t of svg.querySelectorAll("text[data-lieu]")) t.textContent = nomHebreu(t.dataset.lieu);
+    for (const t of entier.querySelectorAll("text[data-lieu]")) t.textContent = nomHebreu(t.dataset.lieu);
+  }
+
+  function echelleDuPlan() {
+    const [, , largeur, hauteur] = (entier.getAttribute("viewBox") ?? "0 0 0 0").split(" ").map(Number);
+    return Math.min(entier.clientWidth / largeur, entier.clientHeight / hauteur) || 0;
+  }
+
+  // Hors du cadre, la flèche flotterait sur le fond de la fenêtre ; une coupe ne la montre qu'à qui s'y trouve.
+  function poser(svg, taille) {
+    const visiteur = svg.querySelector(".visiteur");
+    if (!pose || !visiteur) return;
+    const cadrage = cadrages.find((c) => c.id === svg.dataset.cadrage);
+    const present = cadrage.lieux ? cadrage === ici : contient(cadrage, pose.x, pose.z);
+    visiteur.setAttribute("visibility", present ? "visible" : "hidden");
+    visiteur.setAttribute("transform",
+      `translate(${pose.x.toFixed(2)} ${pose.z.toFixed(2)}) rotate(${pose.angle.toFixed(1)}) scale(${taille.toFixed(3)})`);
   }
 
   // Un nom ne s'écrit que dans un lieu assez large et libre d'un nom plus grand, à l'échelle du cadrage affiché.
   function etiqueter() {
-    const [, , largeur, hauteur] = entier.getAttribute("viewBox").split(" ").map(Number);
-    const echelle = Math.min(entier.clientWidth / largeur, entier.clientHeight / hauteur);
+    const echelle = echelleDuPlan();
     if (!echelle) return;
+    poser(entier, LONGUEUR_VISITEUR / echelle);
     for (const point of entier.querySelectorAll("[data-entree]")) point.setAttribute("r", RAYON_ENTREE / echelle);
     const poses = [...entier.querySelectorAll("[data-entree]")].map((point) => point.getBBox());
     const chevauche = (r) => poses.some((p) =>
       r.x < p.x + p.width && p.x < r.x + r.width && r.y < p.y + p.height && p.y < r.y + r.height);
-    for (const t of entier.querySelectorAll("text[data-lieu]")) {
+    const textes = [...entier.querySelectorAll("text[data-lieu]")];
+    const bornes = textes.map((t) => emprises.get(t.dataset.lieu));
+    for (const t of textes) {
       const b = emprises.get(t.dataset.lieu);
       t.setAttribute("font-size", TAILLE_ETIQUETTE / echelle);
-      // Une cour contient d'autres lieux en son centre : son nom se pose sur son bord sud.
-      if (surface(b) > COUR) t.setAttribute("y", b.max.z - (TAILLE_ETIQUETTE * 1.1) / echelle);
+      // Une cour ou l'anneau des ta'im entoure d'autres lieux : son nom se pose sur son bord sud, pas sur eux.
+      if (bornes.some((autre) => autre !== b && englobe(b, autre))) t.setAttribute("y", b.max.z - (TAILLE_ETIQUETTE * 1.1) / echelle);
       const place = (b.max.x - b.min.x) * echelle;
-      // Un plan est au sol : l'Aliyah prendrait sinon le nom du Heikhal qu'elle surplombe.
-      const aLEtage = b.min.y > HAUTEUR_ETAGE;
-      t.classList.toggle("tue", aLEtage || place < t.textContent.length * TAILLE_ETIQUETTE * 0.62);
+      t.classList.toggle("tue", place < t.textContent.length * TAILLE_ETIQUETTE * 0.62);
       if (t.classList.contains("tue")) continue;
       const cadre = t.getBBox();
       if (chevauche(cadre)) t.classList.add("tue");
@@ -93,18 +146,9 @@ export function plan({ emprises, lieux, entrees, concepts, allerLieu, allerEntre
     }
   }
 
-  function cadrer(nom) {
-    cadrage = nom;
-    const ids = CADRAGES[nom].filter((id) => emprises.has(id));
-    const min = { x: Infinity, z: Infinity }, max = { x: -Infinity, z: -Infinity };
-    for (const id of ids) {
-      const b = emprises.get(id);
-      min.x = Math.min(min.x, b.min.x); min.z = Math.min(min.z, b.min.z);
-      max.x = Math.max(max.x, b.max.x); max.z = Math.max(max.z, b.max.z);
-    }
-    entier.setAttribute("viewBox",
-      `${min.x - MARGE} ${min.z - MARGE} ${max.x - min.x + 2 * MARGE} ${max.z - min.z + 2 * MARGE}`);
-    for (const b of choixCadrage) b.setAttribute("aria-pressed", String(b.dataset.cadrage === nom));
+  function cadrer(cadrage) {
+    dessinerPlan(cadrage);
+    for (const b of choix.children) b.setAttribute("aria-pressed", String(b.dataset.cadrage === cadrage.id));
     etiqueter();
   }
 
@@ -112,7 +156,7 @@ export function plan({ emprises, lieux, entrees, concepts, allerLieu, allerEntre
 
   function ouvrir() {
     fenetre.hidden = false;
-    cadrer(cadrage);
+    cadrer(ici);
   }
 
   function fermer() {
@@ -121,27 +165,36 @@ export function plan({ emprises, lieux, entrees, concepts, allerLieu, allerEntre
   }
 
   function rafraichir() {
-    for (const svg of [mini, entier]) nommer(svg);
-    for (const b of choixCadrage) b.textContent = nomDeZone(b.dataset.cadrage);
+    for (const b of choix.children) b.textContent = nomDeZone(b.dataset.cadrage);
+    nommer();
     if (ouvert()) etiqueter();
   }
 
-  function suivre(position, direction) {
-    const angle = Math.atan2(direction.z, direction.x) * 180 / Math.PI;
-    const pose = `translate(${position.x.toFixed(2)} ${position.z.toFixed(2)}) rotate(${angle.toFixed(1)})`;
-    for (const svg of [mini, entier]) svg.querySelector(".visiteur").setAttribute("transform", pose);
-    mini.setAttribute("viewBox",
-      `${position.x - FENETRE_MINI / 2} ${position.z - FENETRE_MINI / 2} ${FENETRE_MINI} ${FENETRE_MINI}`);
+  // La minicarte prend l'image de la zone où l'on se tient, et n'en montre que les abords.
+  function suivre(position, direction, lieu) {
+    pose = { x: position.x, z: position.z, angle: Math.atan2(direction.z, direction.x) * 180 / Math.PI };
+    const zone = cadrageDe(position, lieu);
+    if (mini.dataset.cadrage !== zone.id) dessinerFond(mini, zone);
+    ici = zone;
+    const cote = Math.max(FENETRE_MINI_MIN, PART_MINI * Math.min(largeurDe(zone), hauteurDe(zone)));
+    mini.setAttribute("viewBox", `${pose.x - cote / 2} ${pose.z - cote / 2} ${cote} ${cote}`);
+    poser(mini, cote / 15);
+    const echelle = ouvert() && echelleDuPlan();
+    if (echelle) poser(entier, LONGUEUR_VISITEUR / echelle);
   }
 
-  dessiner(mini);
-  dessiner(entier);
-  cadrer(cadrage);
+  choix.replaceChildren(...cadrages.map((cadrage) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.cadrage = cadrage.id;
+    b.onclick = () => cadrer(cadrage);
+    return b;
+  }));
+  dessinerFond(mini, ici);
   rafraichir();
 
   bouton.onclick = (e) => { e.currentTarget.blur(); ouvrir(); };
   fenetre.querySelector(".fermer").onclick = fermer;
-  for (const b of choixCadrage) b.onclick = () => cadrer(b.dataset.cadrage);
   entier.addEventListener("click", (e) => {
     const entree = e.target.closest("[data-entree]");
     const lieu = e.target.closest("[data-lieu]");

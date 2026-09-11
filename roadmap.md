@@ -101,6 +101,19 @@ constate, ce qu'on touche, et comment on saura que c'est fait.
 - **Pourquoi.** Pas de WebGL, pas de 12 Mo, lisible sur tout, meilleur pour l'étude et le partage d'une fiche. Les JSON de contenu servent tels quels.
 - **Coût.** Perd le « waouh » et la marche. À ne retenir que si l'usage réel est l'étude, pas la découverte.
 
+### 22. Plan dessiné — `done`
+- **Constat.** Le plan et la minicarte ne montrent que des rectangles orange tirés des emprises ; deux cadrages seulement (Har HaBayit, Azara), rien pour l'intérieur du Beit ni pour les souterrains.
+- **Touche.** Le Temple vu du dessus, rendu en orthographique par Blender à l'export, une image par cadrage : Har HaBayit, Ezrat Nashim, Azara, Heikhal (coupe sous le toit), sous-terrain (coupe sous le sol, tunnels posés sur le plan de l'Azara pâli). Noms hébreux, entrées et visiteur par-dessus ; la minicarte prend l'image de la zone où l'on est.
+- **Fait quand.** Au premier coup d'œil on reconnaît le Temple sur le plan, et on sait où l'on est même dans le Heikhal ou la mesiba.
+
+### 23. Barre en paysage sur téléphone — `done`
+- **Constat.** En paysage (844 × 390), la barre reprend la mise en page du bureau et occupe tout le haut de l'écran, alors que la barre du portrait tient.
+- **Touche.** Même barre compacte qu'en portrait dès que l'écran est bas.
+
+### 24. Cohérence de la barre — `done`
+- **Constat.** Au bureau et en paysage, les `<select>` sont moins hauts que les boutons, et « Vol libre » passe sur deux lignes quand la largeur manque.
+- **Touche.** Une seule hauteur, une seule police, pas de retour à la ligne ; ce qui ne tient pas se replie en icône.
+
 ### 21. C. Simulation du rituel — `backlog`
 - **Idée.** Cohanim animés, service en temps réel.
 - **Pourquoi pas maintenant.** Collection Foule à bâtir, rig et animation, budget GPU mobile. Après A, si le parcours narré prouve l'intérêt.

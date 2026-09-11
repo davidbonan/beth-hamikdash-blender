@@ -1,0 +1,81 @@
+{
+  "cadrages": [
+    {
+      "id": "har_habayit",
+      "image": "plans/har_habayit.webp",
+      "min": [
+        -134.0,
+        -95.0
+      ],
+      "max": [
+        111.0,
+        150.0
+      ]
+    },
+    {
+      "id": "ezrat_nashim",
+      "image": "plans/ezrat_nashim.webp",
+      "min": [
+        -4.0,
+        -38.000625
+      ],
+      "max": [
+        74.0,
+        38.000625
+      ]
+    },
+    {
+      "id": "azara",
+      "image": "plans/azara.webp",
+      "min": [
+        -95.0,
+        -51.0
+      ],
+      "max": [
+        5.0,
+        44.0
+      ]
+    },
+    {
+      "id": "heikhal",
+      "image": "plans/heikhal.webp",
+      "min": [
+        -88.0,
+        -27.001562500000002
+      ],
+      "max": [
+        -33.0,
+        27.001562500000002
+      ],
+      "coupe": 4.5,
+      "lieux": [
+        "oulam",
+        "heikhal",
+        "kodesh_hakodashim",
+        "taim",
+        "mesiba",
+        "douze_marches_oulam"
+      ]
+    },
+    {
+      "id": "sous_terrain",
+      "image": "plans/sous_terrain.webp",
+      "min": [
+        -95.0,
+        -51.0
+      ],
+      "max": [
+        5.0,
+        44.0
+      ],
+      "coupe": -6.0,
+      "lieux": [
+        "mesiba_bira",
+        "beit_hatevila",
+        "shit",
+        "beit_hamoked"
+      ],
+      "dessous": "azara"
+    }
+  ]
+}
