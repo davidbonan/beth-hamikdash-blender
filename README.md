@@ -70,7 +70,9 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/index.html` | La page. Aucune dépendance locale : three.js est chargé depuis un CDN. |
 | `visite/visite.js` | Scène, marche, collisions, regard, désignation. |
 | `visite/pilotage.js` | Les commandes : clavier au bureau, manche du pouce gauche et regard du pouce droit au doigt. |
-| `visite/initiation.js` | Les premiers pas : regarder, avancer, quitter le sol, monter et redescendre, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis le « ? » de la barre. |
+| `visite/initiation.js` | Les premiers pas : regarder, avancer, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis le « ? » de la barre. Quitter le sol, monter et redescendre s'apprennent à part, la première fois qu'on demande le vol libre. |
+| `visite/cadrage.js` | D'où un élément tient entier dans le champ de l'écran : le recul le long d'un cap, borné. |
+| `visite/plan.js` | Le plan tiré des emprises : minicarte qui suit le visiteur, plan entier dont chaque lieu et chaque entrée se touchent pour s'y rendre. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
@@ -79,14 +81,14 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur. |
-| `visite/concepts.json` | **La charnière.** Un concept par entrée : son identifiant, sa zone, et les préfixes de noms d'objets Blender qui lui appartiennent. |
+| `visite/concepts.json` | **La charnière.** Un concept par entrée : son identifiant, sa zone, les préfixes de noms d'objets Blender qui lui appartiennent, et `lieu` quand on s'y tient — la barre en donne alors le nom et le plan le dessine. |
 | `visite/contenu_a.json`, `_b`, `_c` | L'encyclopédie : résumé, cotes, sources. Trois fichiers parce qu'ils ont été relevés en trois passes ; le viewer les fusionne au chargement. |
 | `visite/contenu_a.en.json`, `.he.json`… | Les traductions de l'encyclopédie, un miroir par fichier et par langue. Le français fait foi. En hébreu, une citation est le texte original relevé sur Sefaria, jamais une retraduction du français. |
 | `visite/textes.json` | Par langue : son nom, son sens d'écriture, les textes de l'interface, les zones, les points d'entrée et les titres des œuvres citées. |
 | `visite/langue.js` | La langue : le choix au premier passage, retenu dans le navigateur, et le sélecteur à drapeau de la barre. |
 | `visite/memoire.js` | Ce que le navigateur retient d'une visite à l'autre — la langue, l'initiation suivie —, sans casser quand le stockage est refusé. |
-| `visite/temple.glb` | Géométrie exportée, compressée meshopt : 6,7 Mo pour 746 000 triangles. Artefact — se regénère. |
-| `visite/reperes.json` | Emprise de chaque concept, points d'entrée du menu, et points des creux souterrains que seul « Un élément… » atteint. Artefact. |
+| `visite/temple.glb` | Géométrie exportée, compressée meshopt. Artefact — se regénère, et son poids avec : l'export l'annonce en dernière ligne. |
+| `visite/reperes.json` | Emprise de chaque concept, entrées du menu « Aller à… », vues que « Un élément… » prend pour les concepts que le recul automatique cadre mal (les gros volumes, les creux souterrains), et position des flammes de la Menora. Chaque entrée ou vue nomme ce qu'elle `cadre` ; sans position, le navigateur recule jusqu'à le faire tenir dans le champ. Artefact. |
 
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # regénère temple.glb

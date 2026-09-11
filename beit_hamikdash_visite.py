@@ -41,36 +41,52 @@ COLLECTIONS = ("00_HarHabayit", "10_EzratNashim", "20_Azara", "30_Mizbeach", "40
 CHANFREIN = ("30_Mizbeach", "40_Ulam", "50_Heikhal", "60_KodeshHakodashim",
              "65_Aron", "70_Kelim")
 
-# Points d'entrée, en amot, au niveau du sol — Z_HAR, Z_EZN et Z_AZ du blockout — la hauteur d'œil est ajoutée par le
-# navigateur. Le cap est en degrés, 180 = plein ouest, l'axe du parcours ; le tangage
-# lève le regard au-dessus de l'horizon.
-#
-# La visite s'ouvre dix amot au-delà du Soreg, dans l'axe de la porte orientale : le
-# visiteur franchit le Soreg, gravit les douze marches du 'Heil et passe la porte à pied.
-#
-# L'Ezrat Nashim se prend à SA PORTE, à trois amot du mur est. De là l'axe se lit d'un
-# coup — les quatre menorot de Simhat Beit HaShoeva, les quinze marches, Nicanor, puis la
-# façade du Heikhal — et six degrés de tangage suffisent à poser le toit du Heikhal sous
-# le bord haut, ce que l'horizontale, qui remplit la moitié basse de dallage, ne fait pas.
+# En amot. `cadre` : concepts à montrer entiers ; sans `position`, le navigateur recule le long du `cap` (0 = est, 90 = nord).
+Z_HAR, Z_EZN, Z_AZ, Z_BAT = -16.0, -10.0, 0.0, 6.0
+
 REPERES = [
-    ("har_habayit",       "Har HaBayit, sur l'axe est",   185.0,   0.0, -16.0, 180, 0),
-    ("face_porte_est",    "Face à la porte orientale",    165.0,   0.0, -16.0, 180, 8),
-    ("ezrat_nashim",      "Ezrat Nashim",                 137.0,   0.0, -10.0, 180, 6),
-    ("quinze_marches",    "Pied des quinze marches",       26.0,   0.0, -10.0, 180, 0),
-    ("azara",             "Ezrat Israël",                 -14.0,   0.0,   0.0, 180, 0),
-    ("mizbeach",          "Devant le Mizbea'h",           -17.0,  -9.0,   0.0, 180, 0),
-    ("kiyor",             "Au Kiyor",                     -55.0, -14.0,   0.0, 180, 0),
-    ("oulam",             "Sous l'Oulam",                 -86.0,   0.0,   6.0, 180, 0),
-    ("heikhal",           "Dans le Heikhal",             -112.0,   0.0,   6.0, 180, 0),
-    ("kodesh_hakodashim", "Kodesh HaKodashim",           -143.0,   0.0,   6.0, 180, 0),
+    dict(id="har_habayit", nom="Har HaBayit, sur l'axe est",
+         position=(185.0, 0.0, Z_HAR), cadre=["oulam"]),
+    dict(id="face_porte_est", nom="Face à la porte orientale",
+         position=(165.0, 0.0, Z_HAR), cadre=["porte_est_ezrat_nashim"]),
+    dict(id="ezrat_nashim", nom="Ezrat Nashim",
+         position=(137.0, 0.0, Z_EZN), cadre=["oulam"]),
+    dict(id="quinze_marches", nom="Pied des quinze marches",
+         cadre=["quinze_marches", "shaar_nikanor"], cap=180, sol=Z_EZN, recul_max=40.0),
+    dict(id="azara", nom="Ezrat Israël",
+         position=(-14.0, 0.0, Z_AZ), cadre=["oulam"]),
+    # Plein est, le recul bute sur les lishkot qui flanquent Nikanor ; seul, l'autel se lit comme un mur : avec son kevesh, depuis le sud-est.
+    dict(id="mizbeach", nom="Devant le Mizbea'h",
+         cadre=["mizbeach", "kevesh"], cap=135, sol=Z_AZ, recul_max=60.0),
+    dict(id="kiyor", nom="Au Kiyor",
+         cadre=["kiyor"], cap=135, sol=Z_AZ, recul_max=8.0),
+    dict(id="oulam", nom="Sous l'Oulam",
+         cadre=["portes_heikhal"], cap=180, sol=Z_BAT, recul_max=17.0),
+    dict(id="heikhal", nom="Dans le Heikhal",
+         cadre=["menora", "shulchan", "mizbeach_hazahav"], cap=180, sol=Z_BAT, recul_max=24.0),
+    # Les badim touchent la parokhet (Yoma 54a) : l'Aron ne se voit entier que de flanc, depuis le mur sud.
+    dict(id="kodesh_hakodashim", nom="Kodesh HaKodashim",
+         cadre=["aron", "kaporet", "even_hashetiya"], cap=90, sol=Z_BAT, recul_max=9.0),
 ]
 
-# Les creux sous l'Azara restent hors de « Aller à… » : le vol libre doit les trouver. Sans
-# ces points, « Un élément… » reculerait devant leur emprise enterrée et regarderait dehors.
-SOUTERRAINS = [
-    ("mesiba_bira",    -18.25,  70.0, -15.5, 270, 0),
-    ("beit_hatevila", -162.0,   38.0, -12.0, 146, 0),
-    ("shit",           -48.0,  -19.0,  -9.0, 225, 10),
+# Ce que « Un élément… » montre de `<id>` quand le recul automatique n'y suffit pas ; une cour ne tient entière qu'en vol.
+VUES = [
+    dict(id="vue_azara", cadre=["azara"], cap=180, sol=90.0, recul_max=300.0, vol=True),
+    dict(id="vue_ezrat_nashim",
+         cadre=["porte_est_ezrat_nashim", "lishkat_haetzim", "lishkat_hanezirim",
+                "lishkat_hametzoraim", "lishkat_beit_shemanya", "quinze_marches"],
+         cap=180, sol=60.0, recul_max=300.0, vol=True),
+    dict(id="vue_heikhal", position=(-99.0, 0.0, Z_BAT), cadre=["parokhet"]),
+    dict(id="vue_kiyor", cadre=["kiyor"], cap=135, sol=Z_AZ, recul_max=8.0),
+    dict(id="vue_kodesh_hakodashim", cadre=["aron", "kaporet", "even_hashetiya"], cap=90, sol=Z_BAT,
+         recul_max=9.0),
+    dict(id="vue_mizbeach", cadre=["mizbeach", "kevesh"], cap=135, sol=Z_AZ, recul_max=60.0),
+    dict(id="vue_oulam", position=(-10.0, 17.0, Z_AZ), cadre=["oulam"]),
+    dict(id="vue_quinze_marches", cadre=["quinze_marches", "shaar_nikanor"], cap=180,
+         sol=Z_EZN, recul_max=40.0),
+    dict(id="vue_mesiba_bira", position=(-18.25, 70.0, -15.5), cap=270),
+    dict(id="vue_beit_hatevila", position=(-162.0, 38.0, -12.0), cap=146),
+    dict(id="vue_shit", position=(-48.0, -19.0, -9.0), cap=225, tangage=10),
 ]
 
 
@@ -191,10 +207,33 @@ def bornes(obj):
     return {"min": [bas[0], bas[2], -haut[1]], "max": [haut[0], haut[2], -bas[1]]}
 
 
+def en_metres(vue, emprises):
+    inconnus = [c for c in vue.get("cadre", []) if c not in emprises]
+    if inconnus:
+        raise ValueError(f"{vue['id']} : cadre sans géométrie {inconnus}")
+    sortie = {clef: valeur for clef, valeur in vue.items()
+              if clef in ("id", "nom", "cadre", "cap", "tangage", "vol")}
+    if "position" in vue:
+        x, y, z = vue["position"]
+        sortie["position"] = [x * AMA, z * AMA, -y * AMA]
+    if "sol" in vue:
+        sortie["sol"] = vue["sol"] * AMA
+    if "recul_max" in vue:
+        sortie["recul_max"] = vue["recul_max"] * AMA
+    return sortie
+
+
+# À lire avant le tri des objets : ce sont des lampes, pas des maillages.
+def flammes():
+    return [[o.matrix_world.translation.x, o.matrix_world.translation.z, -o.matrix_world.translation.y]
+            for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith("Menora_flamme")]
+
+
 def main():
     DOSSIER.mkdir(exist_ok=True)
     regles = concepts()
     connus = {ident for _, ident in regles}
+    lampes = flammes()
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
@@ -221,6 +260,8 @@ def main():
         fusionne = fusionner(ident, objets)
         emprises[ident] = bornes(fusionne)
         print(f"  {ident:26s} {len(objets):5d} volumes")
+    entrees = [en_metres(v, emprises) for v in REPERES]
+    vues = [en_metres(v, emprises) for v in VUES]
 
     bpy.ops.export_scene.gltf(
         filepath=str(DOSSIER / "temple.glb"),
@@ -247,11 +288,9 @@ def main():
     (DOSSIER / "reperes.json").write_text(json.dumps({
         "ama": AMA,
         "emprises": emprises,
-        "entrees": [{"id": i, "nom": n, "position": [x * AMA, z * AMA, -y * AMA],
-                     "cap": cap, "tangage": tangage}
-                    for i, n, x, y, z, cap, tangage in REPERES],
-        "souterrains": [{"id": i, "position": [x * AMA, z * AMA, -y * AMA], "cap": cap, "tangage": tangage}
-                        for i, x, y, z, cap, tangage in SOUTERRAINS],
+        "entrees": entrees,
+        "vues": vues,
+        "flammes": lampes,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))

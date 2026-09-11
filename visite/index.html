@@ -16,6 +16,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="image" href="apercu.jpg">
 <style>
   :root {
     --encre: #1b1815;
@@ -47,11 +48,18 @@
   #chargement {
     position: fixed; inset: 0; z-index: 40; display: grid; place-content: center;
     gap: 18px; text-align: center; color: var(--pierre); background: #0d0c0b;
-    transition: opacity .6s ease;
+    overflow: hidden; transition: opacity .6s ease;
+  }
+  /* Le Temple qu'on attend, flou, plutôt qu'un écran noir : l'aperçu de 32 px en ligne couvre l'attente de apercu.jpg. */
+  #chargement::before {
+    content: ""; position: absolute; inset: -40px; z-index: -1;
+    background: url(apercu.jpg) center / cover, url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAEQAAAAD/wAARCAARACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwAJCQkJCQkQCQkQFhAQEBYeFhYWFh4mHh4eHh4mLiYmJiYmJi4uLi4uLi4uNzc3Nzc3QEBAQEBISEhISEhISEhI/9sAQwELDAwSERIfEREfSzMqM0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tL/90ABAAC/9oADAMBAAIRAxEAPwDcVopF2oyMTxxvzj8TivOLrRku9QmlHALE57D8q9FluTsY+d5yqpIIAAB/CuP1aeWw0M3Vq5SV5VG5Tg4IORXDUk01GPU64JWbZgahoD6U1vcnlXO4YzghT74616NaTQtagOyKV4535x26HFcLFf3WpaGJb2RpXjmZAWOcLtBArqNEvG8pR53lBl5JAIyv1rSN/hkRK26P/9CS9/1cn+4K5XxB/wAgKP8A67D/ANBNdVe/6uT/AHBXK+IP+QFH/wBdh/6Ca4n/ABInUvgZkaZ/yBpf+u4/9BrpdA+6v/Aq5rTP+QNL/wBdx/6DXS6B91f+BVt9uRn9lH//2Q==) center / cover;
+    filter: blur(18px) brightness(.4);
   }
   #chargement.parti { opacity: 0; pointer-events: none; }
   #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; }
-  #chargement p { margin: 0; color: #8d8474; font-size: 13px; }
+  #chargement p { margin: 0; color: #b3aa9b; font-size: 13px; }
+  #restant { min-height: 1.4em; font-variant-numeric: tabular-nums; }
   #jauge { width: 260px; max-width: 70vw; height: 2px; background: #2a2724; overflow: hidden; }
   #jauge i { display: block; height: 100%; width: 0; background: var(--or); transition: width .3s ease; }
 
@@ -160,22 +168,36 @@
   #barre #langue-menu button:hover { border-color: var(--or); }
 
   #accueil {
-    position: fixed; inset: 0; z-index: 50; display: grid; place-content: center;
-    gap: 26px; padding-inline: 16px; text-align: center; color: var(--pierre);
-    background: #0d0c0b; transition: opacity .5s ease;
+    position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; justify-items: center;
+    gap: 22px; padding-inline: 16px; text-align: center; color: var(--pierre);
+    background: #0d0c0b url(apercu.jpg) center / cover; transition: opacity .5s ease;
   }
+  #accueil::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(rgba(13,12,11,.25), rgba(13,12,11,.55) 45%, rgba(13,12,11,.85));
+  }
+  #accueil > * { position: relative; }
   #accueil.parti { opacity: 0; pointer-events: none; }
-  #accueil .titre { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; }
-  #accueil .choix { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  #accueil .titre { margin: 0; font-size: clamp(22px, 6.5vw, 30px); font-weight: 500; letter-spacing: .04em;
+                    text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  #accueil .titre bdi { white-space: nowrap; }
+  #accueil .sous-titre { margin: -10px 0 8px; max-width: 32ch; font-size: 17px; color: #e6dfd0;
+                         text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+  #accueil .choix { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   #accueil button {
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    min-width: 128px; padding: 18px 16px 14px; font: inherit; font-size: 16px;
-    color: #e8e0d0; background: rgba(20,18,16,.82); border: 1px solid rgba(203,192,170,.28);
+    display: flex; align-items: center; gap: 9px; padding: 7px 12px; font: inherit; font-size: 14px;
+    color: #e8e0d0; background: rgba(20,18,16,.72); border: 1px solid rgba(203,192,170,.28);
     border-radius: 6px; cursor: pointer; transition: border-color .15s ease, transform .15s ease;
   }
   #accueil button:hover, #accueil button:focus-visible { border-color: var(--or); outline: none; }
   #accueil button:active { transform: scale(.97); }
-  #accueil .drapeau { width: 54px; height: 36px; }
+  #accueil .choix [aria-pressed="true"] { border-color: var(--or); color: #f3efe6; }
+  #accueil .entrer {
+    min-width: 200px; justify-content: center; padding: 13px 30px; font-size: 18px;
+    color: #f3efe6; background: var(--or); border-color: var(--or);
+  }
+  #accueil .entrer:hover, #accueil .entrer:focus-visible { border-color: #f3efe6; }
+  #accueil .drapeau { width: 24px; height: 16px; }
 
   /* La barre commence du côté où l'on lit : la fiche s'ouvre donc de l'autre, sans la couvrir. */
   @media (min-width: 721px), (max-height: 520px) {
@@ -240,18 +262,24 @@
 
   /* ---- initiation ---- */
   /* Sous la barre et la fiche : la carte accompagne ce qu'on fait, elle n'empêche rien.
-     Elle seule prend le doigt ; les démonstrations le laissent passer à la scène. */
+     Elle seule prend le doigt ; les démonstrations le laissent passer à la scène.
+     Hors de l'axe est-ouest qui traverse toutes les portes : en bas, et au bureau dans le coin du rappel qu'elle remplace. */
   #initiation {
     position: fixed; inset: 0; z-index: 18; pointer-events: none; transition: opacity .4s ease;
   }
   #initiation.parti { opacity: 0; }
   #initiation .carte {
-    position: absolute; top: calc(64px + var(--marge-haut)); inset-inline: 0; margin-inline: auto;
+    position: absolute; bottom: calc(96px + var(--marge-bas)); inset-inline: 0; margin-inline: auto;
     width: min(420px, calc(100vw - 32px)); padding: 12px 18px;
     border: 1px solid rgba(203,192,170,.22); border-radius: 8px;
     background: rgba(13,12,11,.8); backdrop-filter: blur(4px); box-shadow: 0 12px 32px rgba(0,0,0,.35);
     color: #e8e0d0; text-align: center; pointer-events: auto;
     transition: border-color .25s ease; animation: paraitre .45s ease both;
+  }
+  @media (hover: hover) and (pointer: fine) and (min-width: 721px) {
+    #initiation .carte {
+      bottom: calc(12px + var(--marge-bas)); inset-inline: calc(14px + var(--marge-gauche)) auto; margin-inline: 0;
+    }
   }
   #initiation .carte.reussie { border-color: var(--or); }
   #initiation .reussie h2::after { content: " ✓"; color: var(--or); }
@@ -305,12 +333,12 @@
   }
   #initiation [data-geste="regarder"] .au-clavier { --x: 50%; }
   #initiation [data-geste="regarder"] .au-doigt { --x: min(74%, calc(100% - 110px)); }
-  #initiation [data-geste="regarder"] :is(.doigt, .sillage, .curseur) { left: var(--x); top: 58%; }
+  #initiation [data-geste="regarder"] :is(.doigt, .sillage, .curseur) { left: var(--x); top: 46%; }
   #initiation [data-geste="regarder"] :is(.doigt, .curseur) { animation: balayer 2.6s ease-in-out infinite; }
   @keyframes balayer { 0%, 100% { transform: translateX(-62px); } 50% { transform: translateX(62px); } }
 
   #initiation .manche-fantome {
-    position: absolute; left: max(80px, 24%); top: 70%; width: 116px; height: 116px;
+    position: absolute; left: max(80px, 24%); top: 54%; width: 116px; height: 116px;
     margin: -58px 0 0 -58px; border: 1px dashed rgba(203,192,170,.6); border-radius: 50%;
     background: rgba(13,12,11,.3);
   }
@@ -322,11 +350,11 @@
     100% { transform: translateY(-46px); opacity: 0; }
   }
   #initiation .touches {
-    position: absolute; left: 50%; top: 60%; display: grid; grid-template-columns: repeat(3, 44px);
+    position: absolute; left: 50%; top: 46%; display: grid; grid-template-columns: repeat(3, 44px);
     gap: 6px; direction: ltr; transform: translate(-50%, -50%);
   }
   #initiation .touches-vol {
-    position: absolute; left: 50%; top: 60%; display: flex; gap: 10px; direction: ltr;
+    position: absolute; left: 50%; top: 46%; display: flex; gap: 10px; direction: ltr;
     transform: translate(-50%, -50%);
   }
   #initiation .touches-vol kbd { min-width: 44px; padding: 0 12px; }
@@ -372,17 +400,72 @@
     to { box-shadow: 0 0 0 14px rgba(217,164,65,0); }
   }
 
+  /* Au doigt, en vol, les flèches ▲ ▼ tiennent le bas à droite : la carte monte au-dessus. */
+  @media (hover: none) and (pointer: coarse) {
+    html.vol #initiation .carte { bottom: calc(156px + var(--marge-bas)); }
+  }
+  /* Le tiroir de la fiche monte à 46 % de la hauteur : la carte reste au-dessus de lui. */
+  @media (max-width: 720px) and (min-height: 521px) {
+    body:has(#fiche.ouverte) #initiation .carte { bottom: calc(46vh + 12px); }
+  }
+
   @media (max-height: 520px) {
-    /* Couchée, la barre passe ses boutons sur deux lignes : la carte descend d'autant. */
-    #initiation .carte { top: calc(72px + var(--marge-haut)); padding: 8px 14px; }
+    #initiation .carte { bottom: calc(12px + var(--marge-bas)); padding: 8px 14px; }
     #initiation h2 { font-size: 16px; }
     #initiation section p { font-size: 13px; }
   }
 
+  /* ---- menus de la barre ---- */
+  /* Au bureau le libellé du menu se lit ; sur un écran étroit il se tronquait en « Un élémen… »,
+     et une icône prend sa place, le menu natif invisible par-dessus. */
+  .menu { display: contents; }
+  .menu .icone { display: none; }
+
+  /* ---- plan ---- */
+  #minicarte {
+    position: fixed; top: calc(58px + var(--marge-haut)); inset-inline-end: calc(12px + var(--marge-droite));
+    z-index: 16; width: 132px; height: 132px; padding: 0; overflow: hidden; cursor: pointer;
+    border: 1px solid rgba(203,192,170,.35); border-radius: 50%;
+    background: rgba(13,12,11,.55); backdrop-filter: blur(3px);
+  }
+  #minicarte:hover { border-color: var(--or); }
+  #minicarte svg { display: block; width: 100%; height: 100%; }
+  #minicarte :is(.entrees, .etiquettes) { display: none; }
+  #plan {
+    position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
+    padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))
+             calc(16px + var(--marge-bas)) calc(16px + var(--marge-gauche));
+    color: #e8e0d0; background: rgba(13,12,11,.93); backdrop-filter: blur(4px);
+  }
+  #plan .tete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  #plan h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  #plan .cadrages { display: flex; gap: 6px; }
+  #plan button {
+    font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 4px; cursor: pointer;
+    border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.82); color: #e8e0d0;
+  }
+  #plan button:hover, #plan [aria-pressed="true"] { border-color: var(--or); color: #f3efe6; }
+  #plan .fermer { width: 34px; padding: 5px 0; font-size: 18px; line-height: 1; }
+  #plan svg { flex: 1; min-height: 0; width: 100%; }
+  .lieux rect { vector-effect: non-scaling-stroke; stroke-width: 1; }
+  .lieux .cour { fill: rgba(203,192,170,.08); stroke: rgba(203,192,170,.5); }
+  .lieux .batiment { fill: rgba(154,107,31,.30); stroke: rgba(217,164,65,.75); }
+  #plan .lieux rect { cursor: pointer; transition: fill .12s ease; }
+  #plan .lieux rect:hover { fill: rgba(217,164,65,.5); }
+  .entrees circle { fill: #f3efe6; stroke: #1b1815; stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
+  .entrees circle:hover { fill: var(--or); }
+  .etiquettes text {
+    fill: #f3efe6; text-anchor: middle; dominant-baseline: central; pointer-events: none;
+    font-family: "Frank Ruehl", "Times New Roman", serif;
+    paint-order: stroke; stroke: rgba(13,12,11,.85); stroke-width: 3px; vector-effect: non-scaling-stroke;
+  }
+  .etiquettes .tue { display: none; }
+  .visiteur path { fill: #d9a441; stroke: #1b1815; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+
   /* ---- au doigt ---- */
   @media (hover: none) and (pointer: coarse) {
     #survol { display: none; }
-    #aide { left: 50%; right: auto; transform: translateX(-50%); max-width: 92vw;
+    #aide { left: 50%; right: auto; transform: translateX(-50%); width: max-content; max-width: 92vw;
             text-align: center; bottom: calc(16px + var(--marge-bas)); }
     .au-clavier { display: none; }
     .au-doigt { display: revert; }
@@ -394,9 +477,16 @@
   /* ---- petit écran : la fiche devient un tiroir ---- */
   @media (max-width: 720px) {
     #barre { gap: 6px; padding-top: calc(8px + var(--marge-haut)); padding-bottom: 8px; }
-    #barre select, #barre button { font-size: 12.5px; padding: 9px 10px; }
-    #aller, #chercher { flex: 1 1 0; min-width: 0; }
-    #mode, #position { display: none; }
+    #barre select, #barre button { font-size: 12.5px; padding: 9px 10px; white-space: nowrap; }
+    #barre .menu {
+      position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 36px;
+      color: #e8e0d0; border: 1px solid rgba(203,192,170,.28); border-radius: 4px; background: rgba(20,18,16,.82);
+    }
+    .menu .icone { display: block; width: 19px; height: 19px; }
+    #barre .menu select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+    #mode { display: none; }
+    #position { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #minicarte { width: 92px; height: 92px; top: calc(62px + var(--marge-haut)); }
 
     #fiche {
       top: auto; left: 0; right: 0; bottom: 0; width: auto;
@@ -458,10 +548,19 @@
     <path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/>
     <path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6"/>
   </symbol>
+  <symbol id="icone-porte" viewBox="0 0 24 24">
+    <path d="M5 21V10a7 7 0 0 1 14 0v11M3 21h18M12 3.2V21" fill="none" stroke="currentColor" stroke-width="1.7"/>
+  </symbol>
+  <symbol id="icone-loupe" viewBox="0 0 24 24">
+    <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <path d="m15 15 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
 </svg>
 
 <div id="accueil" hidden>
-  <p class="titre">Beit HaMikdash · <span lang="he">בית המקדש</span></p>
+  <p class="titre"><bdi dir="ltr">Beit HaMikdash</bdi> · <bdi lang="he" dir="rtl">בית המקדש</bdi></p>
+  <p class="sous-titre" data-texte="accueil_sous_titre">Le Temple d'après la Mishna Middot, à l'échelle</p>
+  <button class="entrer" type="button" data-texte="accueil_entrer">Entrer</button>
   <div class="choix"></div>
 </div>
 
@@ -469,6 +568,7 @@
   <h1 data-texte="lieu">Beit HaMikdash</h1>
   <div id="jauge"><i></i></div>
   <p id="etat" data-texte="chargement">chargement de la scène…</p>
+  <p id="restant"></p>
 </div>
 
 <div id="barre">
@@ -477,8 +577,8 @@
             aria-haspopup="true" aria-expanded="false"><svg class="drapeau" aria-hidden="true"><use href="#drapeau-fr"></use></svg></button>
     <div id="langue-menu" hidden></div>
   </div>
-  <select id="aller"><option value="" data-texte="aller">Aller à…</option></select>
-  <select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select>
+  <label class="menu" title="Aller à…" data-titre="aller"><svg class="icone" aria-hidden="true"><use href="#icone-porte"></use></svg><select id="aller"><option value="" data-texte="aller">Aller à…</option></select></label>
+  <label class="menu" title="Un élément…" data-titre="chercher"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select></label>
   <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="vol">Vol libre</button>
   <span id="mode" data-texte="a_pied">à pied</span>
   <span id="position"></span>
@@ -487,6 +587,17 @@
 </div>
 
 <div id="survol"></div>
+
+<button id="minicarte" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg></button>
+
+<div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>
+  <div class="tete">
+    <h2 id="plan-titre" data-texte="plan">Plan du Temple</h2>
+    <div class="cadrages"><button type="button" data-cadrage="har_habayit"></button><button type="button" data-cadrage="azara"></button></div>
+    <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
+  </div>
+  <svg></svg>
+</div>
 
 <div id="manche"><i></i></div>
 
@@ -500,10 +611,7 @@
         <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> ou les flèches pour marcher ·
         <kbd>Maj</kbd> pour courir<br>
         <kbd>V</kbd> vol libre, puis <kbd>Espace</kbd> monter et <kbd>C</kbd> descendre</span>
-  <span class="au-doigt"><span data-texte-html="aide_doigt">Pouce gauche pour marcher, pousser plus loin pour courir<br>
-        Glisser à droite pour tourner la tête · toucher un élément pour l'interroger<br>
-        Toucher deux fois le sol pour s'y rendre</span>
-        <span class="en-portrait" data-texte-html="aide_portrait"><br>Tourner l'appareil élargit le champ</span></span>
+  <span class="au-doigt" data-texte-html="aide_doigt">Pouce gauche : marcher · pouce droit : regarder<br>Toucher un élément : lire sa fiche</span>
 </div>
 
 <div id="initiation" hidden>
@@ -523,7 +631,7 @@
   </div>
 
   <div class="carte" role="status" aria-live="polite">
-    <p class="points" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></p>
+    <p class="points" aria-hidden="true"></p>
     <section data-etape="regarder" hidden>
       <h2 data-texte="initiation_regarder">Regarder autour de soi</h2>
       <p class="au-clavier" data-texte-html="initiation_regarder_souris"></p>
@@ -552,6 +660,10 @@
     <section data-etape="fin" hidden>
       <h2 data-texte="initiation_fin">À vous de visiter</h2>
       <p><span data-texte="initiation_fin_texte"></span><span class="en-portrait" data-texte-html="aide_portrait"></span></p>
+    </section>
+    <section data-etape="fin_vol" hidden>
+      <h2 data-texte="initiation_fin_vol">Vous savez voler</h2>
+      <p data-texte="initiation_fin_vol_texte"></p>
     </section>
     <div class="pied">
       <div class="progres"><i></i></div>

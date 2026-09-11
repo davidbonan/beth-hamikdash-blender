@@ -1,5 +1,5 @@
 {
-  "_lisez_moi": "Encyclopédie de la visite. Une entrée par concept. `prefixes` fait le lien avec les noms d'objets du blockout : beit_hamikdash_visite.py y attache chaque volume (préfixe le plus long gagnant), et regroupe en un seul maillage par concept. `dit`/`retenu`/`modelise` sont les trois plans que le skill mikdash interdit de confondre.",
+  "_lisez_moi": "Encyclopédie de la visite. Une entrée par concept. `prefixes` fait le lien avec les noms d'objets du blockout : beit_hamikdash_visite.py y attache chaque volume (préfixe le plus long gagnant), et regroupe en un seul maillage par concept. `dit`/`retenu`/`modelise` sont les trois plans que le skill mikdash interdit de confondre. `lieu` : un endroit où l'on se tient — la barre en donne le nom, le plan le dessine.",
   "concepts": [
     {
       "id": "mur_har_habayit",
@@ -19,7 +19,8 @@
         "HarHabayit_sol",
         "Podium_har",
         "Podium_azara"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "soreg",
@@ -55,7 +56,8 @@
         "EzratNashim_couronnement",
         "EzratNashim_socle",
         "EzratNashim_bandeau"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "porte_est_ezrat_nashim",
@@ -63,7 +65,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "EzratNashim_porte"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "gezuztra",
@@ -79,7 +82,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "Lishkat_Etzim"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_hametzoraim",
@@ -87,7 +91,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "Lishkat_Metzoraim"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_hanezirim",
@@ -95,7 +100,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "Lishkat_Nezirim"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_beit_shemanya",
@@ -103,7 +109,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "Lishkat_Shemanya"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "quinze_marches",
@@ -111,7 +118,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "Marche_Nikanor"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "shaar_nikanor",
@@ -119,7 +127,8 @@
       "zone": "azara",
       "prefixes": [
         "Nikanor_"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "azara",
@@ -131,7 +140,8 @@
         "Azara_couronnement",
         "Azara_socle",
         "Azara_bandeau"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "portes_azara",
@@ -166,7 +176,8 @@
         "Mizbeach_haut",
         "Mizbeach_yessod",
         "Keren_"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "hout_hasikra",
@@ -244,7 +255,8 @@
         "Ulam_plafond",
         "Ulam_klonas",
         "Maltera"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "douze_marches_oulam",
@@ -252,7 +264,8 @@
       "zone": "oulam",
       "prefixes": [
         "Marche_Ulam"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "petah_oulam",
@@ -307,7 +320,8 @@
         "Heikhal_corniche",
         "Heikhal_caisson",
         "Heikhal_or_sol"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "portes_heikhal",
@@ -328,7 +342,8 @@
         "Ta_N_",
         "Ta_S_",
         "Ta_O_"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "mesiba",
@@ -337,7 +352,8 @@
       "prefixes": [
         "Mesiba_",
         "Beit_horadat_hamayim"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "aliyah",
@@ -351,7 +367,8 @@
         "Klonas_aliyah",
         "Ulam_plancher_",
         "Ulam_masse"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "kaleh_orev",
@@ -411,7 +428,8 @@
       "zone": "kodesh_hakodashim",
       "prefixes": [
         "KhK_"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "even_hashetiya",
@@ -458,7 +476,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_HaGazit"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_hagola",
@@ -466,7 +485,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_HaGola"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_haetz",
@@ -474,7 +494,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_HaEtz"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_hamelach",
@@ -482,7 +503,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_HaMelach"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_haparva",
@@ -491,7 +513,8 @@
       "prefixes": [
         "Lishkat_HaParva",
         "Mikve_Parva"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_hamedichin",
@@ -500,7 +523,8 @@
       "prefixes": [
         "Lishkat_HaMedichin",
         "Mesiba_Parva"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "beit_hamoked",
@@ -508,7 +532,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Beit_HaMoked"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "mesiba_bira",
@@ -516,7 +541,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Mesiba_bira"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "beit_hatevila",
@@ -524,7 +550,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Beit_HaTevila"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "shaar_hamayim",
@@ -533,7 +560,8 @@
       "prefixes": [
         "Beit_ShaarHaMayim",
         "ShaarHaMayim_"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "beit_avtinas",
@@ -541,7 +569,8 @@
       "zone": "lishkot",
       "prefixes": [
         "BeitAvtinas"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "shaar_hanitzotz",
@@ -550,7 +579,8 @@
       "prefixes": [
         "Beit_ShaarHaNitzotz",
         "ShaarHaNitzotz_"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "beit_hanitzotz",
@@ -558,7 +588,8 @@
       "zone": "lishkot",
       "prefixes": [
         "BeitHaNitzotz"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_parhedrin",
@@ -566,7 +597,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_Parhedrin"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_osei_chavitin",
@@ -574,7 +606,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_Osei_Chavitin"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_pinchas",
@@ -582,7 +615,8 @@
       "zone": "lishkot",
       "prefixes": [
         "Lishkat_Pinchas_HaMalbish"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "sculptures_murs",
@@ -673,7 +707,8 @@
       "prefixes": [
         "Shushan_",
         "HarHabayit_porte_Mizrahi"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "portes_houlda",
@@ -689,7 +724,8 @@
       "zone": "har_habayit",
       "prefixes": [
         "HarHabayit_porte_Tadi"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "shaar_kiponus",
@@ -697,7 +733,8 @@
       "zone": "har_habayit",
       "prefixes": [
         "HarHabayit_porte_Kiponus"
-      ]
+      ],
+      "lieu": true
     }
   ]
 }

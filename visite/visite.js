@@ -11,6 +11,8 @@ import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
 import { initiation } from "./initiation.js";
+import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
+import { plan } from "./plan.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
@@ -90,6 +92,8 @@ const [textes, fiche, ...contenus] = await Promise.all([
 ]);
 installerLangue(textes);
 const reperes = await json("./reperes.json");
+const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
+  [id, new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max))]));
 
 const traductions = new Map();
 function contenusTraduits(code) {
@@ -167,11 +171,40 @@ scene.environment = environnement(renderer);
 const FOV_HORIZONTAL = 94;
 const FOV_VERTICAL = [50, 80];
 const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 900);
-// Une lampe discrète accrochée à la tête : sans elle le Heikhal, qui n'a pas de
-// fenêtre ouvrante dans le blockout, est une pièce noire.
-const lampe = new THREE.PointLight(0xffe9c4, 6, 26, 1.7);
+// Une lampe discrète accrochée à la tête : sans elle l'Oulam et les ta'im, sans fenêtre
+// ouvrante dans le blockout, sont noirs. Dans le Heikhal c'est la Menora qui éclaire.
+const LAMPE_TETE = 6;
+const LAMPE_HEIKHAL = 0.6;
+const lampe = new THREE.PointLight(0xffe9c4, LAMPE_TETE, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
+
+// L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
+const MENORA = { couleur: 0xffb36b, intensite: 150, portee: 18, carte: 512 };
+const FLAMME = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc27a).multiplyScalar(9) });
+
+function allumerMenora(flammes) {
+  if (!flammes?.length) return;
+  const forme = new THREE.ConeGeometry(0.022, 0.08, 8);
+  const centre = new THREE.Vector3();
+  for (const p of flammes) {
+    const flamme = new THREE.Mesh(forme, FLAMME);
+    flamme.position.set(...p);
+    scene.add(flamme);
+    centre.add(flamme.position);
+  }
+  const lumiere = new THREE.PointLight(MENORA.couleur, MENORA.intensite, MENORA.portee, 2);
+  lumiere.position.copy(centre.divideScalar(flammes.length));
+  lumiere.castShadow = PROFIL.menora.ombre;
+  // La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
+  lumiere.shadow.autoUpdate = false;
+  lumiere.shadow.needsUpdate = true;
+  lumiere.shadow.mapSize.set(MENORA.carte, MENORA.carte);
+  lumiere.shadow.camera.near = 0.05;
+  lumiere.shadow.camera.far = MENORA.portee;
+  lumiere.shadow.bias = -0.002;
+  scene.add(lumiere);
+}
 
 // Le dôme est le seul objet qui n'entre pas dans la passe de géométrie : il enveloppe
 // la scène, et il l'occluerait tout entière.
@@ -201,12 +234,17 @@ addEventListener("resize", dimensionner);
 // modèle
 // ---------------------------------------------------------------------------
 const obstacles = [];
+const restant = $("#restant");
+const enMegaoctets = (octets) =>
+  new Intl.NumberFormat(langue(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(octets / 1e6);
 // Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
 // attendre ensuite doublerait l'attente d'un visiteur en 4G.
 const [gltf, jeux] = await Promise.all([
   new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
     .loadAsync("./temple.glb", (e) => {
-      if (e.lengthComputable) jauge.style.width = `${(e.loaded / e.total) * 100}%`;
+      if (!e.lengthComputable) return;
+      jauge.style.width = `${(e.loaded / e.total) * 100}%`;
+      restant.textContent = texte("restant").replace("{mo}", enMegaoctets(e.total - e.loaded));
     }),
   nappes(),
 ]);
@@ -216,6 +254,7 @@ scene.add(gltf.scene);
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
 // aucun sol, et la visite s'ouvrait un mètre au-dessus du dallage.
 gltf.scene.updateMatrixWorld(true);
+allumerMenora(reperes.flammes);
 
 const murs = [];                        // collision : les étoffes en sont exclues
 const horloges = [];                    // uniformes de temps à faire avancer
@@ -355,19 +394,26 @@ function avancer(dt) {
   piedsY = camera.position.y - OEIL;
 }
 
-function poser(x, y, z, visee) {
+function poser([x, y, z]) {
   const sol = vol ? null : solSous(sonde.set(x, y + APLOMB, z), APLOMB * 2);
   piedsY = sol === null ? y : sol;
   camera.position.set(x, piedsY + OEIL, z);
   lisse.set(0, 0, 0);
   cible = null;
-  if (visee) {
-    // Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du
-    // parcours du Cohen Gadol. Le nord de Blender devient -Z une fois passé en Y-haut.
-    const a = THREE.MathUtils.degToRad(visee.cap);
-    const t = THREE.MathUtils.degToRad(visee.tangage ?? 0);
-    camera.lookAt(x + Math.cos(a) * 10, piedsY + OEIL + Math.tan(t) * 10, z - Math.sin(a) * 10);
-  }
+}
+
+// Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du parcours du
+// Cohen Gadol. Le nord de Blender devient -Z une fois passé en Y-haut.
+function orienterCap({ cap, tangage = 0 }) {
+  const a = THREE.MathUtils.degToRad(cap);
+  const t = THREE.MathUtils.degToRad(tangage);
+  const { x, y, z } = camera.position;
+  camera.lookAt(x + Math.cos(a) * 10, y + Math.tan(t) * 10, z - Math.sin(a) * 10);
+  accorderRegard();
+}
+
+function orienterVers(point) {
+  camera.lookAt(point);
   accorderRegard();
 }
 
@@ -520,13 +566,21 @@ function basculerVol() {
   vol = !vol;
   afficherMode();
   cible = null;
-  if (vol) noterEnvol();
+  if (vol) noterEnvol(); else noterAtterrissage();
 }
 boutonVol.onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
 
+// Une vue dit comment on s'y tient : une cour se montre d'en haut, le reste depuis le dallage.
+function tenirLaVue(enVol) {
+  if (vol === enVol) return;
+  vol = enVol;
+  afficherMode();
+  cible = null;
+}
+
 const { lancerInitiation, initiationSuivie, noterRegard, noterDeplacement, noterInterrogation,
-        noterEnvol, noterAltitude } = initiation({
-  elementAMontrer, estEnVol: () => vol, revenirAPied: () => { if (vol) basculerVol(); },
+        noterEnvol, noterAtterrissage, noterAltitude } = initiation({
+  elementAMontrer, estEnVol: () => vol,
 });
 
 const manette = commandes(renderer.domElement, {
@@ -555,7 +609,7 @@ function remplirAller() {
 }
 aller.onchange = () => {
   const id = aller.value;
-  fondu(() => allerA(id));
+  fondu(() => allerVers(id));
   aller.value = "";
   aller.blur();
 };
@@ -577,10 +631,97 @@ chercher.onchange = () => {
   const id = chercher.value;
   if (!id) return;
   montrer(id);
-  fondu(() => allerA(id));
+  fondu(() => allerElement(id));
   chercher.value = "";
   chercher.blur();
 };
+
+// ---------------------------------------------------------------------------
+// vues
+// ---------------------------------------------------------------------------
+const RECUL_AUTO = 60;
+// Le premier côté d'où l'élément se voit sans mur devant ; l'est d'abord, l'axe du parcours.
+const CAPS_AUTO = [180, 0, 90, 270];
+const centreDe = (boite) => boite.getCenter(new THREE.Vector3());
+
+function piedsDe(vue) {
+  if (vue.position) return vue.position;
+  const oeil = oeilQuiCadre(camera, unirEmprises(EMPRISES, vue.cadre),
+    { cap: vue.cap, hauteur: vue.sol + OEIL, reculMax: vue.recul_max ?? RECUL_AUTO });
+  return [oeil.x, vue.sol, oeil.z];
+}
+
+function prendreVue(vue) {
+  tenirLaVue(!!vue.vol);
+  poser(piedsDe(vue));
+  if (vue.cadre) orienterVers(centreDe(unirEmprises(EMPRISES, vue.cadre)));
+  else orienterCap(vue);
+}
+
+function voitLeConcept(oeil, centre, id) {
+  viseur.set(oeil, centre.clone().sub(oeil).normalize());
+  viseur.far = oeil.distanceTo(centre);
+  const [touche] = viseur.intersectObjects(obstacles, false);
+  return !touche || touche.object.userData.concept === id;
+}
+
+function piedsQuiVoient(id, boite) {
+  const centre = centreDe(boite);
+  let repli = null;
+  for (const cap of CAPS_AUTO) {
+    const approche = oeilQuiCadre(camera, boite, { cap, hauteur: centre.y, reculMax: RECUL_AUTO });
+    const sol = solSous(sonde.set(approche.x, centre.y + OEIL, approche.z), Infinity);
+    if (sol === null) continue;
+    const oeil = oeilQuiCadre(camera, boite, { cap, hauteur: sol + OEIL, reculMax: RECUL_AUTO });
+    const pieds = [oeil.x, sol, oeil.z];
+    repli ??= pieds;
+    if (voitLeConcept(oeil, centre, id)) return pieds;
+  }
+  if (repli) return repli;
+  const oeil = oeilQuiCadre(camera, boite, { cap: CAPS_AUTO[0], hauteur: centre.y, reculMax: RECUL_AUTO });
+  return [oeil.x, centre.y - OEIL, oeil.z];
+}
+
+// « Un élément… » montre toujours l'élément, jamais l'entrée qui porterait le même nom.
+function allerElement(id) {
+  const vue = reperes.vues.find((v) => v.id === `vue_${id}`);
+  if (vue) {
+    prendreVue(vue);
+    return true;
+  }
+  const boite = EMPRISES.get(id);
+  if (!boite) return false;
+  tenirLaVue(false);
+  poser(piedsQuiVoient(id, boite));
+  orienterVers(centreDe(boite));
+  return true;
+}
+
+function allerVers(id) {
+  const vue = [...reperes.entrees, ...reperes.vues].find((v) => v.id === id);
+  if (!vue) return allerElement(id);
+  prendreVue(vue);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// lieux et plan
+// ---------------------------------------------------------------------------
+const volume = (b) => {
+  const t = b.getSize(new THREE.Vector3());
+  return t.x * t.y * t.z;
+};
+// Du plus petit au plus grand : le premier qui contient le visiteur est celui où il se tient.
+const LIEUX = fiche.concepts.filter((c) => c.lieu && EMPRISES.has(c.id)).map((c) => c.id)
+  .sort((a, b) => volume(EMPRISES.get(a)) - volume(EMPRISES.get(b)));
+const lieuEn = (point) => LIEUX.find((id) => EMPRISES.get(id).containsPoint(point)) ?? null;
+
+const planMiddot = plan({
+  emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS,
+  entrees: reperes.entrees.map((e) => ({ ...e, position: piedsDe(e) })),
+  allerLieu: (id) => fondu(() => allerElement(id)),
+  allerEntree: (id) => fondu(() => allerVers(id)),
+});
 
 async function accorderLangue(code) {
   const traduits = await conceptsEn(code);
@@ -589,24 +730,11 @@ async function accorderLangue(code) {
   remplirAller();
   remplirChercher();
   rafraichir();
+  planMiddot.rafraichir();
 }
 suivreLangue(accorderLangue);
 // Le choix du premier passage tombe le plus souvent pendant le chargement du modèle.
 await accorderLangue(langue());
-
-function allerA(id) {
-  const e = [...reperes.entrees, ...reperes.souterrains].find((x) => x.id === id);
-  if (e) { poser(...e.position, e); return true; }
-  const b = reperes.emprises[id];
-  if (!b) return false;
-  const centre = new THREE.Vector3(...b.min).add(new THREE.Vector3(...b.max)).multiplyScalar(0.5);
-  const taille = new THREE.Vector3(...b.max).sub(new THREE.Vector3(...b.min));
-  const recul = Math.min(60, Math.max(2.8, Math.max(taille.x, taille.y, taille.z) * 1.3));
-  poser(centre.x + recul, centre.y + taille.y * 0.1, centre.z);
-  camera.lookAt(centre);
-  accorderRegard();
-  return true;
-}
 
 // ---------------------------------------------------------------------------
 // boucle
@@ -615,8 +743,8 @@ const demande = new URLSearchParams(location.search).get("vue");
 // La visite s'ouvre au-delà du Soreg, dans l'axe de la porte orientale : le 'Heil et
 // la porte de l'Ezrat Nashim se franchissent à pied, avant tout le reste.
 const depart = reperes.entrees.find((e) => e.id === "face_porte_est") || reperes.entrees[0];
-poser(...depart.position, depart);
-if (demande) allerA(demande);
+prendreVue(depart);
+if (demande) allerVers(demande);
 
 const horloge = new THREE.Clock();
 let image = 0;
@@ -661,6 +789,8 @@ const aide = $("#aide");
 let moyenne = 16, attente = 0, entame = false;
 // Mesuré autour de la marche seule : un saut du menu n'est pas un pas.
 const avantLePas = new THREE.Vector3();
+// À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
+const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
 function ajusterEchelle(dt) {
   moyenne += (dt * 1000 - moyenne) * 0.05;
@@ -697,8 +827,13 @@ renderer.setAnimationLoop(() => {
       survol.style.left = `${p.clientX}px`;
       survol.style.top = `${p.clientY + 20}px`;
     }
-    position.textContent = `${(camera.position.x / AMA).toFixed(0)} · ` +
-      `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`;
+    const lieu = lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
+    lampe.intensity += ((lieu === "heikhal" ? LAMPE_HEIKHAL : LAMPE_TETE) - lampe.intensity) * 0.25;
+    position.textContent = brut
+      ? `${(camera.position.x / AMA).toFixed(0)} · ` +
+        `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
+      : (lieu ? CONCEPTS.get(lieu).nom : "");
+    planMiddot.suivre(camera.position, camera.getWorldDirection(direction));
   }
   dessiner(dt);
 });
@@ -719,7 +854,8 @@ if (!initiationSuivie()) {
 
 // Points d'accroche de la vérification headless (cdp.py) : sans eux, impossible de
 // savoir depuis un terminal si la page a fini de charger ni ce qu'elle montre.
-window.__vue = (id) => { allerA(id); dessiner(0); };
+window.__vue = (id) => { allerVers(id); dessiner(0); };
+window.__vues = () => [...reperes.entrees, ...reperes.vues].map((v) => v.id);
 window.__cam = (x, y, z, cx, cy, cz) => {
   camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); piedsY = y - OEIL;
   accorderRegard(); dessiner(0);
@@ -731,7 +867,7 @@ window.__etat = () => {
   return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
            x: +camera.position.x.toFixed(3), z: +camera.position.z.toFixed(3),
            piedsY: +piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
-           fov: +camera.fov.toFixed(1) };
+           fov: +camera.fov.toFixed(1), vol, lieu: lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z)) };
 };
 window.__ombres = (actives) => {
   renderer.shadowMap.enabled = actives;

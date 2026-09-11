@@ -35,12 +35,26 @@ function traduirePage() {
   document.querySelector("#langue-courante use").setAttribute("href", `#drapeau-${courante}`);
 }
 
-function choisirLangue(code) {
-  retenir(CLEF, code);
+function appliquerLangue(code) {
   if (code === courante) return;
   courante = code;
   traduirePage();
   for (const suiveur of suiveurs) suiveur(code);
+}
+
+function choisirLangue(code) {
+  retenir(CLEF, code);
+  appliquerLangue(code);
+}
+
+// `iw` est l'ancien code de l'hébreu, que certains navigateurs envoient encore.
+function langueDuNavigateur() {
+  for (const code of navigator.languages ?? [navigator.language]) {
+    const primaire = code.toLowerCase().split("-")[0];
+    const connue = primaire === "iw" ? "he" : primaire;
+    if (Object.hasOwn(textes, connue)) return connue;
+  }
+  return LANGUE_SOURCE;
 }
 
 function boutonsDeLangue() {
@@ -74,16 +88,25 @@ function brancherSelecteur() {
   addEventListener("keydown", (e) => { if (e.key === "Escape") fermerMenu(); });
 }
 
+// La langue devinée est déjà appliquée : un drapeau en change, « Entrer » la retient.
 function accueillir() {
   const accueil = document.querySelector("#accueil");
   const choix = accueil.querySelector(".choix");
   choix.append(...boutonsDeLangue());
+  const marquer = () => {
+    for (const b of choix.children) b.setAttribute("aria-pressed", String(b.dataset.langue === courante));
+  };
+  marquer();
   accueil.hidden = false;
   choix.onclick = (e) => {
     const bouton = e.target.closest("[data-langue]");
     if (!bouton) return;
-    bouton.blur();
-    choisirLangue(bouton.dataset.langue);
+    appliquerLangue(bouton.dataset.langue);
+    marquer();
+  };
+  accueil.querySelector(".entrer").onclick = (e) => {
+    e.currentTarget.blur();
+    choisirLangue(courante);
     accueil.classList.add("parti");
     signalerChoix();
   };
@@ -93,7 +116,7 @@ export function installerLangue(tous) {
   textes = tous;
   const retenue = lireRetenu(CLEF);
   const connue = retenue !== null && Object.hasOwn(textes, retenue);
-  if (connue) courante = retenue;
+  courante = connue ? retenue : langueDuNavigateur();
   traduirePage();
   brancherSelecteur();
   if (connue) signalerChoix(); else accueillir();

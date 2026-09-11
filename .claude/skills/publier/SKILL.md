@@ -68,6 +68,11 @@ cd "$TMPDIR" && npm i playwright-core          # une fois par dossier jetable
 node "$visite" https://davidbonan.io/visite [capture.png]
 ```
 
+`--mobile` passe en 390 × 844 tactile. `--planche <dossier>` capture en plus chaque
+entrée et chaque vue de `reperes.json` puis assemble `planche.html` et `planche.jpg` :
+c'est la vérification des cadrages après toute retouche de `beit_hamikdash_visite.py`
+(`--seulement id,id` pour n'en refaire que quelques-unes).
+
 Il répond `scene prete` et la pose de la caméra (code 0), ou `BLOQUE :` précédé de ce
 qui a manqué — 404 d'asset, erreur de module (code 1). Une capture atterrit dans le
 dossier courant dans les deux cas. `playwright-core` se résout depuis le dossier

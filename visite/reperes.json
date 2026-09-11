@@ -978,144 +978,270 @@
     {
       "id": "har_habayit",
       "nom": "Har HaBayit, sur l'axe est",
+      "cadre": [
+        "oulam"
+      ],
       "position": [
         88.8,
         -7.68,
         -0.0
-      ],
-      "cap": 180,
-      "tangage": 0
+      ]
     },
     {
       "id": "face_porte_est",
       "nom": "Face à la porte orientale",
+      "cadre": [
+        "porte_est_ezrat_nashim"
+      ],
       "position": [
         79.2,
         -7.68,
         -0.0
-      ],
-      "cap": 180,
-      "tangage": 8
+      ]
     },
     {
       "id": "ezrat_nashim",
       "nom": "Ezrat Nashim",
+      "cadre": [
+        "oulam"
+      ],
       "position": [
         65.75999999999999,
         -4.8,
         -0.0
-      ],
-      "cap": 180,
-      "tangage": 6
+      ]
     },
     {
       "id": "quinze_marches",
       "nom": "Pied des quinze marches",
-      "position": [
-        12.48,
-        -4.8,
-        -0.0
+      "cadre": [
+        "quinze_marches",
+        "shaar_nikanor"
       ],
       "cap": 180,
-      "tangage": 0
+      "sol": -4.8,
+      "recul_max": 19.2
     },
     {
       "id": "azara",
       "nom": "Ezrat Israël",
+      "cadre": [
+        "oulam"
+      ],
       "position": [
         -6.72,
         0.0,
         -0.0
-      ],
-      "cap": 180,
-      "tangage": 0
+      ]
     },
     {
       "id": "mizbeach",
       "nom": "Devant le Mizbea'h",
-      "position": [
-        -8.16,
-        0.0,
-        4.32
+      "cadre": [
+        "mizbeach",
+        "kevesh"
       ],
-      "cap": 180,
-      "tangage": 0
+      "cap": 135,
+      "sol": 0.0,
+      "recul_max": 28.799999999999997
     },
     {
       "id": "kiyor",
       "nom": "Au Kiyor",
-      "position": [
-        -26.4,
-        0.0,
-        6.72
+      "cadre": [
+        "kiyor"
       ],
-      "cap": 180,
-      "tangage": 0
+      "cap": 135,
+      "sol": 0.0,
+      "recul_max": 3.84
     },
     {
       "id": "oulam",
       "nom": "Sous l'Oulam",
-      "position": [
-        -41.28,
-        2.88,
-        -0.0
+      "cadre": [
+        "portes_heikhal"
       ],
       "cap": 180,
-      "tangage": 0
+      "sol": 2.88,
+      "recul_max": 8.16
     },
     {
       "id": "heikhal",
       "nom": "Dans le Heikhal",
-      "position": [
-        -53.76,
-        2.88,
-        -0.0
+      "cadre": [
+        "menora",
+        "shulchan",
+        "mizbeach_hazahav"
       ],
       "cap": 180,
-      "tangage": 0
+      "sol": 2.88,
+      "recul_max": 11.52
     },
     {
       "id": "kodesh_hakodashim",
       "nom": "Kodesh HaKodashim",
-      "position": [
-        -68.64,
-        2.88,
-        -0.0
+      "cadre": [
+        "aron",
+        "kaporet",
+        "even_hashetiya"
       ],
-      "cap": 180,
-      "tangage": 0
+      "cap": 90,
+      "sol": 2.88,
+      "recul_max": 4.32
     }
   ],
-  "souterrains": [
+  "vues": [
     {
-      "id": "mesiba_bira",
+      "id": "vue_azara",
+      "cadre": [
+        "azara"
+      ],
+      "cap": 180,
+      "vol": true,
+      "sol": 43.199999999999996,
+      "recul_max": 144.0
+    },
+    {
+      "id": "vue_ezrat_nashim",
+      "cadre": [
+        "porte_est_ezrat_nashim",
+        "lishkat_haetzim",
+        "lishkat_hanezirim",
+        "lishkat_hametzoraim",
+        "lishkat_beit_shemanya",
+        "quinze_marches"
+      ],
+      "cap": 180,
+      "vol": true,
+      "sol": 28.799999999999997,
+      "recul_max": 144.0
+    },
+    {
+      "id": "vue_heikhal",
+      "cadre": [
+        "parokhet"
+      ],
+      "position": [
+        -47.519999999999996,
+        2.88,
+        -0.0
+      ]
+    },
+    {
+      "id": "vue_kiyor",
+      "cadre": [
+        "kiyor"
+      ],
+      "cap": 135,
+      "sol": 0.0,
+      "recul_max": 3.84
+    },
+    {
+      "id": "vue_kodesh_hakodashim",
+      "cadre": [
+        "aron",
+        "kaporet",
+        "even_hashetiya"
+      ],
+      "cap": 90,
+      "sol": 2.88,
+      "recul_max": 4.32
+    },
+    {
+      "id": "vue_mizbeach",
+      "cadre": [
+        "mizbeach",
+        "kevesh"
+      ],
+      "cap": 135,
+      "sol": 0.0,
+      "recul_max": 28.799999999999997
+    },
+    {
+      "id": "vue_oulam",
+      "cadre": [
+        "oulam"
+      ],
+      "position": [
+        -4.8,
+        0.0,
+        -8.16
+      ]
+    },
+    {
+      "id": "vue_quinze_marches",
+      "cadre": [
+        "quinze_marches",
+        "shaar_nikanor"
+      ],
+      "cap": 180,
+      "sol": -4.8,
+      "recul_max": 19.2
+    },
+    {
+      "id": "vue_mesiba_bira",
+      "cap": 270,
       "position": [
         -8.76,
         -7.4399999999999995,
         -33.6
-      ],
-      "cap": 270,
-      "tangage": 0
+      ]
     },
     {
-      "id": "beit_hatevila",
+      "id": "vue_beit_hatevila",
+      "cap": 146,
       "position": [
         -77.75999999999999,
         -5.76,
         -18.24
-      ],
-      "cap": 146,
-      "tangage": 0
+      ]
     },
     {
-      "id": "shit",
+      "id": "vue_shit",
+      "cap": 225,
+      "tangage": 10,
       "position": [
         -23.04,
         -4.32,
         9.12
-      ],
-      "cap": 225,
-      "tangage": 10
+      ]
     }
+  ],
+  "flammes": [
+    [
+      -60.0,
+      4.452000141143799,
+      2.927999973297119
+    ],
+    [
+      -60.0,
+      4.452000141143799,
+      4.271999835968018
+    ],
+    [
+      -60.0,
+      4.452000141143799,
+      3.0959999561309814
+    ],
+    [
+      -60.0,
+      4.452000141143799,
+      4.104000091552734
+    ],
+    [
+      -60.0,
+      4.452000141143799,
+      3.2639999389648438
+    ],
+    [
+      -60.0,
+      4.452000141143799,
+      3.936000108718872
+    ],
+    [
+      -60.0,
+      4.452000141143799,
+      3.5999999046325684
+    ]
   ]
 }
