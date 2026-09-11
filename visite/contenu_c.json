@@ -192,5 +192,70 @@
       {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"}
     ],
     "note": "L'emplacement est un CHOIX explicite du blockout : « Sur l'or du mur est de l'Oulam, côté nord : CHOIX ». Aucune cote n'est sourcée ; les huit lignes gravées sont de la géométrie du script. À ne pas confondre avec l'autre don de la même reine, la nivreshet — un luminaire d'or (« מְנוֹרָה », Bartenura) au-dessus de l'entrée du Heikhal (Yoma 3:10 ; 37b), `Nivreshet_Helene` dans le blockout."
+  },
+
+  "cohanim": {
+    "he": "בגדי כהונה",
+    "translit": "Bigdei kehouna",
+    "resume": "Le cohen hedyot sert en quatre vêtements de lin blanc : la kutonet, les mikhnasayim, la migba'at et l'avnet. La kutonet tombe jusqu'au-dessus du talon et ses manches jusqu'au poignet ; les mikhnasayim couvrent d'au-dessus du nombril jusqu'au genou ; la migba'at est une bande de lin que les fils d'Aharon enroulent « comme un chapeau » ; l'avnet, long de trente-deux amot, s'enroule tour sur tour à hauteur des coudes. Le cohen sert pieds nus : rien ne doit le séparer du dallage. La visite en montre deux au Kiyor — l'un s'y sanctifie, main droite sur le pied droit, main gauche sur le pied gauche, penché —, un qui monte au kevesh et en redescend, et un au pied de l'angle nord-est de l'autel.",
+    "cotes": [
+      "kutonet : jusqu'au-dessus du talon ; manche jusqu'au poignet, large comme la main",
+      "mikhnasayim : d'au-dessus du nombril jusqu'au genou",
+      "migba'at : seize amot de lin, enroulées comme un chapeau",
+      "avnet : trois doigts de large, trente-deux amot de long, enroulé tour sur tour",
+      "avnet porté à hauteur des coudes",
+      "fil de lin retors six fois ; l'avnet seul brodé de laine",
+      "pieds nus sur le dallage",
+      "les figures : de 1,71 à 1,77 m, autour de 3,6 amot"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "28:40-42", "citation": "וּמִגְבָּעוֹת תַּעֲשֶׂה לָהֶם לְכָבוֹד וּלְתִפְאָרֶת"},
+      {"oeuvre": "Shemot", "ref": "39:29", "citation": "וְאֶת הָאַבְנֵט שֵׁשׁ מָשְׁזָר וּתְכֵלֶת וְאַרְגָּמָן וְתוֹלַעַת שָׁנִי מַעֲשֵׂה רֹקֵם"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:1-2", "citation": "וּבָנָיו צוֹנְפִין בָּהּ כְּכוֹבַע"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:17-19", "citation": "אֹרֶךָ הַכֻּתֹּנֶת עַד לְמַעְלָה מִן הֶעָקֵב"},
+      {"oeuvre": "Rashi Exode", "ref": "28:7", "citation": "לֹא לְמַעְלָה מֵאֲצִילֵיהֶם וְלֹא לְמַטָּה מִמָּתְנֵיהֶם"},
+      {"oeuvre": "Zeva'him", "ref": "24a", "citation": "לֹא יְהֵא דָּבָר חוֹצֵץ בֵּינוֹ לְבֵין הָרִצְפָּה"},
+      {"oeuvre": "Yoma", "ref": "6a", "citation": "אַבְנֵטוֹ שֶׁל כֹּהֵן גָּדוֹל זֶהוּ אַבְנֵטוֹ שֶׁל כֹּהֵן הֶדְיוֹט"},
+      {"oeuvre": "Rambam Bi'at HaMikdash", "ref": "5:16", "citation": "מַנִּיחַ יָדוֹ הַיְמָנִית עַל גַּבֵּי רַגְלוֹ הַיְמָנִית וְיָדוֹ הַשְּׂמָאלִית עַל גַּבֵּי רַגְלוֹ הַשְּׂמָאלִית וְשׁוֹחֶה וּמְקַדֵּשׁ"}
+    ],
+    "note": "L'avnet du cohen hedyot est-il celui du Cohen Gadol, brodé de laine ? Yoma 6a en discute ; le Rambam tranche que oui (Klei HaMikdash 8:1-2), et les figures le suivent. La fiche technique (§12) habille les cohanim du film en lin uni. Aucune source ne donne le dessin de la broderie : les rayures de tekhelet, d'argaman et de tola'at shani sont un CHOIX, comme la forme exacte de la migba'at et les gestes des figures."
+  },
+
+  "leviim": {
+    "he": "לויים על הדוכן",
+    "translit": "Leviim al haDoukhan",
+    "resume": "Les Léviim chantent debout sur le Doukhan, la marche qui sépare l'Ezrat Israël de l'Ezrat Cohanim, chacun avec son instrument. On n'en compte jamais moins de douze : au moins neuf kinorot, deux nevalim et un seul tziltzal. Aux jours de Shlomo, le Tanakh montre les chanteurs « vêtus de lin ». La visite en pose douze, tournés vers le Sanctuaire, de part et d'autre de l'axe qu'on suit en montant de la porte de Nikanor. Au tamid, Ben Arza frappe le tziltzal et les Léviim entrent dans le chant : dans la visite, le tziltzal bat la mesure.",
+    "cotes": [
+      "douze Léviim, jamais moins",
+      "neuf kinorot, deux nevalim, un tziltzal",
+      "debout sur le Doukhan, trois marches d'une demi-ama",
+      "vêtus de lin"
+    ],
+    "sources": [
+      {"oeuvre": "Arakhin", "ref": "2:6", "citation": ""},
+      {"oeuvre": "Arakhin", "ref": "2:5", "citation": ""},
+      {"oeuvre": "Arakhin", "ref": "2:3", "citation": ""},
+      {"oeuvre": "Middot", "ref": "2:6", "citation": ""},
+      {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
+      {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
+    ],
+    "note": "Divrei HaYamim II 5:12 décrit la dédicace du Temple de Shlomo ; la Mishna ne dit pas comment les Léviim du Second Temple étaient vêtus. Le lin, la kippa blanche, la place sur la marche la plus haute, l'orientation vers l'ouest et l'allée laissée sur l'axe sont des CHOIX de la visite, comme leur balancement sur la mesure. Les enfants Léviim, qui se tenaient en bas (Arakhin 2:6), ne sont pas figurés."
+  },
+
+  "fideles": {
+    "he": "העם בעזרת הנשים",
+    "translit": "HaAm beEzrat HaNashim",
+    "resume": "L'Ezrat Nashim, 135 amot sur 135, est la cour où hommes et femmes se tiennent avant de monter les quinze marches vers la porte de Nikanor. Elle est plus sainte que le Har HaBayit et le 'Heil : le tevoul yom n'y entre pas. On l'entoura plus tard d'une galerie, pour que « les femmes regardent d'en haut et les hommes d'en bas ». La visite y pose quelques fidèles pour donner l'échelle de la cour, des marches et de la porte.",
+    "cotes": [
+      "135 × 135 amot",
+      "quatre lishkot de 40 amot aux angles, sans toit",
+      "quinze marches vers l'Ezrat Israël",
+      "interdite au tevoul yom"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "2:5", "citation": "שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן"},
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת נָשִׁים מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם"}
+    ],
+    "note": "Les fidèles ne sont pas en costume d'époque : ils sont vêtus comme leur communauté s'habille aujourd'hui pour le jour — costume et chapeau, costume et talith, costume et kippa —, selon la règle du film (fiche technique §12). C'est un parti pris, pas une restitution. La règle, écrite pour les hommes, ne dit rien des femmes : la figure en robe et foulard est un CHOIX de la visite. Leurs gestes — marcher, prier, converser — en sont aussi."
   }
 }

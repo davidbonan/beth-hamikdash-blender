@@ -91,7 +91,10 @@ const [textes, fiche, ...contenus] = await Promise.all([
   ...FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.json`, false)),
 ]);
 installerLangue(textes);
-const [reperes, { cadrages: CADRAGES_DU_PLAN }] = await Promise.all([json("./reperes.json"), json("./plan.json")]);
+const [reperes, { cadrages: CADRAGES_DU_PLAN }, figurants] = await Promise.all([
+  json("./reperes.json"), json("./plan.json"), json("./figures.json")]);
+Object.assign(reperes.emprises, figurants.emprises);
+reperes.vues.push(...figurants.vues);
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
   [id, new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max))]));
 
@@ -239,9 +242,9 @@ const enMegaoctets = (octets) =>
   new Intl.NumberFormat(langue(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(octets / 1e6);
 // Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
 // attendre ensuite doublerait l'attente d'un visiteur en 4G.
+const chargeur = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 const [gltf, jeux] = await Promise.all([
-  new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
-    .loadAsync("./temple.glb", (e) => {
+  chargeur.loadAsync("./temple.glb", (e) => {
       if (!e.lengthComputable) return;
       jauge.style.width = `${(e.loaded / e.total) * 100}%`;
       restant.textContent = texte("restant").replace("{mo}", enMegaoctets(e.total - e.loaded));
@@ -261,12 +264,18 @@ const horloges = [];                    // uniformes de temps à faire avancer
 const brut = new URLSearchParams(location.search).has("brut");
 const IDS = new Set(CONCEPTS.keys());
 const habillees = new Set();
+
+function conceptDe(objet) {
+  for (let n = objet; n; n = n.parent) {
+    const nom = n.name.replace(/_\d+$/, "");
+    if (IDS.has(nom)) return nom;
+  }
+  return undefined;
+}
+
 gltf.scene.traverse((o) => {
   if (!o.isMesh) return;
-  for (let n = o; n; n = n.parent) {
-    const nom = n.name.replace(/_\d+$/, "");
-    if (IDS.has(nom)) { o.userData.concept = nom; break; }
-  }
+  o.userData.concept = conceptDe(o);
   o.geometry.computeBoundingBox();
   o.geometry.computeBoundingSphere();
   o.geometry.computeBoundsTree({ maxLeafTris: 24 });
@@ -285,6 +294,43 @@ gltf.scene.traverse((o) => {
   obstacles.push(o);
   if (!TRAVERSABLES.has(o.userData.concept)) murs.push(o);
 });
+
+// Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
+let melangeur = null;
+const MARGE_GESTE = 0.35;
+const EMPRISES_FIGURANTS = Object.keys(figurants.emprises).map((id) => EMPRISES.get(id));
+const PRISE = new THREE.MeshBasicMaterial();
+
+// Le clic vise une boîte portée par le figurant : un rayon sur un corps animé transforme chaque sommet en JavaScript.
+function prendreEnMain(figurant) {
+  const emprise = new THREE.Box3();
+  figurant.traverse((o) => {
+    if (!o.isMesh) return;
+    o.material.side = ETOFFES.has(o.material.name) ? THREE.DoubleSide : THREE.FrontSide;
+    o.castShadow = PROFIL.figurants.ombre;
+    o.receiveShadow = true;
+    o.computeBoundingSphere();
+    o.boundingSphere.radius += MARGE_GESTE;
+    o.computeBoundingBox();
+    emprise.union(o.boundingBox.clone().applyMatrix4(o.matrix));
+  });
+  const prise = new THREE.Mesh(new THREE.BoxGeometry(...emprise.getSize(new THREE.Vector3()).toArray()), PRISE);
+  emprise.getCenter(prise.position);
+  prise.visible = false;
+  prise.userData.concept = conceptDe(figurant);
+  figurant.add(prise);
+  obstacles.push(prise);
+}
+
+function poserFigurants({ scene: troupe, animations }) {
+  melangeur = new THREE.AnimationMixer(troupe);
+  for (const clip of animations) melangeur.clipAction(clip).play();
+  melangeur.update(0);
+  troupe.updateMatrixWorld(true);
+  for (const figurant of troupe.children) prendreEnMain(figurant);
+  scene.add(troupe);
+}
+const figurantsPrets = chargeur.loadAsync("./figures.glb").then(poserFigurants);
 
 // ---------------------------------------------------------------------------
 // marche
@@ -760,7 +806,12 @@ let image = 0;
 const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
 const PAS_OMBRE = PROFIL.ombres.portee / 10;
 
+// Une carte figée garderait l'ombre des figurants à leur pose de départ.
+const figurantsDansLOmbre = () => PROFIL.figurants.ombre && melangeur !== null
+  && EMPRISES_FIGURANTS.some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
+
 function suivreSoleil() {
+  if (figurantsDansLOmbre()) soleil.shadow.needsUpdate = true;
   if (camera.position.distanceToSquared(ANCRE_OMBRE) < PAS_OMBRE * PAS_OMBRE) return;
   ANCRE_OMBRE.copy(camera.position);
   soleil.target.position.copy(camera.position);
@@ -771,6 +822,7 @@ function suivreSoleil() {
 
 function dessiner(dt) {
   for (const u of horloges) u.value += dt;
+  melangeur?.update(dt);
   suivreSoleil();
   ciel.position.copy(camera.position);
   rendu.rendre();
@@ -875,4 +927,6 @@ window.__ombres = (actives) => {
   scene.traverse((o) => { if (o.isMesh) o.material.needsUpdate = true; });
   dessiner(0);
 };
+window.__figurants = figurantsPrets;
+window.__temps = (t) => { melangeur.setTime(t); dessiner(0); };
 window.__pret = true;

@@ -505,18 +505,27 @@
   /* ---- petit écran : la fiche devient un tiroir ---- */
   @media (max-width: 720px) {
     #fiche {
+      --hauteur-tiroir: min(86vh, 760px);
+      --apercu: 46vh;
       top: auto; left: 0; right: 0; bottom: 0; width: auto;
-      height: 86vh; height: 86dvh; max-height: 760px;
+      height: var(--hauteur-tiroir);
       padding: 0 18px calc(30px + var(--marge-bas));
       border-left: 0; border-top: 1px solid var(--trait);
       border-radius: 16px 16px 0 0; box-shadow: 0 -14px 40px rgba(0,0,0,.45);
       transform: translateY(100%);
       transition: transform .3s cubic-bezier(.22,.61,.36,1);
     }
+    @supports (height: 1dvh) {
+      #fiche { --hauteur-tiroir: min(86dvh, 760px); }
+    }
     /* Deux crans : l'aperçu laisse voir l'élément dont la fiche parle, le plein écran
        est pour les sources. */
-    #fiche.ouverte { transform: translateY(calc(100% - 46vh)); }
-    #fiche.ouverte.pleine { transform: translateY(0); }
+    #fiche.ouverte {
+      transform: translateY(calc(var(--hauteur-tiroir) - var(--apercu)));
+      /* En aperçu le bas du tiroir est sous l'écran : sans cette marge, la fin de la fiche n'y remonte jamais. */
+      padding-bottom: calc(var(--hauteur-tiroir) - var(--apercu) + 30px + var(--marge-bas));
+    }
+    #fiche.ouverte.pleine { transform: translateY(0); padding-bottom: calc(30px + var(--marge-bas)); }
     #poignee { margin: 0 -18px; padding: 12px 18px 8px; cursor: grab; touch-action: none; }
     #poignee::before {
       content: ""; display: block; width: 42px; height: 4px; margin: 0 auto 6px;
@@ -539,7 +548,7 @@
       transform: translateX(101%);
       transition: transform .28s cubic-bezier(.22,.61,.36,1);
     }
-    #fiche.ouverte, #fiche.ouverte.pleine { transform: none; }
+    #fiche.ouverte, #fiche.ouverte.pleine { transform: none; padding-bottom: calc(24px + var(--marge-bas)); }
     #poignee { margin: 0; padding: 16px 0 4px; cursor: default; touch-action: auto; }
     #poignee::before { content: none; }
     #fermer { top: 12px; inset-inline-end: 0; }

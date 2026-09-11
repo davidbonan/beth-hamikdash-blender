@@ -22,7 +22,8 @@ const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT =
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
-export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil"]);
+export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil",
+  "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Voile"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.

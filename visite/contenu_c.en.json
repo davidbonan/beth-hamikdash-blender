@@ -190,5 +190,70 @@
       {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"}
     ],
     "note": "The placement is an explicit CHOICE of the blockout: “On the gold of the east wall of the Ulam, north side: CHOICE.” No measurement is sourced; the eight engraved lines are geometry from the script. Not to be confused with the other gift from the same queen, the nivreshet — a golden lamp (“מְנוֹרָה,” Bartenura) above the entrance to the Heikhal (Yoma 3:10; 37b), `Nivreshet_Helene` in the blockout."
+  },
+
+  "cohanim": {
+    "nom": "Kohanim in their service garments",
+    "translit": "Bigdei kehuna",
+    "resume": "An ordinary kohen serves in four garments of white linen: the kutonet, the mikhnasayim, the migba'at and the avnet. The kutonet falls to just above the heel and its sleeves to the wrist; the mikhnasayim reach from above the navel to the knee; the migba'at is a strip of linen that the sons of Aharon wind “like a hat”; the avnet, thirty-two amot long, is wound turn over turn at the height of the elbows. The kohen serves barefoot: nothing may come between him and the pavement. The tour shows two at the Kiyor — one sanctifies himself there, right hand on right foot, left hand on left foot, bending over —, one going up the kevesh and back down, and one at the foot of the altar's north-east corner.",
+    "cotes": [
+      "kutonet: to just above the heel; sleeve to the wrist, as wide as the hand",
+      "mikhnasayim: from above the navel to the knee",
+      "migba'at: sixteen amot of linen, wound like a hat",
+      "avnet: three fingers wide, thirty-two amot long, wound turn over turn",
+      "avnet worn at the height of the elbows",
+      "linen thread twisted sixfold; only the avnet embroidered with wool",
+      "barefoot on the pavement",
+      "the figures: 1.71 to 1.77 m, about 3.6 amot"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "28:40-42", "citation": "וּמִגְבָּעוֹת תַּעֲשֶׂה לָהֶם לְכָבוֹד וּלְתִפְאָרֶת"},
+      {"oeuvre": "Shemot", "ref": "39:29", "citation": "וְאֶת הָאַבְנֵט שֵׁשׁ מָשְׁזָר וּתְכֵלֶת וְאַרְגָּמָן וְתוֹלַעַת שָׁנִי מַעֲשֵׂה רֹקֵם"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:1-2", "citation": "וּבָנָיו צוֹנְפִין בָּהּ כְּכוֹבַע"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:17-19", "citation": "אֹרֶךָ הַכֻּתֹּנֶת עַד לְמַעְלָה מִן הֶעָקֵב"},
+      {"oeuvre": "Rashi Exode", "ref": "28:7", "citation": "לֹא לְמַעְלָה מֵאֲצִילֵיהֶם וְלֹא לְמַטָּה מִמָּתְנֵיהֶם"},
+      {"oeuvre": "Zeva'him", "ref": "24a", "citation": "לֹא יְהֵא דָּבָר חוֹצֵץ בֵּינוֹ לְבֵין הָרִצְפָּה"},
+      {"oeuvre": "Yoma", "ref": "6a", "citation": "אַבְנֵטוֹ שֶׁל כֹּהֵן גָּדוֹל זֶהוּ אַבְנֵטוֹ שֶׁל כֹּהֵן הֶדְיוֹט"},
+      {"oeuvre": "Rambam Bi'at HaMikdash", "ref": "5:16", "citation": "מַנִּיחַ יָדוֹ הַיְמָנִית עַל גַּבֵּי רַגְלוֹ הַיְמָנִית וְיָדוֹ הַשְּׂמָאלִית עַל גַּבֵּי רַגְלוֹ הַשְּׂמָאלִית וְשׁוֹחֶה וּמְקַדֵּשׁ"}
+    ],
+    "note": "Is an ordinary kohen's avnet the same as the Kohen Gadol's, embroidered with wool? Yoma 6a discusses it; the Rambam rules that it is (Klei HaMikdash 8:1-2), and the figures follow him. The technical spec sheet (§12) dresses the film's kohanim in plain linen. No source gives the pattern of the embroidery: the stripes of tekhelet, argaman and tola'at shani are a CHOICE, as are the exact shape of the migba'at and the figures' gestures."
+  },
+
+  "leviim": {
+    "nom": "Leviim on the Dukhan",
+    "translit": "Leviim al haDukhan",
+    "resume": "The Leviim sing standing on the Dukhan, the step that separates the Ezrat Israel from the Ezrat Kohanim, each with his instrument. Never fewer than twelve are counted: at least nine kinorot, two nevalim and a single tziltzal. In the days of Shlomo, the Tanakh shows the singers “clothed in linen.” The tour places twelve of them, facing the Sanctuary, on either side of the axis one follows coming up from the Nikanor Gate. At the tamid, Ben Arza strikes the tziltzal and the Leviim break into song: in the tour, the tziltzal keeps the beat.",
+    "cotes": [
+      "twelve Leviim, never fewer",
+      "nine kinorot, two nevalim, one tziltzal",
+      "standing on the Dukhan, three half-ama steps",
+      "clothed in linen"
+    ],
+    "sources": [
+      {"oeuvre": "Arakhin", "ref": "2:6", "citation": ""},
+      {"oeuvre": "Arakhin", "ref": "2:5", "citation": ""},
+      {"oeuvre": "Arakhin", "ref": "2:3", "citation": ""},
+      {"oeuvre": "Middot", "ref": "2:6", "citation": ""},
+      {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
+      {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
+    ],
+    "note": "II Chronicles 5:12 describes the dedication of Shlomo's Temple; the Mishna does not say how the Leviim of the Second Temple were dressed. The linen, the white kippa, the place on the highest step, the westward orientation and the passage left open on the axis are CHOICES of the tour, as is their swaying to the beat. The Levite children, who stood below (Arakhin 2:6), are not shown."
+  },
+
+  "fideles": {
+    "nom": "Worshippers in the Ezrat Nashim",
+    "translit": "HaAm beEzrat HaNashim",
+    "resume": "The Ezrat Nashim, 135 amot by 135, is the court where men and women stand before climbing the fifteen steps to the Nikanor Gate. It is holier than the Har HaBayit and the Cheil: a tevul yom may not enter it. A gallery was later built around it, so that “the women watch from above and the men from below.” The tour places a few worshippers there to give the scale of the court, the steps and the gate.",
+    "cotes": [
+      "135 × 135 amot",
+      "four 40-ama lishkot at the corners, unroofed",
+      "fifteen steps up to the Ezrat Israel",
+      "closed to a tevul yom"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "2:5", "citation": "שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן"},
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת נָשִׁים מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם"}
+    ],
+    "note": "The worshippers are not in period costume: they are dressed as their community dresses today for the day — suit and hat, suit and tallit, suit and kippa — following the film's rule (technical spec sheet §12). This is a deliberate choice, not a reconstruction. The rule, written for men, says nothing about women: the figure in a dress and headscarf is a CHOICE of the tour. So are their gestures — walking, praying, talking."
   }
 }

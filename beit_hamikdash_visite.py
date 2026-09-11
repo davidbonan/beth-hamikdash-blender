@@ -90,7 +90,7 @@ VUES = [
 ]
 
 
-def comprimer(glb):
+def comprimer(glb, options=()):
     """Recompresse le .glb en place avec meshopt.
 
     C'est la seule optimisation qui compte sur un téléphone en 4G, et l'export glTF de
@@ -105,7 +105,7 @@ def comprimer(glb):
     """
     sortie = glb.with_suffix(".pack.glb")
     commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
-                "-cc", "-kn", "-km", "-ke", "-vp", "16", "-vn", "12"]
+                "-cc", "-kn", "-km", "-ke", "-vp", "16", "-vn", "12", *options]
     try:
         subprocess.run(commande, check=True, capture_output=True, timeout=600)
     except (OSError, subprocess.SubprocessError) as erreur:
@@ -311,4 +311,5 @@ def main():
     print(f"\n{len(groupes)} maillages · temple.glb {taille:.1f} Mo")
 
 
-main()
+if __name__ == "__main__":
+    main()

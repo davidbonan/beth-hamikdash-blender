@@ -62,10 +62,17 @@ const PORTEE = [45.0, 120.0];
 
 const GEOMETRIE = new THREE.ShaderMaterial({
   vertexShader: /* glsl */`
+    #include <common>
+    #include <skinning_pars_vertex>
     varying vec3 vN; varying float vZ;
     void main(){
-      vec4 mv = modelViewMatrix * vec4(position, 1.0);
-      vN = normalMatrix * normal; vZ = -mv.z;
+      #include <skinbase_vertex>
+      #include <beginnormal_vertex>
+      #include <skinnormal_vertex>
+      #include <begin_vertex>
+      #include <skinning_vertex>
+      vec4 mv = modelViewMatrix * vec4(transformed, 1.0);
+      vN = normalMatrix * objectNormal; vZ = -mv.z;
       gl_Position = projectionMatrix * mv;
     }`,
   fragmentShader: /* glsl */`

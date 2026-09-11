@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les sept scripts
+## Les huit scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -31,6 +31,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
+| `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
 | `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
@@ -124,6 +125,36 @@ avec `visite/reperes.json`. Le lien géométrie ↔ encyclopédie passe par
 lui appartiennent. Un ajout au blockout que `concepts.json` ne déclare pas ressort en
 fin de sortie sous « volumes sans concept » : c'est la liste de ce qu'il reste à
 nommer.
+
+## Les figurants
+
+`beit_hamikdash_figures.py` lit le .blend et écrit `visite/figures.glb` et `visite/figures.json`
+(emprises et vues de `cohanim`, `leviim`, `fideles`, que la visite ajoute à `reperes.json`).
+Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                         # les 22 rôles, une douzaine de minutes
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- cohanim_1 fideles_3   # un essai
+```
+
+Un essai réécrit `figures.glb` avec ses seuls rôles : relancer les 22 avant de committer.
+Rôles, places et gestes se déclarent dans `roles()`.
+
+Corps, peaux, yeux, cheveux, barbes et vêtements viennent de MakeHuman (extension MPFB) : la
+kutonet est la robe de moine `donitz_monk_robe` (CC0) sans pèlerine ni cordon, la robe et le
+voile de la fidèle `punkduck_medieval_dress` et `elvs_charity_veil1` (CC BY), teints par
+`reteindre`. Avnet, migba'at, kippot, talith (étole drapée par simulation) et instruments sont
+générés par le script. Une fois par machine :
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --online-mode -c extension install mpfb --enable
+```
+
+puis décompresser dans `~/Library/Application Support/Blender/5.2/extensions/.user/blender_org/mpfb/data` :
+`https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip`
+et, pour les barbes, `https://files2.makehumancommunity.org/asset_packs/bodyparts05/bodyparts05_cc0.zip`.
+Les trois vêtements se copient seuls dans `data/clothes/`, depuis `suits02/suits02_cc0.zip`,
+`dress03/dress03_cc-by.zip` et `hats03/hats03_cc-by.zip` (même adresse, `asset_packs/`).
 
 ## Détails de plomberie
 

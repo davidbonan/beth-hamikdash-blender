@@ -735,6 +735,24 @@
         "HarHabayit_porte_Kiponus"
       ],
       "lieu": true
+    },
+    {
+      "id": "cohanim",
+      "nom": "Cohanim en vêtements de service",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "leviim",
+      "nom": "Léviim sur le Doukhan",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "fideles",
+      "nom": "Fidèles dans l'Ezrat Nashim",
+      "zone": "ezrat_nashim",
+      "prefixes": []
     }
   ]
 }

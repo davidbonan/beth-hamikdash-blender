@@ -34,7 +34,7 @@ La branche du site est `master`, pas `main`. Netlify déploie au push, ~3 minute
 ## Ce que le script fait, et pourquoi la balise `<base>`
 
 `publier_visite.sh [chemin-du-site]` rsync `index.html`, les `.js`, les `.json`,
-`temple.glb` et `apercu.jpg` vers `public/visite/`, en `--delete` — un fichier
+`temple.glb`, `figures.glb` et `apercu.jpg` vers `public/visite/`, en `--delete` — un fichier
 supprimé ici disparaît là-bas. Puis il insère `<base href="/visite/">` dans la copie.
 
 Cette balise est le seul écart entre la source et le déployé, et il est nécessaire :
@@ -54,7 +54,7 @@ un asset manquant. Deux niveaux.
 
 ```bash
 curl -sIL https://davidbonan.io/visite | grep -i "^HTTP\|^location"
-for f in visite.js temple.glb concepts.json reperes.json textes.json; do
+for f in visite.js temple.glb figures.glb figures.json concepts.json reperes.json textes.json; do
   curl -s -o /dev/null -w "$f %{http_code}\n" "https://davidbonan.io/visite/$f"
 done
 ```

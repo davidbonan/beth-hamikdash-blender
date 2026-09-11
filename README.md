@@ -34,9 +34,11 @@ dernière à droite.*
 | `beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
 | `beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre. Ne reconstruit rien. |
 | `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun et les points d'entrée. Lit le .blend, ne le réécrit pas. |
+| `beit_hamikdash_figures.py` | Les figurants de la visite — cohanim au Kiyor, au kevesh et au pied de l'autel, douze Léviim sur le Doukhan, fidèles dans l'Ezrat Nashim. Corps MakeHuman (CC0), vêtus et animés ; écrit `visite/figures.glb` et `visite/figures.json`. Ni le .blend ni le film ne les voient. |
+| `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
 | `visite/` | La visite elle-même : page web où l'on marche dans le Temple et où l'on clique un élément pour savoir ce que c'est, avec sa source. |
 | `.claude/skills/camera/` | Skill Claude Code + `camera.py` : déclare un plan, en rend les deux images clés et mesure son recouvrement, en une commande. |
-| `.claude/skills/blender/` | Skill Claude Code : les incantations headless des six scripts, et l'invariant « le script est la source, le .blend est l'artefact ». |
+| `.claude/skills/blender/` | Skill Claude Code : les incantations headless des huit scripts, et l'invariant « le script est la source, le .blend est l'artefact ». |
 | `.claude/skills/fal-video/` | Skill Claude Code + `fal_image.py` / `fal_video.py` : stylise une frame clé et génère un plan sur fal.ai en ligne de commande. |
 | `.claude/skills/fal-retouche/` | Skill Claude Code + `retouche.py` : corrige un défaut localisé d'une image validée sans regénérer le cadre. |
 | `.claude/skills/mikdash/` | Skill Claude Code : banque de sources (*Middot*, *Tamid*, *Yoma*, Rambam) pour répondre cote en main plutôt que de mémoire. |
@@ -789,3 +791,6 @@ portait aussi. Ils sont corrigés dans le script, la fiche et les trois langues 
   © 2026 David Bonan.
 - **Textures** de `visite/matieres/` : refabriquées depuis des jeux CC0 de Poly Haven et
   ambientCG, elles restent CC0.
+- **Figurants** de `visite/figures.glb` : corps et vêtements MakeHuman, CC0, sauf la robe
+  *Medieval Dress* de punkduck (CC BY 4.0) et le voile *Charity Veil* d'Elvaerwyn (CC BY),
+  teints pour la visite.
