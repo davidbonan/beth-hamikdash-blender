@@ -1,13 +1,13 @@
 {
   "fondu_s": 1.2,
   "haltes": [
-    { "degre": "har_habayit", "vue": "har_habayit", "point": [200, 42], "hauteur": 38, "sol": -16, "cible": [-76, 26, 0], "pause_s": 4 },
-    { "degre": "heil", "vue": "face_porte_est", "point": [152, 0], "sol": -16, "cible": [138, -6, 0], "duree_s": 14 },
-    { "degre": "ezrat_nashim", "vue": "ezrat_nashim", "point": [128, 0], "sol": -10, "cible": [-76, 30, 0], "duree_s": 8 },
-    { "degre": "azara", "vue": "azara", "point": [-7, 0], "sol": -2.5, "cible": [-76, 25, 0], "duree_s": 26 },
-    { "degre": "mizbeach", "vue": "mizbeach", "point": [-18, -24], "sol": 0, "via": [[-9, -27]], "cible": [-40, 5, 4], "duree_s": 11 },
-    { "degre": "oulam", "vue": "oulam", "point": [-62, -4], "sol": 0, "via": [[-42, -14]], "cible": [-92, 10, 0], "duree_s": 12 },
-    { "degre": "heikhal", "vue": "heikhal", "point": [-108, 0], "sol": 6, "via": [[-70, 0]], "cible": [-138, 12, 0], "duree_s": 16 },
-    { "degre": "kodesh_hakodashim", "vue": "kodesh_hakodashim", "point": [-143, 0], "sol": 6, "cible": [-149, 8, 0], "seuil": [-137.5, 4], "duree_s": 12, "pause_s": 5 }
+    { "degre": "har_habayit", "vue": "har_habayit", "point": [245, -80], "hauteur": 25, "sol": -16, "cible": [-40, 40, 0], "focale": 32, "pause_s": 7 },
+    { "degre": "heil", "vue": "face_porte_est", "point": [178, -4], "sol": -16, "oeil": 3.6, "via": [[190, -20, 10]], "cible": [142, 3, 0], "focale": 24, "duree_s": 14, "pause_s": 7 },
+    { "degre": "ezrat_nashim", "vue": "ezrat_nashim", "point": [105, 0], "sol": -10, "oeil": 3.6, "cible": [-20, 25, 0], "focale": 32, "duree_s": 14, "pause_s": 7 },
+    { "degre": "azara", "vue": "azara", "point": [-2, -32], "sol": -2.5, "oeil": 6.1, "via": [[-6, 0], [-11, -4], [-11, -22]], "cible": [-45, 12, 5], "focale": 28, "duree_s": 26, "pause_s": 7 },
+    { "degre": "mizbeach", "vue": "mizbeach", "point": [-1, 60], "sol": -2.5, "oeil": 6.5, "via": [[-11, -22], [-11, 22]], "cible": [-38, 9, 12], "focale": 32, "duree_s": 16, "pause_s": 7 },
+    { "degre": "oulam", "vue": "oulam", "point": [-58, 0], "sol": 0, "oeil": 3, "via": [[-11, 24], [-11, -24], [-58, -30]], "cible": [-91, 26, 0], "focale": 28, "duree_s": 24, "pause_s": 7 },
+    { "degre": "heikhal", "vue": "heikhal", "point": [-85, 0], "sol": 6, "oeil": 5, "cible": [-138, 11, 0], "focale": 24, "duree_s": 9, "pause_s": 7 },
+    { "degre": "kodesh_hakodashim", "vue": "kodesh_hakodashim", "point": [-141.5, 0], "sol": 6, "oeil": 1.8, "via": [[-112, 3], [-126, 3]], "cible": [-149, 8, 0], "focale": 28, "seuil": [-137.5, 4], "duree_s": 14, "pause_s": 8 }
   ]
 }

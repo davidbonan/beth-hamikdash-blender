@@ -8,12 +8,16 @@
  * contournent ce qui barre la ligne droite — l'autel. Le sol se sonde à chaque
  * image, comme sous le marcheur : les degrés se gravissent, ils ne se traversent pas.
  * Une halte qui donne une `hauteur` est en l'air : on y descend, ou on en descend, en
- * ligne droite, sans sol. La page qui encadre peut demander de sauter à une halte : on
- * y arrive au noir, et la marche reprend de là.
+ * ligne droite, sans sol, et ses points de passage portent leur hauteur en troisième
+ * valeur. Une halte peut poser son `oeil` (hauteur du regard au-dessus
+ * du sol, en amot) et sa `focale` (en mm sur 36) : ce sont les cadrages des images du
+ * film, que l'accueil fond sur la scène à l'arrivée. La page qui encadre peut demander
+ * de sauter à une halte : on y arrive au noir, et la marche reprend de là.
  */
 import * as THREE from "three";
 
 const PAUSE_S = 3;
+const FILM = 16 / 9;
 const REPONSE_SOL = 0.22;      // s : une marche de 1/2 ama se glisse, elle ne se saute pas
 const lisse = (u) => u * u * (3 - 2 * u);
 
@@ -31,9 +35,11 @@ function polyligne(points) {
 }
 
 export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
-  const enM = ([x, z]) => new THREE.Vector3(x * ama, 0, z * ama);
+  const enM = ([x, z, y = 0]) => new THREE.Vector3(x * ama, y * ama, z * ama);
   const cibleEnM = ([x, y, z]) => new THREE.Vector3(x * ama, y * ama, z * ama);
-  const oeilA = (halte) => (halte.hauteur ?? halte.sol) * ama + (halte.hauteur == null ? oeil : 0);
+  const oeilAuSol = (halte) => (halte.oeil != null ? halte.oeil * ama : oeil);
+  const oeilA = (halte) => (halte.hauteur != null ? halte.hauteur * ama : halte.sol * ama + oeilAuSol(halte));
+  const fovDe = (halte) => halte.focale ? 2 * THREE.MathUtils.radToDeg(Math.atan(18 / halte.focale)) : null;
   const fondu = parcours.fondu_s ?? 1;
 
   // Chaque halte devient un segment de temps : le trajet qui y mène, puis la pause.
@@ -43,13 +49,20 @@ export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
     const precedente = parcours.haltes[i - 1];
     const trajet = i === 0 ? 0 : halte.duree_s;
     const pause = halte.pause_s ?? PAUSE_S;
+    const enLAir = halte.hauteur != null || precedente?.hauteur != null;
+    const etapes = i === 0 ? [] : [precedente.point, ...(halte.via ?? []), halte.point].map(enM);
+    if (enLAir && etapes.length) {
+      etapes[0].y = oeilA(precedente);
+      etapes[etapes.length - 1].y = oeilA(halte);
+    }
     segments.push({
       halte, debut, trajet, fin: debut + trajet + pause,
-      chemin: i === 0 ? () => enM(halte.point) : polyligne([precedente.point, ...(halte.via ?? []), halte.point].map(enM)),
+      chemin: i === 0 ? () => enM(halte.point).setY(oeilA(halte)) : polyligne(etapes),
       regardDe: precedente ? cibleEnM(precedente.cible) : cibleEnM(halte.cible),
       regardVers: cibleEnM(halte.cible),
-      enLAir: halte.hauteur != null || precedente?.hauteur != null,
-      oeilDe: oeilA(precedente ?? halte), oeilVers: oeilA(halte),
+      enLAir,
+      oeilSolDe: oeilAuSol(precedente ?? halte), oeilSolVers: oeilAuSol(halte),
+      fovDe: fovDe(precedente ?? halte), fovVers: fovDe(halte),
     });
     debut = segments[segments.length - 1].fin;
   });
@@ -72,17 +85,18 @@ export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
     regard.lerpVectors(s.regardDe, s.regardVers, u);
 
     if (s.enLAir) {
-      hauteurOeil = THREE.MathUtils.lerp(s.oeilDe, s.oeilVers, u);
+      hauteurOeil = point.y;
       pieds = hauteurOeil - oeil;
     } else {
       const sonde = sol(point.x, point.z, pieds);
       if (sonde !== null) pieds = sonde;
       if (u === 1 && Math.abs(pieds - s.halte.sol * ama) > 1) pieds = s.halte.sol * ama;
       const k = dt > 0 ? 1 - Math.exp(-dt / REPONSE_SOL) : 1;
-      hauteurOeil += (pieds + oeil - hauteurOeil) * k;
+      hauteurOeil += (pieds + THREE.MathUtils.lerp(s.oeilSolDe, s.oeilSolVers, u) - hauteurOeil) * k;
     }
     camera.position.set(point.x, hauteurOeil, point.z);
     camera.lookAt(regard);
+    if (s.fovVers) cadrer(THREE.MathUtils.lerp(s.fovDe ?? s.fovVers, s.fovVers, u));
 
     // Noir sur le dernier temps de la dernière pause, sur le premier du départ, et au
     // passage d'un seuil qu'on ne voit pas au travers — la parokhet.
@@ -97,11 +111,22 @@ export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
     }
   }
 
+  // La focale du film est horizontale sur 36 mm, pour une image en 16/9 ; three compte
+  // l'angle vertical. L'accueil couvre l'écran avec l'image du film : sur un écran plus
+  // large qu'elle on en voit toute la largeur, sur un plus haut toute la hauteur.
+  function cadrer(fovHorizontal) {
+    const demi = Math.tan(THREE.MathUtils.degToRad(fovHorizontal) / 2);
+    const vertical = 2 * THREE.MathUtils.radToDeg(Math.atan(demi / Math.max(camera.aspect, FILM)));
+    if (Math.abs(camera.fov - vertical) < 0.01) return;
+    camera.fov = vertical;
+    camera.updateProjectionMatrix();
+  }
+
   function sauter(degre) {
     const s = segments.find((s) => s.halte.degre === degre);
     if (!s) return;
     pieds = s.halte.sol * ama;
-    hauteurOeil = s.oeilVers;
+    hauteurOeil = oeilA(s.halte);
     depuisLaCoupe = 0;
     annoncee = -1;
     poser(s.fin - (s.halte.pause_s ?? PAUSE_S), 0);

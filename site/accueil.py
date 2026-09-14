@@ -5,7 +5,9 @@
 
 L'accueil est la visite elle-même en mode cinéma : la scène marche seule le long des
 degrés de sainteté (Kelim 1:6-9) et la page nomme le degré où elle en est. Les haltes
-et leurs temps viennent de visite/cinema.json ; l'affiche est l'image du départ.
+et leurs temps viennent de visite/cinema.json ; à chaque halte, l'image du film prise
+de ce même point (site/images/<degré>_*.webp) se fond sur la scène, puis la marche
+reprend. L'affiche est l'image du départ.
 """
 import json
 from pathlib import Path
@@ -96,13 +98,20 @@ AUTEUR = {"fr": "David Bonan", "en": "David Bonan", "he": "דוד בונן"}
 
 
 def arrivees():
-    """Le temps d'arrivée à chaque halte, comme cinema.js le compte : trajet puis pause."""
+    """Le temps d'arrivée à chaque halte et la pause qu'on y fait, comme cinema.js les compte."""
     temps, resultat = 0.0, []
     for i, halte in enumerate(PARCOURS["haltes"]):
         temps += 0 if i == 0 else halte["duree_s"]
-        resultat.append((halte, temps))
-        temps += halte.get("pause_s", 3)
+        pause = halte.get("pause_s", 3)
+        resultat.append((halte, temps, pause))
+        temps += pause
     return resultat
+
+
+def vision(halte):
+    d = halte["degre"]
+    return (f'<img class="vision" data-degre="{d}" src="/images/{d}_2000.webp" '
+            f'srcset="/images/{d}_1000.webp 1000w, /images/{d}_2000.webp 2000w" sizes="100vw" alt="" decoding="async">')
 
 
 def nav_langues(code):
@@ -126,14 +135,14 @@ def echelon(t, halte, premier):
     return f'<li><button type="button" data-degre="{halte["degre"]}" title="{nom}" aria-label="{nom}"{courant}></button></li>'
 
 
-def degre(t, halte, temps, premier):
+def degre(t, halte, temps, pause, premier):
     nom, hebreu, ref, phrase = t["degres"][halte["degre"]]
     courant = ' aria-current="true"' if premier else ""
     titre = f'<span class="nom">{nom}</span>'
     if hebreu:
         titre += f' <span class="nom-he" lang="he" dir="rtl">{hebreu}</span>'
     return f'''
-      <li data-degre="{halte["degre"]}" data-vue="{halte["vue"]}" data-temps="{temps:g}"{courant}>
+      <li data-degre="{halte["degre"]}" data-vue="{halte["vue"]}" data-temps="{temps:g}" data-pause="{pause:g}"{courant}>
         <h2>{titre}</h2>
         <p class="mishna">{phrase}</p>
         <p class="source">{t["mishna"]} {ref}</p>
@@ -144,8 +153,9 @@ def page(code):
     t = TEXTES[code]
     url = f'{DOMAINE}/{t["chemin"]}'
     haltes = arrivees()
-    degres = "".join(degre(t, halte, temps, i == 0) for i, (halte, temps) in enumerate(haltes))
-    echelle = "".join(echelon(t, halte, i == 0) for i, (halte, _) in enumerate(haltes))
+    degres = "".join(degre(t, halte, temps, pause, i == 0) for i, (halte, temps, pause) in enumerate(haltes))
+    echelle = "".join(echelon(t, halte, i == 0) for i, (halte, _, _) in enumerate(haltes))
+    visions = "".join(vision(halte) for halte, _, _ in haltes)
     return f'''<!doctype html>
 <html lang="{code}" dir="{t["sens"]}">
 <meta charset="utf-8">
@@ -182,6 +192,7 @@ def page(code):
     </picture>
     <iframe class="vivante" title="" tabindex="-1" aria-hidden="true" hidden></iframe>
     <video class="vivante" muted playsinline loop preload="none" aria-hidden="true" data-src="/images/parcours_portrait.mp4" hidden></video>
+    <div class="visions" aria-hidden="true">{visions}</div>
   </div>
 
   <nav aria-label="{t["nav_langue"]}">

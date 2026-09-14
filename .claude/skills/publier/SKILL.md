@@ -42,13 +42,25 @@ balise `<base>` : la source et le déployé sont identiques. Netlify redirige `/
 
 ## L'accueil est la visite
 
-L'accueil n'a pas d'images du film : il encadre `/visite/?cinema` dans un `<iframe>`, où
-la scène marche seule le long des degrés de sainteté (`visite/cinema.js`, parcours dans
-`visite/cinema.json` — haltes en amot, ce qu'on y regarde, durée du trajet, pause) et
-poste à la page le degré atteint (`postMessage`, type `cinema`). `site/accueil.js`
-affiche le degré, et « Entrer » pointe sur `/visite/?vue=<halte>`. L'échelle des huit
-degrés au-dessus du nom en fait sauter la scène : message `{ type: "cinema", aller }` à
-l'iframe (`cinema.js` y arrive au noir), `currentTime` de la vidéo au téléphone.
+L'accueil encadre `/visite/?cinema` dans un `<iframe>`, où la scène marche seule le long
+des degrés de sainteté (`visite/cinema.js`, parcours dans `visite/cinema.json` — haltes
+en amot, ce qu'on y regarde, durée du trajet, pause) et poste à la page le degré atteint
+(`postMessage`, type `cinema`). `site/accueil.js` affiche le degré, et « Entrer » pointe
+sur `/visite/?vue=<halte>`. L'échelle des huit degrés au-dessus du nom en fait sauter la
+scène : message `{ type: "cinema", aller }` à l'iframe (`cinema.js` y arrive au noir),
+`currentTime` de la vidéo au téléphone.
+
+**Chaque halte est un cadrage du film**, et son image stylisée (`site/images/<degré>_1000`
+et `_2000.webp`, sources dans `renders/style/` : ACC_01 à 05 pour les cinq premières,
+CAM_08, CAM_09A et CAM_11 pour l'Oulam, le Heikhal et le Kodesh HaKodashim) se fond sur la
+scène à l'arrivée, puis s'efface avant que la marche reprenne (`ATTENTE_S`, `FONDU_S` dans
+`accueil.js`). Pour que le fondu raccorde, la halte reprend la caméra du film : `point` et
+`cible` en repère visite (x est, z sud = −y Blender, y haut = z Blender), `oeil` = z de la
+caméra moins le sol, `focale` en mm sur 36 (`cinema.js` en fait l'angle, horizontal sur un
+écran plus large que 16/9, vertical sinon — c'est ainsi que l'image en `cover` se pose sur
+la scène). Les `via` d'un trajet en l'air portent leur hauteur en troisième valeur. Un
+raccord se vérifie scène à côté de l'image, par `__cinema.sauter(<degré>)` puis quelques
+`__cinema.avancer(1/24)` et `__rendre()` — l'affiche est l'image du premier degré.
 
 Trois fichiers de `site/images/` sont des **captures de cette scène**, à refaire dès que
 le parcours ou la scène change — sinon l'affiche ne raccorde plus avec la première image

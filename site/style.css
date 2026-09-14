@@ -42,6 +42,8 @@ p { margin: 0; text-wrap: pretty; }
 .fond iframe { pointer-events: none; }
 .fond .vivante { opacity: 0; transition: opacity 1.6s ease; }
 .scene.vivante .fond .vivante { opacity: 1; }
+.visions img { object-fit: cover; opacity: 0; transition: opacity 1.4s ease; }
+.visions img.visible { opacity: 1; }
 .scene::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background:
@@ -117,6 +119,6 @@ p { margin: 0; text-wrap: pretty; }
   .scene nav { justify-content: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fond .vivante { transition: none; }
+  .fond .vivante, .visions img { transition: none; }
   .degres ul li[aria-current] { animation: none; }
 }
