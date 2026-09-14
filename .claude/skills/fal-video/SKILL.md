@@ -112,6 +112,15 @@ sky, nothing later than the Second Temple ever enters the frame ». Même chose 
 ligne de crête : « nothing breaks that skyline: no tower, spire, belfry, minaret, dome
 or pointed roof ».
 
+**Une matière se décrit par ce qu'on voit à distance, pas par sa recette.** Les trois
+marbres d'Hérode dits « blanc, vert pâle, bleu pâle en assises alternées » sont sortis en
+bandes bleu-vert franches sur les six cadrages d'accueil — le modèle lit une liste de
+couleurs comme un motif à peindre. Réécrit « presque entièrement blanc, la nuance à peine
+perceptible au second regard, jamais des bandes, de loin un seul bloc blanc lumineux »,
+les six sont sortis justes. Même chose pour la pierre : « marges ciselées, usure » a rendu
+un appareil rustique là où *Melakhim I* 7:9 dit des faces sciées lisses. Les prompts
+retenus sont dans `site/styliser_accueil.sh`.
+
 **Une consigne ne nomme que ce que la caméra voit.** Décrire une foule qu'un mur
 occulte, ou des ustensiles sortis du cadre, c'est demander au modèle de les inventer —
 et il refabrique la pièce entière. Avant d'écrire le prompt d'une frame, vérifier le
