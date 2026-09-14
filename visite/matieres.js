@@ -212,14 +212,12 @@ const float ASSISE = 4.0;
 // Le bâtiment en prend deux : à 4, ses vingt-cinq lits le lisaient en carrelage. Même
 // valeur qu'ASSISE_HERODE du blockout.
 const float ASSISE_HERODE = 8.0;
-// « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » (Baba Batra 4a ; Soucca 51b) : une assise déborde, la
-// suivante rentre. Le blockout le pose en bump sur la parité de l'assise (DEBORD_ASSISE,
-// DEBORD_BATIMENT) ; ici, sans dérivée d'écran, la marche se donne par le LIT — creusé
-// plus profond du côté de l'assise rentrante, presque plat du côté de celle qui déborde.
-// Deux encodages du même fait : la valeur n'est pas la même de part et d'autre, le
-// rapport entre le bâtiment et l'enceinte l'est.
-const float DEBORD = 0.16;           // enceinte et pourtour
-const float DEBORD_BATIMENT = 0.35;  // le bâtiment d'Hérode : c'est sa vague
+// « אפיק שפה ועייל שפה, כי היכי דלקבל סידא » (Soucca 51b ; Baba Batra 4a) : une assise
+// déborde, la suivante rentre, pour que l'enduit prenne. La vague est dans la teinte, pas
+// dans ce relief. Le blockout le pose en bump sur la parité de l'assise (DEBORD_ASSISE) ;
+// ici, sans dérivée d'écran, la marche se donne par le LIT — creusé plus profond du côté
+// de l'assise rentrante, presque plat du côté de celle qui déborde.
+const float DEBORD = 0.16;
 // Le sol va en RANGÉES, pas en carreaux : « כל שורה ושורה של אבני הרצפה קרויה רובד »
 // (Bartenura sur Yoma 4:3), et on les compte en sortant du Heikhal — Yoma 4:3 pose le
 // ממרס sur le quatrième rovad de l'Azara. Largeur « ורובד ארבע » (Middot 3:6). Mêmes
@@ -468,12 +466,13 @@ void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rug
     dalles(P, teinte, pente, rugo, usure, photo);
     return;
   }
-  Bloc b = tailler(P, N, Appareil(ASSISE_HERODE, 8.0, 10.0, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE));
+  Bloc b = tailler(P, N, Appareil(ASSISE_HERODE, 8.0, 10.0, DEBORD, JOINT_MARBRE, LISERE_MARBRE));
   pente = b.pente;
   // « בְּאַבְנֵי כּוּחְלָא, שִׁישָׁא וּמַרְמְרָא » (Baba Batra 4a ; Soucca 51b), trois FROIDS selon Rashi,
-  // tirés par assise entière : mêmes écarts au shesh que MARBRES_HERODE du blockout.
+  // tirés par assise entière : mêmes écarts au shesh que MARBRES_HERODE du blockout. C'est leur
+  // écart qui fait la vague, « שהאבנים משונים במראיהן זו מזו » (Rashi sur Soucca 51b).
   vec3 marbre = b.tireAssise < 0.3333 ? vec3(1.00, 1.00, 1.00)
-              : (b.tireAssise < 0.6667 ? vec3(0.86, 0.92, 0.97) : vec3(0.87, 0.95, 0.88));
+              : (b.tireAssise < 0.6667 ? vec3(0.83, 0.92, 1.02) : vec3(0.85, 0.97, 0.83));
   // L'assise porte la vague ; d'un bloc au suivant, à peine une nuance, sinon la façade tourne au patchwork.
   float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
   vec3 base = marbre * mix(vec3(0.97, 0.97, 0.98), vec3(1.03, 1.02, 1.00), clamp(f, 0.0, 1.0));

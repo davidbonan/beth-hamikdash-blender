@@ -221,12 +221,12 @@ ASSISE_HERODE = 8.0         # CHOIX : le bâtiment, deux pas de rovad
 # bordure rapportée ; 0,25 le ramène à un trait de ciseau.
 JOINT = 0.06
 LISERE = 0.25
-# « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » (Baba Batra 4a ; Soucca 51b) : une assise déborde, la
-# suivante rentre. Le débord n'est chiffré nulle part — CHOIX. Il est plus fort sur le
-# bâtiment que sur l'enceinte parce que c'est de SA façade que parle la guemara : là, ce
-# relief est ce que les Sages ont préféré à l'or, et il doit porter la vague à lui seul.
+# « אפיק שפה ועייל שפה, כי היכי דלקבל סידא » (Soucca 51b ; Baba Batra 4a) : une
+# assise déborde, la suivante rentre, pour que l'enduit prenne — celui qu'Hérode voulait
+# dorer. Ce relief n'est pas la vague : Rashi la met dans la teinte, « שהאבנים משונים
+# במראיהן זו מזו » (Soucca 51b). Le débord n'est chiffré nulle part — CHOIX, le même
+# partout.
 DEBORD_ASSISE = 0.05
-DEBORD_BATIMENT = 0.11
 # Le marbre est poli jusqu'à l'arête : pas de liseré, et un joint serré — CHOIX. Au
 # joint du calcaire, ses blocs quadrillaient la façade de traits.
 JOINT_MARBRE = 0.02
@@ -376,11 +376,8 @@ def _tailler(mat, appareil):
     est ce qui donne le bloc, et le bloc l'échelle — sans lui un mur de 100 amot n'a que
     des lignes horizontales et se lit en bardage.
 
-    La parité des assises reste le « אבן יוצא ואבן נכנס » de *Baba Batra* 4a : une assise
-    en léger débord, la suivante en retrait. C'est ce jeu-là — pas un placage — qui a
-    fait renoncer Hérode à dorer le bâtiment, « cela ressemble aux vagues de la mer ».
-    D'où `debord`, plus fort sur le bâtiment que sur l'enceinte : c'est de SA façade que
-    parle la guemara, et c'est le relief qui doit y porter la vague, pas la teinte.
+    La parité des assises reste le « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » de *Soucca* 51b : une assise
+    en léger débord, la suivante en retrait, « כי היכי דלקבל סידא ». D'où `debord`.
     """
     assise, longueurs, _, joint, lisere = appareil
     z, u, aplat = _parement(mat)
@@ -613,10 +610,10 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
 # ירוק », « מרמרא — שיש לבן », « כוחלא — שיש צבוע כעין כחול » — vert, blanc, bleu.
 # Aucune source ne met de jaune sur ce bâtiment ; le troisième marbre en portait un, et
 # c'est lui qui faisait lire la façade en assises de brique.
-# Saturation très basse : ce que les Sages lui ont fait garder contre l'or, c'est « כִּי
-# אִידְווֹתָא דְיַמָּא », le moiré d'une mer — pas une mosaïque.
-MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.81, 0.86, 0.86), (0.82, 0.88, 0.78))
-APPAREIL_HERODE = Appareil(ASSISE_HERODE, PIERRE_LONG, DEBORD_BATIMENT, JOINT_MARBRE, LISERE_MARBRE)
+# C'est leur écart qui fait « כאדותא דימא » : « שהאבנים משונים במראיהן זו מזו »
+# (Rashi sur Soucca 51b). Chroma : CHOIX, franc sans tourner à la mosaïque.
+MARBRES_HERODE = ((0.94, 0.93, 0.89), (0.78, 0.86, 0.91), (0.80, 0.90, 0.74))
+APPAREIL_HERODE = Appareil(ASSISE_HERODE, PIERRE_LONG, DEBORD_ASSISE, JOINT_MARBRE, LISERE_MARBRE)
 RUGOSITE_MARBRE = 0.30
 # Le scan Marble001 que fabrique beit_hamikdash_nappes.py. Mêmes réglages que CARREAU[9] de
 # visite/matieres.js, et mêmes moyennes que le jeu `marbre` de visite/nappes.js.
@@ -1136,7 +1133,7 @@ def eau(name):
 
 # Le calcaire du pourtour, crème presque neutre : c'est la couleur d'un meleke scié
 # de frais, et l'ocre lui vient des bancs (BANCS_CALCAIRE), pas de sa base.
-# Il reste SOUS les trois marbres du bâtiment (MARBRES_HERODE, 0,94 / 0,81 / 0,82) :
+# Il reste SOUS les trois marbres du bâtiment (MARBRES_HERODE, 0,94 / 0,78 / 0,80) :
 # à 0,81, ses blocs les plus clairs montaient à 0,89 et le pourtour brillait autant
 # que le Bayit — l'échelle des blancs va de la chaux du Mizbea'h au dallage, et le
 # bâtiment ne doit jamais y perdre son rang.
@@ -4060,7 +4057,7 @@ for i, giron in enumerate(GIRONS_ULAM):
     box(f"Marche_Ulam_{i:02d}", _x - giron, _x, -11, 11, Z_AZ, Z_AZ + 0.5 * (i + 1), "40_Ulam")
     _x -= giron
 
-# --- Oulam : façade 100 large, ouverture 20 × 40 SANS portes (Middot 3:7)
+# --- Oulam : façade 100 large, ouverture 20 × 40 (Middot 3:7), « וְלֹא הָיָה לוֹ שְׁעָרִים » (Rambam Beit HaBe'hira 4:8)
 box("Ulam_facade_S", BX_E - 5, BX_E, -50, -10, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_facade_N", BX_E - 5, BX_E, 10, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 box("Ulam_facade_linteau", BX_E - 5, BX_E, -10, 10, Z_BAT + 40, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
@@ -4072,7 +4069,9 @@ box("Ulam_facade_linteau", BX_E - 5, BX_E, -10, 10, Z_BAT + 40, Z_TOIT, "40_Ulam
 #     alternées, une en débord une en retrait, déjà dans MAT_MARBRE_HERODE.
 #     L'or reste où les sources le mettent : dedans (Middot 4:1), sur les portes, sur
 #     la vigne et sur la nivreshet d'Hélène.
-# Cinq poutres de chêne au-dessus de l'ouverture (Middot 3:7)
+# Cinq poutres de chêne au-dessus de l'ouverture (Middot 3:7), la première couchée sur le
+# linteau — « מֻשְׁכֶּבֶת עַל מַשְׁקוֹף הַפֶּתַח » (Bartenura ad loc.) —, une assise entre deux.
+# Linteau d'une ama : CHOIX.
 for i in range(5):
     L = 22 + i * 2
     box(f"Maltera_{i}", BX_E - 5.4, BX_E + 0.4, -L / 2, L / 2, Z_BAT + 41 + i * 2, Z_BAT + 42 + i * 2, "40_Ulam", MAT_CHENE_SCULPTE())
@@ -4100,10 +4099,24 @@ rovadim("Ulam_facade", ROVAD_X_E, (1, 0), -50, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT
 for cote, y, sens in (("N", 50, 1), ("S", -50, -1)):
     rovadim(f"Ulam_flanc_{cote}", y, (0, sens), BX_E - 16, ROVAD_X_E + ROVAD_SAILLIE,
             Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
+    # « סָבִיב לְכָתְלֵי הָאוּלָם » : la face ouest des débords aussi, du corps du bâtiment à l'angle.
+    rovadim(f"Ulam_flanc_retour_{cote}", BX_E - 16, (-1, 0), *sorted((sens * 35, y + sens * ROVAD_SAILLIE)),
+            Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 
-# Épaules (Beit Ha'halifot) et intérieur de l'Oulam (11 profond)
-box("Ulam_epaule_S", BX_E - 16, BX_E - 5, -50, -35, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
-box("Ulam_epaule_N", BX_E - 16, BX_E - 5, 35, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
+# Beit HaHalifot : « הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן… וְהוּא הָיָה נִקְרָא בֵּית
+# הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים » (Middot 4:7) — « שֶׁכֹּתֶל הָאוּלָם עָבְיוֹ חָמֵשׁ אַמָּה,
+# וְהָאוּלָם עֶשֶׂר אַמּוֹת לַצָּפוֹן » (Bartenura ad loc.) : l'Oulam lui-même, ouvert, 90 entre ses murs.
+# Le mur qui le ferme à l'ouest n'est dans aucune source : 5 amot pris dans les 16, CHOIX,
+# pour garder le corps à 70.
+for cote, sens in (("N", 1), ("S", -1)):
+    box(f"Ulam_halifot_mur_{cote}", BX_E - 16, BX_E - 5, *sorted((sens * 45, sens * 50)),
+        Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
+    box(f"Ulam_halifot_fond_{cote}", BX_E - 16, BX_E - 11, *sorted((sens * 35, sens * 45)),
+        Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
+    couches_middot(f"Ulam_halifot_plancher_{cote}", BX_E - 11, BX_E - 5, *sorted((sens * 35, sens * 45)),
+                   Z_BAT + 40, "40_Ulam")
+    box(f"Ulam_halifot_masse_{cote}", BX_E - 11, BX_E - 5, *sorted((sens * 35, sens * 45)),
+        Z_BAT + 45, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
 # Le plafond de l'Oulam porte les mêmes cinq amot (Middot 4:6, le bâtiment est un seul
 # bloc de 100). Au-dessus, plein : aucune source ne met de pièce là — les עליות sont sur la
 # Maison chez Rashi, et l'Oulam-tour de Radak est du Premier Temple (CHOIX de suivre Rashi).

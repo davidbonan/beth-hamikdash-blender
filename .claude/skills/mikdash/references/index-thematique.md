@@ -57,7 +57,8 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 | Question | Source primaire | Ligne du film |
 |---|---|---|
 | Le bâtiment 100 × 100 × 100, découpage E-O et N-S | *Middot* 4:6–7 | §8 |
-| Ouverture de l'Oulam 40 × 20 ; la Mishna ne lui donne **pas** de porte | *Middot* 3:7 | §8a |
+| Ouverture de l'Oulam 40 × 20 ; sans portes, « וְלֹא הָיָה לוֹ שְׁעָרִים » | *Middot* 3:7 ; Rambam *Beit HaBe'hira* 4:8 | §8a |
+| Beit HaHalifot, les débords de 15 de l'Oulam où l'on rangeait les couteaux | *Middot* 4:7 ; Bartenura et Tossefot Yom Tov *ad loc.* | §8a |
 | La vigne d'or au-dessus de l'entrée | *Middot* 3:8 | §8a |
 | Ouverture du Heikhal 20 × 10, ses quatre portes | *Middot* 4:1 | §8b |
 | Dimensions intérieures du Heikhal, hauteur, structure du toit | *Middot* 4:6–7 | §8b |
