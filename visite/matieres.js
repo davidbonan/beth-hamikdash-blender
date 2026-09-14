@@ -30,6 +30,17 @@ const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE,
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping, tenue à jour par visite.js.
 export const EXPOSITION = { value: 1 };
+// La pièce sans lumière (Box3, mètres), et ce qui y reste du ciel : ambiance, rebond,
+// soleil et environnement réfléchi y sont ramenés à cette part. Le point qui l'éclaire
+// — les braises — est une lampe ordinaire, que la pénombre ne touche pas.
+const PENOMBRE_MIN = { value: new THREE.Vector3(1, 1, 1) };
+const PENOMBRE_MAX = { value: new THREE.Vector3(0, 0, 0) };
+const PENOMBRE_RESTE = 0.42;
+
+export function assombrir(boite) {
+  PENOMBRE_MIN.value.copy(boite.min);
+  PENOMBRE_MAX.value.copy(boite.max);
+}
 
 const PIXEL = /* glsl */`
 uniform float uHauteurImage;
@@ -121,7 +132,14 @@ varying vec3 vNMonde;
 uniform int uFamille;
 uniform float uTemps;
 uniform vec3 uSoleil;
+uniform vec3 uPenombreMin, uPenombreMax;
 varying float vPixel;
+
+// 1 dehors, PENOMBRE_RESTE dans la pièce sans lumière : le ciel n'y entre pas.
+float penombre(vec3 p){
+  bool dedans = all(greaterThan(p, uPenombreMin)) && all(lessThan(p, uPenombreMax));
+  return dedans ? ${PENOMBRE_RESTE.toFixed(2)} : 1.0;
+}
 
 float alea1(float p){ p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
 float alea3(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
@@ -740,6 +758,18 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 }
 `;
 
+/** Le morceau de three, sa boucle directionnelle encadrée : ce qu'elle ajoute est repris par la pénombre. */
+function soleilEnPenombre() {
+  const morceau = THREE.ShaderChunk.lights_fragment_begin;
+  const avant = "#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )";
+  const apres = "#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )";
+  if (!morceau.includes(avant) || !morceau.includes(apres)) throw new Error("three a changé lights_fragment_begin : pénombre perdue");
+  return morceau
+    .replace(avant, "ReflectedLight avantSoleil = reflectedLight;\n" + avant)
+    .replace(apres, "reflectedLight.directDiffuse = mix(avantSoleil.directDiffuse, reflectedLight.directDiffuse, mPenombre);\n"
+                    + "reflectedLight.directSpecular = mix(avantSoleil.directSpecular, reflectedLight.directSpecular, mPenombre);\n" + apres);
+}
+
 /**
  * Branche le calcul procédural sur une matière standard, sans la remplacer : le
  * modèle d'éclairage, les ombres et le tonemapping de three restent ceux d'origine.
@@ -749,7 +779,7 @@ export function habiller(materiau, horloges, jeux) {
   if (!famille) return;
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
                       uSoleil: { value: SOLEIL }, uHauteurImage: HAUTEUR_IMAGE,
-                      uExposition: EXPOSITION };
+                      uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
   materiau.userData.uniformes = uniformes;
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === BRAISE) {
@@ -803,7 +833,12 @@ export function habiller(materiau, horloges, jeux) {
       .replace("#include <clipping_planes_fragment>", /* glsl */`
         #include <clipping_planes_fragment>
         vec3 mTeinte, mPente, mFeu; float mRugo;
-        matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);`)
+        matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);
+        float mPenombre = penombre(vMonde);`)
+      // Le soleil et le rebond sont des lumières directionnelles, qui ne connaissent
+      // aucun mur : la pénombre reprend ce que leur boucle a ajouté. Les lampes
+      // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.
+      .replace("#include <lights_fragment_begin>", soleilEnPenombre())
       .replace("#include <color_fragment>",
                "#include <color_fragment>\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
       // La teinte d'un minéral se pose APRÈS l'éclairage : son exposant dépend de la
@@ -827,6 +862,9 @@ export function habiller(materiau, horloges, jeux) {
           irradiance *= mReliefCiel;
           iblIrradiance *= mReliefCiel;
         #endif
+        irradiance *= mPenombre;
+        iblIrradiance *= mPenombre;
+        radiance *= mPenombre;
         #include <lights_fragment_end>
         #ifdef TEMPERE
           vec3 mTeinteVue = pow(mTeinte, vec3(mTemperance));

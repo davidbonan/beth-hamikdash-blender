@@ -552,6 +552,14 @@
       ]
     },
     {
+      "id": "machta",
+      "nom": "Ma'hta de Kippour",
+      "zone": "kodesh_hakodashim",
+      "prefixes": [
+        "Machta"
+      ]
+    },
+    {
       "id": "lishkat_hagazit",
       "nom": "Lishkat HaGazit",
       "zone": "lishkot",

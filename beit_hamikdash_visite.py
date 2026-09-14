@@ -224,16 +224,16 @@ def en_metres(vue, emprises):
 
 
 # À lire avant le tri des objets : ce sont des lampes, pas des maillages.
-def flammes():
+def lampes(prefixe):
     return [[o.matrix_world.translation.x, o.matrix_world.translation.z, -o.matrix_world.translation.y]
-            for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith("Menora_flamme")]
+            for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
 def main():
     DOSSIER.mkdir(exist_ok=True)
     regles = concepts()
     connus = {ident for _, ident in regles}
-    lampes = flammes()
+    flammes, braises = lampes("Menora_flamme"), lampes("Machta_braise")
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
@@ -290,7 +290,8 @@ def main():
         "emprises": emprises,
         "entrees": entrees,
         "vues": vues,
-        "flammes": lampes,
+        "flammes": flammes,
+        "braises": braises,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))

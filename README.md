@@ -36,6 +36,8 @@ dernière à droite.*
 | `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun et les points d'entrée. Lit le .blend, ne le réécrit pas. |
 | `beit_hamikdash_figures.py` | Les figurants de la visite — cohanim au Kiyor, au kevesh et au pied de l'autel, douze Léviim sur le Doukhan, fidèles dans l'Ezrat Nashim. Corps MakeHuman (CC0), vêtus et animés ; écrit `visite/figures.glb` et `visite/figures.json`. Ni le .blend ni le film ne les voient. |
 | `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
+| `beit_hamikdash_keruvim.py` | Les deux keruvim de la kaporet : enfants MakeHuman agenouillés, mains jointes, ailes plumées ; écrit `keruvim.blend`, que le blockout lit. À relancer après toute modification de ce script, puis reconstruire la scène. |
+| `keruvim.blend` | Les deux maillages générés (à regénérer après toute modification du script précédent). |
 | `visite/` | La visite elle-même : page web où l'on marche dans le Temple et où l'on clique un élément pour savoir ce que c'est, avec sa source. |
 | `.claude/skills/camera/` | Skill Claude Code + `camera.py` : déclare un plan, en rend les deux images clés et mesure son recouvrement, en une commande. |
 | `.claude/skills/blender/` | Skill Claude Code : les incantations headless des huit scripts, et l'invariant « le script est la source, le .blend est l'artefact ». |

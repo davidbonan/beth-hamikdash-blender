@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
+import { habiller, assombrir, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { chaine } from "./chaine.js";
 import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
@@ -179,12 +179,48 @@ const FOV_HORIZONTAL = 94;
 const FOV_VERTICAL = [50, 80];
 const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 900);
 // Une lampe discrète accrochée à la tête : sans elle l'Oulam et les ta'im, sans fenêtre
-// ouvrante dans le blockout, sont noirs. Dans le Heikhal c'est la Menora qui éclaire.
+// ouvrante dans le blockout, sont noirs. Dans le Heikhal c'est la Menora qui éclaire ;
+// dans le Kodesh HaKodashim, rien d'autre que les braises de la ma'hta.
 const LAMPE_TETE = 6;
-const LAMPE_HEIKHAL = 0.6;
+const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5 };
 const lampe = new THREE.PointLight(0xffe9c4, LAMPE_TETE, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
+
+// Les braises de la ma'hta : une lampe qui vacille, à la mesure d'un bassin de charbons —
+// pas d'une flamme. Deux sinus incommensurables et un peu de hasard, jamais une période.
+const BRAISE = { couleur: 0xff7a2a, intensite: 14, portee: 16, carte: 512 };
+let braise = null;
+let vacillement = 0;
+
+function allumerBraises(points) {
+  if (!points?.length) return;
+  braise = new THREE.PointLight(BRAISE.couleur, BRAISE.intensite, BRAISE.portee, 2);
+  braise.position.set(...points[0]);
+  braise.castShadow = PROFIL.menora.ombre;
+  braise.shadow.autoUpdate = false;
+  braise.shadow.needsUpdate = true;
+  braise.shadow.mapSize.set(BRAISE.carte, BRAISE.carte);
+  braise.shadow.camera.near = 0.05;
+  braise.shadow.camera.far = BRAISE.portee;
+  braise.shadow.bias = -0.002;
+  scene.add(braise);
+  // « Aucune lumière : le Cohen Gadol s'éclaire à la braise de sa pelle » (fiche §8e). La
+  // pièce n'a aucune ouverture, mais le ciel y entrait quand même — par l'ambiance, par
+  // le rebond, par l'or qui le réfléchit. La pénombre est dans la pièce, pas dans le
+  // temps : elle se lit sur la position de chaque point, et la fumée y prend la lumière
+  // des braises.
+  assombrir(EMPRISES.get("kodesh_hakodashim"));
+  rendu.enfumer(EMPRISES.get("kodesh_hakodashim"), braise.position);
+}
+
+function vaciller(dt) {
+  if (!braise) return;
+  vacillement += dt;
+  const t = vacillement;
+  const souffle = 0.86 + 0.09 * Math.sin(t * 1.7) + 0.05 * Math.sin(t * 4.3 + 1.0) + 0.04 * (Math.random() - 0.5);
+  braise.intensity = BRAISE.intensite * souffle;
+}
 
 // L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
 const MENORA = { couleur: 0xffb36b, intensite: 150, portee: 18, carte: 512 };
@@ -262,6 +298,7 @@ scene.add(gltf.scene);
 // aucun sol, et la visite s'ouvrait un mètre au-dessus du dallage.
 gltf.scene.updateMatrixWorld(true);
 allumerMenora(reperes.flammes);
+allumerBraises(reperes.braises);
 
 const murs = [];                        // collision : les étoffes en sont exclues
 const horloges = [];                    // uniformes de temps à faire avancer
@@ -826,6 +863,7 @@ function suivreSoleil() {
 
 function dessiner(dt) {
   for (const u of horloges) u.value += dt;
+  vaciller(dt);
   melangeur?.update(dt);
   suivreSoleil();
   ciel.position.copy(camera.position);
@@ -861,7 +899,7 @@ function ajusterEchelle(dt) {
 
 const lieuOccupe = () => lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
 function accorderLampe(lieu) {
-  lampe.intensity += ((lieu === "heikhal" ? LAMPE_HEIKHAL : LAMPE_TETE) - lampe.intensity) * 0.25;
+  lampe.intensity += ((LAMPE_PAR_LIEU[lieu] ?? LAMPE_TETE) - lampe.intensity) * 0.25;
 }
 
 let film = null;

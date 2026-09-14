@@ -818,5 +818,38 @@
       }
     ],
     "note": "Retenu : devant l'Arche, la manne et le bâton seulement (Rambam, Beit HaBe'hira 4:1) ; le coffret « à côté » d'elle (I Samuel 6:8 ; Bava Batra 14a). Choix de la visite : la place de la fiole d'huile, que les sources disent seulement cachée avec l'Arche (Yoma 52b ; Horayot 12a), et le côté nord du coffret. L'Arche reste fermée ; on ne voit ni les Tables ni le Sefer Torah. Écarté : le Sefer Torah posé à côté de l'Arche, sur le coffret des Philistins ou sur une planche, selon R. Yehouda (Bava Batra 14b)."
+  },
+  "machta": {
+    "he": "מחתה",
+    "translit": "Ma'hta",
+    "resume": "La pelle à braises de Kippour, posée sur la pierre entre les deux badim, au pied de l'Arche. Ce jour-là elle est d'or et non d'argent, elle tient trois kabin, elle est légère, et son manche est long là où celui de chaque jour est court, pour que l'avant-bras en porte le poids. Le Cohen Gadol y a puisé les braises sur l'autel extérieur, l'a portée de la main droite jusqu'ici, l'a posée entre les badim, puis a versé la ketoret sur les braises : la fumée emplit la maison, et ces braises sont la seule lumière du Kodesh HaKodashim.",
+    "cotes": [
+      "trois kabin, pelle légère, manche long",
+      "bassin de 0,52 à 0,60 ama sur 0,16 de haut",
+      "manche rond de 1,1 ama, vers l'est"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "4:4",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:1",
+        "citation": "בֵּין שְׁנֵי הַבַּדִּים"
+      },
+      {
+        "oeuvre": "Lévitique",
+        "ref": "16:12–13",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Avodat Yom HaKippurim",
+        "ref": "4:1",
+        "citation": ""
+      }
+    ],
+    "note": "Le bassin, son manche et leurs cotes sont un CHOIX ; sa place entre les badim, au pied de l'Arche, est Yoma 5:1. Le Cohen Gadol la porte de la main droite malgré la règle qui voudrait la gauche : elle est lourde et chaude."
   }
 }

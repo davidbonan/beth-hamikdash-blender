@@ -168,6 +168,99 @@ const COMPOSITION = {
     }`,
 };
 
+// LA FUMÉE de la ketoret, dans le seul volume qui en a : le Kodesh HaKodashim. Une
+// passe d'écran, pas un objet — la scène n'a ni volumes ni particules, et un nuage de
+// cartes alpha se trahit dès qu'on le traverse. Le rayon de chaque pixel est coupé par
+// la boîte de la pièce et par la géométrie qu'il rencontre (la distance de la passe
+// d'occlusion), puis parcouru pas à pas : à chaque pas une densité — une nappe qui
+// s'amasse sous le plafond, et la colonne qui monte des braises en ondulant — et la
+// lumière que ce point reçoit des braises, en 1/d². C'est cette lumière-là, reprise par
+// la fumée, qui fait lire l'obscurité : sans elle la pièce n'est qu'un écran noir.
+//
+// Elle passe AVANT le halo, pour la même raison que le halo passe avant la sortie : la
+// lueur des braises dans la fumée est une haute lumière, et c'est elle qui doit déborder.
+const FUMEE = {
+  uniforms: { tDiffuse: { value: null }, tGeo: { value: null },
+              uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
+              uBoiteMin: { value: new THREE.Vector3() }, uBoiteMax: { value: new THREE.Vector3() },
+              uBraise: { value: new THREE.Vector3() }, uTemps: { value: 0 },
+              uDensite: { value: 0.11 }, uLueur: { value: 0.35 } },
+  defines: { PAS: PROFIL.fumee.pas },
+  vertexShader: OCCLUSION.vertexShader,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse, tGeo;
+    uniform float uTanFov, uAspect, uTemps, uDensite, uLueur;
+    uniform mat4 uMonde;
+    uniform vec3 uBoiteMin, uBoiteMax, uBraise;
+    varying vec2 vUv;
+
+    float hachage(vec3 p){
+      p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3)); p *= 17.0;
+      return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+    }
+    float bruit(vec3 x){
+      vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
+      return mix(mix(mix(hachage(i), hachage(i + vec3(1, 0, 0)), f.x),
+                     mix(hachage(i + vec3(0, 1, 0)), hachage(i + vec3(1, 1, 0)), f.x), f.y),
+                 mix(mix(hachage(i + vec3(0, 0, 1)), hachage(i + vec3(1, 0, 1)), f.x),
+                     mix(hachage(i + vec3(0, 1, 1)), hachage(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+    }
+
+    // La ketoret a empli la maison : la fumée est partout, un peu plus dense sous le
+    // plafond, et deux octaves de bruit qui dérivent vers le haut la font vivre. Au-dessus
+    // des braises, la colonne qui monte encore, ondulant en s'élargissant.
+    float densite(vec3 p){
+      float h = clamp((p.y - uBoiteMin.y) / (uBoiteMax.y - uBoiteMin.y), 0.0, 1.0);
+      vec3 q = p * 0.45 + vec3(0.0, -uTemps * 0.05, 0.0);
+      float n = bruit(q) * 0.65 + bruit(q * 2.7 + vec3(uTemps * 0.02, 0.0, uTemps * 0.015)) * 0.35;
+      float nappe = 0.7 + 0.3 * h;
+      float dy = p.y - uBraise.y;
+      vec2 d = p.xz - uBraise.xz;
+      d += (bruit(vec3(dy * 0.9 - uTemps * 0.45, 0.7, 0.3)) - 0.5) * 0.4 * max(dy, 0.0);
+      float colonne = exp(-dot(d, d) / (0.05 + 0.10 * max(dy, 0.0))) * smoothstep(-0.05, 0.4, dy) * 3.0;
+      return uDensite * (nappe + colonne) * (0.5 + 1.0 * n);
+    }
+
+    // Ce que ce point de fumée reçoit : les braises en 1/d², et un fond gris-ambré — la
+    // lueur que l'or de la pièce renvoie, et c'est elle qui fait voir la fumée loin des
+    // braises.
+    vec3 lumiere(vec3 p){
+      vec3 v = uBraise - p;
+      float d2 = max(dot(v, v), 0.06);
+      return vec3(1.0, 0.40, 0.12) * (uLueur / d2) + vec3(0.055, 0.045, 0.032);
+    }
+
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      if (uBoiteMax.x <= uBoiteMin.x) { gl_FragColor = c; return; }   // aucune pièce enfumée
+      float z = texture2D(tGeo, vUv).a;
+      vec3 dirVue = normalize(vec3((vUv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0), -1.0));
+      vec3 o = uMonde[3].xyz;
+      vec3 d = normalize(mat3(uMonde) * dirVue);
+      float portee = z > 0.0 ? z / max(-dirVue.z, 1e-3) : 1e4;
+      vec3 inv = 1.0 / d;
+      vec3 a = (uBoiteMin - o) * inv, b = (uBoiteMax - o) * inv;
+      vec3 tmin = min(a, b), tmax = max(a, b);
+      float t0 = max(max(tmin.x, tmin.y), max(tmin.z, 0.0));
+      float t1 = min(min(tmax.x, tmax.y), min(tmax.z, portee));
+      if (t1 <= t0) { gl_FragColor = c; return; }
+      float pas = (t1 - t0) / float(PAS);
+      // Un départ tiré au hasard par pixel : le pas d'un mètre se lirait sinon en strates.
+      float t = t0 + pas * fract(sin(dot(vUv * 977.0 + fract(uTemps), vec2(12.9898, 78.233))) * 43758.5453);
+      float T = 1.0;
+      vec3 L = vec3(0.0);
+      for (int i = 0; i < PAS; i++) {
+        vec3 p = o + d * t;
+        float alpha = 1.0 - exp(-densite(p) * pas);
+        L += T * alpha * lumiere(p);
+        T *= 1.0 - alpha;
+        t += pas;
+        if (T < 0.02) break;
+      }
+      gl_FragColor = vec4(c.rgb * T + L, c.a);
+    }`,
+};
+
 // L'ÉTALONNAGE, en toute fin : bascule de teinte, vignettage, grain.
 //
 // Il travaille sur l'image AFFICHÉE, pas sur le linéaire : c'est le geste d'un
@@ -228,6 +321,9 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const passeComposition = new ShaderPass(COMPOSITION);
   passeComposition.uniforms.tAO.value = cibleAO.texture;
   composeur.addPass(passeComposition);
+  const fumee = new ShaderPass(FUMEE);
+  fumee.uniforms.tGeo.value = cibleGeo.texture;
+  composeur.addPass(fumee);
 
   // Le halo passe AVANT la sortie, donc avant le tonemapping : la cible du composeur
   // est en demi-flottant et garde le linéaire, et c'est là seulement que le soleil sur
@@ -261,6 +357,17 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     passeComposition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
     passeAO.uniforms.uTanFov.value = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
     passeAO.uniforms.uAspect.value = camera.aspect;
+    fumee.uniforms.uTanFov.value = passeAO.uniforms.uTanFov.value;
+    fumee.uniforms.uAspect.value = camera.aspect;
+  }
+
+  /** La pièce enfumée (Box3, en mètres) et le point d'où monte la fumée. Le rayon d'un
+   *  pixel qui n'entre pas dans la boîte — ou que la géométrie arrête avant — n'y coûte
+   *  qu'un test : la passe ne pèse que sur ce qui regarde vraiment dans la pièce. */
+  function enfumer(boite, braise) {
+    fumee.uniforms.uBoiteMin.value.copy(boite.min);
+    fumee.uniforms.uBoiteMax.value.copy(boite.max);
+    fumee.uniforms.uBraise.value.copy(braise);
   }
 
   function rendre() {
@@ -279,10 +386,12 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     for (const o of horsGeo) o.visible = true;
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
+    fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
+    fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
     passeAO.render(renderer, cibleAO, null, 0, false);
     renderer.setRenderTarget(null);
     composeur.render();
   }
 
-  return { rendre, redimensionner };
+  return { rendre, redimensionner, enfumer };
 }

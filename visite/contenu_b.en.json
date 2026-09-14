@@ -811,5 +811,38 @@
       }
     ],
     "note": "Adopted: in front of the Ark, only the manna and the staff (Rambam, Beit HaBechirah 4:1); the chest “beside” it (I Samuel 6:8; Bava Batra 14a). Tour's choice: the place of the oil flask, which the sources only say was hidden with the Ark (Yoma 52b; Horayot 12a), and the north side for the chest. The Ark stays closed; neither the Tablets nor the Sefer Torah are visible. Set aside: the Sefer Torah placed beside the Ark, on the Philistines' chest or on a board, according to R. Yehuda (Bava Batra 14b)."
+  },
+  "machta": {
+    "nom": "Yom Kippur fire pan",
+    "translit": "Machta",
+    "resume": "The Yom Kippur fire pan, set down on the rock between the two poles, at the foot of the Ark. On that day it is of gold rather than silver, holds three kabin, is light, and its handle is long where the everyday one is short, so that the forearm carries its weight. The High Priest scooped the coals from the outer altar, carried the pan here in his right hand, set it down between the poles, then poured the incense onto the coals: the smoke fills the house, and these coals are the only light in the Kodesh HaKodashim.",
+    "cotes": [
+      "three kabin, a light pan, a long handle",
+      "bowl 0.52 to 0.60 ama across, 0.16 high",
+      "round handle of 1.1 ama, toward the east"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "4:4",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "5:1",
+        "citation": "בֵּין שְׁנֵי הַבַּדִּים"
+      },
+      {
+        "oeuvre": "Lévitique",
+        "ref": "16:12–13",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Avodat Yom HaKippurim",
+        "ref": "4:1",
+        "citation": ""
+      }
+    ],
+    "note": "The bowl, its handle and their measures are a CHOICE; its place between the poles, at the foot of the Ark, is Yoma 5:1. The High Priest carries it in his right hand despite the rule that would have it in the left: it is heavy and hot."
   }
 }

@@ -3881,13 +3881,13 @@ MAARAKHOT = (("gedola", -36, -28, -13, -5), ("ketoret", -48, -45, -19, -16),
 # matelas, ce que la visite montrait de près.
 R_GZIR, REWACH, PAS_LIT, LITS = 0.18, 0.15, 0.30, 3
 
-def braises(nom, x0, x1, y0, y1, z, col, mat, maille=0.42, relief=0.22):
+def braises(nom, x0, x1, y0, y1, z, col, mat, maille=0.42, relief=0.22, profondeur=0.35):
     """Bassin de gehalim : une nappe de charbons empilés, en un seul maillage.
 
     Une boîte n'a pas de silhouette de braise, et aucune matière ne la lui rend : la
     hauteur est donc dans la géométrie, tirée du nom pour que le tas soit le même à
     chaque construction. Le bord garde la maille exacte — lui aussi déformé, le bassin
-    débordait sur les gzirin.
+    débordait sur les gzirin. `profondeur` : ce que le tas descend sous `z`.
     """
     nx, ny = max(2, round((x1 - x0) / maille)), max(2, round((y1 - y0) / maille))
     rang = nx + 1
@@ -3901,7 +3901,7 @@ def braises(nom, x0, x1, y0, y1, z, col, mat, maille=0.42, relief=0.22):
             x = x0 + (x1 - x0) * i / nx + (alea(cle, 1) - 0.5) * derive
             y = y0 + (y1 - y0) * j / ny + (alea(cle, 2) - 0.5) * derive
             haut.append((x, y, z + (0.0 if bord else relief * (0.2 + alea(cle, 3)))))
-            bas.append((x, y, z - 0.35))
+            bas.append((x, y, z - profondeur))
     n = len(haut)
     faces = []
     for j in range(ny):
@@ -5374,7 +5374,6 @@ def even_hashetiya(name, col, anneaux=40, segs=320):
 
 
 even_hashetiya("Even_HaShetiya", "60_KodeshHakodashim")
-empty("Point_Machta_braises", ARON_X_MACHTA, 0, Z_BAT + 0.3, "60_KodeshHakodashim")
 
 # --- Aron HaBrit, posé sur la pierre (Rambam, Beit HaBe'hira 4:1) — le Temple à venir
 #     rend l'Arche cachée (Yoma 54a). Cotes : Shemot 25:10-22 ; Soucca 5a-b ; Menachot 98b.
@@ -5468,6 +5467,30 @@ for ns, sy in (("N", 1), ("S", -1)):
              MAT_OR(), rotation=(0, math.pi / 2, 0), majeur=24, mineur=8)
     cyl_between(f"Aron_bad_{ns}", (ARON_X0 - 0.5, sy * ARON_Y_BAD, ARON_Z_BAD),
                 (TR0 + 0.10, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
+
+# --- La ma'hta de Kippour, « בֵּין שְׁנֵי הַבַּדִּים » (Yoma 5:1), posée sur la pierre au pied de la
+#     face est de l'Arche. Ce jour-là elle est d'or, tient trois kabin, est légère et son
+#     manche est long, pour que l'avant-bras en porte le poids (Yoma 4:4) ; le Cohen Gadol
+#     l'a portée de la main droite (Rambam, Avodat Yom HaKippurim 4:1). Bassin tronconique
+#     de 0,52 à 0,60 ama sur 0,16 de haut, manche rond de 1,1 ama vers l'est, d'où il vient :
+#     formes et cotes sont un CHOIX (fiche §8g). Ses braises sont la seule lumière de la pièce.
+Z_MACHTA = cote_shetiya(ARON_X_MACHTA, 0)
+revolution("Machta_bassin", ARON_X_MACHTA, 0, Z_MACHTA,
+           [(0.24, 0.0), (0.26, 0.0), (0.30, 0.16), (0.325, 0.165), (0.325, 0.185), (0.295, 0.185),
+            (0.275, 0.16), (0.235, 0.03), (0.0, 0.03)], ARON, MAT_OR(), verts=32)
+# Le bassin est plein : les charbons affleurent le bord et s'y entassent.
+braises("Machta_gehalim", ARON_X_MACHTA - 0.17, ARON_X_MACHTA + 0.17, -0.17, 0.17, Z_MACHTA + 0.185,
+        ARON, braise("Braise"), maille=0.06, relief=0.10, profondeur=0.12)
+X_POMMEAU = ARON_X_MACHTA + 0.30 + 1.1
+Z_POMMEAU = cote_shetiya(X_POMMEAU, 0) + 0.04
+cyl_between("Machta_manche", (ARON_X_MACHTA + 0.28, 0, Z_MACHTA + 0.14), (X_POMMEAU, 0, Z_POMMEAU),
+            0.035, ARON, MAT_OR(), verts=12)
+_lisser(sphere("Machta_pommeau", X_POMMEAU, 0, Z_POMMEAU, 0.055, ARON, MAT_OR(), segs=20), 20)
+# 8 W : la lueur d'un bassin de braises (fiche §1, avec les flammes de la Menora à 15).
+machta_lueur = lampe("Machta_braise", 'POINT', (m(ARON_X_MACHTA), 0.0, m(Z_MACHTA + 0.22)))
+machta_lueur.data.energy = 8
+machta_lueur.data.color = (1.0, 0.45, 0.15)
+machta_lueur.data.shadow_soft_size = m(0.12)
 
 # ----------------------------------------------------------------------------
 # 75 — FIGURES
