@@ -5383,79 +5383,35 @@ empty("Point_Machta_braises", ARON_X_MACHTA, 0, Z_BAT + 0.3, "60_KodeshHakodashi
 #     tefa'h, keruvim de 10 tefa'him, ailes au-dessus des têtes, l'une vers l'autre
 #     (Soucca 5b). Les badim courent jusqu'à la parokhet extérieure : c'est ce qui rend
 #     physiques « entre les deux badim » (Yoma 5:1, 5:3) et les bosses du rideau.
-H_KERUV = 10 / 6      # 10 tefa'him (Soucca 5b)
 # « ומצודדים פניהם » (Bava Batra 99a) : entre « וּפְנֵיהֶם אִישׁ אֶל אָחִיו » (Shemot 25:20) et
 # « וּפְנֵיהֶם לַבָּיִת » (Divrei HaYamim II 3:13), chaque visage se tourne vers l'est. L'angle : CHOIX.
 BIAIS_KERUV = math.radians(20)
-# Les mains se rejoignent au milieu de la kaporet quel que soit le biais. La portée fixe
-# aussi où tombent les pieds : « מִן הַכַּפֹּרֶת » (Shemot 25:19), rien ne dépasse son bord.
-PORTEE_KERUV = 0.66
-Y_KERUV = 0.05 + PORTEE_KERUV * math.cos(BIAIS_KERUV)
-# Demi-profil d'une penne, déplié par `limbe` : étroite à l'emplanture, large au tiers,
-# effilée au bout. Trois pennes par aile, décalées — une aile d'une seule plaque n'a pas
-# de plumage, et trois plaques plates n'ont pas d'aile.
-PENNE = ((0.0, 0.055), (0.16, 0.150), (0.44, 0.205), (0.70, 0.175), (0.89, 0.100), (1.0, 0.0))
+KERUVIM_BLEND = pathlib.Path(__file__).resolve().parent / "keruvim.blend"
 
 
-def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.26):
-    """Keruv de la kaporet : enfant (« כְּרַבְיָא », Soucca 5b) agenouillé, martelé d'une
-    pièce avec elle — « מִקְשָׁה », ni pieds ni socle (Rashi Shemot 25:18).
+def keruvim():
+    """Les deux keruvim de la kaporet, lus dans `keruvim.blend`.
 
-    Ligne du film (§8h) : le garçon et la fille enlacés, « כְּמַעֲשֵׂה אִישׁ וְאִשְׁתּוֹ »
-    (Yoma 54a), bras tendus jusqu'à se toucher, tête inclinée vers la kaporet, tournés de
-    biais « כתלמיד הנפטר מרבו » (Bava Batra 99a, BIAIS_KERUV), et « פֹּרְשֵׂי כְנָפַיִם לְמַעְלָה סֹכְכִים
-    בְּכַנְפֵיהֶם עַל הַכַּפֹּרֶת » (Shemot 25:20) — les ailes montent du dos, se rejoignent en
-    dais au-dessus du milieu, et ne touchent pas le corps.
-
-    Bâti à l'origine, **-x vers l'autre keruv**, puis tourné : `vers` est le sens en y
-    du centre de la kaporet. `h` et `epaules` distinguent le garçon de la fille.
-
-    Une pile de boîtes surmontée d'une sphère et deux plaques plates en travers rendaient
-    un épouvantail : le membre se lit à son galbe, et l'aile à son plumage.
+    C'est `beit_hamikdash_keruvim.py` qui les bâtit — enfants MakeHuman (« כְּרַבְיָא »,
+    Soucca 5b) agenouillés, mains jointes, ailes plumées en dais (Shemot 25:20) — et les y
+    écrit : MakeHuman coûte une minute par figure, le blockout se reconstruit en cinq
+    secondes. Chaque maillage est dans le repère du keruv, **-x vers l'autre keruv**,
+    origine sur la kaporet, et porte `portee` : la distance de l'origine aux mains jointes,
+    en mètres — les mains se rejoignent au milieu de la kaporet quel que soit le biais.
     """
-    or_ = MAT_OR()
-    genou, hanche, epaule = 0.13 * h, 0.34 * h, 0.62 * h
-    pieces = []
-    for s_ in (-1, 1):
-        yj = s_ * 0.135
-        # Le tibié repose à plat sur la kaporet, le genou devant : c'est l'agenouillement.
-        pieces.append(cyl_between(f"{name}_tibia{s_:+d}", (0.14, yj, 0.075 * h), (0.52, yj, 0.070 * h),
-                                  0.075, col, or_, verts=10))
-        pieces.append(sphere(f"{name}_genou{s_:+d}", 0.14, yj, genou * 0.85, 0.085, col, or_, segs=8))
-        pieces.append(cyl_between(f"{name}_cuisse{s_:+d}", (0.16, yj, genou * 0.85), (-0.06, yj, hanche),
-                                  0.095, col, or_, verts=10))
-    pieces.append(sphere(f"{name}_bassin", -0.03, 0, hanche, 0.155, col, or_, segs=10))
-    # Le torse penche vers l'autre keruv, et c'est ce penchant qui porte tout le groupe.
-    pieces.append(cyl_between(f"{name}_torse", (-0.04, 0, hanche - 0.04), (-0.19, 0, epaule),
-                              0.145, col, or_, verts=12))
-    pieces.append(cyl_between(f"{name}_epaules", (-0.19, -epaules, epaule), (-0.19, epaules, epaule),
-                              0.085, col, or_, verts=10))
-    pieces.append(cyl_between(f"{name}_cou", (-0.21, 0, epaule + 0.01), (-0.27, 0, epaule + 0.10 * h),
-                              0.058, col, or_, verts=8))
-    # Tête d'enfant : large pour le corps, portée en avant — inclinée vers la kaporet.
-    pieces.append(sphere(f"{name}_tete", -0.31, 0, epaule + 0.16 * h, 0.125 * h, col, or_, segs=14))
-    for s_ in (-1, 1):
-        # Les bras vont droit devant, jusqu'à la main de l'autre keruv, au milieu.
-        main = (-PORTEE_KERUV, s_ * 0.055, epaule - 0.10 * h)
-        coude = (-0.42, s_ * 0.13, epaule - 0.09 * h)
-        pieces.append(cyl_between(f"{name}_bras{s_:+d}", (-0.19, s_ * (epaules - 0.03), epaule - 0.02),
-                                  coude, 0.062, col, or_, verts=8))
-        pieces.append(cyl_between(f"{name}_avantbras{s_:+d}", coude,
-                                  main, 0.052, col, or_, verts=8))
-        pieces.append(sphere(f"{name}_main{s_:+d}", *main, 0.072, col, or_, segs=8))
-        # L'aile part de l'omoplate, monte et vient au-dessus du milieu de la kaporet :
-        # les deux keruvim s'y rejoignent en dais, sans qu'aucune aile touche un corps.
-        emplanture = (-0.06, s_ * 0.115, epaule - 0.06 * h)
-        for k, (ecart, longueur, largeur) in enumerate(((0.00, 1.00, 1.00), (0.13, 0.82, 0.80),
-                                                        (0.24, 0.62, 0.62))):
-            cible = (0.04 - PORTEE_KERUV + 0.10 * k, s_ * (0.14 + 0.13 * k), epaule + 0.42 * h - 0.08 * h * k)
-            base = (emplanture[0] + 0.10 * ecart, emplanture[1] + s_ * 0.05 * ecart,
-                    emplanture[2] - 0.20 * ecart)
-            axe = tuple(c - b for c, b in zip(cible, base))
-            portee = math.dist(cible, base)
-            pieces.append(limbe(f"{name}_aile{s_:+d}_penne{k}", PENNE, base, axe, (0, s_, 0),
-                                portee * longueur, 0.028 * largeur, col, or_, courbure=0.16))
-    _poser(pieces, x, y, z0, -vers * (math.pi / 2 + BIAIS_KERUV))   # -x vers l'autre keruv, puis vers l'est
+    with bpy.data.libraries.load(str(KERUVIM_BLEND)) as (_, charge):
+        charge.meshes = ["Keruv_garcon", "Keruv_fille"]
+    return charge.meshes
+
+
+def keruv(name, me, x, y, z0, col, vers):
+    """`vers` est le sens en y du centre de la kaporet."""
+    me.materials.clear()
+    me.materials.append(MAT_OR())
+    o = _objet(name, me, col)
+    o["sans_biseau"] = True   # 36 000 sommets déjà lissés : le biseau n'y ajouterait que du temps
+    _poser([o], x, y, z0, -vers * (math.pi / 2 + BIAIS_KERUV))   # -x vers l'autre keruv, puis vers l'est
+    return o
 
 ARON = "65_Aron"
 ARON_X0, ARON_X1, ARON_Y = KKC - 0.75, KKC + 0.75, 1.25
@@ -5502,8 +5458,10 @@ for k, t in enumerate((0.80, 0.88, 0.96)):
     sphere(f"Aron_mate_amande_{k}", x_, y_, z_, 0.035, ARON, MAT_PIERRE(), segs=8)
 
 # « כְּחִבַּת זָכָר וּנְקֵבָה » (Yoma 54a) ; le garçon au nord et la fille au sud, un peu plus menue : CHOIX.
-keruv("Aron_keruv_N", KKC, Y_KERUV, Z_KAPORET + 1 / 6, ARON, vers=-1)
-keruv("Aron_keruv_S", KKC, -Y_KERUV, Z_KAPORET + 1 / 6, ARON, vers=1, h=0.94 * H_KERUV, epaules=0.25)
+KERUV_GARCON, KERUV_FILLE = keruvim()
+Y_KERUV = 0.05 + KERUV_GARCON["portee"] / AMA * math.cos(BIAIS_KERUV)
+keruv("Aron_keruv_N", KERUV_GARCON, KKC, Y_KERUV, Z_KAPORET + 1 / 6, ARON, vers=-1)
+keruv("Aron_keruv_S", KERUV_FILLE, KKC, -Y_KERUV, Z_KAPORET + 1 / 6, ARON, vers=1)
 for ns, sy in (("N", 1), ("S", -1)):
     for eo, x in (("E", ARON_X1 - 0.10), ("O", ARON_X0 + 0.10)):
         tore(f"Aron_anneau_{ns}{eo}", x, sy * ARON_Y_BAD, ARON_Z_BAD, 0.12, 0.03, ARON,

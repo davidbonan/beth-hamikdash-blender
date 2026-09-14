@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les huit scripts
+## Les neuf scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -32,6 +32,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
+| `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
@@ -97,6 +98,14 @@ $BLENDER -b beit_hamikdash.blend \
 
 Le blockout annonce en dernière ligne son compte d'objets et de collections — la
 vérification la plus rapide qu'il n'a rien cassé.
+
+Les keruvim de la kaporet ne sont pas bâtis par le blockout : il lit `keruvim.blend`, écrit
+par `beit_hamikdash_keruvim.py` (MakeHuman, ~2 min, sans .blend en entrée). Après toute
+modification de ce script, le relancer puis reconstruire la scène :
+
+```bash
+$BLENDER -b -P beit_hamikdash_keruvim.py
+```
 
 `FOULE = True` en tête du blockout ajoute les figures de Yom Kippour : le peuple dans
 l'Ezrat Israël, les cohanim dans l'Ezrat Kohanim, les Léviim et leurs instruments sur
