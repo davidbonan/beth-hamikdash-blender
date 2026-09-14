@@ -9,7 +9,7 @@ Un seul dépôt : Netlify déploie `main` à chaque push, en ~3 minutes.
 
 | Chemin | Rôle |
 |---|---|
-| `site/` | l'accueil (fr, en, he), robots, sitemap, feuille de style. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes : modifier le script, pas les pages |
+| `site/` | l'accueil (fr, en, he), robots, sitemap, feuille de style. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes : modifier le script, pas les pages. Les images de `site/images/` viennent de `renders/style/` (frames du film, ou caméras d'accueil déclarées dans `site/cameras_accueil.json`, à recopier dans `cameras.json` le temps d'un rendu) |
 | `visite/` | la visite, servie à `/visite/` |
 | `construire_site.sh` | assemble `dist/` = `site/` + `visite/` filtrée ; c'est la commande de build Netlify |
 | `netlify.toml` | dossier publié, redirection `www`, cache des assets |

@@ -57,7 +57,9 @@ fois. À garder pour les plans de matière et de ciel, pas pour les plans contr�
 
 | `--modele` | Endpoint | Prix | Mesuré |
 |---|---|---|---|
-| `gpt2` | `openai/gpt-image-2/edit` | ~0,08 $ (facturé au token, `quality: high`) | **retenu** : le meilleur verrou de cadrage des six. Sortie à l'aspect de l'entrée, 1920 × 1072 |
+| `gpt2` | `openai/gpt-image-2/edit` | ~0,08 $ (facturé au token, `quality: high`) | **retenu pour le film** : le meilleur verrou de cadrage des six. Sortie à l'aspect de l'entrée, 1920 × 1072. Sur un plan large d'accueil, a gardé tel quel le sol nu et les cubes du blockout autour du mont là où `gpt25s` en a fait des collines et des maisons |
+| `gpt25s` | `openai/gpt-image-2.5/sunburst/edit` | au token, `quality: high` | **retenu pour l'accueil du site** : même verrou de cadrage que `gpt2`, et le seul des trois GPT à sortir une photo — brume, soleil rasant, flare, pierre à grain variable. Six cadrages vides justes du premier coup |
+| `gpt25` | `openai/gpt-image-2.5/flare/edit` | au token, `quality: high` | même charge que `gpt2` ; cadrage tenu, façades planes gardées planes, mais rendu froid et lisse, « jeu vidéo » ; jugé sans réalisme sur six cadrages |
 | `nano-pro` | `fal-ai/nano-banana-pro/edit` | 0,15 $/image | second : tient les cadrages testés, mais invente une colonnade sur une façade plane. Sortie 2752 × 1536 |
 | `nano2` | `fal-ai/nano-banana-2/edit` | 0,08 $ | recompose : un mur devenu pylône isolé, un animal de premier plan **supprimé** |
 | `seedream` | `bytedance/seedream/v5/pro/edit` | 0,0675 $ | visages de face au premier plan ; l'Oulam repeint en temple grec |

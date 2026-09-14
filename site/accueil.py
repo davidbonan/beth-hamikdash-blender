@@ -8,7 +8,8 @@ from pathlib import Path
 SITE = Path(__file__).resolve().parent
 DOMAINE = "https://bethhamikdach.com"
 
-DEGRES = ["har_habayit", "ezrat_nashim", "azara", "mizbeach", "oulam", "heikhal", "kodesh_hakodashim"]
+DEGRES = [("har_habayit", "har_habayit"), ("heil", "face_porte_est"), ("ezrat_nashim", "ezrat_nashim"), ("azara", "azara"),
+          ("mizbeach", "mizbeach"), ("oulam", "oulam"), ("heikhal", "heikhal"), ("kodesh_hakodashim", "kodesh_hakodashim")]
 
 TEXTES = {
     "fr": {
@@ -28,10 +29,11 @@ TEXTES = {
             "Un clic sur une porte, un ustensile ou un vêtement dit ce que c'est, sa mesure, et cite le texte : <i>Middot</i>, <i>Tamid</i>, <i>Yoma</i>, le Rambam, avec le lien vers Sefaria. Là où les sources divergent ou se taisent, la visite indique l'avis retenu, l'avis écarté, et ce qui n'est qu'un choix du projet.",
         ],
         "montee_titre": "La montée",
-        "montee_intro": "La Mishna compte dix degrés de sainteté, du pays d'Israël au Kodesh HaKodashim, et définit chacun par ceux qui n'y entrent plus (<i>Kelim</i> 1:6-9). La visite parcourt les sept derniers. Cette page aussi : plus on avance, plus la lumière se resserre.",
+        "montee_intro": "La Mishna compte dix degrés de sainteté, du pays d'Israël au Kodesh HaKodashim, et définit chacun par ceux qui n'y entrent plus (<i>Kelim</i> 1:6-9). La visite parcourt les huit derniers. Cette page aussi : plus on avance, plus la lumière se resserre.",
         "aller": "Y aller",
         "degres": {
             "har_habayit": ("Har HaBayit", "הר הבית", "Plus saint que Jérusalem : les zavim, les zavot, les niddot et les accouchées n'y entrent pas."),
+            "heil": ("Heil", "חיל", "Plus saint que le Har HaBayit : les non-Juifs et ceux qu'un mort a rendus impurs n'y entrent pas."),
             "ezrat_nashim": ("Ezrat Nashim", "עזרת נשים", "Plus sainte que le Heil : celui qui s'est immergé le jour même n'y entre pas avant le coucher du soleil."),
             "azara": ("Ezrat Israël", "עזרת ישראל", "Plus sainte que l'Ezrat Nashim : celui à qui il manque encore une offrande d'expiation n'y entre pas."),
             "mizbeach": ("Ezrat Cohanim", "עזרת כהנים", "Plus sainte que l'Ezrat Israël : les Israélites n'y entrent que pour ce qui les requiert, la semikha, la she'hita et la tenoufa."),
@@ -67,10 +69,11 @@ TEXTES = {
             "Click a gate, a vessel or a garment and it tells you what it is, its measure, and the text behind it: <i>Middot</i>, <i>Tamid</i>, <i>Yoma</i>, the Rambam, with a link to Sefaria. Where the sources disagree or fall silent, the tour says which opinion was kept, which was set aside, and what is merely a choice of the project.",
         ],
         "montee_titre": "The ascent",
-        "montee_intro": "The Mishnah counts ten degrees of holiness, from the land of Israel to the Kodesh HaKodashim, and defines each by those who may no longer enter (<i>Kelim</i> 1:6-9). The tour covers the last seven. So does this page: the further you go, the narrower the light.",
+        "montee_intro": "The Mishnah counts ten degrees of holiness, from the land of Israel to the Kodesh HaKodashim, and defines each by those who may no longer enter (<i>Kelim</i> 1:6-9). The tour covers the last eight. So does this page: the further you go, the narrower the light.",
         "aller": "Go there",
         "degres": {
             "har_habayit": ("Har HaBayit", "הר הבית", "Holier than Jerusalem: zavim, zavot, menstruants and women after childbirth may not enter."),
+            "heil": ("Chel", "חיל", "Holier than the Har HaBayit: non-Jews and those made impure by a corpse may not enter."),
             "ezrat_nashim": ("Ezrat Nashim", "עזרת נשים", "Holier than the Chel: one who immersed that same day may not enter before sunset."),
             "azara": ("Ezrat Israel", "עזרת ישראל", "Holier than the Ezrat Nashim: one who still owes an offering of atonement may not enter."),
             "mizbeach": ("Ezrat Kohanim", "עזרת כהנים", "Holier than the Ezrat Israel: Israelites enter only for what requires them, the semikhah, the shechitah and the tenufah."),
@@ -106,16 +109,17 @@ TEXTES = {
             "לחיצה על שער, על כלי או על בגד אומרת מהו, מה מידתו, ומצטטת את המקור: <i>מידות</i>, <i>תמיד</i>, <i>יומא</i>, הרמב״ם, עם קישור לספריא. במקום שהמקורות חלוקים או שותקים, הסיור מציין את הדעה שנתקבלה, את הדעה שנדחתה, ומה שאינו אלא בחירה של הפרויקט.",
         ],
         "montee_titre": "העלייה",
-        "montee_intro": "המשנה מונה עשר קדושות, מארץ ישראל ועד קודש הקודשים, ומגדירה כל אחת במי שאינו נכנס לשם עוד (<i>כלים</i> א, ו–ט). הסיור עובר בשבע האחרונות. וכך גם הדף הזה: ככל שמתקדמים, האור מצטמצם.",
+        "montee_intro": "המשנה מונה עשר קדושות, מארץ ישראל ועד קודש הקודשים, ומגדירה כל אחת במי שאינו נכנס לשם עוד (<i>כלים</i> א, ו–ט). הסיור עובר בשמונה האחרונות. וכך גם הדף הזה: ככל שמתקדמים, האור מצטמצם.",
         "aller": "ללכת לשם",
         "degres": {
-            "har_habayit": ("הר הבית", "", "מְקֻדָּשׁ מירושלים, שֶׁאֵין זָבִים וְזָבוֹת, נִדּוֹת וְיוֹלְדוֹת נִכְנָסִים לְשָׁם."),
-            "ezrat_nashim": ("עזרת נשים", "", "מְקֻדֶּשֶׁת מן החיל, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם."),
-            "azara": ("עזרת ישראל", "", "מְקֻדֶּשֶׁת ממנה, שֶׁאֵין מְחֻסַּר כִּפּוּרִים נִכְנָס לְשָׁם."),
-            "mizbeach": ("עזרת כהנים", "", "מְקֻדֶּשֶׁת ממנה, שֶׁאֵין יִשְׂרָאֵל נִכְנָסִים לְשָׁם אֶלָּא בִשְׁעַת צָרְכֵיהֶם, לִסְמִיכָה לִשְׁחִיטָה וְלִתְנוּפָה."),
-            "oulam": ("בין האולם ולמזבח", "", "מְקֻדָּשׁ ממנה, שֶׁאֵין בַּעֲלֵי מוּמִין וּפְרוּעֵי רֹאשׁ נִכְנָסִים לְשָׁם."),
-            "heikhal": ("היכל", "", "מְקֻדָּשׁ ממנו, שֶׁאֵין נִכְנָס לְשָׁם שֶׁלֹּא רְחוּץ יָדַיִם וְרַגְלָיִם."),
-            "kodesh_hakodashim": ("קודש הקודשים", "", "מְקֻדָּשׁ מהם, שֶׁאֵין נִכְנָס לְשָׁם אֶלָּא כֹהֵן גָּדוֹל בְּיוֹם הַכִּפּוּרִים בִּשְׁעַת הָעֲבוֹדָה."),
+            "har_habayit": ("הר הבית", "", "מְקֻדָּשׁ מִירוּשָׁלַיִם, שֶׁאֵין זָבִים וְזָבוֹת, נִדּוֹת וְיוֹלְדוֹת נִכְנָסִים לְשָׁם."),
+            "heil": ("חיל", "", "מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם."),
+            "ezrat_nashim": ("עזרת נשים", "", "מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם."),
+            "azara": ("עזרת ישראל", "", "מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין מְחֻסַּר כִּפּוּרִים נִכְנָס לְשָׁם."),
+            "mizbeach": ("עזרת כהנים", "", "מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין יִשְׂרָאֵל נִכְנָסִים לְשָׁם אֶלָּא בִשְׁעַת צָרְכֵיהֶם, לִסְמִיכָה לִשְׁחִיטָה וְלִתְנוּפָה."),
+            "oulam": ("בין האולם ולמזבח", "", "מְקֻדָּשׁ מִמֶּנָּה, שֶׁאֵין בַּעֲלֵי מוּמִין וּפְרוּעֵי רֹאשׁ נִכְנָסִים לְשָׁם."),
+            "heikhal": ("היכל", "", "מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין נִכְנָס לְשָׁם שֶׁלֹּא רְחוּץ יָדַיִם וְרַגְלָיִם."),
+            "kodesh_hakodashim": ("קודש הקודשים", "", "מְקֻדָּשׁ מֵהֶם, שֶׁאֵין נִכְנָס לְשָׁם אֶלָּא כֹהֵן גָּדוֹל בְּיוֹם הַכִּפּוּרִים בִּשְׁעַת הָעֲבוֹדָה."),
         },
         "methode_titre": "איך זה נעשה",
         "methode": [
@@ -156,7 +160,7 @@ def hreflangs():
     return "\n".join(lignes)
 
 
-def degre(code, t, identifiant, rang):
+def degre(code, t, identifiant, vue, rang):
     nom, hebreu, phrase = t["degres"][identifiant]
     titre = f'<span class="nom">{nom}</span>'
     if hebreu:
@@ -167,7 +171,7 @@ def degre(code, t, identifiant, rang):
     <div class="texte">
       <h3>{titre}</h3>
       <p class="mishna">{phrase}</p>
-      <a class="aller" href="/visite/?vue={identifiant}" data-langue="{code}">{t["aller"]}</a>
+      <a class="aller" href="/visite/?vue={vue}" data-langue="{code}">{t["aller"]}</a>
     </div>
   </section>'''
 
@@ -177,7 +181,7 @@ def page(code):
     url = f'{DOMAINE}/{t["chemin"]}'
     intro = "\n".join(f"    <p>{p}</p>" for p in t["intro"])
     methode = "\n".join(f"    <p>{p}</p>" for p in t["methode"])
-    degres = "".join(degre(code, t, identifiant, i + 1) for i, identifiant in enumerate(DEGRES))
+    degres = "".join(degre(code, t, identifiant, vue, i + 1) for i, (identifiant, vue) in enumerate(DEGRES))
     return f'''<!doctype html>
 <html lang="{code}" dir="{t["sens"]}">
 <meta charset="utf-8">
@@ -192,7 +196,7 @@ def page(code):
 <meta property="og:title" content="{t["titre"]}">
 <meta property="og:description" content="{t["description"]}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{DOMAINE}/images/crepuscule_2000.webp">
+<meta property="og:image" content="{DOMAINE}/images/seuil_2000.webp">
 <meta property="og:image:width" content="2000">
 <meta property="og:image:height" content="1117">
 <meta name="twitter:card" content="summary_large_image">
@@ -200,13 +204,13 @@ def page(code):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="/style.css">
-<link rel="preload" as="image" href="/images/crepuscule_2000.webp" imagesrcset="/images/crepuscule_1000.webp 1000w, /images/crepuscule_2000.webp 2000w" imagesizes="100vw">
+<link rel="preload" as="image" href="/images/seuil_2000.webp" imagesrcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" imagesizes="100vw">
 
 <header class="seuil">
   <nav aria-label="{t["nav_langue"]}">
     {nav_langues(code)}
   </nav>
-  <img class="fond" src="/images/crepuscule_2000.webp" srcset="/images/crepuscule_1000.webp 1000w, /images/crepuscule_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
+  <img class="fond" src="/images/seuil_2000.webp" srcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
   <div class="titre">
     <h1><span class="he" lang="he" dir="rtl">{t["hebreu"]}</span><span class="latin" lang="fr">{t["latin"]}</span></h1>
     <p class="accroche">{t["accroche"]}</p>

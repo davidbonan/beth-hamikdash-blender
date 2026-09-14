@@ -202,6 +202,16 @@ MODELES = {
         "charge": charge_gpt,
         "prompt": "edition",
     },
+    "gpt25": {
+        "endpoint": "openai/gpt-image-2.5/flare/edit",
+        "charge": charge_gpt,
+        "prompt": "edition",
+    },
+    "gpt25s": {
+        "endpoint": "openai/gpt-image-2.5/sunburst/edit",
+        "charge": charge_gpt,
+        "prompt": "edition",
+    },
     "flux2-pro": {
         "endpoint": "fal-ai/flux-2-pro/edit",
         "charge": charge_flux2,

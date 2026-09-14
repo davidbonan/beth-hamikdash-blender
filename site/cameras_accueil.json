@@ -1,0 +1,70 @@
+{
+  "cameras": [
+    {
+      "nom": "ACC_01_Har_HaBayit",
+      "duree_s": 1,
+      "focale": 32,
+      "camera": [
+        [245.0, 80.0, 25.0]
+      ],
+      "cible": [
+        [-40.0, 0.0, 40.0]
+      ]
+    },
+    {
+      "nom": "ACC_02_Heil",
+      "duree_s": 1,
+      "focale": 24,
+      "camera": [
+        [178.0, 4.0, -12.4]
+      ],
+      "cible": [
+        [142.0, 0.0, 3.0]
+      ]
+    },
+    {
+      "nom": "ACC_03_Ezrat_Nashim",
+      "duree_s": 1,
+      "focale": 32,
+      "camera": [
+        [105.0, 0.0, -6.4]
+      ],
+      "cible": [
+        [-20.0, 0.0, 25.0]
+      ]
+    },
+    {
+      "nom": "ACC_05_Ezrat_Cohanim",
+      "duree_s": 1,
+      "focale": 32,
+      "camera": [
+        [0.0, -60.0, 4.0]
+      ],
+      "cible": [
+        [-38.0, -12.0, 9.0]
+      ]
+    },
+    {
+      "nom": "ACC_06_Seuil",
+      "duree_s": 1,
+      "focale": 85,
+      "camera": [
+        [430.0, -190.0, 95.0]
+      ],
+      "cible": [
+        [-60.0, 0.0, 50.0]
+      ]
+    },
+    {
+      "nom": "ACC_04_Ezrat_Israel",
+      "duree_s": 1,
+      "focale": 28,
+      "camera": [
+        [-2.0, 32.0, 3.6]
+      ],
+      "cible": [
+        [-45.0, -5.0, 12.0]
+      ]
+    }
+  ]
+}
