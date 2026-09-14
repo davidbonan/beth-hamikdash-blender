@@ -204,13 +204,17 @@ def page(code):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="/style.css">
-<link rel="preload" as="image" href="/images/seuil_2000.webp" imagesrcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" imagesizes="100vw">
+<link rel="preload" as="image" href="/images/seuil_2000.webp" imagesrcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
+<link rel="preload" as="image" href="/images/seuil_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
 <header class="seuil">
   <nav aria-label="{t["nav_langue"]}">
     {nav_langues(code)}
   </nav>
-  <img class="fond" src="/images/seuil_2000.webp" srcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
+  <picture class="fond">
+    <source media="(max-aspect-ratio: 4/5)" srcset="/images/seuil_portrait_720.webp">
+    <img src="/images/seuil_2000.webp" srcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
+  </picture>
   <div class="titre">
     <h1><span class="he" lang="he" dir="rtl">{t["hebreu"]}</span><span class="latin" lang="fr">{t["latin"]}</span></h1>
     <p class="accroche">{t["accroche"]}</p>
