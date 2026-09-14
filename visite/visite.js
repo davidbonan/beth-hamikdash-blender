@@ -17,7 +17,7 @@ import { cinema } from "./cinema.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
-const OEIL = 1.75;        // H_HOMME de la fiche : 1,75 m
+const OEIL = 1.55;        // yeux d'un homme de l'époque (1,65 m), sous les 1,75 m des silhouettes
 const RAYON = 0.38;       // demi-largeur du marcheur
 // Les degrés du 'Heil, de Nikanor et de l'Oulam font tous 1/2 ama — 0,24 m de haut
 // comme de giron. La garde se place juste au-dessus de MONTEE et ne porte qu'à une
