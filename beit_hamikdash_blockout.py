@@ -5307,16 +5307,19 @@ for k, (creux, z_haut) in enumerate(((3.0, 38.6), (4.5, 37.6), (6.0, 36.6))):
 #     seule cote : le rocher perce le sol d'or sans jamais le dépasser de 3 doigts, et il
 #     est au centre, « רֶיוַח עֶשֶׂר אַמּוֹת לְכׇל רוּחַ » autour de l'Arche (Bava Batra 99a).
 #     Contour, emprise et relief : CHOIX ; plat là où l'Arche et la ma'hta se posent.
-#     Le relief tient à la matière (`roche`) et au bord cassé : un palier ou une fissure tirés
-#     d'un seuil de bruit en dessinent les courbes de niveau, qui se lisent en traits.
+#     C'est du calcaire en place, et il se lit comme tel : un contour à arêtes, cassé le
+#     long de ses diaclases, une face verticale sur tout son tour, et un dessus en lits —
+#     des paliers plats séparés par des marches d'un doigt, jamais un dôme. La matière
+#     (`roche`) y ajoute le piqué et les fissures.
 KKC = (KK0 + KK1) / 2
 DOIGT = 1 / 24
 ZE = Z_BAT + 3 * DOIGT      # le haut de la pierre, où l'Arche se pose
-SHETIYA_CENTRE, SHETIYA_DEMI_AXES = (KKC + 0.2, 0.1), (2.5, 2.9)
+SHETIYA_CENTRE, SHETIYA_DEMI_AXES = (KKC + 0.2, 0.1), (4.1, 4.6)
 SHETIYA_ASSISE = (KKC - 0.9, KKC + 1.6, -1.45, 1.45)   # l'Arche, ce qui est devant elle, la ma'hta
-SHETIYA_PLANCHER = 0.03     # le rocher reste sur le placage d'or (0,02), qui passe dessous
-# (harmonique, amplitude, phase) du contour : les basses font la masse, les hautes l'arête.
-SHETIYA_HARMONIQUES = ((2, 0.12, 0.7), (3, 0.08, 2.1), (5, 0.05, 4.0), (9, 0.03, 1.2), (17, 0.015, 0.3))
+# Les arêtes du contour, (direction en degrés, rayon en fraction des demi-axes) : le bord
+# va droit de l'une à l'autre. Deux rentrants (0,72) sont des blocs partis.
+SHETIYA_ARETES = ((0, 1.00), (24, 0.86), (58, 1.04), (85, 0.72), (110, 0.95), (150, 1.02), (172, 0.84),
+                  (200, 0.98), (226, 0.90), (262, 1.05), (288, 0.72), (312, 0.94), (340, 0.88))
 
 
 def _bruit(x, y, frequence, graine):
@@ -5326,8 +5329,14 @@ def _bruit(x, y, frequence, graine):
 
 def contour_shetiya(a):
     """Rayon du contour dans la direction `a`, en fraction des demi-axes."""
-    cassure = 0.05 * _bruit(math.cos(a), math.sin(a), 3.0, 5.1) + 0.02 * _bruit(math.cos(a), math.sin(a), 9.0, 8.3)
-    return 1 + cassure + sum(amplitude * math.sin(n * a + phase) for n, amplitude, phase in SHETIYA_HARMONIQUES)
+    aretes = [(math.radians(deg), r) for deg, r in SHETIYA_ARETES]
+    a %= 2 * math.pi
+    (a0, r0), (a1, r1) = next(((aretes[i - 1], aretes[i]) for i in range(1, len(aretes)) if a < aretes[i][0]),
+                              (aretes[-1], (aretes[0][0] + 2 * math.pi, aretes[0][1])))
+    p0, p1 = Vector((r0 * math.cos(a0), r0 * math.sin(a0))), Vector((r1 * math.cos(a1), r1 * math.sin(a1)))
+    direction = Vector((math.cos(a), math.sin(a)))
+    droit = p0.cross(p1) / direction.cross(p1 - p0)
+    return droit + 0.012 * _bruit(math.cos(a), math.sin(a), 9.0, 8.3)
 
 
 def _montee(debut, fin, v):
@@ -5335,25 +5344,26 @@ def _montee(debut, fin, v):
     return t * t * (3 - 2 * t)
 
 
-def dessus_shetiya(x, y, t):
-    """Haut du rocher au-dessus du sol en (x, y), à la fraction `t` du centre au bord."""
-    masse = 0.5 + 0.35 * _bruit(x, y, 0.6, 3.1) + 0.2 * _bruit(x, y, 1.4, 7.7)
-    grain = 0.15 * _bruit(x, y, 11.0, 23.5)
-    rocher = (1.5 + 1.5 * masse * (0.6 + 0.4 * _montee(1.0, 0.7, t)) + grain) * DOIGT
+def dessus_shetiya(x, y):
+    """Haut du rocher au-dessus du sol en (x, y) : trois lits en paliers, fendus de diaclases."""
+    lit = _bruit(x, y, 0.28, 3.1)
+    marches = 1.2 * (1 - _montee(-0.02, 0.06, lit)) + 0.8 * (1 - _montee(-0.40, -0.32, lit))
+    fente = 1.4 * (1 - _montee(0.03, 0.07, abs(_bruit(x, y, 1.1, 12.4))))
+    grain = 0.12 * _bruit(x, y, 11.0, 23.5)
+    rocher = (3 - marches - fente + grain) * DOIGT
     x0, x1, y0, y1 = SHETIYA_ASSISE
     hors_assise = max(x0 - x, x - x1, y0 - y, y - y1, 0.0)
     haut = ZE - Z_BAT
-    return min(haut, max(SHETIYA_PLANCHER, haut + (rocher - haut) * _montee(0.0, 0.3, hors_assise)))
+    return min(haut, haut + (rocher - haut) * _montee(0.0, 0.3, hors_assise))
 
 
 def cote_shetiya(x, y):
     """Cote du dessus du rocher en (x, y), en amot."""
-    u, v = (x - SHETIYA_CENTRE[0]) / SHETIYA_DEMI_AXES[0], (y - SHETIYA_CENTRE[1]) / SHETIYA_DEMI_AXES[1]
-    return Z_BAT + dessus_shetiya(x, y, math.hypot(u, v) / contour_shetiya(math.atan2(v, u)))
+    return Z_BAT + dessus_shetiya(x, y)
 
 
-def even_hashetiya(name, col, anneaux=40, segs=320):
-    """Le rocher en nappe polaire : un dessus irrégulier, puis une jupe qui plonge sous l'or."""
+def even_hashetiya(name, col, anneaux=64, segs=420):
+    """Le rocher en nappe polaire : un dessus en paliers, puis une face droite qui plonge sous l'or."""
     (cx, cy), (ax, ay) = SHETIYA_CENTRE, SHETIYA_DEMI_AXES
     verts = [(cx, cy, cote_shetiya(cx, cy))]
     for i in range(1, anneaux + 1):
@@ -5361,7 +5371,7 @@ def even_hashetiya(name, col, anneaux=40, segs=320):
         for s in range(segs):
             a = 2 * math.pi * s / segs
             x, y = cx + ax * t * contour_shetiya(a) * math.cos(a), cy + ay * t * contour_shetiya(a) * math.sin(a)
-            verts.append((x, y, Z_BAT + dessus_shetiya(x, y, t)))
+            verts.append((x, y, cote_shetiya(x, y)))
     verts += [(x, y, Z_BAT - 0.02) for x, y, _ in verts[-segs:]]
 
     def sommet(i, s):
