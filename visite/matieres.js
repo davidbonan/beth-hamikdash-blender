@@ -15,7 +15,6 @@
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
 import { SOLEIL } from "./ciel.js";
-import { assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
@@ -792,8 +791,6 @@ export function habiller(materiau, horloges, jeux) {
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
       .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
-      .replace("#include <shadowmap_pars_fragment>",
-               PROFIL.ombres.penombre ? assemblage() : "#include <shadowmap_pars_fragment>")
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
       // La normale vient de l'attribut, pas des dérivées de la position : c'est elle

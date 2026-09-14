@@ -5,8 +5,8 @@ import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { chaine } from "./chaine.js";
-import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
-import { regler as reglerOmbres } from "./ombres.js";
+import { BRUME, domeVu, environnement } from "./ciel.js";
+import { poserCascades, suivre as suivreCascades, redemander as redemanderOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
@@ -132,8 +132,8 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.68;
 EXPOSITION.value = renderer.toneMappingExposure;
 renderer.shadowMap.enabled = true;
-// Le profil lourd ne s'en sert pas : `ombres.js` y remplace la lecture de la carte
-// par une pénombre variable. Il reste le réglage du profil léger, qui garde celle-ci.
+// Le profil lourd ne s'en sert pas : `ombres.js` y lit ses deux cartes avec une pénombre
+// variable. Il reste le réglage du profil léger, qui garde celle-ci.
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
@@ -151,16 +151,11 @@ scene.add(new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.16));
 // l'horizon, le soleil traverse plus d'atmosphère : il perd de la force et gagne de
 // l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
 const soleil = new THREE.DirectionalLight(0xffe0b4, 4.9);
-reglerOmbres(soleil);
-scene.add(soleil, soleil.target);
+const CASCADES = poserCascades(soleil);
+for (const { lumiere } of CASCADES) scene.add(lumiere, lumiere.target);
 const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.12);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
-
-// Le soleil est posé loin devant la caméra, pas à sa hauteur : la fenêtre d'ombre le
-// suit, et il faut que ce qui la surplombe — la façade fait cinquante mètres — tienne
-// entre son `near` et son `far`.
-const RECUL_SOLEIL = 200;
 
 const ciel = domeVu(760);
 scene.add(ciel);
@@ -795,29 +790,16 @@ if (demande) allerVers(demande);
 const horloge = new THREE.Clock();
 let image = 0;
 
-// L'ombre portée est une fenêtre de 110 amot ; à l'échelle du Har HaBayit une seule
-// carte figée serait illisible. Elle suit donc le visiteur — mais par sauts, pas à
-// chaque image : la refaire coûte une passe de géométrie entière, la troisième de
-// l'image après la principale et celle de l'occlusion, et la fenêtre fait cinquante
-// mètres de large quand on n'avance que d'une douzaine de centimètres par image, en
-// courant. Tant qu'on ne la rafraîchit pas, three garde aussi la matrice qui va avec :
-// carte et matrice restent d'accord, et l'ombre reste juste — elle est simplement
-// calculée depuis un pas en arrière.
-const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
-const PAS_OMBRE = PROFIL.ombres.portee / 10;
+// L'ombre portée suit le visiteur, par sauts : `ombres.js` décide quand refaire ses cartes.
+const LARGE = CASCADES.at(-1);
 
 // Une carte figée garderait l'ombre des figurants à leur pose de départ.
 const figurantsDansLOmbre = () => PROFIL.figurants.ombre && melangeur !== null
-  && EMPRISES_FIGURANTS.some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
+  && EMPRISES_FIGURANTS.some((b) => b.distanceToPoint(LARGE.ancre) < LARGE.portee);
 
 function suivreSoleil() {
-  if (figurantsDansLOmbre()) soleil.shadow.needsUpdate = true;
-  if (camera.position.distanceToSquared(ANCRE_OMBRE) < PAS_OMBRE * PAS_OMBRE) return;
-  ANCRE_OMBRE.copy(camera.position);
-  soleil.target.position.copy(camera.position);
-  soleil.position.copy(camera.position).addScaledVector(SOLEIL, RECUL_SOLEIL);
-  soleil.target.updateMatrixWorld();
-  soleil.shadow.needsUpdate = true;
+  if (figurantsDansLOmbre()) redemanderOmbres(CASCADES);
+  suivreCascades(CASCADES, camera.position);
 }
 
 function dessiner(dt) {
@@ -923,7 +905,7 @@ window.__etat = () => {
 };
 window.__ombres = (actives) => {
   renderer.shadowMap.enabled = actives;
-  soleil.shadow.needsUpdate = true;
+  redemanderOmbres(CASCADES);
   scene.traverse((o) => { if (o.isMesh) o.material.needsUpdate = true; });
   dessiner(0);
 };
