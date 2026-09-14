@@ -15,120 +15,88 @@
 <meta property="og:title" content="Beit HaMikdach, le Temple de Jérusalem en trois dimensions">
 <meta property="og:description" content="Le Temple de Jérusalem reconstruit aux cotes de la Mishna. Une visite libre, du Har HaBayit au Kodesh HaKodashim, où chaque pierre cite sa source.">
 <meta property="og:url" content="https://bethhamikdach.com/">
-<meta property="og:image" content="https://bethhamikdach.com/images/seuil_2000.webp">
-<meta property="og:image:width" content="2000">
-<meta property="og:image:height" content="1117">
+<meta property="og:image" content="https://bethhamikdach.com/images/partage.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="/style.css">
-<link rel="preload" as="image" href="/images/seuil_2000.webp" imagesrcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
-<link rel="preload" as="image" href="/images/seuil_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
+<link rel="preload" as="image" href="/images/affiche_2000.webp" imagesrcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
+<link rel="preload" as="image" href="/images/affiche_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
-<header class="seuil">
+<main class="scene">
+  <div class="fond">
+    <picture class="affiche">
+      <source media="(max-aspect-ratio: 4/5)" srcset="/images/affiche_portrait_720.webp">
+      <img src="/images/affiche_2000.webp" srcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
+    </picture>
+    <iframe class="vivante" title="" tabindex="-1" aria-hidden="true" hidden></iframe>
+    <video class="vivante" muted playsinline loop preload="none" aria-hidden="true" data-src="/images/parcours_portrait.mp4" hidden></video>
+  </div>
+
   <nav aria-label="Langue">
     <a href="/" lang="fr" dir="ltr" aria-current="page">Français</a>
     <a href="/en/" lang="en" dir="ltr">English</a>
     <a href="/he/" lang="he" dir="rtl">עברית</a>
   </nav>
-  <picture class="fond">
-    <source media="(max-aspect-ratio: 4/5)" srcset="/images/seuil_portrait_720.webp">
-    <img src="/images/seuil_2000.webp" srcset="/images/seuil_1000.webp 1000w, /images/seuil_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
-  </picture>
+
   <div class="titre">
     <h1><span class="he" lang="he" dir="rtl">בית המקדש</span><span class="latin" lang="fr">Beit HaMikdach</span></h1>
     <p class="accroche">Le Temple de Jérusalem, reconstruit en trois dimensions aux cotes de la Mishna. On y entre à pied, on y marche librement, et chaque pierre dit d'où elle vient.</p>
     <p class="action"><a class="entrer" href="/visite/" data-langue="fr">Entrer dans la visite</a><span class="note">Gratuit, sans installation. Dix minutes ou une heure.</span></p>
   </div>
-</header>
 
-<main>
-  <section class="propos" data-degre="0">
-    <p>La visite est une scène en trois dimensions que l'on parcourt au clavier, à la souris ou au doigt. Les cours, les portes, les chambres, l'autel et le Sanctuaire sont bâtis en volumes aux mesures du traité <i>Middot</i>, la seule description mesurée d'un Temple debout.</p>
-    <p>Un clic sur une porte, un ustensile ou un vêtement dit ce que c'est, sa mesure, et cite le texte : <i>Middot</i>, <i>Tamid</i>, <i>Yoma</i>, le Rambam, avec le lien vers Sefaria. Là où les sources divergent ou se taisent, la visite indique l'avis retenu, l'avis écarté, et ce qui n'est qu'un choix du projet.</p>
-  </section>
-
-  <section class="montee-tete" data-degre="0">
-    <h2>La montée</h2>
-    <p>La Mishna compte dix degrés de sainteté, du pays d'Israël au Kodesh HaKodashim, et définit chacun par ceux qui n'y entrent plus (<i>Kelim</i> 1:6-9). La visite parcourt les huit derniers. Cette page aussi : plus on avance, plus la lumière se resserre.</p>
-  </section>
-
-  <section class="degre" data-degre="1" id="har_habayit">
-    <figure><img class="" src="/images/har_habayit_2000.webp" srcset="/images/har_habayit_1000.webp 1000w, /images/har_habayit_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Har HaBayit" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Har HaBayit</span> <span class="nom-he" lang="he" dir="rtl">הר הבית</span></h3>
-      <p class="mishna">Plus saint que Jérusalem : les zavim, les zavot, les niddot et les accouchées n'y entrent pas.</p>
-      <a class="aller" href="/visite/?vue=har_habayit" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="2" id="heil">
-    <figure><img class="" src="/images/heil_2000.webp" srcset="/images/heil_1000.webp 1000w, /images/heil_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Heil" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Heil</span> <span class="nom-he" lang="he" dir="rtl">חיל</span></h3>
-      <p class="mishna">Plus saint que le Har HaBayit : les non-Juifs et ceux qu'un mort a rendus impurs n'y entrent pas.</p>
-      <a class="aller" href="/visite/?vue=face_porte_est" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="3" id="ezrat_nashim">
-    <figure><img class="" src="/images/ezrat_nashim_2000.webp" srcset="/images/ezrat_nashim_1000.webp 1000w, /images/ezrat_nashim_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Ezrat Nashim" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Ezrat Nashim</span> <span class="nom-he" lang="he" dir="rtl">עזרת נשים</span></h3>
-      <p class="mishna">Plus sainte que le Heil : celui qui s'est immergé le jour même n'y entre pas avant le coucher du soleil.</p>
-      <a class="aller" href="/visite/?vue=ezrat_nashim" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="4" id="azara">
-    <figure><img class="" src="/images/azara_2000.webp" srcset="/images/azara_1000.webp 1000w, /images/azara_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Ezrat Israël" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Ezrat Israël</span> <span class="nom-he" lang="he" dir="rtl">עזרת ישראל</span></h3>
-      <p class="mishna">Plus sainte que l'Ezrat Nashim : celui à qui il manque encore une offrande d'expiation n'y entre pas.</p>
-      <a class="aller" href="/visite/?vue=azara" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="5" id="mizbeach">
-    <figure><img class="" src="/images/mizbeach_2000.webp" srcset="/images/mizbeach_1000.webp 1000w, /images/mizbeach_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Ezrat Cohanim" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Ezrat Cohanim</span> <span class="nom-he" lang="he" dir="rtl">עזרת כהנים</span></h3>
-      <p class="mishna">Plus sainte que l'Ezrat Israël : les Israélites n'y entrent que pour ce qui les requiert, la semikha, la she'hita et la tenoufa.</p>
-      <a class="aller" href="/visite/?vue=mizbeach" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="6" id="oulam">
-    <figure><img class="" src="/images/oulam_2000.webp" srcset="/images/oulam_1000.webp 1000w, /images/oulam_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Entre l'Oulam et l'autel" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Entre l'Oulam et l'autel</span> <span class="nom-he" lang="he" dir="rtl">בין האולם ולמזבח</span></h3>
-      <p class="mishna">Plus saint que l'Ezrat Cohanim : les cohanim atteints d'un défaut ou aux cheveux défaits n'y entrent pas.</p>
-      <a class="aller" href="/visite/?vue=oulam" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="7" id="heikhal">
-    <figure><img class="" src="/images/heikhal_2000.webp" srcset="/images/heikhal_1000.webp 1000w, /images/heikhal_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Heikhal" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Heikhal</span> <span class="nom-he" lang="he" dir="rtl">היכל</span></h3>
-      <p class="mishna">Plus saint encore : nul n'y entre sans s'être lavé les mains et les pieds.</p>
-      <a class="aller" href="/visite/?vue=heikhal" data-langue="fr">Y aller</a>
-    </div>
-  </section>
-  <section class="degre" data-degre="8" id="kodesh_hakodashim">
-    <figure><img class="" src="/images/kodesh_hakodashim_2000.webp" srcset="/images/kodesh_hakodashim_1000.webp 1000w, /images/kodesh_hakodashim_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Kodesh HaKodashim" loading="lazy" decoding="async"></figure>
-    <div class="texte">
-      <h3><span class="nom">Kodesh HaKodashim</span> <span class="nom-he" lang="he" dir="rtl">קודש הקודשים</span></h3>
-      <p class="mishna">Plus saint que tout : nul n'y entre, sinon le Cohen Gadol, le jour de Kippour, à l'heure du service.</p>
-      <a class="aller" href="/visite/?vue=kodesh_hakodashim" data-langue="fr">Y aller</a>
-    </div>
+  <section class="degres" aria-label="Les degrés de sainteté" aria-live="polite">
+    <ul>
+      <li data-degre="har_habayit" data-vue="har_habayit" data-temps="0" aria-current="true">
+        <h2><span class="nom">Har HaBayit</span> <span class="nom-he" lang="he" dir="rtl">הר הבית</span></h2>
+        <p class="mishna">Plus saint que Jérusalem : les zavim, les zavot, les niddot et les accouchées n'y entrent pas.</p>
+        <p class="source">Mishna Kelim 1:8</p>
+      </li>
+      <li data-degre="heil" data-vue="face_porte_est" data-temps="18">
+        <h2><span class="nom">Heil</span> <span class="nom-he" lang="he" dir="rtl">חיל</span></h2>
+        <p class="mishna">Plus saint que le Har HaBayit : les non-Juifs et ceux qu'un mort a rendus impurs n'y entrent pas.</p>
+        <p class="source">Mishna Kelim 1:8</p>
+      </li>
+      <li data-degre="ezrat_nashim" data-vue="ezrat_nashim" data-temps="29">
+        <h2><span class="nom">Ezrat Nashim</span> <span class="nom-he" lang="he" dir="rtl">עזרת נשים</span></h2>
+        <p class="mishna">Plus sainte que le Heil : celui qui s'est immergé le jour même n'y entre pas avant le coucher du soleil.</p>
+        <p class="source">Mishna Kelim 1:8</p>
+      </li>
+      <li data-degre="azara" data-vue="azara" data-temps="58">
+        <h2><span class="nom">Ezrat Israël</span> <span class="nom-he" lang="he" dir="rtl">עזרת ישראל</span></h2>
+        <p class="mishna">Plus sainte que l'Ezrat Nashim : celui à qui il manque encore une offrande d'expiation n'y entre pas.</p>
+        <p class="source">Mishna Kelim 1:8</p>
+      </li>
+      <li data-degre="mizbeach" data-vue="mizbeach" data-temps="72">
+        <h2><span class="nom">Ezrat Cohanim</span> <span class="nom-he" lang="he" dir="rtl">עזרת כהנים</span></h2>
+        <p class="mishna">Plus sainte que l'Ezrat Israël : les Israélites n'y entrent que pour ce qui les requiert, la semikha, la she'hita et la tenoufa.</p>
+        <p class="source">Mishna Kelim 1:8</p>
+      </li>
+      <li data-degre="oulam" data-vue="oulam" data-temps="87">
+        <h2><span class="nom">Entre l'Oulam et l'autel</span> <span class="nom-he" lang="he" dir="rtl">בין האולם ולמזבח</span></h2>
+        <p class="mishna">Plus saint que l'Ezrat Cohanim : les cohanim atteints d'un défaut ou aux cheveux défaits n'y entrent pas.</p>
+        <p class="source">Mishna Kelim 1:9</p>
+      </li>
+      <li data-degre="heikhal" data-vue="heikhal" data-temps="106">
+        <h2><span class="nom">Heikhal</span> <span class="nom-he" lang="he" dir="rtl">היכל</span></h2>
+        <p class="mishna">Plus saint encore : nul n'y entre sans s'être lavé les mains et les pieds.</p>
+        <p class="source">Mishna Kelim 1:9</p>
+      </li>
+      <li data-degre="kodesh_hakodashim" data-vue="kodesh_hakodashim" data-temps="121">
+        <h2><span class="nom">Kodesh HaKodashim</span> <span class="nom-he" lang="he" dir="rtl">קודש הקודשים</span></h2>
+        <p class="mishna">Plus saint que tout : nul n'y entre, sinon le Cohen Gadol, le jour de Kippour, à l'heure du service.</p>
+        <p class="source">Mishna Kelim 1:9</p>
+      </li>
+    </ul>
   </section>
 
-  <section class="cloture" data-degre="8">
-    <figure class="hoshen"><img class="" src="/images/hoshen_2000.webp" srcset="/images/hoshen_1000.webp 1000w, /images/hoshen_2000.webp 2000w" sizes="(min-width: 1500px) 1400px, 100vw" alt="Le 'Hoshen du Cohen Gadol, douze pierres aux noms des tribus." loading="lazy" decoding="async"><figcaption>Le 'Hoshen du Cohen Gadol, douze pierres aux noms des tribus.</figcaption></figure>
-    <p class="action"><a class="entrer" href="/visite/" data-langue="fr">Entrer dans la visite</a></p>
-  </section>
+  <footer>
+    <span>© 2026 David Bonan</span>
+  </footer>
 </main>
 
-<footer data-degre="8">
-  <span>Une reconstitution de <a href="https://davidbonan.io">David Bonan</a></span>
-  <span>Textes de la Mishna d'après Sefaria.</span>
-</footer>
-
-<script src="/montee.js" defer></script>
+<script src="/accueil.js" defer></script>
 </html>

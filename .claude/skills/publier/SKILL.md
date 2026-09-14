@@ -9,8 +9,9 @@ Un seul dépôt : Netlify déploie `main` à chaque push, en ~3 minutes.
 
 | Chemin | Rôle |
 |---|---|
-| `site/` | l'accueil (fr, en, he), robots, sitemap, feuille de style. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes : modifier le script, pas les pages. Les images de `site/images/` viennent de `renders/style/` (frames du film, ou caméras d'accueil déclarées dans `site/cameras_accueil.json`, à recopier dans `cameras.json` le temps d'un rendu) |
-| `visite/` | la visite, servie à `/visite/` |
+| `site/` | l'accueil (fr, en, he), robots, sitemap, feuille de style, `accueil.js`. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes et `visite/cinema.json` : modifier le script, pas les pages |
+| `site/images/` | l'affiche (`affiche_*.webp`), l'image de partage (`partage.jpg`) et le parcours des téléphones (`parcours_portrait.mp4`) : tous **captés dans la scène**, voir « L'accueil est la visite » |
+| `visite/` | la visite, servie à `/visite/` ; `?cinema` la fait marcher seule pour l'accueil |
 | `construire_site.sh` | assemble `dist/` = `site/` + `visite/` filtrée ; c'est la commande de build Netlify |
 | `netlify.toml` | dossier publié, redirection `www`, cache des assets |
 
@@ -38,6 +39,46 @@ Le script rsync `index.html`, les `.js`, les `.json`, `temple.glb`, `figures.glb
 Servie à `/visite/` à la racine du domaine, la page résout ses chemins relatifs sans
 balise `<base>` : la source et le déployé sont identiques. Netlify redirige `/visite`
 → `/visite/` de lui-même.
+
+## L'accueil est la visite
+
+L'accueil n'a pas d'images du film : il encadre `/visite/?cinema` dans un `<iframe>`, où
+la scène marche seule le long des degrés de sainteté (`visite/cinema.js`, parcours dans
+`visite/cinema.json` — haltes en amot, ce qu'on y regarde, durée du trajet, pause) et
+poste à la page le degré atteint (`postMessage`, type `cinema`). `site/accueil.js`
+affiche le degré, et « Entrer » pointe sur `/visite/?vue=<halte>`.
+
+Trois fichiers de `site/images/` sont des **captures de cette scène**, à refaire dès que
+le parcours ou la scène change — sinon l'affiche ne raccorde plus avec la première image
+vivante, et le téléphone montre un autre Temple que le bureau :
+
+```bash
+cd "$TMPDIR" && npm i playwright-core                     # une fois par dossier jetable
+(cd <dépôt> && python3 -m http.server 8766 --bind 127.0.0.1 &)   # la scène de l'arbre de travail
+cinema=<dépôt>/.claude/skills/publier/cinema.mjs
+node "$cinema" "http://127.0.0.1:8766/visite/?cinema" affiches/paysage 2000x1125 1 --affiche 1.5
+node "$cinema" "http://127.0.0.1:8766/visite/?cinema" affiches/portrait 720x1280 1 --affiche 1.5
+node "$cinema" "http://127.0.0.1:8766/visite/?cinema" affiches/partage 1200x630 1 --affiche 48
+node "$cinema" "http://127.0.0.1:8766/visite/?cinema" film_portrait 720x1280 1 --film
+```
+
+Puis `cwebp -q 82` vers `affiche_2000.webp` (et `-resize 1000 0` → `affiche_1000.webp`),
+`affiche_portrait_720.webp`, `ffmpeg -q:v 4` vers `partage.jpg`, et pour le film :
+
+```bash
+ffmpeg -framerate 24 -i film_portrait/%05d.jpg -vf "scale=540:960" -c:v libx264 -preset slow -crf 31 -pix_fmt yuv420p \
+       -movflags +faststart site/images/parcours_portrait.mp4
+```
+
+`--affiche t` marche jusqu'au temps `t` puis capte ; `--film` rend chaque image à 24/s.
+Le script rend sous Metal (`--use-angle=metal`, Chromium du cache playwright), fige la
+boucle de la page (`window.__cinema.figer()`) et avance lui-même (`__cinema.avancer`) :
+sous SwiftShader la scène met des secondes par image, et une boucle laissée libre
+dérive le temps du parcours pendant la capture. Le temps 1.5 est la première image
+après le fondu d'ouverture ; 48, les quinze marches devant Nikanor.
+
+Les temps d'arrivée des haltes que la page attache à la vidéo (`data-temps`) sont
+recalculés par `accueil.py` depuis `cinema.json` : regénérer les pages avec le film.
 
 ## Vérifier que c'est en ligne
 
@@ -71,8 +112,10 @@ dossier courant dans les deux cas. `playwright-core` se résout depuis le dossie
 courant, jamais depuis le dépôt ; le Chromium est celui du cache playwright, sinon
 `CHROME=<binaire>`.
 
-Le même script sert pour l'accueil : `node "$visite" https://bethhamikdach.com/` ne
-trouve pas de scène et le dit, mais la capture montre la page.
+Sur l'accueil, `node "$visite" https://bethhamikdach.com/` ne trouve pas de scène et le
+dit ; la capture montre l'affiche. Pour voir la scène vivante dans le cadre, ouvrir la
+page dans un navigateur : la classe `vivante` sur `main.scene` dit que l'iframe a rendu,
+et `.degres li[aria-current]` suit les haltes.
 
 ## Ce qui a déjà mordu
 

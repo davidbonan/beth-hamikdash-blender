@@ -72,6 +72,11 @@
   }
   #voile.noir { opacity: 1; transition-duration: .16s; }
 
+  /* ---- cinéma : la scène seule, encadrée par l'accueil ---- */
+  html.cinema #accueil, html.cinema #chargement, html.cinema #barre, html.cinema #aide, html.cinema #manche,
+  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #fiche, html.cinema #plan { display: none !important; }
+  html.cinema canvas { pointer-events: none; }
+
   /* ---- rappel des commandes ---- */
   #aide {
     position: fixed; left: calc(14px + var(--marge-gauche)); bottom: calc(12px + var(--marge-bas));

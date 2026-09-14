@@ -1,146 +1,108 @@
 :root {
-  --calcaire: #e4dac3;
-  --pierre: #c9b48a;
-  --or: #b08633;
-  --or-sombre: #6e4e14;
-  --tekhelet: #26264f;
+  --or: #c9a04a;
   --nuit: #100e0b;
   --lin: #f6f1e6;
-  --encre: #1b1712;
-  --sourd: #6b5f4d;
-  --fond: var(--calcaire);
-  --texte: var(--encre);
-  --texte-sourd: var(--sourd);
-  --trait: rgba(27, 23, 18, .22);
-  --marge: clamp(20px, 6vw, 96px);
-  --mesure: 34em;
+  --lin-sourd: rgba(246, 241, 230, .72);
+  --trait: rgba(246, 241, 230, .3);
+  --marge: clamp(20px, 5vw, 72px);
 }
 * { box-sizing: border-box; }
-html { color-scheme: light; scroll-behavior: smooth; }
+html { color-scheme: dark; }
 body {
   margin: 0;
-  font: 400 18px/1.6 "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
+  font: 400 17px/1.5 "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
   font-optical-sizing: auto;
-  color: var(--texte);
-  background: var(--fond);
+  color: var(--lin);
+  background: var(--nuit);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 1.2s ease, color 1.2s ease;
 }
-:root[lang="he"] body { font-family: "Frank Ruhl Libre", "Frank Ruehl", "Times New Roman", serif; font-size: 19px; line-height: 1.65; }
+:root[lang="he"] body { font-family: "Frank Ruhl Libre", "Frank Ruehl", "Times New Roman", serif; font-size: 18px; }
 [lang="he"] { font-family: "Frank Ruhl Libre", "Frank Ruehl", "Times New Roman", serif; }
 :root[lang="he"] [lang="fr"], :root[lang="he"] [lang="en"] { font-family: "Marcellus", "Iowan Old Style", Palatino, serif; }
 a { color: inherit; }
-h1, h2, h3 { font-family: "Marcellus", "Iowan Old Style", Palatino, Georgia, serif; font-weight: 400; letter-spacing: .01em; margin: 0; }
-:root[lang="he"] h1, :root[lang="he"] h2, :root[lang="he"] h3 { font-family: "Frank Ruhl Libre", "Frank Ruehl", serif; font-weight: 500; }
-p { margin: 0 0 1em; text-wrap: pretty; }
-i { font-style: italic; }
+h1, h2 { font-family: "Marcellus", "Iowan Old Style", Palatino, Georgia, serif; font-weight: 400; letter-spacing: .01em; margin: 0; }
+:root[lang="he"] h1, :root[lang="he"] h2 { font-family: "Frank Ruhl Libre", "Frank Ruehl", serif; font-weight: 500; }
+p { margin: 0; text-wrap: pretty; }
 
-/* Le fond suit la montée : calcaire, pierre chaude, or, or sombre, nuit. */
-body[data-degre="0"], body[data-degre="1"] { --fond: var(--calcaire); }
-body[data-degre="2"] { --fond: #dccfb0; }
-body[data-degre="3"] { --fond: #d2c3a2; }
-body[data-degre="4"] { --fond: var(--pierre); }
-body[data-degre="5"] { --fond: var(--or); --texte: var(--lin); --texte-sourd: rgba(246, 241, 230, .72); --trait: rgba(246, 241, 230, .3); }
-body[data-degre="6"] { --fond: var(--or-sombre); --texte: var(--lin); --texte-sourd: rgba(246, 241, 230, .68); --trait: rgba(246, 241, 230, .28); }
-body[data-degre="7"], body[data-degre="8"] { --fond: var(--nuit); --texte: var(--lin); --texte-sourd: rgba(246, 241, 230, .6); --trait: rgba(246, 241, 230, .2); }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  body { transition: none; }
+/* ---- la scène ---- */
+.scene {
+  position: relative; min-height: 100svh; isolation: isolate; overflow: hidden;
+  display: grid; grid-template-rows: auto 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 24em);
+  grid-template-areas: "nav nav" ". ." "titre degres" "pied pied";
+  column-gap: clamp(24px, 4vw, 64px);
+  padding: 0 var(--marge) calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.fond { position: absolute; inset: 0; z-index: -2; background: var(--nuit); }
+.fond img, .fond iframe, .fond video {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0;
+}
+.fond img { object-fit: cover; object-position: center 45%; }
+.fond video { object-fit: cover; }
+.fond iframe { pointer-events: none; }
+.fond .vivante { opacity: 0; transition: opacity 1.6s ease; }
+.scene.vivante .fond .vivante { opacity: 1; }
+.scene::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(16,14,11,.38) 0%, rgba(16,14,11,0) 22%, rgba(16,14,11,.12) 46%, rgba(16,14,11,.78) 74%, rgba(16,14,11,.94) 100%);
 }
 
-/* ---- seuil ---- */
-.seuil {
-  position: relative; min-height: 100svh; display: grid; align-content: end;
-  padding: 24px var(--marge) clamp(40px, 8vh, 96px);
-  color: var(--lin); background: var(--nuit); isolation: isolate; overflow: hidden;
+/* ---- langues ---- */
+.scene nav {
+  grid-area: nav; display: flex; justify-content: flex-end; gap: 2px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 0 0; font-size: 14px;
 }
-.seuil .fond { position: absolute; inset: 0; z-index: -2; }
-.seuil .fond img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
-.seuil::after {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to bottom, rgba(16,14,11,.35) 0%, rgba(16,14,11,0) 30%, rgba(16,14,11,.15) 55%, rgba(16,14,11,.9) 100%);
-}
-.seuil nav {
-  position: absolute; top: 0; inset-inline: 0; display: flex; justify-content: flex-end; gap: 2px;
-  padding: 16px var(--marge); font-size: 15px;
-}
-.seuil nav a { padding: 6px 10px; text-decoration: none; opacity: .7; border-bottom: 1px solid transparent; }
-.seuil nav a:hover { opacity: 1; }
-.seuil nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
-.seuil .titre { max-width: 44em; }
-.seuil h1 { display: grid; gap: 4px; line-height: 1; }
-.seuil h1 .he { font-size: clamp(64px, 12vw, 152px); font-weight: 500; letter-spacing: .02em; line-height: .95; }
-.seuil h1 .latin { font-size: clamp(22px, 3vw, 34px); letter-spacing: .06em; opacity: .9; }
-:root[lang="he"] .seuil h1 .he { font-size: clamp(72px, 13vw, 168px); }
-.seuil .accroche { max-width: 30em; margin: 26px 0 0; font-size: clamp(18px, 2vw, 22px); line-height: 1.45; }
-.action { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 28px 0 0; }
+.scene nav a { padding: 6px 10px; text-decoration: none; opacity: .72; border-bottom: 1px solid transparent; }
+.scene nav a:hover { opacity: 1; }
+.scene nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
+
+/* ---- titre ---- */
+.titre { grid-area: titre; align-self: end; max-width: 34em; padding-bottom: 8px; }
+.titre h1 { display: grid; gap: 2px; line-height: 1; text-shadow: 0 2px 24px rgba(16,14,11,.55); }
+.titre h1 .he { justify-self: start; font-size: clamp(56px, 9vw, 120px); font-weight: 500; letter-spacing: .02em; line-height: .95; }
+.titre h1 .latin { font-size: clamp(20px, 2.4vw, 30px); letter-spacing: .06em; opacity: .9; }
+:root[lang="he"] .titre h1 .he { font-size: clamp(64px, 10vw, 136px); }
+.accroche { max-width: 28em; margin-top: 18px; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.45; text-shadow: 0 1px 12px rgba(16,14,11,.5); }
+.action { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 22px; }
 .entrer {
-  display: inline-block; padding: 15px 30px; border: 1px solid var(--lin);
-  color: var(--lin); text-decoration: none; font-family: "Marcellus", serif; font-size: 18px; letter-spacing: .05em;
+  display: inline-block; padding: 14px 28px; border: 1px solid var(--lin);
+  color: var(--lin); text-decoration: none; font-family: "Marcellus", serif; font-size: 17px; letter-spacing: .05em;
   background: rgba(16,14,11,.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   transition: background-color .2s ease, color .2s ease;
 }
 :root[lang="he"] .entrer { font-family: "Frank Ruhl Libre", serif; font-weight: 500; letter-spacing: 0; }
 .entrer:hover, .entrer:focus-visible { background: var(--lin); color: var(--nuit); }
 .entrer:focus-visible { outline: 2px solid var(--or); outline-offset: 3px; }
-.action .note { font-size: 15px; opacity: .8; }
+.action .note { font-size: 14px; opacity: .8; }
 
-/* ---- propos ---- */
-main { display: block; }
-.propos, .montee-tete { padding: 0 var(--marge); max-width: calc(var(--mesure) + 2 * var(--marge)); }
-.propos { padding-top: clamp(56px, 10vh, 120px); }
-.propos p { font-size: clamp(18px, 1.55vw, 21px); line-height: 1.55; }
-.propos p:first-child::first-letter { font-family: "Marcellus", serif; font-size: 2.8em; float: inline-start; line-height: .8; padding: .1em .1em 0 0; }
-:root[lang="he"] .propos p:first-child::first-letter { float: none; font-size: inherit; padding: 0; font-family: inherit; }
-
-.montee-tete { padding-top: clamp(56px, 10vh, 120px); padding-bottom: clamp(24px, 4vh, 48px); }
-h2 { font-size: clamp(32px, 4vw, 48px); margin-bottom: 18px; line-height: 1.1; }
-.montee-tete p { color: var(--texte-sourd); font-size: 18px; }
-
-/* ---- la montée ---- */
-.degre {
-  padding: clamp(32px, 6vh, 72px) var(--marge) clamp(24px, 4vh, 56px);
-  display: grid; gap: clamp(20px, 3vh, 36px);
-}
-.degre figure { margin: 0; max-width: 1400px; }
-.degre img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1072; object-fit: cover; }
-.degre .texte { max-width: var(--mesure); display: grid; gap: 10px; }
-.degre h3 { font-size: clamp(26px, 3vw, 36px); line-height: 1.15; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
-.degre .nom-he { font-size: .85em; color: var(--texte-sourd); font-weight: 400; }
-.degre .mishna { margin: 0; font-size: clamp(18px, 1.5vw, 20px); line-height: 1.5; }
-.degre .aller {
-  justify-self: start; font-family: "Marcellus", serif; font-size: 16px; letter-spacing: .05em;
-  text-decoration: none; padding: 4px 0; border-bottom: 1px solid var(--trait); transition: border-color .2s ease;
-}
-:root[lang="he"] .degre .aller { font-family: inherit; letter-spacing: 0; font-weight: 500; }
-.degre .aller:hover, .degre .aller:focus-visible { border-bottom-color: currentColor; }
-.degre .aller:focus-visible { outline: 2px solid var(--or); outline-offset: 4px; }
-.degre[data-degre="7"] img { box-shadow: 0 0 120px rgba(176, 134, 51, .18); }
-
-/* ---- clôture ---- */
-.cloture { padding: clamp(64px, 12vh, 140px) var(--marge) clamp(48px, 8vh, 96px); max-width: 1400px; }
-.cloture .hoshen { margin: 0; }
-.cloture .hoshen img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1072; object-fit: cover; }
-.cloture figcaption { margin-top: 10px; font-size: 15px; color: var(--texte-sourd); }
-.cloture .action { margin-top: 36px; }
-.cloture .entrer { border-color: var(--or); color: var(--lin); background: transparent; }
-.cloture .entrer:hover, .cloture .entrer:focus-visible { background: var(--or); color: var(--nuit); }
+/* ---- le degré où l'on est ---- */
+.degres { grid-area: degres; align-self: end; padding-bottom: 12px; }
+.degres ul { list-style: none; margin: 0; padding: 0; }
+.degres li { display: none; border-inline-start: 1px solid var(--or); padding-inline-start: 16px; }
+.degres li[aria-current] { display: block; animation: paraitre 1.2s ease both; }
+.degres h2 { font-size: clamp(20px, 1.9vw, 25px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.degres .nom-he { font-size: .85em; color: var(--lin-sourd); font-weight: 400; }
+.degres .mishna { margin-top: 8px; font-size: 15px; line-height: 1.45; color: var(--lin); }
+.degres .source { margin-top: 6px; font-size: 13px; color: var(--lin-sourd); }
+@keyframes paraitre { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* ---- pied ---- */
-footer {
-  padding: 28px var(--marge) calc(28px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--trait); color: var(--texte-sourd); font-size: 15px;
-  display: flex; flex-wrap: wrap; gap: 8px 32px; justify-content: space-between;
+.scene footer {
+  grid-area: pied; margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--trait);
+  color: var(--lin-sourd); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 28px; justify-content: space-between;
 }
-footer a { text-decoration: none; border-bottom: 1px solid var(--trait); }
-footer a:hover { color: var(--texte); border-bottom-color: currentColor; }
 
-@media (max-width: 640px) {
-  .seuil { align-content: end; }
-  .seuil nav { justify-content: flex-start; }
-  .degre h3 { flex-direction: column; gap: 2px; }
+@media (max-width: 860px) {
+  .scene { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nav" "." "titre" "degres" "pied"; }
+  .scene::after {
+    background: linear-gradient(to bottom, rgba(16,14,11,.38) 0%, rgba(16,14,11,0) 20%, rgba(16,14,11,.2) 40%, rgba(16,14,11,.82) 62%, rgba(16,14,11,.95) 100%);
+  }
+  .titre { padding-bottom: 0; }
+  .degres { margin-top: 26px; padding-bottom: 0; }
+  .scene nav { justify-content: flex-start; }
 }
-@media (min-width: 1100px) {
-  .degre { grid-template-columns: minmax(0, 1fr) minmax(280px, 26em); align-items: end; column-gap: clamp(32px, 4vw, 64px); }
-  .degre .texte { padding-bottom: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .fond .vivante { transition: none; }
+  .degres li[aria-current] { animation: none; }
 }

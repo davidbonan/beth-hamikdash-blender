@@ -13,6 +13,7 @@ import { nomDeZone, panneau } from "./fiche.js";
 import { initiation } from "./initiation.js";
 import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
 import { plan } from "./plan.js";
+import { cinema } from "./cinema.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
@@ -91,8 +92,11 @@ const [textes, fiche, ...contenus] = await Promise.all([
   ...FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.json`, false)),
 ]);
 installerLangue(textes);
-const [reperes, { cadrages: CADRAGES_DU_PLAN }, figurants] = await Promise.all([
-  json("./reperes.json"), json("./plan.json"), json("./figures.json")]);
+// Encadrée par l'accueil, la scène marche seule et se tait : ni barre, ni fiche, ni initiation.
+const CINEMA = new URLSearchParams(location.search).has("cinema");
+document.documentElement.classList.toggle("cinema", CINEMA);
+const [reperes, { cadrages: CADRAGES_DU_PLAN }, figurants, parcours] = await Promise.all([
+  json("./reperes.json"), json("./plan.json"), json("./figures.json"), CINEMA ? json("./cinema.json") : null]);
 Object.assign(reperes.emprises, figurants.emprises);
 reperes.vues.push(...figurants.vues);
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
@@ -855,8 +859,22 @@ function ajusterEchelle(dt) {
   dimensionner();
 }
 
+const lieuOccupe = () => lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
+function accorderLampe(lieu) {
+  lampe.intensity += ((lieu === "heikhal" ? LAMPE_HEIKHAL : LAMPE_TETE) - lampe.intensity) * 0.25;
+}
+
+let film = null;
 renderer.setAnimationLoop(() => {
   const dt = Math.min(horloge.getDelta(), 0.1);
+  if (film) {
+    film.avancer(dt);
+    piedsY = camera.position.y - OEIL;
+    if (++image % 4 === 0) accorderLampe(lieuOccupe());
+    ajusterEchelle(dt);
+    dessiner(dt);
+    return;
+  }
   lisserRegard(dt);
   avantLePas.copy(camera.position);
   avancer(dt);
@@ -879,8 +897,8 @@ renderer.setAnimationLoop(() => {
       survol.style.left = `${p.clientX}px`;
       survol.style.top = `${p.clientY + 20}px`;
     }
-    const lieu = lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
-    lampe.intensity += ((lieu === "heikhal" ? LAMPE_HEIKHAL : LAMPE_TETE) - lampe.intensity) * 0.25;
+    const lieu = lieuOccupe();
+    accorderLampe(lieu);
     position.textContent = brut
       ? `${(camera.position.x / AMA).toFixed(0)} · ` +
         `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
@@ -898,7 +916,14 @@ function commencerInitiation() {
   lancerInitiation();
 }
 $("#rejouer").onclick = (e) => { e.currentTarget.blur(); commencerInitiation(); };
-if (!initiationSuivie()) {
+if (CINEMA) {
+  film = cinema({ parcours, camera, sol: solEn, oeil: OEIL, ama: AMA, voile,
+    signaler: (etat) => parent.postMessage({ type: "cinema", ...etat }, location.origin) });
+  film.avancer(0);
+  dessiner(0);
+  parent.postMessage({ type: "cinema", pret: true }, location.origin);
+  window.__cinema = { ...film, figer: () => renderer.setAnimationLoop(null) };
+} else if (!initiationSuivie()) {
   aide.classList.add("parti");
   // Le voile du chargement finit de se lever avant qu'on s'adresse au visiteur.
   langueChoisie.then(() => setTimeout(commencerInitiation, 700));
