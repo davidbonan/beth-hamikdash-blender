@@ -29,73 +29,125 @@
 <link rel="preload" as="image" href="/images/affiche_2000.webp" imagesrcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
 <link rel="preload" as="image" href="/images/affiche_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
-<main class="scene">
-  <div class="fond">
+<main>
+  <header class="seuil">
     <picture class="affiche">
       <source media="(max-aspect-ratio: 4/5)" srcset="/images/affiche_portrait_720.webp">
       <img src="/images/affiche_2000.webp" srcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
     </picture>
-    <iframe class="vivante" title="" tabindex="-1" aria-hidden="true" hidden></iframe>
-    <video class="vivante" muted playsinline loop preload="none" aria-hidden="true" data-src="/images/parcours_portrait.mp4" hidden></video>
-    <div class="visions" aria-hidden="true"><img class="vision" data-degre="har_habayit" src="/images/har_habayit_2000.webp" srcset="/images/har_habayit_1000.webp 1000w, /images/har_habayit_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="heil" src="/images/heil_2000.webp" srcset="/images/heil_1000.webp 1000w, /images/heil_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="ezrat_nashim" src="/images/ezrat_nashim_2000.webp" srcset="/images/ezrat_nashim_1000.webp 1000w, /images/ezrat_nashim_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="azara" src="/images/azara_2000.webp" srcset="/images/azara_1000.webp 1000w, /images/azara_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="mizbeach" src="/images/mizbeach_2000.webp" srcset="/images/mizbeach_1000.webp 1000w, /images/mizbeach_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="oulam" src="/images/oulam_2000.webp" srcset="/images/oulam_1000.webp 1000w, /images/oulam_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="heikhal" src="/images/heikhal_2000.webp" srcset="/images/heikhal_1000.webp 1000w, /images/heikhal_2000.webp 2000w" sizes="100vw" alt="" decoding="async"><img class="vision" data-degre="kodesh_hakodashim" src="/images/kodesh_hakodashim_2000.webp" srcset="/images/kodesh_hakodashim_1000.webp 1000w, /images/kodesh_hakodashim_2000.webp 2000w" sizes="100vw" alt="" decoding="async"></div>
-  </div>
-
-  <nav aria-label="Language">
-    <a href="/" lang="fr" dir="ltr">Français</a>
+    <nav aria-label="Language">
+      <a href="/" lang="fr" dir="ltr">Français</a>
     <a href="/en/" lang="en" dir="ltr" aria-current="page">English</a>
     <a href="/he/" lang="he" dir="rtl">עברית</a>
-  </nav>
+    </nav>
+    <div class="titre">
+      <h1><span class="he" lang="he" dir="rtl">בית המקדש</span><span class="latin" lang="fr">Beit HaMikdach</span></h1>
+      <p class="accroche">The Temple of Jerusalem, rebuilt in three dimensions to the measurements of the Mishnah. You enter on foot, walk where you like, and every stone tells you where it comes from.</p>
+      <p class="action"><a class="entrer" href="/visite/" data-langue="en">Enter the tour</a><span class="note">Free, nothing to install. Ten minutes or an hour.</span></p>
+    </div>
+  </header>
 
-  <div class="titre">
-    <h1><span class="he" lang="he" dir="rtl">בית המקדש</span><span class="latin" lang="fr">Beit HaMikdach</span></h1>
-    <p class="accroche">The Temple of Jerusalem, rebuilt in three dimensions to the measurements of the Mishnah. You enter on foot, walk where you like, and every stone tells you where it comes from.</p>
-    <p class="action"><a class="entrer" href="/visite/" data-langue="en">Enter the tour</a><span class="note">Free, nothing to install. Ten minutes or an hour.</span></p>
-  </div>
+  <section class="montee" aria-labelledby="montee-titre">
+    <div class="ouverture">
+      <h2 id="montee-titre">The degrees of holiness</h2>
+      <p>From the Har HaBayit to the Kodesh HaKodashim, Mishnah Kelim counts the degrees of holiness. At each one, fewer may enter.</p>
+    </div>
+    <div class="ascension">
+      <nav class="echelle" aria-label="The degrees of holiness"><ol>
+      <li data-degre="har_habayit"><a href="#har_habayit" aria-current="true"><span class="rang">1</span>Har HaBayit</a></li>
+      <li data-degre="heil"><a href="#heil"><span class="rang">2</span>Chel</a></li>
+      <li data-degre="ezrat_nashim"><a href="#ezrat_nashim"><span class="rang">3</span>Ezrat Nashim</a></li>
+      <li data-degre="azara"><a href="#azara"><span class="rang">4</span>Ezrat Israel</a></li>
+      <li data-degre="mizbeach"><a href="#mizbeach"><span class="rang">5</span>Ezrat Kohanim</a></li>
+      <li data-degre="oulam"><a href="#oulam"><span class="rang">6</span>Between the Ulam and the altar</a></li>
+      <li data-degre="heikhal"><a href="#heikhal"><span class="rang">7</span>Heikhal</a></li>
+      <li data-degre="kodesh_hakodashim"><a href="#kodesh_hakodashim"><span class="rang">8</span>Kodesh HaKodashim</a></li>
+      </ol></nav>
+      <ol class="degres">
+      <li id="har_habayit">
+        <a class="vue" href="/visite/?vue=har_habayit" data-langue="en"><img src="/images/har_habayit_2000.webp" srcset="/images/har_habayit_1000.webp 1000w, /images/har_habayit_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Har HaBayit" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Har HaBayit</span> <span class="nom-he" lang="he" dir="rtl">הר הבית</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier than Jerusalem: zavim, zavot, menstruants and women after childbirth may not enter.</p>
+            <p class="source">Mishnah Kelim 1:8</p>
+          </div>
+        </div>
+      </li>
+      <li id="heil">
+        <a class="vue" href="/visite/?vue=face_porte_est" data-langue="en"><img src="/images/heil_2000.webp" srcset="/images/heil_1000.webp 1000w, /images/heil_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Chel" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Chel</span> <span class="nom-he" lang="he" dir="rtl">חיל</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier than the Har HaBayit: non-Jews and those made impure by a corpse may not enter.</p>
+            <p class="source">Mishnah Kelim 1:8</p>
+          </div>
+        </div>
+      </li>
+      <li id="ezrat_nashim">
+        <a class="vue" href="/visite/?vue=ezrat_nashim" data-langue="en"><img src="/images/ezrat_nashim_2000.webp" srcset="/images/ezrat_nashim_1000.webp 1000w, /images/ezrat_nashim_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Ezrat Nashim" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Ezrat Nashim</span> <span class="nom-he" lang="he" dir="rtl">עזרת נשים</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier than the Chel: one who immersed that same day may not enter before sunset.</p>
+            <p class="source">Mishnah Kelim 1:8</p>
+          </div>
+        </div>
+      </li>
+      <li id="azara">
+        <a class="vue" href="/visite/?vue=azara" data-langue="en"><img src="/images/azara_2000.webp" srcset="/images/azara_1000.webp 1000w, /images/azara_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Ezrat Israel" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Ezrat Israel</span> <span class="nom-he" lang="he" dir="rtl">עזרת ישראל</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier than the Ezrat Nashim: one who still owes an offering of atonement may not enter.</p>
+            <p class="source">Mishnah Kelim 1:8</p>
+          </div>
+        </div>
+      </li>
+      <li id="mizbeach">
+        <a class="vue" href="/visite/?vue=mizbeach" data-langue="en"><img src="/images/mizbeach_2000.webp" srcset="/images/mizbeach_1000.webp 1000w, /images/mizbeach_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Ezrat Kohanim" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Ezrat Kohanim</span> <span class="nom-he" lang="he" dir="rtl">עזרת כהנים</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier than the Ezrat Israel: Israelites enter only for what requires them, the semikhah, the shechitah and the tenufah.</p>
+            <p class="source">Mishnah Kelim 1:8</p>
+          </div>
+        </div>
+      </li>
+      <li id="oulam">
+        <a class="vue" href="/visite/?vue=oulam" data-langue="en"><img src="/images/oulam_2000.webp" srcset="/images/oulam_1000.webp 1000w, /images/oulam_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Between the Ulam and the altar" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Between the Ulam and the altar</span> <span class="nom-he" lang="he" dir="rtl">בין האולם ולמזבח</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier than the Ezrat Kohanim: priests with a blemish or unkempt hair may not enter.</p>
+            <p class="source">Mishnah Kelim 1:9</p>
+          </div>
+        </div>
+      </li>
+      <li id="heikhal">
+        <a class="vue" href="/visite/?vue=heikhal" data-langue="en"><img src="/images/heikhal_2000.webp" srcset="/images/heikhal_1000.webp 1000w, /images/heikhal_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="Heikhal" decoding="async" loading="lazy"><span class="entrer-ici">See it in the tour</span></a>
+        <div class="legende">
+          <h3><span class="nom">Heikhal</span> <span class="nom-he" lang="he" dir="rtl">היכל</span></h3>
+          <div class="texte">
+            <p class="mishna">Holier still: no one enters without having washed hands and feet.</p>
+            <p class="source">Mishnah Kelim 1:9</p>
+          </div>
+        </div>
+      </li>
+      </ol>
+    </div>
+  </section>
 
-  <section class="degres" aria-label="The degrees of holiness">
-    <ol class="echelle" aria-label="The degrees of holiness"><li><button type="button" data-degre="har_habayit" title="Har HaBayit" aria-label="Har HaBayit" aria-current="true"></button></li><li><button type="button" data-degre="heil" title="Chel" aria-label="Chel"></button></li><li><button type="button" data-degre="ezrat_nashim" title="Ezrat Nashim" aria-label="Ezrat Nashim"></button></li><li><button type="button" data-degre="azara" title="Ezrat Israel" aria-label="Ezrat Israel"></button></li><li><button type="button" data-degre="mizbeach" title="Ezrat Kohanim" aria-label="Ezrat Kohanim"></button></li><li><button type="button" data-degre="oulam" title="Between the Ulam and the altar" aria-label="Between the Ulam and the altar"></button></li><li><button type="button" data-degre="heikhal" title="Heikhal" aria-label="Heikhal"></button></li><li><button type="button" data-degre="kodesh_hakodashim" title="Kodesh HaKodashim" aria-label="Kodesh HaKodashim"></button></li></ol>
-    <ul aria-live="polite">
-      <li data-degre="har_habayit" data-vue="har_habayit" data-temps="0" data-pause="7" aria-current="true">
-        <h2><span class="nom">Har HaBayit</span> <span class="nom-he" lang="he" dir="rtl">הר הבית</span></h2>
-        <p class="mishna">Holier than Jerusalem: zavim, zavot, menstruants and women after childbirth may not enter.</p>
-        <p class="source">Mishnah Kelim 1:8</p>
-      </li>
-      <li data-degre="heil" data-vue="face_porte_est" data-temps="21" data-pause="7">
-        <h2><span class="nom">Chel</span> <span class="nom-he" lang="he" dir="rtl">חיל</span></h2>
-        <p class="mishna">Holier than the Har HaBayit: non-Jews and those made impure by a corpse may not enter.</p>
-        <p class="source">Mishnah Kelim 1:8</p>
-      </li>
-      <li data-degre="ezrat_nashim" data-vue="ezrat_nashim" data-temps="42" data-pause="7">
-        <h2><span class="nom">Ezrat Nashim</span> <span class="nom-he" lang="he" dir="rtl">עזרת נשים</span></h2>
-        <p class="mishna">Holier than the Chel: one who immersed that same day may not enter before sunset.</p>
-        <p class="source">Mishnah Kelim 1:8</p>
-      </li>
-      <li data-degre="azara" data-vue="azara" data-temps="75" data-pause="7">
-        <h2><span class="nom">Ezrat Israel</span> <span class="nom-he" lang="he" dir="rtl">עזרת ישראל</span></h2>
-        <p class="mishna">Holier than the Ezrat Nashim: one who still owes an offering of atonement may not enter.</p>
-        <p class="source">Mishnah Kelim 1:8</p>
-      </li>
-      <li data-degre="mizbeach" data-vue="mizbeach" data-temps="98" data-pause="7">
-        <h2><span class="nom">Ezrat Kohanim</span> <span class="nom-he" lang="he" dir="rtl">עזרת כהנים</span></h2>
-        <p class="mishna">Holier than the Ezrat Israel: Israelites enter only for what requires them, the semikhah, the shechitah and the tenufah.</p>
-        <p class="source">Mishnah Kelim 1:8</p>
-      </li>
-      <li data-degre="oulam" data-vue="oulam" data-temps="129" data-pause="7">
-        <h2><span class="nom">Between the Ulam and the altar</span> <span class="nom-he" lang="he" dir="rtl">בין האולם ולמזבח</span></h2>
-        <p class="mishna">Holier than the Ezrat Kohanim: priests with a blemish or unkempt hair may not enter.</p>
-        <p class="source">Mishnah Kelim 1:9</p>
-      </li>
-      <li data-degre="heikhal" data-vue="heikhal" data-temps="145" data-pause="7">
-        <h2><span class="nom">Heikhal</span> <span class="nom-he" lang="he" dir="rtl">היכל</span></h2>
-        <p class="mishna">Holier still: no one enters without having washed hands and feet.</p>
-        <p class="source">Mishnah Kelim 1:9</p>
-      </li>
-      <li data-degre="kodesh_hakodashim" data-vue="kodesh_hakodashim" data-temps="166" data-pause="8">
-        <h2><span class="nom">Kodesh HaKodashim</span> <span class="nom-he" lang="he" dir="rtl">קודש הקודשים</span></h2>
-        <p class="mishna">Holiest of all: no one enters but the Kohen Gadol, on Yom Kippur, at the hour of the service.</p>
-        <p class="source">Mishnah Kelim 1:9</p>
-      </li>
-    </ul>
+  <section class="sanctuaire" id="kodesh_hakodashim" aria-labelledby="kodesh_hakodashim-titre">
+    <div class="fond"><img src="/images/kodesh_hakodashim_2000.webp" srcset="/images/kodesh_hakodashim_1000.webp 1000w, /images/kodesh_hakodashim_2000.webp 2000w" sizes="100vw" alt="Kodesh HaKodashim" decoding="async" loading="lazy"></div>
+    <div class="legende">
+          <h3 id="kodesh_hakodashim-titre"><span class="nom">Kodesh HaKodashim</span> <span class="nom-he" lang="he" dir="rtl">קודש הקודשים</span></h3>
+          <div class="texte">
+            <p class="mishna">Holiest of all: no one enters but the Kohen Gadol, on Yom Kippur, at the hour of the service.</p>
+            <p class="source">Mishnah Kelim 1:9</p>
+          </div>
+          <p class="action"><a class="entrer" href="/visite/?vue=kodesh_hakodashim" data-langue="en">Enter the tour</a></p>
+        </div>
   </section>
 
   <footer>

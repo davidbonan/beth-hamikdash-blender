@@ -3,18 +3,27 @@
 
     python3 site/accueil.py
 
-L'accueil est la visite elle-même en mode cinéma : la scène marche seule le long des
-degrés de sainteté (Kelim 1:6-9) et la page nomme le degré où elle en est. Les haltes
-et leurs temps viennent de visite/cinema.json ; à chaque halte, l'image du film prise
-de ce même point (site/images/<degré>_*.webp) se fond sur la scène, puis la marche
-reprend. L'affiche est l'image du départ.
+L'accueil est une montée en images : l'affiche en seuil, puis les degrés de sainteté
+(Kelim 1:8-9) un à un, chacun par l'image du film prise de ce point
+(site/images/<degré>_1000 et _2000.webp), et le Kodesh HaKodashim en finale. Chaque image
+mène à la visite, à la vue du même point.
 """
-import json
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parent
 DOMAINE = "https://bethhamikdach.com"
-PARCOURS = json.loads((SITE.parent / "visite" / "cinema.json").read_text(encoding="utf-8"))
+
+# Les degrés dans l'ordre de la montée, et la vue de la visite prise du même point.
+DEGRES = [
+    ("har_habayit", "har_habayit"),
+    ("heil", "face_porte_est"),
+    ("ezrat_nashim", "ezrat_nashim"),
+    ("azara", "azara"),
+    ("mizbeach", "mizbeach"),
+    ("oulam", "oulam"),
+    ("heikhal", "heikhal"),
+    ("kodesh_hakodashim", "kodesh_hakodashim"),
+]
 
 TEXTES = {
     "fr": {
@@ -30,6 +39,8 @@ TEXTES = {
         "entrer": "Entrer dans la visite",
         "entrer_note": "Gratuit, sans installation. Dix minutes ou une heure.",
         "degres_titre": "Les degrés de sainteté",
+        "ouverture": "Du Har HaBayit au Kodesh HaKodashim, la Mishna Kelim compte les degrés de sainteté. À chacun, moins de monde entre.",
+        "voir": "Voir dans la visite",
         "mishna": "Mishna Kelim",
         "degres": {
             "har_habayit": ("Har HaBayit", "הר הבית", "1:8", "Plus saint que Jérusalem : les zavim, les zavot, les niddot et les accouchées n'y entrent pas."),
@@ -55,6 +66,8 @@ TEXTES = {
         "entrer": "Enter the tour",
         "entrer_note": "Free, nothing to install. Ten minutes or an hour.",
         "degres_titre": "The degrees of holiness",
+        "ouverture": "From the Har HaBayit to the Kodesh HaKodashim, Mishnah Kelim counts the degrees of holiness. At each one, fewer may enter.",
+        "voir": "See it in the tour",
         "mishna": "Mishnah Kelim",
         "degres": {
             "har_habayit": ("Har HaBayit", "הר הבית", "1:8", "Holier than Jerusalem: zavim, zavot, menstruants and women after childbirth may not enter."),
@@ -80,6 +93,8 @@ TEXTES = {
         "entrer": "כניסה לסיור",
         "entrer_note": "חינם, ללא התקנה. עשר דקות או שעה.",
         "degres_titre": "מעלות הקדושה",
+        "ouverture": "מהר הבית ועד קודש הקודשים מונה משנה כלים את מעלות הקדושה. בכל מעלה נכנסים פחות.",
+        "voir": "לראות בסיור",
         "mishna": "משנה כלים",
         "degres": {
             "har_habayit": ("הר הבית", "", "א, ח", "מְקֻדָּשׁ מִירוּשָׁלַיִם, שֶׁאֵין זָבִים וְזָבוֹת, נִדּוֹת וְיוֹלְדוֹת נִכְנָסִים לְשָׁם."),
@@ -95,23 +110,7 @@ TEXTES = {
 }
 
 AUTEUR = {"fr": "David Bonan", "en": "David Bonan", "he": "דוד בונן"}
-
-
-def arrivees():
-    """Le temps d'arrivée à chaque halte et la pause qu'on y fait, comme cinema.js les compte."""
-    temps, resultat = 0.0, []
-    for i, halte in enumerate(PARCOURS["haltes"]):
-        temps += 0 if i == 0 else halte["duree_s"]
-        pause = halte.get("pause_s", 3)
-        resultat.append((halte, temps, pause))
-        temps += pause
-    return resultat
-
-
-def vision(halte):
-    d = halte["degre"]
-    return (f'<img class="vision" data-degre="{d}" src="/images/{d}_2000.webp" '
-            f'srcset="/images/{d}_1000.webp 1000w, /images/{d}_2000.webp 2000w" sizes="100vw" alt="" decoding="async">')
+TAILLES = "(max-width: 860px) 100vw, min(1280px, 100vw - 26em)"
 
 
 def nav_langues(code):
@@ -129,33 +128,60 @@ def hreflangs():
     return "\n".join(lignes)
 
 
-def echelon(t, halte, premier):
-    nom = t["degres"][halte["degre"]][0]
-    courant = ' aria-current="true"' if premier else ""
-    return f'<li><button type="button" data-degre="{halte["degre"]}" title="{nom}" aria-label="{nom}"{courant}></button></li>'
+def echelon(t, rang, degre):
+    nom = t["degres"][degre][0]
+    courant = ' aria-current="true"' if rang == 1 else ""
+    return f'\n      <li data-degre="{degre}"><a href="#{degre}"{courant}><span class="rang">{rang}</span>{nom}</a></li>'
 
 
-def degre(t, halte, temps, pause, premier):
-    nom, hebreu, ref, phrase = t["degres"][halte["degre"]]
-    courant = ' aria-current="true"' if premier else ""
+def image(t, degre, taille="2000", tailles=TAILLES, differe=True):
+    nom = t["degres"][degre][0]
+    charge = ' loading="lazy"' if differe else ' fetchpriority="high"'
+    return (f'<img src="/images/{degre}_{taille}.webp" srcset="/images/{degre}_1000.webp 1000w, /images/{degre}_2000.webp 2000w" '
+            f'sizes="{tailles}" alt="{nom}" decoding="async"{charge}>')
+
+
+def titre_degre(t, degre):
+    nom, hebreu, _, _ = t["degres"][degre]
     titre = f'<span class="nom">{nom}</span>'
     if hebreu:
         titre += f' <span class="nom-he" lang="he" dir="rtl">{hebreu}</span>'
+    return titre
+
+
+def legende(t, degre, action=""):
+    _, _, ref, phrase = t["degres"][degre]
+    return f'''<div class="legende">
+          <h3>{titre_degre(t, degre)}</h3>
+          <div class="texte">
+            <p class="mishna">{phrase}</p>
+            <p class="source">{t["mishna"]} {ref}</p>
+          </div>{action}
+        </div>'''
+
+
+def degre(t, degre, vue):
     return f'''
-      <li data-degre="{halte["degre"]}" data-vue="{halte["vue"]}" data-temps="{temps:g}" data-pause="{pause:g}"{courant}>
-        <h2>{titre}</h2>
-        <p class="mishna">{phrase}</p>
-        <p class="source">{t["mishna"]} {ref}</p>
+      <li id="{degre}">
+        <a class="vue" href="/visite/?vue={vue}" data-langue="{t["code"]}">{image(t, degre)}<span class="entrer-ici">{t["voir"]}</span></a>
+        {legende(t, degre)}
       </li>'''
 
 
+def sanctuaire(t, degre, vue):
+    action = (f'\n          <p class="action"><a class="entrer" href="/visite/?vue={vue}" data-langue="{t["code"]}">{t["entrer"]}</a></p>')
+    return f'''<section class="sanctuaire" id="{degre}" aria-labelledby="{degre}-titre">
+    <div class="fond">{image(t, degre, tailles="100vw")}</div>
+    {legende(t, degre, action).replace("<h3>", f'<h3 id="{degre}-titre">', 1)}
+  </section>'''
+
+
 def page(code):
-    t = TEXTES[code]
+    t = {**TEXTES[code], "code": code}
     url = f'{DOMAINE}/{t["chemin"]}'
-    haltes = arrivees()
-    degres = "".join(degre(t, halte, temps, pause, i == 0) for i, (halte, temps, pause) in enumerate(haltes))
-    echelle = "".join(echelon(t, halte, i == 0) for i, (halte, _, _) in enumerate(haltes))
-    visions = "".join(vision(halte) for halte, _, _ in haltes)
+    *montee, dernier = DEGRES
+    echelle = "".join(echelon(t, rang, d) for rang, (d, _) in enumerate(DEGRES, 1))
+    degres = "".join(degre(t, d, vue) for d, vue in montee)
     return f'''<!doctype html>
 <html lang="{code}" dir="{t["sens"]}">
 <meta charset="utf-8">
@@ -184,32 +210,36 @@ def page(code):
 <link rel="preload" as="image" href="/images/affiche_2000.webp" imagesrcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
 <link rel="preload" as="image" href="/images/affiche_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
-<main class="scene">
-  <div class="fond">
+<main>
+  <header class="seuil">
     <picture class="affiche">
       <source media="(max-aspect-ratio: 4/5)" srcset="/images/affiche_portrait_720.webp">
       <img src="/images/affiche_2000.webp" srcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
     </picture>
-    <iframe class="vivante" title="" tabindex="-1" aria-hidden="true" hidden></iframe>
-    <video class="vivante" muted playsinline loop preload="none" aria-hidden="true" data-src="/images/parcours_portrait.mp4" hidden></video>
-    <div class="visions" aria-hidden="true">{visions}</div>
-  </div>
+    <nav aria-label="{t["nav_langue"]}">
+      {nav_langues(code)}
+    </nav>
+    <div class="titre">
+      <h1><span class="he" lang="he" dir="rtl">{t["hebreu"]}</span><span class="latin" lang="fr">{t["latin"]}</span></h1>
+      <p class="accroche">{t["accroche"]}</p>
+      <p class="action"><a class="entrer" href="/visite/" data-langue="{code}">{t["entrer"]}</a><span class="note">{t["entrer_note"]}</span></p>
+    </div>
+  </header>
 
-  <nav aria-label="{t["nav_langue"]}">
-    {nav_langues(code)}
-  </nav>
-
-  <div class="titre">
-    <h1><span class="he" lang="he" dir="rtl">{t["hebreu"]}</span><span class="latin" lang="fr">{t["latin"]}</span></h1>
-    <p class="accroche">{t["accroche"]}</p>
-    <p class="action"><a class="entrer" href="/visite/" data-langue="{code}">{t["entrer"]}</a><span class="note">{t["entrer_note"]}</span></p>
-  </div>
-
-  <section class="degres" aria-label="{t["degres_titre"]}">
-    <ol class="echelle" aria-label="{t["degres_titre"]}">{echelle}</ol>
-    <ul aria-live="polite">{degres}
-    </ul>
+  <section class="montee" aria-labelledby="montee-titre">
+    <div class="ouverture">
+      <h2 id="montee-titre">{t["degres_titre"]}</h2>
+      <p>{t["ouverture"]}</p>
+    </div>
+    <div class="ascension">
+      <nav class="echelle" aria-label="{t["degres_titre"]}"><ol>{echelle}
+      </ol></nav>
+      <ol class="degres">{degres}
+      </ol>
+    </div>
   </section>
+
+  {sanctuaire(t, *dernier)}
 
   <footer>
     <span>© 2026 {AUTEUR[code]}</span>

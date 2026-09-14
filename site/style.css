@@ -1,13 +1,17 @@
 :root {
   --or: #c9a04a;
+  --or-sourd: rgba(201, 160, 74, .45);
   --nuit: #100e0b;
   --lin: #f6f1e6;
-  --lin-sourd: rgba(246, 241, 230, .72);
-  --trait: rgba(246, 241, 230, .3);
+  --lin-sourd: rgba(246, 241, 230, .66);
+  --trait: rgba(246, 241, 230, .2);
   --marge: clamp(20px, 5vw, 72px);
+  --colonne: 1280px;
+  --echelle: 16em;
+  --entre: clamp(24px, 4vw, 64px);
 }
 * { box-sizing: border-box; }
-html { color-scheme: dark; }
+html { color-scheme: dark; scroll-behavior: smooth; }
 body {
   margin: 0;
   font: 400 17px/1.5 "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
@@ -20,47 +24,29 @@ body {
 [lang="he"] { font-family: "Frank Ruhl Libre", "Frank Ruehl", "Times New Roman", serif; }
 :root[lang="he"] [lang="fr"], :root[lang="he"] [lang="en"] { font-family: "Marcellus", "Iowan Old Style", Palatino, serif; }
 a { color: inherit; }
-h1, h2 { font-family: "Marcellus", "Iowan Old Style", Palatino, Georgia, serif; font-weight: 400; letter-spacing: .01em; margin: 0; }
-:root[lang="he"] h1, :root[lang="he"] h2 { font-family: "Frank Ruhl Libre", "Frank Ruehl", serif; font-weight: 500; }
+h1, h2, h3 { font-family: "Marcellus", "Iowan Old Style", Palatino, Georgia, serif; font-weight: 400; letter-spacing: .01em; margin: 0; }
+:root[lang="he"] h1, :root[lang="he"] h2, :root[lang="he"] h3 { font-family: "Frank Ruhl Libre", "Frank Ruehl", serif; font-weight: 500; }
 p { margin: 0; text-wrap: pretty; }
+img { display: block; }
+:focus-visible { outline: 2px solid var(--or); outline-offset: 3px; }
 
-/* ---- la scène ---- */
-.scene {
+/* ---- le seuil ---- */
+.seuil {
   position: relative; min-height: 100svh; isolation: isolate; overflow: hidden;
-  display: grid; grid-template-rows: auto 1fr auto auto;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 24em);
-  grid-template-areas: "nav nav" ". ." "titre degres" "pied pied";
-  column-gap: clamp(24px, 4vw, 64px);
-  padding: 0 var(--marge) calc(14px + env(safe-area-inset-bottom, 0px));
+  display: grid; grid-template-rows: auto 1fr auto;
+  padding: 0 var(--marge) clamp(32px, 6vh, 64px);
 }
-.fond { position: absolute; inset: 0; z-index: -2; background: var(--nuit); }
-.fond img, .fond iframe, .fond video {
-  position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0;
-}
-.fond img { object-fit: cover; object-position: center 45%; }
-.fond video { object-fit: cover; }
-.fond iframe { pointer-events: none; }
-.fond .vivante { opacity: 0; transition: opacity 1.6s ease; }
-.scene.vivante .fond .vivante { opacity: 1; }
-.visions img { object-fit: cover; opacity: 0; transition: opacity 1.4s ease; }
-.visions img.visible { opacity: 1; }
-.scene::after {
+.seuil .affiche { position: absolute; inset: 0; z-index: -2; background: var(--nuit); }
+.seuil .affiche img { width: 100%; height: 100%; object-fit: cover; object-position: center 45%; animation: lever 2.4s ease both; }
+.seuil::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background:
-    linear-gradient(to bottom, rgba(16,14,11,.38) 0%, rgba(16,14,11,0) 22%, rgba(16,14,11,.12) 46%, rgba(16,14,11,.78) 74%, rgba(16,14,11,.94) 100%);
+  background: linear-gradient(to bottom, rgba(16,14,11,.36) 0%, rgba(16,14,11,0) 24%, rgba(16,14,11,.1) 48%, rgba(16,14,11,.78) 76%, var(--nuit) 100%);
 }
-
-/* ---- langues ---- */
-.scene nav {
-  grid-area: nav; display: flex; justify-content: flex-end; gap: 2px;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 0 0; font-size: 14px;
-}
-.scene nav a { padding: 6px 10px; text-decoration: none; opacity: .72; border-bottom: 1px solid transparent; }
-.scene nav a:hover { opacity: 1; }
-.scene nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
-
-/* ---- titre ---- */
-.titre { grid-area: titre; align-self: end; max-width: 34em; padding-bottom: 8px; }
+.seuil nav { display: flex; justify-content: flex-end; gap: 2px; padding: calc(14px + env(safe-area-inset-top, 0px)) 0 0; font-size: 14px; }
+.seuil nav a { padding: 6px 10px; text-decoration: none; opacity: .72; border-bottom: 1px solid transparent; }
+.seuil nav a:hover { opacity: 1; }
+.seuil nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
+.titre { grid-row: 3; align-self: end; max-width: 34em; animation: paraitre 1.6s ease .5s both; }
 .titre h1 { display: grid; gap: 2px; line-height: 1; text-shadow: 0 2px 24px rgba(16,14,11,.55); }
 .titre h1 .he { justify-self: start; font-size: clamp(56px, 9vw, 120px); font-weight: 500; letter-spacing: .02em; line-height: .95; }
 .titre h1 .latin { font-size: clamp(20px, 2.4vw, 30px); letter-spacing: .06em; opacity: .9; }
@@ -71,54 +57,90 @@ p { margin: 0; text-wrap: pretty; }
   display: inline-block; padding: 14px 28px; border: 1px solid var(--lin);
   color: var(--lin); text-decoration: none; font-family: "Marcellus", serif; font-size: 17px; letter-spacing: .05em;
   background: rgba(16,14,11,.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  transition: background-color .2s ease, color .2s ease;
+  transition: background-color .25s ease, color .25s ease;
 }
 :root[lang="he"] .entrer { font-family: "Frank Ruhl Libre", serif; font-weight: 500; letter-spacing: 0; }
 .entrer:hover, .entrer:focus-visible { background: var(--lin); color: var(--nuit); }
-.entrer:focus-visible { outline: 2px solid var(--or); outline-offset: 3px; }
 .action .note { font-size: 14px; opacity: .8; }
+@keyframes lever { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
+@keyframes paraitre { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* ---- le degré où l'on est ---- */
-.degres { grid-area: degres; align-self: end; padding-bottom: 12px; }
-.degres ul, .echelle { list-style: none; margin: 0; padding: 0; }
-.echelle { display: flex; gap: 5px; margin-bottom: 14px; }
-.echelle li { flex: 1 1 0; display: flex; }
-.echelle button {
-  flex: 1; height: 18px; padding: 0; border: 0; background: none; cursor: pointer;
-  display: flex; align-items: center;
+/* ---- la montée ---- */
+.montee { padding: clamp(72px, 12vh, 140px) var(--marge) 0; }
+.ouverture, .ascension {
+  max-width: var(--colonne); margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, var(--echelle)) minmax(0, 1fr); column-gap: var(--entre);
 }
-.echelle button::before {
-  content: ""; flex: 1; height: 2px; background: var(--trait);
-  transition: background-color .4s ease, height .2s ease;
+.ouverture { align-items: end; padding-bottom: clamp(32px, 5vh, 56px); border-bottom: 1px solid var(--trait); }
+.ouverture h2 { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; }
+.ouverture p { max-width: 30em; color: var(--lin-sourd); }
+.echelle { position: sticky; top: 36vh; align-self: start; padding-top: clamp(48px, 8vh, 96px); }
+.echelle ol, .degres { list-style: none; margin: 0; padding: 0; }
+.echelle li { border-inline-start: 1px solid var(--trait); transition: border-color .6s ease; }
+.echelle a {
+  display: flex; gap: 10px; padding: 6px 0 6px 18px; text-decoration: none;
+  font-family: "Marcellus", serif; font-size: 15px; letter-spacing: .02em; line-height: 1.35;
+  color: var(--lin-sourd); transition: color .3s ease;
 }
-.echelle button.gravi::before { background: rgba(201,160,74,.55); }
-.echelle button[aria-current]::before { background: var(--or); height: 3px; }
-.echelle button:hover::before, .echelle button:focus-visible::before { background: var(--lin); height: 3px; }
-.echelle button:focus-visible { outline: 2px solid var(--or); outline-offset: 2px; }
-.degres ul li { display: none; border-inline-start: 1px solid var(--or); padding-inline-start: 16px; }
-.degres ul li[aria-current] { display: block; animation: paraitre 1.2s ease both; }
-.degres h2 { font-size: clamp(20px, 1.9vw, 25px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
-.degres .nom-he { font-size: .85em; color: var(--lin-sourd); font-weight: 400; }
-.degres .mishna { margin-top: 8px; font-size: 15px; line-height: 1.45; color: var(--lin); }
-.degres .source { margin-top: 6px; font-size: 13px; color: var(--lin-sourd); }
-@keyframes paraitre { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+:root[lang="he"] .echelle a { font-family: "Frank Ruhl Libre", serif; font-size: 16px; letter-spacing: 0; padding: 6px 18px 6px 0; }
+.echelle .rang { min-width: 1.1em; font-size: 12px; opacity: .55; padding-top: .15em; }
+.echelle a:hover, .echelle li.gravi a, .echelle li.courant a { color: var(--lin); }
+.echelle li.gravi { border-color: var(--or-sourd); }
+.echelle li.courant { border-color: var(--or); }
+.echelle a:focus-visible { outline-offset: -2px; }
+
+.degres > li { padding: clamp(48px, 8vh, 96px) 0; border-bottom: 1px solid var(--trait); scroll-margin-top: 10vh; }
+.degres > li:last-child { border-bottom: 0; }
+.vue { position: relative; display: block; overflow: hidden; aspect-ratio: 2000 / 1117; background: #1a1712; }
+.vue img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(.88); transform-origin: center;
+  transition: filter 1.2s ease, transform 1.8s ease;
+}
+.vue:hover img, .vue:focus-visible img { filter: none; transform: scale(1.02); }
+.entrer-ici {
+  position: absolute; inset-inline-end: 18px; bottom: 16px; padding: 8px 14px;
+  font-family: "Marcellus", serif; font-size: 14px; letter-spacing: .04em; color: var(--lin);
+  background: rgba(16,14,11,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  opacity: 0; transform: translateY(4px); transition: opacity .5s ease, transform .5s ease;
+}
+:root[lang="he"] .entrer-ici { font-family: "Frank Ruhl Libre", serif; letter-spacing: 0; }
+.vue:hover .entrer-ici, .vue:focus-visible .entrer-ici { opacity: 1; transform: none; }
+
+.legende { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 26em); gap: 10px var(--entre); align-items: baseline; margin-top: 22px; }
+.legende h3 { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.legende .nom-he { font-size: .8em; color: var(--lin-sourd); font-weight: 400; }
+.legende .mishna { font-size: 16px; line-height: 1.5; }
+.legende .source { margin-top: 6px; font-size: 13px; color: var(--lin-sourd); }
+
+/* ---- le sanctuaire ---- */
+.sanctuaire { margin-top: clamp(48px, 8vh, 96px); padding: 0 var(--marge) clamp(48px, 8vh, 96px); }
+.sanctuaire .fond { position: relative; height: 100svh; margin: 0 calc(-1 * var(--marge)); background: var(--nuit); }
+.sanctuaire .fond img { width: 100%; height: 100%; object-fit: cover; }
+.sanctuaire .fond::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, var(--nuit) 0%, rgba(16,14,11,0) 26%, rgba(16,14,11,0) 52%, rgba(16,14,11,.55) 76%, rgba(16,14,11,.92) 92%, var(--nuit) 100%);
+}
+.sanctuaire .legende { max-width: var(--colonne); margin: clamp(8px, 2vh, 24px) auto 0; }
+.sanctuaire .legende h3 { font-size: clamp(28px, 3.2vw, 44px); }
+.sanctuaire .action { grid-column: 1 / -1; margin-top: 28px; }
 
 /* ---- pied ---- */
-.scene footer {
-  grid-area: pied; margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--trait);
-  color: var(--lin-sourd); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 28px; justify-content: space-between;
+main > footer {
+  max-width: var(--colonne); margin: 0 auto; padding: 16px var(--marge) calc(16px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--trait); color: var(--lin-sourd); font-size: 13px;
 }
 
 @media (max-width: 860px) {
-  .scene { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nav" "." "titre" "degres" "pied"; }
-  .scene::after {
-    background: linear-gradient(to bottom, rgba(16,14,11,.38) 0%, rgba(16,14,11,0) 20%, rgba(16,14,11,.2) 40%, rgba(16,14,11,.82) 62%, rgba(16,14,11,.95) 100%);
-  }
-  .titre { padding-bottom: 0; }
-  .degres { margin-top: 26px; padding-bottom: 0; }
-  .scene nav { justify-content: flex-start; }
+  .ouverture, .ascension, .legende { grid-template-columns: minmax(0, 1fr); }
+  .ouverture { row-gap: 12px; }
+  .echelle { display: none; }
+  .seuil nav { justify-content: flex-start; }
+  .sanctuaire .fond { height: min(100svh, 150vw); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fond .vivante, .visions img { transition: none; }
-  .degres ul li[aria-current] { animation: none; }
+  html { scroll-behavior: auto; }
+  .seuil .affiche img, .titre { animation: none; }
+  .vue img, .entrer-ici, .echelle li, .echelle a { transition: none; }
+  .vue:hover img { transform: none; }
 }

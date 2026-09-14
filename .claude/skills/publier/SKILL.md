@@ -9,9 +9,9 @@ Un seul dépôt : Netlify déploie `main` à chaque push, en ~3 minutes.
 
 | Chemin | Rôle |
 |---|---|
-| `site/` | l'accueil (fr, en, he), robots, sitemap, favicon, feuille de style, `accueil.js`. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes et `visite/cinema.json` : modifier le script, pas les pages |
-| `site/images/` | l'affiche (`affiche_*.webp`), l'image de partage (`partage.jpg`) et le parcours des téléphones (`parcours_portrait.mp4`) : tous **captés dans la scène**, voir « L'accueil est la visite » |
-| `visite/` | la visite, servie à `/visite/` ; `?cinema` la fait marcher seule pour l'accueil |
+| `site/` | l'accueil (fr, en, he), robots, sitemap, favicon, feuille de style, `accueil.js`. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes : modifier le script, pas les pages |
+| `site/images/` | l'affiche (`affiche_*.webp`), l'image de partage (`partage.jpg`) et les huit images des degrés (`<degré>_1000` et `_2000.webp`), voir « L'accueil, une montée en images » |
+| `visite/` | la visite, servie à `/visite/` ; `?cinema` la fait marcher seule (plus utilisé par l'accueil) |
 | `construire_site.sh` | assemble `dist/` = `site/` + `visite/` filtrée ; c'est la commande de build Netlify |
 | `netlify.toml` | dossier publié, redirection `www`, cache des assets |
 
@@ -40,31 +40,24 @@ Servie à `/visite/` à la racine du domaine, la page résout ses chemins relati
 balise `<base>` : la source et le déployé sont identiques. Netlify redirige `/visite`
 → `/visite/` de lui-même.
 
-## L'accueil est la visite
+## L'accueil, une montée en images
 
-L'accueil encadre `/visite/?cinema` dans un `<iframe>`, où la scène marche seule le long
-des degrés de sainteté (`visite/cinema.js`, parcours dans `visite/cinema.json` — haltes
-en amot, ce qu'on y regarde, durée du trajet, pause) et poste à la page le degré atteint
-(`postMessage`, type `cinema`). `site/accueil.js` affiche le degré, et « Entrer » pointe
-sur `/visite/?vue=<halte>`. L'échelle des huit degrés au-dessus du nom en fait sauter la
-scène : message `{ type: "cinema", aller }` à l'iframe (`cinema.js` y arrive au noir),
-`currentTime` de la vidéo au téléphone.
+L'accueil ne montre que des images : l'affiche en seuil (`affiche_*.webp`, c'est l'image
+du Har HaBayit), puis les degrés de sainteté (Kelim 1:8-9) un à un, chacun par l'image
+stylisée du film prise de ce point (`site/images/<degré>_1000` et `_2000.webp`, sources
+dans `renders/style/` : ACC_01 à 05 pour les cinq premières, CAM_08, CAM_09A et CAM_11
+pour l'Oulam, le Heikhal et le Kodesh HaKodashim), et le Kodesh HaKodashim en finale
+plein écran. L'ordre des degrés et la vue de la visite prise du même point sont `DEGRES`
+dans `site/accueil.py` ; chaque image mène à `/visite/?vue=<vue>`. Une échelle fixe sur le
+côté suit la lecture (`accueil.js`, un `IntersectionObserver`), et « Entrer » ouvre la
+visite à son début.
 
-**Chaque halte est un cadrage du film**, et son image stylisée (`site/images/<degré>_1000`
-et `_2000.webp`, sources dans `renders/style/` : ACC_01 à 05 pour les cinq premières,
-CAM_08, CAM_09A et CAM_11 pour l'Oulam, le Heikhal et le Kodesh HaKodashim) se fond sur la
-scène à l'arrivée, puis s'efface avant que la marche reprenne (`ATTENTE_S`, `FONDU_S` dans
-`accueil.js`). Pour que le fondu raccorde, la halte reprend la caméra du film : `point` et
-`cible` en repère visite (x est, z sud = −y Blender, y haut = z Blender), `oeil` = z de la
-caméra moins le sol, `focale` en mm sur 36 (`cinema.js` en fait l'angle, horizontal sur un
-écran plus large que 16/9, vertical sinon — c'est ainsi que l'image en `cover` se pose sur
-la scène). Les `via` d'un trajet en l'air portent leur hauteur en troisième valeur. Un
-raccord se vérifie scène à côté de l'image, par `__cinema.sauter(<degré>)` puis quelques
-`__cinema.avancer(1/24)` et `__rendre()` — l'affiche est l'image du premier degré.
+Le mode `?cinema` de la visite (`visite/cinema.js`, parcours dans `visite/cinema.json`)
+fait marcher la scène seule le long des mêmes degrés ; l'accueil ne l'encadre plus, il
+reste pour capter des images ou un film depuis la scène.
 
-Trois fichiers de `site/images/` sont des **captures de cette scène**, à refaire dès que
-le parcours ou la scène change — sinon l'affiche ne raccorde plus avec la première image
-vivante, et le téléphone montre un autre Temple que le bureau :
+L'affiche et l'image de partage sont des **captures de cette scène**, à refaire si la
+scène change et que l'affiche doit la suivre :
 
 ```bash
 cd "$TMPDIR" && npm i playwright-core                     # une fois par dossier jetable
@@ -73,16 +66,10 @@ cinema=<dépôt>/.claude/skills/publier/cinema.mjs
 node "$cinema" "http://127.0.0.1:8766/visite/?cinema" affiches/paysage 2000x1125 1 --affiche 1.5
 node "$cinema" "http://127.0.0.1:8766/visite/?cinema" affiches/portrait 720x1280 1 --affiche 1.5
 node "$cinema" "http://127.0.0.1:8766/visite/?cinema" affiches/partage 1200x630 1 --affiche 48
-node "$cinema" "http://127.0.0.1:8766/visite/?cinema" film_portrait 720x1280 1 --film
 ```
 
 Puis `cwebp -q 82` vers `affiche_2000.webp` (et `-resize 1000 0` → `affiche_1000.webp`),
-`affiche_portrait_720.webp`, `ffmpeg -q:v 4` vers `partage.jpg`, et pour le film :
-
-```bash
-ffmpeg -framerate 24 -i film_portrait/%05d.jpg -vf "scale=540:960" -c:v libx264 -preset slow -crf 31 -pix_fmt yuv420p \
-       -movflags +faststart site/images/parcours_portrait.mp4
-```
+`affiche_portrait_720.webp`, `ffmpeg -q:v 4` vers `partage.jpg`.
 
 `--affiche t` marche jusqu'au temps `t` puis capte ; `--film` rend chaque image à 24/s.
 Le script rend sous Metal (`--use-angle=metal`, Chromium du cache playwright), fige la
@@ -90,9 +77,6 @@ boucle de la page (`window.__cinema.figer()`) et avance lui-même (`__cinema.ava
 sous SwiftShader la scène met des secondes par image, et une boucle laissée libre
 dérive le temps du parcours pendant la capture. Le temps 1.5 est la première image
 après le fondu d'ouverture ; 48, les quinze marches devant Nikanor.
-
-Les temps d'arrivée des haltes que la page attache à la vidéo (`data-temps`) sont
-recalculés par `accueil.py` depuis `cinema.json` : regénérer les pages avec le film.
 
 ## Vérifier que c'est en ligne
 
@@ -127,9 +111,8 @@ courant, jamais depuis le dépôt ; le Chromium est celui du cache playwright, s
 `CHROME=<binaire>`.
 
 Sur l'accueil, `node "$visite" https://bethhamikdach.com/` ne trouve pas de scène et le
-dit ; la capture montre l'affiche. Pour voir la scène vivante dans le cadre, ouvrir la
-page dans un navigateur : la classe `vivante` sur `main.scene` dit que l'iframe a rendu,
-et `.degres li[aria-current]` suit les haltes.
+dit ; la capture montre l'affiche. Les huit images se vérifient en 200 sur
+`/images/<degré>_2000.webp`.
 
 ## Ce qui a déjà mordu
 

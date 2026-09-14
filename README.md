@@ -105,8 +105,9 @@ Un serveur est nécessaire : la page est un module ES, `file://` ne la charge pa
 **En ligne.** Netlify déploie ce dépôt sur https://bethhamikdach.com à chaque push sur
 `main` : `construire_site.sh` assemble `dist/` — les pages de `site/` et la visite filtrée
 sous `dist/visite/` — et `netlify.toml` dit le reste. La visite est servie à `/visite/` ;
-l'accueil l'encadre en `?cinema`, où la scène marche seule d'un degré de sainteté au
-suivant (`visite/cinema.js`, parcours dans `visite/cinema.json`).
+l'accueil (`site/accueil.py`) monte les degrés de sainteté en images du film, chacune
+menant à la visite en `?vue=<degré>`. Le mode `?cinema` (`visite/cinema.js`, parcours dans
+`visite/cinema.json`) fait marcher la scène seule ; l'accueil ne s'en sert plus.
 `?qualite=basse` force le profil léger depuis un bureau — c'est ainsi qu'on vérifie le
 rendu du téléphone sans téléphone sous la main ; `?qualite=haute` fait l'inverse.
 
