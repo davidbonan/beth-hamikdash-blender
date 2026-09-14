@@ -99,7 +99,7 @@ def comprimer(glb, options=()):
     placage d'or ne se tient qu'à 4,8 cm de la pierre qu'il couvre.
 
     `-cc` plutôt que `-c` : l'hébergeur sert le .glb sans compression de transport —
-    `curl -I https://davidbonan.io/visite/temple.glb` ne renvoie aucun `content-encoding`
+    `curl -I https://bethhamikdach.com/visite/temple.glb` ne renvoie aucun `content-encoding`
     —, donc ce sont les octets du fichier qui voyagent, et un cinquième de moins vaut
     l'encodage plus lent. Le décodeur, lui, est le même.
     """

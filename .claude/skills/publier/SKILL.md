@@ -1,51 +1,43 @@
 ---
 name: publier
-description: Met la visite 3D en ligne sur davidbonan.io/visite — recopie visite/ dans public/visite du dépôt davidbonan.com, commit des deux côtés, push, puis vérifie la page déployée. À utiliser dès qu'une modification de la visite doit se voir en ligne — « publie la visite », « mets la visite en ligne », « déploie la visite », « pousse ça sur le site », « la visite en prod est-elle à jour », « le site montre encore l'ancienne version ». Pour regénérer temple.glb avant de publier, c'est le skill blender.
+description: Met la visite 3D et le site en ligne sur bethhamikdach.com — vérifie que la source est à jour, commit, push, puis vérifie la page déployée. À utiliser dès qu'une modification de la visite ou du site doit se voir en ligne — « publie la visite », « mets la visite en ligne », « déploie le site », « pousse ça sur le site », « la visite en prod est-elle à jour », « le site montre encore l'ancienne version ». Pour regénérer temple.glb avant de publier, c'est le skill blender.
 ---
 
-# Publier la visite sur le site perso
+# Publier sur bethhamikdach.com
 
-Deux dépôts, deux commits. La visite **vit ici** ; le site n'en héberge qu'une copie.
+Un seul dépôt : Netlify déploie `main` à chaque push, en ~3 minutes.
 
-| Dépôt | Rôle |
+| Chemin | Rôle |
 |---|---|
-| `beth-hamikdash-blender` (celui-ci) | la source : `visite/` |
-| `davidbonan.com` (voisin, `../davidbonan.com`) | l'hôte : `public/visite/`, déployé par Netlify sur `davidbonan.io` |
+| `site/` | l'accueil (fr, en, he), robots, sitemap, feuille de style |
+| `visite/` | la visite, servie à `/visite/` |
+| `construire_site.sh` | assemble `dist/` = `site/` + `visite/` filtrée ; c'est la commande de build Netlify |
+| `netlify.toml` | dossier publié, redirection `www`, cache des assets |
 
-Si le voisin manque : `git clone https://github.com/davidbonan/davidbonan.com ..`
+Le domaine est chez OVH (A `75.2.60.5` sur `@`, CNAME `www` → `bethhamikdach.netlify.app.`) ;
+Netlify porte le certificat. `davidbonan.io/visite` redirige en 301 vers ici.
 
 ## La séquence
 
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # si le .blend a bougé
 python3 beit_hamikdash_traductions.py                          # doit répondre « traductions à jour »
-./publier_visite.sh                                            # recopie dans ../davidbonan.com
-git add -u visite && git commit && git push                    # la source
-git -C ../davidbonan.com add public/visite
-git -C ../davidbonan.com commit && git -C ../davidbonan.com push origin master
+./construire_site.sh && (cd dist && python3 -m http.server 8790)   # relecture locale, facultative
+git add -u site visite && git commit && git push origin main
 ```
 
-**Commiter la source d'abord.** `publier_visite.sh` recopie l'arbre de travail, pas
-le HEAD : publier sans commiter met en ligne une version qui n'existe dans aucun
-dépôt, et plus personne ne sait ce que le site montre.
+**Ne pas commiter `dist/`** : il est ignoré et Netlify le reconstruit. Ce que le site
+montre est toujours le HEAD de `main`, jamais l'arbre de travail.
 
-La branche du site est `master`, pas `main`. Netlify déploie au push, ~3 minutes.
+## Ce que `construire_site.sh` filtre, et pourquoi pas de `<base>`
 
-## Ce que le script fait, et pourquoi la balise `<base>`
+Le script rsync `index.html`, les `.js`, les `.json`, `temple.glb`, `figures.glb`,
+`apercu.jpg`, `mini_*.png`, `matieres/*.webp` et `plans/*.webp` vers `dist/visite/`, en
+`--delete`. Le reste de `visite/` (scans, profils de navigateur) ne part pas.
 
-`publier_visite.sh [chemin-du-site]` rsync `index.html`, les `.js`, les `.json`,
-`temple.glb`, `figures.glb` et `apercu.jpg` vers `public/visite/`, en `--delete` — un fichier
-supprimé ici disparaît là-bas. Puis il insère `<base href="/visite/">` dans la copie.
-
-Cette balise est le seul écart entre la source et le déployé, et il est nécessaire :
-servie à `/visite` **sans slash final**, la page résoudrait ses `./visite.js` à la
-racine du site et resterait bloquée sur « chargement de la scène… ». La source, elle,
-n'en veut pas : elle est servie depuis `visite/` (`python3 -m http.server 8777`), où
-les chemins relatifs tombent juste. Ne pas porter la balise dans `visite/index.html`.
-
-Netlify redirige `/visite` → `/visite/` ; `next start` en local fait l'inverse. La
-balise étant absolue, les deux marchent — et la règle `rewrites()` de
-`next.config.js` ne sert qu'au local.
+Servie à `/visite/` à la racine du domaine, la page résout ses chemins relatifs sans
+balise `<base>` : la source et le déployé sont identiques. Netlify redirige `/visite`
+→ `/visite/` de lui-même.
 
 ## Vérifier que c'est en ligne
 
@@ -53,9 +45,9 @@ Le 200 ne suffit pas : la page peut se servir et rester noire sur une erreur Web
 un asset manquant. Deux niveaux.
 
 ```bash
-curl -sIL https://davidbonan.io/visite | grep -i "^HTTP\|^location"
+curl -sIL https://bethhamikdach.com/visite | grep -i "^HTTP\|^location"
 for f in visite.js temple.glb figures.glb figures.json concepts.json reperes.json textes.json; do
-  curl -s -o /dev/null -w "$f %{http_code}\n" "https://davidbonan.io/visite/$f"
+  curl -s -o /dev/null -w "$f %{http_code}\n" "https://bethhamikdach.com/visite/$f"
 done
 ```
 
@@ -65,7 +57,7 @@ chargée :
 ```bash
 visite=$PWD/.claude/skills/publier/verifier.mjs
 cd "$TMPDIR" && npm i playwright-core          # une fois par dossier jetable
-node "$visite" https://davidbonan.io/visite [capture.png]
+node "$visite" https://bethhamikdach.com/visite/ [capture.png]
 ```
 
 `--mobile` passe en 390 × 844 tactile. `--planche <dossier>` capture en plus chaque
@@ -79,15 +71,15 @@ dossier courant dans les deux cas. `playwright-core` se résout depuis le dossie
 courant, jamais depuis le dépôt ; le Chromium est celui du cache playwright, sinon
 `CHROME=<binaire>`.
 
+Le même script sert pour l'accueil : `node "$visite" https://bethhamikdach.com/` ne
+trouve pas de scène et le dit, mais la capture montre la page.
+
 ## Ce qui a déjà mordu
 
-- **Le cache Netlify** ne joue pas ici : les fichiers sont statiques et servis tels
-  quels. Une vieille version en ligne veut dire un `publier_visite.sh` non relancé,
-  pas un cache à purger.
-- **`.contentlayer/` est versionné** dans le dépôt du site : un `npm run build` local
-  le régénère et pollue le diff. `git checkout -- .contentlayer` avant de commiter.
-- **`temple.glb` fait 2,8 Mo** — pas de LFS dans le dépôt du site, c'est voulu ;
-  le garder sous ~10 Mo.
-- **Les domaines sont mélangés** dans le dépôt du site : `rss.js` dit `davidbonan.io`,
-  `sitemap.xml/route.js` et `robots.txt` disent `davidbonan.com`. Les métadonnées de
-  la visite (canonical, `og:url`, `og:image`) suivent `.io`, qui est le domaine servi.
+- **Le cache** : HTML et JSON sont servis en `must-revalidate`, les `.glb` et les textures
+  avec un jour de cache. Une vieille scène après un push veut dire un `temple.glb` non
+  regénéré ou non commité, pas un cache à purger — vérifier `git log -1 -- visite/temple.glb`.
+- **Le build Netlify clone le dépôt**, .blend compris : c'est lent mais ça passe. Si un
+  jour ça ne passe plus, `netlify deploy --prod --dir=dist` depuis la machine.
+- **Un profil Chrome dans `visite/`** (Playwright) a déjà fini stagé : `visite/profil/`
+  est ignoré, et le filtre du script ne l'emporterait pas de toute façon.

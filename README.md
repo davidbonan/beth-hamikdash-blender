@@ -100,10 +100,9 @@ cd visite && python3 -m http.server 8777                       # puis http://127
 
 Un serveur est nécessaire : la page est un module ES, `file://` ne la charge pas.
 
-**En ligne.** `./publier_visite.sh [chemin-du-site]` recopie la visite dans
-`public/visite/` du dépôt `davidbonan.com` (le voisin, par défaut) et y ajoute la
-balise `<base>` dont la page a besoin pour être servie à `/visite`, sans slash final.
-Le commit dans ce dépôt-là déclenche Netlify : https://davidbonan.io/visite
+**En ligne.** Netlify déploie ce dépôt sur https://bethhamikdach.com à chaque push sur
+`main` : `construire_site.sh` assemble `dist/` — les pages de `site/` et la visite filtrée
+sous `dist/visite/` — et `netlify.toml` dit le reste. La visite est servie à `/visite/`.
 `?qualite=basse` force le profil léger depuis un bureau — c'est ainsi qu'on vérifie le
 rendu du téléphone sans téléphone sous la main ; `?qualite=haute` fait l'inverse.
 
