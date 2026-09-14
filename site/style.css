@@ -1,71 +1,150 @@
 :root {
-  --encre: #1b1815;
-  --pierre: #f3efe6;
-  --pierre-creuse: #e6dfd0;
-  --trait: #cbc0aa;
-  --or: #9a6b1f;
-  --sourd: #6d6353;
-  --nuit: #0d0c0b;
+  --calcaire: #e4dac3;
+  --pierre: #c9b48a;
+  --or: #b08633;
+  --or-sombre: #6e4e14;
+  --tekhelet: #26264f;
+  --nuit: #100e0b;
+  --lin: #f6f1e6;
+  --encre: #1b1712;
+  --sourd: #6b5f4d;
+  --fond: var(--calcaire);
+  --texte: var(--encre);
+  --texte-sourd: var(--sourd);
+  --trait: rgba(27, 23, 18, .22);
+  --marge: clamp(20px, 6vw, 96px);
+  --mesure: 34em;
 }
 * { box-sizing: border-box; }
-html { color-scheme: light; }
+html { color-scheme: light; scroll-behavior: smooth; }
 body {
-  margin: 0; min-height: 100vh;
-  font: 17px/1.6 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  color: var(--encre); background: var(--pierre);
+  margin: 0;
+  font: 400 18px/1.6 "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
+  font-optical-sizing: auto;
+  color: var(--texte);
+  background: var(--fond);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 1.2s ease, color 1.2s ease;
 }
-:root[lang="he"] body { font-family: "Frank Ruehl", "Times New Roman", serif; font-size: 18px; }
+:root[lang="he"] body { font-family: "Frank Ruhl Libre", "Frank Ruehl", "Times New Roman", serif; font-size: 19px; line-height: 1.65; }
+[lang="he"] { font-family: "Frank Ruhl Libre", "Frank Ruehl", "Times New Roman", serif; }
+:root[lang="he"] [lang="fr"], :root[lang="he"] [lang="en"] { font-family: "Marcellus", "Iowan Old Style", Palatino, serif; }
 a { color: inherit; }
+h1, h2, h3 { font-family: "Marcellus", "Iowan Old Style", Palatino, Georgia, serif; font-weight: 400; letter-spacing: .01em; margin: 0; }
+:root[lang="he"] h1, :root[lang="he"] h2, :root[lang="he"] h3 { font-family: "Frank Ruhl Libre", "Frank Ruehl", serif; font-weight: 500; }
+p { margin: 0 0 1em; text-wrap: pretty; }
+i { font-style: italic; }
 
-.seuil {
-  position: relative; display: grid; align-content: end; min-height: 78vh;
-  padding: 24px clamp(20px, 6vw, 72px) clamp(36px, 7vh, 72px);
-  color: var(--pierre); background: var(--nuit) url(visite/apercu.jpg) center 35% / cover no-repeat;
-  isolation: isolate;
+/* Le fond suit la montée : calcaire, pierre chaude, or, or sombre, nuit. */
+body[data-degre="0"], body[data-degre="1"] { --fond: var(--calcaire); }
+body[data-degre="2"] { --fond: #dccfb0; }
+body[data-degre="3"] { --fond: #d2c3a2; }
+body[data-degre="4"] { --fond: var(--pierre); }
+body[data-degre="5"] { --fond: var(--or); --texte: var(--lin); --texte-sourd: rgba(246, 241, 230, .72); --trait: rgba(246, 241, 230, .3); }
+body[data-degre="6"] { --fond: var(--or-sombre); --texte: var(--lin); --texte-sourd: rgba(246, 241, 230, .68); --trait: rgba(246, 241, 230, .28); }
+body[data-degre="7"], body[data-degre="8"] { --fond: var(--nuit); --texte: var(--lin); --texte-sourd: rgba(246, 241, 230, .6); --trait: rgba(246, 241, 230, .2); }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  body { transition: none; }
 }
-.seuil::before {
+
+/* ---- seuil ---- */
+.seuil {
+  position: relative; min-height: 100svh; display: grid; align-content: end;
+  padding: 24px var(--marge) clamp(40px, 8vh, 96px);
+  color: var(--lin); background: var(--nuit); isolation: isolate; overflow: hidden;
+}
+.seuil .fond {
+  position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 40%;
+}
+.seuil::after {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to bottom, rgba(13,12,11,.55) 0%, rgba(13,12,11,.05) 40%, rgba(13,12,11,.85) 100%);
+  background: linear-gradient(to bottom, rgba(16,14,11,.35) 0%, rgba(16,14,11,0) 30%, rgba(16,14,11,.15) 55%, rgba(16,14,11,.9) 100%);
 }
 .seuil nav {
-  position: absolute; top: 0; inset-inline: 0;
-  display: flex; justify-content: flex-end; gap: 4px;
-  padding: 18px clamp(20px, 6vw, 72px); font-size: 14px; letter-spacing: .04em;
+  position: absolute; top: 0; inset-inline: 0; display: flex; justify-content: flex-end; gap: 2px;
+  padding: 16px var(--marge); font-size: 15px;
 }
-.seuil nav a { padding: 6px 10px; text-decoration: none; opacity: .72; border-radius: 3px; }
-.seuil nav a:hover, .seuil nav a[aria-current] { opacity: 1; background: rgba(243,239,230,.12); }
-:root[dir="ltr"] .seuil .hebreu { text-align: left; }
-:root[dir="rtl"] .seuil .hebreu { text-align: right; }
-.seuil .hebreu { margin: 0 0 6px; font-size: 22px; letter-spacing: .12em; opacity: .85; }
-.seuil h1 {
-  margin: 0; font-weight: 500; font-size: clamp(38px, 7vw, 72px); line-height: 1.05; letter-spacing: .02em;
-}
-.seuil p { max-width: 36em; margin: 18px 0 0; font-size: clamp(17px, 2.2vw, 21px); line-height: 1.45; text-wrap: pretty; }
+.seuil nav a { padding: 6px 10px; text-decoration: none; opacity: .7; border-bottom: 1px solid transparent; }
+.seuil nav a:hover { opacity: 1; }
+.seuil nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
+.seuil .titre { max-width: 44em; }
+.seuil h1 { display: grid; gap: 4px; line-height: 1; }
+.seuil h1 .he { font-size: clamp(64px, 12vw, 152px); font-weight: 500; letter-spacing: .02em; line-height: .95; }
+.seuil h1 .latin { font-size: clamp(22px, 3vw, 34px); letter-spacing: .06em; opacity: .9; }
+:root[lang="he"] .seuil h1 .he { font-size: clamp(72px, 13vw, 168px); }
+.seuil .accroche { max-width: 30em; margin: 26px 0 0; font-size: clamp(18px, 2vw, 22px); line-height: 1.45; }
+.action { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin: 28px 0 0; }
 .entrer {
-  display: inline-block; justify-self: start; margin-top: 30px; padding: 14px 28px;
-  color: var(--encre); background: var(--pierre); text-decoration: none;
-  font-size: 17px; letter-spacing: .04em; border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
-  transition: transform .15s ease, box-shadow .15s ease;
+  display: inline-block; padding: 15px 30px; border: 1px solid var(--lin);
+  color: var(--lin); text-decoration: none; font-family: "Marcellus", serif; font-size: 18px; letter-spacing: .05em;
+  background: rgba(16,14,11,.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: background-color .2s ease, color .2s ease;
 }
-.entrer:hover { transform: translateY(-1px); box-shadow: 0 2px 0 rgba(0,0,0,.3), 0 14px 34px rgba(0,0,0,.4); }
-.entrer:active { transform: none; }
-.entrer small { display: block; margin-top: 2px; font-size: 13px; color: var(--sourd); letter-spacing: 0; }
+:root[lang="he"] .entrer { font-family: "Frank Ruhl Libre", serif; font-weight: 500; letter-spacing: 0; }
+.entrer:hover, .entrer:focus-visible { background: var(--lin); color: var(--nuit); }
+.entrer:focus-visible { outline: 2px solid var(--or); outline-offset: 3px; }
+.action .note { font-size: 15px; opacity: .8; }
 
-main { max-width: 1040px; margin: 0 auto; padding: clamp(40px, 7vh, 80px) clamp(20px, 6vw, 72px); }
-.trois { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px clamp(24px, 4vw, 48px); }
-.trois h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; color: var(--or); letter-spacing: .01em; }
-.trois p { margin: 0; color: var(--encre); text-wrap: pretty; }
-.trois cite { font-style: normal; color: var(--sourd); }
-.temple { margin-top: clamp(40px, 7vh, 72px); padding-top: 32px; border-top: 1px solid var(--trait); }
-.temple h2 { margin: 0 0 12px; font-size: 24px; font-weight: 500; }
-.temple p { max-width: 42em; margin: 0 0 14px; text-wrap: pretty; }
+/* ---- propos ---- */
+main { display: block; }
+.propos, .montee-tete, .methode { padding: 0 var(--marge); max-width: calc(var(--mesure) + 2 * var(--marge)); }
+.propos { padding-top: clamp(56px, 10vh, 120px); }
+.propos p { font-size: clamp(18px, 1.55vw, 21px); line-height: 1.55; }
+.propos p:first-child::first-letter { font-family: "Marcellus", serif; font-size: 2.8em; float: inline-start; line-height: .8; padding: .1em .1em 0 0; }
+:root[lang="he"] .propos p:first-child::first-letter { float: none; font-size: inherit; padding: 0; font-family: inherit; }
 
+.montee-tete { padding-top: clamp(56px, 10vh, 120px); padding-bottom: clamp(24px, 4vh, 48px); }
+h2 { font-size: clamp(32px, 4vw, 48px); margin-bottom: 18px; line-height: 1.1; }
+.montee-tete p { color: var(--texte-sourd); font-size: 18px; }
+
+/* ---- la montée ---- */
+.degre {
+  padding: clamp(32px, 6vh, 72px) var(--marge) clamp(24px, 4vh, 56px);
+  display: grid; gap: clamp(20px, 3vh, 36px);
+}
+.degre figure { margin: 0; max-width: 1400px; }
+.degre img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1072; object-fit: cover; }
+.degre .texte { max-width: var(--mesure); display: grid; gap: 10px; }
+.degre h3 { font-size: clamp(26px, 3vw, 36px); line-height: 1.15; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+.degre .nom-he { font-size: .85em; color: var(--texte-sourd); font-weight: 400; }
+.degre .mishna { margin: 0; font-size: clamp(18px, 1.5vw, 20px); line-height: 1.5; }
+.degre .aller {
+  justify-self: start; font-family: "Marcellus", serif; font-size: 16px; letter-spacing: .05em;
+  text-decoration: none; padding: 4px 0; border-bottom: 1px solid var(--trait); transition: border-color .2s ease;
+}
+:root[lang="he"] .degre .aller { font-family: inherit; letter-spacing: 0; font-weight: 500; }
+.degre .aller:hover, .degre .aller:focus-visible { border-bottom-color: currentColor; }
+.degre .aller:focus-visible { outline: 2px solid var(--or); outline-offset: 4px; }
+.degre[data-degre="7"] img { box-shadow: 0 0 120px rgba(176, 134, 51, .18); }
+
+/* ---- méthode ---- */
+.methode { padding-top: clamp(64px, 12vh, 140px); padding-bottom: clamp(48px, 8vh, 96px); }
+.methode h2 + p, .methode p { color: var(--texte); }
+.methode h2 ~ h2 { margin-top: clamp(40px, 6vh, 72px); }
+.methode .hoshen { margin: clamp(32px, 5vh, 56px) 0; max-width: 100%; }
+.methode .hoshen img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1072; object-fit: cover; }
+.methode figcaption { margin-top: 10px; font-size: 15px; color: var(--texte-sourd); }
+.methode .action { margin-top: 36px; }
+.methode .entrer { border-color: var(--or); color: var(--lin); background: transparent; }
+.methode .entrer:hover, .methode .entrer:focus-visible { background: var(--or); color: var(--nuit); }
+
+/* ---- pied ---- */
 footer {
-  padding: 28px clamp(20px, 6vw, 72px) calc(28px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--trait); background: var(--pierre-creuse);
-  color: var(--sourd); font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+  padding: 28px var(--marge) calc(28px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--trait); color: var(--texte-sourd); font-size: 15px;
+  display: flex; flex-wrap: wrap; gap: 8px 32px; justify-content: space-between;
 }
-footer a { text-decoration: none; }
-footer a:hover { text-decoration: underline; color: var(--encre); }
+footer a { text-decoration: none; border-bottom: 1px solid var(--trait); }
+footer a:hover { color: var(--texte); border-bottom-color: currentColor; }
+
+@media (max-width: 640px) {
+  .seuil { align-content: end; }
+  .seuil nav { justify-content: flex-start; }
+  .degre h3 { flex-direction: column; gap: 2px; }
+}
+@media (min-width: 1100px) {
+  .degre { grid-template-columns: minmax(0, 1fr) minmax(280px, 26em); align-items: end; column-gap: clamp(32px, 4vw, 64px); }
+  .degre .texte { padding-bottom: 8px; }
+}
