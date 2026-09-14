@@ -173,9 +173,7 @@
       "zone": "mizbeach",
       "prefixes": [
         "Mizbeach_corps",
-        "Mizbeach_haut",
-        "Mizbeach_yessod",
-        "Keren_"
+        "Mizbeach_haut"
       ],
       "lieu": true
     },
@@ -188,11 +186,75 @@
       ]
     },
     {
+      "id": "yessod",
+      "nom": "Yessod",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Mizbeach_yessod"
+      ]
+    },
+    {
+      "id": "keranot",
+      "nom": "Keranot",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Keren_"
+      ]
+    },
+    {
       "id": "kevesh",
       "nom": "Kevesh (la rampe)",
       "zone": "mizbeach",
       "prefixes": [
         "Kevesh"
+      ]
+    },
+    {
+      "id": "kevashim_ketanim",
+      "nom": "Kevashim ketanim",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kevesh_katan_"
+      ]
+    },
+    {
+      "id": "revouva",
+      "nom": "Revouva",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kevesh_revouva"
+      ]
+    },
+    {
+      "id": "shulchanot_kevesh",
+      "nom": "Les deux tables du kevesh",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kevesh_shulchan_"
+      ]
+    },
+    {
+      "id": "makom_hadeshen",
+      "nom": "Le lieu du deshen",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kevesh_makom_deshen"
+      ]
+    },
+    {
+      "id": "melach_kevesh",
+      "nom": "Le sel du kevesh",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Kevesh_melach"
+      ]
+    },
+    {
+      "id": "melach_rosh",
+      "nom": "Le sel du sommet",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Mizbeach_melach"
       ]
     },
     {
@@ -209,6 +271,22 @@
       "zone": "mizbeach",
       "prefixes": [
         "Maarakha_"
+      ]
+    },
+    {
+      "id": "tapuach",
+      "nom": "Le tapoua'h",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Maarakha_tapuach"
+      ]
+    },
+    {
+      "id": "sefalim",
+      "nom": "Les deux sefalim d'argent",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Sefel_"
       ]
     },
     {
@@ -250,7 +328,6 @@
       "zone": "oulam",
       "prefixes": [
         "Ulam_facade",
-        "Ulam_halifot",
         "Ulam_flanc",
         "Ulam_plafond",
         "Ulam_klonas",
@@ -682,6 +759,22 @@
       "zone": "oulam",
       "prefixes": [
         "Tavla_Helene"
+      ]
+    },
+    {
+      "id": "beit_hahalifot",
+      "nom": "Beit HaHalifot",
+      "zone": "oulam",
+      "prefixes": [
+        "Ulam_halifot"
+      ]
+    },
+    {
+      "id": "niche_bilga",
+      "nom": "La niche murée de Bilga",
+      "zone": "oulam",
+      "prefixes": [
+        "Ulam_halifot_niche_Bilga"
       ]
     },
     {

@@ -192,6 +192,44 @@
     "note": "Tour's choice: the Mishna does not say where the tablet was; the tour sets it on the gold of the east wall of the Ulam, on the north side. The engraved lines are decorative."
   },
 
+  "beit_hahalifot": {
+    "nom": "Beit HaHalifot (the knife chambers)",
+    "translit": "Beit HaHalifot",
+    "resume": "The Ulam extends fifteen amot north and south beyond the body of the building, and these two extensions were called Beit HaHalifot, “because the knives were stored there”: Bartenura explains that large knives were called ‘halafim. Each of the twenty-four mishmarot — the teams of Kohanim who took turns week by week — had its own niche in the wall for its knives. Sacrifices are slaughtered with a knife consecrated to the service, made of metal, and long enough to reach past the animal's neck. Only one niche was walled up: Bilga's.",
+    "cotes": [
+      "15-amot extension: a 5-amot wall and 10 of space",
+      "24 niches, one per mishmar"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "4:7", "citation": "הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן, וַחֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַדָּרוֹם, וְהוּא הָיָה נִקְרָא בֵּית הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים"},
+      {"oeuvre": "Bartenura sur Middot", "ref": "4:7", "citation": "בֵּית הַחֲלִיפוֹת. עַל שֵׁם הַסַּכִּינִים שֶׁגּוֹנְזִים שָׁם… שֶׁכֵּן בִּלְשׁוֹן רוֹמִי קוֹרִין לַסַּכִּינִים הַגְּדוֹלִים חֲלָפִים"},
+      {"oeuvre": "Bartenura sur Soucca", "ref": "5:8", "citation": "חַלּוֹנוֹת הָיוּ בְּלִשְׁכַּת הַחֲלִיפוֹת שֶׁשָּׁם גּוֹנְזִין אֶת סַכִּינֵיהֶם"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "דלכל משמר ומשמר היה שם ארגז מיוחד בכותל לגנוז שם סכיניהן"},
+      {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
+      {"oeuvre": "Houlin", "ref": "31a", "citation": "מְלֹא צַוָּאר חוּץ לַצַּוָּאר"}
+    ],
+    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam extends the Ulam along the whole building and the Raavad disputes it; the tour follows Bartenura."
+  },
+
+  "niche_bilga": {
+    "nom": "Bilga's walled-up niche",
+    "translit": "'Halonah shel Bilga",
+    "resume": "Bilga is the fifteenth of the twenty-four mishmarot. The Mishna penalises it three times: it always divides its loaves on the south side, even on the day it enters service; its slaughtering ring is fixed, so it must borrow the others'; and its knife niche is walled up. The Gemara gives two reasons. Miriam, daughter of Bilga, had renounced the Torah and married a Greek officer; when the Greeks entered the Heikhal she struck the altar with her sandal: “Lukos, lukos — wolf, wolf! How long will you devour Israel's wealth without standing by them in their hour of distress?” The Sages penalised the whole mishmar, for what a child says in the market he has heard from his father or his mother. According to the other view, Bilga's mishmar was late in coming, and Yeshevav, who precedes it, served in its place.",
+    "cotes": [
+      "15th mishmar of 24",
+      "the niche, the ring and the division of the loaves"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "5:8", "citation": "בִּלְגָּה לְעוֹלָם חוֹלֶקֶת בַּדָּרוֹם, וְטַבַּעְתָּהּ קְבוּעָה, וְחַלּוֹנָהּ סְתוּמָה"},
+      {"oeuvre": "Soucca", "ref": "56b", "citation": "מעשה במרים בת בילגה שהמירה דתה… כששמעו חכמים בדבר, קבעו את טבעתה וסתמו את חלונה"},
+      {"oeuvre": "Divrei HaYamim I", "ref": "24:14", "citation": "לְבִלְגָּה חֲמִשָּׁה עָשָׂר"},
+      {"oeuvre": "Bartenura sur Soucca", "ref": "5:8", "citation": "חַלּוֹנוֹת הָיוּ בְּלִשְׁכַּת הַחֲלִיפוֹת שֶׁשָּׁם גּוֹנְזִין אֶת סַכִּינֵיהֶם"},
+      {"oeuvre": "Yerushalmi Soucca", "ref": "5:8", "citation": "וחלונה סתומה… כהיא דתנינן תמן הוא היה נקרא בית החולפות ששם היו גונזין את הסכינין"}
+    ],
+    "note": "Tour's choice: the Mishna does not say where Bilga's niche was. The tour arranges the niches in the order of the mishmarot, the first twelve on the north: Bilga falls on the south, top row. The niche is closed with a slightly recessed stone so that it reads as walled up."
+  },
+
   "cohanim": {
     "nom": "Kohanim in their service garments",
     "translit": "Bigdei kehuna",

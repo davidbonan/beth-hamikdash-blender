@@ -43,8 +43,15 @@ const OUVRAGES = {
   "rashi exode": "Rashi on Exodus", "rashi shemot": "Rashi on Exodus",
   "rashi sur yoma": "Rashi on Yoma",
   "rashi sur pesachim": "Rashi on Pesachim",
+  "rashi sur zevahim": "Rashi on Zevachim",
+  "rashi sur soucca": "Rashi on Sukkah",
   "rosh sur tamid": "Commentary of the Rosh on Tamid",
   "rambam sur middot": "Rambam on Mishnah Middot",
+  "bartenura sur middot": "Bartenura on Mishnah Middot",
+  "bartenura sur soucca": "Bartenura on Mishnah Sukkah",
+  "divrei hayamim i": "I Chronicles",
+  "yerushalmi soucca": "Jerusalem Talmud Sukkah",
+  "rambam maasse hakorbanot": "Mishneh Torah, Sacrificial Procedure",
 };
 
 const pele = (s) => (s || "").toLowerCase().normalize("NFD")

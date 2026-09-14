@@ -425,12 +425,12 @@
   "mizbeach": {
     "nom": "Mizbeach HaNechoshet",
     "translit": "Mizbeach HaNechoshet",
-    "resume": "The outer altar, built of stones untouched by iron, joined with plaster and whitewashed with lime twice a year. Its base, the yessod, is 32 amot on each side and one ama high; a one-ama setback gives 30 × 30 up to the sovev, the walkable ledge at six amot; a second setback gives 28 × 28 up to the surface of the fire. Four horns of one cubic ama occupy the corners. It is not centered on the axis of the Heikhal: it is offset nine amot to the south.",
+    "resume": "The outer altar, built of stones untouched by iron, joined with plaster and whitewashed with lime twice a year. Its base, the yessod, is 32 amot on each side and one ama high; a one-ama setback gives 30 × 30 up to the sovev, the walkable ledge at six amot; a second setback gives 28 × 28 up to the surface of the fire. Four hollow horns of one cubic ama occupy the corners. It is not centered on the axis of the Heikhal: it is offset nine amot to the south.",
     "cotes": [
       "yessod: 32 × 32 amot, 1 ama high",
       "30 × 30 up to the sovev, at 6 amot high (1 yessod + 5)",
       "28 × 28 up to the surface (ma'arakha)",
-      "keranot: four blocks of 1 × 1 × 1 ama at the corners",
+      "keranot: four hollow cubes of one ama at the corners (Rambam Beit HaBe'hira 2:8)",
       "1 ama of walkway (makom hilukh haregel), then a 24 × 24 fire zone",
       "total height 10 amot (≈ 4.8 m): 9 to the surface + 1 for the horn",
       "32 amot in both the east-west and north-south division of the Azara",
@@ -485,14 +485,85 @@
       }
     ]
   },
+  "yessod": {
+    "nom": "Yesod",
+    "translit": "Yesod",
+    "resume": "The base of the altar: a step one amah high and one amah wide. It does not go all the way around. It runs along the whole north and the whole west, and extends only one amah onto the south, at the southwest corner, and one amah onto the east, at the northeast corner. The southeast corner has none. The remaining blood of the offerings is poured onto it.",
+    "cotes": [
+      "1 amah high, 1 amah wide",
+      "the whole north and the whole west: 32 amot each",
+      "one amah on the south, at the southwest corner; one amah on the east, at the northeast corner",
+      "the southeast corner has no yesod"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:1",
+        "citation": "וְהַיְסוֹד הָיָה מְהַלֵּךְ עַל פְּנֵי כָל הַצָּפוֹן וְעַל פְּנֵי כָל הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת, וּבַמִּזְרָח אַמָּה אֶחָת"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:10",
+        "citation": "וְקֶרֶן דְּרוֹמִית מִזְרָחִית לֹא הָיָה לָהּ יְסוֹד"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "3:2",
+        "citation": "שֶׁהַדָּמִים הַנִּתָּנִין עַל יְסוֹד מַעֲרָבִי וְעַל יְסוֹד דְּרוֹמִי, יוֹרְדִין בָּהֶן"
+      },
+      {
+        "oeuvre": "Zeva'him",
+        "ref": "5:3",
+        "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"
+      }
+    ],
+    "note": "Not modelled: the two holes at the southwest corner through which the blood poured on the yesod runs down, and the amah channel that carries it to the Kidron (Middot 3:2)."
+  },
+  "keranot": {
+    "nom": "Keranot",
+    "translit": "Keranot",
+    "resume": "The four horns at the corners of the altar top, one amah by one amah, hollow. The blood of the chatat is placed on them, once on each of the four. Inside them, one amah where the kohanim walk, then the place of the fire.",
+    "cotes": [
+      "one amah by one amah, at the four corners of the top",
+      "hollow",
+      "height: one amah in the model; five tefachim according to the Rambam",
+      "walls a quarter amah thick (choice)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:1",
+        "citation": "מְקוֹם הַקְּרָנוֹת אַמָּה מִזֶּה וְאַמָּה מִזֶּה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:8",
+        "citation": "גֹּבַהּ כָּל קֶרֶן וְקֶרֶן חֲמִשָּׁה טְפָחִים. וְרִבּוּעַ כָּל קֶרֶן אַמָּה עַל אַמָּה. וְאַרְבַּע הַקְּרָנוֹת חֲלוּלוֹת הָיוּ מִתּוֹכָן"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:16",
+        "citation": "וְיִשָּׁאֲרוּ הַקְּרָנוֹת חֲלוּלִין"
+      },
+      {
+        "oeuvre": "Zeva'him",
+        "ref": "5:3",
+        "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"
+      }
+    ],
+    "note": "Choices of the tour: the horns rise one amah and their walls are a quarter amah thick. The Rambam gives them five tefachim of height (Beit HaBechirah 2:8); the tour has not yet decided between that figure and the model's amah."
+  },
   "kevesh": {
     "nom": "Kevesh (the Ramp)",
     "translit": "Kevesh",
-    "resume": "The ramp that rises to the altar, to the south, in its extension. 32 amot long and 16 wide, it starts from the ground and reaches the surface; two small side ramps branch off from it, one toward the yessod, the other toward the sovev. The altar has no staircase: the Torah forbids it.",
+    "resume": "The ramp that rises to the altar, to the south, in its extension. 32 amot long and 16 wide, it starts from the ground and reaches the surface, its last two amot overhanging the yessod and the sovev, with a little air between it and the altar. Two small ramps branch off from it: to the east toward the sovev, to the west toward the yessod. In its west face is the revuva, a one-ama niche where disqualified bird chatat offerings were placed; to the west stand two tables, of marble for the limbs and of silver for the vessels; to the east, on the floor, the heap where the terumat hadeshen is set down. The altar has no staircase: the Torah forbids it.",
     "cotes": [
       "32 amot long × 16 wide",
       "south of the Mizbeach, in its extension",
-      "“Kevesh” strip in the north-south division of the Azara: 30 amot"
+      "“Kevesh” strip in the north-south division of the Azara: 30 amot",
+      "30 amot on the ground, 2 overhanging the yessod and the sovev",
+      "revuva: a niche of one ama by one ama in the west face",
+      "place of the deshen: ten amot from the foot, three tefachim from the east face"
     ],
     "sources": [
       {
@@ -517,10 +588,158 @@
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",
-        "ref": "2",
-        "citation": ""
+        "ref": "2:13–15",
+        "citation": "וַאֲוִיר מְעַט הָיָה מַפְסִיק בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ"
+      },
+      {
+        "oeuvre": "Zeva'him",
+        "ref": "62b",
+        "citation": "שְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִין מִן הַכֶּבֶשׁ, שֶׁבָּהֶן פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב"
+      },
+      {
+        "oeuvre": "Rashi sur Zeva'him",
+        "ref": "62b",
+        "citation": "אותו שפונין בו לסובב יצא במזרחו של כבש… והפונה ליסוד יוצא למערבו"
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "6:4",
+        "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:4",
+        "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת"
       }
-    ]
+    ],
+    "note": "Adopted: the sides of the two small ramps according to Rashi (Zevachim 62b), the sovev to the east, the yessod to the west. Choices of the tour: the thickness of the head, the width of the air gap, the sovev ramp starting 18 amot from the altar to leave the place of the deshen free, the placement of the revuva and of the two tables."
+  },
+  "kevashim_ketanim": {
+    "nom": "Kevashim ketanim",
+    "translit": "Kevashim ketanim",
+    "resume": "Two small ramps branch off the kevesh, separated from the altar by a hair's breadth. The eastern one climbs diagonally to the sovev. The western one starts at the foot of the kevesh and runs diagonally to the yesod, at the southwest corner.",
+    "cotes": [
+      "sovev ramp: east of the kevesh, up to 6 amot high",
+      "yesod ramp: to the west, up to one amah, at the southwest corner",
+      "gap from the altar: a hair (מלא נימא)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Zeva'him",
+        "ref": "62b",
+        "citation": "שְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִין מִן הַכֶּבֶשׁ, שֶׁבָּהֶן פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב; וּמוּבְדָּלִין מִן הַמִּזְבֵּחַ מְלֹא נִימָא"
+      },
+      {
+        "oeuvre": "Rashi sur Zeva'him",
+        "ref": "62b",
+        "citation": "אותו שפונין בו לסובב יצא במזרחו של כבש… והפונה ליסוד יוצא למערבו"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:14",
+        "citation": "וּשְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִים מִמֶּנּוּ שֶׁבָּהֶם פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב"
+      }
+    ],
+    "note": "Adopted: the sides according to Rashi, the sovev to the east, the yesod to the west. Choices of the tour: their widths (2.5 and 2 amot), and the sovev ramp starting 18 amot from the altar to leave the place of the deshen free."
+  },
+  "revouva": {
+    "nom": "Revuva",
+    "translit": "Revuva",
+    "resume": "A niche one amah by one amah in the western face of the kevesh. Bird chatat offerings that had become invalid were placed there, until their appearance spoiled and they were taken out to the place of burning.",
+    "cotes": [
+      "one amah by one amah",
+      "in the western face of the kevesh"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "3:3",
+        "citation": "וּרְבוּבָה הָיְתָה לוֹ בְּמַעֲרָבוֹ, שֶׁשָּׁם הָיוּ נוֹתְנִים פְּסוּלֵי חַטַּאת הָעוֹף"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:14",
+        "citation": "וְחַלּוֹן הָיְתָה בְּמַעֲרָבוֹ שֶׁל כֶּבֶשׁ אַמָּה עַל אַמָּה… עַד שֶׁתַּעֲבֹר צוּרָתָהּ וְתֵצֵא לְבֵית הַשְּׂרֵפָה"
+      }
+    ],
+    "note": "Choices of the tour: its position, 12 amot from the altar, and its height, 2 amot above the ground."
+  },
+  "shulchanot_kevesh": {
+    "nom": "The two tables of the kevesh",
+    "translit": "Shulchanot",
+    "resume": "West of the kevesh, two tables. On the marble one the limbs of the offerings were placed; on the silver one, the vessels of the service.",
+    "cotes": [
+      "one of marble, one of silver",
+      "1 × 2 amot, 1.5 high, like the tables of the Beit HaMitbachayim (choice)",
+      "west of the yesod ramp (choice)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shekalim",
+        "ref": "6:4",
+        "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף עַל שֶׁל שַׁיִשׁ הָיוּ נוֹתְנִים אֶת הָאֵבָרִים, עַל שֶׁל כֶּסֶף כְּלֵי שָׁרֵת"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:15",
+        "citation": "וּשְׁנֵי שֻׁלְחָנוֹת הָיוּ בְּמַעֲרַב הַכֶּבֶשׁ"
+      }
+    ],
+    "note": "Choices of the tour: their dimensions, taken from the tables of the Beit HaMitbachayim, and their position west of the yesod ramp."
+  },
+  "makom_hadeshen": {
+    "nom": "The place of the deshen",
+    "translit": "Makom HaDeshen",
+    "resume": "Every morning, the kohen of the terumat hadeshen takes the silver pan, goes up to the top, scoops consumed coals from the middle of the fire and comes down. On the floor he turns north, walks about ten amot along the east side of the kevesh and piles them on the pavement, three tefachim from the kevesh. The crops of the birds and the ashes of the inner altar and of the Menorah are also put there.",
+    "cotes": [
+      "east of the kevesh, about ten amot from its foot",
+      "three tefachim (half an amah) from its face"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:4",
+        "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת. צָבַר אֶת הַגֶּחָלִים עַל גַּבֵּי הָרִצְפָה רָחוֹק מִן הַכֶּבֶשׁ שְׁלשָׁה טְפָחִים, מְקוֹם שֶׁנּוֹתְנִין מֻרְאוֹת הָעוֹף וְדִּשּׁוּן מִזְבֵּחַ הַפְּנִימִי וְהַמְּנוֹרָה"
+      }
+    ],
+    "note": "Choice of the tour: the size of the heap. Not modelled: the silver pan, kept in the corner between the kevesh and the altar, west of the kevesh (Tamid 1:4)."
+  },
+  "melach_kevesh": {
+    "nom": "The salt of the kevesh",
+    "translit": "Melach",
+    "resume": "Salt is kept in three places: in the Lishkat HaMelach, on the kevesh, and on top of the altar. On the kevesh the limbs of the offerings are salted. The kohanim who bring them set them down on the lower half of the kevesh, on its west side, and salt them.",
+    "cotes": [
+      "on the lower half of the kevesh, west side"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "21b",
+        "citation": "בִּשְׁלֹשָׁה מְקוֹמוֹת הַמֶּלַח נְתוּנָה: בְּלִשְׁכַּת הַמֶּלַח, וְעַל גַּבֵּי הַכֶּבֶשׁ, וּבְרֹאשׁוֹ שֶׁל מִזְבֵּחַ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "4:3",
+        "citation": "הָלְכוּ וּנְתָנוּם מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ, וּמְלָחוּם"
+      }
+    ],
+    "note": "Choices of the tour: a heap lying on the slope, its size and its place within that half."
+  },
+  "melach_rosh": {
+    "nom": "The salt on top of the altar",
+    "translit": "Melach",
+    "resume": "The third place of salt, on top of the altar. What goes straight up to the fire is salted there: the kometz of the menachot, the levonah and the ketoret.",
+    "cotes": [
+      "on top of the altar"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "21b",
+        "citation": "בְּרֹאשׁוֹ שֶׁל מִזְבֵּחַ – שֶׁשָּׁם מוֹלְחִין הַקּוֹמֶץ וְהַלְּבוֹנָה וְהַקְּטוֹרֶת"
+      }
+    ],
+    "note": "Choices of the tour: its position, on the southern walkway strip east of where the kevesh arrives, and its size. The source names the place, not the spot on the top."
   },
   "shit": {
     "nom": "Shit",
@@ -574,11 +793,13 @@
   "maarakhot": {
     "nom": "The Ma'arakhot",
     "translit": "Ma'arakhot",
-    "resume": "The woodpiles set up on the surface of the altar. According to R. Yosei, three fires burn there, and four on Yom Kippur. Smoke rises straight up from them, continuously.",
+    "resume": "The woodpiles set up on the surface of the altar. According to R. Yosei, three fires burn there, and four on Yom Kippur. In the center is the tapuach, the mound of ash that the logs of the great ma'arakha touch. Smoke rises straight up from them, continuously.",
     "cotes": [
       "surface of the altar: 28 × 28 amot",
       "fire zone: 24 × 24 amot, past the ama of the horns and the ama of walkway",
-      "three fires, four on Kippur (R. Yosei; R. Meir: 4 and 5; R. Yehuda: 2 and 3)"
+      "three fires, four on Kippur (R. Yosei; R. Meir: 4 and 5; R. Yehuda: 2 and 3)",
+      "the fourth on Kippur provides the coals for the incense of the Kodesh HaKodashim",
+      "tapuach: at the center of the top"
     ],
     "sources": [
       {
@@ -595,8 +816,73 @@
         "oeuvre": "Tamid",
         "ref": "2:1–5",
         "citation": ""
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "2:2",
+        "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ"
+      },
+      {
+        "oeuvre": "Rambam Temidin",
+        "ref": "2:4–7",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Yoma 4:6",
+        "citation": "וּמוֹסִיפִין בְּיוֹם הַכִּפּוּרִים עוֹד מַעֲרָכָה אַחַת לִטֹּל מִמֶּנָּה גֶּחָלִים לַקְּטֹרֶת לִפְנַי וְלִפְנִים"
       }
     ]
+  },
+  "tapuach": {
+    "nom": "The tapuach",
+    "translit": "Tapuach",
+    "resume": "In the middle of the top, the mound onto which the ash gathered on the altar is heaped. At times it held nearly three hundred kor. On the festivals it was not cleared, for it was an adornment of the altar. The inner ends of the logs of the great ma'arakhah touch it.",
+    "cotes": [
+      "in the middle of the altar top",
+      "4 amot across and 1.5 high in the model (choice)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Tamid",
+        "ref": "2:2",
+        "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ, פְּעָמִים עָלָיו כִּשְׁלשׁ מֵאוֹת כּוֹר. וּבָרְגָלִים לֹא הָיוּ מְדַשְּׁנִין אוֹתוֹ, מִפְּנֵי שֶׁהוּא נוֹי לַמִּזְבֵּחַ"
+      },
+      {
+        "oeuvre": "Rambam Temidin",
+        "ref": "2:7",
+        "citation": "וְרָאשֵׁי הַגְּזָרִים הַפְּנִימִיִּים הָיוּ נוֹגְעִין בַּדֶּשֶׁן שֶׁבְּאֶמְצַע הַמִּזְבֵּחַ וְהוּא הַנִּקְרָא תַּפּוּחַ"
+      }
+    ],
+    "note": "Choice of the tour: its size. The sources give its volume, not its shape."
+  },
+  "sefalim": {
+    "nom": "The two silver sefalim",
+    "translit": "Sefalim",
+    "resume": "On top, by the southwest horn, two silver bowls for the libations, side by side: the western one for water, the eastern one for wine. Each is pierced with a narrow spout, the water's narrower than the wine's, so that both empty at the same time. The liquid flows onto the altar and runs down through a hole to the shitin.",
+    "cotes": [
+      "on top, by the southwest horn",
+      "water to the west, wine to the east, side by side",
+      "the water spout narrower than the wine spout"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "4:9",
+        "citation": "עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ, שְׁנֵי סְפָלִים שֶׁל כֶּסֶף הָיוּ שָׁם"
+      },
+      {
+        "oeuvre": "Rambam Temidin",
+        "ref": "10:7",
+        "citation": "וְשֶׁל מַיִם הָיָה נֶקֶב שֶׁלּוֹ דַּק מִשֶּׁל יַיִן כְּדֵי שֶׁיִּכְלֶה הַמַּיִם עִם הַיַּיִן כְּאֶחָד"
+      },
+      {
+        "oeuvre": "Rashi sur Soucca",
+        "ref": "48b",
+        "citation": "הספלים נתונים אצל הקרן זה לפני זה סמוכין זה לזה אחד לצד מערב ואחד לפנים הימנו דהיינו למזרח"
+      }
+    ],
+    "note": "Adopted: silver. Rejected: according to R. Yehudah they were of plaster, blackened by the wine (Sukkah 4:9). Choices of the tour: their size, their profile and the direction of the spouts."
   },
   "kiyor": {
     "nom": "Kiyor",

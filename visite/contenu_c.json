@@ -194,6 +194,44 @@
     "note": "Choix de la visite : la Mishna ne dit pas où était la tablette ; la visite la pose sur l'or du mur est de l'Oulam, côté nord. Les lignes gravées sont décoratives."
   },
 
+  "beit_hahalifot": {
+    "he": "בית החליפות",
+    "translit": "Beit HaHalifot",
+    "resume": "L'Oulam déborde de quinze amot au nord et au sud du corps du bâtiment, et ces deux débords s'appelaient Beit HaHalifot, « parce qu'on y rangeait les couteaux » : Bartenura explique que les grands couteaux se disaient ‘halafim. Chacune des vingt-quatre michmarot — les équipes de cohanim qui se relayaient chaque semaine — y avait sa niche dans le mur pour ses propres couteaux. Les sacrifices s'égorgent avec un couteau consacré au service, de métal, et assez long pour dépasser le cou de la bête. Une seule niche était murée : celle de Bilga.",
+    "cotes": [
+      "débord de 15 amot : mur de 5 et 10 d'espace",
+      "24 niches, une par michmar"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "4:7", "citation": "הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן, וַחֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַדָּרוֹם, וְהוּא הָיָה נִקְרָא בֵּית הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים"},
+      {"oeuvre": "Bartenura sur Middot", "ref": "4:7", "citation": "בֵּית הַחֲלִיפוֹת. עַל שֵׁם הַסַּכִּינִים שֶׁגּוֹנְזִים שָׁם… שֶׁכֵּן בִּלְשׁוֹן רוֹמִי קוֹרִין לַסַּכִּינִים הַגְּדוֹלִים חֲלָפִים"},
+      {"oeuvre": "Bartenura sur Soucca", "ref": "5:8", "citation": "חַלּוֹנוֹת הָיוּ בְּלִשְׁכַּת הַחֲלִיפוֹת שֶׁשָּׁם גּוֹנְזִין אֶת סַכִּינֵיהֶם"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "דלכל משמר ומשמר היה שם ארגז מיוחד בכותל לגנוז שם סכיניהן"},
+      {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
+      {"oeuvre": "Houlin", "ref": "31a", "citation": "מְלֹא צַוָּאר חוּץ לַצַּוָּאר"}
+    ],
+    "note": "Choix de la visite : aucune source ne dit où passe le mur ouest du Beit HaHalifot — la visite le prend dans les 16 amot pour garder le corps du bâtiment à 70. La taille des niches, leur place dans le mur latéral, leur ordre (celui des michmarot de Divrei HaYamim I 24) sont des choix, comme la forme des couteaux, leur fer, leur manche de bronze et leur nombre, deux par niche. Le Rambam prolonge l'Oulam sur toute la longueur du bâtiment et le Raavad le lui conteste ; la visite suit Bartenura."
+  },
+
+  "niche_bilga": {
+    "he": "חלונה של בלגה",
+    "translit": "'Halonah shel Bilga",
+    "resume": "Bilga est la quinzième des vingt-quatre michmarot. La Mishna la punit trois fois : elle partage toujours ses pains au sud, même le jour où elle entre en service ; son anneau d'abattage est fixé, si bien qu'elle doit emprunter celui des autres ; et sa niche à couteaux est murée. La guemara en donne deux raisons. Myriam, fille de Bilga, avait renié la Torah et épousé un officier grec ; quand les Grecs entrèrent au Heikhal, elle frappa l'autel de sa sandale : « Loukos, loukos — loup, loup ! Jusqu'à quand dévoreras-tu l'argent d'Israël sans te tenir à leurs côtés à l'heure de la détresse ? » Les Sages punirent toute la michmar, car ce qu'un enfant dit au marché, il l'a entendu de son père ou de sa mère. Selon l'autre avis, la michmar de Bilga tardait à venir, et Yeshevav, qui la précède, servit à sa place.",
+    "cotes": [
+      "15ᵉ michmar sur 24",
+      "la niche, l'anneau et le partage des pains"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "5:8", "citation": "בִּלְגָּה לְעוֹלָם חוֹלֶקֶת בַּדָּרוֹם, וְטַבַּעְתָּהּ קְבוּעָה, וְחַלּוֹנָהּ סְתוּמָה"},
+      {"oeuvre": "Soucca", "ref": "56b", "citation": "מעשה במרים בת בילגה שהמירה דתה… כששמעו חכמים בדבר, קבעו את טבעתה וסתמו את חלונה"},
+      {"oeuvre": "Divrei HaYamim I", "ref": "24:14", "citation": "לְבִלְגָּה חֲמִשָּׁה עָשָׂר"},
+      {"oeuvre": "Bartenura sur Soucca", "ref": "5:8", "citation": "חַלּוֹנוֹת הָיוּ בְּלִשְׁכַּת הַחֲלִיפוֹת שֶׁשָּׁם גּוֹנְזִין אֶת סַכִּינֵיהֶם"},
+      {"oeuvre": "Yerushalmi Soucca", "ref": "5:8", "citation": "וחלונה סתומה… כהיא דתנינן תמן הוא היה נקרא בית החולפות ששם היו גונזין את הסכינין"}
+    ],
+    "note": "Choix de la visite : la Mishna ne dit pas où était la niche de Bilga. La visite range les niches dans l'ordre des michmarot, les douze premières au nord : Bilga tombe au sud, rang du haut. La niche est fermée d'une pierre en léger retrait pour qu'on voie qu'elle a été murée."
+  },
+
   "cohanim": {
     "he": "בגדי כהונה",
     "translit": "Bigdei kehouna",

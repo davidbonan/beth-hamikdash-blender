@@ -56,6 +56,10 @@
       "accueil_entrer": "Entrer",
       "plan": "Plan du Temple",
       "plan_ouvrir": "Ouvrir le plan",
+      "nord": "N",
+      "sud": "S",
+      "est": "E",
+      "ouest": "O",
       "initiation_fin_vol": "Vous savez voler",
       "initiation_fin_vol_texte": "« À pied », en haut de l'écran, vous repose au sol."
     },
@@ -128,6 +132,10 @@
       "accueil_entrer": "כניסה",
       "plan": "מפת המקדש",
       "plan_ouvrir": "פתיחת המפה",
+      "nord": "צפ",
+      "sud": "דר",
+      "est": "מז",
+      "ouest": "מע",
       "initiation_fin_vol": "עכשיו אתם יודעים לטוס",
       "initiation_fin_vol_texte": "\"הליכה\" בראש המסך תחזיר אתכם לקרקע."
     },
@@ -202,8 +210,15 @@
       "Metsoudat David": "מצודת דוד",
       "Rashi sur Yoma": "רש״י על יומא",
       "Rashi sur Pesachim": "רש״י על פסחים",
+      "Rashi sur Zeva'him": "רש״י על זבחים",
+      "Rashi sur Soucca": "רש״י על סוכה",
       "Rosh sur Tamid": "רא״ש על תמיד",
-      "Rashash": "רש״ש"
+      "Rashash": "רש״ש",
+      "Bartenura sur Soucca": "ברטנורא על סוכה",
+      "Divrei HaYamim I": "דברי הימים א",
+      "Yerushalmi Soucca": "ירושלמי סוכה",
+      "Rambam Ma'asse HaKorbanot": "רמב״ם מעשה הקרבנות",
+      "Houlin": "חולין"
     }
   },
   "en": {
@@ -263,6 +278,10 @@
       "accueil_entrer": "Enter",
       "plan": "Temple plan",
       "plan_ouvrir": "Open the plan",
+      "nord": "N",
+      "sud": "S",
+      "est": "E",
+      "ouest": "W",
       "initiation_fin_vol": "You can fly",
       "initiation_fin_vol_texte": "“Walk”, at the top of the screen, sets you back on the ground."
     },
@@ -337,8 +356,15 @@
       "Meïla": "Meilah",
       "Tiferet Israël": "Tiferet Yisrael",
       "Rashi sur Pesachim": "Rashi on Pesachim",
+      "Rashi sur Zeva'him": "Rashi on Zevachim",
+      "Rashi sur Soucca": "Rashi on Sukkah",
       "Rosh sur Tamid": "Rosh on Tamid",
-      "Rashash": "Rashash"
+      "Rashash": "Rashash",
+      "Bartenura sur Soucca": "Bartenura on Sukkah",
+      "Divrei HaYamim I": "I Chronicles",
+      "Yerushalmi Soucca": "Yerushalmi Sukkah",
+      "Rambam Ma'asse HaKorbanot": "Rambam, Sacrificial Procedure",
+      "Houlin": "Chullin"
     }
   }
 }

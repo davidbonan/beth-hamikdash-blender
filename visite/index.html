@@ -439,6 +439,16 @@
   #minicarte:hover { border-color: var(--or); }
   #minicarte svg { display: block; width: 100%; height: 100%; }
   #minicarte :is(.entrees, .etiquettes) { display: none; }
+  /* Le plan ne tourne pas avec le visiteur : nord en haut, est à droite, quelle que soit la langue. */
+  #minicarte .rose { position: absolute; inset: 0; pointer-events: none; direction: ltr; }
+  #minicarte .rose span {
+    position: absolute; font-size: 11px; font-weight: 600; line-height: 1; color: #f3efe6;
+    text-shadow: 0 0 3px rgba(13,12,11,.95), 0 0 1px rgba(13,12,11,.95);
+  }
+  #minicarte .rose .nord { top: 4px; left: 50%; transform: translateX(-50%); color: #d9a441; }
+  #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%); }
+  #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%); }
+  #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%); }
   #plan {
     position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
     padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))
@@ -613,7 +623,7 @@
 
 <div id="survol"></div>
 
-<button id="minicarte" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg></button>
+<button id="minicarte" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg><span class="rose" aria-hidden="true"><span class="nord" data-texte="nord">N</span><span class="sud" data-texte="sud">S</span><span class="est" data-texte="est">E</span><span class="ouest" data-texte="ouest">O</span></span></button>
 
 <div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>
   <div class="tete">

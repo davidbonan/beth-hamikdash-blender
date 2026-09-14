@@ -265,12 +265,12 @@
   "mizbeach": {
     "he": "מזבח הנחושת",
     "translit": "Mizbea'h HaNe'hoshet",
-    "resume": "L'autel extérieur, bâti de pierres non taillées par le fer, jointes au plâtre et blanchies à la chaux deux fois l'an. Sa base, le yessod, fait 32 amot de côté sur une ama de haut ; un retrait d'une ama donne 30 × 30 jusqu'au sovev, le pourtour praticable à six amot ; un second retrait donne 28 × 28 jusqu'à la surface du feu. Quatre cornes d'une ama cube en occupent les angles. Il n'est pas centré sur l'axe du Heikhal : il est décalé de neuf amot vers le sud.",
+    "resume": "L'autel extérieur, bâti de pierres non taillées par le fer, jointes au plâtre et blanchies à la chaux deux fois l'an. Sa base, le yessod, fait 32 amot de côté sur une ama de haut ; un retrait d'une ama donne 30 × 30 jusqu'au sovev, le pourtour praticable à six amot ; un second retrait donne 28 × 28 jusqu'à la surface du feu. Quatre cornes creuses d'une ama cube en occupent les angles. Il n'est pas centré sur l'axe du Heikhal : il est décalé de neuf amot vers le sud.",
     "cotes": [
       "yessod : 32 × 32 amot, 1 ama de haut",
       "30 × 30 jusqu'au sovev, à 6 amot de haut (1 yessod + 5)",
       "28 × 28 jusqu'à la surface (ma'arakha)",
-      "keranot : quatre blocs de 1 × 1 × 1 ama aux angles",
+      "keranot : quatre cubes d'une ama aux angles, creux (Rambam Beit HaBe'hira 2:8)",
       "1 ama de passage (makom hilukh haregel), puis zone du feu de 24 × 24",
       "hauteur totale 10 amot (≈ 4,8 m) : 9 à la surface + 1 de corne",
       "32 amot dans le découpage est-ouest comme dans le découpage nord-sud de l'Azara",
@@ -297,22 +297,157 @@
     ]
   },
 
+  "yessod": {
+    "he": "יסוד",
+    "translit": "Yessod",
+    "resume": "La base de l'autel : une marche d'une ama de haut et d'une ama de large. Elle ne fait pas le tour. Elle court le long de tout le nord et de tout l'ouest, et n'avance que d'une ama sur le sud, à l'angle sud-ouest, et d'une ama sur l'est, à l'angle nord-est. L'angle sud-est n'en a pas. On y verse le reste du sang des offrandes.",
+    "cotes": [
+      "1 ama de haut, 1 ama de large",
+      "tout le nord et tout l'ouest : 32 amot chacun",
+      "une ama sur le sud, à l'angle sud-ouest ; une ama sur l'est, à l'angle nord-est",
+      "l'angle sud-est sans yessod"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "3:1", "citation": "וְהַיְסוֹד הָיָה מְהַלֵּךְ עַל פְּנֵי כָל הַצָּפוֹן וְעַל פְּנֵי כָל הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת, וּבַמִּזְרָח אַמָּה אֶחָת"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:10", "citation": "וְקֶרֶן דְּרוֹמִית מִזְרָחִית לֹא הָיָה לָהּ יְסוֹד"},
+      {"oeuvre": "Middot", "ref": "3:2", "citation": "שֶׁהַדָּמִים הַנִּתָּנִין עַל יְסוֹד מַעֲרָבִי וְעַל יְסוֹד דְּרוֹמִי, יוֹרְדִין בָּהֶן"},
+      {"oeuvre": "Zeva'him", "ref": "5:3", "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"}
+    ],
+    "note": "Non modélisés : les deux trous de l'angle sud-ouest où descend le sang versé sur le yessod, et l'amah qui l'emporte vers le Kidron (Middot 3:2)."
+  },
+
+  "keranot": {
+    "he": "קרנות",
+    "translit": "Keranot",
+    "resume": "Les quatre cornes aux angles du sommet de l'autel, une ama sur une ama, creuses. Le sang de la 'hatat se donne sur elles, une fois sur chacune des quatre. Au-delà d'elles, une ama de passage pour les pieds des cohanim, puis la place du feu.",
+    "cotes": [
+      "une ama sur une ama, aux quatre angles de la surface",
+      "creuses",
+      "hauteur : une ama dans le modèle ; cinq tefa'him selon le Rambam",
+      "parois d'un quart d'ama (choix)"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "3:1", "citation": "מְקוֹם הַקְּרָנוֹת אַמָּה מִזֶּה וְאַמָּה מִזֶּה"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:8", "citation": "גֹּבַהּ כָּל קֶרֶן וְקֶרֶן חֲמִשָּׁה טְפָחִים. וְרִבּוּעַ כָּל קֶרֶן אַמָּה עַל אַמָּה. וְאַרְבַּע הַקְּרָנוֹת חֲלוּלוֹת הָיוּ מִתּוֹכָן"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:16", "citation": "וְיִשָּׁאֲרוּ הַקְּרָנוֹת חֲלוּלִין"},
+      {"oeuvre": "Zeva'him", "ref": "5:3", "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"}
+    ],
+    "note": "Choix de la visite : les cornes montent d'une ama et leurs parois font un quart d'ama. Le Rambam leur donne cinq tefa'him de haut (Beit HaBe'hira 2:8) ; la visite n'a pas encore tranché entre cette cote et l'ama du modèle."
+  },
+
   "kevesh": {
     "he": "כבש",
     "translit": "Kevesh",
-    "resume": "La rampe qui monte à l'autel, au sud, dans son prolongement. Longue de 32 amot et large de 16, elle part du sol et atteint la surface ; deux petites rampes latérales en partent, l'une vers le yessod, l'autre vers le sovev. L'autel n'a pas d'escalier : la Torah l'interdit.",
+    "resume": "La rampe qui monte à l'autel, au sud, dans son prolongement. Longue de 32 amot et large de 16, elle part du sol et atteint la surface, ses deux dernières amot en porte-à-faux au-dessus du yessod et du sovev, un peu d'air la séparant de l'autel. Deux petites rampes en partent : à l'est vers le sovev, à l'ouest vers le yessod. Dans sa face ouest, la revouva, une niche d'une ama où l'on posait les oiseaux de 'hatat invalidés ; à l'ouest, deux tables, de marbre pour les membres et d'argent pour les ustensiles ; à l'est, au sol, le tas où l'on dépose la terumat hadeshen. L'autel n'a pas d'escalier : la Torah l'interdit.",
     "cotes": [
       "32 amot de long × 16 de large",
       "au sud du Mizbea'h, dans son prolongement",
-      "bande « Kevesh » du découpage nord-sud de l'Azara : 30 amot"
+      "bande « Kevesh » du découpage nord-sud de l'Azara : 30 amot",
+      "30 amot au sol, 2 en porte-à-faux au-dessus du yessod et du sovev",
+      "revouva : niche d'une ama sur une ama dans la face ouest",
+      "lieu du deshen : à dix amot du pied, trois tefa'him de la face est"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:3", "citation": ""},
       {"oeuvre": "Middot", "ref": "3:4", "citation": ""},
       {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
       {"oeuvre": "Shemot", "ref": "20:23", "citation": ""},
-      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2", "citation": ""}
-    ]
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:13–15", "citation": "וַאֲוִיר מְעַט הָיָה מַפְסִיק בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ"},
+      {"oeuvre": "Zeva'him", "ref": "62b", "citation": "שְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִין מִן הַכֶּבֶשׁ, שֶׁבָּהֶן פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב"},
+      {"oeuvre": "Rashi sur Zeva'him", "ref": "62b", "citation": "אותו שפונין בו לסובב יצא במזרחו של כבש… והפונה ליסוד יוצא למערבו"},
+      {"oeuvre": "Shekalim", "ref": "6:4", "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף"},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת"}
+    ],
+    "note": "Retenu : les côtés des deux petites rampes selon Rashi (Zeva'him 62b), le sovev à l'est, le yessod à l'ouest. Choix de la visite : l'épaisseur de la tête, la largeur de l'air, la rampe du sovev partant à 18 amot de l'autel pour laisser libre le lieu du deshen, la place de la revouva et des deux tables."
+  },
+
+  "kevashim_ketanim": {
+    "he": "כבשים קטנים",
+    "translit": "Kevashim ketanim",
+    "resume": "Deux petites rampes partent du kevesh, séparées de l'autel de l'épaisseur d'un cheveu. Celle de l'est monte en biais jusqu'au sovev. Celle de l'ouest part du pied du kevesh et rejoint en biais le yessod, à l'angle sud-ouest.",
+    "cotes": [
+      "rampe du sovev : à l'est du kevesh, jusqu'à 6 amot de haut",
+      "rampe du yessod : à l'ouest, jusqu'à une ama, à l'angle sud-ouest",
+      "écart avec l'autel : un cheveu (מלא נימא)"
+    ],
+    "sources": [
+      {"oeuvre": "Zeva'him", "ref": "62b", "citation": "שְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִין מִן הַכֶּבֶשׁ, שֶׁבָּהֶן פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב; וּמוּבְדָּלִין מִן הַמִּזְבֵּחַ מְלֹא נִימָא"},
+      {"oeuvre": "Rashi sur Zeva'him", "ref": "62b", "citation": "אותו שפונין בו לסובב יצא במזרחו של כבש… והפונה ליסוד יוצא למערבו"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:14", "citation": "וּשְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִים מִמֶּנּוּ שֶׁבָּהֶם פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב"}
+    ],
+    "note": "Retenu : les côtés selon Rashi, le sovev à l'est, le yessod à l'ouest. Choix de la visite : leurs largeurs (2,5 et 2 amot) et le départ de la rampe du sovev à 18 amot de l'autel, pour laisser libre le lieu du deshen."
+  },
+
+  "revouva": {
+    "he": "רבובה",
+    "translit": "Revouva",
+    "resume": "Une niche d'une ama sur une ama dans la face ouest du kevesh. On y posait les oiseaux offerts en 'hatat devenus invalides, jusqu'à ce que leur aspect se gâte et qu'on les sorte au lieu où l'on brûle.",
+    "cotes": [
+      "une ama sur une ama",
+      "dans la face ouest du kevesh"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "3:3", "citation": "וּרְבוּבָה הָיְתָה לוֹ בְּמַעֲרָבוֹ, שֶׁשָּׁם הָיוּ נוֹתְנִים פְּסוּלֵי חַטַּאת הָעוֹף"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:14", "citation": "וְחַלּוֹן הָיְתָה בְּמַעֲרָבוֹ שֶׁל כֶּבֶשׁ אַמָּה עַל אַמָּה… עַד שֶׁתַּעֲבֹר צוּרָתָהּ וְתֵצֵא לְבֵית הַשְּׂרֵפָה"}
+    ],
+    "note": "Choix de la visite : sa place, à 12 amot de l'autel, et sa hauteur, à 2 amot du sol."
+  },
+
+  "shulchanot_kevesh": {
+    "he": "שולחנות שבמערב הכבש",
+    "translit": "Shul'hanot",
+    "resume": "À l'ouest du kevesh, deux tables. Sur celle de marbre, on posait les membres des offrandes ; sur celle d'argent, les ustensiles du service.",
+    "cotes": [
+      "une de marbre, une d'argent",
+      "1 × 2 amot, 1,5 de haut, comme les tables du Beit HaMitba'hayim (choix)",
+      "à l'ouest de la rampe du yessod (choix)"
+    ],
+    "sources": [
+      {"oeuvre": "Shekalim", "ref": "6:4", "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף עַל שֶׁל שַׁיִשׁ הָיוּ נוֹתְנִים אֶת הָאֵבָרִים, עַל שֶׁל כֶּסֶף כְּלֵי שָׁרֵת"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:15", "citation": "וּשְׁנֵי שֻׁלְחָנוֹת הָיוּ בְּמַעֲרַב הַכֶּבֶשׁ"}
+    ],
+    "note": "Choix de la visite : leurs cotes, prises aux tables du Beit HaMitba'hayim, et leur place à l'ouest de la rampe du yessod."
+  },
+
+  "makom_hadeshen": {
+    "he": "מקום הדשן",
+    "translit": "Makom HaDeshen",
+    "resume": "Chaque matin, le cohen de la terumat hadeshen prend la pelle d'argent, monte au sommet, ramasse des braises consumées au milieu du feu et redescend. Au sol, il se tourne vers le nord, va à l'est du kevesh sur une dizaine d'amot et les dépose sur le dallage, à trois tefa'him du kevesh. On y met aussi le jabot des oiseaux et les cendres de l'autel intérieur et de la Menora.",
+    "cotes": [
+      "à l'est du kevesh, à une dizaine d'amot de son pied",
+      "à trois tefa'him (une demi-ama) de sa face"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת. צָבַר אֶת הַגֶּחָלִים עַל גַּבֵּי הָרִצְפָה רָחוֹק מִן הַכֶּבֶשׁ שְׁלשָׁה טְפָחִים, מְקוֹם שֶׁנּוֹתְנִין מֻרְאוֹת הָעוֹף וְדִּשּׁוּן מִזְבֵּחַ הַפְּנִימִי וְהַמְּנוֹרָה"}
+    ],
+    "note": "Choix de la visite : la taille du tas. Non modélisée : la pelle d'argent, posée dans l'angle entre le kevesh et l'autel, à l'ouest du kevesh (Tamid 1:4)."
+  },
+
+  "melach_kevesh": {
+    "he": "מלח שעל גבי הכבש",
+    "translit": "Mela'h",
+    "resume": "Le sel se trouve en trois lieux : dans la Lishkat HaMela'h, sur le kevesh et au sommet de l'autel. Sur le kevesh, on sale les membres des offrandes. Les cohanim qui les apportent les posent dans la moitié basse du kevesh, du côté ouest, et les salent.",
+    "cotes": [
+      "dans la moitié basse du kevesh, côté ouest"
+    ],
+    "sources": [
+      {"oeuvre": "Mena'hot", "ref": "21b", "citation": "בִּשְׁלֹשָׁה מְקוֹמוֹת הַמֶּלַח נְתוּנָה: בְּלִשְׁכַּת הַמֶּלַח, וְעַל גַּבֵּי הַכֶּבֶשׁ, וּבְרֹאשׁוֹ שֶׁל מִזְבֵּחַ"},
+      {"oeuvre": "Tamid", "ref": "4:3", "citation": "הָלְכוּ וּנְתָנוּם מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ, וּמְלָחוּם"}
+    ],
+    "note": "Choix de la visite : un tas posé sur la pente, sa taille et sa place dans cette moitié."
+  },
+
+  "melach_rosh": {
+    "he": "מלח שבראש המזבח",
+    "translit": "Mela'h",
+    "resume": "Le troisième lieu du sel, au sommet de l'autel. On y sale ce qui monte directement au feu : le kometz des mena'hot, la levona et la ketoret.",
+    "cotes": [
+      "au sommet de l'autel"
+    ],
+    "sources": [
+      {"oeuvre": "Mena'hot", "ref": "21b", "citation": "בְּרֹאשׁוֹ שֶׁל מִזְבֵּחַ – שֶׁשָּׁם מוֹלְחִין הַקּוֹמֶץ וְהַלְּבוֹנָה וְהַקְּטוֹרֶת"}
+    ],
+    "note": "Choix de la visite : sa place, dans l'ama de passage du sud, à l'est de l'arrivée du kevesh, et sa taille. La source nomme le lieu, pas l'endroit sur le sommet."
   },
 
   "shit": {
@@ -340,17 +475,54 @@
   "maarakhot": {
     "he": "מערכות",
     "translit": "Ma'arakhot",
-    "resume": "Les bûchers dressés sur la surface de l'autel. Selon R. Yossé, trois feux y brûlent, et quatre à Yom Kippour. La fumée en monte droit, en permanence.",
+    "resume": "Les bûchers dressés sur la surface de l'autel. Selon R. Yossé, trois feux y brûlent, et quatre à Yom Kippour. Au centre, le tapoua'h, le monticule de cendre que touchent les bûches de la grande ma'arakha. La fumée en monte droit, en permanence.",
     "cotes": [
       "surface de l'autel : 28 × 28 amot",
       "zone du feu : 24 × 24 amot, après l'ama des keranot et l'ama de passage",
-      "trois feux, quatre à Kippour (R. Yossé ; R. Meir : 4 et 5 ; R. Yehouda : 2 et 3)"
+      "trois feux, quatre à Kippour (R. Yossé ; R. Meir : 4 et 5 ; R. Yehouda : 2 et 3)",
+      "la quatrième de Kippour donne les braises de la ketoret du Kodesh HaKodashim",
+      "tapoua'h : au centre du sommet"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:1", "citation": ""},
       {"oeuvre": "Yoma", "ref": "4:6", "citation": ""},
-      {"oeuvre": "Tamid", "ref": "2:1–5", "citation": ""}
+      {"oeuvre": "Tamid", "ref": "2:1–5", "citation": ""},
+      {"oeuvre": "Tamid", "ref": "2:2", "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:4–7", "citation": ""},
+      {"oeuvre": "Bartenura", "ref": "Yoma 4:6", "citation": "וּמוֹסִיפִין בְּיוֹם הַכִּפּוּרִים עוֹד מַעֲרָכָה אַחַת לִטֹּל מִמֶּנָּה גֶּחָלִים לַקְּטֹרֶת לִפְנַי וְלִפְנִים"}
     ]
+  },
+
+  "tapuach": {
+    "he": "תפוח",
+    "translit": "Tapoua'h",
+    "resume": "Au milieu du sommet, le monticule où l'on monte la cendre ramassée sur l'autel. Il en portait parfois près de trois cents kor. Aux fêtes, on ne le vidait pas : c'était une parure pour l'autel. Les bouts intérieurs des bûches de la grande ma'arakha le touchent.",
+    "cotes": [
+      "au milieu du sommet de l'autel",
+      "4 amot de diamètre et 1,5 de haut dans le modèle (choix)"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "2:2", "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ, פְּעָמִים עָלָיו כִּשְׁלשׁ מֵאוֹת כּוֹר. וּבָרְגָלִים לֹא הָיוּ מְדַשְּׁנִין אוֹתוֹ, מִפְּנֵי שֶׁהוּא נוֹי לַמִּזְבֵּחַ"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:7", "citation": "וְרָאשֵׁי הַגְּזָרִים הַפְּנִימִיִּים הָיוּ נוֹגְעִין בַּדֶּשֶׁן שֶׁבְּאֶמְצַע הַמִּזְבֵּחַ וְהוּא הַנִּקְרָא תַּפּוּחַ"}
+    ],
+    "note": "Choix de la visite : sa taille. Les sources en donnent le volume, pas la forme."
+  },
+
+  "sefalim": {
+    "he": "ספלים",
+    "translit": "Sefalim",
+    "resume": "Au sommet, contre la corne sud-ouest, deux coupes d'argent pour les nessakhim, côte à côte : à l'ouest celle de l'eau, à l'est celle du vin. Chacune est percée d'un bec fin, celui de l'eau plus fin que celui du vin, pour que les deux se vident ensemble. Le liquide coule sur l'autel et descend aux shitin par un trou.",
+    "cotes": [
+      "au sommet, contre la corne sud-ouest",
+      "l'eau à l'ouest, le vin à l'est, côte à côte",
+      "le bec de l'eau plus fin que celui du vin"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "4:9", "citation": "עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ, שְׁנֵי סְפָלִים שֶׁל כֶּסֶף הָיוּ שָׁם"},
+      {"oeuvre": "Rambam Temidin", "ref": "10:7", "citation": "וְשֶׁל מַיִם הָיָה נֶקֶב שֶׁלּוֹ דַּק מִשֶּׁל יַיִן כְּדֵי שֶׁיִּכְלֶה הַמַּיִם עִם הַיַּיִן כְּאֶחָד"},
+      {"oeuvre": "Rashi sur Soucca", "ref": "48b", "citation": "הספלים נתונים אצל הקרן זה לפני זה סמוכין זה לזה אחד לצד מערב ואחד לפנים הימנו דהיינו למזרח"}
+    ],
+    "note": "Retenu : l'argent. Écarté : pour R. Yehouda, elles étaient de chaux, noircies par le vin (Soucca 4:9). Choix de la visite : leur taille, leur profil et le sens des becs."
   },
 
   "kiyor": {

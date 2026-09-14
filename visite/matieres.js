@@ -19,13 +19,13 @@ import { assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
-      MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14;
+      MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil",
   "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Voile"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
-const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE]);
+const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE, ROCHE]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping, tenue à jour par visite.js.
@@ -58,7 +58,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
-                   13: "pierre", 14: "pierre",
+                   13: "pierre", 14: "pierre", 15: "pierre",
                    3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
@@ -89,20 +89,22 @@ const CARREAU = {
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
   // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
   13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
+  // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
+  15: [1.0, 0.60, 0.40, 1.60, 0.70],
 };
 
 const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
   Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: MARBRE_HERODE,
-  Or: METAL, Or_plaque: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
+  Or: METAL, Or_plaque: METAL, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
   Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
   Parokhet_tissee: ETOFFE, Parokhet_figure: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Peau: ETOFFE,
   Eau_Kiyor: EAU,
-  Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ENDUIT, Sel: ENDUIT, Ketoret: ENDUIT,
+  Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE,
 };
 
@@ -625,6 +627,17 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     float g = grain(P * 11.0, empreinteMax() * 11.0), fin = grain(P * 47.0, empreinteMax() * 47.0);
     teinte = vec3(1.0 + (g - 0.5) * 0.20 + (fin - 0.5) * 0.09);
     rugo = (g - 0.5) * 0.12;
+  }
+  else if (uFamille == 15) {                                  // rocher nu : ni joint ni lit
+    // Relief dérivé dans le plan de la face, comme le métal.
+    vec3 t1 = normalize(abs(N.y) > 0.7 ? vec3(1.0, 0.0, 0.0) : cross(N, vec3(0.0, 1.0, 0.0)));
+    vec3 t2 = cross(N, t1);
+    vec3 q = P * 7.0;
+    float e = 0.08;
+    float g = grainNorme(q);
+    pente = ((grainNorme(q + t1 * e) - g) * t1 + (grainNorme(q + t2 * e) - g) * t2) * (0.30 / e);
+    teinte = vec3(0.80 + grainNorme(P * 2.2 + 17.0) * 0.40 + (grainNorme(P * 40.0) - 0.5) * 0.12);
+    rugo = 0.10;
   }
   else if (uFamille == 12) {                                  // gehalim : les braises
     // Le charbon se lit à deux échelles : des morceaux qui se cassent, et le réseau de

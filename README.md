@@ -671,10 +671,8 @@ glTF ne transporte pas — il n'en restait que la couleur de base, uniforme.
 - **Seuils normalisés.** `grainNorme()` : les octaves de `grain` somment à 0,875, ou 0,75
   sans la troisième. Un seuil écrit sur la valeur brute ne coupe donc pas au même endroit
   de la distribution selon le profil — celui de la braise se prend sur [0, 1].
-- **Non fait : le tapoua'h.** Le monticule de cendre au centre du dessus de l'autel
-  (*Tamid* 2:2 ; Rambam *Temidin ouMousafin* 2:7, où les bouts intérieurs des gzirin de la
-  grande ma'arakha le touchent) n'est pas modelé. Le dessus de l'autel reste nu entre les
-  quatre bûchers.
+- **Le tapoua'h** (*Tamid* 2:2 ; Rambam *Temidin ouMousafin* 2:7), non fait ici, est
+  modelé depuis le 14/09.
 
 ### La vigne et la couronne (9/09)
 
@@ -782,6 +780,37 @@ portait aussi. Ils sont corrigés dans le script, la fiche et les trois langues 
   de la parokhet sont de **Rashi** sur *Yoma* 72b ; les fenêtres qui répandent la lumière
   sont Rashi sur *Mena'hot* 86b, pas la guemara ; le pain de proposition fait 10 × 5
   tefa'him, relevé sur la Table de 6.
+
+### Le Mizbea'h relu (14/09)
+
+Relecture de *Middot* 3:1-4, du Rambam *Beit HaBe'hira* 2 et de *Zeva'him* 62b contre le
+blockout. Corrigé dans le script, la fiche §6 et les trois langues de la visite.
+
+- **Les petites rampes étaient inversées.** « אותו שפונין בו לסובב יצא במזרחו של כבש… והפונה
+  ליסוד יוצא למערבו » (Rashi sur *Zeva'him* 62b) : le sovev à l'est, le yessod à l'ouest.
+  Celle du yessod butait sur la face sud nue, le yessod du sud n'étant qu'à l'angle sud-ouest
+  (Rambam 2:10) ; elle part du pied du kevesh et descend en biais jusqu'à l'angle (**CHOIX** du tracé ; un premier palier le long de la face sud laissait une tranchée d'une ama contre l'autel). Celle du sovev
+  monte en biais depuis le sol, à 18 amot de l'autel (**CHOIX** : le deshen est à dix amot du
+  pied, *Tamid* 1:4). Le texte cité n'était pas *Middot* 3:3 mais Rav Yehouda, et l'écart est
+  « מְלֹא נִימָא », pas une ama.
+- **Le kevesh ne touche pas l'autel.** « וּפוֹרֵחַ מִמֶּנָּה אַמָּה עַל הַיְסוֹד וְאַמָּה עַל הַסּוֹבֵב. וַאֲוִיר מְעַט
+  הָיָה מַפְסִיק » (Rambam 2:13) : `Kevesh_raccord`, plein jusqu'au sol, devient `Kevesh_rosh`,
+  une tête en porte-à-faux arrêtée à ¼ d'ama (**CHOIX**).
+- **Les keranot sont creuses** (Rambam 2:8, 2:16) : quatre murets autour d'un vide.
+- **Ajoutés** : la revouva dans la face ouest du kevesh (*Middot* 3:3), les tables de marbre
+  et d'argent à son ouest (*Shekalim* 6:4), le lieu du deshen à son est (*Tamid* 1:4), le
+  tapoua'h au centre du sommet (*Tamid* 2:2). Matières `Cendre` et `Argent`. Places et
+  tailles : **CHOIX**.
+- **Commentaires.** La quatrième ma'arakha de Kippour, chez R. Yossi, donne les braises de la
+  ketoret du Kodesh HaKodashim, pas les membres de la veille (Bartenura sur *Yoma* 4:6) ; et
+  *Yoma* 4:6 n'a pas de tana kama. Le כַּרְכֹּב est *Shemot* 27:5 et *Zeva'him* 62a, pas *Middot* 3:1.
+- **Le sel et les sefalim.** Le sel sur le kevesh, là où l'on sale les membres (*Mena'hot* 21b ;
+  *Tamid* 4:3, « מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ »), celui du sommet pour le kometz, la levona et la
+  ketoret (*Mena'hot* 21b), et les deux coupes d'argent des nessakhim
+  au sommet, contre la corne sud-ouest (*Soucca* 4:9 ; Rashi 48b). Tailles et places : **CHOIX**.
+- **Une fiche par élément.** L'autel n'avait que six fiches pour une vingtaine de pièces : le
+  yessod, les keranot, les petites rampes, la revouva, les tables, le lieu du deshen, les deux sels, le
+  tapoua'h et les sefalim ont maintenant chacun la leur (`visite/concepts.json`).
 
 ## Licence
 
