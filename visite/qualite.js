@@ -21,8 +21,8 @@ const leger = demande === "basse"
 // niveaux de flou de la passe sont alloués par son constructeur, qu'elle serve ou non.
 export const PROFIL = leger
   ? { dprMax: 1.5, echelleMin: 0.75, profondeurLog: false, grainLeger: true,
-      ombres: { taille: 1024, portee: 26 }, occlusion: 6,
+      ombres: { taille: 1024, portee: 26, penombre: false }, occlusion: 6,
       halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, menora: { ombre: false }, figurants: { ombre: false } }
   : { dprMax: 2, echelleMin: 0.7, profondeurLog: true, grainLeger: false,
-      ombres: { taille: 2048, portee: 40, proche: 10 }, occlusion: 12,
+      ombres: { taille: 2048, portee: 40, penombre: true }, occlusion: 12,
       halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, menora: { ombre: true }, figurants: { ombre: true } };
