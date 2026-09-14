@@ -52,7 +52,7 @@
         "citation": "אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת"
       }
     ],
-    "note": "Arbitrage du projet : la façade n'est PAS plaquée d'or. Hérode voulut la dorer, on lui conseilla de laisser la pierre visible car « cela ressemble aux vagues de la mer » (Baba Batra 4a ; Soucca 51b). L'or reste où les sources le mettent : à l'intérieur du Bayit, sur les portes du Heikhal, sur le mur du fond de l'Oulam, sur la vigne et sur la nivreshet d'Hélène. L'appareil : des blocs de dix et de huit amot, « אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת » (Melakhim I 7:10), aux faces sciées lisses dedans et dehors (7:9)."
+    "note": "Retenu : la façade n'est pas dorée. Hérode voulut la plaquer d'or ; on lui conseilla de laisser voir la pierre, qui « ressemble aux vagues de la mer » (Baba Batra 4a ; Soucca 51b). L'or est à l'intérieur (Middot 4:1). Choix de la visite : l'appareil en blocs de dix et de huit amot, sciés lisses, que Melakhim I 7:9-10 décrit pour les constructions de Shlomo."
   },
   "oulam": {
     "he": "אולם",
@@ -86,7 +86,7 @@
         "citation": "אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה"
       }
     ],
-    "note": "Deux points tranchés par le projet. La saillie du rovad n'est chiffrée nulle part : 1 ama est un CHOIX, calé sur le pas des maltera'ot. Et aucune source ne met de colonne devant ce bâtiment — ni Middot 3:7-8 et 4:6-7, ni le Rambam. Le Kessef Mishneh précise que le corps du Heikhal, lui, n'est pas ceinturé de rovadim comme l'Oulam."
+    "note": "Retenu : aucune colonne ni pilastre sur la façade, car aucune source n'en met (Middot 3:7-8 et 4:6-7, Rambam). Choix de la visite : la saillie des bandeaux (rovadim), qu'aucune source ne chiffre, fixée à une ama."
   },
   "douze_marches_oulam": {
     "he": "",
@@ -135,8 +135,7 @@
         "ref": "2:4",
         "citation": "tous les murs qui étaient là étaient hauts, sauf le mur oriental, car le cohen qui brûle la para se tient au sommet du mont des Oliviers, vise, et voit l'ouverture du Heikhal au moment de l'aspersion du sang"
       }
-    ],
-    "note": "Cet axe est-ouest reste dégagé — ni colonne de portique, ni foule en travers. Aucune porte fermée sur cet axe à l'heure du service."
+    ]
   },
   "gefen_zahav": {
     "he": "גפן זהב",
@@ -249,7 +248,7 @@
         "citation": ""
       }
     ],
-    "note": "Les portes sont modélisées ouvertes (`PORTES_HEIKHAL_OUVERTES = True`), battants extérieurs rabattus dans l'embrasure, intérieurs dans le Heikhal, à plat contre le mur est (Middot 4:1). Aucune porte fermée sur l'axe est-ouest à l'heure du service, ni Nikanor ni celles-ci."
+    "note": "Choix de la visite : les quatre portes sont montrées ouvertes, comme pendant le service."
   },
   "taim": {
     "he": "תאים",
@@ -286,7 +285,7 @@
         "citation": "כִּי מִגְרָעוֹת נָתַן לַבַּיִת סָבִיב חוּצָה לְבִלְתִּי אֲחֹז בְּקִירוֹת הַבָּיִת"
       }
     ],
-    "note": "Ce que les sources ne donnent pas et qui est donc CHOIX : la hauteur d'un étage de cellules (les trois remplissent les quarante amot du rez), la longueur des cellules et l'épaisseur des refends."
+    "note": "Choix de la visite : la hauteur de chaque étage de cellules, leur longueur et l'épaisseur des murs qui les séparent — les sources ne les donnent pas."
   },
   "mesiba": {
     "he": "מְסִבָּה",
@@ -315,7 +314,7 @@
         "citation": "וּבְקֶרֶן מִזְרָחִית צְפוֹנִית הָיוּ חֲמִשָּׁה פְתָחִים… וְאֶחָד לַמְּסִבָּה"
       }
     ],
-    "note": "Middot 4:7 bande le couloir au nord (3 amot, mur de 5) et au sud (les 3 amot du Beit Horadat HaMayim), mais à l'ouest les cent amot est-ouest sont pleines : aucune bande n'y est prévue alors que Middot 4:5 y fait passer la messiba. Les trois amot du couloir d'ouest sont donc prises sur les cinq du mur des ta'im, une ama de maçonnerie de chaque côté — CHOIX. La pente n'est donnée nulle part : elle est répartie sur les trois branches. La couverture du couloir non plus : huit amot au-dessus du haut de chaque branche."
+    "note": "Choix de la visite : Middot 4:7 réserve une bande à la rampe au nord et au sud, mais pas à l'ouest, où Middot 4:5 la fait pourtant passer. La visite y creuse le couloir dans l'épaisseur du mur des cellules. La pente et la hauteur du couloir, qu'aucune source ne donne, sont aussi des choix."
   },
   "aliyah": {
     "he": "עֲלִיָּה",
@@ -355,7 +354,7 @@
         "citation": "מִקַּרְקָעִית הַבַּיִת עַד קֵרוּי עֲלִיָּה רִאשׁוֹנָה שְׁלֹשִׁים"
       }
     ],
-    "note": "Arbitrage : l'étage est creusé au-dessus du Heikhal et du Kodesh HaKodashim, pas au-dessus de l'Oulam. C'est là que Middot 4:5 le meuble, et Rashi (sur Divrei HaYamim II 3:4) met les aliyot du Premier Temple au-dessus de la Maison — trente amot jusqu'au plafond du premier étage, quatre-vingt-dix ensuite jusqu'au toit du haut ; Metsoudat David donne la même lecture en second. Radak, lui, préfère mettre les cent vingt amot de Divrei HaYamim II 3:4 sur l'Oulam seul, qui contiendrait les aliyot : lecture minoritaire, et sur le Premier Temple. Au-dessus de l'Oulam, le bâtiment reste plein. Le nombre et la place des loulin ne sont donnés par aucune source : deux trémies de deux amot sur l'axe sont un CHOIX. La messiba qui y mène et les taim qu'elle dessert sont creusés depuis."
+    "note": "Retenu : l'étage est au-dessus du Heikhal et du Kodesh HaKodashim, là où Middot 4:5 le décrit et où Rashi met les étages du Premier Temple (sur Divrei HaYamim II 3:4). Écarté : la lecture de Radak, qui les place dans l'Oulam ; au-dessus de l'Oulam, la visite laisse le bâtiment plein. Choix de la visite : deux trappes de deux amot sur l'axe — aucune source n'en donne le nombre ni la place."
   },
   "kaleh_orev": {
     "he": "כָּלֵה עוֹרֵב",
@@ -377,7 +376,7 @@
         "citation": "בְּחֶשֶׁק שֶׁל בַּרְזֶל גֹּבַהּ אַמָּה חַד כְּמוֹ הַסַּיִף"
       }
     ],
-    "note": "Divergence : R. Yehouda (Middot 4:6) ne compte pas le kaleh orev et donne 4 amot au maake. La visite suit le tana kama."
+    "note": "Retenu : l'avis anonyme de la michna (Middot 4:6) — un garde-corps de trois amot et un kaleh orev d'une ama. Écarté : R. Yehouda, pour qui le kaleh orev ne compte pas dans les cent amot et le garde-corps en fait quatre."
   },
   "maake": {
     "he": "מַעֲקֶה",
@@ -394,7 +393,7 @@
         "citation": ""
       }
     ],
-    "note": "Divergence : R. Yehouda (Middot 4:6) donne 4 amot au maake et ne compte pas le kaleh orev. La visite suit le tana kama — 3 amot de maake, 1 de kaleh orev."
+    "note": "Retenu : l'avis anonyme de la michna (Middot 4:6) — un garde-corps de trois amot et un kaleh orev d'une ama. Écarté : R. Yehouda, pour qui le garde-corps fait quatre amot et le kaleh orev ne compte pas."
   },
   "menora": {
     "he": "מנורה",
@@ -424,7 +423,7 @@
         "citation": ""
       }
     ],
-    "note": "Les branches sont DROITES, en diagonale (Rambam, Rashi), contre les branches courbes des représentations traditionnelles et de l'Arc de Titus. Jamais neuf branches (c'est une 'hanoukia), six ou huit."
+    "note": "Retenu : des branches droites, montant en diagonale, selon le dessin du Rambam et Rashi (sur Exode 25:32). Écarté : les branches arrondies des représentations courantes."
   },
   "shulchan": {
     "he": "שולחן",
@@ -511,7 +510,7 @@
         "citation": ""
       }
     ],
-    "note": "Divergence : Kelim 17:10 mesure cet autel en ama de 5 tefa'him — R. Meir et R. Yehouda d'accord (Mena'hot 97a) —, soit 0,83 × 0,83 × 1,67. La visite garde l'ama de 6. L'autel d'or ne porte pas de flamme mais des braises apportées du grand autel extérieur, étalées pour l'encens (Tamid 6:2) — à Kippour comme chaque jour."
+    "note": "Écarté : Kelim 17:10 mesure cet autel avec une ama plus petite, de cinq tefa'him — R. Meir et R. Yehouda s'accordent sur ce point (Mena'hot 97a) —, soit environ 0,40 × 0,40 × 0,80 m. La visite garde l'ama ordinaire de six tefa'him : 0,48 × 0,48 × 0,96 m."
   },
   "parokhet": {
     "he": "פרוכת",
@@ -567,7 +566,7 @@
         "citation": ""
       }
     ],
-    "note": "Deux parokhot parce que le doute sur l'appartenance de l'ama n'a pas été tranché : on couvre les deux lectures. Étoffe lourde et plate, sans plis de drapé, les quatre couleurs en champs larges, frise de créatures ailées et de lions tissée dans les laines, jamais en or, sans visage humain."
+    "note": "Retenu : les quatre laines sont tissées dans chaque fil (Shekalim 8:5 ; Rashi sur Exode 26:31) — l'étoffe est un pourpre chiné, pas des bandes de couleur. Choix de la visite : une étoffe lourde et plate, sans drapé, et des figures sans visage humain. Non représentée : l'autre image que porte le revers (Rashi sur Yoma 72b)."
   },
   "kodesh_hakodashim": {
     "he": "קודש הקודשים",
@@ -602,8 +601,7 @@
         "ref": "5:3",
         "citation": ""
       }
-    ],
-    "note": "Rien d'autre que l'Arche dans cet espace : obscurité, or pris dans la lueur de la braise, fumée, aucune figure humaine détaillée. Murs, plafond et sol sont plaqués d'or comme au Heikhal ; dans le noir, cet or ne rend que sous la braise."
+    ]
   },
   "even_hashetiya": {
     "he": "אבן השתייה",
@@ -629,7 +627,7 @@
         "citation": ""
       }
     ],
-    "note": "Deux arbitrages. Position : le Rambam (Beit HaBe'hira 4:1) place la pierre « à l'ouest » du Kodesh HaKodashim ; la fiche la garde au centre, Yoma 5:2 ne fixant rien. Et la pierre nue de Yoma 5:2 décrit l'état d'après l'enlèvement de l'Arche : cet état est écarté, puisque la visite montre le Temple à venir, Arche revenue à sa place."
+    "note": "Écarté : le Rambam place la pierre dans la partie ouest du Kodesh HaKodashim (Beit HaBe'hira 4:1) ; la visite la garde au centre, Yoma 5:2 ne précisant pas. La pierre n'est pas nue comme au Second Temple (Yoma 5:2) : la visite montre le Temple à venir, l'Arche posée dessus."
   },
   "aron": {
     "he": "ארון הברית",
@@ -694,7 +692,7 @@
         "citation": "arrivé à l'Arche, il pose la ma'hta entre les deux badim"
       }
     ],
-    "note": "CHOIX DU PROJET : le Temple représenté est celui À VENIR, où l'Arche cachée sous le Temple est revenue à sa place (Yoma 54a ; Rambam Beit HaBe'hira 4:1). La visite ne fabrique pas d'Arche neuve — Jérémie 3:16 dit « on n'en fera pas une autre » — : elle montre celle de Moïse, enfouie par Yoshiyahou et révélée. Divergence à faire valider par un rav. La longueur des badim n'est chiffrée nulle part : les faire courir jusqu'à la parokhet intérieure est un choix du modèle, c'est lui qui rend physiques « entre les badim » et les bosses du rideau ; l'alternative écartée est celle de badim courts et de bosses miraculeuses (Bava Batra 99a)."
+    "note": "Prise de position du projet : la visite montre le Temple à venir, l'Arche à sa place. Ce n'est pas une Arche neuve — « on n'en fera pas une autre » (Jérémie 3:16) —, mais celle de Moïse, que Yoshiyahou cacha (Yoma 52b ; Rambam, Beit HaBe'hira 4:1). Aucune source ne décrit son retour : c'est un choix du projet. Choix de la visite : la longueur des barres, qu'aucune source ne chiffre ; elles vont jusqu'au rideau intérieur et le poussent, comme le décrit Yoma 54a."
   },
   "kaporet": {
     "he": "כפורת",
@@ -749,12 +747,12 @@
         "citation": "comme un homme et sa compagne"
       }
     ],
-    "note": "CHOIX DU PROJET (Temple à venir, Arche à sa place). Pour les keruvim : un garçon et une fille enlacés, bras tendus jusqu'à se toucher, ailes jointes au centre — la visite suit Soucca 5b et Rashi (visages d'enfants) et leur applique l'enlacement de Yoma 54a–b, que la guemara rapporte au Premier Temple ou aux dessins des murs. Divergences écartées : le Rashbam (Ex. 25:18) y voit de grands oiseaux ; les keruvim de Salomon (I Rois 6:23–28), deux figures debout de 10 amot aux ailes de 20, tiennent du Premier Temple et ne sont pas modélisés. Jamais d'ange drapé ni de putto bouclé : c'est l'iconographie chrétienne."
+    "note": "Retenu : des keruvim au visage d'enfant (Soucca 5b ; Rashi), un garçon et une fille enlacés, ailes jointes au-dessus du couvercle. La visite leur applique l'enlacement de Yoma 54a–b, que la guemara rapporte pourtant au Premier Temple ou aux dessins des murs. Écarté : les grands oiseaux du Rashbam (sur Exode 25:18). Non représentés : les keruvim debout de Shlomo, hauts de dix amot (I Rois 6:23–28)."
   },
   "contenu_aron": {
     "he": "",
     "translit": "",
-    "resume": "Quatre objets accompagnent l'Arche : la fiole de manne, en terre, le bâton d'Aharon avec ses amandes et ses fleurs, la fiole d'huile d'onction, et le coffret que les Philistins renvoyèrent avec elle. Attention : la fiche ne les met pas DANS l'Arche mais posés DEVANT elle, entre les badim.",
+    "resume": "Quatre objets accompagnent l'Arche : la fiole de manne, en terre, le bâton d'Aharon avec ses amandes et ses fleurs, la fiole d'huile d'onction, et le coffret que les Philistins renvoyèrent avec elle. La visite ne les met pas dans l'Arche mais devant elle, entre les badim.",
     "cotes": [],
     "sources": [
       {
@@ -788,6 +786,6 @@
         "citation": ""
       }
     ],
-    "note": "CHOIX DU PROJET (Temple à venir, Arche revenue à sa place). Écarté : la tablette portant le Sefer Torah (Bava Batra 14b, avis de R. Yehouda). Et l'Arche reste fermée, jamais ouverte, aucune table de la Loi visible."
+    "note": "Choix de la visite : l'Arche reste fermée ; on ne voit ni les Tables ni le Sefer Torah. Écarté : le Sefer Torah posé à côté de l'Arche, sur le coffret des Philistins ou sur une planche, selon R. Yehouda (Bava Batra 14b)."
   }
 }

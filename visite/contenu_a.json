@@ -14,7 +14,7 @@
       {"oeuvre": "Middot", "ref": "2:2", "citation": ""},
       {"oeuvre": "Middot", "ref": "2:4", "citation": "tous les murs qui étaient là étaient hauts, sauf le mur oriental, car le cohen qui brûle la para se tient au sommet du mont des Oliviers, vise, et voit l'ouverture du Heikhal au moment de l'aspersion du sang."}
     ],
-    "note": "La ligne de mire mont des Oliviers → porte est → Nikanor → ouverture de l'Oulam → porte du Heikhal est alignée sur l'axe est-ouest et reste dégagée, sans colonne de portique ni foule."
+    "note": "Choix de la visite : rien ne coupe la ligne de mire qui va du mont des Oliviers à l'entrée du Heikhal — ni colonne, ni porte fermée, ni foule sur l'axe est-ouest."
   },
 
   "sol_har_habayit": {
@@ -28,8 +28,7 @@
     "sources": [
       {"oeuvre": "Middot", "ref": "2:1", "citation": ""},
       {"oeuvre": "Middot", "ref": "2:2", "citation": ""}
-    ],
-    "note": "L'esplanade hérodienne réelle est plus grande que ce carré : la Mishna décrit l'enceinte sacrée, pas la plateforme d'Hérode."
+    ]
   },
 
   "soreg": {
@@ -54,7 +53,7 @@
     "sources": [
       {"oeuvre": "Middot", "ref": "2:3", "citation": ""}
     ],
-    "note": "Contrainte de modélisation : les corps de porte débordent de 12 amot des murs, et la Lishkat HaEtz se pose en second rang derrière eux ; les 10 amot du 'Heil se mesurent depuis sa face, la plus saillante, sinon le Soreg leur passe au travers."
+    "note": "Choix de la visite : les dix amot du 'Heil sont comptées depuis les avancées des portes de l'Azara, la partie la plus saillante du mur. Comptées depuis le mur lui-même, le Soreg traverserait ces avancées."
   },
 
   "portiques": {
@@ -67,7 +66,7 @@
       {"oeuvre": "Rashi sur Pesachim", "ref": "13b", "citation": "האיצטבא סביב סביב מקפת ובתוך אותו הקף עוד אחר"},
       {"oeuvre": "Pesachim", "ref": "13b", "citation": "על גג האיצטבא"}
     ],
-    "note": "Aucune colonne ne se dresse devant les cinq portes du Har HaBayit, et aucune ne coupe la ligne de mire est-ouest, que le mur est bas existe précisément pour dégager."
+    "note": "Choix de la visite : aucune colonne devant les cinq portes du Har HaBayit, ni sur l'axe est-ouest, pour garder dégagée la vue que le mur est bas doit laisser passer (Middot 2:4)."
   },
 
   "ezrat_nashim": {
@@ -107,15 +106,14 @@
   "lishkat_haetzim": {
     "he": "לשכת העצים",
     "translit": "Lishkat HaEtzim",
-    "resume": "Chambre d'angle nord-est de l'Ezrat Nashim, sans toit, de quarante amot de côté. On y trie le bois, et les Cohanim inaptes au service y travaillent.",
+    "resume": "Chambre d'angle nord-est de l'Ezrat Nashim, sans toit, de quarante amot de côté. On y trie le bois, et les Cohanim inaptes au service y travaillent. À ne pas confondre avec la Lishkat HaEtz, au nord de l'Azara.",
     "cotes": [
       "40 × 40 amot, sans toit",
       "angle nord-est de l'Ezrat Nashim"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:5", "citation": ""}
-    ],
-    "note": "À ne pas confondre avec la Lishkat HaEtz du mur nord de l'Azara (Middot 5:4 ; au nord selon la girsa de Yoma 19a, que suit la visite), dont R. Eliézer ben Yaakov dit avoir oublié l'usage et qu'Abba Shaul identifie à la chambre du Cohen Gadol."
+    ]
   },
 
   "lishkat_hametzoraim": {
@@ -186,7 +184,7 @@
       {"oeuvre": "Middot", "ref": "2:6", "citation": ""},
       {"oeuvre": "Soucca", "ref": "5:5", "citation": ""}
     ],
-    "note": "Tranché : la porte est ouverte, battants rabattus dans l'embrasure. Fermée, Nikanor bouche la ligne de mire que le mur est bas existe précisément pour dégager, et coupe en deux le parcours d'est en ouest."
+    "note": "Choix de la visite : la porte est montrée ouverte, battants rabattus dans l'embrasure, comme pendant le service. Fermée, elle couperait la ligne de mire que le mur est bas doit laisser passer."
   },
 
   "azara": {
@@ -203,7 +201,7 @@
       {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:13–15", "citation": ""}
     ],
-    "note": "Le découpage nord-sud est celui du Rambam : la Mishna donne « le kevesh et le Mizbea'h : 62 » puis 8 / 24 / 4 / 4 / 8, et laisse 25 amot de reste ; le Rambam les partage en 12,5 + 12,5 et fusionne les 4 + 4 en « place des tables : 8 »."
+    "note": "Retenu : la répartition du Rambam (Beit HaBe'hira 5:13–15). Du nord au sud, Middot 5:2 laisse 25 amot sans les chiffrer, entre la rampe et le mur d'un côté, pour les piliers de l'autre ; le Rambam en donne 12,5 à chacun."
   },
 
   "portes_azara": {
@@ -223,7 +221,7 @@
       {"oeuvre": "Shekalim", "ref": "6:3", "citation": ""},
       {"oeuvre": "Yoma", "ref": "19a", "citation": ""}
     ],
-    "note": "Deux points tranchés. Le nombre : Abba Yossi ben 'Hanan en compte 13 (Middot 2:6, dont la liste citée ajoute Sha'ar HaElyon au sud ; Shekalim 6:3), la 3D en retient 7. Le sens du comptage : « סְמוּכִים לַמַּעֲרָב » veut dire qu'on part de la plus occidentale — Bartenura, et Tosfot Yom Tov sur Middot 5:3 qui fait de cette formule le marqueur du sens. Aucune source ne donne de distance entre les portes : seul l'ordre est halakhique. Girsa : Yoma 19a lit au sud Sha'ar HaDelaka et Sha'ar HaKorban au lieu de HaBekhorot, sans changer le rang de Sha'ar HaMayim."
+    "note": "Retenu : sept portes, selon Middot 1:4. Écarté : les treize portes d'Abba Yossi ben 'Hanan (Middot 2:6). Les noms suivent Middot 1:4 ; au sud, Yoma 19a lit Sha'ar HaDelaka et Sha'ar HaKorban, sans changer la place de Sha'ar HaMayim. Choix de la visite : l'écartement des portes, qu'aucune source ne donne — seul leur ordre est connu."
   },
 
   "doukhan": {
@@ -243,7 +241,7 @@
       {"oeuvre": "Arakhin", "ref": "2:3", "citation": ""},
       {"oeuvre": "Tamid", "ref": "7:3", "citation": ""}
     ],
-    "note": "Une rangée de sept Léviim est une erreur — le minimum est douze. Les ketanim chantent sans instrument (Arakhin 2:6)."
+    "note": "Retenu : l'avis de R. Eliézer ben Yaakov (Middot 2:6) — une marche d'une ama sépare l'Ezrat Israël de l'Ezrat Cohanim, et le Doukhan est posé dessus. Selon le premier avis de la michna, les deux cours ne sont séparées que par une rangée de saillies (rashei pispasin)."
   },
 
   "ezrat_israel": {
@@ -261,7 +259,7 @@
       {"oeuvre": "Middot", "ref": "2:6", "citation": ""},
       {"oeuvre": "Kelim", "ref": "1:8", "citation": ""}
     ],
-    "note": "L'Ezrat Israël ne fait que 11 × 135 : le débordement du peuple se fait dans l'Ezrat Nashim (135 × 135), puis sur le Har HaBayit."
+    "note": "Retenu : une marche d'une ama entre l'Ezrat Israël et l'Ezrat Cohanim, qui porte le Doukhan, selon R. Eliézer ben Yaakov (Middot 2:6). Écarté : la simple rangée de saillies (rashei pispasin) du premier avis de la michna."
   },
 
   "mizbeach": {
@@ -286,7 +284,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:15", "citation": "מכותל צפוני של עזרה עד כותל המזבח שהוא רוחב ששים ומחצה"},
       {"oeuvre": "Zeva'him", "ref": "59a", "citation": "צפונה"}
     ],
-    "note": "Décalage sud tranché contre l'avis courant. R. Eliézer ben Yaakov (Zeva'him 59a) veut le « nord » halakhique — lieu d'abattage des kodshei kodashim — libre de tout, même de l'autel, ce qui pousse l'autel vers le sud. L'avis contraire de R. Yehouda (Zeva'him 58b, « מזבח ממוצע ועומד באמצע העזרה », autel centré face à l'ouverture du Heikhal) est écarté ; c'est pourtant celui que reproduisent beaucoup de représentations et de maquettes populaires. Conséquence : l'ouverture du Heikhal tombe dans le tiers nord de l'autel. Autres détails : le yessod ne fait le tour complet qu'au nord et à l'ouest, à l'est et au sud il n'y a qu'une ama à chaque angle (Middot 3:1) ; deux shitin à l'angle sud-ouest recueillent le sang et le vin. Rendu : masse blanche presque monolithique, noircie au sommet par le feu — jamais d'escalier, c'est une rampe."
+    "note": "Retenu : l'autel décalé vers le sud, son centre à neuf amot au sud de l'axe du Heikhal. C'est ce que donnent les cotes de Middot 5:2 lues par le Rambam, et l'avis de R. Eliézer ben Yaakov, qui veut le « nord » — où l'on abat les offrandes les plus saintes — libre de tout, même de l'autel (Zeva'him 59a). Écarté : l'autel centré face au Heikhal de R. Yehouda (Zeva'him 58b), que suivent beaucoup de maquettes."
   },
 
   "hout_hasikra": {
@@ -314,8 +312,7 @@
       {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
       {"oeuvre": "Shemot", "ref": "20:23", "citation": ""},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2", "citation": ""}
-    ],
-    "note": "Erreur fréquente des représentations : le Mizbea'h n'a pas d'escalier, c'est une rampe."
+    ]
   },
 
   "shit": {
@@ -337,7 +334,7 @@
       {"oeuvre": "Soucca", "ref": "49a", "citation": "שִׁיתִּין מְחוֹלָלִין וְיוֹרְדִין עַד תְּהוֹם"},
       {"oeuvre": "Tiferet Israël", "ref": "Middot 3:3", "citation": "ויורדים משם בסולם אל החלל הקטן שתחת היסוד"}
     ],
-    "note": "Deux lectures. Bartenura et le Rambam font du shit le creux des nessakhim : c'est ce que le modèle construit. Le Tiferet Israël y voit le petit creux sous le yessod où coule le sang des deux trous de Middot 3:2, dégagé vers le Kidron. Non modélisés : ces deux trous et l'amah qui emporte le sang (Middot 3:2 ; Yoma 5:6), les deux sefalim du sommet (Soucca 4:9), le lul où les jeunes cohanim descendaient tous les soixante-dix ans ramasser le vin figé (Soucca 49a). Place de la dalle, cotes du creux, échelle et conduit sont des choix du modèle."
+    "note": "Retenu : le shit est le creux sous l'autel où descendent le vin et l'eau des libations, comme le lisent Bartenura et le Rambam (Middot 3:3). Écarté : le Tiferet Israël, pour qui c'est le creux où s'écoule le sang. Non représentés : les deux trous du sang et le canal qui l'emporte (Middot 3:2), les deux coupes du sommet de l'autel (Soucca 4:9). Choix de la visite : la place de la dalle, les dimensions du creux, l'échelle et le conduit."
   },
 
   "maarakhot": {
@@ -388,8 +385,7 @@
       {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
       {"oeuvre": "Tamid", "ref": "3:5", "citation": ""},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:13–15", "citation": ""}
-    ],
-    "note": "Le rectangle de 60,5 amot (nord-sud) sur 76 (est-ouest) qui va du mur nord au bord nord de l'autel est le « nord » halakhique, lieu d'abattage des kodshei kodashim (Rambam Beit HaBe'hira 5:15–16). Un canal (amma) traverse l'Azara pour évacuer l'eau et le sang vers le Kidron."
+    ]
   },
 
   "tabaot": {
@@ -405,7 +401,7 @@
       {"oeuvre": "Middot", "ref": "3:5", "citation": "six rangées de quatre, et certains disent quatre rangées de six"},
       {"oeuvre": "Middot", "ref": "5:2", "citation": ""}
     ],
-    "note": "Divergence dans la Mishna elle-même sur la disposition : 6 × 4 ou 4 × 6."
+    "note": "Middot 3:5 donne deux dispositions : six rangées de quatre anneaux, ou quatre rangées de six. La visite pose quatre rangées de six."
   },
 
   "lishkat_hagazit": {
@@ -425,7 +421,7 @@
       {"oeuvre": "Yoma", "ref": "19a", "citation": ""},
       {"oeuvre": "Middot", "ref": "5:4", "citation": ""}
     ],
-    "note": "Emplacement tranché au nord, selon la girsa de Yoma 19a et celle du Rambam ; le texte imprimé de Middot 5:4 la met au sud. Tosfot Yom Tov sur Middot 5:3 préfère lui aussi le nord (« ונראה בעיני שגירסת הספר נשתבשה »). L'ouverture du hol à l'est est un choix du modèle : la Lishkat HaEtz ferme le nord à une ama. Les trois gradins aussi — seize amot de salle ne tiennent pas soixante et onze sièges sur un rang."
+    "note": "Retenu : au nord de l'Azara, selon la version de Yoma 19a, que suivent le Rambam et Tosfot Yom Tov. Écarté : le texte imprimé de Middot 5:4, qui la met au sud. Choix de la visite : l'ouverture côté profane, à l'est, et les trois gradins du Sanhédrin — soixante et onze sièges ne tiennent pas sur un seul rang dans seize amot."
   },
 
   "lishkat_hagola": {
@@ -442,7 +438,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": ""}
     ],
-    "note": "Emplacement tranché au nord avec HaGazit et HaEtz, selon la girsa de Yoma 19a et celle du Rambam ; le texte imprimé de Middot 5:4 met les trois au sud. Elle est bâtie sur la terrasse du 'Heil et ouverte sur le sacré : son intérieur est alors sanctifié, son toit ne l'est pas (Tosfot Yom Tov sur Middot 5:3, d'après Maaser Sheni 3:8) — sans conséquence pour un puits. Le petah qui perce le mur n'est pas une huitième porte de l'Azara : Middot 1:4 en compte sept, et ne compte que des she'arim. La margelle et la roue sur sa potence sont dessinées par le modèle : la michna n'en donne pas la forme."
+    "note": "Retenu : au nord, avec la Lishkat HaGazit et la Lishkat HaEtz, selon la version de Yoma 19a que suit le Rambam ; le texte imprimé de Middot 5:4 met les trois au sud. Son ouverture dans le mur n'est pas une huitième porte de l'Azara : Middot 1:4 ne compte que les portes. Choix de la visite : la margelle et la roue du puits."
   },
 
   "lishkat_haetz": {
@@ -459,7 +455,7 @@
       {"oeuvre": "Middot", "ref": "5:4", "citation": "אָמַר רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב, שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""}
     ],
-    "note": "Le second rang la met entière hors du mur, sur la terrasse du 'Heil, alors que Middot 5:3 donne les six lishkot comme étant « dans l'Azara » : dans la cour, il ne reste que 17,5 amot entre le mur nord et le socle du Sanctuaire, pas de quoi loger un corps derrière un autre. Sa porte, faute d'usage connu, est un choix du modèle. Selon Abba Shaul (Middot 5:4) c'est la chambre du Cohen Gadol, et le Rambam (Beit HaBe'hira 5:17) l'identifie à la Lishkat Parhedrin : le modèle ne suit pas cette identification et tient les deux chambres pour distinctes."
+    "note": "Choix de la visite : la chambre est posée derrière les deux autres, hors du mur, faute de place dans la cour — il ne reste que 17,5 amot entre le mur nord et le Bâtiment —, alors que Middot 5:3 range les six chambres « dans l'Azara ». Sa porte est aussi un choix. Écarté : le Rambam (Beit HaBe'hira 5:17) l'identifie à la Lishkat Parhedrin, la chambre du Cohen Gadol ; la visite en fait deux chambres distinctes."
   },
 
   "lishkat_hamelach": {
@@ -476,7 +472,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": "שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה"}
     ],
-    "note": "Emplacement tranché au sud avec HaParva et HaMedi'hin, selon la girsa de Yoma 19a et celle du Rambam ; le texte imprimé de Middot 5:3 met les trois au nord. L'ordre est-ouest suit Tosfot Yom Tov, qui le tire de l'absence de « semoukhin lamaarav » et l'appuie sur le schéma du commentaire du Rambam. La place des trois lishkot le long du mur est un choix : aucune source n'en donne. La porte à l'est aussi, et les tas de sel."
+    "note": "Retenu : au sud, avec la Lishkat HaParva et la Lishkat HaMedi'hin, selon la version de Yoma 19a que suit le Rambam ; le texte imprimé de Middot 5:3 met les trois au nord. Leur ordre d'est en ouest suit Tosfot Yom Tov. Choix de la visite : leur place le long du mur, la porte à l'est et les tas de sel."
   },
 
   "lishkat_haparva": {
@@ -496,7 +492,7 @@
       {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""}
     ],
-    "note": "C'est cette chambre qui décide de l'emplacement des trois du sud, dans l'Azara et non sur la terrasse du 'Heil : la Mishna dit son toit « dans le sacré », et le toit d'un bâtiment élevé dans le hol n'est pas sanctifié même quand son intérieur l'est (Tosfot Yom Tov sur Middot 5:3, d'après Maaser Sheni 3:8). Dedans, les peaux empilées sur une banquette et un tas de sel : disposition choisie par le modèle. Le drap de lin et les marches de la cuve ne sont pas modélisés."
+    "note": "Retenu : les trois chambres du sud sont dans l'Azara, et non sur la terrasse du 'Heil, car la Mishna place les bains du Cohen Gadol « dans le sacré, sur la Parva » (Yoma 3:3) ; or le toit d'un bâtiment élevé hors de l'enceinte n'est pas sanctifié (Tosfot Yom Tov sur Middot 5:3). Choix de la visite : les peaux empilées sur une banquette et le tas de sel. Non représentés : le drap de lin et les marches du bain."
   },
 
   "lishkat_hamedichin": {
@@ -513,7 +509,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": ""},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": "שֶׁלֹּא יִתָּכֵן… שֶׁהַכֹּהֵן גָּדוֹל יַעֲלֶה לְבֵית טְבִילָתוֹ דֶּרֶךְ מָקוֹם שֶׁמְּדִיחִין בּוֹ"}
     ],
-    "note": "Tosfot Yom Tov donne à cette chambre deux ouvertures sur l'Azara — celle du travail, et celle de la mesiba, du côté de la Parva, pour que le Cohen Gadol ne monte pas au bain par l'endroit où l'on rince les entrailles. Le modèle n'en représente qu'une, la mesiba tenant lieu de seconde. Sa forme ronde est un choix : mesiba est une vis. Sa tour reste pleine : entre la Parva et la Medi'hin, l'écart ne loge pas encore la vis. L'auge et les deux tables de marbre sont des choix."
+    "note": "Écarté : Tosfot Yom Tov donne à cette chambre deux ouvertures sur l'Azara — l'une pour le travail, l'autre pour que le Cohen Gadol monte au bain sans passer par où l'on rince les entrailles. La visite n'en perce qu'une, l'entrée de la montée tenant lieu de seconde. Choix de la visite : la forme ronde de la montée (mesiba veut dire « vis »), l'auge et les deux tables de marbre."
   },
 
   "beit_hamoked": {
@@ -536,7 +532,7 @@
       {"oeuvre": "Middot", "ref": "1:9", "citation": "וְטַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ"},
       {"oeuvre": "Tamid", "ref": "1:1", "citation": ""}
     ],
-    "note": "Non modélisée, écartée exprès : la כִּפָּה (la coupole) de Middot 1:8 — aucune coupole n'est représentée. La descente du kiton nord-ouest est le puits de la mesiba qui passe sous la bira (Middot 1:9). Les cotes des quatre chambres, les vingt degrés pris hors de la salle et le mobilier des chambres sont des choix du modèle."
+    "note": "Écarté : la kippa de Middot 1:8, souvent comprise comme une coupole — la visite n'en montre pas. Choix de la visite : les dimensions des quatre petites chambres, l'emplacement des vingt degrés et le mobilier."
   },
 
   "mesiba_bira": {
@@ -558,7 +554,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "8:7", "citation": "שֶׁהַמְּחִלּוֹת הַפְּתוּחוֹת לְהַר הַבַּיִת לֹא נִתְקַדְּשׁוּ"},
       {"oeuvre": "Tamid", "ref": "27b", "citation": "מְחִילּוֹת לֹא נִתְקַדְּשׁוּ"}
     ],
-    "note": "Avis écarté : R. Eliézer ben Yaakov fait passer la mesiba sous le 'Heil et sortir le cohen par la porte Tadi (Middot 1:9) ; la halakha n'est pas comme lui (Rambam et Bartenura ad loc.). Le tracé, la section, la forme de la descente et l'écart des lampes ne sont écrits nulle part : ce sont des choix du modèle."
+    "note": "Écarté : l'avis de R. Eliézer ben Yaakov, qui fait passer le tunnel sous le 'Heil et sortir le cohen par la porte Tadi (Middot 1:9) ; le Rambam et Bartenura ne le retiennent pas. Choix de la visite : le tracé, la largeur et la hauteur du tunnel, la forme de la descente et l'espacement des lampes."
   },
 
   "beit_hatevila": {
@@ -576,7 +572,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:11", "citation": ""},
       {"oeuvre": "Rambam Mikvaot", "ref": "4:1", "citation": "אַמָּה עַל אַמָּה בְּרוּם שָׁלֹשׁ אַמּוֹת"}
     ],
-    "note": "Aucune source ne situe ni ne mesure le Beit HaTevila : sa place, ses cotes et les formes du mikvé, du foyer et du beit kissé sont des choix du modèle. Le mikvé contient bien plus que les quarante séa requises."
+    "note": "Choix de la visite : aucune source ne situe ni ne mesure cette salle. Sa place, ses dimensions et la forme du bain, du foyer et des toilettes sont dessinées pour la visite."
   },
 
   "shaar_hamayim": {
@@ -594,8 +590,7 @@
       {"oeuvre": "Middot", "ref": "1:4", "citation": ""},
       {"oeuvre": "Shekalim", "ref": "6:3", "citation": ""},
       {"oeuvre": "Yoma", "ref": "19a", "citation": ""}
-    ],
-    "note": "Girsa : Yoma 19a lit au sud « שַׁעַר הַדְלָקָה, שֵׁנִי לוֹ שַׁעַר הַקָּרְבָּן, שְׁלִישִׁי לוֹ שַׁעַר הַמַּיִם » — Sha'ar HaKorban au lieu de HaBekhorot. Le rang de Sha'ar HaMayim, lui, ne change pas."
+    ]
   },
 
   "beit_avtinas": {
@@ -622,7 +617,7 @@
       {"oeuvre": "Yoma", "ref": "1:5", "citation": ""},
       {"oeuvre": "Yoma", "ref": "3:3", "citation": ""}
     ],
-    "note": "« עַל גַּבֵּי » est pris au mot : chambre creuse posée sur la terrasse du corps de porte. Middot 1:1 et Tamid 1:1 en font une עלייה, un étage, ce qui exige donc un rez-de-chaussée. Seule la makhteshet est nommée par les sources ; la table, la balance, les bols, leurs formes et leurs matières sont des choix du modèle. Aucune source ne dit de quoi était fait le mortier : le bronze le tient pour un kli sharet, que le Rambam veut de métal (Beit HaBe'hira 1:18)."
+    "note": "Retenu : « au-dessus de Sha'ar HaMayim » (Yerushalmi Yoma 1:5) est pris au mot — la chambre est un étage (Tamid 1:1) posé sur le corps de la porte. Choix de la visite : la table, la balance et les bols, car les sources ne nomment que le mortier. Aucune source ne dit de quoi était fait ce mortier ; la visite le fait en bronze, le Rambam voulant de métal les ustensiles du service (Beit HaBe'hira 1:18)."
   },
 
   "shaar_hanitzotz": {
@@ -639,7 +634,7 @@
       {"oeuvre": "Middot", "ref": "1:5", "citation": ""},
       {"oeuvre": "Middot", "ref": "2:6", "citation": "וּלְעֻמָּתָן בַּצָּפוֹן סְמוּכִים לַמַּעֲרָב"}
     ],
-    "note": "Aucune source ne donne de distance entre les portes : la répartition régulière du blockout est un choix, seul l'ordre est halakhique. Les degrés pris dans le corps de porte aussi : dix amot séparent l'Azara de la terrasse du 'Heil, et aucune source ne dit où on les monte."
+    "note": "Choix de la visite : les sources donnent l'ordre des portes, pas leur écartement ; elles sont réparties régulièrement. Rien ne dit non plus où l'on monte de la terrasse du 'Heil au niveau de l'Azara : la visite place ces degrés dans le corps de la porte."
   },
 
   "beit_hanitzotz": {
@@ -663,7 +658,7 @@
       {"oeuvre": "Yoma", "ref": "19a", "citation": "וְלֹא יָדַעְנָא"},
       {"oeuvre": "Middot", "ref": "5:4", "citation": ""}
     ],
-    "note": "Question laissée ouverte par les sources : Yoma 19a ne sait pas laquelle des deux lishkot du Cohen Gadol est au nord et laquelle au sud, et son mistabra mettrait Parhedrin au sud et Avtinas au nord — raisonnement aussitôt repoussé. Selon Abba Shaul (Middot 5:4), la chambre du Cohen Gadol est la Lishkat HaEtz."
+    "note": "Question ouverte : Yoma 19a ne sait pas laquelle des chambres du Cohen Gadol est au nord et laquelle au sud. La visite met la Lishkat Parhedrin au sud, contre la chambre d'Avtinas, que le Talmud de Jérusalem dit « au-dessus de Sha'ar HaMayim, et voisine de sa chambre » (Yerushalmi Yoma 1:5)."
   },
 
   "lishkat_osei_chavitin": {
@@ -680,7 +675,7 @@
       {"oeuvre": "Menachot", "ref": "11:3", "citation": "חֲבִתֵּי כֹהֵן גָּדוֹל, לִישָׁתָן וַעֲרִיכָתָן וַאֲפִיָּתָן בִּפְנִים"},
       {"oeuvre": "Menachot", "ref": "5:8", "citation": "הַמַּרְחֶשֶׁת יֶשׁ לָהּ כִּסּוּי, וְהַמַּחֲבַת אֵין לָהּ כִּסּוּי"}
     ],
-    "note": "Middot 1:4 ne dit pas laquelle des deux est au sud. La disposition de la table, du foyer et de la ma'havat est un choix du modèle."
+    "note": "Choix de la visite : Middot 1:4 ne précise pas laquelle des deux chambres qui encadrent Nikanor est au sud ; la visite y met celle des 'havitin. La disposition de la table, du foyer et de la poêle est aussi un choix."
   },
 
   "lishkat_pinchas": {
@@ -697,7 +692,7 @@
       {"oeuvre": "Shekalim", "ref": "5:1", "citation": "וּפִנְחָס עַל הַמַּלְבּוּשׁ"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:8", "citation": "וְשִׁשָּׁה וְתִשְׁעִים חַלּוֹן הָיוּ בַּמִּקְדָּשׁ לְהָנִיחַ בָּהֶן הַבְּגָדִים… וְכֻלָּן סְתוּמוֹת"}
     ],
-    "note": "Middot 1:4 ne dit pas laquelle des deux est au nord. Le Rambam ne dit pas où étaient les quatre-vingt-seize chalonot : le modèle les met chez Pin'has, sur le nom de la chambre ; leur disposition sur les murs est un choix."
+    "note": "Choix de la visite : Middot 1:4 ne précise pas laquelle des deux chambres qui encadrent Nikanor est au nord ; la visite y met celle de Pin'has. Le Rambam ne dit pas où étaient les quatre-vingt-seize placards des vêtements : la visite les range ici, chez celui qui en a la charge."
   },
 
   "portes_houlda": {
@@ -706,7 +701,7 @@
     "resume": "Les deux portes du sud, « qui servaient à l'entrée et à la sortie » : c'est par elles que le peuple monte au Har HaBayit et en redescend. La michna ne dit pas où elles s'ouvrent dans le mur, et Middot 2:3 donne à toutes les portes 20 amot de haut sur 10 de large. Comme toute porte du Temple hormis Tadi, elles sont couvertes d'un linteau et non d'un arc, et chacun de leurs jambages porte une timora.",
     "cotes": [
       "deux portes, au sud",
-      "20 amot de haut × 10 de large (Middot 2:3) ; leur abscisse : CHOIX",
+      "20 amot de haut × 10 de large (Middot 2:3) ; leur place le long du mur : choix de la visite",
       "un palmier par jambage, comme à toutes les portes"
     ],
     "sources": [
@@ -723,13 +718,13 @@
     "cotes": [
       "au nord, hors service",
       "deux pierres penchées au lieu d'un linteau",
-      "10 × 20 amot ; sa pente et sa portée au sommet sont un CHOIX"
+      "10 × 20 amot ; sa pente et sa portée au sommet sont un choix de la visite"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "Tadi au nord ne servait à rien."},
       {"oeuvre": "Middot", "ref": "2:3", "citation": "sauf la porte de Tadi, où il y avait deux pierres penchées l'une sur l'autre."}
     ],
-    "note": "Ce n'est pas un arc : la michna dit deux pierres, et elles se rejoignent en angle."
+    "note": "Retenu : deux pierres penchées qui se rejoignent en pointe, comme le dit la michna (Middot 2:3) — pas un arc. Choix de la visite : leur pente et leur portée."
   },
 
   "shaar_kiponus": {

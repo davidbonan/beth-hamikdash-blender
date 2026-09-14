@@ -52,7 +52,7 @@
         "citation": "אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת"
       }
     ],
-    "note": "Project decision: the façade is NOT gold-plated. Herod wanted to gild it, but was advised to leave the stone visible because “it resembles the waves of the sea” (Bava Batra 4a; Sukkah 51b). The gold stays where the sources put it: inside the Bayit, on the doors of the Heikhal, on the back wall of the Ulam, on the vine and on Helena's nivreshet. The masonry: blocks of ten and eight amot, “אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת” (I Kings 7:10), their faces sawn smooth inside and out (7:9)."
+    "note": "Adopted: the façade is not gilded. Herod wanted to overlay it with gold; he was advised to leave the stone visible, as it “looks like the waves of the sea” (Bava Batra 4a; Sukkah 51b). The gold is inside (Middot 4:1). Tour's choice: masonry of blocks of ten and eight amot, sawn smooth, which I Kings 7:9-10 describes for Shlomo's buildings."
   },
   "oulam": {
     "nom": "Ulam",
@@ -86,7 +86,7 @@
         "citation": "אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה"
       }
     ],
-    "note": "Two points settled by the project. The projection of the rovad is nowhere given a figure: 1 ama is a CHOICE, set to the spacing of the maltera'ot. And no source puts a column in front of this building — neither Middot 3:7-8 and 4:6-7, nor the Rambam. The Kessef Mishneh specifies that the body of the Heikhal, unlike the Ulam, is not girded with rovadim."
+    "note": "Adopted: no column or pilaster on the façade, since no source places any (Middot 3:7-8 and 4:6-7, Rambam). Tour's choice: the projection of the bands (rovadim), which no source gives, set at one ama."
   },
   "douze_marches_oulam": {
     "nom": "The Twelve Steps of the Ulam",
@@ -134,8 +134,7 @@
         "ref": "2:4",
         "citation": "all the walls there were high, except the eastern wall, because the Kohen who burns the para stands atop the Mount of Olives, takes aim, and sees the opening of the Heikhal at the moment of the sprinkling of the blood"
       }
-    ],
-    "note": "This east-west axis remains clear — no portico column, no crowd across it. No closed door on this axis at the hour of the service."
+    ]
   },
   "gefen_zahav": {
     "nom": "Gefen Zahav (the Golden Vine)",
@@ -244,7 +243,7 @@
         "citation": ""
       }
     ],
-    "note": "The doors are modeled open (`PORTES_HEIKHAL_OUVERTES = True`), outer leaves folded back into the embrasure, inner leaves into the Heikhal, flat against the east wall (Middot 4:1). No closed door on the east-west axis at the hour of the service, neither Nikanor nor these."
+    "note": "Tour's choice: the four doors are shown open, as during the service."
   },
   "taim": {
     "nom": "Ta'im (the Cells)",
@@ -281,7 +280,7 @@
         "citation": "כִּי מִגְרָעוֹת נָתַן לַבַּיִת סָבִיב חוּצָה לְבִלְתִּי אֲחֹז בְּקִירוֹת הַבָּיִת"
       }
     ],
-    "note": "What the sources do not give, and is therefore a CHOICE: the height of a floor of cells (the three fill the forty amot of the ground floor), the length of the cells, and the thickness of the partition walls."
+    "note": "Tour's choice: the height of each story of cells, their length and the thickness of the walls between them — the sources do not give them."
   },
   "mesiba": {
     "nom": "Messiba (the Ramp)",
@@ -310,7 +309,7 @@
         "citation": "וּבְקֶרֶן מִזְרָחִית צְפוֹנִית הָיוּ חֲמִשָּׁה פְתָחִים… וְאֶחָד לַמְּסִבָּה"
       }
     ],
-    "note": "Middot 4:7 bands the corridor to the north (3 amot, wall of 5) and to the south (the 3 amot of the Beit Horadat HaMayim), but to the west the hundred east-west amot are solid: no strip is provided there, even though Middot 4:5 routes the Messiba through it. The three amot of the west corridor are therefore taken from the five of the wall of the ta'im, one ama of masonry on each side — CHOICE. The slope is nowhere given: it is spread over the three branches. Nor is the covering of the corridor: eight amot above the top of each branch."
+    "note": "Tour's choice: Middot 4:7 reserves a strip for the ramp on the north and on the south, but not on the west, where Middot 4:5 nonetheless runs it. The tour cuts the corridor into the thickness of the cell wall there. The slope and height of the corridor, which no source gives, are also choices."
   },
   "aliyah": {
     "nom": "Aliyah (the Upper Floor)",
@@ -350,7 +349,7 @@
         "citation": "מִקַּרְקָעִית הַבַּיִת עַד קֵרוּי עֲלִיָּה רִאשׁוֹנָה שְׁלֹשִׁים"
       }
     ],
-    "note": "Decision: the upper floor is hollowed out above the Heikhal and the Kodesh HaKodashim, not above the Ulam. This is where Middot 4:5 furnishes it, and Rashi (on II Chronicles 3:4) puts the aliyot of the First Temple above the House — thirty amot up to the ceiling of the first floor, ninety more up to the topmost roof; Metzudat David gives the same reading in second place. Radak, for his part, prefers to put the hundred and twenty amot of II Chronicles 3:4 on the Ulam alone, which would contain the aliyot: a minority reading, and about the First Temple. Above the Ulam, the building remains solid. The number and placement of the lulin is given by no source: two shafts of two amot on the axis are a CHOICE. The Messiba that leads there and the ta'im it serves are hollowed out accordingly."
+    "note": "Adopted: the upper floor is above the Heikhal and the Kodesh HaKodashim, where Middot 4:5 describes it and where Rashi puts the upper stories of the First Temple (on II Chronicles 3:4). Set aside: Radak's reading, which places them in the Ulam; above the Ulam, the tour leaves the building solid. Tour's choice: two hatches of two amot on the axis — no source gives their number or position."
   },
   "kaleh_orev": {
     "nom": "Kaleh Orev",
@@ -372,7 +371,7 @@
         "citation": "בְּחֶשֶׁק שֶׁל בַּרְזֶל גֹּבַהּ אַמָּה חַד כְּמוֹ הַסַּיִף"
       }
     ],
-    "note": "Divergence: R. Yehuda (Middot 4:6) does not count the Kaleh Orev and gives 4 amot to the Ma'ake. The tour follows the tana kama."
+    "note": "Adopted: the anonymous view of the mishna (Middot 4:6) — a parapet of three amot and a kaleh orev of one ama. Set aside: R. Yehuda, for whom the kaleh orev is not counted in the hundred amot and the parapet is four amot."
   },
   "maake": {
     "nom": "Ma'ake (the Parapet)",
@@ -389,7 +388,7 @@
         "citation": ""
       }
     ],
-    "note": "Divergence: R. Yehuda (Middot 4:6) gives 4 amot to the Ma'ake and does not count the Kaleh Orev. The tour follows the tana kama — 3 amot of Ma'ake, 1 of Kaleh Orev."
+    "note": "Adopted: the anonymous view of the mishna (Middot 4:6) — a parapet of three amot and a kaleh orev of one ama. Set aside: R. Yehuda, for whom the parapet is four amot and the kaleh orev is not counted."
   },
   "menora": {
     "nom": "Menora",
@@ -419,7 +418,7 @@
         "citation": ""
       }
     ],
-    "note": "The branches are STRAIGHT, on a diagonal (Rambam, Rashi), against the curved branches of traditional depictions and of the Arch of Titus. Never nine branches (that's a chanukia), six, or eight."
+    "note": "Adopted: straight branches rising on a diagonal, following the Rambam's drawing and Rashi (on Exodus 25:32). Set aside: the rounded branches of common depictions."
   },
   "shulchan": {
     "nom": "Shulchan and the Lechem HaPanim",
@@ -506,7 +505,7 @@
         "citation": ""
       }
     ],
-    "note": "Divergence: Kelim 17:10 measures this altar in amot of 5 tefachim — R. Meir and R. Yehuda agree (Menachot 97a) — that is 0.83 × 0.83 × 1.67. The tour keeps the ama of 6. The golden altar bears no flame but embers brought from the great outer altar, spread out for the incense (Tamid 6:2) — on Kippur as on every day."
+    "note": "Set aside: Kelim 17:10 measures this altar with a smaller ama of five tefachim — R. Meir and R. Yehuda agree on this (Menachot 97a) — about 0.40 × 0.40 × 0.80 m. The tour keeps the ordinary ama of six tefachim: 0.48 × 0.48 × 0.96 m."
   },
   "parokhet": {
     "nom": "The Two Parokhot",
@@ -562,7 +561,7 @@
         "citation": ""
       }
     ],
-    "note": "Two parokhot because the doubt over which side the ama belongs to was never settled: both readings are covered. Heavy, flat cloth, with no drapery folds, the four colors in broad fields, a frieze of winged creatures and lions woven into the wools, never in gold, with no human face."
+    "note": "Adopted: the four wools are woven into every thread (Shekalim 8:5; Rashi on Exodus 26:31) — the fabric is a mottled purple, not bands of color. Tour's choice: a heavy, flat fabric without drapery, and figures without any human face. Not shown: the different image on the reverse side (Rashi on Yoma 72b)."
   },
   "kodesh_hakodashim": {
     "nom": "Kodesh HaKodashim",
@@ -597,8 +596,7 @@
         "ref": "5:3",
         "citation": ""
       }
-    ],
-    "note": "Nothing but the Ark in this space: darkness, gold caught in the glow of the embers, smoke, no detailed human figure. Walls, ceiling and floor are gold-plated as in the Heikhal; in the dark, this gold shows only under the embers."
+    ]
   },
   "even_hashetiya": {
     "nom": "Even HaShetiya",
@@ -624,7 +622,7 @@
         "citation": ""
       }
     ],
-    "note": "Two decisions. Position: the Rambam (Beit HaBechirah 4:1) places the stone “to the west” of the Kodesh HaKodashim; this entry keeps it at the center, since Yoma 5:2 fixes nothing. And the bare stone of Yoma 5:2 describes the state after the Ark was removed: that state is set aside, since the tour shows the Temple as it will be, with the Ark returned to its place."
+    "note": "Set aside: the Rambam places the stone in the western part of the Kodesh HaKodashim (Beit HaBechirah 4:1); the tour keeps it in the center, as Yoma 5:2 does not specify. The stone is not bare as in the Second Temple (Yoma 5:2): the tour shows the Temple to come, with the Ark resting on it."
   },
   "aron": {
     "nom": "Aron HaBrit",
@@ -689,7 +687,7 @@
         "citation": "having arrived at the Ark, he sets the machta between the two badim"
       }
     ],
-    "note": "PROJECT CHOICE: the Temple depicted is the one TO COME, where the Ark hidden beneath the Temple has returned to its place (Yoma 54a; Rambam, Beit HaBechirah 4:1). The tour does not fabricate a new Ark — Jeremiah 3:16 says “they shall not make another” — it shows the one of Moses, buried by Yoshiyahu and revealed. Divergence to be validated by a rabbi. The length of the badim is nowhere given a figure: having them run to the inner parokhet is a choice of the model, and it is this that makes physical both “between the badim” and the bulges in the curtain; the alternative set aside is that of short badim and miraculous bulges (Bava Batra 99a)."
+    "note": "Project's position: the tour shows the Temple to come, with the Ark in its place. It is not a new Ark — “nor shall they make another” (Jeremiah 3:16) — but the Ark of Moses, which Yoshiyahu hid (Yoma 52b; Rambam, Beit HaBechirah 4:1). No source describes its return: this is the project's choice. Tour's choice: the length of the poles, which no source gives; they reach the inner curtain and press against it, as Yoma 54a describes."
   },
   "kaporet": {
     "nom": "Kaporet and the Keruvim",
@@ -744,11 +742,11 @@
         "citation": "like a man and his companion"
       }
     ],
-    "note": "PROJECT CHOICE (Temple to come, Ark in its place). For the keruvim: a boy and a girl embracing, arms outstretched until they touch, wings joined at the center — the tour follows Sukkah 5b and Rashi (children's faces) and applies to them the embrace of Yoma 54a–b, which the gemara attributes to the First Temple or to the carvings on the walls. Divergences set aside: the Rashbam (Ex. 25:18) sees them as large birds; Solomon's keruvim (I Kings 6:23–28), two standing figures 10 amot tall with wings of 20, belong to the First Temple and are not modeled. Never a draped angel or a curly-haired putto: that is Christian iconography."
+    "note": "Adopted: keruvim with a child's face (Sukkah 5b; Rashi), a boy and a girl embracing, wings joined above the cover. The tour applies to them the embrace of Yoma 54a–b, although the Gemara refers it to the First Temple or to the wall carvings. Set aside: the Rashbam's great birds (on Exodus 25:18). Not shown: Shlomo's standing keruvim, ten amot high (I Kings 6:23–28)."
   },
   "contenu_aron": {
     "nom": "What Accompanies the Aron",
-    "resume": "Four objects accompany the Ark: the jar of manna, of clay, the staff of Aharon with its almonds and blossoms, the flask of anointing oil, and the chest that the Philistines sent back with it. Note: this entry does not place them INSIDE the Ark but set IN FRONT of it, between the badim.",
+    "resume": "Four objects accompany the Ark: the jar of manna, of clay, the staff of Aharon with its almonds and blossoms, the flask of anointing oil, and the chest that the Philistines sent back with it. The tour does not place them inside the Ark but in front of it, between the badim.",
     "sources": [
       {
         "oeuvre": "Rambam Beit HaBe'hira",
@@ -781,6 +779,6 @@
         "citation": ""
       }
     ],
-    "note": "PROJECT CHOICE (Temple to come, Ark returned to its place). Set aside: the tablet bearing the Sefer Torah (Bava Batra 14b, view of R. Yehuda). And the Ark stays closed, never open, no tablet of the Law visible."
+    "note": "Tour's choice: the Ark stays closed; neither the Tablets nor the Sefer Torah are visible. Set aside: the Sefer Torah placed beside the Ark, on the Philistines' chest or on a board, according to R. Yehuda (Bava Batra 14b)."
   }
 }

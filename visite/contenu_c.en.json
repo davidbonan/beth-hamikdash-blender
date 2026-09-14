@@ -2,7 +2,7 @@
   "yam": {
     "nom": "Yam (the Bronze Sea)",
     "translit": "Yam Mutzak",
-    "resume": "The bronze Sea of Shlomo: a large basin resting on twelve bronze oxen, three facing each cardinal direction, their hindquarters toward the center. Its rim is worked “like the brim of a cup, in the shape of a lily flower,” and two rows of gourds run beneath it. The blockout places it at the southeast of the building, between the steps of the Ulam and the ramp of the Mizbeach, next to the Kiyor of the Mishna.",
+    "resume": "The bronze Sea of Shlomo: a large basin resting on twelve bronze oxen, three facing each cardinal direction, their hindquarters toward the center. Its rim is worked “like the brim of a cup, in the shape of a lily flower,” and two rows of gourds run beneath it. The tour places it at the southeast of the building, between the steps of the Ulam and the ramp of the Mizbeach, next to the Kiyor of the Mishna.",
     "cotes": [
       "ten amot from rim to rim",
       "five amot high",
@@ -18,13 +18,13 @@
       {"oeuvre": "Divrei HaYamim II", "ref": "4:2-6", "citation": ""},
       {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
     ],
-    "note": "An element of the First Temple, assumed as such: the blockout's commentary states, “They are from the First Temple: Middot does not know them (CHOICE).” The principle of coexistence is set out by the README (§ “Jewish tradition only,” 8/09): “The principle is that of Menachot 98b, which arranges Shlomo's ten menorot and ten tables around those of Moshe: Shlomo's kelim coexist with those of the Mishna,” under the guideline “Priority to the First Temple (Tanakh), then to the Mishna where it is compatible.”"
+    "note": "Project's position: the Bronze Sea is a vessel of the First Temple that the Mishna does not mention. The tour places it in the Temple of the Mishna, just as Menachot 98b sets Shlomo's ten menorot and ten tables around those of Moses: the vessels of both Temples stand together."
   },
 
   "mekhonot": {
     "nom": "The Ten Mekhonot",
     "translit": "Mekhonot",
-    "resume": "The ten mobile bronze stands of Shlomo. Each rolls on four wheels and carries a basin. Five are arranged to the north, five to the south, “on the shoulder of the building” — in the blockout, the floor of the Azara along the body of the Bayit. Their panels bore lions, oxen and keruvim; in the blockout, only their frames are modeled.",
+    "resume": "The ten mobile bronze stands of Shlomo. Each rolls on four wheels and carries a basin. Five are arranged to the north, five to the south, “on the shoulder of the building” — in the tour, the floor of the Azara along the body of the Bayit. Their panels bore lions, oxen and keruvim; in the tour, only their frames are shown.",
     "cotes": [
       "stands of 4 × 4 × 3 amot",
       "four wheels of one and a half amot",
@@ -37,7 +37,7 @@
       {"oeuvre": "Divrei HaYamim II", "ref": "4:14", "citation": ""},
       {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
     ],
-    "note": "Same arbitration as for the Sea: an element of the First Temple placed in the Temple of the Mishna under the principle of Menachot 98b (README, § “Jewish tradition only,” 8/09). The blockout notes that the figured panels are not modeled: “panels with lions, oxen and keruvim (here: their frames only).”"
+    "note": "Project's position, as for the Bronze Sea: a vessel of the First Temple placed in the Temple of the Mishna, on the principle of Menachot 98b."
   },
 
   "yakhin_boaz": {
@@ -66,13 +66,13 @@
       {"oeuvre": "Radak", "ref": "sur Divrei HaYamim II 3:15", "citation": "עַל מִדַּת שְׁנֵי הָעַמּוּדִים הוּא אוֹמֵר"},
       {"oeuvre": "Metsoudat David", "ref": "sur Melakhim I 7:19", "citation": "כִּי הָעַמּוּדִים הָיוּ בְּרֹחַב אַרְבַּע אַמּוֹת"}
     ],
-    "note": "An explicit point of arbitration for the project. The façade of the Ulam remains without a column — spec sheet §8a — and Yakhin and Boaz do not return there: they are inside, “לְאֻלָם הַהֵיכָל” read as “כְּמוֹ בְּאוּלָם הַהֵיכָל” by Radak, “שֶׁהֱקִימָם בּוֹ” by Ralbag, “בַּחֲלַל הָאוּלָם” by Metzudat David (on Divrei HaYamim II 3:15). Their presence in this Temple stems from the same principle of Menachot 98b as the Sea and the mekhonot. A measurement not to be confused with the height: the thirty-five amot of Divrei HaYamim II 3:15 measure the two columns lying down at the moment of casting, not the height of a single column (Radak, Rashi, Metzudat David ad loc.) — reading them as an elevation gives columns twice too tall and too thin."
+    "note": "Adopted: the columns stand inside the Ulam, on either side of the opening, not in front of the façade — this is how Radak, Ralbag and Metzudat David read “לְאֻלָם הַהֵיכָל.” Like the Bronze Sea, they come from the First Temple (principle of Menachot 98b). The thirty-five amot of II Chronicles 3:15 measure the two columns together, lying down at casting, not the height of each (Rashi, Radak)."
   },
 
   "mukhni": {
     "nom": "Mukhni of the Kiyor",
     "translit": "Mukhni",
-    "resume": "The mechanism installed by Ben Katin at the edge of the Kiyor: a wheel and a chain that lower the basin into its well every evening, “so that its water not be disqualified by the night.” The blockout gives it a post, a crossbeam, a strut, a spoked wheel and a chain reaching to the edge of the basin.",
+    "resume": "The mechanism installed by Ben Katin at the edge of the Kiyor: a wheel and a chain that lower the basin into its well every evening, “so that its water not be disqualified by the night.” The tour gives it a post, a crossbeam, a strut, a spoked wheel and a chain reaching to the edge of the basin.",
     "sources": [
       {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁלֹּא יִהְיוּ מֵימָיו נִפְסָלִין בְּלִינָה"},
       {"oeuvre": "Yoma", "ref": "37a", "citation": ""},
@@ -80,7 +80,7 @@
       {"oeuvre": "Tamid", "ref": "1:4", "citation": ""},
       {"oeuvre": "Tamid", "ref": "3:8", "citation": ""}
     ],
-    "note": "No measurement is sourced: the blockout writes, “the shape is a CHOICE.” The sources say that the mechanism exists and what it is for; of its form they give only the wheel (“גִּילְגְּלָא דַּהֲוָה מְשַׁקְּעָא לֵיהּ,” Yoma 37a) and the wood (“קוֹל הָעֵץ,” Tamid 1:4). The technical spec sheet (§ Kiyor) mentions the same device: “Twelve taps (Ben Katin's improvement, Yoma 3:10) and a system (mukhni) to lower it into the well at night.” The thematic index of the mikdash skill files the question under “Kiyor: location, material, mechanism of the mukhni” with Middot 3:6; Tamid 1:4; 3:8; Yoma 3:10."
+    "note": "Tour's choice: the shape of the mechanism. The sources give only two features: a wheel (Yoma 37a) and wood, whose sound could be heard (Tamid 1:4). Post, crossbeam and chain are designed for the tour."
   },
 
   "magrefa": {
@@ -100,7 +100,7 @@
       {"oeuvre": "Arakhin", "ref": "10b-11a", "citation": "הִיא אַמָּה וּגְבוֹהָ אַמָּה, וְקַתָּא יוֹצָא הֵימֶנָּה, וַעֲשָׂרָה נְקָבִים הָיוּ בָּהּ"},
       {"oeuvre": "Rashash", "ref": "Tamid 5:6", "citation": "פירוש הראב\"ד למסכת תמיד שכתב לעיל בפ\"ג דזאת שבכאן היא עצמה דלעיל"}
     ],
-    "note": "It is not the magrefa of Arakhin — one ama by one ama, a handle, ten holes: that one is a musical instrument, which throwing would have broken (Tosafot Yom Tov). The Raavad, as reported by the Rashash, holds on the contrary that they are the same, and reads “throws it” as releasing all its sounds at once. The model follows Bartenura and Tosafot Yom Tov. Diameter, handle and bronze are choices."
+    "note": "Adopted: a large shovel thrown down to make noise, following Bartenura and Tosafot Yom Tov. Set aside: the Raavad, cited by the Rashash, for whom it is the ten-holed musical instrument of Arakhin 10b-11a, all of whose voices were released at once. Tour's choice: its diameter, its handle and the bronze."
   },
 
   "candelabres_shoeva": {
@@ -117,13 +117,13 @@
       {"oeuvre": "Soucca", "ref": "5:2-3", "citation": "מְנוֹרוֹת שֶׁל זָהָב הָיוּ שָׁם, וְאַרְבָּעָה סְפָלִים שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד"},
       {"oeuvre": "Soucca", "ref": "52b", "citation": ""}
     ],
-    "note": "Two acknowledged CHOICEs, both written into the repository. (1) The number: “Four poles (number: CHOICE, the Mishna says ‘menorot’)” (blockout). (2) The timing: “this is a Sukkot installation, left standing on the day of Kippur” (README) — a `CANDELABRES_SHOEVA = False` switch removes them from the blockout. The spacing of the ladder rungs (one every three-quarters of an ama) is geometry from the script, not a sourced measurement."
+    "note": "Tour's choice: the Mishna speaks of “candelabra” without giving their number; the tour raises four. They belong to the festival of Sukkot: the tour leaves them standing on the Yom Kippur it depicts."
   },
 
   "shofarot": {
     "nom": "The Thirteen Shofarot",
     "translit": "Shelosha asar shofarot",
-    "resume": "Thirteen trunks “shaped like a shofar” — narrow at the top, wide at the bottom, so that no hand could be slipped in — lined up, in the blockout, along the east wall of the Ezrat Nashim, on either side of the gate.",
+    "resume": "Thirteen trunks “shaped like a shofar” — narrow at the top, wide at the bottom, so that no hand could be slipped in — lined up, in the tour, along the east wall of the Ezrat Nashim, on either side of the gate.",
     "cotes": [
       "thirteen",
       "narrow at the top, wide at the bottom, so that no hand could be slipped in",
@@ -133,13 +133,13 @@
       {"oeuvre": "Shekalim", "ref": "6:5", "citation": ""},
       {"oeuvre": "Bartenura", "ref": "sur Shekalim 6:1", "citation": ""}
     ],
-    "note": "A discrepancy in reference within the repository: the blockout and the README write Shekalim 6:5, while the mikdash skill's corpus files “the 13 shofarot” under Shekalim 6:1. Both are correct: 6:1 counts the thirteen shofarot, 6:5 gives what is written on each. The material is a CHOICE: “Bronze: CHOICE, the Mishna does not give the material” (blockout)."
+    "note": "Tour's choice: their material, bronze, which the Mishna does not specify, and their place along the east wall of the Ezrat Nashim, on either side of the gate."
   },
 
   "sculptures_murs": {
     "nom": "Wall Carvings: Keruvim, Palm Trees, Flowers",
     "translit": "Keruvim, timorot u-peturei tzitzim",
-    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The blockout arranges them in three registers, from the floor up to 22 amot, separated by bands of flowers.",
+    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The tour arranges them in three registers, from the floor up to 22 amot, separated by bands of flowers.",
     "cotes": [
       "three registers from the floor up to 22 amot, separated by bands of blossoming flowers",
       "0.22 ama in relief",
@@ -152,44 +152,44 @@
       {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
       {"oeuvre": "Middot", "ref": "4:1", "citation": ""}
     ],
-    "note": "The blockout sets out the arbitration: “Above, the gold stays bare up to the cornice: two registers floating at mid-height are in no source” — the field from the floor to 22 amot comes from Ye'hezkel 41:20; its three registers and its 0.22 ama of relief are the project's own, the pattern comes from the Tanakh. The README adds that this relief “replaces the generic scrollwork pattern as ornament of the building (the maltera'ot keep theirs).” POINT TO FLAG: the technical spec sheet (§ prohibitions) still reads “No other statues or figurative reliefs (except the woven keruvim of the curtains)” — this line predates the addition and has not been updated. The detail of the reliefs (seven fronds per timora, eight petals per flower, two raised wings per keruv) is geometry from the script, without a sourced measurement."
+    "note": "Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The three registers, the relief depth and the details of the motifs are designed for the tour."
   },
 
   "chaines_devir": {
     "nom": "Chains before the Devir",
     "translit": "Ratukot zahav",
-    "resume": "Golden chains stretched before the Devir, the Kodesh HaKodashim. In the blockout: three chainlets beneath the ceiling, stretched from one wall to the other, before the parokhet.",
+    "resume": "Golden chains stretched before the Devir, the Kodesh HaKodashim. In the tour: three chainlets beneath the ceiling, stretched from one wall to the other, before the parokhet.",
     "cotes": [
-      "three chainlets beneath the ceiling, wall to wall, before the parokhet (geometry of the blockout)"
+      "three chainlets beneath the ceiling, wall to wall, before the parokhet (the tour's choice)"
     ],
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "6:21", "citation": "וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר"}
     ],
-    "note": "The verse says that golden chains pass before the Devir, without giving their number or height: the three chainlets and their sag are the blockout's own design choice. An element of the First Temple, falling under the same guideline, “Priority to the First Temple (Tanakh), then to the Mishna where it is compatible” (README)."
+    "note": "Tour's choice: the verse says golden chains run before the Devir (I Kings 6:21), without giving their number or height; the tour stretches three beneath the ceiling. An element of the First Temple, included like the Bronze Sea."
   },
 
   "shaar_shushan": {
     "nom": "Sha'ar Shushan",
     "translit": "Sha'ar HaMizrachi — Shushan HaBira",
-    "resume": "The eastern gate of the Har HaBayit, on the axis of the Temple. Above it is depicted Shushan the capital, facing the Mount of Olives. The blockout renders it as a bas-relief in the stone of the wall: a rampart and three crenellated towers.",
+    "resume": "The eastern gate of the Har HaBayit, on the axis of the Temple. Above it is depicted Shushan the capital, facing the Mount of Olives. The tour renders it as a bas-relief in the stone of the wall: a rampart and three crenellated towers.",
     "cotes": [
       "above the east gate of the Har HaBayit, facing the Mount of Olives",
-      "a rampart and three crenellated towers (the blockout's design choice)"
+      "a rampart and three crenellated towers (the tour's choice)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה"}
     ],
-    "note": "The technical spec sheet (§1) counts it among the five gates of the Mount: “East gate (Shushan) decorated with a depiction of Shushan.” The shape of the bas-relief — rampart and three towers — is not in the source: it is the blockout's design choice."
+    "note": "Tour's choice: the Mishna says Shushan was depicted above the gate (Middot 1:3), without saying how. The bas-relief — a rampart and three towers — is designed for the tour."
   },
 
   "tavla_helene": {
     "nom": "Helena's Tablet",
     "translit": "Tavla shel zahav",
-    "resume": "A golden tablet donated by Queen Helena, “on which the parasha of the sota is written”: it is from this that the Kohen copies out the passage. The blockout places it on the gold of the east wall of the Ulam, on the north side.",
+    "resume": "A golden tablet donated by Queen Helena, “on which the parasha of the sota is written”: it is from this that the Kohen copies out the passage. The tour places it on the gold of the east wall of the Ulam, on the north side.",
     "sources": [
       {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"}
     ],
-    "note": "The placement is an explicit CHOICE of the blockout: “On the gold of the east wall of the Ulam, north side: CHOICE.” No measurement is sourced; the eight engraved lines are geometry from the script. Not to be confused with the other gift from the same queen, the nivreshet — a golden lamp (“מְנוֹרָה,” Bartenura) above the entrance to the Heikhal (Yoma 3:10; 37b), `Nivreshet_Helene` in the blockout."
+    "note": "Tour's choice: the Mishna does not say where the tablet was; the tour sets it on the gold of the east wall of the Ulam, on the north side. The engraved lines are decorative."
   },
 
   "cohanim": {
@@ -216,7 +216,7 @@
       {"oeuvre": "Yoma", "ref": "6a", "citation": "אַבְנֵטוֹ שֶׁל כֹּהֵן גָּדוֹל זֶהוּ אַבְנֵטוֹ שֶׁל כֹּהֵן הֶדְיוֹט"},
       {"oeuvre": "Rambam Bi'at HaMikdash", "ref": "5:16", "citation": "מַנִּיחַ יָדוֹ הַיְמָנִית עַל גַּבֵּי רַגְלוֹ הַיְמָנִית וְיָדוֹ הַשְּׂמָאלִית עַל גַּבֵּי רַגְלוֹ הַשְּׂמָאלִית וְשׁוֹחֶה וּמְקַדֵּשׁ"}
     ],
-    "note": "Is an ordinary kohen's avnet the same as the Kohen Gadol's, embroidered with wool? Yoma 6a discusses it; the Rambam rules that it is (Klei HaMikdash 8:1-2), and the figures follow him. The technical spec sheet (§12) dresses the film's kohanim in plain linen. No source gives the pattern of the embroidery: the stripes of tekhelet, argaman and tola'at shani are a CHOICE, as are the exact shape of the migba'at and the figures' gestures."
+    "note": "Adopted: an ordinary kohen's avnet is embroidered with wool, like the Kohen Gadol's — Yoma 6a discusses it, and the Rambam rules so (Klei HaMikdash 8:1-2). Tour's choice: the pattern of the embroidery, in stripes of blue-violet, purple and scarlet, which the sources do not describe, the exact shape of the migba'at and the figures' gestures."
   },
 
   "leviim": {
@@ -237,7 +237,7 @@
       {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
       {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
     ],
-    "note": "II Chronicles 5:12 describes the dedication of Shlomo's Temple; the Mishna does not say how the Leviim of the Second Temple were dressed. The linen, the white kippa, the place on the highest step, the westward orientation and the passage left open on the axis are CHOICES of the tour, as is their swaying to the beat. The Levite children, who stood below (Arakhin 2:6), are not shown."
+    "note": "Tour's choice: the Mishna does not say how the Leviim were dressed; the linen comes from the dedication of Shlomo's Temple (II Chronicles 5:12). The white kippa, the place on the top step facing the Sanctuary, the passage left open on the axis and the swaying are also choices. Not shown: the Levite children, who stood below according to R. Eliezer ben Yaakov (Arakhin 2:6)."
   },
 
   "fideles": {
@@ -254,6 +254,6 @@
       {"oeuvre": "Middot", "ref": "2:5", "citation": "שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן"},
       {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת נָשִׁים מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם"}
     ],
-    "note": "The worshippers are not in period costume: they are dressed as their community dresses today for the day — suit and hat, suit and tallit, suit and kippa — following the film's rule (technical spec sheet §12). This is a deliberate choice, not a reconstruction. The rule, written for men, says nothing about women: the figure in a dress and headscarf is a CHOICE of the tour. So are their gestures — walking, praying, talking."
+    "note": "Project's position: the worshippers are not in period costume. They are dressed as their community dresses today for Yom Kippur — suit and hat, suit and tallit, suit and kippa. This is a deliberate stance, not a reconstruction. The women's dress and headscarf and the figures' gestures are also choices."
   }
 }
