@@ -87,7 +87,7 @@ body[data-degre="7"], body[data-degre="8"] { --fond: var(--nuit); --texte: var(-
 
 /* ---- propos ---- */
 main { display: block; }
-.propos, .montee-tete, .methode { padding: 0 var(--marge); max-width: calc(var(--mesure) + 2 * var(--marge)); }
+.propos, .montee-tete { padding: 0 var(--marge); max-width: calc(var(--mesure) + 2 * var(--marge)); }
 .propos { padding-top: clamp(56px, 10vh, 120px); }
 .propos p { font-size: clamp(18px, 1.55vw, 21px); line-height: 1.55; }
 .propos p:first-child::first-letter { font-family: "Marcellus", serif; font-size: 2.8em; float: inline-start; line-height: .8; padding: .1em .1em 0 0; }
@@ -117,16 +117,14 @@ h2 { font-size: clamp(32px, 4vw, 48px); margin-bottom: 18px; line-height: 1.1; }
 .degre .aller:focus-visible { outline: 2px solid var(--or); outline-offset: 4px; }
 .degre[data-degre="7"] img { box-shadow: 0 0 120px rgba(176, 134, 51, .18); }
 
-/* ---- méthode ---- */
-.methode { padding-top: clamp(64px, 12vh, 140px); padding-bottom: clamp(48px, 8vh, 96px); }
-.methode h2 + p, .methode p { color: var(--texte); }
-.methode h2 ~ h2 { margin-top: clamp(40px, 6vh, 72px); }
-.methode .hoshen { margin: clamp(32px, 5vh, 56px) 0; max-width: 100%; }
-.methode .hoshen img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1072; object-fit: cover; }
-.methode figcaption { margin-top: 10px; font-size: 15px; color: var(--texte-sourd); }
-.methode .action { margin-top: 36px; }
-.methode .entrer { border-color: var(--or); color: var(--lin); background: transparent; }
-.methode .entrer:hover, .methode .entrer:focus-visible { background: var(--or); color: var(--nuit); }
+/* ---- clôture ---- */
+.cloture { padding: clamp(64px, 12vh, 140px) var(--marge) clamp(48px, 8vh, 96px); max-width: 1400px; }
+.cloture .hoshen { margin: 0; }
+.cloture .hoshen img { display: block; width: 100%; height: auto; aspect-ratio: 1920 / 1072; object-fit: cover; }
+.cloture figcaption { margin-top: 10px; font-size: 15px; color: var(--texte-sourd); }
+.cloture .action { margin-top: 36px; }
+.cloture .entrer { border-color: var(--or); color: var(--lin); background: transparent; }
+.cloture .entrer:hover, .cloture .entrer:focus-visible { background: var(--or); color: var(--nuit); }
 
 /* ---- pied ---- */
 footer {
