@@ -3,8 +3,8 @@
     "nom": "Français",
     "sens": "ltr",
     "interface": {
-      "titre": "Visite du Beit HaMikdash",
-      "lieu": "Beit HaMikdash",
+      "titre": "Visite du Beit HaMikdach",
+      "lieu": "Beit HaMikdach",
       "chargement": "chargement de la scène…",
       "preparation": "préparation…",
       "echec": "échec :",
@@ -225,8 +225,8 @@
     "nom": "English",
     "sens": "ltr",
     "interface": {
-      "titre": "Beit HaMikdash Tour",
-      "lieu": "Beit HaMikdash",
+      "titre": "Beit HaMikdach Tour",
+      "lieu": "Beit HaMikdach",
       "chargement": "loading the scene…",
       "preparation": "preparing…",
       "echec": "failed:",
