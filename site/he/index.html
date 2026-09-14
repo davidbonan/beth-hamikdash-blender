@@ -23,6 +23,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="image" href="/images/affiche_2000.webp" imagesrcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
 <link rel="preload" as="image" href="/images/affiche_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
@@ -48,8 +51,9 @@
     <p class="action"><a class="entrer" href="/visite/" data-langue="he">כניסה לסיור</a><span class="note">חינם, ללא התקנה. עשר דקות או שעה.</span></p>
   </div>
 
-  <section class="degres" aria-label="מעלות הקדושה" aria-live="polite">
-    <ul>
+  <section class="degres" aria-label="מעלות הקדושה">
+    <ol class="echelle" aria-label="מעלות הקדושה"><li><button type="button" data-degre="har_habayit" title="הר הבית" aria-label="הר הבית" aria-current="true"></button></li><li><button type="button" data-degre="heil" title="חיל" aria-label="חיל"></button></li><li><button type="button" data-degre="ezrat_nashim" title="עזרת נשים" aria-label="עזרת נשים"></button></li><li><button type="button" data-degre="azara" title="עזרת ישראל" aria-label="עזרת ישראל"></button></li><li><button type="button" data-degre="mizbeach" title="עזרת כהנים" aria-label="עזרת כהנים"></button></li><li><button type="button" data-degre="oulam" title="בין האולם ולמזבח" aria-label="בין האולם ולמזבח"></button></li><li><button type="button" data-degre="heikhal" title="היכל" aria-label="היכל"></button></li><li><button type="button" data-degre="kodesh_hakodashim" title="קודש הקודשים" aria-label="קודש הקודשים"></button></li></ol>
+    <ul aria-live="polite">
       <li data-degre="har_habayit" data-vue="har_habayit" data-temps="0" aria-current="true">
         <h2><span class="nom">הר הבית</span></h2>
         <p class="mishna">מְקֻדָּשׁ מִירוּשָׁלַיִם, שֶׁאֵין זָבִים וְזָבוֹת, נִדּוֹת וְיוֹלְדוֹת נִכְנָסִים לְשָׁם.</p>

@@ -8,7 +8,8 @@
  * contournent ce qui barre la ligne droite — l'autel. Le sol se sonde à chaque
  * image, comme sous le marcheur : les degrés se gravissent, ils ne se traversent pas.
  * Une halte qui donne une `hauteur` est en l'air : on y descend, ou on en descend, en
- * ligne droite, sans sol.
+ * ligne droite, sans sol. La page qui encadre peut demander de sauter à une halte : on
+ * y arrive au noir, et la marche reprend de là.
  */
 import * as THREE from "three";
 
@@ -58,6 +59,7 @@ export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
   let pieds = parcours.haltes[0].sol * ama;
   let hauteurOeil = pieds + oeil;
   let annoncee = -1;
+  let depuisLaCoupe = Infinity;
   const regard = new THREE.Vector3();
   voile.style.transition = "none";
 
@@ -85,7 +87,7 @@ export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
     // Noir sur le dernier temps de la dernière pause, sur le premier du départ, et au
     // passage d'un seuil qu'on ne voit pas au travers — la parokhet.
     const versLaFin = duree - temps, depuisLeDebut = temps;
-    let noir = 1 - Math.min(versLaFin, depuisLeDebut) / fondu;
+    let noir = 1 - Math.min(versLaFin, depuisLeDebut, depuisLaCoupe) / fondu;
     if (s.halte.seuil) noir = Math.max(noir, 1 - Math.abs(point.x / ama - s.halte.seuil[0]) / s.halte.seuil[1]);
     voile.style.opacity = String(Math.max(0, noir));
 
@@ -95,9 +97,24 @@ export function cinema({ parcours, camera, sol, oeil, ama, voile, signaler }) {
     }
   }
 
+  function sauter(degre) {
+    const s = segments.find((s) => s.halte.degre === degre);
+    if (!s) return;
+    pieds = s.halte.sol * ama;
+    hauteurOeil = s.oeilVers;
+    depuisLaCoupe = 0;
+    annoncee = -1;
+    poser(s.fin - (s.halte.pause_s ?? PAUSE_S), 0);
+  }
+
+  addEventListener("message", (e) => {
+    if (e.source === parent && e.origin === location.origin && e.data?.type === "cinema" && e.data.aller) sauter(e.data.aller);
+  });
+
   return {
     duree,
-    avancer: (dt) => poser(temps + dt, dt),
+    avancer: (dt) => { depuisLaCoupe += dt; poser(temps + dt, dt); },
     aller: (t) => { annoncee = -1; poser(t, 0); },
+    sauter,
   };
 }

@@ -9,7 +9,7 @@ Un seul dépôt : Netlify déploie `main` à chaque push, en ~3 minutes.
 
 | Chemin | Rôle |
 |---|---|
-| `site/` | l'accueil (fr, en, he), robots, sitemap, feuille de style, `accueil.js`. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes et `visite/cinema.json` : modifier le script, pas les pages |
+| `site/` | l'accueil (fr, en, he), robots, sitemap, favicon, feuille de style, `accueil.js`. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes et `visite/cinema.json` : modifier le script, pas les pages |
 | `site/images/` | l'affiche (`affiche_*.webp`), l'image de partage (`partage.jpg`) et le parcours des téléphones (`parcours_portrait.mp4`) : tous **captés dans la scène**, voir « L'accueil est la visite » |
 | `visite/` | la visite, servie à `/visite/` ; `?cinema` la fait marcher seule pour l'accueil |
 | `construire_site.sh` | assemble `dist/` = `site/` + `visite/` filtrée ; c'est la commande de build Netlify |
@@ -46,7 +46,9 @@ L'accueil n'a pas d'images du film : il encadre `/visite/?cinema` dans un `<ifra
 la scène marche seule le long des degrés de sainteté (`visite/cinema.js`, parcours dans
 `visite/cinema.json` — haltes en amot, ce qu'on y regarde, durée du trajet, pause) et
 poste à la page le degré atteint (`postMessage`, type `cinema`). `site/accueil.js`
-affiche le degré, et « Entrer » pointe sur `/visite/?vue=<halte>`.
+affiche le degré, et « Entrer » pointe sur `/visite/?vue=<halte>`. L'échelle des huit
+degrés au-dessus du nom en fait sauter la scène : message `{ type: "cinema", aller }` à
+l'iframe (`cinema.js` y arrive au noir), `currentTime` de la vidéo au téléphone.
 
 Trois fichiers de `site/images/` sont des **captures de cette scène**, à refaire dès que
 le parcours ou la scène change — sinon l'affiche ne raccorde plus avec la première image

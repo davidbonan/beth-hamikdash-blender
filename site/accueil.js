@@ -9,11 +9,19 @@ const scene = document.querySelector(".scene");
 const cadre = scene.querySelector("iframe");
 const video = scene.querySelector("video");
 const entrees = scene.querySelectorAll("a.entrer");
-const degres = [...scene.querySelectorAll(".degres li")];
+const degres = [...scene.querySelectorAll(".degres ul li")];
+const echelons = [...scene.querySelectorAll(".echelle button")];
 
 function montrerDegre(id, vue) {
   for (const li of degres) li.toggleAttribute("aria-current", li.dataset.degre === id);
   for (const a of entrees) a.href = vue ? `/visite/?vue=${vue}` : "/visite/";
+  let gravi = true;
+  for (const bouton of echelons) {
+    const courant = bouton.dataset.degre === id;
+    bouton.toggleAttribute("aria-current", courant);
+    bouton.classList.toggle("gravi", gravi && !courant);
+    if (courant) gravi = false;
+  }
 }
 montrerDegre(degres[0].dataset.degre, degres[0].dataset.vue);
 
@@ -27,6 +35,20 @@ function suivreLaVideo() {
   const atteint = degres.filter((li) => Number(li.dataset.temps) <= t).pop() ?? degres[0];
   if (!atteint.hasAttribute("aria-current")) montrerDegre(atteint.dataset.degre, atteint.dataset.vue);
 }
+
+// Un échelon cliqué mène la scène à son degré : le film y saute, la vidéo s'y cale.
+function sauterA(degre) {
+  const li = degres.find((li) => li.dataset.degre === degre);
+  montrerDegre(li.dataset.degre, li.dataset.vue);
+  if (immobile) return;
+  if (telephone) {
+    video.currentTime = Number(li.dataset.temps);
+    video.play().catch(() => {});
+  } else {
+    cadre.contentWindow?.postMessage({ type: "cinema", aller: degre }, location.origin);
+  }
+}
+for (const bouton of echelons) bouton.addEventListener("click", () => sauterA(bouton.dataset.degre));
 
 if (immobile) {
   // L'affiche suffit.

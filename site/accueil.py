@@ -120,6 +120,12 @@ def hreflangs():
     return "\n".join(lignes)
 
 
+def echelon(t, halte, premier):
+    nom = t["degres"][halte["degre"]][0]
+    courant = ' aria-current="true"' if premier else ""
+    return f'<li><button type="button" data-degre="{halte["degre"]}" title="{nom}" aria-label="{nom}"{courant}></button></li>'
+
+
 def degre(t, halte, temps, premier):
     nom, hebreu, ref, phrase = t["degres"][halte["degre"]]
     courant = ' aria-current="true"' if premier else ""
@@ -139,6 +145,7 @@ def page(code):
     url = f'{DOMAINE}/{t["chemin"]}'
     haltes = arrivees()
     degres = "".join(degre(t, halte, temps, i == 0) for i, (halte, temps) in enumerate(haltes))
+    echelle = "".join(echelon(t, halte, i == 0) for i, (halte, _) in enumerate(haltes))
     return f'''<!doctype html>
 <html lang="{code}" dir="{t["sens"]}">
 <meta charset="utf-8">
@@ -161,6 +168,9 @@ def page(code):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="image" href="/images/affiche_2000.webp" imagesrcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
 <link rel="preload" as="image" href="/images/affiche_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
@@ -184,8 +194,9 @@ def page(code):
     <p class="action"><a class="entrer" href="/visite/" data-langue="{code}">{t["entrer"]}</a><span class="note">{t["entrer_note"]}</span></p>
   </div>
 
-  <section class="degres" aria-label="{t["degres_titre"]}" aria-live="polite">
-    <ul>{degres}
+  <section class="degres" aria-label="{t["degres_titre"]}">
+    <ol class="echelle" aria-label="{t["degres_titre"]}">{echelle}</ol>
+    <ul aria-live="polite">{degres}
     </ul>
   </section>
 

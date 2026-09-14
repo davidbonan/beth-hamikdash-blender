@@ -23,6 +23,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=Frank+Ruhl+Libre:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" as="image" href="/images/affiche_2000.webp" imagesrcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" imagesizes="100vw" media="(min-aspect-ratio: 4/5)">
 <link rel="preload" as="image" href="/images/affiche_portrait_720.webp" media="(max-aspect-ratio: 4/5)">
 
@@ -48,8 +51,9 @@
     <p class="action"><a class="entrer" href="/visite/" data-langue="en">Enter the tour</a><span class="note">Free, nothing to install. Ten minutes or an hour.</span></p>
   </div>
 
-  <section class="degres" aria-label="The degrees of holiness" aria-live="polite">
-    <ul>
+  <section class="degres" aria-label="The degrees of holiness">
+    <ol class="echelle" aria-label="The degrees of holiness"><li><button type="button" data-degre="har_habayit" title="Har HaBayit" aria-label="Har HaBayit" aria-current="true"></button></li><li><button type="button" data-degre="heil" title="Chel" aria-label="Chel"></button></li><li><button type="button" data-degre="ezrat_nashim" title="Ezrat Nashim" aria-label="Ezrat Nashim"></button></li><li><button type="button" data-degre="azara" title="Ezrat Israel" aria-label="Ezrat Israel"></button></li><li><button type="button" data-degre="mizbeach" title="Ezrat Kohanim" aria-label="Ezrat Kohanim"></button></li><li><button type="button" data-degre="oulam" title="Between the Ulam and the altar" aria-label="Between the Ulam and the altar"></button></li><li><button type="button" data-degre="heikhal" title="Heikhal" aria-label="Heikhal"></button></li><li><button type="button" data-degre="kodesh_hakodashim" title="Kodesh HaKodashim" aria-label="Kodesh HaKodashim"></button></li></ol>
+    <ul aria-live="polite">
       <li data-degre="har_habayit" data-vue="har_habayit" data-temps="0" aria-current="true">
         <h2><span class="nom">Har HaBayit</span> <span class="nom-he" lang="he" dir="rtl">הר הבית</span></h2>
         <p class="mishna">Holier than Jerusalem: zavim, zavot, menstruants and women after childbirth may not enter.</p>

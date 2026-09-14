@@ -78,9 +78,23 @@ p { margin: 0; text-wrap: pretty; }
 
 /* ---- le degré où l'on est ---- */
 .degres { grid-area: degres; align-self: end; padding-bottom: 12px; }
-.degres ul { list-style: none; margin: 0; padding: 0; }
-.degres li { display: none; border-inline-start: 1px solid var(--or); padding-inline-start: 16px; }
-.degres li[aria-current] { display: block; animation: paraitre 1.2s ease both; }
+.degres ul, .echelle { list-style: none; margin: 0; padding: 0; }
+.echelle { display: flex; gap: 5px; margin-bottom: 14px; }
+.echelle li { flex: 1 1 0; display: flex; }
+.echelle button {
+  flex: 1; height: 18px; padding: 0; border: 0; background: none; cursor: pointer;
+  display: flex; align-items: center;
+}
+.echelle button::before {
+  content: ""; flex: 1; height: 2px; background: var(--trait);
+  transition: background-color .4s ease, height .2s ease;
+}
+.echelle button.gravi::before { background: rgba(201,160,74,.55); }
+.echelle button[aria-current]::before { background: var(--or); height: 3px; }
+.echelle button:hover::before, .echelle button:focus-visible::before { background: var(--lin); height: 3px; }
+.echelle button:focus-visible { outline: 2px solid var(--or); outline-offset: 2px; }
+.degres ul li { display: none; border-inline-start: 1px solid var(--or); padding-inline-start: 16px; }
+.degres ul li[aria-current] { display: block; animation: paraitre 1.2s ease both; }
 .degres h2 { font-size: clamp(20px, 1.9vw, 25px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 .degres .nom-he { font-size: .85em; color: var(--lin-sourd); font-weight: 400; }
 .degres .mishna { margin-top: 8px; font-size: 15px; line-height: 1.45; color: var(--lin); }
@@ -104,5 +118,5 @@ p { margin: 0; text-wrap: pretty; }
 }
 @media (prefers-reduced-motion: reduce) {
   .fond .vivante { transition: none; }
-  .degres li[aria-current] { animation: none; }
+  .degres ul li[aria-current] { animation: none; }
 }
