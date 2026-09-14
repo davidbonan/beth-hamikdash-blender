@@ -566,7 +566,7 @@
         "citation": ""
       }
     ],
-    "note": "Adopted: the four wools are woven into every thread (Shekalim 8:5; Rashi on Exodus 26:31) — the fabric is a mottled purple, not bands of color. Tour's choice: a heavy, flat fabric without drapery, and figures without any human face. Not shown: the different image on the reverse side (Rashi on Yoma 72b)."
+    "note": "Adopted: the four wools are woven into every thread (Shekalim 8:5; Rashi on Exodus 26:31) — the fabric is a mottled purple, not bands of color. Tour's choice: a heavy, flat fabric without drapery, and figures without any human face. Not shown: the different image on the reverse side (Rashi on Yoma 72b). Set aside: R. Yossi, for whom there was only a single parokhet (Yoma 5:1). Tour's choice: Yoma 54a speaks of one parokhet; with two, the bars of the Ark cross the Amah Traksin, carry the inner curtain with them and make the outer one bulge."
   },
   "kodesh_hakodashim": {
     "nom": "Kodesh HaKodashim",
@@ -600,15 +600,21 @@
         "oeuvre": "Yoma",
         "ref": "5:3",
         "citation": ""
+      },
+      {
+        "oeuvre": "Bava Batra",
+        "ref": "99a",
+        "citation": ""
       }
     ]
   },
   "even_hashetiya": {
     "nom": "Even HaShetiya",
     "translit": "Even HaShetiya",
-    "resume": "The foundation stone, at the center of the Kodesh HaKodashim, which rises three fingers above the floor. The Ark rests on it.",
+    "resume": "The foundation stone, at the center of the Kodesh HaKodashim: bare rock breaking through the gold floor and rising three fingers above it. The Ark rests on it.",
     "cotes": [
-      "rises three fingers above the floor"
+      "rises three fingers above the floor",
+      "at the center: ten amot of space on every side of the Ark"
     ],
     "sources": [
       {
@@ -625,9 +631,14 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "4:1",
         "citation": ""
+      },
+      {
+        "oeuvre": "Bava Batra",
+        "ref": "99a",
+        "citation": "ten amot of space on every side"
       }
     ],
-    "note": "Set aside: the Rambam places the stone in the western part of the Kodesh HaKodashim (Beit HaBechirah 4:1); the tour keeps it in the center, as Yoma 5:2 does not specify. The stone is not bare as in the Second Temple (Yoma 5:2): the tour shows the Temple to come, with the Ark resting on it."
+    "note": "Adopted: the stone at the center, since the Ark has “ten amot of space on every side” (Bava Batra 99a). Set aside: the Rambam, who places the stone in the western part of the Kodesh HaKodashim (Beit HaBechirah 4:1). Tour's choice: the irregular outline of the rock, its extent and its relief, which no source gives — only its height, three fingers, is fixed. The stone is not bare as in the Second Temple (Yoma 5:2): the tour shows the Temple to come, with the Ark resting on it."
   },
   "aron": {
     "nom": "Aron HaBrit",
@@ -638,7 +649,7 @@
       "three nested chests (gold, wood, gold)",
       "four gold rings at the upper corners, two per side",
       "2.5 amot between the two badim",
-      "badim ≈ 11 amot (model's choice: they run to the inner parokhet)"
+      "badim ≈ 12 amot (model's choice: they cross the Amah Traksin to the outer parokhet)"
     ],
     "sources": [
       {
@@ -692,7 +703,7 @@
         "citation": "having arrived at the Ark, he sets the machta between the two badim"
       }
     ],
-    "note": "Project's position: the tour shows the Temple to come, with the Ark in its place. It is not a new Ark — “nor shall they make another” (Jeremiah 3:16) — but the Ark of Moses, which Yoshiyahu hid (Yoma 52b; Rambam, Beit HaBechirah 4:1). No source describes its return: this is the project's choice. Tour's choice: the length of the poles, which no source gives; they reach the inner curtain and press against it, as Yoma 54a describes."
+    "note": "Project's position: the tour shows the Temple to come, with the Ark in its place. It is not a new Ark — “nor shall they make another” (Jeremiah 3:16) — but the Ark of Moses, which Yoshiyahu hid (Yoma 52b; Rambam, Beit HaBechirah 4:1). No source describes its return: this is the project's choice. Tour's choice: the length of the poles, which no source gives; they cross the Amah Traksin, carry the inner curtain with them and press against the outer one, as Yoma 54a describes."
   },
   "kaporet": {
     "nom": "Kaporet and the Keruvim",
@@ -751,7 +762,7 @@
   },
   "contenu_aron": {
     "nom": "What Accompanies the Aron",
-    "resume": "Four objects accompany the Ark: the jar of manna, of clay, the staff of Aharon with its almonds and blossoms, the flask of anointing oil, and the chest that the Philistines sent back with it. The tour does not place them inside the Ark but in front of it, between the badim.",
+    "resume": "Four objects accompany the Ark. In front of it, between the badim, the jar of manna, of clay, and the staff of Aharon with its almonds and blossoms. Beside it, to the north, the chest that the Philistines sent back with it. The flask of anointing oil stands in front of it as well.",
     "sources": [
       {
         "oeuvre": "Rambam Beit HaBe'hira",
@@ -782,8 +793,23 @@
         "oeuvre": "Bava Batra",
         "ref": "14b",
         "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "52b",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "17:25",
+        "citation": ""
+      },
+      {
+        "oeuvre": "Bava Batra",
+        "ref": "14a",
+        "citation": ""
       }
     ],
-    "note": "Tour's choice: the Ark stays closed; neither the Tablets nor the Sefer Torah are visible. Set aside: the Sefer Torah placed beside the Ark, on the Philistines' chest or on a board, according to R. Yehuda (Bava Batra 14b)."
+    "note": "Adopted: in front of the Ark, only the manna and the staff (Rambam, Beit HaBechirah 4:1); the chest “beside” it (I Samuel 6:8; Bava Batra 14a). Tour's choice: the place of the oil flask, which the sources only say was hidden with the Ark (Yoma 52b; Horayot 12a), and the north side for the chest. The Ark stays closed; neither the Tablets nor the Sefer Torah are visible. Set aside: the Sefer Torah placed beside the Ark, on the Philistines' chest or on a board, according to R. Yehuda (Bava Batra 14b)."
   }
 }

@@ -1121,6 +1121,24 @@ def terre(name):
     _creuser(mat, _grain(mat, 1.5), 0.5, 0.12)
     return mat
 
+def roche(name):
+    """Rocher en place, ni taillé ni lavé en dalle : deux tons de calcaire, piqué et crevassé.
+    La couleur de base est la moyenne des deux — c'est elle que la visite emporte."""
+    mat, neuf = _neuf(name, (0.40, 0.35, 0.28))
+    if not neuf:
+        return mat
+    liens = mat.node_tree.links
+    _bsdf(mat).inputs["Roughness"].default_value = 0.88
+    melange = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
+    melange.inputs["Color1"].default_value = (0.50, 0.44, 0.35, 1.0)
+    melange.inputs["Color2"].default_value = (0.30, 0.26, 0.21, 1.0)
+    liens.new(_grain(mat, 0.9), melange.inputs["Factor"])
+    liens.new(melange.outputs["Color"], _bsdf(mat).inputs["Base Color"])
+    _creuser(mat, _grain(mat, 1.2), 1.0, 0.35)
+    _creuser(mat, _grain(mat, 0.3), 0.9, 0.08)
+    _creuser(mat, _grain(mat, 0.06), 0.6, 0.015)
+    return mat
+
 def eau(name):
     """Eau du Kiyor : sombre, lisse, elle ne renvoie que le ciel et le bronze."""
     mat, neuf = _neuf(name, (0.05, 0.08, 0.09))
@@ -1150,6 +1168,7 @@ MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 # que le bronze : c'est de sa lumière que vient l'argument.
 MAT_NEHOSHET = lambda: metal("Nehoshet_matzhiv", (0.86, 0.63, 0.29), 0.34)
 MAT_TERRE_CUITE = lambda: enduit("Terre_cuite", (0.46, 0.25, 0.16))
+MAT_ROCHE = lambda: roche("Roche_shetiya")
 MAT_SEL = lambda: enduit("Sel", (0.93, 0.93, 0.91))              # Lishkat HaMela'h (Middot 5:3)
 MAT_PEAU = lambda: etoffe("Peau", (0.40, 0.26, 0.16))            # peaux salées de la Parva (Middot 5:3)
 MAT_KETORET = lambda: enduit("Ketoret", (0.52, 0.38, 0.26))      # sammanim pilés (Keritot 6b)
@@ -1639,6 +1658,15 @@ def sphere(name, x, y, z, r, col="20_Azara", mat=None, segs=16):
                     indice(i + 1, k + 1), indice(i, k + 1)])
              for i in range(anneaux) for k in range(segs)]
     return mesh_from_pydata(name, verts, faces, col, mat)
+
+def ellipsoide(name, x, y, z, rayons, col, mat=None, segs=16):
+    """Sphère unité étirée de `rayons` (rx, ry, rz) amot autour de son centre."""
+    o = sphere(name, x, y, z, 1.0, col, mat, segs)
+    centre = Vector((m(x), m(y), m(z)))
+    for v in o.data.vertices:
+        v.co = centre + Vector(tuple(d * r for d, r in zip(v.co - centre, rayons)))
+    o.data.update()
+    return o
 
 def tore(name, x, y, z, R, r, col, mat=None, rotation=(0, 0, 0), majeur=48, mineur=12):
     """Tore : R rayon du cercle porteur, r rayon du tube (amot).
@@ -4906,12 +4934,15 @@ empty("Parokhet_int_agrafe_NORD", TR1, 9.5, Z_BAT + 20, "60_KodeshHakodashim")
 for cote, paroi in (("ext", ("y", TR0, 1)), ("int", ("y", TR1, -1))):
     frise_parokhet(f"Parokhet_{cote}", paroi, "60_KodeshHakodashim")
 # Les badim de l'Arche pressent le rideau et se voient du Heikhal « כִּשְׁנֵי דַּדֵּי אִשָּׁה »
-# (Yoma 54a ; Mena'hot 98b ; Melakhim I 8:8) : l'étoffe se tend sur quelques amot, et
-# le bout de la barre la pointe au milieu de ce gonflement. Une demi-sphère seule ne
-# rendait qu'une pastille sombre sur le rideau.
+# (Yoma 54a ; Mena'hot 98b ; Melakhim I 8:8). Yoma 54a n'a qu'une parokhet ; avec deux, la
+# barre emporte l'intérieure à travers l'ama de Traksin jusqu'à l'extérieure, qui bombe
+# seule dans le Heikhal. Rien de ces volumes ne passe à l'ouest de la parokhet intérieure.
+TRAKSIN_VIDE = (TR0 - PAROKHET_EP) - (TR1 + PAROKHET_EP)
 for ns, y in (("N", ARON_Y_BAD), ("S", -ARON_Y_BAD)):
-    sphere(f"Parokhet_ext_tension_{ns}", TR0 - 1.55, y, ARON_Z_BAD, 1.8,
-           "60_KodeshHakodashim", MAT_PAROKHET())
+    ellipsoide(f"Parokhet_int_tension_{ns}", (TR0 + TR1) / 2, y, ARON_Z_BAD,
+               (TRAKSIN_VIDE / 2, 0.3, 0.3), "60_KodeshHakodashim", MAT_PAROKHET())
+    ellipsoide(f"Parokhet_ext_tension_{ns}", TR0 - PAROKHET_EP, y, ARON_Z_BAD,
+               (PAROKHET_EP + 0.25, 0.92, 0.92), "60_KodeshHakodashim", MAT_PAROKHET())
     sphere(f"Parokhet_ext_bosse_{ns}", TR0 + 0.16, y, ARON_Z_BAD, 0.36,
            "60_KodeshHakodashim", MAT_PAROKHET())
 
@@ -4977,11 +5008,65 @@ for k, (creux, z_haut) in enumerate(((3.0, 38.6), (4.5, 37.6), (6.0, 36.6))):
     for i in range(24):
         cyl_between(f"Devir_chaine_{k}_{i:02d}", points[i], points[i + 1], 0.06, "50_Heikhal", MAT_OR(), verts=6)
 
-# --- Kodesh HaKodashim : Even HaShetiya (3 doigts ≈ 0.125 ama, Yoma 5:2)
+# --- Kodesh HaKodashim : Even HaShetiya. « גְּבוֹהָה מִן הָאָרֶץ שָׁלשׁ אֶצְבָּעוֹת » (Yoma 5:2) est sa
+#     seule cote : le rocher perce le sol d'or sans jamais le dépasser de 3 doigts, et il
+#     est au centre, « רֶיוַח עֶשֶׂר אַמּוֹת לְכׇל רוּחַ » autour de l'Arche (Bava Batra 99a).
+#     Contour, emprise et relief : CHOIX ; plat là où l'Arche et la ma'hta se posent.
 KKC = (KK0 + KK1) / 2
-ZE = Z_BAT + 0.125          # dessus de la pierre
-box("Even_HaShetiya", KKC - 1.5, KKC + 1.5, -1.5, 1.5,
-    Z_BAT, ZE, "60_KodeshHakodashim", MAT_SOL())
+ZE = Z_BAT + 0.125          # 3 doigts : le haut de la pierre, où l'Arche se pose
+SHETIYA_CENTRE, SHETIYA_DEMI_AXES = (KKC + 0.2, 0.1), (2.5, 2.9)
+SHETIYA_ASSISE = (KKC - 0.9, KKC + 1.6, -1.45, 1.45)   # l'Arche, ce qui est devant elle, la ma'hta
+# (harmonique, amplitude, phase) du contour : les basses font la masse, les hautes l'arête.
+SHETIYA_HARMONIQUES = ((2, 0.12, 0.7), (3, 0.08, 2.1), (5, 0.05, 4.0), (9, 0.03, 1.2), (17, 0.015, 0.3))
+
+
+def contour_shetiya(a):
+    """Rayon du contour dans la direction `a`, en fraction des demi-axes."""
+    return 1 + sum(amplitude * math.sin(n * a + phase) for n, amplitude, phase in SHETIYA_HARMONIQUES)
+
+
+def _montee(debut, fin, v):
+    t = min(1.0, max(0.0, (v - debut) / (fin - debut)))
+    return t * t * (3 - 2 * t)
+
+
+def dessus_shetiya(x, y, t):
+    """Haut du rocher au-dessus du sol en (x, y), à la fraction `t` du centre au bord."""
+    bord = 0.125 * (0.15 + 0.85 * _montee(1.0, 0.6, t))
+    creux = 0.035 * (1 + math.sin(3.1 * x + 1.3) * math.cos(2.3 * y + 0.4)) * (0.6 + 0.4 * math.sin(5.3 * (x + y)))
+    x0, x1, y0, y1 = SHETIYA_ASSISE
+    hors_assise = max(x0 - x, x - x1, y0 - y, y - y1, 0.0)
+    return max(0.04, ZE - Z_BAT - (0.125 - bord + creux) * _montee(0.0, 0.4, hors_assise))   # 0,04 : au-dessus du placage d'or
+
+
+def cote_shetiya(x, y):
+    """Cote du dessus du rocher en (x, y), en amot."""
+    u, v = (x - SHETIYA_CENTRE[0]) / SHETIYA_DEMI_AXES[0], (y - SHETIYA_CENTRE[1]) / SHETIYA_DEMI_AXES[1]
+    return Z_BAT + dessus_shetiya(x, y, math.hypot(u, v) / contour_shetiya(math.atan2(v, u)))
+
+
+def even_hashetiya(name, col, anneaux=16, segs=144):
+    """Le rocher en nappe polaire : un dessus irrégulier, puis une jupe qui plonge sous l'or."""
+    (cx, cy), (ax, ay) = SHETIYA_CENTRE, SHETIYA_DEMI_AXES
+    verts = [(cx, cy, cote_shetiya(cx, cy))]
+    for i in range(1, anneaux + 1):
+        t = i / anneaux
+        for s in range(segs):
+            a = 2 * math.pi * s / segs
+            x, y = cx + ax * t * contour_shetiya(a) * math.cos(a), cy + ay * t * contour_shetiya(a) * math.sin(a)
+            verts.append((x, y, Z_BAT + dessus_shetiya(x, y, t)))
+    verts += [(x, y, Z_BAT - 0.02) for x, y, _ in verts[-segs:]]
+
+    def sommet(i, s):
+        return 1 + (i - 1) * segs + s % segs
+
+    faces = [[0, sommet(1, s), sommet(1, s + 1)] for s in range(segs)]
+    faces += [[sommet(i, s), sommet(i + 1, s), sommet(i + 1, s + 1), sommet(i, s + 1)]
+              for i in range(1, anneaux + 1) for s in range(segs)]
+    return _lisser(mesh_from_pydata(name, verts, faces, col, MAT_ROCHE()), 8)
+
+
+even_hashetiya("Even_HaShetiya", "60_KodeshHakodashim")
 empty("Point_Machta_braises", ARON_X_MACHTA, 0, Z_BAT + 0.3, "60_KodeshHakodashim")
 
 # --- Aron HaBrit, posé sur la pierre (Rambam, Beit HaBe'hira 4:1) — le Temple à venir
@@ -4989,14 +5074,16 @@ empty("Point_Machta_braises", ARON_X_MACHTA, 0, Z_BAT + 0.3, "60_KodeshHakodashi
 #     2,5 × 1,5 × 1,5 amot, grand côté nord-sud, badim est-ouest le long de la largeur
 #     (Menachot 98b), anneaux aux coins supérieurs (Rashi Shemot 25:12), kaporet d'un
 #     tefa'h, keruvim de 10 tefa'him, ailes au-dessus des têtes, l'une vers l'autre
-#     (Soucca 5b). Les badim courent jusqu'à la parokhet intérieure : c'est ce qui rend
+#     (Soucca 5b). Les badim courent jusqu'à la parokhet extérieure : c'est ce qui rend
 #     physiques « entre les deux badim » (Yoma 5:1, 5:3) et les bosses du rideau.
 H_KERUV = 10 / 6      # 10 tefa'him (Soucca 5b)
 # « ומצודדים פניהם » (Bava Batra 99a) : entre « וּפְנֵיהֶם אִישׁ אֶל אָחִיו » (Shemot 25:20) et
 # « וּפְנֵיהֶם לַבָּיִת » (Divrei HaYamim II 3:13), chaque visage se tourne vers l'est. L'angle : CHOIX.
 BIAIS_KERUV = math.radians(20)
-# Les mains se rejoignent au milieu de la kaporet quel que soit le biais (main à 0,80 du torse).
-Y_KERUV = 0.05 + 0.80 * math.cos(BIAIS_KERUV)
+# Les mains se rejoignent au milieu de la kaporet quel que soit le biais. La portée fixe
+# aussi où tombent les pieds : « מִן הַכַּפֹּרֶת » (Shemot 25:19), rien ne dépasse son bord.
+PORTEE_KERUV = 0.66
+Y_KERUV = 0.05 + PORTEE_KERUV * math.cos(BIAIS_KERUV)
 # Demi-profil d'une penne, déplié par `limbe` : étroite à l'emplanture, large au tiers,
 # effilée au bout. Trois pennes par aile, décalées — une aile d'une seule plaque n'a pas
 # de plumage, et trois plaques plates n'ont pas d'aile.
@@ -5014,7 +5101,7 @@ def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.26):
     dais au-dessus du milieu, et ne touchent pas le corps.
 
     Bâti à l'origine, **-x vers l'autre keruv**, puis tourné : `vers` est le sens en y
-    du centre de la kaporet. `h` et `epaules` distinguent le garçon de la fille (Yoma 54b).
+    du centre de la kaporet. `h` et `epaules` distinguent le garçon de la fille.
 
     Une pile de boîtes surmontée d'une sphère et deux plaques plates en travers rendaient
     un épouvantail : le membre se lit à son galbe, et l'aile à son plumage.
@@ -5025,7 +5112,7 @@ def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.26):
     for s_ in (-1, 1):
         yj = s_ * 0.135
         # Le tibié repose à plat sur la kaporet, le genou devant : c'est l'agenouillement.
-        pieces.append(cyl_between(f"{name}_tibia{s_:+d}", (0.14, yj, 0.075 * h), (0.66, yj, 0.070 * h),
+        pieces.append(cyl_between(f"{name}_tibia{s_:+d}", (0.14, yj, 0.075 * h), (0.52, yj, 0.070 * h),
                                   0.075, col, or_, verts=10))
         pieces.append(sphere(f"{name}_genou{s_:+d}", 0.14, yj, genou * 0.85, 0.085, col, or_, segs=8))
         pieces.append(cyl_between(f"{name}_cuisse{s_:+d}", (0.16, yj, genou * 0.85), (-0.06, yj, hanche),
@@ -5042,10 +5129,11 @@ def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.26):
     pieces.append(sphere(f"{name}_tete", -0.31, 0, epaule + 0.16 * h, 0.125 * h, col, or_, segs=14))
     for s_ in (-1, 1):
         # Les bras vont droit devant, jusqu'à la main de l'autre keruv, au milieu.
-        main = (-0.80, s_ * 0.055, epaule - 0.10 * h)
+        main = (-PORTEE_KERUV, s_ * 0.055, epaule - 0.10 * h)
+        coude = (-0.42, s_ * 0.13, epaule - 0.09 * h)
         pieces.append(cyl_between(f"{name}_bras{s_:+d}", (-0.19, s_ * (epaules - 0.03), epaule - 0.02),
-                                  (-0.50, s_ * 0.13, epaule - 0.09 * h), 0.062, col, or_, verts=8))
-        pieces.append(cyl_between(f"{name}_avantbras{s_:+d}", (-0.50, s_ * 0.13, epaule - 0.09 * h),
+                                  coude, 0.062, col, or_, verts=8))
+        pieces.append(cyl_between(f"{name}_avantbras{s_:+d}", coude,
                                   main, 0.052, col, or_, verts=8))
         pieces.append(sphere(f"{name}_main{s_:+d}", *main, 0.072, col, or_, segs=8))
         # L'aile part de l'omoplate, monte et vient au-dessus du milieu de la kaporet :
@@ -5053,7 +5141,7 @@ def keruv(name, x, y, z0, col, vers, h=H_KERUV, epaules=0.26):
         emplanture = (-0.06, s_ * 0.115, epaule - 0.06 * h)
         for k, (ecart, longueur, largeur) in enumerate(((0.00, 1.00, 1.00), (0.13, 0.82, 0.80),
                                                         (0.24, 0.62, 0.62))):
-            cible = (-0.76 + 0.10 * k, s_ * (0.14 + 0.13 * k), epaule + 0.42 * h - 0.08 * h * k)
+            cible = (0.04 - PORTEE_KERUV + 0.10 * k, s_ * (0.14 + 0.13 * k), epaule + 0.42 * h - 0.08 * h * k)
             base = (emplanture[0] + 0.10 * ecart, emplanture[1] + s_ * 0.05 * ecart,
                     emplanture[2] - 0.20 * ecart)
             axe = tuple(c - b for c, b in zip(cible, base))
@@ -5080,19 +5168,24 @@ for etage, (saillie, zb, zh) in enumerate(((0.06, Z_KAPORET - 0.14, Z_ZER - 0.05
                                   ("O", (ARON_X0 - saillie, ARON_X0 + 0.02, -ARON_Y - saillie, ARON_Y + saillie))):
         box(f"Aron_zer{etage}_{cote}", x0, x1, y0, y1, zb, zh, ARON, MAT_OR())
 
-# Devant l'Arche, entre les badim (Rambam, Beit HaBe'hira 4:1 ; Horayot 12a) : la
-# fiole de manne en terre (Shemot 16:33, Rashi), le bâton d'Aharon avec ses amandes et
-# ses fleurs (Bamidbar 17:23), la fiole d'huile d'onction, le coffret des Philistins
-# (Shmouel I 6:8). Sur la pierre, de part et d'autre de la place de la ma'hta.
+# « וּלְפָנָיו צִנְצֶנֶת הַמָּן וּמַטֵּה אַהֲרֹן » (Rambam, Beit HaBe'hira 4:1) : devant l'Arche, entre les
+# badim, la fiole de manne « צְלוֹחִית שֶׁל חֶרֶס » (Rashi Shemot 16:33) et le bâton d'Aharon avec
+# ses amandes et ses fleurs (Bamidbar 17:23-25). La fiole d'huile d'onction n'est que
+# « cachée avec » l'Arche (Yoma 52b) : sa place devant elle est un CHOIX.
 X_DEVANT = ARON_X1 + 0.32
 revolution("Aron_tsintsenet_man", X_DEVANT, 0.62, ZE,
            [(0.07, 0), (0.12, 0.05), (0.13, 0.20), (0.09, 0.28), (0.06, 0.31), (0.07, 0.35),
-            (0.05, 0.35), (0.0, 0.33)], ARON, MAT_PIERRE(), verts=16)
+            (0.05, 0.35), (0.0, 0.33)], ARON, MAT_TERRE_CUITE(), verts=16)
 revolution("Aron_pakh_shemen", X_DEVANT, -0.62, ZE,
            [(0.06, 0), (0.10, 0.04), (0.10, 0.16), (0.04, 0.22), (0.035, 0.30), (0.05, 0.32),
             (0.0, 0.31)], ARON, MAT_PIERRE(), verts=16)
-box("Aron_argaz", ARON_X1 + 0.06, ARON_X1 + 0.50, 0.88, 1.28, ZE, ZE + 0.28, ARON, MAT_CEDRE())
-box("Aron_argaz_couvercle", ARON_X1 + 0.03, ARON_X1 + 0.53, 0.85, 1.31, ZE + 0.28, ZE + 0.34, ARON, MAT_CEDRE())
+# Le coffret des Philistins est « מִצִּדּוֹ » (Shmouel I 6:8 ; Bava Batra 14a), à côté de l'Arche
+# et non devant : au nord, au-delà du bad — le côté est un CHOIX. Posé au plus bas du rocher.
+ARGAZ = (KKC - 0.22, KKC + 0.22, 1.62, 2.02)
+Z_ARGAZ = min(cote_shetiya(x, y) for x in ARGAZ[:2] for y in ARGAZ[2:])
+box("Aron_argaz", *ARGAZ, Z_ARGAZ, Z_ARGAZ + 0.28, ARON, MAT_CEDRE())
+box("Aron_argaz_couvercle", ARGAZ[0] - 0.03, ARGAZ[1] + 0.03, ARGAZ[2] - 0.03, ARGAZ[3] + 0.03,
+    Z_ARGAZ + 0.28, Z_ARGAZ + 0.34, ARON, MAT_CEDRE())
 PIED_MATE, TETE_MATE = (ARON_X1 + 0.62, -1.02, ZE), (ARON_X1 + 0.02, -1.14, Z_ZER + 0.30)
 cyl_between("Aron_mate_Aharon", PIED_MATE, TETE_MATE, 0.03, ARON, MAT_CHENE(), verts=8)
 for k, t in enumerate((0.80, 0.88, 0.96)):
@@ -5101,7 +5194,7 @@ for k, t in enumerate((0.80, 0.88, 0.96)):
     z_ = PIED_MATE[2] + t * (TETE_MATE[2] - PIED_MATE[2])
     sphere(f"Aron_mate_amande_{k}", x_, y_, z_, 0.035, ARON, MAT_PIERRE(), segs=8)
 
-# Le garçon au nord, la fille au sud (Yoma 54b), un peu plus menue.
+# « כְּחִבַּת זָכָר וּנְקֵבָה » (Yoma 54a) ; le garçon au nord et la fille au sud, un peu plus menue : CHOIX.
 keruv("Aron_keruv_N", KKC, Y_KERUV, Z_KAPORET + 1 / 6, ARON, vers=-1)
 keruv("Aron_keruv_S", KKC, -Y_KERUV, Z_KAPORET + 1 / 6, ARON, vers=1, h=0.94 * H_KERUV, epaules=0.25)
 for ns, sy in (("N", 1), ("S", -1)):
@@ -5109,7 +5202,7 @@ for ns, sy in (("N", 1), ("S", -1)):
         tore(f"Aron_anneau_{ns}{eo}", x, sy * ARON_Y_BAD, ARON_Z_BAD, 0.12, 0.03, ARON,
              MAT_OR(), rotation=(0, math.pi / 2, 0), majeur=24, mineur=8)
     cyl_between(f"Aron_bad_{ns}", (ARON_X0 - 0.5, sy * ARON_Y_BAD, ARON_Z_BAD),
-                (TR1 + 0.05, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
+                (TR0 + 0.10, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
 
 # ----------------------------------------------------------------------------
 # 75 — FIGURES
