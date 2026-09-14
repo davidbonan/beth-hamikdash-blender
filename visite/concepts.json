@@ -8,6 +8,8 @@
       "prefixes": [
         "HarHabayit_mur",
         "HarHabayit_creneaux",
+        "HarHabayit_bandeau",
+        "HarHabayit_pilastre",
         "HarHabayit_soubassement"
       ]
     },
@@ -55,7 +57,8 @@
         "EzratNashim_sol",
         "EzratNashim_couronnement",
         "EzratNashim_socle",
-        "EzratNashim_bandeau"
+        "EzratNashim_bandeau",
+        "EzratNashim_pilastre"
       ],
       "lieu": true
     },
@@ -139,6 +142,7 @@
         "Azara_sol",
         "Azara_couronnement",
         "Azara_socle",
+        "Azara_pilastre",
         "Azara_bandeau"
       ],
       "lieu": true
