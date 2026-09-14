@@ -1,0 +1,40 @@
+[build]
+  command = "./construire_site.sh"
+  publish = "dist"
+
+[[redirects]]
+  from = "https://www.bethhamikdach.com/*"
+  to = "https://bethhamikdach.com/:splat"
+  status = 301
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/visite/*.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/visite/*.glb"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/visite/matieres/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=2592000"
+
+[[headers]]
+  for = "/visite/plans/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=2592000"
