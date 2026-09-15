@@ -7,7 +7,7 @@ et écrit la carte. `beit_hamikdash_parokhet.py` (le motif tissé) et
 `beit_hamikdash_gravures.py` (les figures des parois) le lisent tous deux.
 
 Ligne 0 en bas, comme z. Ni scipy ni PIL : numpy seul, et bpy pour écrire le PNG que
-`cwebp` compresse — l'alpha du WebP est codé à part et sans perte.
+`cwebp` compresse, sans perte : une hauteur se dérive, ses blocs feraient des marches.
 """
 import pathlib
 import subprocess
@@ -82,6 +82,60 @@ def distance(masque, rayon):
     return d
 
 
+def inonder(graine, dedans):
+    """Les pixels de `dedans` que l'on atteint depuis `graine` par les quatre voisins :
+    une dilatation par tour, jusqu'à ce que plus rien ne s'ajoute."""
+    courant = graine & dedans
+    while True:
+        g = np.pad(courant, 1, constant_values=False)
+        suivant = (courant | g[:-2, 1:-1] | g[2:, 1:-1] | g[1:-1, :-2] | g[1:-1, 2:]) & dedans
+        if (suivant == courant).all():
+            return courant
+        courant = suivant
+
+
+def figure(masque):
+    """Le masque ramené à UNE figure pleine : le morceau qui compte le plus de pixels,
+    ses trous bouchés. Une ouverture d'un pixel ôte d'abord les poussières, qui
+    coûteraient chacune un remplissage."""
+    g = np.pad(_eroder(masque, diagonales=False), 1, constant_values=False)
+    reste = g[1:-1, 1:-1] | g[:-2, 1:-1] | g[2:, 1:-1] | g[1:-1, :-2] | g[1:-1, 2:]
+    meilleur = np.zeros_like(masque)
+    while reste.any():
+        graine = np.zeros_like(masque)
+        graine[tuple(np.argwhere(reste)[0])] = True
+        morceau = inonder(graine, reste)
+        if morceau.sum() > meilleur.sum():
+            meilleur = morceau
+        reste &= ~morceau
+    bord = np.zeros_like(masque)
+    bord[0, :] = bord[-1, :] = bord[:, 0] = bord[:, -1] = True
+    return ~inonder(bord, ~meilleur)
+
+
+def cadrer(carte, masque, cadre, pixels):
+    """La carte posée dans `cadre` = (u0, z0, u1, z1) à `pixels` de large : le pied de
+    la figure en z = 0, son sommet en z = 1, l'axe de sa boîte en u = 0. Bilinéaire."""
+    lignes, colonnes = np.nonzero(masque)
+    bas, haut = lignes.min(), lignes.max() + 1
+    milieu = (colonnes.min() + colonnes.max() + 1) / 2
+    u0, z0, u1, z1 = cadre
+    echelle = pixels / (u1 - u0)
+    hauteur = int(round((z1 - z0) * echelle))
+    z = z0 + (np.arange(hauteur) + 0.5) / echelle
+    u = u0 + (np.arange(pixels) + 0.5) / echelle
+    l = np.clip(bas + z * (haut - bas) - 0.5, 0, carte.shape[0] - 1.001)
+    c = np.clip(milieu + u * (haut - bas) - 0.5, 0, carte.shape[1] - 1.001)
+    l0, c0 = np.floor(l).astype(int), np.floor(c).astype(int)
+    fl, fc = (l - l0)[:, None], (c - c0)[None, :]
+
+    def echantillon(source):
+        source = source.astype(np.float32)
+        return ((1 - fl) * (1 - fc) * source[l0][:, c0] + (1 - fl) * fc * source[l0][:, c0 + 1]
+                + fl * (1 - fc) * source[l0 + 1][:, c0] + fl * fc * source[l0 + 1][:, c0 + 1])
+    return echantillon(carte), echantillon(masque) > 0.5
+
+
 def bombe(t):
     """Le profil d'un bombé, de t = 0 au bord à t = 1 au plein : une parabole, qui
     monte vite au bord et s'aplatit au sommet. Un quart de cercle grésillait au bord."""
@@ -148,18 +202,23 @@ class Planche:
         return carte, self.masque.astype(np.float32)
 
     def silhouette(self, tolerance):
-        """Le contour extérieur de tout ce qui a été posé, en coordonnées réelles,
-        simplifié à `tolerance` (réel) près. Une seule figure d'un seul tenant."""
-        pixels = tracer(self.masque)
-        aire_masque = self.masque.sum()
-        aire_polygone = abs(sum(u0 * z1 - u1 * z0 for (u0, z0), (u1, z1)
-                                in zip(pixels, pixels[1:] + pixels[:1]))) / 2
-        if abs(aire_polygone - aire_masque) > 0.05 * aire_masque:
-            raise ValueError(f"silhouette en plusieurs morceaux ou trouée : polygone "
-                             f"{aire_polygone:.0f} px² pour un masque de {aire_masque} px²")
-        simple = simplifier(pixels, tolerance * self.echelle)
-        return [(self.u0 + (c + 0.5) / self.echelle, self.z0 + (l + 0.5) / self.echelle)
-                for c, l in simple]
+        """Le contour extérieur de tout ce qui a été posé, en coordonnées réelles."""
+        return silhouette(self.masque, (self.u0, self.z0), self.echelle, tolerance)
+
+
+def silhouette(masque, origine, echelle, tolerance):
+    """Le contour extérieur d'un masque, en coordonnées réelles depuis `origine` (u, z),
+    simplifié à `tolerance` (réel) près. Une seule figure d'un seul tenant."""
+    pixels = tracer(masque)
+    aire_masque = masque.sum()
+    aire_polygone = abs(sum(u0 * z1 - u1 * z0 for (u0, z0), (u1, z1)
+                            in zip(pixels, pixels[1:] + pixels[:1]))) / 2
+    if abs(aire_polygone - aire_masque) > 0.05 * aire_masque:
+        raise ValueError(f"silhouette en plusieurs morceaux ou trouée : polygone "
+                         f"{aire_polygone:.0f} px² pour un masque de {aire_masque} px²")
+    u0, z0 = origine
+    return [(u0 + (c + 0.5) / echelle, z0 + (l + 0.5) / echelle)
+            for c, l in simplifier(pixels, tolerance * echelle)]
 
 
 # Les huit voisins dans l'ordre horaire, en (colonne, ligne), la ligne 0 étant en bas.
@@ -226,9 +285,22 @@ def _dp(pts, tolerance):
     return [tuple(p) for p in pts[garde]]
 
 
+def lire(chemin):
+    """La luminance d'une image, ligne 0 en bas, aux valeurs du fichier : lue en couleur,
+    bpy la passerait en linéaire, et les gris sombres, écrasés, sortiraient en marches."""
+    image = bpy.data.images.load(str(chemin))
+    image.colorspace_settings.name = "Non-Color"
+    largeur, hauteur = image.size
+    pixels = np.empty(largeur * hauteur * 4, dtype=np.float32)
+    image.pixels.foreach_get(pixels)
+    bpy.data.images.remove(image)
+    return pixels.reshape(hauteur, largeur, 4)[..., :3].mean(axis=2)
+
+
 def ecrire(nom, relief, masque):
     """RGB = hauteur en gris, alpha = masque. Le PNG passe par bpy, le WebP par cwebp,
-    `-exact` gardant l'alpha entier là où il vaut zéro."""
+    SANS PERTE : une hauteur se dérive en pente, et les blocs d'une compression à perte,
+    invisibles sur une image, ressortent en marches dès que la carte porte du détail."""
     hauteur, largeur = relief.shape
     pixels = np.empty((hauteur, largeur, 4), dtype=np.float32)
     pixels[..., 0] = pixels[..., 1] = pixels[..., 2] = relief
@@ -241,7 +313,7 @@ def ecrire(nom, relief, masque):
     image.file_format = "PNG"
     image.save()
     webp = SORTIE / f"{nom}.webp"
-    subprocess.run(["cwebp", "-quiet", "-q", "90", "-m", "6", "-exact", str(png), "-o", str(webp)],
+    subprocess.run(["cwebp", "-quiet", "-lossless", "-z", "9", "-exact", str(png), "-o", str(webp)],
                    check=True)
     print(f"  {webp.relative_to(RACINE)} : {largeur} × {hauteur}, {webp.stat().st_size / 1e3:.0f} ko")
     return webp

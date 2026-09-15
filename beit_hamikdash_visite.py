@@ -105,11 +105,13 @@ def comprimer(glb, options=()):
     """
     sortie = glb.with_suffix(".pack.glb")
     # `-kv` : les UV des plaques gravées ne servent à aucune texture glTF — c'est
-    # matieres.js qui les lit — et gltfpack les jetait comme inutilisées. `-vt 16` :
-    # à 12 bits il les range dans un uint16 seize fois trop petit et compense par une
-    # KHR_texture_transform sur la texture de la matière, qu'aucune matière n'a ici.
+    # matieres.js qui les lit — et gltfpack les jetait comme inutilisées. `-vtf` : quantifiées,
+    # il les recadre sur leur boîte englobante et compense par une KHR_texture_transform
+    # sur la texture de la matière, qu'aucune matière n'a ici — à 16 bits l'écart
+    # restait, un dixième de figure en haut de l'atlas, et le modelé glissait sous sa
+    # plaque. En flottants, il les laisse telles quelles.
     commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
-                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vn", "12", "-vt", "16", *options]
+                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vn", "12", "-vtf", *options]
     try:
         subprocess.run(commande, check=True, capture_output=True, timeout=600)
     except (OSError, subprocess.SubprocessError) as erreur:

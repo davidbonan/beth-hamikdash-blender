@@ -7,7 +7,11 @@ L'accueil est une montée en images : l'affiche en seuil, puis les degrés de sa
 (Kelim 1:8-9) un à un sur une scène épinglée, chacun par l'image du film prise de ce point
 (site/images/<degré>_1000 et _2000.webp) qui se fond dans la suivante au fil du défilement,
 et le Kodesh HaKodashim en finale. Chaque légende mène à la visite, à la vue du même point.
+
+Avant la montée, les lishkot : une plongée sur les cours (site/images/lishkot_*.webp, caméra
+ACC_09_Lishkot), un repère par chambre à sa place projetée dans le cadre.
 """
+import json
 from pathlib import Path
 
 SITE = Path(__file__).resolve().parent
@@ -24,6 +28,28 @@ DEGRES = [
     ("heikhal", "heikhal"),
     ("kodesh_hakodashim", "kodesh_hakodashim"),
 ]
+
+# Chaque chambre à la place où la caméra ACC_09_Lishkot la projette, en % du cadre, dans l'ordre de la marche.
+CHAMBRES = [
+    ("lishkat_hanezirim", 72.2, 90.9),
+    ("lishkat_haetzim", 79.4, 65.1),
+    ("lishkat_hametzoraim", 64.2, 51.4),
+    ("lishkat_beit_shemanya", 56.3, 75.5),
+    ("lishkat_pinchas", 56.9, 53.6),
+    ("lishkat_osei_chavitin", 54.7, 60.0),
+    ("beit_hamoked", 61.0, 36.2),
+    ("beit_hatevila", 35.6, 28.2),
+    ("beit_hanitzotz", 45.3, 22.4),
+    ("lishkat_hagazit", 40.8, 19.9),
+    ("lishkat_hagola", 37.9, 14.7),
+    ("lishkat_haetz", 41.0, 12.9),
+    ("lishkat_hamelach", 45.3, 68.7),
+    ("lishkat_haparva", 37.8, 60.8),
+    ("lishkat_hamedichin", 34.6, 58.0),
+    ("lishkat_parhedrin", 43.9, 74.0),
+    ("beit_avtinas", 47.4, 75.1),
+]
+SOUTERRAINES = {"beit_hatevila"}
 
 TEXTES = {
     "fr": {
@@ -42,6 +68,28 @@ TEXTES = {
         "ouverture": "Du Har HaBayit au Kodesh HaKodashim, la Mishna Kelim compte les degrés de sainteté. À chacun, moins de monde entre.",
         "voir": "Voir dans la visite",
         "mishna": "Mishna Kelim",
+        "lishkot_titre": "Les lishkot",
+        "lishkot_ouverture": "Autour des cours, dix-sept chambres, chacune à son service. Le Sanhédrin siège dans l'une, on sale les peaux dans une autre, le Cohen Gadol s'immerge sur un toit. Toutes sont bâties dans la visite.",
+        "sous_terre": "sous terre",
+        "chambres": {
+            "lishkat_hanezirim": ("Les nazirs y font cuire leurs offrandes de paix, et y jettent sous la marmite la chevelure qu'ils ont rasée.", "Middot 2:5"),
+            "lishkat_haetzim": ("Les cohanim atteints d'un défaut y trient le bois de l'autel et écartent toute bûche véreuse.", "Middot 2:5"),
+            "lishkat_hametzoraim": ("La cour sans toit des metzoraïm.", "Middot 2:5"),
+            "lishkat_beit_shemanya": ("La réserve du vin et de l'huile, selon Abba Shaoul.", "Middot 2:5"),
+            "lishkat_pinchas": ("Pin'has, l'habilleur, y vêt les cohanim pour le service.", "Middot 1:4 ; Shekalim 5:1"),
+            "lishkat_osei_chavitin": ("On y prépare les 'havitin, l'offrande quotidienne du Cohen Gadol.", "Middot 1:4"),
+            "beit_hamoked": ("Une grande salle voûtée où dorment les anciens de la garde, les clefs de l'Azara en main.", "Middot 1:8"),
+            "beit_hatevila": ("Sous l'Azara, au bout d'un tunnel éclairé : le cohen devenu impur la nuit s'y immerge puis se réchauffe au feu.", "Tamid 1:1"),
+            "beit_hanitzotz": ("L'étage au-dessus de la porte : les cohanim y montent la garde en haut, les Léviim en bas.", "Middot 1:5"),
+            "lishkat_hagazit": ("La salle de pierre taillée, où siège le Grand Sanhédrin d'Israël.", "Middot 5:4"),
+            "lishkat_hagola": ("Un puits creusé, une roue posée dessus : c'est de là que l'eau vient à toute l'Azara.", "Middot 5:4"),
+            "lishkat_haetz": ("« J'ai oublié à quoi elle servait », dit Rabbi Eliézer ben Yaakov.", "Middot 5:4"),
+            "lishkat_hamelach": ("On y garde le sel des korbanot.", "Middot 5:3"),
+            "lishkat_haparva": ("On y sale les peaux des offrandes ; sur son toit, le bain du Cohen Gadol à Kippour.", "Middot 5:3"),
+            "lishkat_hamedichin": ("On y rince les entrailles des offrandes ; une montée en vis mène au toit de la Parva.", "Middot 5:3"),
+            "lishkat_parhedrin": ("Le Cohen Gadol y demeure les sept jours qui précèdent Kippour.", "Yoma 1:1"),
+            "beit_avtinas": ("La famille d'Avtinas y prépare l'encens, dont elle garde le secret.", "Tamid 1:1 ; Yoma 3:11"),
+        },
         "degres": {
             "har_habayit": ("Har HaBayit", "הר הבית", "1:8", "Plus saint que Jérusalem : les zavim, les zavot, les niddot et les accouchées n'y entrent pas."),
             "heil": ("Heil", "חיל", "1:8", "Plus saint que le Har HaBayit : les non-Juifs et ceux qu'un mort a rendus impurs n'y entrent pas."),
@@ -69,6 +117,28 @@ TEXTES = {
         "ouverture": "From the Har HaBayit to the Kodesh HaKodashim, Mishnah Kelim counts the degrees of holiness. At each one, fewer may enter.",
         "voir": "See it in the tour",
         "mishna": "Mishnah Kelim",
+        "lishkot_titre": "The lishkot",
+        "lishkot_ouverture": "Around the courts, seventeen chambers, each with its own service. The Sanhedrin sits in one, hides are salted in another, the Kohen Gadol immerses on a rooftop. Every one of them is built in the tour.",
+        "sous_terre": "underground",
+        "chambres": {
+            "lishkat_hanezirim": ("The nazirites cook their peace offerings here, and throw the hair they have shaved under the pot.", "Middot 2:5"),
+            "lishkat_haetzim": ("Blemished kohanim sort the wood for the altar here and set aside every wormy log.", "Middot 2:5"),
+            "lishkat_hametzoraim": ("The roofless court of the metzora'im.", "Middot 2:5"),
+            "lishkat_beit_shemanya": ("The store of wine and oil, according to Abba Shaul.", "Middot 2:5"),
+            "lishkat_pinchas": ("Pinchas the dresser clothes the kohanim here for the service.", "Middot 1:4; Shekalim 5:1"),
+            "lishkat_osei_chavitin": ("The chavitin are made here, the daily offering of the Kohen Gadol.", "Middot 1:4"),
+            "beit_hamoked": ("A great vaulted hall where the elders of the watch sleep, the keys of the Azara in their hands.", "Middot 1:8"),
+            "beit_hatevila": ("Beneath the Azara, at the end of a lamplit tunnel: a kohen made impure in the night immerses here, then warms himself by the fire.", "Tamid 1:1"),
+            "beit_hanitzotz": ("The upper storey over the gate: kohanim keep watch above, Levites below.", "Middot 1:5"),
+            "lishkat_hagazit": ("The hall of hewn stone, where the Great Sanhedrin of Israel sits.", "Middot 5:4"),
+            "lishkat_hagola": ("A cistern dug out, a wheel set over it: from here water reaches the whole Azara.", "Middot 5:4"),
+            "lishkat_haetz": ("“I have forgotten what it was used for,” says Rabbi Eliezer ben Yaakov.", "Middot 5:4"),
+            "lishkat_hamelach": ("The salt for the korbanot is kept here.", "Middot 5:3"),
+            "lishkat_haparva": ("The hides of the offerings are salted here; on its roof, the bath of the Kohen Gadol on Yom Kippur.", "Middot 5:3"),
+            "lishkat_hamedichin": ("The entrails of the offerings are rinsed here; a winding stair climbs to the roof of the Parva.", "Middot 5:3"),
+            "lishkat_parhedrin": ("The Kohen Gadol stays here for the seven days before Yom Kippur.", "Yoma 1:1"),
+            "beit_avtinas": ("The house of Avtinas prepares the incense here, and keeps its secret.", "Tamid 1:1; Yoma 3:11"),
+        },
         "degres": {
             "har_habayit": ("Har HaBayit", "הר הבית", "1:8", "Holier than Jerusalem: zavim, zavot, menstruants and women after childbirth may not enter."),
             "heil": ("Chel", "חיל", "1:8", "Holier than the Har HaBayit: non-Jews and those made impure by a corpse may not enter."),
@@ -96,6 +166,28 @@ TEXTES = {
         "ouverture": "מהר הבית ועד קודש הקודשים מונה משנה כלים את מעלות הקדושה. בכל מעלה נכנסים פחות.",
         "voir": "לראות בסיור",
         "mishna": "משנה כלים",
+        "lishkot_titre": "הלשכות",
+        "lishkot_ouverture": "סביב העזרות שבע־עשרה לשכות, לכל אחת עבודתה. באחת יושבת הסנהדרין, באחרת מולחים עורות, ועל גג אחת טובל הכהן הגדול. כולן בנויות בסיור.",
+        "sous_terre": "מתחת לקרקע",
+        "chambres": {
+            "lishkat_hanezirim": ("שֶׁשָּׁם הַנְּזִירִים מְבַשְּׁלִין אֶת שַׁלְמֵיהֶן, וּמְגַלְּחִין אֶת שְׂעָרָן, וּמְשַׁלְּחִים תַּחַת הַדּוּד.", "מידות ב, ה"),
+            "lishkat_haetzim": ("שֶׁשָּׁם הַכֹּהֲנִים בַּעֲלֵי מוּמִין מַתְלִיעִין הָעֵצִים.", "מידות ב, ה"),
+            "lishkat_hametzoraim": ("חצר שאינה מקורה, לשכת המצורעים.", "מידות ב, ה"),
+            "lishkat_beit_shemanya": ("אַבָּא שָׁאוּל אוֹמֵר, שָׁם הָיוּ נוֹתְנִין יַיִן וָשֶׁמֶן.", "מידות ב, ה"),
+            "lishkat_pinchas": ("בה מלביש פנחס המלביש את הכהנים לעבודה.", "מידות א, ד; שקלים ה, א"),
+            "lishkat_osei_chavitin": ("בה עושים את החביתין, מנחת הכהן הגדול שבכל יום.", "מידות א, ד"),
+            "beit_hamoked": ("כִּפָּה, וּבַיִת גָּדוֹל הָיָה, מֻקָּף רוֹבָדִין שֶׁל אֶבֶן, וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם, וּמַפְתְּחוֹת הָעֲזָרָה בְּיָדָם.", "מידות א, ח"),
+            "beit_hatevila": ("תחת העזרה, בסוף מסבה מוארת בנרות: כהן שנטמא בלילה טובל שם ומתחמם כנגד המדורה.", "תמיד א, א"),
+            "beit_hanitzotz": ("עֲלִיָּה בְנוּיָה עַל גַּבָּיו, שֶׁהַכֹּהֲנִים שׁוֹמְרִים מִלְמַעְלָן וְהַלְוִיִּם מִלְּמַטָּן.", "מידות א, ה"),
+            "lishkat_hagazit": ("שָׁם הָיְתָה סַנְהֶדְרִי גְדוֹלָה שֶׁל יִשְׂרָאֵל יוֹשֶׁבֶת.", "מידות ה, ד"),
+            "lishkat_hagola": ("שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם לְכָל הָעֲזָרָה.", "מידות ה, ד"),
+            "lishkat_haetz": ("אָמַר רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב, שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת.", "מידות ה, ד"),
+            "lishkat_hamelach": ("שָׁם הָיוּ נוֹתְנִים מֶלַח לַקָּרְבָּן.", "מידות ה, ג"),
+            "lishkat_haparva": ("שָׁם הָיוּ מוֹלְחִין עוֹרוֹת קָדָשִׁים, וְעַל גַּגָּהּ הָיָה בֵית הַטְּבִילָה לְכֹהֵן גָּדוֹל בְּיוֹם הַכִּפּוּרִים.", "מידות ה, ג"),
+            "lishkat_hamedichin": ("שֶׁשָּׁם הָיוּ מְדִיחִין קִרְבֵי הַקֳּדָשִׁים, וּמִשָּׁם מְסִבָּה עוֹלָה לְגַג בֵּית הַפַּרְוָה.", "מידות ה, ג"),
+            "lishkat_parhedrin": ("שם שוהה הכהן הגדול שבעת ימים קודם יום הכיפורים.", "יומא א, א"),
+            "beit_avtinas": ("שם מכינים בית אבטינס את הקטורת, ששמרו את סודה.", "תמיד א, א; יומא ג, יא"),
+        },
         "degres": {
             "har_habayit": ("הר הבית", "", "א, ח", "מְקֻדָּשׁ מִירוּשָׁלַיִם, שֶׁאֵין זָבִים וְזָבוֹת, נִדּוֹת וְיוֹלְדוֹת נִכְנָסִים לְשָׁם."),
             "heil": ("חיל", "", "א, ח", "מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם."),
@@ -108,6 +200,9 @@ TEXTES = {
         },
     },
 }
+
+FICHES = {code: json.loads((SITE.parent / "visite" / f"contenu_a{'' if code == 'fr' else '.' + code}.json").read_text(encoding="utf-8"))
+          for code in TEXTES}
 
 AUTEUR = {"fr": "David Bonan", "en": "David Bonan", "he": "דוד בונן"}
 TAILLES = "100vw"
@@ -186,6 +281,57 @@ def sanctuaire(t, degre, vue):
   </section>'''
 
 
+def nom_chambre(t, chambre):
+    hebreu = FICHES["fr"][chambre]["he"]
+    if t["code"] == "he":
+        return hebreu, ""
+    fiche = FICHES[t["code"]][chambre]
+    return fiche.get("nom", fiche.get("translit")), hebreu
+
+
+def repere(t, rang, chambre, x, y):
+    nom, _ = nom_chambre(t, chambre)
+    souterraine = ' data-souterraine' if chambre in SOUTERRAINES else ""
+    courant = ' aria-current="true"' if rang == 1 else ""
+    return (f'\n        <a class="repere" href="#{chambre}" data-chambre="{chambre}" style="--x: {x}; --y: {y}"{souterraine}{courant}>'
+            f'<span class="rang">{rang}</span><span class="nom">{nom}</span></a>')
+
+
+def carte_chambre(t, rang, chambre):
+    nom, hebreu = nom_chambre(t, chambre)
+    role, source = t["chambres"][chambre]
+    titre = f'<span class="nom">{nom}</span>'
+    if hebreu:
+        titre += f' <span class="nom-he" lang="he" dir="rtl">{hebreu}</span>'
+    if chambre in SOUTERRAINES:
+        titre += f' <span class="sous-terre">{t["sous_terre"]}</span>'
+    return f'''
+        <li id="{chambre}" data-chambre="{chambre}">
+          <h3><span class="rang">{rang}</span>{titre}</h3>
+          <p class="role">{role}</p>
+          <p class="source">{source}</p>
+          <a class="entrer-ici" href="/visite/?vue={chambre}" data-langue="{t["code"]}">{t["voir"]}</a>
+        </li>'''
+
+
+def lishkot(t):
+    reperes = "".join(repere(t, rang, c, x, y) for rang, (c, x, y) in enumerate(CHAMBRES, 1))
+    chambres = "".join(carte_chambre(t, rang, c) for rang, (c, _, _) in enumerate(CHAMBRES, 1))
+    return f'''<section class="lishkot" aria-labelledby="lishkot-titre">
+    <div class="plongee">
+      <div class="cadre">
+        <img src="/images/lishkot_2000.webp" srcset="/images/lishkot_1000.webp 1000w, /images/lishkot_2000.webp 2000w" sizes="(max-width: 860px) 170vw, (min-aspect-ratio: 16/9) 100vw, 180vh" alt="" decoding="async" loading="lazy">{reperes}
+      </div>
+      <div class="entete">
+        <h2 id="lishkot-titre">{t["lishkot_titre"]}</h2>
+        <p>{t["lishkot_ouverture"]}</p>
+      </div>
+      <ol class="chambres">{chambres}
+      </ol>
+    </div>
+  </section>'''
+
+
 def page(code):
     t = {**TEXTES[code], "code": code}
     url = f'{DOMAINE}/{t["chemin"]}'
@@ -237,6 +383,8 @@ def page(code):
       <p class="action"><a class="entrer" href="/visite/" data-langue="{code}">{t["entrer"]}</a><span class="note">{t["entrer_note"]}</span></p>
     </div>
   </header>
+
+  {lishkot(t)}
 
   <section class="montee" aria-labelledby="montee-titre">
     <div class="ouverture">

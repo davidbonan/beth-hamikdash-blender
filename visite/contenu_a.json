@@ -579,21 +579,33 @@
   "lishkat_hagazit": {
     "he": "לשכת הגזית",
     "translit": "Lishkat HaGazit",
-    "resume": "Siège du Sanhédrin, et lieu du tirage au sort des Cohanim. Elle est à cheval sur le mur nord de l'Azara, moitié dans le sacré, moitié hors : le mur s'interrompt sur sa largeur. Deux ouvertures, l'une sur l'Azara au sud, l'autre sur le hol à l'est, en haut de vingt degrés venant de la terrasse du 'Heil. La guemara les appelle petahim, et non she'arim — ce ne sont pas des portes de l'Azara. Le Sanhédrin siège en demi-cercle dans la moitié de hol.",
+    "resume": "Siège du Sanhédrin, et lieu du tirage au sort des Cohanim. Elle est à cheval sur le mur nord de l'Azara, moitié dans le sacré, moitié hors : le mur s'interrompt sur sa largeur, et la limite est tracée au sol. Deux ouvertures, l'une sur l'Azara au sud, l'autre sur le hol à l'est, en haut de vingt degrés venant de la terrasse du 'Heil. La guemara les appelle petahim, et non she'arim — ce ne sont pas des portes de l'Azara. Ses murs sont de pierre taillée coupée de rangs de cèdre ; dans la moitié de hol, où siège le tribunal, le sol est de cèdre et le mur du fond est revêtu de panneaux de cèdre sculptés. Dans la moitié sacrée, les Cohanim se tiennent en cercle pour le tirage au sort, et ils y viennent lire le Shema. Le Sanhédrin siège dans la moitié de hol, car nul ne s'assied dans l'Azara, sauf les rois de la maison de David. Il siège en demi-cercle, pour que les juges se voient : le Nasi au milieu, l'Av Beit Din à sa droite, deux greffiers debout devant eux, et trois rangs d'élèves assis face aux juges. Il siège là du Tamid du matin à celui du soir ; le Shabbat et les jours de fête, il siège sur le 'Heil. Il y juge les Cohanim : celui qu'on trouve inapte s'habille de noir et s'en va, celui qu'on trouve apte s'habille de blanc et entre servir avec ses frères.",
     "cotes": [
       "à cheval sur le mur nord",
-      "moitié dans le sacré, moitié hors",
+      "moitié dans le sacré, moitié hors, la limite tracée au sol",
       "deux petahim : au sud sur l'Azara, à l'est sur le 'Heil",
-      "le Sanhédrin en demi-cercle, dans la moitié de hol"
+      "le Sanhédrin en demi-cercle, dans la moitié de hol",
+      "le Nasi au milieu, l'Av Beit Din à sa droite",
+      "deux greffiers debout, trois rangs d'élèves face aux juges"
     ],
     "sources": [
       {"oeuvre": "Yoma", "ref": "25a", "citation": "חֶצְיָהּ בַּקֹּדֶשׁ וְחֶצְיָהּ בַּחוֹל… שְׁנֵי פְתָחִים הָיוּ לָהּ"},
+      {"oeuvre": "Yoma", "ref": "25a", "citation": "לשכת הגזית כמין בסילקי גדולה היתה, פייס במזרחה, וזקן יושב במערבה. והכהנים מוקפין ועומדין כמין כוליאר"},
+      {"oeuvre": "Yoma", "ref": "25a", "citation": "אין ישיבה בעזרה אלא למלכי בית דוד בלבד"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "וּבַחֵצִי שֶׁל חֹל הָיוּ הַסַּנְהֶדְרִין יוֹשְׁבִין"},
-      {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "סַנְהֶדְרִין הָיְתָה כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה"},
-      {"oeuvre": "Yoma", "ref": "19a", "citation": ""},
-      {"oeuvre": "Middot", "ref": "5:4", "citation": ""}
+      {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "סַנְהֶדְרִין הָיְתָה כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה. וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"},
+      {"oeuvre": "Sanhedrin", "ref": "4:4", "citation": "וְשָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים יוֹשְׁבִין לִפְנֵיהֶם, כָּל אֶחָד וְאֶחָד מַכִּיר אֶת מְקוֹמוֹ"},
+      {"oeuvre": "Tosefta Sanhedrin", "ref": "8:1", "citation": "הנשיא יושב באמצע וזקנים יושבים מימינו ושמאלו"},
+      {"oeuvre": "Rambam Sanhedrin", "ref": "1:3", "citation": "וּמוֹשִׁיבִין הַגָּדוֹל שֶׁבַּשִּׁבְעִים מִשְׁנֶה לָרֹאשׁ וְיוֹשֵׁב מִימִינוֹ וְהוּא הַנִּקְרָא אַב בֵּית דִּין"},
+      {"oeuvre": "Sanhedrin", "ref": "88b", "citation": "בית דין של שבעים ואחד יושבין בלשכת הגזית… ששם יושבין מתמיד של שחר עד תמיד של בין הערבים. ובשבתות ובימים טובים, יושבין בחיל"},
+      {"oeuvre": "Middot", "ref": "5:4", "citation": "לִשְׁכַּת הַגָּזִית, שָׁם הָיְתָה סַנְהֶדְרִי גְדוֹלָה שֶׁל יִשְׂרָאֵל יוֹשֶׁבֶת וְדָנָה אֶת הַכְּהֻנָּה, וְכֹהֵן שֶׁנִּמְצָא בוֹ פְסוּל, לוֹבֵשׁ שְׁחוֹרִים וּמִתְעַטֵּף שְׁחוֹרִים, וְיוֹצֵא וְהוֹלֵךְ לוֹ. וְשֶׁלֹּא נִמְצָא בוֹ פְסוּל, לוֹבֵשׁ לְבָנִים וּמִתְעַטֵּף לְבָנִים, נִכְנָס וּמְשַׁמֵּשׁ עִם אֶחָיו הַכֹּהֲנִים"},
+      {"oeuvre": "Tamid", "ref": "4:3", "citation": "וְיָרְדוּ וּבָאוּ לָהֶם לְלִשְׁכַּת הַגָּזִית, לִקְרוֹת אֶת שְׁמַע"},
+      {"oeuvre": "Melakhim I", "ref": "7:7", "citation": "וְאוּלָם הַכִּסֵּא אֲשֶׁר יִשְׁפָּט שָׁם אֻלָם הַמִּשְׁפָּט עָשָׂה וְסָפוּן בָּאֶרֶז מֵהַקַּרְקַע עַד הַקַּרְקָע"},
+      {"oeuvre": "Melakhim I", "ref": "6:18", "citation": "וְאֶרֶז אֶל הַבַּיִת פְּנִימָה מִקְלַעַת פְּקָעִים וּפְטוּרֵי צִצִּים"},
+      {"oeuvre": "Melakhim I", "ref": "10:19", "citation": "וְרֹאשׁ עָגֹל לַכִּסֵּה מֵאַחֲרָיו וְיָדֹת מִזֶּה וּמִזֶּה אֶל מְקוֹם הַשָּׁבֶת"},
+      {"oeuvre": "Yoma", "ref": "19a", "citation": ""}
     ],
-    "note": "Retenu : au nord de l'Azara, selon la version de Yoma 19a, que suivent le Rambam et Tosfot Yom Tov. Écarté : le texte imprimé de Middot 5:4, qui la met au sud. Choix de la visite : l'ouverture côté profane, à l'est, et les trois gradins du Sanhédrin — soixante et onze sièges ne tiennent pas sur un seul rang dans seize amot."
+    "note": "Retenu : au nord de l'Azara, selon la version de Yoma 19a, que suivent le Rambam et Tosfot Yom Tov. Écarté : le texte imprimé de Middot 5:4, qui la met au sud. Choix de la visite : l'ouverture côté profane, à l'est ; le décor, que la guemara dit seulement « comme une grande basilique », pris au Tanakh et non à l'architecture romaine : rangs de poutres de cèdre dans la pierre comme dans les murs de la cour de Shlomo, sol de cèdre comme sa salle de jugement, mur du fond en panneaux de cèdre cadrés dont les traverses portent les coloquintes et les fleurs du Bayit, plafond de poutres de cèdre ; les trois gradins et l'estrade du Nasi ; les sièges sur le modèle du trône de Shlomo, à dossier arrondi et accoudoirs, sans ses lions, celui du Nasi plaqué d'or ; les pupitres des greffiers et les bancs des élèves ; la limite tracée au sol, par analogie avec le Beit HaMoked, dont Middot 1:6 le dit. La salle montre la disposition du tribunal, pas son nombre : soixante et onze juges et trois rangs d'élèves n'y tiennent pas."
   },
 
   "lishkat_hagola": {
@@ -768,7 +780,7 @@
   "beit_avtinas": {
     "he": "לשכת בית אבטינס",
     "translit": "Lishkat Beit Avtinas",
-    "resume": "La chambre de la famille d'Avtinas, où l'on prépare l'encens. Elle est bâtie en étage au-dessus de Sha'ar HaMayim, à l'extrémité est du mur sud, contre la Lishkat Parhedrin. Le Cohen Gadol y est conduit la veille de Kippour, et c'est là qu'il prend le premier bain rituel du jour. Dedans, le mortier où l'on pile l'encens, la makhteshet — celle de Beit Avtinas est comptée avec la Table et la Menora parmi ce qui fut emporté à Rome —, et la table où l'on pèse les onze sammanim avant de les piler chacun à part.",
+    "resume": "La chambre de la famille d'Avtinas, où l'on prépare l'encens. Elle est bâtie en étage au-dessus de Sha'ar HaMayim, à l'extrémité est du mur sud, contre la Lishkat Parhedrin. Le Cohen Gadol y est conduit la veille de Kippour, et c'est là qu'il prend le premier bain rituel du jour. Dedans, le mortier où l'on pile l'encens, la makhteshet — celle de Beit Avtinas est comptée avec la Table et la Menora parmi ce qui fut emporté à Rome —, et la table où l'on pèse les onze sammanim avant de les piler chacun à part. Les Avtinas gardaient le secret de l'encens, et la Mishna le leur compte à honte. Les Sages les ont renvoyés et ont fait venir des artisans d'Alexandrie : ceux-ci savaient mêler les épices, mais pas faire monter la fumée — la leur partait de tous côtés, celle des Avtinas montait droite comme un bâton. Rappelée, la famille n'est revenue que pour un salaire doublé. Sa raison : elle savait le Temple promis à la destruction, et craignait qu'un homme indigne apprenne l'art et s'en serve pour l'idolâtrie. On la loue aussi : jamais une mariée ne sortait parfumée de ses maisons, pour qu'on ne dise pas qu'on s'y parfumait avec l'encens. Après la destruction, l'un d'eux a remis à Rabbi Yo'hanan ben Nouri le rouleau des épices, et Rabbi Akiva a dit : désormais, il est interdit de parler d'eux en mal.",
     "cotes": [
       "au-dessus de Sha'ar HaMayim, à l'extrémité est du mur sud",
       "murs d'une ama",
@@ -781,6 +793,11 @@
       {"oeuvre": "Yoma", "ref": "19a", "citation": "בַּחוֹל, עַל גַּבֵּי שַׁעַר הַמַּיִם, וּבְצַד לִשְׁכָּתוֹ"},
       {"oeuvre": "Yoma", "ref": "19a", "citation": "תָּנָא: לְלַמְּדוֹ חֲפִינָה"},
       {"oeuvre": "Shekalim", "ref": "5:1", "citation": "בֵּית אַבְטִינָס עַל מַעֲשֵׂה הַקְּטֹרֶת"},
+      {"oeuvre": "Yoma", "ref": "3:11", "citation": "שֶׁל בֵּית אַבְטִינָס לֹא רָצוּ לְלַמֵּד עַל מַעֲשֵׂה הַקְּטֹרֶת"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "וְהָיוּ יוֹדְעִין לְפַטֵּם כְּמוֹתָם וְלֹא הָיוּ יוֹדְעִין לְהַעֲלוֹת עָשָׁן כְּמוֹתָן. שֶׁל הַלָּלוּ — מִתַּמֵּר וְעוֹלֶה כְּמַקֵּל, שֶׁל הַלָּלוּ — מַפְצִיעַ לְכָאן וּלְכָאן"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "יוֹדְעִין הָיוּ שֶׁל בֵּית אַבָּא שֶׁבַּיִת זֶה עָתִיד לֵיחָרֵב… שֶׁמָּא יִלְמוֹד אָדָם שֶׁאֵינוֹ מְהוּגָּן וְיֵלֵךְ וְיַעֲבוֹד עֲבוֹדָה זָרָה בְּכָךְ"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "מֵעוֹלָם לֹא יָצָאת כַּלָּה מְבוּשֶּׂמֶת מִבָּתֵּיהֶן"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "מֵעַתָּה אָסוּר לְסַפֵּר בִּגְנוּתָן שֶׁל אֵלּוּ"},
       {"oeuvre": "Keritot", "ref": "6b", "citation": "הָיוּ מַחֲזִירִין אוֹתָהּ לְמַכְתֶּשֶׁת פַּעֲמַיִם בְּשָׁנָה… וּכְשֶׁהוּא שׁוֹחֵק, אוֹמֵר: הָדֵק הֵיטֵב, הֵיטֵב הָדֵק"},
       {"oeuvre": "Avot deRabbi Natan", "ref": "41:12", "citation": "אבל מכתשת של בית אבטינס שלחן ומנורה ופרוכת וציץ עדיין מונחין ברומי"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "2:5", "citation": "וְאַחַר כָּךְ שׁוֹחֵק כָּל אֶחָד מִן הַסַּמָּנִים בִּפְנֵי עַצְמוֹ הָדֵק"},

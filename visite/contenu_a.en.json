@@ -975,18 +975,30 @@
   "lishkat_hagazit": {
     "nom": "Lishkat HaGazit",
     "translit": "Lishkat HaGazit",
-    "resume": "Seat of the Sanhedrin, and place where the lots for the Kohanim were drawn. It straddles the north wall of the Azara, half within the sacred area, half outside it: the wall breaks off across its width. Two openings, one onto the Azara in the south, the other onto the chol in the east, at the top of twenty steps coming up from the terrace of the Cheil. The Gemara calls them petachim, not sha'arim — they are not gates of the Azara. The Sanhedrin sits in a semicircle in the chol half.",
+    "resume": "Seat of the Sanhedrin, and place where the lots for the Kohanim were drawn. It straddles the north wall of the Azara, half within the sacred area, half outside it: the wall breaks off across its width, and the boundary is marked on the floor. Two openings, one onto the Azara in the south, the other onto the chol in the east, at the top of twenty steps coming up from the terrace of the Cheil. The Gemara calls them petachim, not sha'arim — they are not gates of the Azara. Its walls are of hewn stone broken by courses of cedar; in the chol half, where the court sits, the floor is of cedar and the far wall is lined with carved cedar panels. In the sacred half, the Kohanim stand in a circle for the drawing of lots, and they come there to read the Shema. The Sanhedrin sits in the chol half, since no one sits in the Azara except the kings of the house of David. It sits in a semicircle, so that the judges see one another: the Nasi in the middle, the Av Beit Din at his right, two scribes standing before them, and three rows of students seated facing the judges. It sits there from the morning Tamid until the evening one; on Shabbat and festivals, it sits on the Cheil. There it judges the Kohanim: one found unfit dresses in black and leaves, one found fit dresses in white and goes in to serve with his brothers.",
     "cotes": [
       "straddling the north wall",
-      "half in the sacred area, half outside it",
+      "half in the sacred area, half outside it, the boundary marked on the floor",
       "two petachim: to the south onto the Azara, to the east onto the Cheil",
-      "the Sanhedrin in a semicircle, in the chol half"
+      "the Sanhedrin in a semicircle, in the chol half",
+      "the Nasi in the middle, the Av Beit Din at his right",
+      "two scribes standing, three rows of students facing the judges"
     ],
     "sources": [
       {
         "oeuvre": "Yoma",
         "ref": "25a",
         "citation": "חֶצְיָהּ בַּקֹּדֶשׁ וְחֶצְיָהּ בַּחוֹל… שְׁנֵי פְתָחִים הָיוּ לָהּ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "25a",
+        "citation": "לשכת הגזית כמין בסילקי גדולה היתה, פייס במזרחה, וזקן יושב במערבה. והכהנים מוקפין ועומדין כמין כוליאר"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "25a",
+        "citation": "אין ישיבה בעזרה אלא למלכי בית דוד בלבד"
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",
@@ -996,20 +1008,60 @@
       {
         "oeuvre": "Sanhedrin",
         "ref": "4:3",
-        "citation": "סַנְהֶדְרִין הָיְתָה כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה"
+        "citation": "סַנְהֶדְרִין הָיְתָה כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה. וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"
+      },
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "4:4",
+        "citation": "וְשָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים יוֹשְׁבִין לִפְנֵיהֶם, כָּל אֶחָד וְאֶחָד מַכִּיר אֶת מְקוֹמוֹ"
+      },
+      {
+        "oeuvre": "Tosefta Sanhedrin",
+        "ref": "8:1",
+        "citation": "הנשיא יושב באמצע וזקנים יושבים מימינו ושמאלו"
+      },
+      {
+        "oeuvre": "Rambam Sanhedrin",
+        "ref": "1:3",
+        "citation": "וּמוֹשִׁיבִין הַגָּדוֹל שֶׁבַּשִּׁבְעִים מִשְׁנֶה לָרֹאשׁ וְיוֹשֵׁב מִימִינוֹ וְהוּא הַנִּקְרָא אַב בֵּית דִּין"
+      },
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "88b",
+        "citation": "בית דין של שבעים ואחד יושבין בלשכת הגזית… ששם יושבין מתמיד של שחר עד תמיד של בין הערבים. ובשבתות ובימים טובים, יושבין בחיל"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "5:4",
+        "citation": "לִשְׁכַּת הַגָּזִית, שָׁם הָיְתָה סַנְהֶדְרִי גְדוֹלָה שֶׁל יִשְׂרָאֵל יוֹשֶׁבֶת וְדָנָה אֶת הַכְּהֻנָּה, וְכֹהֵן שֶׁנִּמְצָא בוֹ פְסוּל, לוֹבֵשׁ שְׁחוֹרִים וּמִתְעַטֵּף שְׁחוֹרִים, וְיוֹצֵא וְהוֹלֵךְ לוֹ. וְשֶׁלֹּא נִמְצָא בוֹ פְסוּל, לוֹבֵשׁ לְבָנִים וּמִתְעַטֵּף לְבָנִים, נִכְנָס וּמְשַׁמֵּשׁ עִם אֶחָיו הַכֹּהֲנִים"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "4:3",
+        "citation": "וְיָרְדוּ וּבָאוּ לָהֶם לְלִשְׁכַּת הַגָּזִית, לִקְרוֹת אֶת שְׁמַע"
+      },
+      {
+        "oeuvre": "Melakhim I",
+        "ref": "7:7",
+        "citation": "וְאוּלָם הַכִּסֵּא אֲשֶׁר יִשְׁפָּט שָׁם אֻלָם הַמִּשְׁפָּט עָשָׂה וְסָפוּן בָּאֶרֶז מֵהַקַּרְקַע עַד הַקַּרְקָע"
+      },
+      {
+        "oeuvre": "Melakhim I",
+        "ref": "6:18",
+        "citation": "וְאֶרֶז אֶל הַבַּיִת פְּנִימָה מִקְלַעַת פְּקָעִים וּפְטוּרֵי צִצִּים"
+      },
+      {
+        "oeuvre": "Melakhim I",
+        "ref": "10:19",
+        "citation": "וְרֹאשׁ עָגֹל לַכִּסֵּה מֵאַחֲרָיו וְיָדֹת מִזֶּה וּמִזֶּה אֶל מְקוֹם הַשָּׁבֶת"
       },
       {
         "oeuvre": "Yoma",
         "ref": "19a",
         "citation": ""
-      },
-      {
-        "oeuvre": "Middot",
-        "ref": "5:4",
-        "citation": ""
       }
     ],
-    "note": "Adopted: on the north side of the Azara, following the reading of Yoma 19a, which the Rambam and Tosafot Yom Tov follow. Set aside: the printed text of Middot 5:4, which places it in the south. Tour's choice: the opening onto the non-sacred area to the east, and the three tiers of the Sanhedrin — seventy-one seats do not fit in a single row within sixteen amot."
+    "note": "Adopted: on the north side of the Azara, following the reading of Yoma 19a, which the Rambam and Tosafot Yom Tov follow. Set aside: the printed text of Middot 5:4, which places it in the south. Tour's choice: the opening onto the non-sacred area to the east; the decoration, which the Gemara only calls \"like a great basilica\", taken from the Tanakh and not from Roman architecture: courses of cedar beams in the stone as in the walls of Solomon's court, a cedar floor like his hall of judgment, a far wall of framed cedar panels whose rails carry the gourds and flowers of the Bayit, a ceiling of cedar beams; the three tiers and the Nasi's dais; seats modelled on Solomon's throne, with a rounded back and armrests but without its lions, the Nasi's overlaid with gold; the scribes' lecterns and the students' benches; the boundary marked on the floor, by analogy with the Beit HaMoked, of which Middot 1:6 says it. The room shows the layout of the court, not its numbers: seventy-one judges and three rows of students do not fit in it."
   },
   "lishkat_hagola": {
     "nom": "Lishkat HaGola",
@@ -1330,7 +1382,7 @@
   "beit_avtinas": {
     "nom": "Lishkat Beit Avtinas",
     "translit": "Lishkat Beit Avtinas",
-    "resume": "The chamber of the Avtinas family, where the incense is prepared. It is built as an upper floor above Sha'ar HaMayim, at the east end of the south wall, against the Lishkat Parhedrin. The Kohen Gadol is brought there on the eve of Kippur, and it is there that he takes the first ritual bath of the day. Inside, the mortar in which the incense is pounded, the makhteshet — the one from Beit Avtinas is counted, along with the Table and the Menora, among what was carried off to Rome —, and the table where the eleven sammanim are weighed before each is pounded separately.",
+    "resume": "The chamber of the Avtinas family, where the incense is prepared. It is built as an upper floor above Sha'ar HaMayim, at the east end of the south wall, against the Lishkat Parhedrin. The Kohen Gadol is brought there on the eve of Kippur, and it is there that he takes the first ritual bath of the day. Inside, the mortar in which the incense is pounded, the makhteshet — the one from Beit Avtinas is counted, along with the Table and the Menora, among what was carried off to Rome —, and the table where the eleven sammanim are weighed before each is pounded separately. The Avtinas family kept the secret of the incense, and the Mishna counts it to their shame. The Sages dismissed them and brought craftsmen from Alexandria: these knew how to blend the spices, but not how to make the smoke rise — theirs spread out every which way, while that of the Avtinas rose straight as a stick. When recalled, the family came back only for doubled wages. Their reason: they knew the Temple was destined to be destroyed, and feared that an unworthy man would learn the craft and use it for idolatry. They are praised as well: no bride ever went out perfumed from their homes, so that no one would say they perfumed themselves with the incense. After the destruction, one of them handed Rabbi Yochanan ben Nuri the scroll of spices, and Rabbi Akiva said: from now on, it is forbidden to speak ill of them.",
     "cotes": [
       "above Sha'ar HaMayim, at the east end of the south wall",
       "one-ama-thick walls",
@@ -1358,6 +1410,31 @@
         "oeuvre": "Shekalim",
         "ref": "5:1",
         "citation": "בֵּית אַבְטִינָס עַל מַעֲשֵׂה הַקְּטֹרֶת"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "3:11",
+        "citation": "שֶׁל בֵּית אַבְטִינָס לֹא רָצוּ לְלַמֵּד עַל מַעֲשֵׂה הַקְּטֹרֶת"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "וְהָיוּ יוֹדְעִין לְפַטֵּם כְּמוֹתָם וְלֹא הָיוּ יוֹדְעִין לְהַעֲלוֹת עָשָׁן כְּמוֹתָן. שֶׁל הַלָּלוּ — מִתַּמֵּר וְעוֹלֶה כְּמַקֵּל, שֶׁל הַלָּלוּ — מַפְצִיעַ לְכָאן וּלְכָאן"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "יוֹדְעִין הָיוּ שֶׁל בֵּית אַבָּא שֶׁבַּיִת זֶה עָתִיד לֵיחָרֵב… שֶׁמָּא יִלְמוֹד אָדָם שֶׁאֵינוֹ מְהוּגָּן וְיֵלֵךְ וְיַעֲבוֹד עֲבוֹדָה זָרָה בְּכָךְ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "מֵעוֹלָם לֹא יָצָאת כַּלָּה מְבוּשֶּׂמֶת מִבָּתֵּיהֶן"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "מֵעַתָּה אָסוּר לְסַפֵּר בִּגְנוּתָן שֶׁל אֵלּוּ"
       },
       {
         "oeuvre": "Keritot",

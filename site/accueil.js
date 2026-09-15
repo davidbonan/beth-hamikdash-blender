@@ -26,3 +26,45 @@ const guetteur = new IntersectionObserver((entrees) => {
   for (const e of entrees) if (e.isIntersecting) marquer(e.target.id);
 }, { rootMargin: "-45% 0px -45% 0px" });
 for (const lieu of lieux) guetteur.observe(lieu);
+
+// Les lishkot : un repère choisi montre sa chambre ; tant qu'on n'a touché à rien, la plongée les parcourt d'elle-même.
+const lishkot = document.querySelector(".lishkot");
+if (lishkot) {
+  const reperes = [...lishkot.querySelectorAll(".repere")];
+  const cartes = [...lishkot.querySelectorAll(".chambres li")];
+  let courante = 0;
+  let parcours = null;
+  let choisie = false;
+
+  function montrer(rang) {
+    courante = (rang + reperes.length) % reperes.length;
+    reperes.forEach((r, i) => r.toggleAttribute("aria-current", i === courante));
+    cartes.forEach((c, i) => c.classList.toggle("courant", i === courante));
+  }
+
+  function arreterParcours() {
+    clearInterval(parcours);
+    parcours = null;
+  }
+
+  function choisir(rang) {
+    choisie = true;
+    arreterParcours();
+    montrer(rang);
+  }
+
+  reperes.forEach((repere, rang) => {
+    repere.addEventListener("click", (e) => { e.preventDefault(); choisir(rang); });
+    repere.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") choisir(rang); });
+    repere.addEventListener("focus", () => choisir(rang));
+  });
+  lishkot.classList.add("vivante");
+  montrer(0);
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return arreterParcours();
+      if (!choisie && !parcours) parcours = setInterval(() => montrer(courante + 1), 4500);
+    }, { threshold: 0.5 }).observe(lishkot);
+  }
+}

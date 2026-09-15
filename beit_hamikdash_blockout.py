@@ -1228,6 +1228,8 @@ MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
 MAT_OR_PLAQUE = lambda: metal("Or_plaque", (1.0, 0.76, 0.33), 0.4)
 TEINTE_CEDRE = (0.44, 0.25, 0.14)
 MAT_CEDRE = lambda: bois("Cedre", TEINTE_CEDRE)
+# Le cèdre choisi des revêtements, plus rouge ; la visite en tire une photo plus calme.
+MAT_CEDRE_LAMBRIS = lambda: bois("Cedre_lambris", (0.46, 0.23, 0.13))
 
 # Le rayon (m) part en extra glTF : la visite en a besoin pour garder la pièce lisible sous le pixel.
 def MAT_ECHELLE(piece, rayon):
@@ -1501,12 +1503,14 @@ def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None, uv=None):
 #     tracées sur la carte même. Des plaques empilées, aussi bien découpées fussent-elles,
 #     se lisaient en emporte-pièce : seul le chanfrein prenait la lumière.
 BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
-SAILLIE_KIR = 0.22        # saillie de la plaque : 11 cm. À 0,35 la figure se lisait en plaque
-                          # posée dessus, à 0,14 elle ne prenait plus la lumière rasante
-PAS_KIR = 4.44            # pas visé d'une figure, en amot
+SAILLIE_KIR = 0.05        # saillie de la plaque : 2,5 cm, ce qu'un bas-relief d'ossuaire sort
+                          # de sa dalle. À 0,16 la figure se lisait encore posée sur le mur,
+                          # comme appliquée ; ici elle est prise dans le plaquage
+PAS_KIR = 3.7             # pas visé d'une figure, en amot : entre un keruv (large d'une
+                          # hauteur) et une timora (0,7), il reste 1,3 ama d'or nu
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
 CARTE_GRAVURES = GRAVURES_JSON.with_name("gravures_2048.webp")
-MODELE_GRAVURE = 0.12     # amot : ce dont le modelé bombe par-dessus la plaque, 6 cm sur un
+MODELE_GRAVURE = 0.03     # amot : ce dont le modelé bombe par-dessus la plaque, 1,5 cm sur un
                           # keruv de paroi. La visite le prend en part de la hauteur de la
                           # figure (matieres.js, RELIEF_GRAVURE) ; ici c'est le keruv qui règle.
 
@@ -1562,8 +1566,17 @@ def _relief_grave(nom, paroi, motif, u, z0, h, col, mat=None):
     return _relief_profil(nom, paroi, contour, 0.0, SAILLIE_KIR, col, matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
 
 
+def largeur_gravure(motif):
+    """Largeur de la figure, en part de sa hauteur, lue sur sa silhouette dans l'atlas."""
+    us = [du for du, _ in GRAVURES[motif]["silhouette"]]
+    zs = [dz for _, dz in GRAVURES[motif]["silhouette"]]
+    return (max(us) - min(us)) / (max(zs) - min(zs))
+
+
 def timora(nom, paroi, u, z0, h, col, mat=None):
-    """« תִּמֹרָה » : le palmier — fût annelé, couronne de palmes qui retombent, régimes.
+    """« תִּמֹרָה » : le dattier — Rashi et Radak lisent דקלים —, fût à écailles, sept
+    palmes, deux régimes de dattes, comme sur les monnaies de Bar Kokhba
+    (`beit_hamikdash_gravures.py`).
 
     Sur l'or du Bayit elle est dorée et `mat` reste vide ; sur le jambage d'une porte
     du Har HaBayit, que nulle source ne dore, elle se taille dans la pierre du mur.
@@ -2378,10 +2391,12 @@ CHAMBRANLE_LISERE = 0.5   # le filet qui le borde, et sa seconde ligne d'ombre
 # sort de son nu et pour la même raison : c'est le ressaut le plus fort qui porte
 # l'ombre, et une porte qui n'en jette pas ne se voit pas du fond de la cour.
 CHAMBRANLE_CORNICHE = 1.7        # sa hauteur, quand la place au-dessus de la baie le permet
-# Hauteur du palmier, en part de la largeur du jambage : ses palmes s'ouvrent sur un peu
-# plus d'une demi-hauteur, et c'est le jambage qui doit les contenir — sur le cadre
-# étroit d'un corps de porte, une timora à cote fixe débordait sur le nu du mur.
-TIMORA_SUR_CADRE = 2.0
+# Largeur du palmier, en part de la largeur du jambage : c'est le jambage qui doit le
+# contenir. Réglé par la HAUTEUR (deux fois le cadre), le dattier aux palmes ouvertes
+# — large des trois quarts de sa hauteur — débordait le jambage d'un quart de chaque côté,
+# et se lisait posé sur le mur ; sur le cadre étroit d'un corps de porte, une timora à
+# cote fixe faisait de même.
+TIMORA_SUR_CADRE = 0.7
 # L'emprise d'un cadre de porte de part et d'autre de sa baie, corniche comprise.
 ENCADREMENT_SHAAR = CHAMBRANLE + CHAMBRANLE_LISERE + 0.4
 
@@ -2440,7 +2455,7 @@ def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
     # mur — c'est de l'איל que parle le verset. Il se dore avec le שער, et reste de la
     # pierre du mur là où aucune source ne met d'or.
     jambage = (axe, cote + sens * nu, sens)
-    palmier = min(cadre * TIMORA_SUR_CADRE, hauteur * 0.4)
+    palmier = min(cadre * TIMORA_SUR_CADRE / largeur_gravure("timora"), hauteur * 0.4)
     for face, sortie in (("O", -1), ("E", 1)):
         timora(f"{nom}_timora_{face}", jambage, centre + sortie * (demi + cadre / 2),
                z0 + (hauteur - palmier) / 2, palmier, col, metal or mat)
@@ -2969,7 +2984,7 @@ box("EzratNashim_porte_est_linteau", EX1, EX1 + 5, -5, 5, Z_EZN + 20, Z_EZN + H_
 H_LISHKA_EN = 15
 SOUS_CORNICHE_LISHKA_EN = Z_EZN + H_LISHKA_EN + min(zb for zb, _, _ in CORNICHE)
 # Le cadre d'une porte de chambre porte ses deux timorot à l'échelle de son jambage
-# (TIMORA_SUR_CADRE) : à 1,5 ama elles faisaient trois amot et ne se voyaient pas de la cour.
+# (TIMORA_SUR_CADRE) : à 1,5 ama de cadre elles ne se voyaient pas de la cour.
 CADRE_LISHKA_EN = 2.5
 ATTIQUE = ((0.00, 1.20, 0.0), (1.20, 1.45, 0.2))
 H_DE_ATTIQUE = 2.1
@@ -3465,19 +3480,246 @@ lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_EZN, Z_AZ + 30
 maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
 box("Lishkat_HaGazit_sol_hol", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT, AY1 + T,
     NORD_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL())
-# « וּבַחֵצִי שֶׁל חֹל הָיוּ הַסַּנְהֶדְרִין יוֹשְׁבִין » (Rambam, Beit HaBe'hira 5:17), « כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי
-# שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה » (Sanhedrin 4:3) : le demi-cercle dans la moitié nord, son diamètre
-# sur la limite du sacré. Seize amot de salle ne tiennent pas soixante et onze sièges sur
-# un seul rang : trois gradins, CHOIX.
+# « וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל » est dit du Beit HaMoked (Middot 1:6) ; la même
+# limite tracée ici, sur l'axe du mur, est une analogie : CHOIX.
+box("Lishkat_HaGazit_rashei_pispasin", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT,
+    AXE_MUR_N - 0.1, AXE_MUR_N + 0.1, Z_AZ, Z_AZ + 0.03, "80_Lishkot", MAT_MARBRE())
+# « לִשְׁכַּת הַגָּזִית כְּמִין בְּסִילְקִי גְדוֹלָה הָיְתָה » (Yoma 25a) : une grande salle, dont aucune
+# source ne décrit le décor. Il se prend au Tanakh, pas à l'archéologie hérodienne : ni
+# colonne, ni entablement, ni fronton. Les murs sont de gazit, coupés de rangs de poutres,
+# « שְׁלֹשָׁה טוּרֵי גָזִית וְטוּר כְּרֻתֹת אֲרָזִים » (Melakhim I 6:36 ; 7:12). La moitié de 'hol est la
+# salle de jugement : son sol est de cèdre comme celui de l'« אֻלָם הַמִּשְׁפָּט », « וְסָפוּן בָּאֶרֶז
+# מֵהַקַּרְקַע עַד הַקַּרְקָע » (Melakhim I 7:7), que Rashi et Radak lisent du sol, « מְחֻפֶּה קַרְקַע
+# הָרִצְפָּה בַּאֲרָזִים ». Seul le mur derrière le tribunal est revêtu de cèdre, en panneaux cadrés
+# dont les traverses portent les « פְּקָעִים וּפְטוּרֵי צִצִּים » du Bayit (Melakhim I 6:18). Ces
+# emprunts sont des analogies : CHOIX, comme les hauteurs des rangs et des traverses.
+GAZIT_NUS = {"O": GAZIT_X0 + LISHKA_PAREMENT, "E": GAZIT_X1 - LISHKA_PAREMENT,
+             "S": NORD_Y0 + LISHKA_PAREMENT, "N": NORD_Y1 - LISHKA_PAREMENT}
+GAZIT_PLAFOND = Z_AZ + 30 - LISHKA_CORNICHE
+GAZIT_PORTE_S = ((GAZIT_X0 + GAZIT_X1 - PORTE_SHAAR[0]) / 2, (GAZIT_X0 + GAZIT_X1 + PORTE_SHAAR[0]) / 2)
+GAZIT_PORTE_E = (AY1 + T, AY1 + T + PETAH_HOL_GAZIT[0])
+SOL_CEDRE = 0.04
+
+# Un rang de poutres de cèdre après trois assises de pierre, deux fois : à mi-hauteur et
+# sous le plafond, sur le sud, l'est et l'ouest ; le nord est revêtu.
+ASSISES_PAR_RANG = 3
+RANGS_CEDRE = (Z_AZ + ASSISES_PAR_RANG * ASSISE, GAZIT_PLAFOND - 1)
+for n, z in enumerate(RANGS_CEDRE):
+    for face, bornes, cotes, mitres, reserve in (
+            ("S", (GAZIT_NUS["O"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["S"]), (False, True),
+             ("libre", "libre"), [GAZIT_PORTE_S] if z < Z_AZ + PORTE_SHAAR[1] else []),
+            ("O", (GAZIT_NUS["O"], GAZIT_NUS["O"], GAZIT_NUS["S"], GAZIT_NUS["N"]), (False, True), ("bute", "libre"), []),
+            ("E", (GAZIT_NUS["E"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["N"]), (True, False), ("bute", "libre"), [])):
+        moulure(f"Lishkat_HaGazit_keroutot_{n}_{face}", *bornes, z, ((0.0, 1.0, 1.0),), "80_Lishkot",
+                MAT_CEDRE(), saillie=0.3, mitres=mitres, cotes=cotes, reserve=reserve)
+
+box("Lishkat_HaGazit_sol_cedre", GAZIT_NUS["O"], GAZIT_NUS["E"], AXE_MUR_N + 0.1, GAZIT_NUS["N"],
+    Z_AZ, Z_AZ + SOL_CEDRE, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+
+# Le revêtement du nord, du sol au plafond : un fond, quatre travées de montants, et des
+# traverses qui passent devant eux. Chaque case entre montants et traverses porte un panneau.
+LAMBRIS_Y = GAZIT_NUS["N"]
+FOND, MONTANT, TRAVERSE, PANNEAU = 0.25, 0.15, 0.22, 0.08    # saillies successives sur le mur
+LAMBRIS_X = [GAZIT_NUS["O"] + (GAZIT_NUS["E"] - GAZIT_NUS["O"]) * k / 4 for k in range(5)]
+LARGEUR_MONTANT = 0.6
+# Traverses : (bas, haut, sculptée). La première passe au-dessus du dossier du Nasi, la
+# deuxième tombe sur le rang de cèdre des murs voisins.
+TRAVERSES = ((Z_AZ, Z_AZ + 1.2, False), (Z_AZ + 7.0, Z_AZ + 9.0, True),
+             (RANGS_CEDRE[0] - 0.5, RANGS_CEDRE[0] + 1.5, True), (Z_AZ + 19.0, Z_AZ + 21.0, True),
+             (RANGS_CEDRE[1] - 0.2, GAZIT_PLAFOND, False))
+box("Lishkat_HaGazit_lambris_fond", GAZIT_NUS["O"], GAZIT_NUS["E"], LAMBRIS_Y - FOND, LAMBRIS_Y,
+    Z_AZ, GAZIT_PLAFOND, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+for k, x in enumerate(LAMBRIS_X):
+    x0 = min(max(x - LARGEUR_MONTANT / 2, GAZIT_NUS["O"]), GAZIT_NUS["E"] - LARGEUR_MONTANT)
+    box(f"Lishkat_HaGazit_lambris_montant_{k}", x0, x0 + LARGEUR_MONTANT,
+        LAMBRIS_Y - FOND - MONTANT, LAMBRIS_Y - FOND, Z_AZ, GAZIT_PLAFOND, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+NU_TRAVERSE = LAMBRIS_Y - FOND - MONTANT - TRAVERSE
+FLEUR_R, FLEUR_PAS, PEKA_R, PEKA_PAS = 0.42, 1.3, 0.16, 0.55
+for k, (z0, z1, sculptee) in enumerate(TRAVERSES):
+    box(f"Lishkat_HaGazit_lambris_traverse_{k}", GAZIT_NUS["O"], GAZIT_NUS["E"], NU_TRAVERSE,
+        LAMBRIS_Y - FOND - MONTANT, z0, z1, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+    if not sculptee:
+        continue
+    paroi, milieu = ("x", NU_TRAVERSE, -1), (z0 + z1) / 2
+    u0, u1 = GAZIT_NUS["O"] + 0.4, GAZIT_NUS["E"] - 0.4
+    fleurs = round((u1 - u0) / FLEUR_PAS)
+    for i in range(fleurs):
+        petur_tzitz(f"Lishkat_HaGazit_lambris_traverse_{k}_fleur_{i:02d}", paroi,
+                    u0 + (u1 - u0) * (i + 0.5) / fleurs, milieu, FLEUR_R, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+    pekaim = int((u1 - u0) / PEKA_PAS)
+    for rang, zp in enumerate((z0 + 0.3, z1 - 0.3)):
+        for i in range(pekaim):
+            sphere(f"Lishkat_HaGazit_lambris_traverse_{k}_peka_{rang}_{i:02d}",
+                   u0 + (u1 - u0) * (i + 0.5) / pekaim, NU_TRAVERSE + 0.04, zp, PEKA_R,
+                   "80_Lishkot", MAT_CEDRE_LAMBRIS(), segs=8)
+# Les panneaux : un par case, en retrait des montants et des traverses qui les cadrent.
+for j, ((_, bas, _), (haut, _, _)) in enumerate(zip(TRAVERSES, TRAVERSES[1:])):
+    for k, (xa, xb) in enumerate(zip(LAMBRIS_X, LAMBRIS_X[1:])):
+        box(f"Lishkat_HaGazit_lambris_panneau_{j}{k}", xa + LARGEUR_MONTANT / 2 + 0.35, xb - LARGEUR_MONTANT / 2 - 0.35,
+            LAMBRIS_Y - FOND - PANNEAU, LAMBRIS_Y - FOND, bas + 0.35, haut - 0.35, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+
+# « וַיִּסְפֹּן אֶת הַבַּיִת גֵּבִים וּשְׂדֵרֹת בָּאֲרָזִים » (Melakhim I 6:9) : poutres et planches de cèdre.
+PLAFOND_POUTRES = 5
+box("Lishkat_HaGazit_plafond_planches", GAZIT_NUS["O"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["N"],
+    GAZIT_PLAFOND - 0.15, GAZIT_PLAFOND, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+for k in range(PLAFOND_POUTRES):
+    y = GAZIT_NUS["S"] + (GAZIT_NUS["N"] - GAZIT_NUS["S"]) * (k + 1) / (PLAFOND_POUTRES + 1)
+    box(f"Lishkat_HaGazit_plafond_poutre_{k}", GAZIT_NUS["O"] + 0.3, GAZIT_NUS["E"] - 0.3,
+        y - 0.45, y + 0.45, GAZIT_PLAFOND - 1.4, GAZIT_PLAFOND - 0.15, "80_Lishkot", MAT_CEDRE())
+
+# « וּבַחֵצִי שֶׁל חֹל הָיוּ הַסַּנְהֶדְרִין יוֹשְׁבִין » (Rambam, Beit HaBe'hira 5:17) — « אֵין יְשִׁיבָה בָּעֲזָרָה
+# אֶלָּא לְמַלְכֵי בֵית דָּוִד » (Yoma 25a) : tout ce qui s'assied est au nord de la limite.
+# « כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה » (Sanhedrin 4:3) : trois gradins en
+# demi-cercle, ouvert vers le sud. Son diamètre passe au nord du פתח de 'hol, pour que les
+# pointes de l'arc ne le bouchent pas. Entre l'arc et la limite, ceux qui sont « לִפְנֵיהֶם ».
+# La salle, vingt amot, tient la disposition, pas le nombre : ni soixante et onze juges ni
+# trois rangs d'élèves n'y ont chacun leur place. Des tablettes de marbre, comme les
+# « שֻׁלְחָנוֹת… שֶׁל שַׁיִשׁ » du Mikdash (Shekalim 6:4). Gradins, rayons, rangs : CHOIX.
 SANHEDRIN_X = (GAZIT_X0 + GAZIT_X1) / 2
+SANHEDRIN_Y = AY1 + T + PETAH_HOL_GAZIT[0] + 0.5
+SANHEDRIN_R0 = 2.2
+GRADINS_H = (0.9, 1.5, 2.1)
+GRADINS_PAS = math.pi / 24
+PLAT = 0.12                    # épaisseur des tablettes de marbre
+# L'estrade du Nasi prend les six tronçons du milieu, au niveau du deuxième gradin.
+ESTRADE = range(9, 15)
+DOSSERET = (5.2, 5.4, 3.3)     # mur d'appui derrière le dernier gradin : rayons, hauteur
+
+
+def gazit_point(r, angle, t=0.0):
+    """Point à `r` du centre de l'arc dans la direction `angle`, décalé de `t` en travers."""
+    return (SANHEDRIN_X + r * math.cos(angle) - t * math.sin(angle),
+            SANHEDRIN_Y + r * math.sin(angle) + t * math.cos(angle))
+
+
+def troncon(name, r0, r1, k, z0, z1, mat=None):
+    """Le k-ième tronçon de couronne entre `r0` et `r1` : un quadrilatère, jamais un n-gone concave."""
+    a0, a1 = k * GRADINS_PAS, (k + 1) * GRADINS_PAS
+    prism(name, [gazit_point(r0, a0), gazit_point(r1, a0), gazit_point(r1, a1), gazit_point(r0, a1)],
+          z0, z1, "80_Lishkot", mat)
+
+
+def gradin(name, r0, r1, k, h):
+    """Corps de pierre et tablette de marbre, dont le nez déborde vers le centre."""
+    troncon(f"{name}_corps", r0, r1, k, Z_AZ, Z_AZ + h - PLAT)
+    troncon(f"{name}_tablette", r0 - 0.08, r1, k, Z_AZ + h - PLAT, Z_AZ + h, MAT_MARBRE())
+
+
+for k in range(24):
+    if k in ESTRADE:
+        gradin(f"Lishkat_HaGazit_estrade_{k:02d}", SANHEDRIN_R0, DOSSERET[0], k, GRADINS_H[1])
+        for marche, (r0, h) in enumerate(((SANHEDRIN_R0 - 0.8, 0.5), (SANHEDRIN_R0 - 0.4, 1.0))):
+            gradin(f"Lishkat_HaGazit_estrade_{k:02d}_marche_{marche}", r0, r0 + 0.4, k, h)
+    else:
+        for rang, h in enumerate(GRADINS_H):
+            gradin(f"Lishkat_HaGazit_sanhedrin_{rang}_{k:02d}", SANHEDRIN_R0 + rang,
+                   SANHEDRIN_R0 + rang + 1, k, h)
+    troncon(f"Lishkat_HaGazit_dosseret_{k:02d}", DOSSERET[0], DOSSERET[1], k,
+            Z_AZ + GRADINS_H[2], Z_AZ + DOSSERET[2])
+    troncon(f"Lishkat_HaGazit_dosseret_{k:02d}_chaperon", DOSSERET[0] - 0.05, DOSSERET[1] + 0.05, k,
+            Z_AZ + DOSSERET[2], Z_AZ + DOSSERET[2] + 0.15, MAT_MARBRE())
+# Les pointes de l'arc se ferment sur des joues de marbre, qui suivent les gradins en escalier.
+for cote, angle in (("E", 0.0), ("O", math.pi)):
+    marches = [(SANHEDRIN_R0 - 0.15 + 0.15 * rang, SANHEDRIN_R0 + rang + 1, h + 0.3)
+               for rang, h in enumerate(GRADINS_H)] + [(DOSSERET[0], DOSSERET[1] + 0.1, DOSSERET[2] + 0.45)]
+    for rang, (r0, r1, h) in enumerate(marches):
+        (xa, _), (xb, _) = gazit_point(r0, angle), gazit_point(r1, angle)
+        box(f"Lishkat_HaGazit_joue_{cote}_{rang}", min(xa, xb), max(xa, xb), SANHEDRIN_Y - 0.25, SANHEDRIN_Y,
+            Z_AZ, Z_AZ + h, "80_Lishkot", MAT_MARBRE())
+# « כַּחֲצִי גֹרֶן עֲגֻלָּה » : l'aire que l'arc enferme, marquée sur le cèdre d'un demi-disque de marbre
+# cerclé de bronze, là où se tiennent les parties devant le tribunal. CHOIX.
+GOREN_R = SANHEDRIN_R0 - 0.9
+GOREN_Z = Z_AZ + SOL_CEDRE
+prism("Lishkat_HaGazit_goren", [gazit_point(GOREN_R, math.pi * i / 16) for i in range(17)],
+      GOREN_Z, GOREN_Z + 0.02, "80_Lishkot", MAT_MARBRE())
+for k in range(8):
+    a0, a1 = math.pi * k / 8, math.pi * (k + 1) / 8
+    prism(f"Lishkat_HaGazit_goren_cercle_{k}",
+          [gazit_point(GOREN_R, a0), gazit_point(GOREN_R + 0.12, a0),
+           gazit_point(GOREN_R + 0.12, a1), gazit_point(GOREN_R, a1)],
+          GOREN_Z, GOREN_Z + 0.025, "80_Lishkot", MAT_BRONZE())
+
+
+class Siege(NamedTuple):
+    """Siège tourné vers le centre de l'arc. `r` : rayon du devant de l'assise ; `demi` :
+    demi-largeur ; `sol` : la cote où il pose ; `dossier` : hauteur du dossier au-dessus du
+    sol ; `matiere` : ce dont il est fait ou plaqué."""
+    r: float
+    demi: float
+    sol: float
+    dossier: float
+    matiere: bpy.types.Material
+
+
+def pave(name, angle, bornes, mat):
+    """Pavé orienté sur l'arc : `bornes` = (r0, r1, t0, t1, z0, z1), r le long du rayon."""
+    r0, r1, t0, t1, z0, z1 = bornes
+    prism(name, [gazit_point(r0, angle, t0), gazit_point(r1, angle, t0),
+                 gazit_point(r1, angle, t1), gazit_point(r0, angle, t1)], z0, z1, "80_Lishkot", mat)
+
+
+def dossier_arrondi(name, angle, bornes, mat):
+    """Dossier debout de `r0` à `r1`, large de deux `demi`, de `z0` à `z1`, sommé d'un demi-cercle.
+    `bornes` = (r0, r1, demi, z0, z1). Profil tracé en sens direct dans le plan (travers, z)."""
+    r0, r1, d, z0, z1 = bornes
+    zc = z1 - d
+    profil = [(-d, z0), (d, z0)] + [(d * math.cos(math.pi * i / 12), zc + d * math.sin(math.pi * i / 12))
+                                    for i in range(13)]
+    n = len(profil)
+    avant = [(*gazit_point(r0, angle, t), z) for t, z in profil]
+    arriere = [(*gazit_point(r1, angle, t), z) for t, z in profil]
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    faces += [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
+    return mesh_from_pydata(name, avant + arriere, faces, "80_Lishkot", mat)
+
+
+def kisse(name, angle, siege):
+    """Sur le trône de Shlomo : « וְרֹאשׁ עָגֹל לַכִּסֵּה מֵאַחֲרָיו וְיָדֹת מִזֶּה וּמִזֶּה אֶל מְקוֹם הַשָּׁבֶת »
+    (Melakhim I 10:19), des accoudoirs « כְּמִין מַקְלוֹת… לִסְמוֹךְ זְרוֹעוֹתָיו » (Rashi sur Divrei
+    HaYamim II 9:18). Sans les lions : ce sont des figures, et c'est le trône d'un roi."""
+    r0, d, z, h, mat = siege.r, siege.demi, siege.sol, siege.dossier, siege.matiere
+    r1 = r0 + 1.1
+    pave(f"{name}_assise", angle, (r0, r1, -d, d, z, z + 1.0), mat)
+    dossier_arrondi(f"{name}_dossier", angle, (r1, r1 + 0.3, d, z, z + h), mat)
+    for cote, s in (("d", 1), ("g", -1)):
+        pave(f"{name}_montant_{cote}", angle, (r0 + 0.05, r0 + 0.25, *sorted((s * (d - 0.2), s * d)),
+             z + 1.0, z + 1.75), mat)
+        pave(f"{name}_accoudoir_{cote}", angle, (r0, r1, *sorted((s * (d - 0.2), s * d)), z + 1.75, z + 1.9), mat)
+
+
+# « הַנָּשִׂיא יוֹשֵׁב בָּאֶמְצַע וּזְקֵנִים יוֹשְׁבִים מִימִינוֹ וּשְׂמֹאלוֹ » (Tosefta Sanhedrin 8:1) : le Nasi
+# sur l'estrade, son siège plaqué d'or comme celui de Shlomo, « וַיְצַפֵּהוּ זָהָב מוּפָז » (Melakhim I
+# 10:18). L'Av Beit Din « יוֹשֵׁב מִימִינוֹ » (Rambam, Sanhedrin 1:3), au même niveau, sur le
+# deuxième gradin, le même siège en marbre. Le Nasi regarde le sud : sa droite est à
+# l'ouest, l'angle qui croît. Estrade, formes et matières : CHOIX.
+kisse("Lishkat_HaGazit_kisse_nasi", math.pi / 2, Siege(3.3, 0.85, Z_AZ + GRADINS_H[1], 4.6, MAT_OR_PLAQUE()))
+kisse("Lishkat_HaGazit_kisse_av_beit_din", math.radians(127),
+      Siege(SANHEDRIN_R0 + 0.95, 0.7, Z_AZ + GRADINS_H[1], 3.4, MAT_MARBRE()))
+
+# « וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל » (Sanhedrin 4:3) :
+# debout, donc un pupitre chacun, au pied des deux pointes de l'arc. Pupitre tourné : CHOIX.
+PIED_DE_PUPITRE = ((0.35, 0.0), (0.35, 0.12), (0.22, 0.22), (0.12, 0.35), (0.09, 1.25), (0.15, 1.4),
+                   (0.09, 1.55), (0.09, 1.95), (0.22, 2.08), (0.22, 2.2), (0.0, 2.2))
+SOFRIM_Y = SANHEDRIN_Y - 1.4
+for cote, x in (("O", SANHEDRIN_X - SANHEDRIN_R0 - 2.6), ("E", SANHEDRIN_X + SANHEDRIN_R0 + 2.6)):
+    nom = f"Lishkat_HaGazit_sofer_{cote}"
+    revolution(f"{nom}_pied", x, SOFRIM_Y, Z_AZ, PIED_DE_PUPITRE, "80_Lishkot", MAT_CEDRE(), verts=16)
+    plaque(f"{nom}_pupitre",
+           [(x - 0.5, SOFRIM_Y - 0.35, Z_AZ + 2.05), (x + 0.5, SOFRIM_Y - 0.35, Z_AZ + 2.05),
+            (x + 0.5, SOFRIM_Y + 0.35, Z_AZ + 2.35), (x - 0.5, SOFRIM_Y + 0.35, Z_AZ + 2.35)],
+           0.06, "80_Lishkot", MAT_CEDRE())
+    box(f"{nom}_rebord", x - 0.5, x + 0.5, SOFRIM_Y - 0.41, SOFRIM_Y - 0.35, Z_AZ + 2.02, Z_AZ + 2.16,
+        "80_Lishkot", MAT_CEDRE())
+# « וְשָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים יוֹשְׁבִין לִפְנֵיהֶם » (Sanhedrin 4:4), « גְּדוֹלִים בָּרִאשׁוֹנָה »
+# (Tosefta Sanhedrin 8:1) : trois bancs de marbre face aux juges, le premier le plus près d'eux.
+# Ils laissent à l'est un passage le long du mur, devant le פתח.
 for rang in range(3):
-    r0, r1 = 3.2 + rang, 4.2 + rang
-    for k in range(12):
-        a0, a1 = math.pi * k / 12, math.pi * (k + 1) / 12
-        prism(f"Lishkat_HaGazit_sanhedrin_{rang}_{k:02d}",
-              [(SANHEDRIN_X + r * math.cos(a), AXE_MUR_N + r * math.sin(a))
-               for r, a in ((r0, a0), (r1, a0), (r1, a1), (r0, a1))],
-              Z_AZ, Z_AZ + 0.9 + 0.6 * rang, "80_Lishkot")
+    y1 = SOFRIM_Y - 1.0 - 1.5 * rang
+    nom = f"Lishkat_HaGazit_talmidim_{rang}"
+    for k, x in enumerate((SANHEDRIN_X - 3.8, SANHEDRIN_X - 0.3, SANHEDRIN_X + 3.2)):
+        box(f"{nom}_pied_{k}", x, x + 0.6, y1 - 0.7, y1 - 0.1, Z_AZ, Z_AZ + 0.68, "80_Lishkot")
+    box(f"{nom}_assise", SANHEDRIN_X - 4, SANHEDRIN_X + 4, y1 - 0.8, y1, Z_AZ + 0.68, Z_AZ + 0.85,
+        "80_Lishkot", MAT_MARBRE())
 # Lishkat HaGola : « שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם
 # לְכָל הָעֲזָרָה » (Middot 5:4). Elle alimente la cour, elle s'ouvre donc dessus, et son
 # unique פתח perce le mur nord — pas une porte de plus au compte de Middot 1:4.
@@ -5215,7 +5457,11 @@ box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim",
 #     (Middot 4:1). Au-dessus, l'or reste nu jusqu'à la corniche : deux registres
 #     flottant à mi-hauteur ne sont dans aucune source.
 CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
-REGISTRES_KIR = 3         # registres de figures, séparés par des bandeaux de fleurons
+# Cinq registres, et la figure ne remplit que 82 % de ce que le bandeau laisse : 2,9 amot,
+# posée au milieu, de l'or nu dessus et dessous. À trois registres pleins, des keruvim
+# de 6 amot se touchaient par les ailes et le champ se lisait en papier peint massif.
+REGISTRES_KIR = 5         # registres de figures, séparés par des bandeaux de fleurons
+PART_FIGURE_KIR = 0.82    # hauteur d'une figure, en part du registre hors bandeau
 
 
 def champ_sculpte(nom, paroi, u0, u1, col):
@@ -5227,11 +5473,12 @@ def champ_sculpte(nom, paroi, u0, u1, col):
     pas = (u1 - u0) / n
     for r in range(REGISTRES_KIR + 1):
         bandeau_fleurons(f"Kir_{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
+    h = (registre - BANDEAU_KIR) * PART_FIGURE_KIR
     for r in range(REGISTRES_KIR):
         for i in range(n):
             motif = keruv_grave if i % 2 == 0 else timora
             motif(f"Kir_{nom}_{r}{i:02d}", paroi, u0 + pas * (i + 0.5),
-                  z0 + r * registre + BANDEAU_KIR, registre - BANDEAU_KIR, col)
+                  z0 + r * registre + (registre + BANDEAU_KIR - h) / 2, h, col)
 
 
 PAROIS_OR = [

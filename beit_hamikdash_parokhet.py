@@ -11,8 +11,7 @@ lisaient en carton ; ce qui se lit ici, c'est le rideau lui-même, qui porte le 
 
 Écrit `visite/matieres/parokhet_2048.webp`, une carte de 20 amot sur 40 — le rideau
 entier, lu par la position de monde (y, z) : RGB porte la HAUTEUR du bombé en gris,
-alpha porte le MASQUE de la figure. L'alpha du WebP est codé à part et sans perte, le
-gris passe entier dans la luminance : ni l'un ni l'autre ne souffre du 4:2:0.
+alpha porte le MASQUE de la figure. Le WebP est sans perte (`beit_hamikdash_carte.py`).
 
 Le blockout la lit dans `parokhet()` (bump + ton), `visite/matieres.js` dans la
 famille étoffe (pente + ton). La rasterisation est celle de `beit_hamikdash_carte.py` ;

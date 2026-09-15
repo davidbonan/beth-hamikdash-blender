@@ -86,6 +86,74 @@ img { display: block; }
 @keyframes balayer { to { transform: translateX(130%); } }
 @keyframes balayer-rtl { to { transform: translateX(-130%); } }
 
+/* ---- les lishkot ---- */
+.lishkot { position: relative; scroll-snap-align: start; }
+.plongee { position: relative; display: flex; flex-direction: column; }
+.cadre {
+  --zoom: 1; --fy: .52;
+  --ih: calc(max(100cqh, min(55.83cqw, 116cqh)) * var(--zoom));
+  --iw: calc(var(--ih) * 1.791);
+  --gauche: clamp(100cqw - var(--iw), min(50cqw - .4 * var(--iw), 100cqw - .83 * var(--iw)), 0px);
+  --haut: clamp(100cqh - var(--ih), 50cqh - var(--fy) * var(--ih), 0px);
+  position: relative; height: 100svh; container-type: size; overflow: hidden; background: var(--nuit); isolation: isolate;
+}
+.cadre img {
+  position: absolute; max-width: none; z-index: -2;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%); mask-image: linear-gradient(to right, transparent, #000 10%);
+  width: var(--iw); height: var(--ih); left: var(--gauche); top: var(--haut); }
+.cadre::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 42% 34% at 0% 0%, rgba(16,14,11,.78), rgba(16,14,11,0)),
+    linear-gradient(to right, rgba(16,14,11,.82) 0%, rgba(16,14,11,.45) 22%, rgba(16,14,11,0) 34%),
+    linear-gradient(to bottom, var(--nuit) 0%, rgba(16,14,11,0) 16%, rgba(16,14,11,0) 84%, var(--nuit) 100%);
+}
+.repere {
+  position: absolute; translate: -50% -50%;
+  left: calc(var(--gauche) + var(--x) * var(--iw) / 100); top: calc(var(--haut) + var(--y) * var(--ih) / 100);
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  font: 500 12px/1 "Source Serif 4", Georgia, serif; color: var(--lin); text-decoration: none; font-variant-numeric: lining-nums tabular-nums;
+  background: rgba(16,14,11,.64); border: 1px solid var(--or-clair); box-shadow: 0 1px 8px rgba(16,14,11,.5);
+  transition: background-color .25s ease, color .25s ease, scale .25s ease;
+}
+.repere::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
+.repere[data-souterraine] { border-style: dashed; background: rgba(16,14,11,.38); }
+.repere .nom {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; translate: -50% 4px; white-space: nowrap;
+  padding: 4px 9px; font-size: 14px; color: var(--lin); background: rgba(16,14,11,.8); opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, translate .2s ease;
+}
+.repere:hover .nom, .repere:focus-visible .nom { opacity: 1; translate: -50% 0; }
+.repere:hover { background: rgba(16,14,11,.85); z-index: 2; }
+.repere[aria-current] { z-index: 1; background: var(--or); color: var(--nuit); border-color: var(--or-clair); scale: 1.18; }
+.repere[aria-current]::before {
+  content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid var(--or-clair);
+  animation: sonder 2.2s ease-out infinite;
+}
+@keyframes sonder { from { scale: 1; opacity: .9; } to { scale: 2.2; opacity: 0; } }
+.lishkot .entete { position: absolute; top: clamp(24px, 5vh, 56px); inset-inline-start: var(--marge); max-width: min(24em, 28vw); text-shadow: 0 1px 12px rgba(16,14,11,.7); }
+:root[dir="rtl"] .lishkot .entete { inset-inline-start: auto; left: var(--marge); }
+.lishkot .entete h2 { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; }
+.lishkot .entete p { margin-top: 10px; color: var(--lin-sourd); font-size: 16px; }
+.chambres {
+  position: absolute; bottom: clamp(28px, 7vh, 72px); left: var(--marge); width: min(22em, 26vw);
+  display: grid; list-style: none; margin: 0; padding: 0;
+}
+.chambres li {
+  grid-area: 1 / 1; align-self: end; visibility: hidden; opacity: 0;
+  padding: 18px 22px; background: rgba(16,14,11,.72); border-inline-start: 1px solid var(--or);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: opacity .35s ease, visibility 0s linear .35s;
+}
+.lishkot:not(.vivante) .chambres li:first-child, .chambres li.courant { visibility: visible; opacity: 1; transition: opacity .35s ease; }
+.chambres h3 { font-size: clamp(20px, 1.8vw, 26px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+.chambres .rang { font: 500 14px/1 "Source Serif 4", Georgia, serif; font-variant-numeric: lining-nums; color: var(--or); min-width: 1.4em; }
+.chambres .nom-he { font-size: .8em; color: var(--lin-sourd); }
+.chambres .sous-terre { font-size: 13px; color: var(--or-clair); font-style: italic; }
+.chambres .role { margin-top: 8px; font-size: 16px; line-height: 1.5; }
+.chambres .source { margin-top: 6px; font-size: 13px; color: var(--lin-sourd); }
+.chambres .entrer-ici { margin-top: 12px; }
+
 /* ---- la montée ---- */
 .montee { padding: clamp(72px, 12vh, 140px) var(--marge) 0; }
 .ouverture {
@@ -223,6 +291,12 @@ img { display: block; }
 }
 
 @media (max-width: 860px) {
+  .cadre { --zoom: 1.15; height: auto; aspect-ratio: 5 / 4; }
+  .cadre::after { background: linear-gradient(to bottom, rgba(16,14,11,0) 92%, var(--nuit) 100%); }
+  .repere { width: 22px; height: 22px; font-size: 11px; }
+  .repere .nom { display: none; }
+  .lishkot .entete, :root[dir="rtl"] .lishkot .entete { position: static; order: -1; max-width: none; padding: clamp(56px, 10vh, 96px) var(--marge) 20px; }
+  .chambres { position: static; width: auto; margin: 12px var(--marge) 0; }
   .ouverture, .legende { grid-template-columns: minmax(0, 1fr); }
   .ouverture { row-gap: 12px; }
   .echelle { display: none; }
@@ -234,7 +308,7 @@ img { display: block; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .seuil .affiche img, .titre, .titre h1 .he, .entrer::after, .scene .vue img, .degres .legende, .fumee, .braise, .reflet, .sanctuaire .fond img, .sanctuaire .legende > * { animation: none; }
+  .seuil .affiche img, .titre, .titre h1 .he, .entrer::after, .scene .vue img, .degres .legende, .fumee, .braise, .reflet, .sanctuaire .fond img, .sanctuaire .legende > *, .repere[aria-current]::before { animation: none; }
   .fumee { opacity: .6; }
   html { scroll-snap-type: none; }
   .scene, .entrer-ici, .echelle li, .echelle a { transition: none; }

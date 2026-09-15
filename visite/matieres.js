@@ -22,7 +22,8 @@ import { assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
-      MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15;
+      MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
+      LAMBRIS = 16;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
@@ -73,7 +74,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
                    13: "pierre", 14: "pierre", 15: "pierre",
-                   3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit" };
+                   3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
 // marbre, gazit scié — prend la même pierre que le reste, en moins appuyé : c'est cette
@@ -105,6 +106,9 @@ const CARREAU = {
   13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
   15: [1.0, 0.60, 0.40, 1.60, 0.70],
+  // Le lambris de cèdre prend la photo du bois trois fois plus grande et presque sans nœuds :
+  // à un mètre le carreau, une paroi de douze mètres se lisait en bardage de chalet.
+  16: [3.6, 0.22, 0.30, 0.30, 0.35],
 };
 
 const FAMILLES = {
@@ -114,7 +118,7 @@ const FAMILLES = {
   Or: METAL, Or_plaque: METAL, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
   Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
-  Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
+  Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS, Cedre_lambris: LAMBRIS,
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Peau: ETOFFE,
   Eau_Kiyor: EAU,
@@ -274,11 +278,11 @@ const float BOMBE_PAROKHET = 0.12 * AMA;
 const vec3 TON_FIGURE_PAROKHET = vec3(1.52, 1.53, 1.45);
 const vec2 TEXEL_PAROKHET = vec2(1.0 / 2048.0, 1.0 / 4096.0);
 // Les gravures des parois : le modelé bombe de RELIEF_GRAVURE fois la hauteur de la
-// figure au-dessus de sa plaque — 6 cm sur un keruv de paroi, 2 sur la timora d'un
+// figure au-dessus de sa plaque — 1,5 cm sur un keruv de paroi, 1 sur la timora d'un
 // jambage —, et une tuile de l'atlas couvre CADRE_GRAVURE hauteurs de figure sur
 // TAILLE_TUILE d'UV (beit_hamikdash_gravures.py). En part de la hauteur, la pente ne
 // dépend pas de la taille de la plaque : rien à lui transmettre.
-const float RELIEF_GRAVURE = 0.02;
+const float RELIEF_GRAVURE = 0.01;
 const float CADRE_GRAVURE = 1.2;
 const float TAILLE_TUILE = 0.5;
 const float TEXEL_GRAVURE = 1.0 / 2048.0;
@@ -643,12 +647,14 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     teinte = vec3(1.0 + (g - 0.5) * 0.05);
     rugo = (g - 0.5) * 0.10;
   }
-  else if (uFamille == 4) {                                   // bois : fil étiré
+  else if (uFamille == 4 || uFamille == 16) {                // bois : fil étiré
     // Le fil reste écrit — une planche de cèdre du Heikhal fait 20 amot de haut, et
-    // aucune nappe d'un mètre ne porte une veine de cette longueur.
+    // aucune nappe d'un mètre ne porte une veine de cette longueur. Le lambris le garde
+    // à moitié : c'est un bois choisi et poli.
+    float fort = uFamille == 16 ? 0.5 : 1.0;
     float f = grain(P * vec3(9.0, 1.1, 9.0), empreinteMax() * 9.0);
-    teinte = vec3(1.0 + (f - 0.5) * 0.18 - fract(f * 7.0) * 0.06);
-    rugo = (f - 0.5) * 0.10;
+    teinte = vec3(1.0 + ((f - 0.5) * 0.18 - fract(f * 7.0) * 0.06) * fort);
+    rugo = (f - 0.5) * 0.10 * fort;
   }
   else if (uFamille == 5) {                                   // étoffe
     // La trame vient de la nappe : le sinus qui la portait valait 38 périodes au mètre
@@ -770,7 +776,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
   // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y
   // (le -z de three) sur un mur ouest — et v monte. Les flancs de la plaque, hauts de
-  // 11 cm, ne portent pas de modelé.
+  // 4 cm, ne portent pas de modelé.
   {
     vec3 tu = abs(N.z) > abs(N.x) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, -1.0);
     vec2 pas = vec2(TEXEL_GRAVURE, 0.0);
@@ -877,7 +883,10 @@ export function habiller(materiau, horloges, jeux) {
       .replace("#include <begin_vertex>",
                "#include <begin_vertex>\n#ifdef FIL\ntransformed = grossirFil(transformed, objectNormal);\n#endif\n" +
                "vMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPixel = pixelVu(transformed);\n" +
-               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = uv;\n#endif\n");
+               // L'exporteur glTF retourne v (0 en haut) ; l'atlas se lit v montant, comme
+               // Blender l'a écrit et comme la parokhet — sinon la plaque keruv lit la tuile
+               // fleuron, et la timora un quart vide.
+               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n");
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
       .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
