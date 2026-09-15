@@ -104,8 +104,12 @@ def comprimer(glb, options=()):
     l'encodage plus lent. Le décodeur, lui, est le même.
     """
     sortie = glb.with_suffix(".pack.glb")
+    # `-kv` : les UV des plaques gravées ne servent à aucune texture glTF — c'est
+    # matieres.js qui les lit — et gltfpack les jetait comme inutilisées. `-vt 16` :
+    # à 12 bits il les range dans un uint16 seize fois trop petit et compense par une
+    # KHR_texture_transform sur la texture de la matière, qu'aucune matière n'a ici.
     commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
-                "-cc", "-kn", "-km", "-ke", "-vp", "16", "-vn", "12", *options]
+                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vn", "12", "-vt", "16", *options]
     try:
         subprocess.run(commande, check=True, capture_output=True, timeout=600)
     except (OSError, subprocess.SubprocessError) as erreur:
@@ -278,7 +282,11 @@ def main():
         # elles : la carte d'ombre se mord alors elle-même, et l'intérieur du Heikhal
         # se couvre d'un damier clair/sombre à l'échelle du texel.
         export_normals=True,
-        export_texcoords=False,
+        # Seules les plaques gravées portent des UV — celles de `beit_hamikdash_gravures.py`,
+        # que le blockout écrit lui-même : aucun dépliage à la main, rien à repeindre.
+        # Un maillage sans couche UV ne sort aucune coordonnée ; les concepts qui
+        # mêlent plaques et volumes nus en portent pour tous, à zéro sur les nus.
+        export_texcoords=True,
         export_skins=False,
         export_animations=False,
     )

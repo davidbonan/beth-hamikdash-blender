@@ -60,6 +60,7 @@ masque.
 | `--modele` | Endpoint | Prix | Masque | Seed |
 |---|---|---|---|---|
 | `gpt2` (défaut) | `openai/gpt-image-2/edit` | ~0,08 $ (au token, `quality: high`) | oui | non — deux appels identiques ne donnent pas la même image |
+| `gpt25s` | `openai/gpt-image-2.5/sunburst/edit` | au token, `quality: high` | oui | non — le modèle des images d'accueil ; à prendre pour retoucher l'une d'elles |
 | `nano-pro` | `fal-ai/nano-banana-pro/edit` | 0,15 $ | non | oui |
 | `nano2` | `fal-ai/nano-banana-2/edit` | 0,08 $ | non | oui |
 

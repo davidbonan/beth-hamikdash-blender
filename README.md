@@ -38,6 +38,10 @@ dernière à droite.*
 | `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
 | `beit_hamikdash_keruvim.py` | Les deux keruvim de la kaporet : enfants MakeHuman agenouillés, mains jointes, ailes plumées ; écrit `keruvim.blend`, que le blockout lit. À relancer après toute modification de ce script, puis reconstruire la scène. |
 | `keruvim.blend` | Les deux maillages générés (à regénérer après toute modification du script précédent). |
+| `beit_hamikdash_parokhet.py` | Le motif tissé des deux Parokhot — créatures ailées et lions en alternance — rasterisé en carte de relief : gris = hauteur du bombé, alpha = figure ; écrit `visite/matieres/parokhet_2048.webp`, que la matière du blockout et le nuanceur de la visite lisent tous deux en coordonnées de rideau. À relancer après toute modification, puis reconstruire. |
+| `beit_hamikdash_gravures.py` | Les trois figures gravées des parois du Bayit — keruv, timora, fleuron — rasterisées avec leur modelé (volumes bombés, sillons entre les pennes, palmes qui ploient) en un atlas `visite/matieres/gravures_2048.webp`, plus `gravures.json` : la silhouette de chaque figure, tracée sur la carte même. Le blockout ne pose plus qu'une plaque par figure, à cette silhouette, dont les UV visent la tuile ; la matière et le nuanceur lisent le modelé. À relancer après toute modification, puis reconstruire. |
+| `beit_hamikdash_carte.py` | La rasterisation partagée des deux précédents : remplir un contour, bomber, creuser un sillon, fondre, tracer une silhouette, écrire le WebP. |
+| `beit_hamikdash_contours.py` | Les contours des figures — corps dressé, crâne à deux faces, aile plumée, corolle — et le lissage de Chaikin qui en fait des silhouettes. Importé par les deux scripts de cartes. |
 | `visite/` | La visite elle-même : page web où l'on marche dans le Temple et où l'on clique un élément pour savoir ce que c'est, avec sa source. |
 | `.claude/skills/camera/` | Skill Claude Code + `camera.py` : déclare un plan, en rend les deux images clés et mesure son recouvrement, en une commande. |
 | `.claude/skills/blender/` | Skill Claude Code : les incantations headless des huit scripts, et l'invariant « le script est la source, le .blend est l'artefact ». |
@@ -82,7 +86,7 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
 | `visite/nappes.js` | Les cinq jeux de scans, chargés en 1024 sur toutes les machines. |
-| `visite/matieres/` | Les scans eux-mêmes, en 1024. Artefacts — `beit_hamikdash_nappes.py` les refabrique. |
+| `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `beit_hamikdash_nappes.py`, `beit_hamikdash_parokhet.py` et `beit_hamikdash_gravures.py` les refabriquent. |
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur. |
@@ -105,8 +109,11 @@ Un serveur est nécessaire : la page est un module ES, `file://` ne la charge pa
 **En ligne.** Netlify déploie ce dépôt sur https://bethhamikdach.com à chaque push sur
 `main` : `construire_site.sh` assemble `dist/` — les pages de `site/` et la visite filtrée
 sous `dist/visite/` — et `netlify.toml` dit le reste. La visite est servie à `/visite/` ;
-l'accueil (`site/accueil.py`) monte les degrés de sainteté en images du film, chacune
-menant à la visite en `?vue=<degré>`. Le mode `?cinema` (`visite/cinema.js`, parcours dans
+l'accueil (`site/accueil.py`) monte les degrés de sainteté en images du film sur une scène
+épinglée — chaque vue se fond dans la suivante au fil du défilement (animations CSS au
+défilement, repli en fondu par classes ailleurs), la nuit tombe degré après degré, et le
+Kodesh HaKodashim monte du noir sous une fumée qui dérive — chaque légende menant à la
+visite en `?vue=<degré>`. Le mode `?cinema` (`visite/cinema.js`, parcours dans
 `visite/cinema.json`) fait marcher la scène seule ; l'accueil ne s'en sert plus.
 `?qualite=basse` force le profil léger depuis un bureau — c'est ainsi qu'on vérifie le
 rendu du téléphone sans téléphone sous la main ; `?qualite=haute` fait l'inverse.

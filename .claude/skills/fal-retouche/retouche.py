@@ -76,6 +76,7 @@ def charge_nano(reg):
 
 MODELES = {
     "gpt2": {"endpoint": "openai/gpt-image-2/edit", "charge": charge_gpt, "masque": True},
+    "gpt25s": {"endpoint": "openai/gpt-image-2.5/sunburst/edit", "charge": charge_gpt, "masque": True},
     "nano-pro": {"endpoint": "fal-ai/nano-banana-pro/edit", "charge": charge_nano, "masque": False},
     "nano2": {"endpoint": "fal-ai/nano-banana-2/edit", "charge": charge_nano, "masque": False},
 }

@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les neuf scripts
+## Les onze scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -33,6 +33,8 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
+| `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte de relief (gris = bombé, alpha = figure), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp` |
+| `beit_hamikdash_gravures.py` | les figures gravées des parois (keruv, timora, fleuron) : atlas de modelé et silhouettes, que le blockout lit pour poser une plaque par figure | `visite/matieres/gravures_2048.webp`, `gravures.json` |
 | `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
@@ -105,6 +107,27 @@ modification de ce script, le relancer puis reconstruire la scène :
 
 ```bash
 $BLENDER -b -P beit_hamikdash_keruvim.py
+```
+
+Même logique pour le motif des Parokhot : il n'est pas de la géométrie mais une carte,
+`visite/matieres/parokhet_2048.webp`, écrite par `beit_hamikdash_parokhet.py` (~5 s, numpy
+de Blender, `cwebp` sur le PATH) et lue par `parokhet()` du blockout comme par le nuanceur
+étoffe de la visite. Les contours des figures — les siennes et celles des parois du Bayit —
+vivent dans `beit_hamikdash_contours.py`. Après toute modification de l'un ou l'autre :
+
+```bash
+$BLENDER -b -P beit_hamikdash_parokhet.py
+```
+
+Et pour les figures gravées des parois du Bayit — keruvim, timorot, fleurons, sur les murs
+d'or, les vantaux du Heikhal et les jambages des portes des cours — `beit_hamikdash_gravures.py`
+(~4 s) écrit l'atlas de modelé `visite/matieres/gravures_2048.webp` **et** `gravures.json`,
+la silhouette de chaque figure tracée sur la carte même. Le blockout **lit ce JSON** pour
+poser une seule plaque par figure, à sa silhouette, dont les UV visent la tuile ; sans lui
+il s'arrête net. La rasterisation commune aux deux cartes est `beit_hamikdash_carte.py`.
+
+```bash
+$BLENDER -b -P beit_hamikdash_gravures.py
 ```
 
 `FOULE = True` en tête du blockout ajoute les figures de Yom Kippour : le peuple dans

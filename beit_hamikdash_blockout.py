@@ -20,12 +20,14 @@ Les choix entre avis divergents sont signalés par "# CHOIX".
 """
 
 import bpy
+import json
 import math
 import pathlib
 import sys
 import zlib
 from typing import NamedTuple
 from mathutils import Matrix, Vector, noise
+
 
 # ----------------------------------------------------------------------------
 # PARAMÈTRES
@@ -979,8 +981,31 @@ NIMA = 20 / 72   # amot : les 72 נִימִין de Shekalim 8:5 réparties sur l
 MOYENNE_PAROKHET = tuple(sum(c[k] for c in MATIERES_PAROKHET) / 4 for k in range(3))
 ECART_PAROKHET = 0.18
 LONGUEUR_DOSAGE = 12   # en nimin : sur quelle longueur le dosage d'un cordon dérive
+# Le motif tissé — créatures ailées et lions —, écrit par beit_hamikdash_parokhet.py :
+# le gris porte la hauteur du bombé, l'alpha le masque de la figure. Lue par (y, z) de
+# monde sur les 20 × 40 amot du rideau ; mêmes lectures dans visite/matieres.js.
+CARTE_PAROKHET = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "parokhet_2048.webp"
+BOMBE_PAROKHET = 0.12      # amot : ce dont une figure TISSÉE bombe l'étoffe, 6 cm — pas un relief
+TON_FIGURE_PAROKHET = 1.35          # la figure remonte le ton : la même laine lue par son autre face
+JOUR_FOND, JOUR_FIGURE = (0.72, 0.68, 0.72), (1.20, 1.16, 1.10)
 
-def parokhet(name, figure=False):
+def _carte_parokhet(mat):
+    """(hauteur du bombé, masque de la figure) au point ombré, lus dans CARTE_PAROKHET."""
+    liens = mat.node_tree.links
+    axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1700, 900)
+    liens.new(_position(mat), axe.inputs["Vector"])
+    uv = _noeud(mat, "ShaderNodeCombineXYZ", -1400, 900)
+    liens.new(_calc(mat, "DIVIDE", _calc(mat, "ADD", axe.outputs["Y"], m(10)), m(20)), uv.inputs["X"])
+    liens.new(_calc(mat, "DIVIDE", _calc(mat, "SUBTRACT", axe.outputs["Z"], m(Z_BAT)), m(40)), uv.inputs["Y"])
+    carte = _noeud(mat, "ShaderNodeTexImage", -1200, 900)
+    carte.image = bpy.data.images.load(str(CARTE_PAROKHET), check_existing=True)
+    carte.image.colorspace_settings.name = "Non-Color"
+    carte.image.alpha_mode = "CHANNEL_PACKED"
+    carte.extension = "EXTEND"
+    liens.new(uv.outputs["Vector"], carte.inputs["Vector"])
+    return carte.outputs["Color"], carte.outputs["Alpha"]
+
+def parokhet(name):
     """Étoffe chinée des quatre matières, et non quatre bandes de couleur.
 
     « וְעַל שִׁבְעִים וּשְׁתַּיִם נִימִין נֶאֱרֶגֶת, וְעַל כָּל נִימָא וְנִימָא עֶשְׂרִים וְאַרְבָּעָה חוּטִין »
@@ -993,13 +1018,13 @@ def parokhet(name, figure=False):
     posée sur un bruit les aurait pondérées par la loi du bruit. Le cordon des nimin,
     large de 20/72 d'ama, donne au tissu son corps.
 
-    `figure=True` couche ce cordon et remonte le ton : c'est la seconde face d'un
-    maassé 'hoshev, « אֲרִיגָה שֶׁל שְׁתֵּי קִירוֹת » (Rashi, ibid.), la même laine lue par son
-    autre côté. C'est ce qui fait voir les créatures sans y mettre un fil d'or, qu'Ex.
-    26:31 ne donne pas.
+    Là où la carte de beit_hamikdash_parokhet.py dit une figure, le cordon se couche
+    et le ton remonte : c'est la seconde face d'un maassé 'hoshev, « אֲרִיגָה שֶׁל שְׁתֵּי
+    קִירוֹת » (Rashi, ibid.), la même laine lue par son autre côté. C'est ce qui fait voir
+    les créatures sans y mettre un fil d'or, qu'Ex. 26:31 ne donne pas — et sans un
+    volume : la figure bombe l'étoffe de BOMBE_PAROKHET, elle n'y est pas posée.
     """
-    mat, neuf = _neuf(name, tuple(min(1.0, c * (1.35 if figure else 1.0))
-                                 for c in MOYENNE_PAROKHET))
+    mat, neuf = _neuf(name, MOYENNE_PAROKHET)
     if not neuf:
         return mat
     liens = mat.node_tree.links
@@ -1008,10 +1033,10 @@ def parokhet(name, figure=False):
     bsdf.inputs["Sheen Weight"].default_value = 0.50
     bsdf.inputs["Sheen Roughness"].default_value = 0.45
     bsdf.inputs["Specular IOR Level"].default_value = 0.2
+    bombe, figure = _carte_parokhet(mat)
     axe = _noeud(mat, "ShaderNodeSeparateXYZ", -1700, 0)
     liens.new(_position(mat), axe.inputs["Vector"])
-    chaine, trame = ((axe.outputs["Y"], axe.outputs["Z"]) if not figure
-                     else (axe.outputs["Z"], axe.outputs["Y"]))
+    chaine, trame = axe.outputs["Y"], axe.outputs["Z"]
     cellule = _noeud(mat, "ShaderNodeCombineXYZ", -1400, 0)
     liens.new(_calc(mat, "FLOOR", _calc(mat, "DIVIDE", chaine, m(NIMA))), cellule.inputs["X"])
     liens.new(_calc(mat, "FLOOR", _calc(mat, "DIVIDE", trame, m(NIMA * LONGUEUR_DOSAGE))),
@@ -1033,19 +1058,30 @@ def parokhet(name, figure=False):
     dosage.inputs["Color1"].default_value = (*MOYENNE_PAROKHET, 1.0)
     liens.new(laine.outputs["Color"], dosage.inputs["Color2"])
     # Le jour d'une étoffe lourde : un champ d'un ton parfaitement égal se lit peint.
-    jour = _noeud(mat, "ShaderNodeMixRGB", -700, 0)
-    jour.blend_type = 'MULTIPLY'
-    jour.inputs["Color2"].default_value = ((1.20, 1.16, 1.10, 1.0) if figure
-                                           else (0.72, 0.68, 0.72, 1.0))
-    liens.new(dosage.outputs["Color"], jour.inputs["Color1"])
-    liens.new(_grain(mat, 2.5), jour.inputs["Factor"])
-    liens.new(jour.outputs["Color"], bsdf.inputs["Base Color"])
-    for k, (sens, largeur, force, creux) in enumerate(((chaine, NIMA, 0.6, NIMA * 0.18),
-                                                       (trame, NIMA / 3, 0.4, NIMA * 0.07))):
+    grain = _grain(mat, 2.5)
+    jours = []
+    for k, (ton, jour_de) in enumerate(((1.0, JOUR_FOND), (TON_FIGURE_PAROKHET, JOUR_FIGURE))):
+        jour = _noeud(mat, "ShaderNodeMixRGB", -700, -120 * k)
+        jour.blend_type = 'MULTIPLY'
+        jour.inputs["Color2"].default_value = (*(c * ton for c in jour_de), 1.0)
+        liens.new(dosage.outputs["Color"], jour.inputs["Color1"])
+        liens.new(grain, jour.inputs["Factor"])
+        jours.append(jour.outputs["Color"])
+    teinte = _noeud(mat, "ShaderNodeMixRGB", -500, 0)
+    liens.new(figure, teinte.inputs["Factor"])
+    liens.new(jours[0], teinte.inputs["Color1"])
+    liens.new(jours[1], teinte.inputs["Color2"])
+    liens.new(teinte.outputs["Color"], bsdf.inputs["Base Color"])
+    # Le cordon de la chaîne domine le fond, celui de la trame domine la figure : le
+    # fil s'y couche dans l'autre sens.
+    for k, (sens, largeur, force_fond, force_figure, creux) in enumerate((
+            (chaine, NIMA, 0.6, 0.4, NIMA * 0.18), (trame, NIMA / 3, 0.4, 0.6, NIMA * 0.07))):
         cordon = _noeud(mat, "ShaderNodeMath", -900, -500 - 200 * k)
         cordon.operation = "SINE"
         liens.new(_calc(mat, "MULTIPLY", sens, 2 * math.pi / m(largeur)), cordon.inputs[0])
-        _creuser(mat, cordon.outputs[0], force, creux)
+        _creuser(mat, cordon.outputs[0],
+                 _calc(mat, "MULTIPLY_ADD", figure, force_figure - force_fond, force_fond), creux)
+    _creuser(mat, bombe, 1.0, BOMBE_PAROKHET)
     _creuser(mat, _grain(mat, 0.05), 0.4, 0.008)
     return mat
 
@@ -1210,8 +1246,6 @@ MAT_BOIS_MAARAKHA = lambda: bois("Bois_maarakha", (0.17, 0.12, 0.074))
 MAT_BOIS_ROUSSI = lambda: bois("Bois_roussi", (0.125, 0.092, 0.062))
 MAT_BOIS_CHARBON = lambda: bois("Bois_charbon", (0.050, 0.040, 0.036))
 MAT_PAROKHET = lambda: parokhet("Parokhet_tissee")
-# Le fil couché des figures : même laine, tissage tourné (Rashi Ex. 26:31).
-MAT_PAROKHET_FIGURE = lambda: parokhet("Parokhet_figure", figure=True)
 MAT_TERRE = lambda: terre("Terre_Jerusalem")
 # La ville, deux tons sous le Temple, et son appareil est domestique : le gazit de
 # huit à dix amot (Melakhim I 7:10) est celui de la maison du Roi et du Bayit, pas
@@ -1251,10 +1285,15 @@ def _objet(name, data, col, mat=None):
         data.materials.append(mat)
     return link_to(o, col)
 
-def mesh_from_pydata(name, verts, faces, col, mat=None):
-    """Maillage à partir de sommets en amot et de faces indexées."""
+def mesh_from_pydata(name, verts, faces, col, mat=None, uv=None):
+    """Maillage à partir de sommets en amot et de faces indexées. `uv`, une coordonnée
+    de texture par sommet, n'est porté que par les plaques gravées : tout le reste de la
+    scène se lit en coordonnées de monde, et n'a rien à déplier."""
     me = bpy.data.meshes.new(name)
     me.from_pydata([tuple(m(c) for c in v) for v in verts], [], faces)
+    if uv is not None:
+        couche = me.uv_layers.new(name="UVMap")
+        couche.data.foreach_set("uv", [c for boucle in me.loops for c in uv[boucle.vertex_index]])
     me.update()
     return _objet(name, me, col, mat or MAT_PIERRE())
 
@@ -1421,8 +1460,9 @@ def _repere(paroi):
     return (lambda u, z, d: Vector((c + sens * d, u, z))), Vector((0, 1, 0)), Vector((sens, 0, 0))
 
 
-def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None):
-    """Un contour libre tracé dans le plan de la paroi, sorti d'elle de `d0` à `d1`.
+def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None, uv=None):
+    """Un contour libre tracé dans le plan de la paroi, sorti d'elle de `d0` à `d1`,
+    `uv` (une coordonnée par point du contour) allant aux deux faces.
 
     Une silhouette d'un seul tenant, et non un assemblage de plaques rectangulaires :
     c'est le contour qui fait lire la figure, et c'est lui que la passe Normal donne au
@@ -1436,62 +1476,14 @@ def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None):
         aire += (fond[k] - fond[0]).cross(fond[k + 1] - fond[0])
     if aire.dot(normale) < 0:
         fond.reverse()
+        uv = uv and uv[::-1]
     n = len(fond)
     saillie = normale * (d1 - d0)
     verts = [tuple(p) for p in fond] + [tuple(p + saillie) for p in fond]
     faces = [list(range(n))[::-1], list(range(n, 2 * n))]
     faces += [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
-    return mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE())
+    return mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE(), uv and uv + uv)
 
-
-def _relief_limbe(nom, paroi, u, z, inclinaison, longueur, contour, epaisseur, col, mat=None,
-                  courbure=0.0):
-    """Une lame attachée en (u, z) et penchée de `inclinaison` degrés sur la verticale,
-    positive vers les u croissants : palme d'une timora, aile d'un keruv."""
-    point, du, normale = _repere(paroi)
-    a = math.radians(inclinaison)
-    axe = du * math.sin(a) + Vector((0.0, 0.0, 1.0)) * math.cos(a)
-    return limbe(nom, contour, point(u, z, 0.01), axe, normale, longueur, epaisseur,
-                 col, mat or MAT_OR_PLAQUE(), courbure)
-
-
-def _relief_bosse(nom, paroi, u, z, d, r, col, mat=None):
-    """Un bouton en relief : cœur d'un fleuron, pommeau, mufle."""
-    point, _, _ = _repere(paroi)
-    p = point(u, z, d)
-    return sphere(nom, p.x, p.y, p.z, r, col, mat or MAT_OR_PLAQUE(), segs=10)
-
-
-# Le profil d'une tête, museau vers +u, origine à l'attache du cou : crâne, nuque,
-# gorge, mâchoire, museau, chanfrein, front. Un ovale paramétré rendait deux pièces de
-# monnaie posées sur les épaules — une tête se lit à sa nuque et à son museau, pas à
-# son ovale.
-PROFIL_TETE = ((1.35, 0.10), (1.25, -0.15), (0.75, -0.30), (0.15, -0.42), (-0.55, -0.35),
-               (-0.90, 0.05), (-0.80, 0.55), (-0.35, 0.85), (0.35, 0.88), (0.90, 0.62),
-               (1.20, 0.35))
-
-
-def _profil_tete(u, z, taille, sens):
-    """Contour d'une tête de profil, museau vers `sens`, SANS AUCUN TRAIT.
-
-    Ye'hezkel 41:19 donne « פְּנֵי אָדָם » d'un côté et « פְּנֵי כְפִיר » de l'autre ; §9 de la
-    fiche interdit le visage humain. Une silhouette sans œil ni bouche tient les deux —
-    le verset est lu, aucun visage n'est figuré.
-    """
-    return [(u + sens * taille * du, z + taille * dz) for du, dz in PROFIL_TETE]
-
-
-def _profil_corolle(u, z, r, lobes=8):
-    """Contour d'une fleur épanouie : `lobes` pétales autour d'un cœur. Sert aussi de
-    crinière — une crinière de lion est une corolle."""
-    return [(u + rk * math.cos(a), z + rk * math.sin(a))
-            for a, rk in ((a, r * (0.60 + 0.40 * abs(math.cos(lobes * a / 2)) ** 0.65))
-                          for a in (2 * math.pi * k / (lobes * 8) for k in range(lobes * 8)))]
-
-
-# Demi-profils des lames, dépliés par `limbe` : le long de la nervure, puis en travers.
-PALME = ((0.0, 0.045), (0.16, 0.150), (0.48, 0.195), (0.78, 0.135), (1.0, 0.0))
-AILE = ((0.0, 0.100), (0.22, 0.215), (0.55, 0.240), (0.82, 0.155), (1.0, 0.0))
 
 # --- Les trois figures gravées du Bayit, et le palmier de tous ses jambages :
 #     « כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים » (Melakhim I 6:29 pour les parois, 6:32 et 6:35
@@ -1502,61 +1494,98 @@ AILE = ((0.0, 0.100), (0.22, 0.215), (0.55, 0.240), (0.82, 0.155), (1.0, 0.0))
 #     (Ye'hezkel 40:26, 31, 34, 37) en met une sur CHAQUE jambage de porte, et c'est le
 #     seul ornement que les sources donnent aux baies des cours. D'où sa place ici, dans
 #     la bibliothèque, et non dans la section du Heikhal où elle est née.
+#
+#     Une figure est UNE plaque à sa silhouette, et son modelé — corps qui bombe, pennes
+#     séparées d'un sillon, palmes qui ploient — est une carte de hauteur que la plaque
+#     lit par ses UV : `beit_hamikdash_gravures.py` écrit la carte et les silhouettes,
+#     tracées sur la carte même. Des plaques empilées, aussi bien découpées fussent-elles,
+#     se lisaient en emporte-pièce : seul le chanfrein prenait la lumière.
 BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
-SAILLIE_KIR = 0.22        # saillie du relief : 11 cm. À 0,35 la figure se lisait en plaque
+SAILLIE_KIR = 0.22        # saillie de la plaque : 11 cm. À 0,35 la figure se lisait en plaque
                           # posée dessus, à 0,14 elle ne prenait plus la lumière rasante
 PAS_KIR = 4.44            # pas visé d'une figure, en amot
+GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
+CARTE_GRAVURES = GRAVURES_JSON.with_name("gravures_2048.webp")
+MODELE_GRAVURE = 0.12     # amot : ce dont le modelé bombe par-dessus la plaque, 6 cm sur un
+                          # keruv de paroi. La visite le prend en part de la hauteur de la
+                          # figure (matieres.js, RELIEF_GRAVURE) ; ici c'est le keruv qui règle.
 
-# Les palmes d'une timora : (inclinaison sur la verticale, longueur en part de la
-# hauteur). Sept est un CHOIX — la source ne les compte pas ; les deux dernières
-# retombent, ce qui est ce qui distingue un palmier d'un éventail.
-PALMES = ((0, 0.42), (30, 0.37), (-30, 0.37), (66, 0.30), (-66, 0.30), (106, 0.26), (-106, 0.26))
+
+def _lire_gravures():
+    try:
+        return json.loads(GRAVURES_JSON.read_text(encoding="utf-8"))["motifs"]
+    except FileNotFoundError:
+        raise SystemExit(f"{GRAVURES_JSON.name} absent : lancer beit_hamikdash_gravures.py d'abord.")
+
+
+GRAVURES = _lire_gravures()
+_GRAVEES = {}
+
+
+def matiere_gravee(mat):
+    """La même matière, qui lit en plus la carte des gravures par les UV de la plaque.
+
+    Une copie nommée `<matière>_grave`, une par matière et par exécution — comme les
+    matières de `_neuf`, la copie d'une exécution précédente est jetée, sans quoi le
+    .blend figerait la première version. La visite retrouve la famille au nom de base.
+    """
+    nom = f"{mat.name}_grave"
+    if nom in _GRAVEES:
+        return _GRAVEES[nom]
+    ancien = bpy.data.materials.get(nom)
+    if ancien is not None:
+        bpy.data.materials.remove(ancien)
+    copie = mat.copy()
+    copie.name = nom
+    uv = _noeud(copie, "ShaderNodeUVMap", -1500, 900)
+    carte = _noeud(copie, "ShaderNodeTexImage", -1200, 900)
+    carte.image = bpy.data.images.load(str(CARTE_GRAVURES), check_existing=True)
+    carte.image.colorspace_settings.name = "Non-Color"
+    carte.image.alpha_mode = "CHANNEL_PACKED"
+    carte.extension = "EXTEND"
+    copie.node_tree.links.new(uv.outputs["UV"], carte.inputs["Vector"])
+    _creuser(copie, carte.outputs["Color"], 1.0, MODELE_GRAVURE)
+    _GRAVEES[nom] = copie
+    return copie
+
+
+def _relief_grave(nom, paroi, motif, u, z0, h, col, mat=None):
+    """La plaque d'une figure gravée : sa silhouette, sortie de SAILLIE_KIR, posée en
+    (u, z0) à la hauteur `h`, et dont chaque sommet vise la tuile du motif dans l'atlas."""
+    fiche = GRAVURES[motif]
+    u0, z_bas, u1, _ = fiche["cadre"]
+    ou, ov, taille = fiche["tuile"]
+    cadre = u1 - u0
+    contour = [(u + du * h, z0 + dz * h) for du, dz in fiche["silhouette"]]
+    uv = [(ou + taille * (du - u0) / cadre, ov + taille * (dz - z_bas) / cadre)
+          for du, dz in fiche["silhouette"]]
+    return _relief_profil(nom, paroi, contour, 0.0, SAILLIE_KIR, col, matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
 
 
 def timora(nom, paroi, u, z0, h, col, mat=None):
-    """« תִּמֹרָה » : le palmier — fût annelé, couronne de sept palmes.
+    """« תִּמֹרָה » : le palmier — fût annelé, couronne de palmes qui retombent, régimes.
 
     Sur l'or du Bayit elle est dorée et `mat` reste vide ; sur le jambage d'une porte
     du Har HaBayit, que nulle source ne dore, elle se taille dans la pierre du mur.
     """
-    fut, e = 0.58 * h, 0.052 * h
-    gauche, droite = [], []
-    for k in range(9):
-        z = z0 + fut * k / 8
-        w = e * (1.0 - 0.22 * k / 8) * (1.0 if k % 2 == 0 else 0.74)
-        gauche.append((u - w, z))
-        droite.append((u + w, z))
-    _relief_profil(f"{nom}_fut", paroi, gauche + droite[::-1], 0.0, SAILLIE_KIR, col, mat)
-    for k, (inclinaison, longueur) in enumerate(PALMES):
-        _relief_limbe(f"{nom}_palme_{k}", paroi, u, z0 + fut * 0.94, inclinaison, longueur * h,
-                      PALME, SAILLIE_KIR * 0.45, col, mat, courbure=0.10)
-    _relief_bosse(f"{nom}_coeur", paroi, u, z0 + fut * 0.97, SAILLIE_KIR * 0.35, 0.045 * h,
-                  col, mat)
+    return _relief_grave(nom, paroi, "timora", u, z0, h, col, mat)
 
 
 def keruv_grave(nom, paroi, u, z0, h, col):
     """« כְּרוּבִים » — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), et 41:19 tourne chaque
-    profil vers la timora qui le jouxte. Deux têtes SANS TRAITS, deux ailes levées."""
-    corps = [(u - 0.150 * h, z0), (u + 0.150 * h, z0),
-             (u + 0.105 * h, z0 + 0.10 * h), (u + 0.060 * h, z0 + 0.34 * h),
-             (u + 0.140 * h, z0 + 0.54 * h), (u + 0.120 * h, z0 + 0.62 * h),
-             (u - 0.120 * h, z0 + 0.62 * h), (u - 0.140 * h, z0 + 0.54 * h),
-             (u - 0.060 * h, z0 + 0.34 * h), (u - 0.105 * h, z0 + 0.10 * h)]
-    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, SAILLIE_KIR, col)
-    for sens in (-1, 1):
-        cote = "N" if sens > 0 else "S"
-        _relief_profil(f"{nom}_tete_{cote}", paroi,
-                       _profil_tete(u + sens * 0.100 * h, z0 + 0.62 * h, 0.095 * h, sens),
-                       0.0, SAILLIE_KIR * 0.85, col)
-        _relief_limbe(f"{nom}_aile_{cote}", paroi, u + sens * 0.075 * h, z0 + 0.52 * h,
-                      sens * 32, 0.40 * h, AILE, SAILLIE_KIR * 0.45, col, courbure=0.16)
+    profil vers la timora qui le jouxte. Un crâne à deux faces SANS TRAITS, deux ailes
+    levées, le corps vêtu, les bras le long du corps."""
+    return _relief_grave(nom, paroi, "keruv", u, z0, h, col)
 
 
 def petur_tzitz(nom, paroi, u, z, r, col, mat=None):
-    """« פְּטוּרֵי צִצִּים » : la fleur épanouie. Le verset la met au même rang que les
-    keruvim et les timorot — elle court donc en bandeau, elle n'est pas un bouton isolé."""
-    _relief_profil(f"{nom}_corolle", paroi, _profil_corolle(u, z, r), 0.0, SAILLIE_KIR * 0.55, col, mat)
-    _relief_bosse(f"{nom}_coeur", paroi, u, z, SAILLIE_KIR * 0.5, r * 0.28, col, mat)
+    """« פְּטוּרֵי צִצִּים » : la fleur épanouie, de rayon `r` autour de (u, z). Le verset la
+    met au même rang que les keruvim et les timorot — elle court donc en bandeau, elle
+    n'est pas un bouton isolé. Sans chanfrein : 3 cm de biseau sur 22 cm de corolle en
+    mangeaient le pétale, et le dédoublaient en sommets par centaines de fleurons."""
+    o = _relief_grave(nom, paroi, "fleuron", u, z - r, 2 * r, col, mat)
+    o["sans_biseau"] = True
+    return o
 
 
 def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
@@ -5146,88 +5175,13 @@ menora("Menora", XU, YM, allumee=True)
 # --- Les deux Parokhot (Yoma 5:1) : extérieure agrafée au SUD, intérieure au NORD.
 #     « אָרְכָּהּ אַרְבָּעִים אַמָּה וְרָחְבָּהּ עֶשְׂרִים אַמָּה », « עָבְיָהּ טֶפַח » (Shekalim 8:5).
 PAROKHET_EP = 1 / 6            # טפח : l'épaisseur que la michna donne à l'étoffe
-PAROKHET_CHAMP = (2.0, 38.0)   # bas et haut du champ figuré, en amot au-dessus de Z_BAT
-PAROKHET_RANGS, PAROKHET_COLONNES = 6, 4
-PAROKHET_SAILLIE = 0.12        # ce dont une figure TISSÉE bombe l'étoffe : 6 cm, pas un relief
-LISERE_PAROKHET = 0.9          # largeur de la lisière qui borde le champ
-
-
-def creature_ailee(nom, paroi, u, z0, h, col, mat):
-    """Créature ailée de la frise : corps dressé, deux ailes levées, tête de profil sans
-    traits, queue étalée. « כְּרֻבִים » de Ex. 26:31 vaut « צִיּוּרִין שֶׁל בְּרִיּוֹת » (Rashi)."""
-    e = PAROKHET_SAILLIE
-    corps = [(u - 0.11 * h, z0 + 0.06 * h), (u + 0.11 * h, z0 + 0.06 * h),
-             (u + 0.075 * h, z0 + 0.20 * h), (u + 0.055 * h, z0 + 0.42 * h),
-             (u + 0.105 * h, z0 + 0.58 * h), (u + 0.085 * h, z0 + 0.66 * h),
-             (u - 0.085 * h, z0 + 0.66 * h), (u - 0.105 * h, z0 + 0.58 * h),
-             (u - 0.055 * h, z0 + 0.42 * h), (u - 0.075 * h, z0 + 0.20 * h)]
-    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, e, col, mat)
-    _relief_profil(f"{nom}_tete", paroi, _profil_tete(u + 0.08 * h, z0 + 0.66 * h, 0.10 * h, 1),
-                   0.0, e * 0.9, col, mat)
-    _relief_profil(f"{nom}_queue", paroi,
-                   [(u - 0.06 * h, z0 + 0.10 * h), (u + 0.06 * h, z0 + 0.10 * h),
-                    (u + 0.20 * h, z0), (u - 0.20 * h, z0)], 0.0, e * 0.8, col, mat)
-    for sens in (-1, 1):
-        _relief_limbe(f"{nom}_aile_{'N' if sens > 0 else 'S'}", paroi, u + sens * 0.06 * h,
-                      z0 + 0.44 * h, sens * 74, 0.42 * h, AILE, e * 0.7, col, mat, courbure=0.12)
-
-
-def lion(nom, paroi, u, z0, h, col, mat):
-    """Le lion de la frise — « וּפְנֵי כְפִיר » (Ye'hezkel 41:19), et le lion du revers d'un
-    maassé 'hoshev (Rashi sur Yoma 72b). De profil, marchant vers les u croissants."""
-    e = PAROKHET_SAILLIE
-    corps = [(u - 0.44 * h, z0 + 0.30 * h), (u - 0.30 * h, z0 + 0.58 * h),
-             (u + 0.10 * h, z0 + 0.62 * h), (u + 0.34 * h, z0 + 0.56 * h),
-             (u + 0.40 * h, z0 + 0.34 * h), (u + 0.16 * h, z0 + 0.30 * h),
-             (u - 0.16 * h, z0 + 0.28 * h)]
-    _relief_profil(f"{nom}_corps", paroi, corps, 0.0, e, col, mat)
-    for k, du in enumerate((-0.36, -0.22, 0.14, 0.28)):
-        _relief_profil(f"{nom}_patte_{k}", paroi,
-                       [(u + (du - 0.05) * h, z0), (u + (du + 0.05) * h, z0),
-                        (u + (du + 0.05) * h, z0 + 0.34 * h), (u + (du - 0.05) * h, z0 + 0.34 * h)],
-                       0.0, e * 0.8, col, mat)
-    _relief_profil(f"{nom}_criniere", paroi,
-                   _profil_corolle(u + 0.32 * h, z0 + 0.60 * h, 0.16 * h, 9), 0.0, e * 0.75, col, mat)
-    _relief_profil(f"{nom}_tete", paroi, _profil_tete(u + 0.34 * h, z0 + 0.58 * h, 0.11 * h, 1),
-                   0.0, e, col, mat)
-    _relief_profil(f"{nom}_queue", paroi,
-                   [(u - 0.44 * h, z0 + 0.50 * h), (u - 0.38 * h, z0 + 0.56 * h),
-                    (u - 0.44 * h, z0 + 0.80 * h), (u - 0.50 * h, z0 + 0.78 * h)],
-                   0.0, e * 0.7, col, mat)
-
-
-def frise_parokhet(nom, paroi, col):
-    """« מַעֲשֵׂה חֹשֵׁב יַעֲשֶׂה אֹתָהּ כְּרֻבִים » (Ex. 26:31) : créatures ailées et lions en
-    alternance, tissés dans les mêmes quatre laines — jamais d'or (le verset n'en liste
-    que quatre), jamais brodés, et sans un visage (§9). Un rideau nu se lisait en drap.
-    """
-    mat = MAT_PAROKHET_FIGURE()
-    z0, z1 = Z_BAT + PAROKHET_CHAMP[0], Z_BAT + PAROKHET_CHAMP[1]
-    rang, pas = (z1 - z0) / PAROKHET_RANGS, 20 / PAROKHET_COLONNES
-    for r in range(PAROKHET_RANGS):
-        for i in range(PAROKHET_COLONNES):
-            motif = creature_ailee if (i + r) % 2 == 0 else lion
-            motif(f"{nom}_frise_{r}{i}", paroi, -10 + pas * (i + 0.5),
-                  z0 + rang * (r + 0.10), rang * 0.80, col, mat)
-    L = LISERE_PAROKHET
-    for k, contour in enumerate((
-            [(-10, z0 - L), (10, z0 - L), (10, z0), (-10, z0)],
-            [(-10, z1), (10, z1), (10, z1 + L), (-10, z1 + L)],
-            [(-10, z0 - L), (-10 + L, z0 - L), (-10 + L, z1 + L), (-10, z1 + L)],
-            [(10 - L, z0 - L), (10, z0 - L), (10, z1 + L), (10 - L, z1 + L)])):
-        _relief_profil(f"{nom}_lisiere_{k}", paroi, contour, 0.0, PAROKHET_SAILLIE * 0.7, col, mat)
-
-
 box("Parokhet_ext", TR0 - PAROKHET_EP, TR0, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
 box("Parokhet_int", TR1, TR1 + PAROKHET_EP, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
 empty("Parokhet_ext_agrafe_SUD", TR0, -9.5, Z_BAT + 20, "60_KodeshHakodashim")
 empty("Parokhet_int_agrafe_NORD", TR1, 9.5, Z_BAT + 20, "60_KodeshHakodashim")
-# La frise ne se pose que du côté que la caméra atteint : l'est pour l'extérieure (vue
-# du Heikhal), l'ouest pour l'intérieure (vue du Kodesh HaKodashim). Un maassé 'hoshev
-# en porte une AUTRE au revers — « מצד זה ארי ומצד זה נשר » (Rashi sur Yoma 72b) ; aucun plan
-# ne cadre ces deux faces-là, et elles ne sont pas modélisées.
-for cote, paroi in (("ext", ("y", TR0, 1)), ("int", ("y", TR1, -1))):
-    frise_parokhet(f"Parokhet_{cote}", paroi, "60_KodeshHakodashim")
+# Le motif est dans la matière (voir `parokhet`), et le même sur les deux faces. Un
+# maassé 'hoshev en porte un AUTRE au revers — « מצד זה ארי ומצד זה נשר » (Rashi sur Yoma
+# 72b) ; aucun plan ne cadre le revers, et il n'est pas tissé.
 # Les badim de l'Arche pressent le rideau et se voient du Heikhal « כִּשְׁנֵי דַּדֵּי אִשָּׁה »
 # (Yoma 54a ; Mena'hot 98b ; Melakhim I 8:8). Yoma 54a n'a qu'une parokhet ; avec deux, la
 # barre emporte l'intérieure à travers l'ama de Traksin jusqu'à l'extérieure, qui bombe

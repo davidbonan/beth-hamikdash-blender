@@ -1,11 +1,13 @@
 /**
  * Les nappes photographiques, que `matieres.js` projette en triplanaire.
  *
- * Le blockout n'a pas d'UV — `export_texcoords=False` — et n'en aura pas : ses volumes
- * sont fusionnés par concept à chaque export, et aucun dépliage ne survivrait à une
+ * Le blockout n'a pas d'UV dépliées à la main, et n'en aura pas : ses volumes sont
+ * fusionnés par concept à chaque export, et aucun dépliage ne survivrait à une
  * modification dans Blender. Les nappes se posent donc sur la position de MONDE, comme
  * tout le reste du fichier voisin : rien à déplier, rien à repeindre, et une retouche
- * de la scène ne demande que de réexporter.
+ * de la scène ne demande que de réexporter. La seule exception est écrite par le
+ * blockout lui-même : les plaques gravées des parois visent par leurs UV l'atlas de
+ * `beit_hamikdash_gravures.py`.
  *
  * Deux fichiers par nappe. La couleur porte la rugosité dans son canal alpha : l'alpha
  * du WebP est codé à part et à pleine définition, là où le bleu part en 4:2:0 avec le
@@ -52,5 +54,16 @@ export async function nappes() {
       rugosite: jeu.rugosite,
     });
   }));
+  // Le motif tissé des Parokhot, que `beit_hamikdash_parokhet.py` écrit : gris =
+  // hauteur du bombé, alpha = figure. Une seule carte aux dimensions du rideau, lue en
+  // coordonnées de rideau et jamais répétée.
+  const motif = regler(await chargeur.loadAsync("parokhet_2048.webp"), THREE.NoColorSpace);
+  motif.wrapS = motif.wrapT = THREE.ClampToEdgeWrapping;
+  jeux.set("parokhet", { motif });
+  // Les gravures des parois, que `beit_hamikdash_gravures.py` écrit : trois tuiles —
+  // keruv, timora, fleuron — lues par les UV de chaque plaque. Gris = hauteur du modelé.
+  const gravures = regler(await chargeur.loadAsync("gravures_2048.webp"), THREE.NoColorSpace);
+  gravures.wrapS = gravures.wrapT = THREE.ClampToEdgeWrapping;
+  jeux.set("gravures", { motif: gravures });
   return jeux;
 }

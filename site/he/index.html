@@ -52,8 +52,17 @@
       <h2 id="montee-titre">מעלות הקדושה</h2>
       <p>מהר הבית ועד קודש הקודשים מונה משנה כלים את מעלות הקדושה. בכל מעלה נכנסים פחות.</p>
     </div>
-    <div class="ascension">
-      <nav class="echelle" aria-label="מעלות הקדושה"><ol>
+    <div class="ascension" style="timeline-scope: --har_habayit, --heil, --ezrat_nashim, --azara, --mizbeach, --oulam, --heikhal; --fin: --heikhal">
+      <div class="scene">
+        <div class="vue" data-degre="har_habayit" style="--fil: --har_habayit"><img src="/images/har_habayit_2000.webp" srcset="/images/har_habayit_1000.webp 1000w, /images/har_habayit_2000.webp 2000w" sizes="100vw" alt="" decoding="async" fetchpriority="high"></div>
+        <div class="vue" data-degre="heil" style="--fil: --heil"><img src="/images/heil_2000.webp" srcset="/images/heil_1000.webp 1000w, /images/heil_2000.webp 2000w" sizes="100vw" alt="" decoding="async" loading="lazy"></div>
+        <div class="vue" data-degre="ezrat_nashim" style="--fil: --ezrat_nashim"><img src="/images/ezrat_nashim_2000.webp" srcset="/images/ezrat_nashim_1000.webp 1000w, /images/ezrat_nashim_2000.webp 2000w" sizes="100vw" alt="" decoding="async" loading="lazy"></div>
+        <div class="vue" data-degre="azara" style="--fil: --azara"><img src="/images/azara_2000.webp" srcset="/images/azara_1000.webp 1000w, /images/azara_2000.webp 2000w" sizes="100vw" alt="" decoding="async" loading="lazy"></div>
+        <div class="vue" data-degre="mizbeach" style="--fil: --mizbeach"><img src="/images/mizbeach_2000.webp" srcset="/images/mizbeach_1000.webp 1000w, /images/mizbeach_2000.webp 2000w" sizes="100vw" alt="" decoding="async" loading="lazy"></div>
+        <div class="vue" data-degre="oulam" style="--fil: --oulam"><img src="/images/oulam_2000.webp" srcset="/images/oulam_1000.webp 1000w, /images/oulam_2000.webp 2000w" sizes="100vw" alt="" decoding="async" loading="lazy"></div>
+        <div class="vue" data-degre="heikhal" style="--fil: --heikhal"><img src="/images/heikhal_2000.webp" srcset="/images/heikhal_1000.webp 1000w, /images/heikhal_2000.webp 2000w" sizes="100vw" alt="" decoding="async" loading="lazy"></div>
+        <span class="nuit-tombe"></span>
+        <nav class="echelle" aria-label="מעלות הקדושה"><ol>
       <li data-degre="har_habayit"><a href="#har_habayit" aria-current="true"><span class="rang">1</span>הר הבית</a></li>
       <li data-degre="heil"><a href="#heil"><span class="rang">2</span>חיל</a></li>
       <li data-degre="ezrat_nashim"><a href="#ezrat_nashim"><span class="rang">3</span>עזרת נשים</a></li>
@@ -62,75 +71,76 @@
       <li data-degre="oulam"><a href="#oulam"><span class="rang">6</span>בין האולם ולמזבח</a></li>
       <li data-degre="heikhal"><a href="#heikhal"><span class="rang">7</span>היכל</a></li>
       <li data-degre="kodesh_hakodashim"><a href="#kodesh_hakodashim"><span class="rang">8</span>קודש הקודשים</a></li>
-      </ol></nav>
+        </ol></nav>
+      </div>
       <ol class="degres">
-      <li id="har_habayit">
-        <a class="vue" href="/visite/?vue=har_habayit" data-langue="he"><img src="/images/har_habayit_2000.webp" srcset="/images/har_habayit_1000.webp 1000w, /images/har_habayit_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="הר הבית" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="har_habayit" style="--fil: --har_habayit">
         <div class="legende">
           <h3><span class="nom">הר הבית</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדָּשׁ מִירוּשָׁלַיִם, שֶׁאֵין זָבִים וְזָבוֹת, נִדּוֹת וְיוֹלְדוֹת נִכְנָסִים לְשָׁם.</p>
             <p class="source">משנה כלים א, ח</p>
+            <a class="entrer-ici" href="/visite/?vue=har_habayit" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
-      <li id="heil">
-        <a class="vue" href="/visite/?vue=face_porte_est" data-langue="he"><img src="/images/heil_2000.webp" srcset="/images/heil_1000.webp 1000w, /images/heil_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="חיל" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="heil" style="--fil: --heil">
         <div class="legende">
           <h3><span class="nom">חיל</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם.</p>
             <p class="source">משנה כלים א, ח</p>
+            <a class="entrer-ici" href="/visite/?vue=face_porte_est" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
-      <li id="ezrat_nashim">
-        <a class="vue" href="/visite/?vue=ezrat_nashim" data-langue="he"><img src="/images/ezrat_nashim_2000.webp" srcset="/images/ezrat_nashim_1000.webp 1000w, /images/ezrat_nashim_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="עזרת נשים" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="ezrat_nashim" style="--fil: --ezrat_nashim">
         <div class="legende">
           <h3><span class="nom">עזרת נשים</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם.</p>
             <p class="source">משנה כלים א, ח</p>
+            <a class="entrer-ici" href="/visite/?vue=ezrat_nashim" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
-      <li id="azara">
-        <a class="vue" href="/visite/?vue=azara" data-langue="he"><img src="/images/azara_2000.webp" srcset="/images/azara_1000.webp 1000w, /images/azara_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="עזרת ישראל" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="azara" style="--fil: --azara">
         <div class="legende">
           <h3><span class="nom">עזרת ישראל</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין מְחֻסַּר כִּפּוּרִים נִכְנָס לְשָׁם.</p>
             <p class="source">משנה כלים א, ח</p>
+            <a class="entrer-ici" href="/visite/?vue=azara" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
-      <li id="mizbeach">
-        <a class="vue" href="/visite/?vue=mizbeach" data-langue="he"><img src="/images/mizbeach_2000.webp" srcset="/images/mizbeach_1000.webp 1000w, /images/mizbeach_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="עזרת כהנים" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="mizbeach" style="--fil: --mizbeach">
         <div class="legende">
           <h3><span class="nom">עזרת כהנים</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין יִשְׂרָאֵל נִכְנָסִים לְשָׁם אֶלָּא בִשְׁעַת צָרְכֵיהֶם, לִסְמִיכָה לִשְׁחִיטָה וְלִתְנוּפָה.</p>
             <p class="source">משנה כלים א, ח</p>
+            <a class="entrer-ici" href="/visite/?vue=mizbeach" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
-      <li id="oulam">
-        <a class="vue" href="/visite/?vue=oulam" data-langue="he"><img src="/images/oulam_2000.webp" srcset="/images/oulam_1000.webp 1000w, /images/oulam_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="בין האולם ולמזבח" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="oulam" style="--fil: --oulam">
         <div class="legende">
           <h3><span class="nom">בין האולם ולמזבח</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדָּשׁ מִמֶּנָּה, שֶׁאֵין בַּעֲלֵי מוּמִין וּפְרוּעֵי רֹאשׁ נִכְנָסִים לְשָׁם.</p>
             <p class="source">משנה כלים א, ט</p>
+            <a class="entrer-ici" href="/visite/?vue=oulam" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
-      <li id="heikhal">
-        <a class="vue" href="/visite/?vue=heikhal" data-langue="he"><img src="/images/heikhal_2000.webp" srcset="/images/heikhal_1000.webp 1000w, /images/heikhal_2000.webp 2000w" sizes="(max-width: 860px) 100vw, min(1280px, 100vw - 26em)" alt="היכל" decoding="async" loading="lazy"><span class="entrer-ici">לראות בסיור</span></a>
+      <li id="heikhal" style="--fil: --heikhal">
         <div class="legende">
           <h3><span class="nom">היכל</span></h3>
           <div class="texte">
             <p class="mishna">מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין נִכְנָס לְשָׁם שֶׁלֹּא רְחוּץ יָדַיִם וְרַגְלָיִם.</p>
             <p class="source">משנה כלים א, ט</p>
+            <a class="entrer-ici" href="/visite/?vue=heikhal" data-langue="he">לראות בסיור</a>
           </div>
         </div>
       </li>
@@ -139,7 +149,8 @@
   </section>
 
   <section class="sanctuaire" id="kodesh_hakodashim" aria-labelledby="kodesh_hakodashim-titre">
-    <div class="fond"><img src="/images/kodesh_hakodashim_2000.webp" srcset="/images/kodesh_hakodashim_1000.webp 1000w, /images/kodesh_hakodashim_2000.webp 2000w" sizes="100vw" alt="קודש הקודשים" decoding="async" loading="lazy"></div>
+    <svg width="0" height="0" aria-hidden="true"><filter id="volutes" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".009" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="160" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+    <div class="fond"><img src="/images/kodesh_hakodashim_2000.webp" srcset="/images/kodesh_hakodashim_1000.webp 1000w, /images/kodesh_hakodashim_2000.webp 2000w" sizes="100vw" alt="קודש הקודשים" decoding="async" loading="lazy"><span class="fumee"></span><span class="fumee"></span><span class="fumee"></span><span class="braise"></span><span class="reflet"></span></div>
     <div class="legende">
           <h3 id="kodesh_hakodashim-titre"><span class="nom">קודש הקודשים</span></h3>
           <div class="texte">
@@ -148,11 +159,8 @@
           </div>
           <p class="action"><a class="entrer" href="/visite/?vue=kodesh_hakodashim" data-langue="he">כניסה לסיור</a></p>
         </div>
+    <footer><span>© 2026 דוד בונן</span></footer>
   </section>
-
-  <footer>
-    <span>© 2026 דוד בונן</span>
-  </footer>
 </main>
 
 <script src="/accueil.js" defer></script>

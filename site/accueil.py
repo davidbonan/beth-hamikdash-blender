@@ -4,9 +4,9 @@
     python3 site/accueil.py
 
 L'accueil est une montée en images : l'affiche en seuil, puis les degrés de sainteté
-(Kelim 1:8-9) un à un, chacun par l'image du film prise de ce point
-(site/images/<degré>_1000 et _2000.webp), et le Kodesh HaKodashim en finale. Chaque image
-mène à la visite, à la vue du même point.
+(Kelim 1:8-9) un à un sur une scène épinglée, chacun par l'image du film prise de ce point
+(site/images/<degré>_1000 et _2000.webp) qui se fond dans la suivante au fil du défilement,
+et le Kodesh HaKodashim en finale. Chaque légende mène à la visite, à la vue du même point.
 """
 from pathlib import Path
 
@@ -110,7 +110,7 @@ TEXTES = {
 }
 
 AUTEUR = {"fr": "David Bonan", "en": "David Bonan", "he": "דוד בונן"}
-TAILLES = "(max-width: 860px) 100vw, min(1280px, 100vw - 26em)"
+TAILLES = "100vw"
 
 
 def nav_langues(code):
@@ -134,11 +134,15 @@ def echelon(t, rang, degre):
     return f'\n      <li data-degre="{degre}"><a href="#{degre}"{courant}><span class="rang">{rang}</span>{nom}</a></li>'
 
 
-def image(t, degre, taille="2000", tailles=TAILLES, differe=True):
-    nom = t["degres"][degre][0]
+def image(t, degre, taille="2000", differe=True, decorative=False):
+    nom = "" if decorative else t["degres"][degre][0]
     charge = ' loading="lazy"' if differe else ' fetchpriority="high"'
     return (f'<img src="/images/{degre}_{taille}.webp" srcset="/images/{degre}_1000.webp 1000w, /images/{degre}_2000.webp 2000w" '
-            f'sizes="{tailles}" alt="{nom}" decoding="async"{charge}>')
+            f'sizes="{TAILLES}" alt="{nom}" decoding="async"{charge}>')
+
+
+def vue(t, rang, degre):
+    return f'\n        <div class="vue" data-degre="{degre}" style="--fil: --{degre}">{image(t, degre, differe=rang > 1, decorative=True)}</div>'
 
 
 def titre_degre(t, degre):
@@ -149,30 +153,36 @@ def titre_degre(t, degre):
     return titre
 
 
-def legende(t, degre, action=""):
+def legende(t, degre, lien="", action=""):
     _, _, ref, phrase = t["degres"][degre]
     return f'''<div class="legende">
           <h3>{titre_degre(t, degre)}</h3>
           <div class="texte">
             <p class="mishna">{phrase}</p>
-            <p class="source">{t["mishna"]} {ref}</p>
+            <p class="source">{t["mishna"]} {ref}</p>{lien}
           </div>{action}
         </div>'''
 
 
 def degre(t, degre, vue):
+    lien = f'\n            <a class="entrer-ici" href="/visite/?vue={vue}" data-langue="{t["code"]}">{t["voir"]}</a>'
     return f'''
-      <li id="{degre}">
-        <a class="vue" href="/visite/?vue={vue}" data-langue="{t["code"]}">{image(t, degre)}<span class="entrer-ici">{t["voir"]}</span></a>
-        {legende(t, degre)}
+      <li id="{degre}" style="--fil: --{degre}">
+        {legende(t, degre, lien)}
       </li>'''
 
 
 def sanctuaire(t, degre, vue):
     action = (f'\n          <p class="action"><a class="entrer" href="/visite/?vue={vue}" data-langue="{t["code"]}">{t["entrer"]}</a></p>')
+    fumee = "".join('<span class="fumee"></span>' for _ in range(3))
+    volutes = ('<svg width="0" height="0" aria-hidden="true"><filter id="volutes" x="-20%" y="-20%" width="140%" height="140%">'
+               '<feTurbulence type="fractalNoise" baseFrequency=".009" numOctaves="3" seed="7"/>'
+               '<feDisplacementMap in="SourceGraphic" scale="160" xChannelSelector="R" yChannelSelector="G"/></filter></svg>')
     return f'''<section class="sanctuaire" id="{degre}" aria-labelledby="{degre}-titre">
-    <div class="fond">{image(t, degre, tailles="100vw")}</div>
-    {legende(t, degre, action).replace("<h3>", f'<h3 id="{degre}-titre">', 1)}
+    {volutes}
+    <div class="fond">{image(t, degre)}{fumee}<span class="braise"></span><span class="reflet"></span></div>
+    {legende(t, degre, action=action).replace("<h3>", f'<h3 id="{degre}-titre">', 1)}
+    <footer><span>© 2026 {AUTEUR[t["code"]]}</span></footer>
   </section>'''
 
 
@@ -181,7 +191,9 @@ def page(code):
     url = f'{DOMAINE}/{t["chemin"]}'
     *montee, dernier = DEGRES
     echelle = "".join(echelon(t, rang, d) for rang, (d, _) in enumerate(DEGRES, 1))
-    degres = "".join(degre(t, d, vue) for d, vue in montee)
+    vues = "".join(vue(t, rang, d) for rang, (d, _) in enumerate(montee, 1))
+    fils = ", ".join(f"--{d}" for d, _ in montee)
+    degres = "".join(degre(t, d, v) for d, v in montee)
     return f'''<!doctype html>
 <html lang="{code}" dir="{t["sens"]}">
 <meta charset="utf-8">
@@ -231,19 +243,18 @@ def page(code):
       <h2 id="montee-titre">{t["degres_titre"]}</h2>
       <p>{t["ouverture"]}</p>
     </div>
-    <div class="ascension">
-      <nav class="echelle" aria-label="{t["degres_titre"]}"><ol>{echelle}
-      </ol></nav>
+    <div class="ascension" style="timeline-scope: {fils}; --fin: --{montee[-1][0]}">
+      <div class="scene">{vues}
+        <span class="nuit-tombe"></span>
+        <nav class="echelle" aria-label="{t["degres_titre"]}"><ol>{echelle}
+        </ol></nav>
+      </div>
       <ol class="degres">{degres}
       </ol>
     </div>
   </section>
 
   {sanctuaire(t, *dernier)}
-
-  <footer>
-    <span>© 2026 {AUTEUR[code]}</span>
-  </footer>
 </main>
 
 <script src="/accueil.js" defer></script>

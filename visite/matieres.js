@@ -7,10 +7,13 @@
  * l'export n'en garde que la couleur de base — d'où ces volumes uniformément gris.
  *
  * Ce fichier remet le relief là où il était, avec les mêmes entrées : la position du
- * point dans le monde, et rien d'autre. Aucune image, aucune UV — les maillages n'en
- * ont pas. Les assises d'une ama, leur alternance et leur grain sont donc calculés
- * ici comme ils l'étaient dans Blender, et se poursuivent d'un objet au suivant sans
- * saut de motif.
+ * point dans le monde, et rien d'autre. Aucune UV dépliée — les maillages n'en ont
+ * pas. Les assises d'une ama, leur alternance et leur grain sont donc calculés ici
+ * comme ils l'étaient dans Blender, et se poursuivent d'un objet au suivant sans saut
+ * de motif. Les deux images qui s'y ajoutent sont des cartes de hauteur écrites par
+ * les scripts, pas des peintures : le motif de la parokhet, lu en position de monde,
+ * et les gravures des parois, que leurs plaques visent par des UV que le blockout
+ * a calculées.
  */
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
@@ -22,7 +25,7 @@ const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT =
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
-export const ETOFFES = new Set(["Parokhet_tissee", "Parokhet_figure", "Lin_blanc", "Tekhelet_meil",
+export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
   "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Voile"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE, ROCHE]);
@@ -112,7 +115,7 @@ const FAMILLES = {
   Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS,
-  Parokhet_tissee: ETOFFE, Parokhet_figure: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
+  Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Peau: ETOFFE,
   Eau_Kiyor: EAU,
   Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT,
@@ -264,6 +267,21 @@ const float CREUX_M = 0.020;
 // soleil de l'Azara qui est chaud lui aussi, elle rend de la TERRE. Elle est donc
 // reprise neutre ici, et plus basse : un âtre est noir, pas gris de boue.
 const vec3 NOIR_SUIE = vec3(0.165, 0.165, 0.170);
+// Les Parokhot : le sol du Bayit, ce dont une figure tissée bombe l'étoffe, et de
+// combien la figure remonte le ton — les mêmes lectures que parokhet() du blockout.
+const float SOL_BAYIT = 6.0 * AMA;
+const float BOMBE_PAROKHET = 0.12 * AMA;
+const vec3 TON_FIGURE_PAROKHET = vec3(1.52, 1.53, 1.45);
+const vec2 TEXEL_PAROKHET = vec2(1.0 / 2048.0, 1.0 / 4096.0);
+// Les gravures des parois : le modelé bombe de RELIEF_GRAVURE fois la hauteur de la
+// figure au-dessus de sa plaque — 6 cm sur un keruv de paroi, 2 sur la timora d'un
+// jambage —, et une tuile de l'atlas couvre CADRE_GRAVURE hauteurs de figure sur
+// TAILLE_TUILE d'UV (beit_hamikdash_gravures.py). En part de la hauteur, la pente ne
+// dépend pas de la taille de la plaque : rien à lui transmettre.
+const float RELIEF_GRAVURE = 0.02;
+const float CADRE_GRAVURE = 1.2;
+const float TAILLE_TUILE = 0.5;
+const float TEXEL_GRAVURE = 1.0 / 2048.0;
 // La cendre de bois, elle, est claire et froide. C'est le contraste des deux — et non
 // le grain de l'un ou de l'autre — qui fait lire un lit de feu.
 const vec3 GRIS_CENDRE = vec3(0.42, 0.42, 0.43);
@@ -502,6 +520,14 @@ void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rug
   photo = vec4(vec3(b.tireBloc, b.tireFini, b.tireBloc + b.tireFini) * 13.0, 1.0);
 }
 
+#ifdef PAROKHET
+uniform sampler2D uParokhet;   // rgb hauteur du bombé, a masque de la figure
+#endif
+#ifdef GRAVURE
+uniform sampler2D uGravure;    // rgb hauteur du modelé, a masque de la figure
+varying vec2 vGravure;
+#endif
+
 #ifdef NAPPE
 uniform sampler2D uNappeN;
 uniform vec4 uCarreau;        // x carreaux/m, y couleur, z relief, w rugosité
@@ -629,6 +655,17 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     // et grésillait dès deux pas de recul, ce qu'aucun mipmap ne pouvait rattraper.
     teinte = vec3(1.0 + (grain(P * 45.0, empreinteMax() * 45.0) - 0.5) * 0.10);
     rugo = -0.03;
+#ifdef PAROKHET
+    // Le motif tissé, lu par (y, z) de monde sur les 20 × 40 amot du rideau : la
+    // hauteur se dérive en pente, comme le joint d'un bloc, et le masque monte le ton.
+    // u court vers -z (le nord de Blender est le -z de three), v monte avec y.
+    vec2 uv = vec2(0.5 - P.z / (20.0 * AMA), (P.y - SOL_BAYIT) / (40.0 * AMA));
+    vec2 pas = TEXEL_PAROKHET * 2.0;
+    float dU = texture2D(uParokhet, uv + vec2(pas.x, 0.0)).r - texture2D(uParokhet, uv - vec2(pas.x, 0.0)).r;
+    float dV = texture2D(uParokhet, uv + vec2(0.0, pas.y)).r - texture2D(uParokhet, uv - vec2(0.0, pas.y)).r;
+    pente = BOMBE_PAROKHET * vec3(0.0, dV / (2.0 * pas.y * 40.0 * AMA), -dU / (2.0 * pas.x * 20.0 * AMA));
+    teinte *= mix(vec3(1.0), TON_FIGURE_PAROKHET, texture2D(uParokhet, uv).a);
+#endif
   }
   else if (uFamille == 6) {                                   // eau : ride lente
     // La ride se voit au reflet, pas à la teinte : c'est la seule famille hors pierre
@@ -729,6 +766,20 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   else if (uFamille == 1 || uFamille == 10) {
     patiner(P, N, 0.5, teinte, rugo);
   }
+#ifdef GRAVURE
+  // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
+  // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y
+  // (le -z de three) sur un mur ouest — et v monte. Les flancs de la plaque, hauts de
+  // 11 cm, ne portent pas de modelé.
+  {
+    vec3 tu = abs(N.z) > abs(N.x) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, -1.0);
+    vec2 pas = vec2(TEXEL_GRAVURE, 0.0);
+    float dU = texture2D(uGravure, vGravure + pas.xy).r - texture2D(uGravure, vGravure - pas.xy).r;
+    float dV = texture2D(uGravure, vGravure + pas.yx).r - texture2D(uGravure, vGravure - pas.yx).r;
+    pente += (RELIEF_GRAVURE * TAILLE_TUILE / CADRE_GRAVURE / (2.0 * TEXEL_GRAVURE))
+           * (dU * tu + dV * vec3(0.0, 1.0, 0.0)) * (1.0 - step(0.5, abs(N.y)));
+  }
+#endif
   teinte = mix(vec3(1.0), teinte, nettete);
   pente *= finesse;
   rugo *= nettete;
@@ -775,7 +826,9 @@ function soleilEnPenombre() {
  * modèle d'éclairage, les ombres et le tonemapping de three restent ceux d'origine.
  */
 export function habiller(materiau, horloges, jeux) {
-  const famille = FAMILLES[materiau.name];
+  // Une matière `_grave` est sa matière de base, plus la carte des gravures.
+  const gravure = materiau.name.endsWith("_grave");
+  const famille = FAMILLES[gravure ? materiau.name.slice(0, -"_grave".length) : materiau.name];
   if (!famille) return;
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
                       uSoleil: { value: SOLEIL }, uHauteurImage: HAUTEUR_IMAGE,
@@ -800,6 +853,9 @@ export function habiller(materiau, horloges, jeux) {
       uniformes.uRugoMoy = { value: jeu.rugosite };
     }
   }
+  const parokhet = materiau.name === "Parokhet_tissee";
+  if (parokhet) uniformes.uParokhet = { value: jeux.get("parokhet").motif };
+  if (gravure) uniformes.uGravure = { value: jeux.get("gravures").motif };
   const rayonFil = materiau.userData.rayon;
   if (rayonFil) {
     uniformes.uRayonFil = { value: rayonFil };
@@ -809,16 +865,19 @@ export function habiller(materiau, horloges, jeux) {
     + (MINERAUX.has(famille) ? "#define TEMPERE\n" : "")
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
+    + (parokhet ? "#define PAROKHET\n" : "")
+    + (gravure ? "#define GRAVURE\n" : "")
     + (rayonFil ? "#define FIL\n" : "");
 
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
     nuanceur.vertexShader = nuanceur.vertexShader
-      .replace("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;")
+      .replace("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;\n"
+               + "#ifdef GRAVURE\nvarying vec2 vGravure;\n#endif\n")
       .replace("#include <begin_vertex>",
                "#include <begin_vertex>\n#ifdef FIL\ntransformed = grossirFil(transformed, objectNormal);\n#endif\n" +
                "vMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPixel = pixelVu(transformed);\n" +
-               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);");
+               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = uv;\n#endif\n");
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
       .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")

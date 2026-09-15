@@ -1,6 +1,7 @@
 :root {
   --or: #c9a04a;
   --or-sourd: rgba(201, 160, 74, .45);
+  --or-clair: #f6e2ac;
   --nuit: #100e0b;
   --lin: #f6f1e6;
   --lin-sourd: rgba(246, 241, 230, .66);
@@ -11,7 +12,7 @@
   --entre: clamp(24px, 4vw, 64px);
 }
 * { box-sizing: border-box; }
-html { color-scheme: dark; scroll-behavior: smooth; }
+html { color-scheme: dark; scroll-behavior: smooth; scroll-snap-type: y proximity; }
 body {
   margin: 0;
   font: 400 17px/1.5 "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
@@ -48,39 +49,78 @@ img { display: block; }
 .seuil nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
 .titre { grid-row: 3; align-self: end; max-width: 34em; animation: paraitre 1.6s ease .5s both; }
 .titre h1 { display: grid; gap: 2px; line-height: 1; text-shadow: 0 2px 24px rgba(16,14,11,.55); }
-.titre h1 .he { justify-self: start; font-size: clamp(56px, 9vw, 120px); font-weight: 500; letter-spacing: .02em; line-height: .95; }
+.titre h1 .he {
+  justify-self: start; font-size: clamp(56px, 9vw, 120px); font-weight: 500; letter-spacing: .02em; line-height: .95;
+  color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(100deg, var(--lin) 0 44%, var(--or-clair) 50%, var(--lin) 56% 100%);
+  background-size: 300% 100%; background-position: 0 0;
+  text-shadow: none; filter: drop-shadow(0 2px 24px rgba(16,14,11,.55));
+  animation: dorer 2.8s ease-in-out 1.7s both;
+}
 .titre h1 .latin { font-size: clamp(20px, 2.4vw, 30px); letter-spacing: .06em; opacity: .9; }
 :root[lang="he"] .titre h1 .he { font-size: clamp(64px, 10vw, 136px); }
 .accroche { max-width: 28em; margin-top: 18px; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.45; text-shadow: 0 1px 12px rgba(16,14,11,.5); }
 .action { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 22px; }
 .entrer {
+  position: relative; overflow: hidden;
   display: inline-block; padding: 14px 28px; border: 1px solid var(--lin);
   color: var(--lin); text-decoration: none; font-family: "Marcellus", serif; font-size: 17px; letter-spacing: .05em;
   background: rgba(16,14,11,.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  transition: background-color .25s ease, color .25s ease;
+  transition: background-color .25s ease, color .25s ease, transform .15s ease;
 }
 :root[lang="he"] .entrer { font-family: "Frank Ruhl Libre", serif; font-weight: 500; letter-spacing: 0; }
 .entrer:hover, .entrer:focus-visible { background: var(--lin); color: var(--nuit); }
+.entrer:active { transform: scale(.96); }
+.entrer::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(201,160,74,.5) 50%, transparent 70%);
+  transform: translateX(-130%);
+}
+.entrer:hover::after, .entrer:focus-visible::after { animation: balayer .9s ease-out both; }
+:root[dir="rtl"] .entrer::after { transform: translateX(130%); }
+:root[dir="rtl"] .entrer:hover::after, :root[dir="rtl"] .entrer:focus-visible::after { animation-name: balayer-rtl; }
 .action .note { font-size: 14px; opacity: .8; }
 @keyframes lever { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
 @keyframes paraitre { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes dorer { from { background-position: 0 0; } to { background-position: 100% 0; } }
+@keyframes balayer { to { transform: translateX(130%); } }
+@keyframes balayer-rtl { to { transform: translateX(-130%); } }
 
 /* ---- la montée ---- */
 .montee { padding: clamp(72px, 12vh, 140px) var(--marge) 0; }
-.ouverture, .ascension {
+.ouverture {
   max-width: var(--colonne); margin: 0 auto;
   display: grid; grid-template-columns: minmax(0, var(--echelle)) minmax(0, 1fr); column-gap: var(--entre);
+  align-items: end; padding-bottom: clamp(32px, 6vh, 72px);
 }
-.ouverture { align-items: end; padding-bottom: clamp(32px, 5vh, 56px); border-bottom: 1px solid var(--trait); }
-.ouverture h2 { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; }
+.ouverture h2 { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; text-wrap: balance; }
 .ouverture p { max-width: 30em; color: var(--lin-sourd); }
-.echelle { position: sticky; top: 36vh; align-self: start; padding-top: clamp(48px, 8vh, 96px); }
+
+.ascension { position: relative; margin: 0 calc(-1 * var(--marge)); view-timeline-name: --montee; }
+.scene {
+  position: sticky; top: 0; height: 100svh; margin-bottom: -100svh; /* les degrés recouvrent la scène */
+  overflow: hidden; background: var(--nuit); isolation: isolate;
+  transition: filter 1s ease;
+}
+.ascension:has(.entrer-ici:hover) .scene { filter: brightness(1.08); }
+.scene .vue { position: absolute; inset: 0; }
+.scene .vue img { width: 100%; height: 100%; object-fit: cover; transform-origin: center 60%; }
+.scene .nuit-tombe { position: absolute; inset: 0; background: var(--nuit); opacity: 0; pointer-events: none; }
+.scene::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(16,14,11,.3) 0%, rgba(16,14,11,0) 22%, rgba(16,14,11,0) 48%, rgba(16,14,11,.7) 78%, rgba(16,14,11,.9) 100%);
+}
+.echelle { position: absolute; z-index: 1; inset-inline-start: var(--marge); top: 42%; transform: translateY(-50%); width: var(--echelle); }
+.echelle::before {
+  content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 1px;
+  background: var(--or); transform-origin: top; transform: scaleY(0);
+}
 .echelle ol, .degres { list-style: none; margin: 0; padding: 0; }
 .echelle li { border-inline-start: 1px solid var(--trait); transition: border-color .6s ease; }
 .echelle a {
   display: flex; gap: 10px; padding: 6px 0 6px 18px; text-decoration: none;
   font-family: "Marcellus", serif; font-size: 15px; letter-spacing: .02em; line-height: 1.35;
-  color: var(--lin-sourd); transition: color .3s ease;
+  color: var(--lin-sourd); text-shadow: 0 1px 8px rgba(16,14,11,.6); transition: color .3s ease;
 }
 :root[lang="he"] .echelle a { font-family: "Frank Ruhl Libre", serif; font-size: 16px; letter-spacing: 0; padding: 6px 18px 6px 0; }
 .echelle .rang { min-width: 1.1em; font-size: 12px; opacity: .55; padding-top: .15em; }
@@ -89,58 +129,114 @@ img { display: block; }
 .echelle li.courant { border-color: var(--or); }
 .echelle a:focus-visible { outline-offset: -2px; }
 
-.degres > li { padding: clamp(48px, 8vh, 96px) 0; border-bottom: 1px solid var(--trait); scroll-margin-top: 10vh; }
-.degres > li:last-child { border-bottom: 0; }
-.vue { position: relative; display: block; overflow: hidden; aspect-ratio: 2000 / 1117; background: #1a1712; }
-.vue img {
-  width: 100%; height: 100%; object-fit: cover;
-  filter: brightness(.88); transform-origin: center;
-  transition: filter 1.2s ease, transform 1.8s ease;
+.degres { position: relative; z-index: 1; }
+.degres > li { display: grid; align-content: end; min-height: 100svh; padding: 0 var(--marge); scroll-snap-align: start; view-timeline-name: var(--fil); }
+.degres > li:last-child { min-height: 170svh; }
+.degres .legende {
+  position: sticky; bottom: 0; width: 100%; max-width: var(--colonne); margin: 0 auto;
+  padding-bottom: clamp(40px, 7vh, 80px); text-shadow: 0 1px 10px rgba(16,14,11,.6);
 }
-.vue:hover img, .vue:focus-visible img { filter: none; transform: scale(1.02); }
 .entrer-ici {
-  position: absolute; inset-inline-end: 18px; bottom: 16px; padding: 8px 14px;
+  position: relative; display: inline-block; margin-top: 16px; padding: 3px 0; text-decoration: none;
   font-family: "Marcellus", serif; font-size: 14px; letter-spacing: .04em; color: var(--lin);
-  background: rgba(16,14,11,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  opacity: 0; transform: translateY(4px); transition: opacity .5s ease, transform .5s ease;
+  border-bottom: 1px solid var(--or-sourd); transition: color .3s ease, border-color .3s ease;
 }
+.entrer-ici::before { content: ""; position: absolute; inset: -10px 0; }
 :root[lang="he"] .entrer-ici { font-family: "Frank Ruhl Libre", serif; letter-spacing: 0; }
-.vue:hover .entrer-ici, .vue:focus-visible .entrer-ici { opacity: 1; transform: none; }
+.entrer-ici:hover, .entrer-ici:focus-visible { color: var(--or-clair); border-color: var(--or); }
 
-.legende { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 26em); gap: 10px var(--entre); align-items: baseline; margin-top: 22px; }
-.legende h3 { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.legende { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 26em); gap: 10px var(--entre); align-items: baseline; }
+.legende h3 { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; text-wrap: balance; }
 .legende .nom-he { font-size: .8em; color: var(--lin-sourd); font-weight: 400; }
 .legende .mishna { font-size: 16px; line-height: 1.5; }
 .legende .source { margin-top: 6px; font-size: 13px; color: var(--lin-sourd); }
 
+/* repli sans animations au défilement : les vues gravies s'allument en fondu */
+.scene .vue { opacity: 0; transition: opacity 1.2s ease; }
+.scene .vue:first-child, .scene .vue.gravi, .scene .vue.courant { opacity: 1; }
+
+@supports (animation-timeline: view()) {
+  .scene { animation: s-eteindre linear both; animation-timeline: var(--fin); animation-range: contain 15% contain 85%; }
+  .scene .vue { transition: none; animation: se-lever linear both; animation-timeline: var(--fil); animation-range: entry 35% entry 100%; }
+  .scene .vue:first-child { animation: none; }
+  .scene .vue img { animation: avancer linear both; animation-timeline: var(--fil); animation-range: entry 0% exit 100%; }
+  .scene .nuit-tombe { animation: tomber linear both; animation-timeline: --montee; animation-range: contain 0% contain 100%; }
+  .echelle::before { animation: grimper linear both; animation-timeline: --montee; animation-range: contain 0% contain 100%; }
+  .degres > li { animation: s-effacer linear both; animation-timeline: var(--fil); animation-range: exit 0% exit 30%; }
+  .degres > li:last-child { animation-range: contain 10% contain 60%; }
+  .degres .legende { animation: paraitre linear both; animation-timeline: var(--fil); animation-range: entry 60% entry 100%; }
+}
+@keyframes se-lever { from { opacity: 0; } to { opacity: 1; } }
+@keyframes avancer { from { transform: scale(1); } to { transform: scale(1.06); } }
+@keyframes tomber { from { opacity: 0; } to { opacity: .38; } }
+@keyframes grimper { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes s-effacer { from { opacity: 1; } to { opacity: 0; } }
+@keyframes s-eteindre { from { opacity: 1; } to { opacity: 0; } }
+
 /* ---- le sanctuaire ---- */
-.sanctuaire { margin-top: clamp(48px, 8vh, 96px); padding: 0 var(--marge) clamp(48px, 8vh, 96px); }
-.sanctuaire .fond { position: relative; height: 100svh; margin: 0 calc(-1 * var(--marge)); background: var(--nuit); }
-.sanctuaire .fond img { width: 100%; height: 100%; object-fit: cover; }
+.sanctuaire {
+  position: relative; height: 100svh; isolation: isolate; scroll-snap-align: start;
+  display: grid; align-content: end; padding: 0 var(--marge) clamp(56px, 9vh, 88px);
+}
+.sanctuaire .fond { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--nuit); isolation: isolate; }
+.sanctuaire .fond img { width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 62%; animation: respirer 26s ease-in-out infinite alternate; }
+@keyframes respirer { from { scale: 1; } to { scale: 1.07; } }
 .sanctuaire .fond::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to bottom, var(--nuit) 0%, rgba(16,14,11,0) 26%, rgba(16,14,11,0) 52%, rgba(16,14,11,.55) 76%, rgba(16,14,11,.92) 92%, var(--nuit) 100%);
+  background: linear-gradient(to bottom, var(--nuit) 0%, rgba(16,14,11,0) 22%, rgba(16,14,11,0) 48%, rgba(16,14,11,.6) 72%, rgba(16,14,11,.94) 100%);
 }
-.sanctuaire .legende { max-width: var(--colonne); margin: clamp(8px, 2vh, 24px) auto 0; }
+.fumee {
+  position: absolute; left: 50%; top: 44%; width: 70vmax; height: 70vmax; translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(232,214,184,.5), rgba(232,214,184,.18) 40%, transparent 70%);
+  filter: url(#volutes); mix-blend-mode: screen; pointer-events: none; will-change: transform, opacity;
+  animation: deriver 11s ease-in-out infinite;
+}
+.fumee:nth-child(3) { --sens: -1; width: 52vmax; height: 52vmax; top: 38%; animation-duration: 13s; animation-delay: -5s; }
+.fumee:nth-child(4) { width: 44vmax; height: 44vmax; top: 58%; animation-duration: 8s; animation-delay: -3s; }
+@keyframes deriver {
+  0% { opacity: 0; transform: translate(calc(-18% * var(--sens, 1)), 28%) rotate(calc(-10deg * var(--sens, 1))) scale(.7); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(16% * var(--sens, 1)), -40%) rotate(calc(9deg * var(--sens, 1))) scale(1.4); }
+}
+.braise {
+  position: absolute; left: 50%; top: 86%; width: 34vmax; height: 20vmax; translate: -50% -50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255,150,60,.55), rgba(255,120,40,.18) 40%, transparent 72%);
+  mix-blend-mode: screen; animation: braiser 2.4s ease-in-out infinite alternate;
+}
+@keyframes braiser { from { opacity: .3; scale: .9; } to { opacity: 1; scale: 1.1; } }
+.reflet {
+  position: absolute; top: 0; bottom: 0; left: -100%; width: 300%; pointer-events: none;
+  background: linear-gradient(105deg, transparent 45%, rgba(255,226,170,.85) 50%, transparent 55%);
+  mix-blend-mode: overlay; transform: translateX(-30%); will-change: transform;
+  animation: luire 8s ease-in-out infinite;
+}
+@keyframes luire { 0% { transform: translateX(-30%); } 60%, 100% { transform: translateX(30%); } }
+.sanctuaire .legende { width: 100%; max-width: var(--colonne); margin: 0 auto; text-shadow: 0 1px 10px rgba(16,14,11,.6); }
 .sanctuaire .legende h3 { font-size: clamp(28px, 3.2vw, 44px); }
 .sanctuaire .action { grid-column: 1 / -1; margin-top: 28px; }
-
-/* ---- pied ---- */
-main > footer {
-  max-width: var(--colonne); margin: 0 auto; padding: 16px var(--marge) calc(16px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--trait); color: var(--lin-sourd); font-size: 13px;
+.sanctuaire footer {
+  position: absolute; inset-inline: var(--marge); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  color: var(--lin-sourd); font-size: 13px;
+}
+@supports (animation-timeline: view()) {
+  .sanctuaire .legende > * { animation: paraitre linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
 }
 
 @media (max-width: 860px) {
-  .ouverture, .ascension, .legende { grid-template-columns: minmax(0, 1fr); }
+  .ouverture, .legende { grid-template-columns: minmax(0, 1fr); }
   .ouverture { row-gap: 12px; }
   .echelle { display: none; }
   .seuil nav { justify-content: flex-start; }
-  .sanctuaire .fond { height: min(100svh, 150vw); }
+  .scene .vue { bottom: auto; height: 56svh; }
+  .scene .vue img { object-position: center 40%; }
+  .scene::after { background: linear-gradient(to bottom, rgba(16,14,11,.2) 0%, rgba(16,14,11,0) 20%, rgba(16,14,11,0) 40%, var(--nuit) 56%); }
+  .sanctuaire .fond::after { background: linear-gradient(to bottom, var(--nuit) 0%, rgba(16,14,11,0) 18%, rgba(16,14,11,0) 36%, rgba(16,14,11,.78) 60%, rgba(16,14,11,.97) 100%); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .seuil .affiche img, .titre { animation: none; }
-  .vue img, .entrer-ici, .echelle li, .echelle a { transition: none; }
-  .vue:hover img { transform: none; }
+  .seuil .affiche img, .titre, .titre h1 .he, .entrer::after, .scene .vue img, .degres .legende, .fumee, .braise, .reflet, .sanctuaire .fond img, .sanctuaire .legende > * { animation: none; }
+  .fumee { opacity: .6; }
+  html { scroll-snap-type: none; }
+  .scene, .entrer-ici, .echelle li, .echelle a { transition: none; }
+  .ascension:has(.entrer-ici:hover) .scene { filter: none; }
 }
