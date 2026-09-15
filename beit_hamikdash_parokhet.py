@@ -89,7 +89,7 @@ VERT = 0.12
 # un drapeau, pas une tapisserie — les teintes d'un lainage se tiennent de près.
 LAINES = (("tekhelet", (0.10, 0.17, 0.48)), ("argaman", (0.40, 0.08, 0.30)),
           ("shani", (0.55, 0.08, 0.08)), ("lin", (0.86, 0.84, 0.78)))
-DOSAGES = {"fond": (0.50, 0.40, 0.07, 0.03), "chaud": (0.10, 0.35, 0.50, 0.05),
+DOSAGES = {"fond": (0.50, 0.42, 0.08, 0.00), "chaud": (0.10, 0.35, 0.50, 0.05),
            "clair": (0.05, 0.05, 0.20, 0.70), "clair_chaud": (0.00, 0.10, 0.45, 0.45)}
 JOUR = 0.75   # la laine teinte absorbe : le jour d'une étoffe lourde, sur les quatre faces
 PALETTE = {face: tuple(JOUR * sum(p * rgb[k] for p, (_, rgb) in zip(parts, LAINES)) for k in range(3))

@@ -993,7 +993,7 @@ NIMA = 20 / 72   # amot : les 72 נִימִין de Shekalim 8:5 réparties sur l
 # cordon fait un pixel, et quatre couleurs saturées tirées au sort par pixel ne se
 # fondent pas, elles crépitent. Un fil de 24 brins qui contient les quatre EST de la
 # couleur moyenne — ce qui change d'un fil à l'autre n'est que le dosage.
-ECART_PAROKHET = 0.18
+ECART_PAROKHET = 0.12
 LONGUEUR_DOSAGE = 12   # en nimin : sur quelle longueur le dosage d'un cordon dérive
 # Les FACES du tissage — « אֲרִיגָה שֶׁל שְׁתֵּי קִירוֹת » (Rashi Ex. 26:31) : deux parois de fils
 # dont l'une passe devant l'autre là où le dessin le veut. Chaque cordon porte les quatre
