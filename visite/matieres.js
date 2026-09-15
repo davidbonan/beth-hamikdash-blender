@@ -35,7 +35,7 @@ export const EXPOSITION = { value: 1 };
 // — les braises — est une lampe ordinaire, que la pénombre ne touche pas.
 const PENOMBRE_MIN = { value: new THREE.Vector3(1, 1, 1) };
 const PENOMBRE_MAX = { value: new THREE.Vector3(0, 0, 0) };
-const PENOMBRE_RESTE = 0.42;
+const PENOMBRE_RESTE = 0.12;
 
 export function assombrir(boite) {
   PENOMBRE_MIN.value.copy(boite.min);

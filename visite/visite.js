@@ -189,7 +189,7 @@ scene.add(camera);
 
 // Les braises de la ma'hta : une lampe qui vacille, à la mesure d'un bassin de charbons —
 // pas d'une flamme. Deux sinus incommensurables et un peu de hasard, jamais une période.
-const BRAISE = { couleur: 0xff7a2a, intensite: 14, portee: 16, carte: 512 };
+const BRAISE = { couleur: 0xff7a2a, intensite: 18, portee: 8, carte: 512 };
 let braise = null;
 let vacillement = 0;
 

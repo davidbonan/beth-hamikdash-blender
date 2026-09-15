@@ -184,12 +184,13 @@ const FUMEE = {
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
               uBoiteMin: { value: new THREE.Vector3() }, uBoiteMax: { value: new THREE.Vector3() },
               uBraise: { value: new THREE.Vector3() }, uTemps: { value: 0 },
-              uDensite: { value: 0.11 }, uLueur: { value: 0.35 } },
-  defines: { PAS: PROFIL.fumee.pas },
+              uVoile: { value: 0.03 }, uVolutes: { value: 1.4 },
+              uLueur: { value: 0.32 }, uLampe: { value: 0.06 } },
+  defines: { PAS: PROFIL.fumee.pas, OCTAVES: PROFIL.fumee.octaves },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse, tGeo;
-    uniform float uTanFov, uAspect, uTemps, uDensite, uLueur;
+    uniform float uTanFov, uAspect, uTemps, uVoile, uVolutes, uLueur, uLampe;
     uniform mat4 uMonde;
     uniform vec3 uBoiteMin, uBoiteMax, uBraise;
     varying vec2 vUv;
@@ -206,28 +207,51 @@ const FUMEE = {
                      mix(hachage(i + vec3(0, 1, 1)), hachage(i + vec3(1, 1, 1)), f.x), f.y), f.z);
     }
 
-    // La ketoret a empli la maison : la fumée est partout, un peu plus dense sous le
-    // plafond, et deux octaves de bruit qui dérivent vers le haut la font vivre. Au-dessus
-    // des braises, la colonne qui monte encore, ondulant en s'élargissant.
-    float densite(vec3 p){
-      float h = clamp((p.y - uBoiteMin.y) / (uBoiteMax.y - uBoiteMin.y), 0.0, 1.0);
-      vec3 q = p * 0.45 + vec3(0.0, -uTemps * 0.05, 0.0);
-      float n = bruit(q) * 0.65 + bruit(q * 2.7 + vec3(uTemps * 0.02, 0.0, uTemps * 0.015)) * 0.35;
-      float nappe = 0.7 + 0.3 * h;
-      float dy = p.y - uBraise.y;
-      vec2 d = p.xz - uBraise.xz;
-      d += (bruit(vec3(dy * 0.9 - uTemps * 0.45, 0.7, 0.3)) - 0.5) * 0.4 * max(dy, 0.0);
-      float colonne = exp(-dot(d, d) / (0.05 + 0.10 * max(dy, 0.0))) * smoothstep(-0.05, 0.4, dy) * 3.0;
-      return uDensite * (nappe + colonne) * (0.5 + 1.0 * n);
+    float fbm(vec3 x){
+      float s = 0.0, a = 0.5, somme = 0.0;
+      for (int i = 0; i < OCTAVES; i++) {
+        s += a * bruit(x); somme += a;
+        x = x * 2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5;
+      }
+      return s / somme;
     }
 
-    // Ce que ce point de fumée reçoit : les braises en 1/d², et un fond gris-ambré — la
-    // lueur que l'or de la pièce renvoie, et c'est elle qui fait voir la fumée loin des
-    // braises.
-    vec3 lumiere(vec3 p){
-      vec3 v = uBraise - p;
+    // La ketoret a empli la maison (Yoma 5:1) : un voile diffus partout, et des volutes
+    // nettes dans le seul panache qui monte des braises en s'élargissant. Une volute est
+    // la crête d'un bruit déformé par un autre bruit : fine, enroulée.
+    float densite(vec3 p){
+      float h = clamp((p.y - uBoiteMin.y) / (uBoiteMax.y - uBoiteMin.y), 0.0, 1.0);
+      vec2 r = p.xz - uBraise.xz;
+      float angle = uTemps * 0.04 + h * 1.5;
+      float c = cos(angle), s = sin(angle);
+      vec3 q = vec3(c * r.x - s * r.y, p.y - uTemps * 0.35, s * r.x + c * r.y) * 0.32;
+      vec3 w = vec3(bruit(q * 0.7 + vec3(0.0, uTemps * 0.03, 5.2)),
+                    bruit(q * 0.7 + vec3(3.1, 0.0, uTemps * 0.03)),
+                    bruit(q * 0.7 + vec3(7.4, uTemps * 0.02, 1.3))) - 0.5;
+      float crete = 1.0 - abs(fbm(q * 2.0 + w * 3.0) * 2.0 - 1.0);
+      float volute = smoothstep(0.90, 0.995, crete);
+      float dy = p.y - uBraise.y;
+      vec2 d = r + w.xz * 0.6 * max(dy, 0.0);
+      float colonne = exp(-dot(d, d) / (0.04 + 0.12 * max(dy, 0.0))) * smoothstep(-0.05, 0.3, dy);
+      float rayon = 0.35 + 0.3 * max(dy, 0.0);
+      float panache = exp(-dot(d, d) / (rayon * rayon)) * smoothstep(-0.05, 0.3, dy);
+      float voile = 0.6 + 0.4 * h + 0.5 * (bruit(p * 0.15 + vec3(uTemps * 0.01, 0.0, -uTemps * 0.008)) - 0.5);
+      return uVoile * voile + uVolutes * (volute * panache + 0.4 * colonne);
+    }
+
+    // La fumée est blanche : elle prend la couleur de ce qui l'éclaire. Les braises en
+    // 1/d², diffusées vers l'avant — à contre-jour elle brille —, la lampe de tête qui la
+    // fait voir autour de soi, et un fond presque noir.
+    vec3 lumiere(vec3 p, vec3 o, vec3 d){
+      vec3 v = p - uBraise;
       float d2 = max(dot(v, v), 0.06);
-      return vec3(1.0, 0.40, 0.12) * (uLueur / d2) + vec3(0.055, 0.045, 0.032);
+      const float g = 0.5;
+      float cosT = dot(v * inversesqrt(d2), d);
+      float phase = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * cosT, 1.5);
+      float dc = max(distance(p, o), 0.6);
+      return vec3(1.0, 0.62, 0.36) * (uLueur * phase / d2)
+           + vec3(1.0, 0.95, 0.88) * (uLampe / pow(dc, 1.7))
+           + vec3(0.010, 0.009, 0.008);
     }
 
     void main(){
@@ -244,17 +268,22 @@ const FUMEE = {
       float t0 = max(max(tmin.x, tmin.y), max(tmin.z, 0.0));
       float t1 = min(min(tmax.x, tmax.y), min(tmax.z, portee));
       if (t1 <= t0) { gl_FragColor = c; return; }
-      float pas = (t1 - t0) / float(PAS);
-      // Un départ tiré au hasard par pixel : le pas d'un mètre se lirait sinon en strates.
-      float t = t0 + pas * fract(sin(dot(vUv * 977.0 + fract(uTemps), vec2(12.9898, 78.233))) * 43758.5453);
+      // Pas en progression quadratique : fins près de l'œil, où une volute se voit en
+      // détail, longs au loin, où elle ne couvre que quelques pixels. Un départ tiré au
+      // hasard par pixel, sinon les pas se liraient en strates.
+      float etendue = t1 - t0;
+      float hasard = fract(sin(dot(vUv * 977.0 + fract(uTemps), vec2(12.9898, 78.233))) * 43758.5453);
       float T = 1.0;
       vec3 L = vec3(0.0);
       for (int i = 0; i < PAS; i++) {
-        vec3 p = o + d * t;
+        float u0 = (float(i) + hasard) / float(PAS);
+        if (u0 >= 1.0) break;
+        float u1 = min((float(i) + 1.0 + hasard) / float(PAS), 1.0);
+        float pas = etendue * (u1 * u1 - u0 * u0);
+        vec3 p = o + d * (t0 + etendue * 0.5 * (u0 * u0 + u1 * u1));
         float alpha = 1.0 - exp(-densite(p) * pas);
-        L += T * alpha * lumiere(p);
+        L += T * alpha * lumiere(p, o, d);
         T *= 1.0 - alpha;
-        t += pas;
         if (T < 0.02) break;
       }
       gl_FragColor = vec4(c.rgb * T + L, c.a);
