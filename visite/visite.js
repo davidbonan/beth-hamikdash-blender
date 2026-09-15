@@ -154,7 +154,7 @@ scene.add(new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.16));
 // Matin, à l'est : l'axe de l'avoda, et la lumière qui rase la façade. Plus bas sur
 // l'horizon, le soleil traverse plus d'atmosphère : il perd de la force et gagne de
 // l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
-const soleil = new THREE.DirectionalLight(0xffe0b4, 4.9);
+const soleil = new THREE.DirectionalLight(0xffd6a0, 4.9);
 reglerOmbres(soleil);
 scene.add(soleil, soleil.target);
 const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.12);  // rebond du ciel à l'ouest
