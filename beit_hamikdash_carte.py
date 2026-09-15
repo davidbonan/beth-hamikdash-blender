@@ -126,14 +126,20 @@ def cadrer(carte, masque, cadre, pixels):
     u = u0 + (np.arange(pixels) + 0.5) / echelle
     l = np.clip(bas + z * (haut - bas) - 0.5, 0, carte.shape[0] - 1.001)
     c = np.clip(milieu + u * (haut - bas) - 0.5, 0, carte.shape[1] - 1.001)
-    l0, c0 = np.floor(l).astype(int), np.floor(c).astype(int)
-    fl, fc = (l - l0)[:, None], (c - c0)[None, :]
+    return reechantillonner(carte, l, c), reechantillonner(masque, l, c) > 0.5
 
-    def echantillon(source):
-        source = source.astype(np.float32)
-        return ((1 - fl) * (1 - fc) * source[l0][:, c0] + (1 - fl) * fc * source[l0][:, c0 + 1]
-                + fl * (1 - fc) * source[l0 + 1][:, c0] + fl * fc * source[l0 + 1][:, c0 + 1])
-    return echantillon(carte), echantillon(masque) > 0.5
+
+def reechantillonner(source, lignes, colonnes):
+    """La source lue, bilinéaire, sur la grille des `lignes` × `colonnes` données en
+    pixels de source (flottants, déjà bornés) ; un dernier axe de la source, s'il en a
+    un, est conservé."""
+    l0, c0 = np.floor(lignes).astype(int), np.floor(colonnes).astype(int)
+    fl, fc = (lignes - l0)[:, None], (colonnes - c0)[None, :]
+    if source.ndim == 3:
+        fl, fc = fl[..., None], fc[..., None]
+    source = source.astype(np.float32)
+    return ((1 - fl) * (1 - fc) * source[l0][:, c0] + (1 - fl) * fc * source[l0][:, c0 + 1]
+            + fl * (1 - fc) * source[l0 + 1][:, c0] + fl * fc * source[l0 + 1][:, c0 + 1])
 
 
 def bombe(t):
@@ -285,25 +291,34 @@ def _dp(pts, tolerance):
     return [tuple(p) for p in pts[garde]]
 
 
-def lire(chemin):
-    """La luminance d'une image, ligne 0 en bas, aux valeurs du fichier : lue en couleur,
-    bpy la passerait en linéaire, et les gris sombres, écrasés, sortiraient en marches."""
+def lire_rgb(chemin):
+    """Les trois canaux d'une image, ligne 0 en bas, aux valeurs du fichier : lue en
+    couleur, bpy la passerait en linéaire, et les gris sombres, écrasés, sortiraient en
+    marches."""
     image = bpy.data.images.load(str(chemin))
     image.colorspace_settings.name = "Non-Color"
     largeur, hauteur = image.size
     pixels = np.empty(largeur * hauteur * 4, dtype=np.float32)
     image.pixels.foreach_get(pixels)
     bpy.data.images.remove(image)
-    return pixels.reshape(hauteur, largeur, 4)[..., :3].mean(axis=2)
+    return pixels.reshape(hauteur, largeur, 4)[..., :3]
 
 
-def ecrire(nom, relief, masque):
-    """RGB = hauteur en gris, alpha = masque. Le PNG passe par bpy, le WebP par cwebp,
-    SANS PERTE : une hauteur se dérive en pente, et les blocs d'une compression à perte,
-    invisibles sur une image, ressortent en marches dès que la carte porte du détail."""
+def lire(chemin):
+    """La luminance d'une image, aux valeurs du fichier (voir `lire_rgb`)."""
+    return lire_rgb(chemin).mean(axis=2)
+
+
+def ecrire(nom, relief, masque, faces=None):
+    """R = hauteur, alpha = masque ; G et B portent `faces` (deux cartes sur le dernier
+    axe) quand la matière lit autre chose que la hauteur, sinon la hauteur en gris. Le
+    PNG passe par bpy, le WebP par cwebp, SANS PERTE : une hauteur se dérive en pente,
+    et les blocs d'une compression à perte, invisibles sur une image, ressortent en
+    marches dès que la carte porte du détail."""
     hauteur, largeur = relief.shape
     pixels = np.empty((hauteur, largeur, 4), dtype=np.float32)
-    pixels[..., 0] = pixels[..., 1] = pixels[..., 2] = relief
+    pixels[..., 0] = relief
+    pixels[..., 1:3] = faces if faces is not None else relief[..., None]
     pixels[..., 3] = masque
     image = bpy.data.images.new(nom, largeur, hauteur, alpha=True, is_data=True)
     image.pixels.foreach_set(pixels.ravel())

@@ -271,11 +271,18 @@ const float CREUX_M = 0.020;
 // soleil de l'Azara qui est chaud lui aussi, elle rend de la TERRE. Elle est donc
 // reprise neutre ici, et plus basse : un âtre est noir, pas gris de boue.
 const vec3 NOIR_SUIE = vec3(0.165, 0.165, 0.170);
-// Les Parokhot : le sol du Bayit, ce dont une figure tissée bombe l'étoffe, et de
-// combien la figure remonte le ton — les mêmes lectures que parokhet() du blockout.
+// Les Parokhot : le sol du Bayit, ce dont une figure tissée bombe l'étoffe, et les
+// quatre FACES du tissage — les mêmes lectures que parokhet() du blockout, et la
+// palette de visite/matieres/parokhet.json (linéaire) : le fond bleu-violet de
+// tekhelet et d'argaman, le chaud cramoisi de tola'at shani, le clair de lin, et le
+// coin lin-cramoisi que seul un fondu atteint. La carte les parcourt en (clarté, rougeur) ;
+// le fond est la couleur que le glb porte, les autres s'en déduisent par rapport.
 const float SOL_BAYIT = 6.0 * AMA;
 const float BOMBE_PAROKHET = 0.12 * AMA;
-const vec3 TON_FIGURE_PAROKHET = vec3(1.52, 1.53, 1.45);
+const vec3 FOND_PAROKHET = vec3(0.2057, 0.1109, 0.2918);
+const vec3 CHAUD_PAROKHET = vec3(0.3510, 0.0953, 0.1740);
+const vec3 CLAIR_PAROKHET = vec3(0.5527, 0.4624, 0.4507);
+const vec3 CLAIR_CHAUD_PAROKHET = vec3(0.5059, 0.3165, 0.3128);
 const vec2 TEXEL_PAROKHET = vec2(1.0 / 2048.0, 1.0 / 4096.0);
 // Les gravures des parois : le modelé bombe de RELIEF_GRAVURE fois la hauteur de la
 // figure au-dessus de sa plaque — 1,5 cm sur un keruv de paroi, 1 sur la timora d'un
@@ -663,14 +670,18 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo = -0.03;
 #ifdef PAROKHET
     // Le motif tissé, lu par (y, z) de monde sur les 20 × 40 amot du rideau : la
-    // hauteur se dérive en pente, comme le joint d'un bloc, et le masque monte le ton.
-    // u court vers -z (le nord de Blender est le -z de three), v monte avec y.
+    // hauteur (r) se dérive en pente, comme le joint d'un bloc, et (g, b) choisit la
+    // face qui affleure. u court vers -z (le nord de Blender est le -z de three), v
+    // monte avec y.
     vec2 uv = vec2(0.5 - P.z / (20.0 * AMA), (P.y - SOL_BAYIT) / (40.0 * AMA));
     vec2 pas = TEXEL_PAROKHET * 2.0;
     float dU = texture2D(uParokhet, uv + vec2(pas.x, 0.0)).r - texture2D(uParokhet, uv - vec2(pas.x, 0.0)).r;
     float dV = texture2D(uParokhet, uv + vec2(0.0, pas.y)).r - texture2D(uParokhet, uv - vec2(0.0, pas.y)).r;
     pente = BOMBE_PAROKHET * vec3(0.0, dV / (2.0 * pas.y * 40.0 * AMA), -dU / (2.0 * pas.x * 20.0 * AMA));
-    teinte *= mix(vec3(1.0), TON_FIGURE_PAROKHET, texture2D(uParokhet, uv).a);
+    vec4 tisse = texture2D(uParokhet, uv);
+    vec3 face = mix(mix(FOND_PAROKHET, CHAUD_PAROKHET, tisse.b),
+                    mix(CLAIR_PAROKHET, CLAIR_CHAUD_PAROKHET, tisse.b), tisse.g);
+    teinte *= face / FOND_PAROKHET;
 #endif
   }
   else if (uFamille == 6) {                                   // eau : ride lente

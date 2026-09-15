@@ -25,6 +25,34 @@ def lisser(contour, passes=3):
     return points
 
 
+def courbe(fil, passes=3):
+    """Chaikin sur un fil OUVERT : les deux bouts restent en place, le reste s'arrondit."""
+    points = list(fil)
+    for _ in range(passes):
+        coupe = [points[0]]
+        for (u0, z0), (u1, z1) in zip(points, points[1:]):
+            coupe.append((0.75 * u0 + 0.25 * u1, 0.75 * z0 + 0.25 * z1))
+            coupe.append((0.25 * u0 + 0.75 * u1, 0.25 * z0 + 0.75 * z1))
+        coupe.append(points[-1])
+        points = coupe
+    return points
+
+
+def ruban(fil, largeur):
+    """Le contour fermé d'un trait qui suit `fil` à `largeur` constante : l'aller décalé
+    d'un côté de la normale, le retour de l'autre. Une queue, une ceinture, un pli."""
+    n = len(fil)
+    gauche, droite = [], []
+    for i, (u, z) in enumerate(fil):
+        (u0, z0), (u1, z1) = fil[max(i - 1, 0)], fil[min(i + 1, n - 1)]
+        du, dz = u1 - u0, z1 - z0
+        norme = math.hypot(du, dz) or 1.0
+        nu, nz = -dz / norme * largeur / 2, du / norme * largeur / 2
+        gauche.append((u + nu, z + nz))
+        droite.append((u - nu, z - nz))
+    return gauche + droite[::-1]
+
+
 def symetrique(demi):
     """Le contour entier d'une figure symétrique, depuis sa moitié droite donnée du haut
     de l'axe au bas de l'axe : la moitié gauche est son miroir, parcourue en remontant."""
@@ -83,6 +111,23 @@ CORPS_DRESSE = symetrique([
     (0.000, 0.820), (0.055, 0.820), (0.065, 0.790), (0.150, 0.770), (0.175, 0.700),
     (0.150, 0.600), (0.095, 0.520), (0.130, 0.420), (0.165, 0.220), (0.185, 0.030),
     (0.170, 0.000), (0.000, 0.000)])
+
+# Le corps vêtu du keruv, sans les bras : cou, épaules, poitrine, taille, hanches, robe
+# évasée jusqu'à l'ourlet. Moitié droite, du haut du cou à l'axe de l'ourlet. Le
+# CORPS_DRESSE était sans épaules ni cou : une figure de trois mètres se lisait en
+# mannequin de couturière. Le cou monte DANS le crâne, qui le recouvre : arrêté
+# dessous, le lissage le rognait et la tête flottait.
+# Les proportions sont celles d'un ENFANT — « כְּרוּב : כְּרַבְיָא » (Soucca 5b, Rashi Ex. 25:18) :
+# la tête fait un cinquième de la hauteur, les épaules tombent à 0,74, non 0,80.
+CORPS_KERUV = symetrique([
+    (0.000, 0.860), (0.050, 0.860), (0.055, 0.750), (0.165, 0.730), (0.185, 0.680),
+    (0.165, 0.600), (0.140, 0.540), (0.155, 0.470), (0.180, 0.400), (0.210, 0.250),
+    (0.230, 0.100), (0.235, 0.030), (0.000, 0.030)])
+# Le bras droit, le long du corps et un peu fléchi : épaule, coude, poignet.
+BRAS = ((0.150, 0.710), (0.200, 0.580), (0.165, 0.440))
+LARGEURS_BRAS = (0.052, 0.046, 0.036)
+# Les plis de la robe partent de la ceinture et s'écartent vers l'ourlet.
+PLIS = (-1.0, -0.5, 0.0, 0.5, 1.0)
 
 # La tête double du keruv — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18) : un seul crâne,
 # un profil de chaque côté, museau vers l'extérieur, et AUCUN TRAIT (§9 de la fiche).

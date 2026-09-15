@@ -33,7 +33,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
-| `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte de relief (gris = bombé, alpha = figure), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp` |
+| `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
 | `beit_hamikdash_gravures.py` | les figures gravées des parois (keruv, timora, fleuron) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour poser une plaque par figure | `visite/matieres/gravures_2048.webp`, `gravures.json` |
 | `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
@@ -110,10 +110,13 @@ $BLENDER -b -P beit_hamikdash_keruvim.py
 ```
 
 Même logique pour le motif des Parokhot : il n'est pas de la géométrie mais une carte,
-`visite/matieres/parokhet_2048.webp`, écrite par `beit_hamikdash_parokhet.py` (~5 s, numpy
-de Blender, `cwebp` sur le PATH) et lue par `parokhet()` du blockout comme par le nuanceur
-étoffe de la visite. Les contours des figures — les siennes et celles des parois du Bayit —
-vivent dans `beit_hamikdash_contours.py`. Après toute modification de l'un ou l'autre :
+`visite/matieres/parokhet_2048.webp` (et `parokhet.json`, la palette des quatre laines),
+écrite par `beit_hamikdash_parokhet.py` (~20 s, numpy de Blender, `cwebp` sur le PATH) et
+lue par `parokhet()` du blockout comme par le nuanceur étoffe de la visite. Les figures —
+lion, créature ailée — sont tissées par gpt-image-2 depuis des guides, comme les gravures :
+`tissages/` est la source versionnée, `--guides` redessine les guides, `--tisser <nom>` fait
+tisser une figure (FAL_AI_KEY dans `.env`). Les contours des guides — les siens et ceux des
+parois du Bayit — vivent dans `beit_hamikdash_contours.py`. Après toute modification :
 
 ```bash
 $BLENDER -b -P beit_hamikdash_parokhet.py

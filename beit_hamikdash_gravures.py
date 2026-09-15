@@ -46,8 +46,8 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (TETE_DOUBLE, aile, corolle, ellipse, lisser,  # noqa: E402
-                                     poser, poser_lame, symetrique)
+from beit_hamikdash_contours import (BRAS, CORPS_KERUV, LARGEURS_BRAS, PLIS, TETE_DOUBLE,  # noqa: E402
+                                     aile, corolle, ellipse, lisser, poser, poser_lame, symetrique)
 
 TUILE_PX = 1024
 ATLAS_PX = 2 * TUILE_PX
@@ -97,22 +97,8 @@ def ruban(axe, largeurs):
 
 # --- Le keruv : debout, de face, deux ailes levées, un crâne à deux profils. ------------
 
-# Le corps vêtu, sans les bras : cou, épaules, poitrine, taille, hanches, robe évasée
-# jusqu'à l'ourlet. Moitié droite, du haut du cou à l'axe de l'ourlet. Le
-# CORPS_DRESSE du rideau était sans épaules ni cou : une figure de trois mètres se
-# lisait en mannequin de couturière. Le cou monte DANS le crâne, qui le recouvre :
-# arrêté dessous, le lissage le rognait et la tête flottait.
-# Les proportions sont celles d'un ENFANT — « כְּרוּב : כְּרַבְיָא » (Soucca 5b, Rashi Ex. 25:18) :
-# la tête fait un cinquième de la hauteur, les épaules tombent à 0,74, non 0,80.
-CORPS_KERUV = symetrique([
-    (0.000, 0.860), (0.050, 0.860), (0.055, 0.750), (0.165, 0.730), (0.185, 0.680),
-    (0.165, 0.600), (0.140, 0.540), (0.155, 0.470), (0.180, 0.400), (0.210, 0.250),
-    (0.230, 0.100), (0.235, 0.030), (0.000, 0.030)])
-# Le bras droit, le long du corps et un peu fléchi : épaule, coude, poignet.
-BRAS = ((0.150, 0.710), (0.200, 0.580), (0.165, 0.440))
-LARGEURS_BRAS = (0.052, 0.046, 0.036)
-# Les plis de la robe partent de la ceinture et s'écartent vers l'ourlet.
-PLIS = (-1.0, -0.5, 0.0, 0.5, 1.0)
+# Le corps, le bras et les plis du keruv sont dans beit_hamikdash_contours.py : le
+# guide de la créature ailée du rideau est bâti sur la même figure.
 
 # Les niveaux, en unités libres : ce qui est devant est plus haut. L'atlas les ramène
 # tous ensemble à [0, 1], et la visite les lit à la même échelle sur les trois motifs.

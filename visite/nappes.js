@@ -54,9 +54,9 @@ export async function nappes() {
       rugosite: jeu.rugosite,
     });
   }));
-  // Le motif tissé des Parokhot, que `beit_hamikdash_parokhet.py` écrit : gris =
-  // hauteur du bombé, alpha = figure. Une seule carte aux dimensions du rideau, lue en
-  // coordonnées de rideau et jamais répétée.
+  // Le motif tissé des Parokhot, que `beit_hamikdash_parokhet.py` écrit : r = hauteur
+  // du bombé, (g, b) = face du tissage qui affleure, alpha = figure. Une seule carte
+  // aux dimensions du rideau, lue en coordonnées de rideau et jamais répétée.
   const motif = regler(await chargeur.loadAsync("parokhet_2048.webp"), THREE.NoColorSpace);
   motif.wrapS = motif.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("parokhet", { motif });
