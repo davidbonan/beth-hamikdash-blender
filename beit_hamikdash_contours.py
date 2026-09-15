@@ -38,18 +38,31 @@ def courbe(fil, passes=3):
     return points
 
 
-def ruban(fil, largeur):
-    """Le contour fermé d'un trait qui suit `fil` à `largeur` constante : l'aller décalé
-    d'un côté de la normale, le retour de l'autre. Une queue, une ceinture, un pli."""
-    n = len(fil)
-    gauche, droite = [], []
-    for i, (u, z) in enumerate(fil):
-        (u0, z0), (u1, z1) = fil[max(i - 1, 0)], fil[min(i + 1, n - 1)]
+def bezier(p0, p1, p2, n=24):
+    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0],
+             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1])
+            for t in (k / (n - 1) for k in range(n))]
+
+
+def normales(axe):
+    """La normale unitaire en chaque point d'une ligne brisée, moyenne des deux segments."""
+    n = []
+    for k, (u, z) in enumerate(axe):
+        (u0, z0), (u1, z1) = axe[max(0, k - 1)], axe[min(len(axe) - 1, k + 1)]
         du, dz = u1 - u0, z1 - z0
-        norme = math.hypot(du, dz) or 1.0
-        nu, nz = -dz / norme * largeur / 2, du / norme * largeur / 2
-        gauche.append((u + nu, z + nz))
-        droite.append((u - nu, z - nz))
+        l = math.hypot(du, dz) or 1.0
+        n.append((-dz / l, du / l))
+    return n
+
+
+def ruban(axe, largeur):
+    """Le contour fermé d'un trait qui suit `axe` : l'aller décalé d'un côté de la
+    normale, le retour de l'autre. `largeur` est un nombre — une queue, une ceinture,
+    un pli — ou la demi-largeur en chaque point — une palme, un bras."""
+    demi = [largeur / 2] * len(axe) if isinstance(largeur, (int, float)) else list(largeur)
+    n = normales(axe)
+    gauche = [(u + nu * w, z + nz * w) for (u, z), (nu, nz), w in zip(axe, n, demi)]
+    droite = [(u - nu * w, z - nz * w) for (u, z), (nu, nz), w in zip(axe, n, demi)]
     return gauche + droite[::-1]
 
 
@@ -136,3 +149,38 @@ PLIS = (-1.0, -0.5, 0.0, 0.5, 1.0)
 TETE_DOUBLE = symetrique([
     (0.00, 0.90), (0.35, 0.88), (0.90, 0.62), (1.20, 0.35), (1.35, 0.10), (1.25, -0.15),
     (0.75, -0.30), (0.15, -0.42), (0.00, -0.45)])
+
+
+# --- La timora : le dattier, tel que la tradition le lit et le frappe. -----------------
+
+# « וְתִמֹרֹת » (Melakhim I 6:29) : Rashi et Radak lisent דקלים, des palmiers-dattiers, et
+# la fiche (§8c-bis) en fixe sept palmes. Son image juive est celle des monnaies de
+# Bar Kokhba : un fût droit à écailles, sept palmes — celle du milieu dressée, les
+# paires suivantes qui ploient en arc —, et deux régimes de dattes qui pendent de la
+# couronne, de part et d'autre du fût. Ni volutes ni collier : c'était la palmette
+# assyrienne, étrangère à cette tradition.
+FUT = 0.56
+TRONC = symetrique([(0.0, FUT), (0.045, FUT), (0.052, 0.10), (0.065, 0.035), (0.09, 0.0), (0.0, 0.0)])
+ECAILLE = 0.045                          # pas des losanges du fût
+COURONNE = (0.0, FUT - 0.01)
+# (inclinaison sur la verticale, longueur, retombée) : la palme du milieu se dresse, les
+# paires suivantes ploient de plus en plus, la dernière retombe sous l'horizontale.
+PALMES = ((0, 0.42, 0.0), (28, 0.42, 0.18), (60, 0.40, 0.42), (95, 0.34, 0.55))
+REGIME = ((0.0, 0.0, 0.026), (-0.028, -0.030, 0.023), (0.028, -0.030, 0.023),
+          (-0.040, -0.065, 0.020), (0.0, -0.060, 0.021), (0.040, -0.065, 0.020),
+          (-0.018, -0.095, 0.017), (0.018, -0.095, 0.017), (0.0, -0.122, 0.014))
+ATTACHE_REGIME = (0.085, FUT - 0.05)
+
+
+def palme(inclinaison, longueur, retombee):
+    """(axe, demi-largeurs) d'une palme : un arc depuis la couronne, large à la base,
+    effilé à la pointe. La silhouette reste LISSE : les folioles ne sont que des sillons."""
+    a = math.radians(inclinaison)
+    p0 = COURONNE
+    p1 = (p0[0] + 0.5 * longueur * math.sin(a), p0[1] + 0.5 * longueur * math.cos(a))
+    p2 = (p0[0] + longueur * math.sin(a), p0[1] + longueur * (math.cos(a) - retombee))
+    axe = bezier(p0, p1, p2, 32)
+    n = len(axe) - 1
+    largeurs = [0.005 + 0.062 * (1.0 - k / n) ** 0.55 * min(1.0, 0.45 + 4.0 * k / n)
+                for k in range(len(axe))]
+    return axe, largeurs

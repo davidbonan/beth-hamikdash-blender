@@ -46,8 +46,10 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (BRAS, CORPS_KERUV, LARGEURS_BRAS, PLIS, TETE_DOUBLE,  # noqa: E402
-                                     aile, corolle, ellipse, lisser, poser, poser_lame, symetrique)
+from beit_hamikdash_contours import (ATTACHE_REGIME, BRAS, CORPS_KERUV, ECAILLE, FUT,  # noqa: E402
+                                     LARGEURS_BRAS, PALMES, PLIS, REGIME, TETE_DOUBLE, TRONC, aile,
+                                     corolle, ellipse, lisser, normales, palme, poser, poser_lame,
+                                     ruban)
 
 TUILE_PX = 1024
 ATLAS_PX = 2 * TUILE_PX
@@ -66,33 +68,6 @@ FONDU = 0.005            # en part de la hauteur : 2 cm sur un keruv de paroi
 # 1 cm sur la timora d'un jambage. Le fleuron fait 22 cm et court par centaines : le
 # chanfrein et l'export dédoublent chaque sommet, et c'est là que le glb se gagne.
 TOLERANCE = {"keruv": 0.005, "timora": 0.005, "fleuron": 0.02}
-
-
-# --- Les rubans : bras, palmes. ------------------------------------------------------
-
-def bezier(p0, p1, p2, n=24):
-    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0],
-             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1])
-            for t in (k / (n - 1) for k in range(n))]
-
-
-def normales(axe):
-    """La normale unitaire en chaque point d'une ligne brisée, moyenne des deux segments."""
-    n = []
-    for k, (u, z) in enumerate(axe):
-        (u0, z0), (u1, z1) = axe[max(0, k - 1)], axe[min(len(axe) - 1, k + 1)]
-        du, dz = u1 - u0, z1 - z0
-        l = math.hypot(du, dz) or 1.0
-        n.append((-dz / l, du / l))
-    return n
-
-
-def ruban(axe, largeurs):
-    """Le contour d'un ruban le long de `axe`, de demi-largeur `largeurs[k]` au point k."""
-    n = normales(axe)
-    gauche = [(u + nu * w, z + nz * w) for (u, z), (nu, nz), w in zip(axe, n, largeurs)]
-    droite = [(u - nu * w, z - nz * w) for (u, z), (nu, nz), w in zip(axe, n, largeurs)]
-    return gauche + droite[::-1]
 
 
 # --- Le keruv : debout, de face, deux ailes levées, un crâne à deux profils. ------------
@@ -142,39 +117,9 @@ def keruv(planche):
     planche.graver([(-0.10, 0.92), (0.0, 0.932), (0.10, 0.92)], 0.010, 0.4)
 
 
-# --- La timora : le dattier, tel que la tradition le lit et le frappe. -----------------
+# --- La timora : le dattier (beit_hamikdash_contours.py), et ses sillons. ---------------
 
-# « וְתִמֹרֹת » (Melakhim I 6:29) : Rashi et Radak lisent דקלים, des palmiers-dattiers, et
-# la fiche (§8c-bis) en fixe sept palmes. Son image juive est celle des monnaies de
-# Bar Kokhba : un fût droit à écailles, sept palmes — celle du milieu dressée, les
-# paires suivantes qui ploient en arc —, et deux régimes de dattes qui pendent de la
-# couronne, de part et d'autre du fût. Ni volutes ni collier : c'était la palmette
-# assyrienne, étrangère à cette tradition. La silhouette des palmes reste LISSE, les
-# folioles ne sont que des sillons qui s'arrêtent avant le bord.
-FUT = 0.56
-TRONC = symetrique([(0.0, FUT), (0.045, FUT), (0.052, 0.10), (0.065, 0.035), (0.09, 0.0), (0.0, 0.0)])
-ECAILLE = 0.045                          # pas des losanges du fût
-COURONNE = (0.0, FUT - 0.01)
-# (inclinaison sur la verticale, longueur, retombée) : la palme du milieu se dresse, les
-# paires suivantes ploient de plus en plus, la dernière retombe sous l'horizontale.
-PALMES = ((0, 0.42, 0.0), (28, 0.42, 0.18), (60, 0.40, 0.42), (95, 0.34, 0.55))
-REGIME = ((0.0, 0.0, 0.026), (-0.028, -0.030, 0.023), (0.028, -0.030, 0.023),
-          (-0.040, -0.065, 0.020), (0.0, -0.060, 0.021), (0.040, -0.065, 0.020),
-          (-0.018, -0.095, 0.017), (0.018, -0.095, 0.017), (0.0, -0.122, 0.014))
-ATTACHE_REGIME = (0.085, FUT - 0.05)
 NIVEAU_FUT, NIVEAU_PALME, NIVEAU_REGIME = 0.4, 0.25, 0.55
-
-
-def palme(inclinaison, longueur, retombee):
-    a = math.radians(inclinaison)
-    p0 = COURONNE
-    p1 = (p0[0] + 0.5 * longueur * math.sin(a), p0[1] + 0.5 * longueur * math.cos(a))
-    p2 = (p0[0] + longueur * math.sin(a), p0[1] + longueur * (math.cos(a) - retombee))
-    axe = bezier(p0, p1, p2, 32)
-    n = len(axe) - 1
-    largeurs = [0.005 + 0.062 * (1.0 - k / n) ** 0.55 * min(1.0, 0.45 + 4.0 * k / n)
-                for k in range(len(axe))]
-    return axe, largeurs
 
 
 def nervures(planche, axe, largeurs):

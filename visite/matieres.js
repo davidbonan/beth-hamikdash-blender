@@ -279,7 +279,7 @@ const vec3 NOIR_SUIE = vec3(0.165, 0.165, 0.170);
 // le fond est la couleur que le glb porte, les autres s'en déduisent par rapport.
 const float SOL_BAYIT = 6.0 * AMA;
 const float BOMBE_PAROKHET = 0.12 * AMA;
-const vec3 FOND_PAROKHET = vec3(0.1965, 0.0938, 0.2793);
+const vec3 FOND_PAROKHET = vec3(0.1695, 0.1018, 0.2955);
 const vec3 CHAUD_PAROKHET = vec3(0.3510, 0.0953, 0.1740);
 const vec3 CLAIR_PAROKHET = vec3(0.5527, 0.4624, 0.4507);
 const vec3 CLAIR_CHAUD_PAROKHET = vec3(0.5059, 0.3165, 0.3128);

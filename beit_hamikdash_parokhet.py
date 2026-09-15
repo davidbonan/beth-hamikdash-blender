@@ -50,8 +50,9 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, bombe, cadrer, distance, ecrire, figure,  # noqa: E402
                                   flouter, lire_rgb, reechantillonner, remplir)
-from beit_hamikdash_contours import (BRAS, CORPS_KERUV, LARGEURS_BRAS, PLIS, TETE_DOUBLE,  # noqa: E402
-                                     aile, corolle, courbe, ellipse, lisser, poser, poser_lame,
+from beit_hamikdash_contours import (ATTACHE_REGIME, BRAS, CORPS_KERUV, ECAILLE, FUT,  # noqa: E402
+                                     LARGEURS_BRAS, PALMES, PLIS, REGIME, TETE_DOUBLE, TRONC, aile,
+                                     corolle, courbe, ellipse, lisser, palme, poser, poser_lame,
                                      ruban)
 
 LARGEUR_PX = 2048
@@ -62,12 +63,13 @@ GUIDES = TISSAGES / "guides"
 
 # « אָרְכָּהּ אַרְבָּעִים אַמָּה וְרָחְבָּהּ עֶשְׂרִים אַמָּה » (Shekalim 8:5) : la carte est le rideau.
 LARGEUR, HAUTEUR = 20.0, 40.0
-CHAMP = (2.0, 38.0)       # bas et haut du champ figuré, en amot depuis le bas du rideau
-RANGS, COLONNES = 6, 4
-PART_FIGURE = 0.78        # hauteur d'une figure, au plus, en part du rang
-PART_COLONNE = 0.92       # largeur d'une figure, au plus, en part de sa colonne
-LISIERE = 0.9             # largeur de la lisière qui borde le champ
-LISTEL = 0.10             # les deux filets clairs qui bordent la lisière
+LISIERE = 1.2             # largeur de la lisière qui borde le champ
+LISTEL = 0.10             # les deux filets clairs qui bordent la lisière et les bandes
+BANDE = 0.6               # hauteur d'une bande de guilloché entre deux registres
+# Les registres, en amot depuis le bas du rideau : bas, centre, haut, et les deux bandes
+# qui les séparent. Une tapisserie d'apparat n'est pas une grille : un centre qui
+# domine, des registres qui l'encadrent, des bandes qui les tiennent.
+REGISTRES = {"bas": (LISIERE, 9.0), "centre": (9.6, 30.4), "haut": (31.0, HAUTEUR - LISIERE)}
 # Le bombé se fond sur 4 cm : c'est un fil qui passe par-dessus, pas une arête.
 FONDU = 0.04
 SURECHANTILLON = 2
@@ -89,7 +91,10 @@ VERT = 0.12
 # un drapeau, pas une tapisserie — les teintes d'un lainage se tiennent de près.
 LAINES = (("tekhelet", (0.10, 0.17, 0.48)), ("argaman", (0.40, 0.08, 0.30)),
           ("shani", (0.55, 0.08, 0.08)), ("lin", (0.86, 0.84, 0.78)))
-DOSAGES = {"fond": (0.50, 0.42, 0.08, 0.00), "chaud": (0.10, 0.35, 0.50, 0.05),
+# Le fond est de tekhelet avant tout : « תְּכֵלֶת דּוֹמֶה לַיָּם וְיָם דּוֹמֶה לָרָקִיעַ וְרָקִיעַ
+# דּוֹמֶה לְכִסֵּא הַכָּבוֹד » (Menachot 43b) — c'est la couleur du Trône que le rideau du Devir
+# porte, l'argaman ne fait que l'assombrir.
+DOSAGES = {"fond": (0.62, 0.30, 0.08, 0.00), "chaud": (0.10, 0.35, 0.50, 0.05),
            "clair": (0.05, 0.05, 0.20, 0.70), "clair_chaud": (0.00, 0.10, 0.45, 0.45)}
 JOUR = 0.75   # la laine teinte absorbe : le jour d'une étoffe lourde, sur les quatre faces
 PALETTE = {face: tuple(JOUR * sum(p * rgb[k] for p, (_, rgb) in zip(parts, LAINES)) for k in range(3))
@@ -183,6 +188,29 @@ def lion():
     return parties
 
 
+def timora():
+    """Le dattier — « וְתִמֹרֹת » (Melakhim I 6:29), et « תִמֹרָה בֵּין כְּרוּב לִכְרוּב » (Ye'hezkel
+    41:18) : entre deux keruvim, une timora. Celle des parois (beit_hamikdash_contours.py),
+    tissée : fût pourpre à écailles du fond, palmes de lin nervurées, dattes cramoisies."""
+    parties = [(TRONC, 0.6, POURPRE)]
+    for k in range(int(FUT / ECAILLE) - 1):
+        z = ECAILLE * k + 0.02
+        for sens in (-1, 1):
+            parties.append((ruban([(sens * -0.04, z), (sens * 0.04, z + 0.08)], 0.008), BOMBE_TRAIT, FOND))
+    for inclinaison, longueur, retombee in PALMES[::-1]:
+        for sens in ((1,) if inclinaison == 0 else (-1, 1)):
+            axe, largeurs = palme(sens * inclinaison, longueur, retombee)
+            parties.append((lisser(ruban(axe, largeurs), passes=2), 0.8, CLAIR))
+            parties.append((ruban(axe[2:-2], 0.008), BOMBE_TRAIT, FOND))
+    for sens in (-1, 1):
+        parties.append((ruban([(sens * 0.03, FUT + 0.01), (sens * ATTACHE_REGIME[0], ATTACHE_REGIME[1] + 0.02)],
+                              0.022), 0.7, POURPRE))
+        for du, dz, r in REGIME:
+            parties.append((ellipse(sens * ATTACHE_REGIME[0] + du, ATTACHE_REGIME[1] + dz, r * 0.9, r * 1.3),
+                            0.7, CHAUD))
+    return parties
+
+
 # Ce que l'on demande au modèle pour chaque motif : l'iconographie mot à mot, parce que
 # c'est elle que le guide ne porte qu'à moitié. La manière est celle des tapisseries de
 # l'Orient ancien — laines plates, contours en fil, dessin intérieur en fils contrastés.
@@ -206,6 +234,11 @@ MOTIFS = {
                  "carrying TWO faces in profile, one looking left and one looking right "
                  "(Janus-like), with a plain headband, no hair, no beard. IMPORTANT: the faces "
                  "are perfectly smooth and blank, with no eyes, no nose, no mouth."),
+    "timora": (timora, (-0.6, -0.1, 0.6, 1.1), 1.00, "date palm tree, as on the Bar Kokhba coins",
+               "a straight purple trunk with a scale pattern, flared foot, a crown of exactly "
+               "seven fronds of ivory linen — the middle one upright, the others bending down "
+               "in smooth arcs — each with a fine violet midrib, and two clusters of crimson "
+               "dates hanging from the crown on either side of the trunk."),
     "lion": (lion, (-0.80, -0.25, 0.90, 1.45), 1.52, "striding lion",
              "a lion in profile walking to the right, body of ivory linen, a full crimson "
              "mane in stylised locks around the head and chest, a half-open muzzle, a small "
@@ -215,56 +248,95 @@ MOTIFS = {
 }
 
 
-# --- La lisière et la frise : ce qui reste dessiné ici. ---
+# --- La lisière, les bandes, le fleuron : ce qui reste dessiné ici. ---
 
 def rosace(u, z):
     """Une rosace de la lisière : le ציץ des parois (I Rois 6:29) repris en bordure — un
     CHOIX ; corolle de lin, cœur cramoisi."""
-    return [(corolle(u, z, 0.26, 8), 0.80, CLAIR), (ellipse(u, z, 0.08, 0.08), 0.65, CHAUD)]
+    return [(corolle(u, z, 0.32, 8), 0.80, CLAIR), (ellipse(u, z, 0.10, 0.10), 0.65, CHAUD)]
+
+
+def cadre_plein(u0, z0, u1, z1, hauteur, face):
+    return ([(u0, z0), (u1, z0), (u1, z1), (u0, z1)], hauteur, face)
 
 
 def lisiere():
     """La bordure : un champ pourpre entre deux filets de lin, semé de rosaces."""
-    z0, z1 = CHAMP
     L, F, g, d = LISIERE, LISTEL, -LARGEUR / 2, LARGEUR / 2
-    bas, haut = z0 - L, z1 + L
-    parties = []
-    for contour in ([(g, bas), (d, bas), (d, z0), (g, z0)], [(g, z1), (d, z1), (d, haut), (g, haut)],
-                    [(g, bas), (g + L, bas), (g + L, haut), (g, haut)],
-                    [(d - L, bas), (d, bas), (d, haut), (d - L, haut)]):
-        parties.append((contour, 0.50, POURPRE))
-    for (u0, z_0, u1, z_1) in ((g, bas, d, bas + F), (g, haut - F, d, haut), (g, bas, g + F, haut),
-                               (d - F, bas, d, haut), (g + L - F, z0 - F, d - L + F, z0),
-                               (g + L - F, z1, d - L + F, z1 + F), (g + L - F, z0 - F, g + L, z1 + F),
-                               (d - L, z0 - F, d - L + F, z1 + F)):
-        parties.append(([(u0, z_0), (u1, z_0), (u1, z_1), (u0, z_1)], 0.60, CLAIR))
-    # Les rosaces se suivent à une ama, une aux quatre coins ; les rangs verticaux
-    # partent du coin sans le redoubler.
-    axe_bas, axe_haut, axe_g, axe_d = bas + L / 2, haut - L / 2, g + L / 2, d - L / 2
-    for u in np.linspace(axe_g, axe_d, round(axe_d - axe_g) + 1):
+    parties = [cadre_plein(g, 0.0, d, HAUTEUR, 0.50, POURPRE),
+               cadre_plein(g + L, L, d - L, HAUTEUR - L, 0.0, FOND)]
+    for (u0, z0, u1, z1) in ((g, 0.0, d, F), (g, HAUTEUR - F, d, HAUTEUR), (g, 0.0, g + F, HAUTEUR),
+                             (d - F, 0.0, d, HAUTEUR), (g + L - F, L - F, d - L + F, L),
+                             (g + L - F, HAUTEUR - L, d - L + F, HAUTEUR - L + F),
+                             (g + L - F, L - F, g + L, HAUTEUR - L + F),
+                             (d - L, L - F, d - L + F, HAUTEUR - L + F)):
+        parties.append(cadre_plein(u0, z0, u1, z1, 0.60, CLAIR))
+    # Les rosaces se suivent à un peu plus d'une ama, une aux quatre coins ; les rangs
+    # verticaux partent du coin sans le redoubler.
+    axe_bas, axe_haut, axe_g, axe_d = L / 2, HAUTEUR - L / 2, g + L / 2, d - L / 2
+    for u in np.linspace(axe_g, axe_d, round((axe_d - axe_g) / 1.1) + 1):
         parties += rosace(u, axe_bas) + rosace(u, axe_haut)
-    for z in np.linspace(axe_bas, axe_haut, round(axe_haut - axe_bas) + 1)[1:-1]:
+    for z in np.linspace(axe_bas, axe_haut, round((axe_haut - axe_bas) / 1.1) + 1)[1:-1]:
         parties += rosace(axe_g, z) + rosace(axe_d, z)
     return parties
 
 
-def frise():
-    """Les places des figures : (motif, u de l'axe, z du pied, hauteur, sens) — créatures
-    et lions en alternance stricte, les lions d'un rang marchant vers ceux du rang
-    voisin, comme deux cortèges qui se croisent."""
-    z0, z1 = CHAMP
-    g = -LARGEUR / 2
-    # Les colonnes se partagent le champ ENTRE les lisières : réparties sur toute la
-    # largeur, celles des bords mordaient sur la bordure.
-    rang, pas = (z1 - z0) / RANGS, (LARGEUR - 2 * LISIERE) / COLONNES
-    places = []
-    for r in range(RANGS):
-        for i in range(COLONNES):
-            nom = "creature" if (i + r) % 2 == 0 else "lion"
-            h = min(rang * PART_FIGURE, pas * PART_COLONNE / MOTIFS[nom][2])
-            places.append((nom, g + LISIERE + pas * (i + 0.5), z0 + rang * r + (rang - h) / 2, h,
-                           1 if r % 2 == 0 else -1))
-    return places
+def guilloche(z0, z1):
+    """Une bande entre deux registres : deux fils de lin qui se croisent en tresse sur le
+    pourpre, un point cramoisi dans chaque maille — la torsade des cordons eux-mêmes."""
+    g, d, F = -LARGEUR / 2 + LISIERE, LARGEUR / 2 - LISIERE, LISTEL
+    zc, amplitude, periode = (z0 + z1) / 2, (z1 - z0) * 0.28, 1.1
+    parties = [cadre_plein(g, z0, d, z1, 0.50, POURPRE),
+               cadre_plein(g, z0, d, z0 + F * 0.6, 0.60, CLAIR), cadre_plein(g, z1 - F * 0.6, d, z1, 0.60, CLAIR)]
+    us = np.linspace(g, d, int((d - g) / periode * 16) + 1)
+    for phase in (0.0, np.pi):
+        fil = [(u, zc + amplitude * np.sin(2 * np.pi * (u - g) / periode + phase)) for u in us]
+        parties.append((ruban(fil, 0.09), 0.75, CLAIR))
+    for k in range(int((d - g) / periode)):
+        parties.append((ellipse(g + periode * (k + 0.25), zc, 0.09, 0.09), 0.65, CHAUD))
+        parties.append((ellipse(g + periode * (k + 0.75), zc, 0.09, 0.09), 0.65, CHAUD))
+    return parties
+
+
+def fleuron(u, z, r):
+    """« פְּטוּרֵי צִצִּים » (Melakhim I 6:29) : la rosette à six pétales des ossuaires de
+    Jérusalem, comme aux parois — en lin, à cœur cramoisi, les pétales séparés du fond."""
+    parties = [(corolle(u, z, r, 6), 0.85, CLAIR)]
+    for k in range(6):
+        a = np.pi * (2 * k + 1) / 6
+        parties.append((ruban([(u + 0.2 * r * np.cos(a), z + 0.2 * r * np.sin(a)),
+                               (u + 0.8 * r * np.cos(a), z + 0.8 * r * np.sin(a))], 0.05 * r), BOMBE_TRAIT, FOND))
+    parties.append((ellipse(u, z, 0.26 * r, 0.26 * r), 0.7, CHAUD))
+    return parties
+
+
+def ornements():
+    """Tout ce qui se dessine : la lisière, les deux bandes, le fleuron du centre."""
+    (b0, b1), (c0, c1), (h0, h1) = REGISTRES["bas"], REGISTRES["centre"], REGISTRES["haut"]
+    return lisiere() + guilloche(b1, c0) + guilloche(c1, h0) + fleuron(0.0, 25.3, 1.3)
+
+
+def composition():
+    """Les places des figures : (motif, u de l'axe, z du pied, hauteur, sens).
+
+    « וְעָשׂוּי כְּרוּבִים וְתִמֹרִים וְתִמֹרָה בֵּין־כְּרוּב לִכְרוּב » (Ye'hezkel 41:18) : la timora
+    entre deux keruvim, c'est la composition même des parois du Bayit, et le lion est
+    la seconde face du keruv (41:19), tournée vers la timora. Au centre, deux grands
+    keruvim dont les ailes se croisent au-dessus d'une timora — comme celles de la
+    kaporet, « סֹכְכִים בְּכַנְפֵיהֶם » (Ex. 25:20) —, et au-dessus d'eux deux lions en
+    cortège vers un fleuron. En bas, deux lions vers une timora ; en haut, keruv, timora,
+    keruv. Les lions, les keruvim et les timorot sont aussi ceux des panneaux du Temple
+    de Shlomo (Melakhim I 7:29, 36)."""
+    (b0, b1), (c0, c1), (h0, h1) = REGISTRES["bas"], REGISTRES["centre"], REGISTRES["haut"]
+    # La timora du centre est aussi grande que les corps des keruvim le permettent : ses
+    # palmes s'ouvrent sur 0,41 de sa hauteur de chaque côté. Les registres haut et bas
+    # restent nettement plus petits que le centre, sinon la hiérarchie s'écrase.
+    return [("timora", 0.0, b0 + 1.4, 5.0, 1), ("lion", -5.6, b0 + 1.8, 3.9, 1), ("lion", 5.6, b0 + 1.8, 3.9, -1),
+            ("timora", 0.0, c0 + 1.4, 6.0, 1),
+            ("creature", -4.5, c0 + 1.4, 8.2, 1), ("creature", 4.5, c0 + 1.4, 8.2, 1),
+            ("lion", -3.3, 23.5, 3.6, 1), ("lion", 3.3, 23.5, 3.6, -1),
+            ("timora", 0.0, h0 + 1.7, 4.0, 1),
+            ("creature", -5.6, h0 + 1.5, 4.6, 1), ("creature", 5.6, h0 + 1.5, 4.6, 1)]
 
 
 # --- Les guides, le tissage, la carte. ---
@@ -362,13 +434,13 @@ def figure_tissee(nom):
 
 def tisser():
     """(hauteur, faces, masque) : trois cartes de LARGEUR_PX sur le double, ligne 0 en bas ;
-    les faces portent (clarté, rougeur) sur leur dernier axe. La lisière se rasterise,
+    les faces portent (clarté, rougeur) sur leur dernier axe. Les ornements se rasterisent,
     les figures tissées se posent à leur place, chacune lue bilinéaire dans son cadre."""
     largeur, hauteur = LARGEUR_PX * SURECHANTILLON, LARGEUR_PX * SURECHANTILLON * 2
     echelle = largeur / LARGEUR
-    relief, faces = rasteriser(lisiere(), (-LARGEUR / 2, 0.0, LARGEUR / 2, HAUTEUR), largeur, echelle)
+    relief, faces = rasteriser(ornements(), (-LARGEUR / 2, 0.0, LARGEUR / 2, HAUTEUR), largeur, echelle)
     figures = {nom: figure_tissee(nom) for nom in MOTIFS}
-    for nom, u, z0, h, sens in frise():
+    for nom, u, z0, h, sens in composition():
         _, (cu0, cz0, cu1, cz1), _, _, _ = MOTIFS[nom]
         relief_fig, faces_fig, masque_fig = figures[nom]
         echelle_fig = TUILE_PX / (cu1 - cu0)
