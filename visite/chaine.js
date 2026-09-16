@@ -177,9 +177,9 @@ const COMPOSITION = {
 // Elle passe AVANT le halo, pour la même raison que le halo passe avant la sortie : la
 // lueur des braises dans la fumée est une haute lumière, et c'est elle qui doit déborder.
 //
-// Le parcours se fait au quart de la définition : à pleine définition il coûtait deux fois
-// toute la scène du Kodesh HaKodashim. La fumée est douce, un texel de plus ne s'y voit pas.
-// Il écrit la lumière reprise et, en alpha, ce qui traverse ; `VOILE` pose ça sur l'image.
+// Le parcours se fait en demi-définition, sur la grille de la passe de géométrie qu'il lit :
+// au quart les volutes perdent leur détail. Il écrit la lumière reprise et, en alpha, ce qui
+// traverse ; `VOILE` pose ça sur l'image.
 const FUMEE = {
   uniforms: { tGeo: { value: null },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
@@ -222,7 +222,17 @@ const FUMEE = {
     // la crête d'un bruit déformé par un autre bruit : fine, enroulée.
     float densite(vec3 p){
       float h = clamp((p.y - uBoiteMin.y) / (uBoiteMax.y - uBoiteMin.y), 0.0, 1.0);
+      float voile = 0.6 + 0.4 * h + 0.5 * (bruit(p * 0.15 + vec3(uTemps * 0.01, 0.0, -uTemps * 0.008)) - 0.5);
+      // Le déplacement du panache ne l'écarte jamais de plus de 0,45·dy : au-delà, ses
+      // volutes pèsent moins qu'un millième et ses quatre bruits ne changent rien.
       vec2 r = p.xz - uBraise.xz;
+      float dy = p.y - uBraise.y;
+      float montee = max(dy, 0.0);
+      float ecartMin = max(length(r) - 0.45 * montee, 0.0);
+      float rayon = 0.35 + 0.3 * montee;
+      float large = max(rayon * rayon, 0.04 + 0.12 * montee);
+      if (dy < -0.05 || uVolutes * exp(-ecartMin * ecartMin / large) < 1e-3) return uVoile * voile;
+
       float angle = uTemps * 0.04 + h * 1.5;
       float c = cos(angle), s = sin(angle);
       vec3 q = vec3(c * r.x - s * r.y, p.y - uTemps * 0.35, s * r.x + c * r.y) * 0.32;
@@ -231,12 +241,9 @@ const FUMEE = {
                     bruit(q * 0.7 + vec3(7.4, uTemps * 0.02, 1.3))) - 0.5;
       float crete = 1.0 - abs(fbm(q * 2.0 + w * 3.0) * 2.0 - 1.0);
       float volute = smoothstep(0.90, 0.995, crete);
-      float dy = p.y - uBraise.y;
-      vec2 d = r + w.xz * 0.6 * max(dy, 0.0);
-      float colonne = exp(-dot(d, d) / (0.04 + 0.12 * max(dy, 0.0))) * smoothstep(-0.05, 0.3, dy);
-      float rayon = 0.35 + 0.3 * max(dy, 0.0);
+      vec2 d = r + w.xz * 0.6 * montee;
+      float colonne = exp(-dot(d, d) / (0.04 + 0.12 * montee)) * smoothstep(-0.05, 0.3, dy);
       float panache = exp(-dot(d, d) / (rayon * rayon)) * smoothstep(-0.05, 0.3, dy);
-      float voile = 0.6 + 0.4 * h + 0.5 * (bruit(p * 0.15 + vec3(uTemps * 0.01, 0.0, -uTemps * 0.008)) - 0.5);
       return uVoile * voile + uVolutes * (volute * panache + 0.4 * colonne);
     }
 
@@ -289,7 +296,7 @@ const FUMEE = {
     }`,
 };
 
-// Le départ tiré au hasard de chaque texel, agrandi quatre fois, marbrerait la fumée : quatre
+// Le départ tiré au hasard de chaque texel, agrandi deux fois, marbrerait la fumée : quatre
 // prises bilinéaires décalées d'un texel le fondent.
 const VOILE = {
   uniforms: { tDiffuse: { value: null }, tFumee: { value: null }, uPas: { value: new THREE.Vector2() } },
@@ -401,7 +408,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     composeur.setSize(l, h);
     cibleGeo.setSize(Math.round(l * p * 0.5), Math.round(h * p * 0.5));
     cibleAO.setSize(cibleGeo.width, cibleGeo.height);
-    cibleFumee.setSize(Math.round(cibleGeo.width / 2), Math.round(cibleGeo.height / 2));
+    cibleFumee.setSize(cibleGeo.width, cibleGeo.height);
     voile.uniforms.uPas.value.set(1 / cibleFumee.width, 1 / cibleFumee.height);
     halo?.setSize(l * p, h * p);
     arretes.material.uniforms.resolution.value.set(1 / (l * p), 1 / (h * p));
