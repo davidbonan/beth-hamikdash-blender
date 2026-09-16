@@ -24,7 +24,7 @@ const RAYON = 0.38;       // demi-largeur du marcheur
 // peau : la première contremarche qu'elle voit est deux girons plus loin, jamais
 // celle qu'on s'apprête à gravir.
 // MONTEE suit la plus haute marche du parcours : celle d'une ama qui porte le Doukhan
-// (Middot 2:6), sur toute la largeur de la cour. À 0,28 m, l'Azara restait hors d'atteinte.
+// (Middot 2:6, selon R. Eliézer ben Yaakov), sur toute la largeur de la cour. À 0,28 m, l'Azara restait hors d'atteinte.
 const MARCHE = 0.5 * 0.48; // 1/2 ama
 const MONTEE = AMA + 0.02;
 const CHUTE = 0.60;        // au-delà, il n'y a pas de sol : le pas est refusé

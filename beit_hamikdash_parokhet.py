@@ -5,12 +5,13 @@
     /Applications/Blender.app/Contents/MacOS/Blender -b -P beit_hamikdash_parokhet.py -- --tisser lion    # une figure
 
 « מַעֲשֵׂה חֹשֵׁב יַעֲשֶׂה אֹתָהּ כְּרֻבִים » (Ex. 26:31) : créatures ailées et lions en alternance,
-tissés dans les mêmes quatre laines — jamais d'or (le verset n'en liste que quatre),
+tissés dans les mêmes quatre matières, trois laines et le lin — jamais d'or (le verset
+n'en liste que quatre),
 jamais brodés, et sans un visage humain (§9 de la fiche). Une figure TISSÉE n'est pas
 un volume : elle bombe l'étoffe de quelques centimètres et s'en distingue par la FACE
 du tissage qui la montre — « אֲרִיגָה שֶׁל שְׁתֵּי קִירוֹת » (Rashi, ibid.), deux parois de
 fils dont l'une passe devant l'autre là où le dessin le veut. Chaque cordon porte les
-quatre laines (Shekalim 8:5) ; ce qui change d'une face à l'autre, c'est celle qui
+quatre matières (Shekalim 8:5) ; ce qui change d'une face à l'autre, c'est celle qui
 affleure : le fond montre ses tekhelet et argaman, la figure ses lin et tola'at shani.
 Le lion du sceau de Shema, serviteur de Yarovam, en est le contemporain hébreu.
 
@@ -34,7 +35,7 @@ de la face (0 les laines sombres, 1 le lin), B sa ROUGEUR (0 tekhelet, 1 tola'at
 shani), alpha le MASQUE de la figure. Deux axes de dosage plutôt qu'un index de face :
 un index ne survit pas au filtrage — entre un lion clair et le fond, la moyenne des
 deux textures voisines tombait sur une troisième couleur ; un dosage moyenné reste
-un dosage. Et `visite/matieres/parokhet.json` : les quatre laines, les dosages des
+un dosage. Et `visite/matieres/parokhet.json` : les quatre matières, les dosages des
 faces et la palette qui en sort, que le blockout lit (`parokhet()`) ; la visite
 (`visite/matieres.js`) porte la même palette en constantes. Le WebP est sans perte
 (`beit_hamikdash_carte.py`). Demande `cwebp` sur le PATH, et FAL_AI_KEY (`.env`) pour
@@ -88,8 +89,8 @@ RONDEUR, GRAIN, PART_MODELE = 0.06, 0.004, 0.35
 # rouge et sur le bleu (valeurs du fichier) — aucune laine n'est verte.
 VERT = 0.12
 
-# Les quatre laines (Shekalim 8:5 ; Rashi Ex. 26:31), en linéaire : tekhelet, argaman,
-# tola'at shani, lin — et les FACES du tissage, en dosage de ces quatre laines, aux
+# Les quatre matières (Shekalim 8:5 ; Rashi Ex. 26:31), en linéaire : tekhelet, argaman,
+# tola'at shani, lin — et les FACES du tissage, en dosage de ces quatre matières, aux
 # coins d'un carré (clarté, rougeur) que la carte parcourt : le fond bleu-violet, le
 # chaud cramoisi, le clair de lin, et le coin lin-cramoisi qu'un fondu atteint. Aucun
 # dosage n'est pur : un rouge de tola'at seule et un lin blanc sur le violet faisaient

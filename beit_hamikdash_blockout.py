@@ -969,7 +969,7 @@ def bois_sculpte(name, rgb):
     _creuser(mat, rinceaux.outputs["Factor"], 0.9, 0.05)
     return mat
 
-# Les quatre laines de la parokhet (Shekalim 8:5 ; Rashi Ex. 26:31) — tekhelet,
+# Les quatre matières de la parokhet (Shekalim 8:5 ; Rashi Ex. 26:31) — tekhelet,
 # argaman, tola'at shani, lin, et aucun fil d'or (Ex. 26:31) —, les FACES du tissage
 # qui les dosent et la palette qui en sort, tels que beit_hamikdash_parokhet.py les
 # écrit dans parokhet.json : c'est lui la source, la carte tissée en dépend.
@@ -988,7 +988,7 @@ DOSAGES_PAROKHET = {face: tuple(parts) for face, parts in _PAROKHET["dosages"].i
 JOUR_PAROKHET = _PAROKHET["jour"]
 PALETTE_PAROKHET = {face: tuple(rgb) for face, rgb in _PAROKHET["palette"].items()}
 NIMA = 20 / 72   # amot : les 72 נִימִין de Shekalim 8:5 réparties sur les 20 amot de large
-# La moyenne des quatre laines, et de combien un cordon s'en écarte. Les quatre teintes
+# La moyenne des quatre matières, et de combien un cordon s'en écarte. Les quatre teintes
 # pures, tirées cordon par cordon, rendaient une neige de télévision : à dix amot un
 # cordon fait un pixel, et quatre couleurs saturées tirées au sort par pixel ne se
 # fondent pas, elles crépitent. Un fil de 24 brins qui contient les quatre EST de la
@@ -1057,7 +1057,7 @@ def parokhet(name):
 
     « וְעַל שִׁבְעִים וּשְׁתַּיִם נִימִין נֶאֱרֶגֶת, וְעַל כָּל נִימָא וְנִימָא עֶשְׂרִים וְאַרְבָּעָה חוּטִין »
     (Shekalim 8:5), et Rashi Ex. 26:31 : « כָּל מִין וָמִין הָיָה כָפוּל בְּכָל חוּט וָחוּט שִׁשָּׁה
-    חוּטִין ». Les quatre laines sont retordues DANS chaque fil : le champ est un pourpre
+    חוּטִין ». Les quatre matières — trois laines et le lin — sont retordues DANS chaque fil : le champ est un pourpre
     changeant où les quatre teintes se lisent de près, pas un drapeau à quatre bandes —
     huit champs de cinq amot rendaient un pavillon national en travers du Devir.
 
@@ -3794,10 +3794,10 @@ for k in range(6):
 cyl_between("Lishkat_HaGola_galgal_corde", (BOR_X + 0.9, BOR_Y, GALGAL_Z), (BOR_X + 0.9, BOR_Y, Z_EZN + 2.5),
             0.04, "80_Lishkot", MAT_CHENE(), verts=6)
 # Lishkat HaEtz, en second rang : « וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), sur la
-# largeur des deux autres. Elle ne peut pas être dans l'Azara : entre le mur nord et le
-# socle du Sanctuaire il ne reste que 17,5 amot (135 − 100, moitié), et à l'est de
-# celui-ci le Beit HaMitba'haïm tient le terrain — pas de quoi loger un corps derrière
-# un autre. Elle est donc entière dans le 'hol, ce que la Mishna ne dit pas d'elle
+# largeur des deux autres. Elle ne tient pas dans l'Azara : à son droit, entre le mur nord
+# et le Heikhal, il reste 32,5 amot (70 de corps, Middot 4:7), et cette bande est le
+# « nord » de l'abattage, le Beit HaMitba'haïm à l'est — pas de quoi loger un corps
+# derrière un autre. Elle est donc entière dans le 'hol, ce que la Mishna ne dit pas d'elle
 # (« שֵׁשׁ לְשָׁכוֹת הָיוּ בָעֲזָרָה », Middot 5:3) : c'est le prix du second rang, et il est
 # écrit ici. R. Eliezer ben Yaakov : « שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת » — sans usage connu,
 # pas d'ouverture connue non plus ; CHOIX, une porte sur le 'Heil.
@@ -5325,7 +5325,7 @@ for suffixe, xa, xb, ya, yb in POURTOUR_TOIT:
         box(f"Kaleh_orev_{suffixe}", c - LAME_EP / 2, c + LAME_EP / 2, ya, yb,
             Z_TOIT + MAAKE_H, Z_FAITE, "50_Heikhal", MAT_FER_LAME())
 
-# --- Ustensiles du Heikhal (Yoma 33b ; Menachot 98b) : dans les deux tiers ouest,
+# --- Ustensiles du Heikhal (Yoma 33b ; Menachot 98b) : dans la moitié ouest,
 #     à 2.5 amot des murs. Table au NORD, Menora au SUD, autel d'or entre les deux, vers l'est.
 XU = -125
 # Shoul'han 2 × 1 × 1.5, longueur E-O (Rambam Beit HaBe'hira 3:12), à 2,5 amot du mur nord (Yoma 33b)
@@ -5358,7 +5358,7 @@ def shulchan(nom, x, avec_pain):
         Z_SNIF = Z_TABLE + 6 * PAS_PAIN + 0.3
         for cote, y in (("S", YS0 - 0.1), ("N", YS1 + 0.1)):
             box(f"Snif_{k}{cote}", (x0 + x1) / 2 - 0.08, (x0 + x1) / 2 + 0.08, y - 0.04, y + 0.04, Z_BAT, Z_SNIF, "70_Kelim", MAT_OR())
-        # bazikh d'encens posé sur la pile (Rambam 3:14)
+        # bazikh d'encens posé sur la pile, selon les Sages (Mena'hot 11:5) ; CHOIX, le Rambam le met à côté (Beit HaBe'hira 3:14)
         cyl(f"Bazikh_{k}", (x0 + x1) / 2, (YS0 + YS1) / 2, Z_TABLE + 5 * PAS_PAIN + TEFAH, Z_TABLE + 5 * PAS_PAIN + TEFAH + 0.12, 0.15, "70_Kelim", MAT_OR())
 
 
@@ -5542,7 +5542,8 @@ for k, (creux, z_haut) in enumerate(((3.0, 38.6), (4.5, 37.6), (6.0, 36.6))):
 
 # --- Kodesh HaKodashim : Even HaShetiya. « גְּבוֹהָה מִן הָאָרֶץ שָׁלשׁ אֶצְבָּעוֹת » (Yoma 5:2) est sa
 #     seule cote : le rocher perce le sol d'or sans jamais le dépasser de 3 doigts, et il
-#     est au centre, « רֶיוַח עֶשֶׂר אַמּוֹת לְכׇל רוּחַ » autour de l'Arche (Bava Batra 99a).
+#     est au centre, CHOIX : le « רֶיוַח עֶשֶׂר אַמּוֹת » de Bava Batra 99a est un miracle, pas une place,
+#     et le Rambam la met « בְּמַעֲרָבוֹ » (Beit HaBe'hira 4:1).
 #     Contour, emprise et relief : CHOIX ; plat là où l'Arche et la ma'hta se posent.
 #     C'est du calcaire en place, et il se lit comme tel : un contour à arêtes, cassé le
 #     long de ses diaclases, une face verticale sur tout son tour, et un dessus en lits —
