@@ -21,12 +21,9 @@
  * elle —, et une colonne posée sur un dallage y semble collée dessus. La passe
  * ci-dessous rend cette part-là.
  *
- * Il ne lit PAS le tampon de profondeur. La visite tourne en profondeur
- * logarithmique — le plaquage d'or est posé exactement sur la pierre qu'il couvre —,
- * et une profondeur logarithmique ne se reconvertit pas en distance sans connaître
- * l'encodage exact du moteur. Une passe séparée écrit donc la normale et la distance
- * en clair, en mètres, dans une cible flottante : ce qu'on y lit ne dépend d'aucun
- * réglage du moteur.
+ * Il ne lit PAS le tampon de profondeur, multi-échantillonné et encodé par le moteur.
+ * Une passe séparée écrit donc la normale et la distance en clair, en mètres, dans une
+ * cible flottante : ce qu'on y lit ne dépend d'aucun réglage du moteur.
  */
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
@@ -179,8 +176,12 @@ const COMPOSITION = {
 //
 // Elle passe AVANT le halo, pour la même raison que le halo passe avant la sortie : la
 // lueur des braises dans la fumée est une haute lumière, et c'est elle qui doit déborder.
+//
+// Le parcours se fait au quart de la définition : à pleine définition il coûtait deux fois
+// toute la scène du Kodesh HaKodashim. La fumée est douce, un texel de plus ne s'y voit pas.
+// Il écrit la lumière reprise et, en alpha, ce qui traverse ; `VOILE` pose ça sur l'image.
 const FUMEE = {
-  uniforms: { tDiffuse: { value: null }, tGeo: { value: null },
+  uniforms: { tGeo: { value: null },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
               uBoiteMin: { value: new THREE.Vector3() }, uBoiteMax: { value: new THREE.Vector3() },
               uBraise: { value: new THREE.Vector3() }, uTemps: { value: 0 },
@@ -189,7 +190,7 @@ const FUMEE = {
   defines: { PAS: PROFIL.fumee.pas, OCTAVES: PROFIL.fumee.octaves },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
-    uniform sampler2D tDiffuse, tGeo;
+    uniform sampler2D tGeo;
     uniform float uTanFov, uAspect, uTemps, uVoile, uVolutes, uLueur, uLampe;
     uniform mat4 uMonde;
     uniform vec3 uBoiteMin, uBoiteMax, uBraise;
@@ -255,8 +256,6 @@ const FUMEE = {
     }
 
     void main(){
-      vec4 c = texture2D(tDiffuse, vUv);
-      if (uBoiteMax.x <= uBoiteMin.x) { gl_FragColor = c; return; }   // aucune pièce enfumée
       float z = texture2D(tGeo, vUv).a;
       vec3 dirVue = normalize(vec3((vUv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0), -1.0));
       vec3 o = uMonde[3].xyz;
@@ -267,7 +266,7 @@ const FUMEE = {
       vec3 tmin = min(a, b), tmax = max(a, b);
       float t0 = max(max(tmin.x, tmin.y), max(tmin.z, 0.0));
       float t1 = min(min(tmax.x, tmax.y), min(tmax.z, portee));
-      if (t1 <= t0) { gl_FragColor = c; return; }
+      if (t1 <= t0) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
       // Pas en progression quadratique : fins près de l'œil, où une volute se voit en
       // détail, longs au loin, où elle ne couvre que quelques pixels. Un départ tiré au
       // hasard par pixel, sinon les pas se liraient en strates.
@@ -286,7 +285,24 @@ const FUMEE = {
         T *= 1.0 - alpha;
         if (T < 0.02) break;
       }
-      gl_FragColor = vec4(c.rgb * T + L, c.a);
+      gl_FragColor = vec4(L, T);
+    }`,
+};
+
+// Le départ tiré au hasard de chaque texel, agrandi quatre fois, marbrerait la fumée : quatre
+// prises bilinéaires décalées d'un texel le fondent.
+const VOILE = {
+  uniforms: { tDiffuse: { value: null }, tFumee: { value: null }, uPas: { value: new THREE.Vector2() } },
+  vertexShader: OCCLUSION.vertexShader,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse, tFumee;
+    uniform vec2 uPas;
+    varying vec2 vUv;
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      vec4 f = 0.25 * (texture2D(tFumee, vUv + uPas * vec2(-1.0, -1.0)) + texture2D(tFumee, vUv + uPas * vec2(1.0, -1.0))
+                     + texture2D(tFumee, vUv + uPas * vec2(-1.0, 1.0)) + texture2D(tFumee, vUv + uPas * vec2(1.0, 1.0)));
+      gl_FragColor = vec4(c.rgb * f.a + f.rgb, c.a);
     }`,
 };
 
@@ -340,6 +356,7 @@ const ETALONNAGE = {
 export function chaine(renderer, scene, camera, horsGeo = []) {
   const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
   const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
+  const cibleFumee = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
 
   const teinteFond = new THREE.Color();
   const composeur = new EffectComposer(renderer,
@@ -352,7 +369,10 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   composeur.addPass(passeComposition);
   const fumee = new ShaderPass(FUMEE);
   fumee.uniforms.tGeo.value = cibleGeo.texture;
-  composeur.addPass(fumee);
+  const voile = new ShaderPass(VOILE);
+  voile.uniforms.tFumee.value = cibleFumee.texture;
+  voile.enabled = false;
+  composeur.addPass(voile);
 
   // Le halo passe AVANT la sortie, donc avant le tonemapping : la cible du composeur
   // est en demi-flottant et garde le linéaire, et c'est là seulement que le soleil sur
@@ -381,6 +401,8 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     composeur.setSize(l, h);
     cibleGeo.setSize(Math.round(l * p * 0.5), Math.round(h * p * 0.5));
     cibleAO.setSize(cibleGeo.width, cibleGeo.height);
+    cibleFumee.setSize(Math.round(cibleGeo.width / 2), Math.round(cibleGeo.height / 2));
+    voile.uniforms.uPas.value.set(1 / cibleFumee.width, 1 / cibleFumee.height);
     halo?.setSize(l * p, h * p);
     arretes.material.uniforms.resolution.value.set(1 / (l * p), 1 / (h * p));
     passeComposition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
@@ -392,12 +414,19 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   /** La pièce enfumée (Box3, en mètres) et le point d'où monte la fumée. Le rayon d'un
    *  pixel qui n'entre pas dans la boîte — ou que la géométrie arrête avant — n'y coûte
-   *  qu'un test : la passe ne pèse que sur ce qui regarde vraiment dans la pièce. */
+   *  qu'un test, et une pièce hors du champ ne coûte aucune passe. */
+  let pieceEnfumee = null;
+  const champ = new THREE.Frustum();
+  const vueProjetee = new THREE.Matrix4();
   function enfumer(boite, braise) {
+    pieceEnfumee = boite.clone();
     fumee.uniforms.uBoiteMin.value.copy(boite.min);
     fumee.uniforms.uBoiteMax.value.copy(boite.max);
     fumee.uniforms.uBraise.value.copy(braise);
   }
+
+  const pieceEnfumeeVue = () => pieceEnfumee !== null && champ.setFromProjectionMatrix(
+    vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(pieceEnfumee);
 
   function rendre() {
     for (const o of horsGeo) o.visible = false;
@@ -418,6 +447,8 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
     passeAO.render(renderer, cibleAO, null, 0, false);
+    voile.enabled = pieceEnfumeeVue();
+    if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
     renderer.setRenderTarget(null);
     composeur.render();
   }
