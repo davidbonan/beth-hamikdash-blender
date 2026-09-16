@@ -122,7 +122,7 @@ const FAMILLES = {
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Peau: ETOFFE,
   Eau_Kiyor: EAU,
-  Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT,
+  Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE,
 };
 

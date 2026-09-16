@@ -499,13 +499,15 @@
   "menora": {
     "nom": "Menora",
     "translit": "Menora",
-    "resume": "The pure gold candelabrum, hammered from a single piece, stands to the south of the Heikhal, two and a half amot from the wall, facing the Table. It is 18 tefachim high, that is three amot, about 1.44 meters. Seven branches, in a single plane oriented north-south according to R. Elazar b. R. Shimon and the Rambam, adorned with 22 cups, 11 knobs and 9 flowers, on a base with three feet. In front of it, three stone steps, for the Kohen who comes to trim the wicks. Its seven flames are the only warm light in the room.",
+    "resume": "The pure gold candelabrum, hammered from a single piece, stands to the south of the Heikhal, two and a half amot from the wall, facing the Table. It is 18 tefachim high, that is three amot, about 1.44 meters. Seven branches, in a single plane oriented north-south according to R. Elazar b. R. Shimon and the Rambam, adorned with 22 cups, 11 knobs and 9 flowers, on a base with three feet. The six lamps of the branches turn their spouts toward the middle one, whose spout faces the Kodesh HaKodashim. In front of it, three stone steps, for the Kohen who comes to trim the wicks; between the two stages of that work, he leaves the kuz, a large gold pitcher, on the second step. Its seven flames are the only warm light in the room.",
     "cotes": [
       "18 tefachim (3 amot) high ≈ 1.44 m",
       "seven branches",
       "22 cups, 11 knobs, 9 flowers",
       "2.5 amot from the south wall",
-      "three stone steps in front"
+      "three stone steps in front",
+      "lamps evenly spaced 3 tefachim apart",
+      "the kuz on the second step"
     ],
     "sources": [
       {
@@ -539,6 +541,21 @@
         "citation": "וְכֵן נֵרוֹת הַמְּנוֹרָה כְּנֶגֶד רֹחַב הַבַּיִת בֵּין הַצָּפוֹן וּבֵין הַדָּרוֹם"
       },
       {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:8",
+        "citation": "כֻּלָּן פְּנֵיהֶם לַנֵּר הָאֶמְצָעִי שֶׁעַל קְנֵי הַמְּנוֹרָה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:9",
+        "citation": "הַגְּבִיעִים דּוֹמִין לְכוֹסוֹת אֲלֶכְּסַנְדְּרִיאָה שֶׁפִּיהֶן רָחָב וְשׁוּלֵיהֶן קָצָר"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:9",
+        "citation": "וְהִנִּיחַ אֶת הַכּוּז עַל מַעֲלָה שְׁנִיָּה"
+      },
+      {
         "oeuvre": "Rashi Exode",
         "ref": "25:32",
         "citation": "לְכָאן וּלְכָאן בַּאֲלַכְסוֹן"
@@ -549,7 +566,7 @@
         "citation": "ראיתי לצייר בכאן צורת המנורה שלימה"
       }
     ],
-    "note": "Adopted: the lamps aligned north to south, with R. Elazar b. R. Shimon (Menachot 98b) and the Rambam (Beit HaBechirah 3:12). Set aside: Rabbi, for whom the Menora stood east to west (Menachot 98b). Adopted: straight branches rising on a diagonal, following the Rambam's drawing (Commentary on the Mishna, Menachot 3:7) and Rashi (on Exodus 25:32). Set aside: the rounded branches of common depictions."
+    "note": "Adopted: the lamps aligned north to south, with R. Elazar b. R. Shimon (Menachot 98b) and the Rambam (Beit HaBechirah 3:12). Set aside: Rabbi, for whom the Menora stood east to west (Menachot 98b). Adopted: straight branches rising on a diagonal, following the Rambam's drawing (Commentary on the Mishna, Menachot 3:7) and Rashi (on Exodus 25:32). Set aside: the rounded branches of common depictions. Adopted: the cups upside down, mouth downward, as in the Rambam's drawing. His commentary nonetheless describes the cup as narrow at the bottom, and warns that the drawing does not show its exact form, only the number and placement of the ornaments (Rambam on Menachot 3:7)."
   },
   "shulchan": {
     "nom": "Shulchan and the Lechem HaPanim",

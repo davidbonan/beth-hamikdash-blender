@@ -502,13 +502,15 @@
   "menora": {
     "he": "מנורה",
     "translit": "Menora",
-    "resume": "Le chandelier d'or pur, martelé d'une seule pièce, se tient au sud du Heikhal, à deux amot et demie du mur, face à la Table. Il fait 18 tefa'him de haut, soit trois amot, environ 1,44 mètre. Sept branches, dans un même plan orienté nord-sud selon R. Elazar b. R. Shimon et le Rambam, ornées de 22 coupes, 11 pommes et 9 fleurs, sur un pied à trois pieds. Devant lui, trois marches de pierre, pour le cohen qui vient préparer les mèches. Ses sept flammes sont la seule lumière chaude de la salle.",
+    "resume": "Le chandelier d'or pur, martelé d'une seule pièce, se tient au sud du Heikhal, à deux amot et demie du mur, face à la Table. Il fait 18 tefa'him de haut, soit trois amot, environ 1,44 mètre. Sept branches, dans un même plan orienté nord-sud selon R. Elazar b. R. Shimon et le Rambam, ornées de 22 coupes, 11 pommes et 9 fleurs, sur un pied à trois pieds. Les six lampes des branches tournent leur bec vers celle du milieu, dont le bec regarde le Kodesh HaKodashim. Devant lui, trois marches de pierre, pour le cohen qui vient préparer les mèches ; entre les deux temps de ce travail, il laisse sur la deuxième le kuz, une grande cruche d'or. Ses sept flammes sont la seule lumière chaude de la salle.",
     "cotes": [
       "18 tefa'him (3 amot) de haut ≈ 1,44 m",
       "sept branches",
       "22 coupes, 11 pommes, 9 fleurs",
       "à 2,5 amot du mur sud",
-      "trois marches de pierre devant"
+      "trois marches de pierre devant",
+      "lampes à pas égal de 3 tefa'him",
+      "le kuz sur la deuxième marche"
     ],
     "sources": [
       {
@@ -542,6 +544,21 @@
         "citation": "וְכֵן נֵרוֹת הַמְּנוֹרָה כְּנֶגֶד רֹחַב הַבַּיִת בֵּין הַצָּפוֹן וּבֵין הַדָּרוֹם"
       },
       {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:8",
+        "citation": "כֻּלָּן פְּנֵיהֶם לַנֵּר הָאֶמְצָעִי שֶׁעַל קְנֵי הַמְּנוֹרָה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:9",
+        "citation": "הַגְּבִיעִים דּוֹמִין לְכוֹסוֹת אֲלֶכְּסַנְדְּרִיאָה שֶׁפִּיהֶן רָחָב וְשׁוּלֵיהֶן קָצָר"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:9",
+        "citation": "וְהִנִּיחַ אֶת הַכּוּז עַל מַעֲלָה שְׁנִיָּה"
+      },
+      {
         "oeuvre": "Rashi Exode",
         "ref": "25:32",
         "citation": "לְכָאן וּלְכָאן בַּאֲלַכְסוֹן"
@@ -552,7 +569,7 @@
         "citation": "ראיתי לצייר בכאן צורת המנורה שלימה"
       }
     ],
-    "note": "Retenu : les lampes alignées du nord au sud, avec R. Elazar b. R. Shimon (Mena'hot 98b) et le Rambam (Beit HaBe'hira 3:12). Écarté : Rabbi, pour qui la Menora était placée d'est en ouest (Mena'hot 98b). Retenu : des branches droites, montant en diagonale, selon le dessin du Rambam (commentaire de la Michna, Mena'hot 3:7) et Rashi (sur Exode 25:32). Écarté : les branches arrondies des représentations courantes."
+    "note": "Retenu : les lampes alignées du nord au sud, avec R. Elazar b. R. Shimon (Mena'hot 98b) et le Rambam (Beit HaBe'hira 3:12). Écarté : Rabbi, pour qui la Menora était placée d'est en ouest (Mena'hot 98b). Retenu : des branches droites, montant en diagonale, selon le dessin du Rambam (commentaire de la Michna, Mena'hot 3:7) et Rashi (sur Exode 25:32). Écarté : les branches arrondies des représentations courantes. Retenu : les coupes renversées, bouche en bas, comme au dessin du Rambam. Son commentaire décrit pourtant la coupe étroite en bas, et prévient que le dessin n'en montre pas la forme exacte, seulement le nombre et la place des ornements (Rambam sur Mena'hot 3:7)."
   },
   "shulchan": {
     "he": "שולחן",
