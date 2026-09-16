@@ -130,15 +130,11 @@ const CONCEPTS = await conceptsEn(langue());
 // ---------------------------------------------------------------------------
 // scène
 // ---------------------------------------------------------------------------
-// Profondeur logarithmique : le plaquage d'or du Heikhal est posé exactement sur la
-// pierre qu'il couvre, et la scène va du centimètre d'une flamme aux 240 m de
-// l'esplanade. Un tampon linéaire y fait clignoter les deux surfaces l'une dans
-// l'autre. Elle écrit en revanche la profondeur depuis le nuanceur, ce qui prive les
-// GPU à tuiles de leur tri préalable : le profil léger s'en passe, et compte pour ça
-// sur le seul écart qui reste à départager, les 4,8 cm du placage.
-const renderer = new THREE.WebGLRenderer({
-  powerPreference: "high-performance",
-  logarithmicDepthBuffer: PROFIL.profondeurLog });
+// Pas de profondeur logarithmique : écrite depuis le nuanceur, elle éteint le test de
+// profondeur anticipé, et tout ce que les murs cachent passait par la matière — le
+// Heikhal ombrait la cour entière derrière lui. Le tampon linéaire départage encore les
+// 4,8 cm du placage d'or à trois cents mètres.
+const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance" });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.68;
 EXPOSITION.value = renderer.toneMappingExposure;
