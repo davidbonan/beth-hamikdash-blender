@@ -5119,7 +5119,7 @@ TR0, TR1 = HK1, HK1 - 1                 # Amah Traksin : -138 → -139
 KK0, KK1 = TR1, TR1 - 20                # Kodesh HaKodashim : -139 → -159
 ARON_Y_BAD = 1.38                       # les badim, hors des flancs de l'Arche (1,25 + anneau)
 ARON_Z_BAD = Z_BAT + 0.125 + 1.35       # à hauteur des anneaux, coins supérieurs de la caisse
-ARON_X_MACHTA = (KK0 + KK1) / 2 + 1.15  # la ma'hta entre les badim, au pied de la face est
+ARON_X_MACHTA = (KK0 + KK1) / 2 + 2.5   # la ma'hta entre les badim, assez loin de la face est pour que ses braises montent sur les keruvim
 # Les fenêtres hautes du Heikhal, « שְׁקוּפִים אֲטוּמִים » (Melakhim I 6:4 ; Mena'hot 86b) :
 # étroites dedans, larges dehors, « להוציא אורה לעולם » (Rashi sur Mena'hot 86b).
 # Elles étaient des boîtes de chaux noyées dans le mur, coplanaires avec ses deux
@@ -5784,7 +5784,7 @@ KKC = (KK0 + KK1) / 2
 DOIGT = 1 / 24
 ZE = Z_BAT + 3 * DOIGT      # le haut de la pierre, où l'Arche se pose
 SHETIYA_CENTRE, SHETIYA_DEMI_AXES = (KKC + 0.2, 0.1), (4.1, 4.6)
-SHETIYA_ASSISE = (KKC - 0.9, KKC + 1.6, -1.45, 1.45)   # l'Arche, ce qui est devant elle, la ma'hta
+SHETIYA_ASSISE = (KKC - 0.9, ARON_X_MACHTA + 0.45, -1.45, 1.45)   # l'Arche, ce qui est devant elle, la ma'hta
 # Les arêtes du contour, (direction en degrés, rayon en fraction des demi-axes) : le bord
 # va droit de l'une à l'autre. Deux rentrants (0,72) sont des blocs partis.
 SHETIYA_ARETES = ((0, 1.00), (24, 0.86), (58, 1.04), (85, 0.72), (110, 0.95), (150, 1.02), (172, 0.84),
@@ -5947,7 +5947,7 @@ for ns, sy in (("N", 1), ("S", -1)):
     cyl_between(f"Aron_bad_{ns}", (ARON_X0 - 0.5, sy * ARON_Y_BAD, ARON_Z_BAD),
                 (TR0 + 0.10, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
 
-# --- La ma'hta de Kippour, « בֵּין שְׁנֵי הַבַּדִּים » (Yoma 5:1), posée sur la pierre au pied de la
+# --- La ma'hta de Kippour, « בֵּין שְׁנֵי הַבַּדִּים » (Yoma 5:1), posée sur la pierre devant la
 #     face est de l'Arche. Ce jour-là elle est d'or, tient trois kabin, est légère et son
 #     manche est long, pour que l'avant-bras en porte le poids (Yoma 4:4) ; le Cohen Gadol
 #     l'a portée de la main droite (Rambam, Avodat Yom HaKippurim 4:1). Bassin tronconique

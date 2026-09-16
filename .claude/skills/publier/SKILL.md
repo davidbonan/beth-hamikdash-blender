@@ -21,7 +21,7 @@ Netlify porte le certificat. `davidbonan.io/visite` redirige en 301 vers ici.
 ## La séquence
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # si le .blend a bougé
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # si le .blend a bougé — sans --sans-occlusion
 python3 beit_hamikdash_traductions.py                          # doit répondre « traductions à jour »
 ./construire_site.sh && (cd dist && python3 -m http.server 8790)   # relecture locale, facultative
 git add -u site visite && git commit && git push origin main
@@ -33,7 +33,7 @@ montre est toujours le HEAD de `main`, jamais l'arbre de travail.
 ## Ce que `construire_site.sh` filtre, et pourquoi pas de `<base>`
 
 Le script rsync `index.html`, les `.js`, les `.json`, `temple.glb`, `figures.glb`,
-`apercu.jpg`, `mini_*.png`, `matieres/*.webp` et `plans/*.webp` vers `dist/visite/`, en
+`apercu.jpg`, `mini_*.png`, `matieres/*.webp`, `plans/*.webp` et `occlusion/*.webp` vers `dist/visite/`, en
 `--delete`. Le reste de `visite/` (scans, profils de navigateur) ne part pas.
 
 Servie à `/visite/` à la racine du domaine, la page résout ses chemins relatifs sans
@@ -135,8 +135,8 @@ dit ; la capture montre l'affiche. Les huit images se vérifient en 200 sur
 
 ## Ce qui a déjà mordu
 
-- **Le cache** : HTML et JSON sont servis en `must-revalidate`, les `.glb` et les textures
-  avec un jour de cache. Une vieille scène après un push veut dire un `temple.glb` non
+- **Le cache** : seules les pages HTML se revalident ; tout le reste est `immutable` sous
+  son empreinte. Une vieille scène après un push veut dire un `temple.glb` non
   regénéré ou non commité, pas un cache à purger — vérifier `git log -1 -- visite/temple.glb`.
 - **Le build Netlify clone le dépôt**, .blend compris : c'est lent mais ça passe. Si un
   jour ça ne passe plus, `netlify deploy --prod --dir=dist` depuis la machine.

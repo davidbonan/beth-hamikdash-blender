@@ -9,7 +9,11 @@ matières) puis quitte. Ne jamais y appeler `wm.save_mainfile`.
 
 Il produit deux fichiers :
     visite/temple.glb    la géométrie, un maillage par concept
-    visite/reperes.json  l'emprise de chaque concept et les points d'entrée
+    visite/reperes.json  l'emprise de chaque concept, les points d'entrée et les cartes d'occlusion
+    visite/occlusion/    l'occlusion du ciel cuite par Cycles (`beit_hamikdash_occlusion.py`)
+
+`-- --sans-occlusion` saute la cuisson (quelques minutes) : le .glb sort alors sans couche
+d'occlusion, et reperes.json sans cartes, ce qui reste cohérent.
 
 Le lien géométrie ↔ encyclopédie passe par `visite/concepts.json` : chaque concept y
 déclare les préfixes de noms d'objets qui lui appartiennent, le préfixe le plus long
@@ -26,6 +30,9 @@ import sys
 import bpy
 
 RACINE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(RACINE))
+from beit_hamikdash_occlusion import cuire_occlusion  # noqa: E402
+
 DOSSIER = RACINE / "visite"
 AMA = 0.48
 
@@ -257,15 +264,18 @@ def main():
 
     chanfreiner(gardes)
 
-    for mat in bpy.data.materials:
-        aplatir(mat)
-
-    emprises = {}
+    emprises, fusionnes = {}, {}
     for ident in sorted(groupes):
         objets = sorted(groupes[ident], key=lambda o: o.name)
-        fusionne = fusionner(ident, objets)
-        emprises[ident] = bornes(fusionne)
+        fusionnes[ident] = fusionner(ident, objets)
+        emprises[ident] = bornes(fusionnes[ident])
         print(f"  {ident:26s} {len(objets):5d} volumes")
+
+    # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
+    occlusion = {} if "--sans-occlusion" in sys.argv else cuire_occlusion(fusionnes)
+
+    for mat in bpy.data.materials:
+        aplatir(mat)
     entrees = [en_metres(v, emprises) for v in REPERES]
     vues = [en_metres(v, emprises) for v in VUES]
 
@@ -302,6 +312,7 @@ def main():
         "vues": vues,
         "flammes": flammes,
         "braises": braises,
+        "occlusion": occlusion,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))

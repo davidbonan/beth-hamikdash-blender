@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les douze scripts
+## Les treize scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -31,7 +31,8 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
 | `beit_hamikdash_marche.py` | **lit** la scène et rejoue la règle de marche de la visite : où l'on passe à pied, où l'on bute et pourquoi | `renders/marche/marche.png` |
-| `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
+| `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
+| `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel dans Cycles, appelé par le précédent | `visite/occlusion/*.webp` |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
@@ -170,6 +171,21 @@ avec `visite/reperes.json`. Le lien géométrie ↔ encyclopédie passe par
 lui appartiennent. Un ajout au blockout que `concepts.json` ne déclare pas ressort en
 fin de sortie sous « volumes sans concept » : c'est la liste de ce qu'il reste à
 nommer.
+
+L'export **cuit l'occlusion du ciel** avant d'aplatir les matières
+(`beit_hamikdash_occlusion.py`) : chaque concept d'architecture — aire ≥ 50 m², au moins 10
+texels par face, hors Kodesh HaKodashim qui a sa pénombre — perd d'abord ses faces collées
+contre une autre (cachées, elles cuisaient noires et perçaient sur mobile), puis reçoit une couche UV `Occlusion` et une carte `visite/occlusion/<concept>.webp`,
+que `reperes.json` liste sous `occlusion` et que la visite pose en `aoMap`. Cuite au double
+puis réduite en WebP à perte (`cwebp` sur le PATH), portée 8 m, 3 m dans le Heikhal où la
+sonde de `visite/sonde.js` écarte déjà le ciel. C'est l'essentiel du temps de l'export :
+
+```bash
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --sans-occlusion   # itération rapide
+```
+
+Sans cuisson, le .glb sort sans couche `Occlusion` et `reperes.json` sans cartes : la visite
+reste cohérente, simplement sans occlusion cuite. À relancer sans l'option avant de publier.
 
 ## Les figurants
 

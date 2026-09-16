@@ -567,12 +567,12 @@
     },
     "machta": {
       "min": [
-        -71.1240005493164,
-        2.912937641143799,
+        -70.47599792480469,
+        2.9098947048187256,
         -0.15600000321865082
       ],
       "max": [
-        -70.26959991455078,
+        -69.62159729003906,
         3.080702066421509,
         0.15600000321865082
       ]
@@ -1402,9 +1402,223 @@
   ],
   "braises": [
     [
-      -70.96800231933594,
+      -70.31999969482422,
       3.045599937438965,
       -0.0
     ]
-  ]
+  ],
+  "occlusion": {
+    "_non_classe": {
+      "carte": "occlusion/_non_classe.webp",
+      "canal": 0
+    },
+    "aliyah": {
+      "carte": "occlusion/aliyah.webp",
+      "canal": 0
+    },
+    "azara": {
+      "carte": "occlusion/azara.webp",
+      "canal": 0
+    },
+    "batiment": {
+      "carte": "occlusion/batiment.webp",
+      "canal": 0
+    },
+    "beit_avtinas": {
+      "carte": "occlusion/beit_avtinas.webp",
+      "canal": 0
+    },
+    "beit_hahalifot": {
+      "carte": "occlusion/beit_hahalifot.webp",
+      "canal": 0
+    },
+    "beit_hamoked": {
+      "carte": "occlusion/beit_hamoked.webp",
+      "canal": 1
+    },
+    "beit_hanitzotz": {
+      "carte": "occlusion/beit_hanitzotz.webp",
+      "canal": 0
+    },
+    "beit_hatevila": {
+      "carte": "occlusion/beit_hatevila.webp",
+      "canal": 0
+    },
+    "doukhan": {
+      "carte": "occlusion/doukhan.webp",
+      "canal": 0
+    },
+    "douze_marches_oulam": {
+      "carte": "occlusion/douze_marches_oulam.webp",
+      "canal": 0
+    },
+    "ezrat_israel": {
+      "carte": "occlusion/ezrat_israel.webp",
+      "canal": 0
+    },
+    "ezrat_nashim": {
+      "carte": "occlusion/ezrat_nashim.webp",
+      "canal": 0
+    },
+    "heikhal": {
+      "carte": "occlusion/heikhal.webp",
+      "canal": 0
+    },
+    "heil": {
+      "carte": "occlusion/heil.webp",
+      "canal": 0
+    },
+    "kaleh_orev": {
+      "carte": "occlusion/kaleh_orev.webp",
+      "canal": 0
+    },
+    "kevashim_ketanim": {
+      "carte": "occlusion/kevashim_ketanim.webp",
+      "canal": 0
+    },
+    "kevesh": {
+      "carte": "occlusion/kevesh.webp",
+      "canal": 0
+    },
+    "lishkat_beit_shemanya": {
+      "carte": "occlusion/lishkat_beit_shemanya.webp",
+      "canal": 1
+    },
+    "lishkat_haetz": {
+      "carte": "occlusion/lishkat_haetz.webp",
+      "canal": 1
+    },
+    "lishkat_haetzim": {
+      "carte": "occlusion/lishkat_haetzim.webp",
+      "canal": 1
+    },
+    "lishkat_hagazit": {
+      "carte": "occlusion/lishkat_hagazit.webp",
+      "canal": 1
+    },
+    "lishkat_hagola": {
+      "carte": "occlusion/lishkat_hagola.webp",
+      "canal": 0
+    },
+    "lishkat_hamedichin": {
+      "carte": "occlusion/lishkat_hamedichin.webp",
+      "canal": 1
+    },
+    "lishkat_hamelach": {
+      "carte": "occlusion/lishkat_hamelach.webp",
+      "canal": 1
+    },
+    "lishkat_hametzoraim": {
+      "carte": "occlusion/lishkat_hametzoraim.webp",
+      "canal": 1
+    },
+    "lishkat_hanezirim": {
+      "carte": "occlusion/lishkat_hanezirim.webp",
+      "canal": 1
+    },
+    "lishkat_haparva": {
+      "carte": "occlusion/lishkat_haparva.webp",
+      "canal": 1
+    },
+    "lishkat_osei_chavitin": {
+      "carte": "occlusion/lishkat_osei_chavitin.webp",
+      "canal": 1
+    },
+    "lishkat_parhedrin": {
+      "carte": "occlusion/lishkat_parhedrin.webp",
+      "canal": 1
+    },
+    "lishkat_pinchas": {
+      "carte": "occlusion/lishkat_pinchas.webp",
+      "canal": 1
+    },
+    "maake": {
+      "carte": "occlusion/maake.webp",
+      "canal": 0
+    },
+    "mesiba": {
+      "carte": "occlusion/mesiba.webp",
+      "canal": 0
+    },
+    "mesiba_bira": {
+      "carte": "occlusion/mesiba_bira.webp",
+      "canal": 0
+    },
+    "mizbeach": {
+      "carte": "occlusion/mizbeach.webp",
+      "canal": 0
+    },
+    "mur_har_habayit": {
+      "carte": "occlusion/mur_har_habayit.webp",
+      "canal": 0
+    },
+    "oulam": {
+      "carte": "occlusion/oulam.webp",
+      "canal": 0
+    },
+    "parokhet": {
+      "carte": "occlusion/parokhet.webp",
+      "canal": 0
+    },
+    "petah_oulam": {
+      "carte": "occlusion/petah_oulam.webp",
+      "canal": 0
+    },
+    "porte_est_ezrat_nashim": {
+      "carte": "occlusion/porte_est_ezrat_nashim.webp",
+      "canal": 1
+    },
+    "portes_azara": {
+      "carte": "occlusion/portes_azara.webp",
+      "canal": 1
+    },
+    "portes_houlda": {
+      "carte": "occlusion/portes_houlda.webp",
+      "canal": 1
+    },
+    "portiques": {
+      "carte": "occlusion/portiques.webp",
+      "canal": 0
+    },
+    "quinze_marches": {
+      "carte": "occlusion/quinze_marches.webp",
+      "canal": 0
+    },
+    "shaar_hamayim": {
+      "carte": "occlusion/shaar_hamayim.webp",
+      "canal": 1
+    },
+    "shaar_hanitzotz": {
+      "carte": "occlusion/shaar_hanitzotz.webp",
+      "canal": 1
+    },
+    "shaar_kiponus": {
+      "carte": "occlusion/shaar_kiponus.webp",
+      "canal": 1
+    },
+    "shaar_nikanor": {
+      "carte": "occlusion/shaar_nikanor.webp",
+      "canal": 1
+    },
+    "shaar_shushan": {
+      "carte": "occlusion/shaar_shushan.webp",
+      "canal": 1
+    },
+    "shaar_tadi": {
+      "carte": "occlusion/shaar_tadi.webp",
+      "canal": 1
+    },
+    "sol_har_habayit": {
+      "carte": "occlusion/sol_har_habayit.webp",
+      "canal": 0
+    },
+    "taim": {
+      "carte": "occlusion/taim.webp",
+      "canal": 0
+    },
+    "yessod": {
+      "carte": "occlusion/yessod.webp",
+      "canal": 0
+    }
+  }
 }

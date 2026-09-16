@@ -34,7 +34,8 @@ dernière à droite.*
 | `beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
 | `beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre. Ne reconstruit rien. |
 | `beit_hamikdash_marche.py` | Rejoue la règle de marche de la visite sur une grille posée sur la scène et dit où l'on passe à pied, où l'on bute et pourquoi — marche trop haute, vide, fente, mur. Ne reconstruit rien. |
-| `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun et les points d'entrée. Lit le .blend, ne le réécrit pas. |
+| `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun, les points d'entrée et l'occlusion cuite. Lit le .blend, ne le réécrit pas. |
+| `beit_hamikdash_occlusion.py` | L'occlusion du ciel cuite par Cycles sur l'architecture de la visite : une couche UV et une carte WebP par concept. Appelé par le précédent. |
 | `beit_hamikdash_figures.py` | Les figurants de la visite — cohanim au Kiyor, au kevesh et au pied de l'autel, douze Léviim sur le Doukhan, fidèles dans l'Ezrat Nashim. Corps MakeHuman (CC0), vêtus et animés ; écrit `visite/figures.glb` et `visite/figures.json`. Ni le .blend ni le film ne les voient. |
 | `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
 | `beit_hamikdash_keruvim.py` | Les deux keruvim de la kaporet : enfants MakeHuman agenouillés, mains jointes, ailes plumées ; écrit `keruvim.blend`, que le blockout lit. À relancer après toute modification de ce script, puis reconstruire la scène. |
@@ -92,6 +93,8 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur. |
+| `visite/occlusion.js` | Pose les cartes d'occlusion cuites en `aoMap` : elles n'assombrissent que la lumière sans direction. |
+| `visite/sonde.js` | Le reflet du Heikhal : la salle rendue une fois depuis le milieu des kelim, éclairée par la seule Menora, remplace le ciel pour ce qui s'y trouve. |
 | `visite/concepts.json` | **La charnière.** Un concept par entrée : son identifiant, sa zone, les préfixes de noms d'objets Blender qui lui appartiennent, et `lieu` quand on s'y tient — la barre en donne alors le nom et le plan le dessine. |
 | `visite/contenu_a.json`, `_b`, `_c` | L'encyclopédie : résumé, cotes, sources. Trois fichiers parce qu'ils ont été relevés en trois passes ; le viewer les fusionne au chargement. |
 | `visite/contenu_a.en.json`, `.he.json`… | Les traductions de l'encyclopédie, un miroir par fichier et par langue. Le français fait foi. En hébreu, une citation est le texte original relevé sur Sefaria, jamais une retraduction du français. |
@@ -99,10 +102,11 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/langue.js` | La langue : le choix au premier passage, retenu dans le navigateur, et le sélecteur à drapeau de la barre. |
 | `visite/memoire.js` | Ce que le navigateur retient d'une visite à l'autre — la langue, l'initiation suivie —, sans casser quand le stockage est refusé. |
 | `visite/temple.glb` | Géométrie exportée, compressée meshopt. Artefact — se regénère, et son poids avec : l'export l'annonce en dernière ligne. |
-| `visite/reperes.json` | Emprise de chaque concept, entrées du menu « Aller à… », vues que « Un élément… » prend pour les concepts que le recul automatique cadre mal (les gros volumes, les creux souterrains), et position des flammes de la Menora. Chaque entrée ou vue nomme ce qu'elle `cadre` ; sans position, le navigateur recule jusqu'à le faire tenir dans le champ. Artefact. |
+| `visite/reperes.json` | Emprise de chaque concept, entrées du menu « Aller à… », vues que « Un élément… » prend pour les concepts que le recul automatique cadre mal (les gros volumes, les creux souterrains), et position des flammes de la Menora, cartes d'occlusion et couche UV de chacune. Chaque entrée ou vue nomme ce qu'elle `cadre` ; sans position, le navigateur recule jusqu'à le faire tenir dans le champ. Artefact. |
+| `visite/occlusion/` | Une carte d'occlusion par concept d'architecture, WebP. Artefact de l'export. |
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # regénère temple.glb
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # regénère temple.glb, reperes.json, occlusion/
 cd visite && python3 -m http.server 8777                       # puis http://127.0.0.1:8777/
 ```
 
@@ -849,6 +853,41 @@ blockout. Corrigé dans le script, la fiche §6 et les trois langues de la visit
 - **Une fiche par élément.** L'autel n'avait que six fiches pour une vingtaine de pièces : le
   yessod, les keranot, les petites rampes, la revouva, les tables, le lieu du deshen, les deux sels, le
   tapoua'h et les sefalim ont maintenant chacun la leur (`visite/concepts.json`).
+
+### La lumière cuite (16/09)
+
+La visite éclairait tout ce qui n'était pas au soleil par le ciel entier, quoi qu'il y ait
+devant : l'Oulam couvert était aussi clair que la cour, et le Heikhal, sans ouverture sur
+le ciel, rendait un or plat de maquette. Deux ajouts, vérifiés en captures contre la
+version précédente, même glb, même pose.
+
+- **L'occlusion du ciel est cuite par Cycles** à l'export (`beit_hamikdash_occlusion.py`)
+  et posée en `aoMap` (`visite/occlusion.js`) : elle n'assombrit que la lumière sans
+  direction, le soleil et les lampes gardent leurs ombres. Portée 8 m. 53 concepts, 1,8 Mo
+  de WebP, +1,2 Mo de glb pour les UV, ~11 min de cuisson sur Metal (M5 Pro). Cuite au
+  double puis réduite, sans quoi le bruit de Cycles doublait le poids.
+- **Écartés de la cuisson.** Ce qui fait moins de 10 texels par face — échelles des
+  candélabres, treillis du soreg, portes du Heikhal, ma'arakhot, vigne : plus fin qu'un
+  texel, un barreau prend l'ombre de ses faces cachées et vire au noir. Et le Kodesh
+  HaKodashim, qui a sa pénombre : cuite, l'occlusion y assombrissait les parois mais pas les
+  plaques gravées de `sculptures_murs`, qui ressortaient claires derrière les keruvim.
+- **Les faces collées sont retirées avant la cuisson.** Deux volumes du blockout qui se
+  touchent laissent des faces l'une contre l'autre : la cachée cuisait noire, et les GPU de
+  téléphone, moins précis en profondeur, la faisaient percer en bandes et en moucheté. Une
+  face couverte à moins d'1 cm par une face tournée du même côté, en tous ses points témoins
+  (un tous les 25 cm sur sa vraie triangulation), sort du maillage ; de deux faces confondues,
+  une seule. Dos à dos, les faces restent : chacune est dans le volume de l'autre, invisible.
+  1 882 faces sur 125 750.
+- **Le Heikhal reflète la salle, pas le ciel** (`visite/sonde.js`) : une carte cubique
+  rendue une fois au chargement depuis le milieu des kelim, soleil, ciel et lampes éteints
+  — la Menora seule, un rebond, intensité 0,5. L'or étant métallique, c'est son reflet qui
+  porte la lumière de la salle ; un lightmap du rebond n'y aurait rien changé. Portée
+  d'occlusion ramenée à 3 m dans la salle, où la sonde écarte déjà le ciel. `sculptures_murs`
+  court sur les parois des deux pièces : ce qui sort du Heikhal est détaché au chargement et
+  garde le ciel assombri du Kodesh HaKodashim.
+- **Non mesuré** : le temps par image. Rien n'est retiré — la SSAO de `chaine.js` reste,
+  pour les contacts et les figurants — et la cuisson ajoute une lecture de texture ; aucun
+  gain de performance n'est à attendre de ce changement.
 
 ## Licence
 

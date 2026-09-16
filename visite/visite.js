@@ -4,6 +4,8 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import { habiller, assombrir, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
+import { cartesOcclusion } from "./occlusion.js";
+import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
 import { regler as reglerOmbres } from "./ombres.js";
@@ -155,7 +157,8 @@ scene.fog = BRUME;
 // Le rapport compte plus que les niveaux — même arbitrage que le ciel du blockout.
 // Elle descend une seconde fois, avec `ambiance` dans ciel.js : ce que ce réglage-ci
 // corrigeait pour les parements, il restait à le corriger pour tout ce qui est à plat.
-scene.add(new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.16));
+const cielAmbiant = new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.16);
+scene.add(cielAmbiant);
 // Matin, à l'est : l'axe de l'avoda, et la lumière qui rase la façade. Plus bas sur
 // l'horizon, le soleil traverse plus d'atmosphère : il perd de la force et gagne de
 // l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
@@ -333,13 +336,14 @@ const enMegaoctets = (octets) =>
 // Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
 // attendre ensuite doublerait l'attente d'un visiteur en 4G.
 const chargeur = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-const [gltf, jeux] = await Promise.all([
+const [gltf, jeux, occlusions] = await Promise.all([
   chargeur.loadAsync("./temple.glb", (e) => {
       if (!e.lengthComputable) return;
       jauge.style.width = `${(e.loaded / e.total) * 100}%`;
       restant.textContent = texte("restant").replace("{mo}", enMegaoctets(e.total - e.loaded));
     }),
   nappes(),
+  cartesOcclusion(reperes.occlusion),
 ]);
 ecrire(etat, "preparation");
 scene.add(gltf.scene);
@@ -355,6 +359,7 @@ const horloges = [];                    // uniformes de temps à faire avancer
 const brut = new URLSearchParams(location.search).has("brut");
 const IDS = new Set(CONCEPTS.keys());
 const habillees = new Set();
+const materiauxHeikhal = [];
 
 function conceptDe(objet) {
   for (let n = objet; n; n = n.parent) {
@@ -364,9 +369,17 @@ function conceptDe(objet) {
   return undefined;
 }
 
+const maillages = [];
 gltf.scene.traverse((o) => {
   if (!o.isMesh) return;
   o.userData.concept = conceptDe(o);
+  maillages.push(o);
+});
+const sousSonde = new Set(brut ? [] : separerDuHeikhal(
+  maillages.filter((o) => DANS_HEIKHAL.has(o.userData.concept)), EMPRISES.get("heikhal")));
+
+gltf.scene.traverse((o) => {
+  if (!o.isMesh) return;
   o.geometry.computeBoundingBox();
   o.geometry.computeBoundingSphere();
   o.geometry.computeBoundsTree({ maxLeafTris: 24 });
@@ -378,12 +391,25 @@ gltf.scene.traverse((o) => {
   o.material.side = ETOFFES.has(o.material.name) ? THREE.DoubleSide : THREE.FrontSide;
   o.castShadow = true;
   o.receiveShadow = true;
+  if (!brut) {
+    const occlusion = occlusions.get(o.userData.concept);
+    // Une matière est partagée entre concepts ; sa carte d'occlusion et son reflet ne le sont pas.
+    if (occlusion || sousSonde.has(o)) o.material = o.material.clone();
+    if (occlusion) o.material.aoMap = occlusion;
+    if (sousSonde.has(o)) materiauxHeikhal.push(o.material);
+  }
   if (!brut && !habillees.has(o.material.uuid)) {
     habillees.add(o.material.uuid);
     habiller(o.material, horloges, jeux);
   }
   obstacles.push(o);
   if (!TRAVERSABLES.has(o.userData.concept)) murs.push(o);
+});
+
+if (!brut) sonderHeikhal(renderer, scene, {
+  kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
+  materiaux: materiauxHeikhal,
+  eteints: [soleil, appoint, lampe, ciel, cielAmbiant],
 });
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
