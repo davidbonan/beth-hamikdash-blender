@@ -499,7 +499,7 @@
   "menora": {
     "nom": "Menora",
     "translit": "Menora",
-    "resume": "The pure gold candelabrum, hammered from a single piece, stands to the south of the Heikhal, two and a half amot from the wall, facing the Table. It is 18 tefachim high, that is three amot, about 1.44 meters. Seven branches, in a single plane oriented north-south according to R. Elazar b. R. Shimon and the Rambam, adorned with 22 cups, 11 knobs and 9 flowers, on a base with three feet. The six lamps of the branches turn their spouts toward the middle one, whose spout faces the Kodesh HaKodashim. In front of it, three stone steps, for the Kohen who comes to trim the wicks; between the two stages of that work, he leaves the kuz, a large gold pitcher, on the second step. Its seven flames are the only warm light in the room.",
+    "resume": "The pure gold candelabrum, hammered from a single piece, stands to the south of the Heikhal, two and a half amot from the wall, facing the Table. It is 18 tefachim high, that is three amot, about 1.44 meters. Seven branches, in a single plane oriented north-south according to R. Elazar b. R. Shimon and the Rambam, adorned with 22 cups, 11 knobs and 9 flowers, on a base with three feet. Hollow, as the halakha allows, it weighs a kikar of gold with its lamps, about 58 kilograms. The six lamps of the branches turn their spouts toward the middle one, whose spout faces the Kodesh HaKodashim. In front of it, three stone steps, for the Kohen who comes to trim the wicks; between the two stages of that work, he leaves the kuz, a large gold pitcher, on the second step. Its seven flames are the only warm light in the room.",
     "cotes": [
       "18 tefachim (3 amot) high ≈ 1.44 m",
       "seven branches",
@@ -507,7 +507,8 @@
       "2.5 amot from the south wall",
       "three stone steps in front",
       "lamps evenly spaced 3 tefachim apart",
-      "the kuz on the second step"
+      "the kuz on the second step",
+      "hollow, a kikar of gold with its lamps ≈ 58 kg"
     ],
     "sources": [
       {
@@ -529,6 +530,11 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "3:3",
         "citation": "נִמְצְאוּ כָּל הַגְּבִיעִים שְׁנַיִם וְעֶשְׂרִים. וְהַפְּרָחִים תִּשְׁעָה. וְהַכַּפְתּוֹרִים אַחַד עָשָׂר"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:4",
+        "citation": "וְכֵן מְנוֹרָה הַבָּאָה זָהָב תִּהְיֶה כֻּלָּהּ כִּכָּר עִם נֵרוֹתֶיהָ […] וְאִם הָיְתָה חֲלוּלָה כְּשֵׁרָה"
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",

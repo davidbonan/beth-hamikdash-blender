@@ -23,7 +23,7 @@ import { assemblage } from "./ombres.js";
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
-      LAMBRIS = 16;
+      LAMBRIS = 16, MIKSHE = 17;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
@@ -74,7 +74,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
                    13: "pierre", 14: "pierre", 15: "pierre",
-                   3: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois" };
+                   3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
 // marbre, gazit scié — prend la même pierre que le reste, en moins appuyé : c'est cette
@@ -94,7 +94,7 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pie
 // l'affaire de `temperance`, qui ne laisse pas la courbe les grossir.
 const CARREAU = {
   1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
-  3: [1.6, 0.34, 0.14, 0.60, 0.70],
+  3: [1.6, 0.34, 0.14, 0.60, 0.70], 17: [1.6, 0.34, 0.14, 0.60, 0.70],
   4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
   7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
   // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
@@ -115,7 +115,7 @@ const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
   Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: MARBRE_HERODE,
-  Or: METAL, Or_plaque: METAL, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
+  Or: METAL, Or_plaque: METAL, Or_mikshe: MIKSHE, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
   Fer: METAL, Fer_lame: METAL,
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS, Cedre_lambris: LAMBRIS,
@@ -593,6 +593,30 @@ void patiner(vec3 P, vec3 N, float force, inout vec3 teinte, inout float rugo){
   rugo += trainee * 0.10;
 }
 
+// La Menora est מִקְשָׁה, et « מְשֻׁקָּדִים » : « שהן מכין בפטיש העשת עד שיהיה כולו שקדים שקדים » (Rambam
+// sur Mena'hot 3:7). Chaque coup laisse une cupule en amande, deux fois plus longue que large
+// sur la verticale ; sa pente est celle du carré de la distance à son centre, écrite et non
+// dérivée à l'écran. Elle s'efface quand la cupule passe sous le pixel.
+const float AMANDE = 0.006, CREUX_AMANDE = 0.0004;
+void facettesAmande(vec3 P, vec3 N, inout vec3 pente, inout float rugo){
+  float fin = 1.0 - smoothstep(0.25, 0.7, empreinteMax() / AMANDE);
+  if (fin <= 0.0) return;
+  vec3 taille = vec3(AMANDE, 2.0 * AMANDE, AMANDE);
+  vec3 q = P / taille, i = floor(q), f = fract(q);
+  float d = 9.0; vec3 r = vec3(0.0);
+  for (int x = -1; x <= 1; x++)
+  for (int y = -1; y <= 1; y++)
+  for (int z = -1; z <= 1; z++) {
+    vec3 c = vec3(float(x), float(y), float(z));
+    vec3 v = c + vec3(alea3(i + c), alea3(i + c + 17.0), alea3(i + c + 41.0)) - f;
+    float dv = dot(v, v);
+    if (dv < d) { d = dv; r = v; }
+  }
+  vec3 g = -2.0 * CREUX_AMANDE * r / taille;
+  pente += (g - N * dot(g, N)) * fin;
+  rugo += (d - 0.35) * 0.04 * fin;
+}
+
 void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec3 feu){
   teinte = vec3(1.0); pente = vec3(0.0); rugo = 0.0; feu = vec3(1.0);
   // Où la nappe se prend pour ce point, et ce que ce point en garde de relief : un
@@ -639,7 +663,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     teinte = vec3(1.0 + (v - 0.5) * 0.13);
     rugo = (v - 0.5) * 0.06;
   }
-  else if (uFamille == 3) {                                   // métal battu au marteau
+  else if (uFamille == 3 || uFamille == 17) {                // métal battu au marteau
     // La nappe apporte le terni et les éraflures, pas les creux : une tôle laminée n'en
     // a pas. Or l'or du Heikhal est BATTU, et un creux de marteau ne se voit qu'au
     // reflet — c'est là, et jamais dans la teinte, que se joue le métal.
@@ -653,6 +677,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     pente = ((grain(q + t1 * e, empreinteMax() * 6.0) - g) * t1 + (grain(q + t2 * e, empreinteMax() * 6.0) - g) * t2) * (0.055 / e);
     teinte = vec3(1.0 + (g - 0.5) * 0.05);
     rugo = (g - 0.5) * 0.10;
+    if (uFamille == 17) facettesAmande(P, N, pente, rugo);
   }
   else if (uFamille == 4 || uFamille == 16) {                // bois : fil étiré
     // Le fil reste écrit — une planche de cèdre du Heikhal fait 20 amot de haut, et

@@ -502,7 +502,7 @@
   "menora": {
     "he": "מנורה",
     "translit": "Menora",
-    "resume": "Le chandelier d'or pur, martelé d'une seule pièce, se tient au sud du Heikhal, à deux amot et demie du mur, face à la Table. Il fait 18 tefa'him de haut, soit trois amot, environ 1,44 mètre. Sept branches, dans un même plan orienté nord-sud selon R. Elazar b. R. Shimon et le Rambam, ornées de 22 coupes, 11 pommes et 9 fleurs, sur un pied à trois pieds. Les six lampes des branches tournent leur bec vers celle du milieu, dont le bec regarde le Kodesh HaKodashim. Devant lui, trois marches de pierre, pour le cohen qui vient préparer les mèches ; entre les deux temps de ce travail, il laisse sur la deuxième le kuz, une grande cruche d'or. Ses sept flammes sont la seule lumière chaude de la salle.",
+    "resume": "Le chandelier d'or pur, martelé d'une seule pièce, se tient au sud du Heikhal, à deux amot et demie du mur, face à la Table. Il fait 18 tefa'him de haut, soit trois amot, environ 1,44 mètre. Sept branches, dans un même plan orienté nord-sud selon R. Elazar b. R. Shimon et le Rambam, ornées de 22 coupes, 11 pommes et 9 fleurs, sur un pied à trois pieds. Creuse, ce que la halakha permet, elle pèse avec ses lampes un kikar d'or, près de 58 kilos. Les six lampes des branches tournent leur bec vers celle du milieu, dont le bec regarde le Kodesh HaKodashim. Devant lui, trois marches de pierre, pour le cohen qui vient préparer les mèches ; entre les deux temps de ce travail, il laisse sur la deuxième le kuz, une grande cruche d'or. Ses sept flammes sont la seule lumière chaude de la salle.",
     "cotes": [
       "18 tefa'him (3 amot) de haut ≈ 1,44 m",
       "sept branches",
@@ -510,7 +510,8 @@
       "à 2,5 amot du mur sud",
       "trois marches de pierre devant",
       "lampes à pas égal de 3 tefa'him",
-      "le kuz sur la deuxième marche"
+      "le kuz sur la deuxième marche",
+      "creuse, un kikar d'or avec ses lampes ≈ 58 kg"
     ],
     "sources": [
       {
@@ -532,6 +533,11 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "3:3",
         "citation": "נִמְצְאוּ כָּל הַגְּבִיעִים שְׁנַיִם וְעֶשְׂרִים. וְהַפְּרָחִים תִּשְׁעָה. וְהַכַּפְתּוֹרִים אַחַד עָשָׂר"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "3:4",
+        "citation": "וְכֵן מְנוֹרָה הַבָּאָה זָהָב תִּהְיֶה כֻּלָּהּ כִּכָּר עִם נֵרוֹתֶיהָ […] וְאִם הָיְתָה חֲלוּלָה כְּשֵׁרָה"
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",

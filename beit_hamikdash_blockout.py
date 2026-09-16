@@ -1222,6 +1222,14 @@ def eau(name):
         _creuser(mat, _grain(mat, 0.25), 0.15, 0.003)
     return mat
 
+
+def huile(name, rgb):
+    """L'huile d'une lampe : lisse et sombre, elle renvoie la flamme."""
+    mat, neuf = _neuf(name, rgb)
+    if neuf:
+        _bsdf(mat).inputs["Roughness"].default_value = 0.06
+    return mat
+
 # Le calcaire du pourtour, crème presque neutre : c'est la couleur d'un meleke scié
 # de frais, et l'ocre lui vient des bancs (BANCS_CALCAIRE), pas de sa base.
 # Il reste SOUS les trois marbres du bâtiment (MARBRES_HERODE, 0,94 / 0,78 / 0,80) :
@@ -1264,6 +1272,9 @@ MAT_MARBRE_HERODE = lambda: marbre_herode("Marbre_Herode")
 # L'or des parois est un placage martelé sur de la pierre, pas un ustensile tourné :
 # plus mat que la Menora, sinon un mur entier ne rend qu'un point spéculaire.
 MAT_OR_PLAQUE = lambda: metal("Or_plaque", (1.0, 0.76, 0.33), 0.4)
+MAT_OR_MIKSHE = lambda: metal("Or_mikshe", (1.0, 0.76, 0.33), 0.3)   # la visite y bat « שְׁקֵדִים שְׁקֵדִים »
+MAT_SHEMEN = lambda: huile("Shemen_zayit", (0.11, 0.065, 0.01))      # « שֶׁמֶן זַיִת זָךְ » (Shemot 27:20)
+MAT_PETILA = lambda: material("Petila", (0.10, 0.08, 0.06))
 TEINTE_CEDRE = (0.44, 0.25, 0.14)
 MAT_CEDRE = lambda: bois("Cedre", TEINTE_CEDRE)
 # Le cèdre choisi des revêtements, plus rouge ; la visite en tire une photo plus calme.
@@ -2043,7 +2054,7 @@ def _bandes(x0, x1, y0, y1, dedans, dehors, adossee):
     return bandes
 
 
-def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None):
+def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None, tremies=()):
     """Chambre du pourtour, creuse : socle, murs percés de baies, bandeau, corniche qui la couvre.
 
     Posée en boîte nue, une lishka ne se lit pas : à 750 amot elle n'a ni pied, ni
@@ -2053,7 +2064,8 @@ def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None):
     `portes` : des `Porte`. Chacune s'ouvre à son seuil, et le socle s'ouvre avec elle
     quand ce seuil est plus bas que lui. Le sol intérieur n'est pas bâti ici : il dépend
     de ce que la chambre enjambe. `adossee` : la face collée à un mur d'enceinte, qui lui
-    sert de mur — ni parement, ni socle, ni saillie.
+    sert de mur — ni parement, ni socle, ni saillie. `tremies` : ce que la corniche laisse
+    ouvert, le puits d'une mesiba qui monte au-dessus d'elle.
     """
     zs, zc = z0 + LISHKA_SOCLE, z1 - LISHKA_CORNICHE
     d = LISHKA_PAREMENT
@@ -2078,7 +2090,7 @@ def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None):
         box(f"{name}_bandeau_{face}", *bornes, z_bandeau, z_bandeau + LISHKA_BANDEAU, col, mat)
     enveloppe = [plus(b[i] for b in pourtour.values())
                  for plus, i in ((min, 0), (max, 1), (min, 2), (max, 3))]
-    box(f"{name}_corniche", *enveloppe, zc, z1, col, mat)
+    dalle_percee(f"{name}_corniche", *enveloppe, zc, z1, col, mat, tremies)
 
     haut_bandeau = z_bandeau + LISHKA_BANDEAU
     z_baie0 = haut_bandeau + (zc - haut_bandeau) * 0.25
@@ -2128,14 +2140,48 @@ def escalier(name, x0, x1, y0, y1, z_bas, z_haut, descente, col, mat=None):
         box(f"{name}_{k:02d}", *emprise, z_bas, z_haut - DEGRE * k, col, mat)
 
 
-def terrasse_de_porte(name, x0, x1, y0, y1, z, chambre, col, mat=None):
+def escalier_a_vis(name, cx, cy, rayon, z_haut, z_bas, sortie, col, mat=None):
+    """Vis de degrés d'une demi-ama autour d'un noyau, douze au tour, qui descend dans le
+    sens trigonométrique. `sortie` : le cap, en degrés, par où l'on quitte le dernier degré ;
+    le degré du tour d'au-dessus y laisse cinq amot de passage."""
+    noyau, par_tour = 0.35, 12
+    pas = 2 * math.pi / par_tour
+    n = round((z_haut - z_bas) / DEGRE) - 1
+    depart = math.radians(sortie) - pas * (n + 0.5)
+    cyl(f"{name}_noyau", cx, cy, z_bas, z_haut, noyau, col, mat, verts=12)
+    for k in range(n):
+        a0, a1 = depart + pas * k, depart + pas * (k + 1)
+        rayons = [(noyau, a0)] + [(rayon, a0 + (a1 - a0) * t / 2) for t in range(3)] + [(noyau, a1)]
+        z = z_haut - DEGRE * (k + 1)
+        prism(f"{name}_{k:02d}", [(cx + r * math.cos(a), cy + r * math.sin(a)) for r, a in rayons],
+              z - 1, z, col, mat)
+
+
+# Aucune source ne dit par où l'on montait à l'aliyah de Middot 1:5 : la Mishna y poste
+# les cohanim — « שֶׁהַכֹּהֲנִים שׁוֹמְרִים מִלְמַעְלָן » — sans jamais les y faire monter. CHOIX :
+# une vis, comme celle qui mène au toit du Beit HaParva (Middot 5:3), dans l'angle est de
+# la cage. Vingt-six amot de montée ne tiennent pas en volée droite dans les seize de la
+# cage, et « וּכְמִין אַכְסַדְרָה הָיָה » ne laisse rien dépasser au-dehors. Son puits traverse
+# la corniche et la terrasse ; la cage garde treize amot pour ses vingt degrés, plus que
+# les dix du שער qu'ils desservent.
+MESIBA_PORTE = 3          # côté du puits de la vis ; le reste de l'angle fait palier
+
+
+def puits_de_mesiba(x1, y0, y1):
+    """Le carré que la vis d'un corps de porte réserve dans l'angle est de sa cage."""
+    cy = (y0 + y1) / 2
+    return (x1 - MESIBA_PORTE, x1, cy - MESIBA_PORTE / 2, cy + MESIBA_PORTE / 2)
+
+
+def terrasse_de_porte(name, x0, x1, y0, y1, z, chambre, col, mat=None, tremies=()):
     """Toit d'un corps de porte : dalle, garde-corps sur le pourtour resté libre.
 
     C'est elle qui assoit la chambre haute — l'aliyah de Middot 1:5 et de Tamid 1:1.
     `chambre` : l'intervalle en x qu'occupe cette chambre ; le garde-corps s'arrête
-    contre elle, deux parois coplanaires clignoteraient.
+    contre elle, deux parois coplanaires clignoteraient. `tremies` : le puits par où
+    la mesiba de la cage débouche sur la terrasse.
     """
-    box(f"{name}_terrasse", x0, x1, y0, y1, z, z + 1, col, mat)
+    dalle_percee(f"{name}_terrasse", x0, x1, y0, y1, z, z + 1, col, mat, tremies)
     bords = [("ouest", x0, x0 + 1, y0, y1), ("est", x1 - 1, x1, y0, y1)]
     for cote, b0, b1 in (("sud", y0, y0 + 1), ("nord", y1 - 1, y1)):
         bords += [(f"{cote}_O", x0 + 1, chambre[0], b0, b1),
@@ -2144,25 +2190,20 @@ def terrasse_de_porte(name, x0, x1, y0, y1, z, chambre, col, mat=None):
         box(f"{name}_garde_{suffixe}", a, b, c, e, z + 1, z + 3, col, mat)
 
 
-def aliyah(name, x0, x1, y0, y1, z0, h, col, fenetre, mat=None):
-    """Chambre haute posée sur un corps de porte, murs d'une ama, une fenêtre.
+def aliyah(name, x0, x1, y0, y1, z0, h, col, fenetre, porte, mat=None):
+    """Chambre haute posée sur un corps de porte, murs d'une ama, une fenêtre et une porte.
 
     « בֵּית אַבְטִינָס וּבֵית הַנִּיצוֹץ הָיוּ עֲלִיּוֹת » (Middot 1:1 ; Tamid 1:1) : ce sont
-    des étages, et un étage a un rez-de-chaussée. `fenetre` : (face, u0, u1) — la
-    face percée et l'intervalle en x de la baie, qui va de 3 à 7 amot du sol.
+    des étages, et un étage a un rez-de-chaussée. `fenetre` et `porte` : (face, u0, u1) —
+    la face percée et l'intervalle de la baie le long d'elle. La fenêtre va de 3 à 7 amot
+    du sol, la porte du sol à 8 ; elle ouvre sur la terrasse, où débouche la mesiba.
     """
-    face, f0, f1 = fenetre
+    baies = {fenetre[0]: [(fenetre[1], fenetre[2], z0 + 3, z0 + 7)],
+             porte[0]: [(porte[1], porte[2], z0, z0 + 8)]}
     box(f"{name}_toit", x0, x1, y0, y1, z0 + h - 1, z0 + h, col, mat)
-    box(f"{name}_mur_ouest", x0, x0 + 1, y0, y1, z0, z0 + h, col, mat)
-    box(f"{name}_mur_est", x1 - 1, x1, y0, y1, z0, z0 + h, col, mat)
-    for cote, b0, b1 in (("sud", y0, y0 + 1), ("nord", y1 - 1, y1)):
-        if cote != face:
-            box(f"{name}_mur_{cote}", x0, x1, b0, b1, z0, z0 + h, col, mat)
-            continue
-        box(f"{name}_mur_{cote}_O", x0, f0, b0, b1, z0, z0 + h, col, mat)
-        box(f"{name}_mur_{cote}_E", f1, x1, b0, b1, z0, z0 + h, col, mat)
-        box(f"{name}_fenetre_appui", f0, f1, b0, b1, z0, z0 + 3, col, mat)
-        box(f"{name}_fenetre_linteau", f0, f1, b0, b1, z0 + 7, z0 + h, col, mat)
+    for cote, bornes in (("ouest", (x0, x0 + 1, y0, y1)), ("est", (x1 - 1, x1, y0, y1)),
+                         ("sud", (x0, x1, y0, y0 + 1)), ("nord", (x0, x1, y1 - 1, y1))):
+        paroi_percee(f"{name}_mur_{cote}", *bornes, z0, z0 + h, col, mat, baies.get(cote, []))
 
 
 def maake(name, x0, x1, y0, y1, z, col, mat=None):
@@ -3851,11 +3892,16 @@ maake("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1, Z_AZ + 30, "80_Lishkot
 NZ_X0, NZ_X1 = PORTE_NITZOTZ - 10, PORTE_NITZOTZ + 10
 NZ_Y0, NZ_Y1, NZ_Z0 = AY1 + T, NORD_Y1, Z_AZ + 25
 # La porte de l'Azara est au niveau de la cour, celle du 'Heil dix amot plus bas : le corps
-# de porte est une cage d'escalier, ses vingt degrés sur toute sa largeur.
+# de porte est une cage d'escalier, ses vingt degrés sur ce que la mesiba lui laisse.
+NZ_VIS = puits_de_mesiba(NZ_X1 - LISHKA_PAREMENT, NZ_Y0, NZ_Y1 - LISHKA_PAREMENT)
 lishka("Beit_ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, Z_EZN, NZ_Z0, "80_Lishkot",
-       [Porte("N", *PORTE_SHAAR, Z_EZN)], adossee="S")
-escalier("Beit_ShaarHaNitzotz_escalier", NZ_X0 + LISHKA_PAREMENT, NZ_X1 - LISHKA_PAREMENT,
+       [Porte("N", *PORTE_SHAAR, Z_EZN)], adossee="S", tremies=[NZ_VIS])
+escalier("Beit_ShaarHaNitzotz_escalier", NZ_X0 + LISHKA_PAREMENT, NZ_VIS[0],
          NZ_Y0, NZ_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "+y", "80_Lishkot")
+box("Beit_ShaarHaNitzotz_mesiba_palier", NZ_VIS[0], NZ_VIS[1], NZ_Y0, NZ_Y1 - LISHKA_PAREMENT,
+    Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL())
+escalier_a_vis("Beit_ShaarHaNitzotz_mesiba", (NZ_VIS[0] + NZ_VIS[1]) / 2, (NZ_VIS[2] + NZ_VIS[3]) / 2,
+               MESIBA_PORTE / 2, NZ_Z0 + 1, Z_AZ, 180, "80_Lishkot")
 # Les degrés du פתח de 'hol de la Lishkat HaGazit, entre elle et ce corps de porte, à deux
 # dixièmes de son socle : jointifs, leurs faces se confondraient.
 GAZIT_PALIER_Y = AY1 + T + PETAH_HOL_GAZIT[0]
@@ -3865,9 +3911,11 @@ box("Lishkat_HaGazit_palier", GAZIT_X1, GAZIT_DEGRES_X1, AY1 + T, GAZIT_PALIER_Y
 escalier("Lishkat_HaGazit_escalier", GAZIT_X1, GAZIT_DEGRES_X1, GAZIT_PALIER_Y, GAZIT_PALIER_Y + 10,
          Z_EZN, Z_AZ, "+y", "80_Lishkot")
 terrasse_de_porte("ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, NZ_Z0,
-                  (PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5), "80_Lishkot")
+                  (PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5), "80_Lishkot", tremies=[NZ_VIS])
+# La porte de la chambre est à côté du puits, non en face : en face, elle ouvrirait sur le vide.
 aliyah("BeitHaNitzotz", PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5, NZ_Y0, NZ_Y1, NZ_Z0, 12,
-       "80_Lishkot", ("sud", PORTE_NITZOTZ - 1.5, PORTE_NITZOTZ + 1.5))
+       "80_Lishkot", ("sud", PORTE_NITZOTZ - 1.5, PORTE_NITZOTZ + 1.5),
+       ("est", NZ_VIS[3], NZ_VIS[3] + MESIBA_PORTE))
 
 # Beit Avtinas : l'aliyah du corps de porte de Sha'ar HaMayim — la plus ORIENTALE des
 # trois portes du sud —, creuse, murs d'une ama, fenêtre 3 x 4 au nord sur l'Azara.
@@ -3883,17 +3931,23 @@ aliyah("BeitHaNitzotz", PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5, NZ_Y0, NZ_Y1, NZ_Z
 BA_X0, BA_X1 = PORTE_MAYIM - 5, PORTE_MAYIM + 5
 BA_Y0, BA_Y1, BA_Z0 = AY0 - T - SAILLIE, AY0 - T, Z_AZ + 25
 SM_X0, SM_X1 = PORTE_MAYIM - 10, PORTE_MAYIM + 10
+SM_VIS = puits_de_mesiba(SM_X1 - LISHKA_PAREMENT, BA_Y0 + LISHKA_PAREMENT, BA_Y1)
 lishka("Beit_ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, Z_EZN, BA_Z0, "80_Lishkot",
-       [Porte("S", *PORTE_SHAAR, Z_EZN)], adossee="N")
-escalier("Beit_ShaarHaMayim_escalier", SM_X0 + LISHKA_PAREMENT, SM_X1 - LISHKA_PAREMENT,
+       [Porte("S", *PORTE_SHAAR, Z_EZN)], adossee="N", tremies=[SM_VIS])
+escalier("Beit_ShaarHaMayim_escalier", SM_X0 + LISHKA_PAREMENT, SM_VIS[0],
          BA_Y0 + LISHKA_PAREMENT, BA_Y1, Z_EZN, Z_AZ, "-y", "80_Lishkot")
+box("Beit_ShaarHaMayim_mesiba_palier", SM_VIS[0], SM_VIS[1], BA_Y0 + LISHKA_PAREMENT, BA_Y1,
+    Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL())
+escalier_a_vis("Beit_ShaarHaMayim_mesiba", (SM_VIS[0] + SM_VIS[1]) / 2, (SM_VIS[2] + SM_VIS[3]) / 2,
+               MESIBA_PORTE / 2, BA_Z0 + 1, Z_AZ, 180, "80_Lishkot")
 # La baie déborde sur l'Ezrat Israël : sous le mur, le podium laisserait un trou au pied des degrés.
 box("Beit_ShaarHaMayim_seuil", X_DOUKHAN, PORTE_MAYIM + 5, AY0 - T, AY0, Z_EZI - 1, Z_AZ,
     "80_Lishkot", MAT_SOL())
 terrasse_de_porte("ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, BA_Z0,
-                  (BA_X0, BA_X1), "80_Lishkot")
+                  (BA_X0, BA_X1), "80_Lishkot", tremies=[SM_VIS])
 aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
-       "80_Lishkot", ("nord", PORTE_MAYIM - 1.5, PORTE_MAYIM + 1.5))
+       "80_Lishkot", ("nord", PORTE_MAYIM - 1.5, PORTE_MAYIM + 1.5),
+       ("est", SM_VIS[2] - MESIBA_PORTE, SM_VIS[2]))
 # « היו מחזירין אותה למכתשת… וכשהוא שוחק אומר הדק היטב » (Keritot 6b), « מכתשת של בית אבטינס »
 # (Avot deRabbi Natan 41:12) ; les sammanim pesés « במשקל מכוון », chacun pilé à part (Rambam
 # Klei HaMikdash 2:2, 2:5). Table, balance, bols, formes et matières : CHOIX.
@@ -4568,23 +4622,6 @@ massif_evide("EzratNashim_sol", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_EZN - 1, Z
              VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN)], "10_EzratNashim", MAT_SOL())
 massif_evide("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN - 1,
              VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN)], "00_HarHabayit")
-
-
-def escalier_a_vis(name, cx, cy, rayon, z_haut, z_bas, sortie, col, mat=None):
-    """Vis de degrés d'une demi-ama autour d'un noyau, douze au tour, qui descend dans le
-    sens trigonométrique. `sortie` : le cap, en degrés, par où l'on quitte le dernier degré ;
-    le degré du tour d'au-dessus y laisse cinq amot de passage."""
-    noyau, par_tour = 0.35, 12
-    pas = 2 * math.pi / par_tour
-    n = round((z_haut - z_bas) / DEGRE) - 1
-    depart = math.radians(sortie) - pas * (n + 0.5)
-    cyl(f"{name}_noyau", cx, cy, z_bas, z_haut, noyau, col, mat, verts=12)
-    for k in range(n):
-        a0, a1 = depart + pas * k, depart + pas * (k + 1)
-        rayons = [(noyau, a0)] + [(rayon, a0 + (a1 - a0) * t / 2) for t in range(3)] + [(noyau, a1)]
-        z = z_haut - DEGRE * (k + 1)
-        prism(f"{name}_{k:02d}", [(cx + r * math.cos(a), cy + r * math.sin(a)) for r, a in rayons],
-              z - 1, z, col, mat)
 
 
 def ner_sur_tablette(name, x, y, normale, z, col):
@@ -5419,11 +5456,14 @@ for i in range(3):
     box(f"Menora_marche_{i}", XU + 1.2 + i * 0.4, XU + 1.6 + i * 0.4, YM - 1.5, YM + 1.5,
         Z_BAT, Z_BAT + 0.3 * (3 - i), "70_Kelim")
 
-TIGE_R, BRANCHE_R = 0.2 * TEFAH, 0.16 * TEFAH
+# « וְאִם הָיְתָה חֲלוּלָה כְּשֵׁרָה » (Beit HaBe'hira 3:4) : creuse, d'où l'épaisseur, sous le poids d'un
+# kikar avec ses lampes (Rashi sur Shemot 25:39). Paroi et diamètres : CHOIX.
+TIGE_R, BRANCHE_R = 0.35 * TEFAH, 0.3 * TEFAH
 # « שֶׁכָּל הַכַּפְתּוֹרִים שִׁיעוּר אֶחָד לְכֻלָּן, וְכֵן הַגְּבִיעִים כֻּלָּן שָׁוִין, וְהַפְּרָחִים גַּם כֵּן » (Rambam sur
-# Mena'hot 3:7) : une seule taille par ornement, celle qui tient à trois dans un tefa'h (Mena'hot 28b).
+# Mena'hot 3:7) : une seule taille par ornement, sur la tige comme sur les branches, la hauteur
+# de celle qui tient à trois dans un tefa'h (Mena'hot 28b) ; la largeur est libre.
 H_GAVIA, H_KAFTOR, H_PERACH = 0.35 * TEFAH, 0.4 * TEFAH, 0.25 * TEFAH
-R_PERACH, SAILLIE_KAFTOR = 0.45 * TEFAH, 0.13 * TEFAH
+R_GAVIA, R_KAFTOR, R_PERACH = 0.66 * TEFAH, 0.68 * TEFAH, 0.76 * TEFAH
 # Bouton de la tige d'où sort chaque paire de branches (Beit HaBe'hira 3:10), et l'écart de
 # ses lampes en pas : la plus basse est la plus longue (Rashi sur Shemot 25:32).
 PAIRES = ((8.5, 3), (10.5, 2), (12.5, 1))
@@ -5432,21 +5472,28 @@ SOMMET = 18 - H_PERACH / TEFAH  # pied de la fleur qui porte chaque lampe, en te
 # Sous chaque lampe, sur la tige comme sur les branches : trois coupes, un bouton, la fleur,
 # chacun au milieu de sa part des trois derniers tefa'him — distances sous SOMMET.
 SOUS_KAFTOR, SOUS_GEVIIM = 0.65 * TEFAH, (1.25 * TEFAH, 1.85 * TEFAH, 2.45 * TEFAH)
-NER_R, NER_H, NER_BEC = 0.52 * TEFAH, 0.5 * TEFAH, 0.8
-FLAMME_DEMI = 0.04 / AMA        # la visite centre sur ce point un cône de flamme de 8 cm
+NER_R, NER_H, NER_BEC = 0.66 * TEFAH, 0.56 * TEFAH, 0.8
+NIVEAU_SHEMEN, PETILA_R = 0.72, 0.03 * TEFAH
 NER_PROFIL = [(0, 0), (0.5 * NER_R, 0), (0.82 * NER_R, 0.14 * NER_H), (0.98 * NER_R, 0.45 * NER_H),
               (NER_R, 0.8 * NER_H), (0.97 * NER_R, NER_H), (0.86 * NER_R, NER_H),
               (0.84 * NER_R, 0.8 * NER_H), (0.62 * NER_R, 0.5 * NER_H), (0, 0.44 * NER_H)]
-YEREKH_PROFIL = [(0, 1.1 * TEFAH), (0.8 * TEFAH, 1.1 * TEFAH), (0.9 * TEFAH, 1.2 * TEFAH),
-                 (0.9 * TEFAH, 1.32 * TEFAH), (0.76 * TEFAH, 1.42 * TEFAH), (0.76 * TEFAH, 1.98 * TEFAH),
-                 (0.9 * TEFAH, 2.08 * TEFAH), (0.9 * TEFAH, 2.2 * TEFAH), (0.5 * TEFAH, 2.3 * TEFAH),
-                 (TIGE_R + 0.04 * TEFAH, 2.36 * TEFAH), (0, 2.36 * TEFAH)]
+# « הרגלים והפרח ג' » (Mena'hot 28b, cité par le Rambam sur Mena'hot 3:7) : le pied et sa fleur font trois tefa'him.
+YEREKH_HAUT = 3 - H_PERACH / TEFAH
+YEREKH_PROFIL = [(0, 1.1 * TEFAH), (1.3 * TEFAH, 1.1 * TEFAH), (1.45 * TEFAH, 1.22 * TEFAH),
+                 (1.45 * TEFAH, 1.38 * TEFAH), (1.22 * TEFAH, 1.5 * TEFAH), (1.22 * TEFAH, 2.25 * TEFAH),
+                 (1.4 * TEFAH, 2.37 * TEFAH), (1.4 * TEFAH, 2.5 * TEFAH), (0.8 * TEFAH, 2.64 * TEFAH),
+                 (TIGE_R + 0.06 * TEFAH, YEREKH_HAUT * TEFAH), (0, YEREKH_HAUT * TEFAH)]
 
 
 def cotes_amande(n, creux):
     """« מְשֻׁקָּדִים » : « מַעֲשֵׂה שְׁקֵדִים », l'or battu « עַד שֶׁיִּהְיֶה כֻּלּוֹ שְׁקֵדִים שְׁקֵדִים » (Rambam sur
     Mena'hot 3:7) — n côtes effilées aux deux bouts."""
     return lambda th, t: 1 - creux * (1 - abs(math.cos(n * th / 2)) ** 0.5) * math.sin(math.pi * t) ** 0.8
+
+
+def lys(n, creux):
+    """« ופרח צורת שושן » (Rambam sur Mena'hot 3:7) : n pétales fendus dans la lèvre — six : CHOIX."""
+    return lambda th, t: 1 - creux * (1 - abs(math.cos(n * th / 2)) ** 0.3) * min(1.0, max(0.0, (t - 0.8) / 0.1))
 
 
 def bec(th, t):
@@ -5456,7 +5503,7 @@ def bec(th, t):
 
 def gavia_profil(rt):
     """« פִּיהֶן רָחָב וְשׁוּלֵיהֶן קָצָר » (Beit HaBe'hira 3:9) : pied serré sur la tige, bouche large."""
-    e, h = 0.6 * TEFAH, H_GAVIA
+    e, h = (R_GAVIA - rt) / 0.36, H_GAVIA
     return [(rt, 0), (rt + 0.12 * e, 0), (rt + 0.12 * e, 0.06 * h), (rt + 0.04 * e, 0.14 * h),
             (rt + 0.07 * e, 0.28 * h), (rt + 0.17 * e, 0.45 * h), (rt + 0.26 * e, 0.63 * h),
             (rt + 0.31 * e, 0.8 * h), (rt + 0.33 * e, 0.92 * h), (rt + 0.36 * e, h), (rt + 0.29 * e, h),
@@ -5466,12 +5513,12 @@ def gavia_profil(rt):
 
 def kaftor_profil(rt):
     """« אֲרֻכִּין מְעַט כְּבֵיצָה שֶׁשְּׁנֵי רָאשֶׁיהָ כַּדִּין » (Beit HaBe'hira 3:9)."""
-    return [(rt + SAILLIE_KAFTOR * math.sin(math.pi * i / 12) ** 0.75, H_KAFTOR * i / 12) for i in range(13)]
+    return [(rt + (R_KAFTOR - rt) * (1 - (i / 12 - 1) ** 2) ** 0.4, H_KAFTOR * i / 24) for i in range(25)]
 
 
 def perach_profil(rt):
     """« כְּמִין קְעָרָה וּשְׂפָתָהּ כְּפוּלָה לַחוּץ » (Beit HaBe'hira 3:9)."""
-    lev, d, h = 0.07 * TEFAH, R_PERACH - rt, H_PERACH
+    lev, d, h = 0.09 * TEFAH, R_PERACH - rt, H_PERACH
     return [(rt, 0), (rt + 0.1 * d, 0.15 * h), (rt + 0.38 * d, 0.45 * h), (rt + 0.72 * d, 0.72 * h),
             (R_PERACH, 0.84 * h), (R_PERACH + lev, 0.9 * h), (R_PERACH + 1.2 * lev, 0.97 * h),
             (R_PERACH + 0.6 * lev, h), (R_PERACH - 0.4 * lev, 0.96 * h), (rt + 0.6 * d, 0.62 * h),
@@ -5492,18 +5539,18 @@ def gavia(nom, centre, axe, rt):
     sens = -a if GEVIIM_RENVERSES else a
     pied = Vector(centre) - sens * H_GAVIA / 2
     return or_cisele(revolution_axe(f"{nom}_gavia", pied, sens, gavia_profil(rt), "70_Kelim",
-                                    MAT_OR(), 40, forme=cotes_amande(6, 0.18)))
+                                    MAT_OR_MIKSHE(), 40, forme=cotes_amande(6, 0.18)))
 
 
 def kaftor(nom, centre, axe, rt):
     a = Vector(axe).normalized()
     return or_cisele(revolution_axe(f"{nom}_kaftor", Vector(centre) - a * H_KAFTOR / 2, a, kaftor_profil(rt),
-                                    "70_Kelim", MAT_OR(), 32, forme=cotes_amande(6, 0.06)))
+                                    "70_Kelim", MAT_OR_MIKSHE(), 32))
 
 
 def perach(nom, base, rt):
     return or_cisele(revolution_axe(f"{nom}_perach", base, (0, 0, 1), perach_profil(rt), "70_Kelim",
-                                    MAT_OR(), 40, forme=cotes_amande(8, 0.05)))
+                                    MAT_OR_MIKSHE(), 72, forme=lys(6, 0.3)))
 
 
 def point_du_chemin(chemin, s):
@@ -5520,20 +5567,20 @@ def menora_pied(nom, x, y):
     d'où elles descendent (Rashi sur Shemot 25:31) — hexagonal : CHOIX. Puis la fleur
     « סָמוּךְ לִירֵכָהּ » (Beit HaBe'hira 3:1)."""
     or_cisele(revolution_axe(f"{nom}_yerekh", (x, y, Z_BAT), (0, 0, 1), YEREKH_PROFIL, "70_Kelim",
-                             MAT_OR(), 6, depart=(-1, 0, 0)))
+                             MAT_OR_MIKSHE(), 6, depart=(-1, 0, 0)))
     for k, angle in enumerate((180, 60, -60)):
         cap = Vector((math.cos(math.radians(angle)), math.sin(math.radians(angle)), 0))
-        haut = Vector((x, y, Z_BAT + 1.15 * TEFAH)) + cap * 0.55 * TEFAH
-        bas = Vector((x, y, Z_BAT + 0.3 * TEFAH)) + cap * 2.6 * TEFAH
+        haut = Vector((x, y, Z_BAT + 1.2 * TEFAH)) + cap * 0.9 * TEFAH
+        bas = Vector((x, y, Z_BAT + 0.4 * TEFAH)) + cap * 4.0 * TEFAH
         L = (bas - haut).length
         or_cisele(revolution_axe(f"{nom}_regel_{k}", haut, bas - haut,
-                                 [(0.3 * TEFAH, 0), (0.26 * TEFAH, 0.2 * L), (0.21 * TEFAH, 0.5 * L),
-                                  (0.26 * TEFAH, 0.56 * L), (0.26 * TEFAH, 0.6 * L), (0.2 * TEFAH, 0.66 * L),
-                                  (0.16 * TEFAH, L)], "70_Kelim", MAT_OR(), 16))
+                                 [(0.6 * TEFAH, 0), (0.54 * TEFAH, 0.2 * L), (0.44 * TEFAH, 0.5 * L),
+                                  (0.54 * TEFAH, 0.56 * L), (0.54 * TEFAH, 0.6 * L), (0.42 * TEFAH, 0.66 * L),
+                                  (0.36 * TEFAH, L)], "70_Kelim", MAT_OR_MIKSHE(), 24))
         or_cisele(revolution_axe(f"{nom}_regel_{k}_patin", (bas.x, bas.y, Z_BAT), (0, 0, 1),
-                                 [(0, 0), (0.42 * TEFAH, 0), (0.45 * TEFAH, 0.08 * TEFAH), (0.36 * TEFAH, 0.2 * TEFAH),
-                                  (0.2 * TEFAH, 0.34 * TEFAH), (0, 0.36 * TEFAH)], "70_Kelim", MAT_OR(), 24))
-    perach(f"{nom}_pied", (x, y, Z_BAT + 2.36 * TEFAH), TIGE_R)
+                                 [(0, 0), (0.62 * TEFAH, 0), (0.66 * TEFAH, 0.1 * TEFAH), (0.54 * TEFAH, 0.26 * TEFAH),
+                                  (0.3 * TEFAH, 0.44 * TEFAH), (0, 0.46 * TEFAH)], "70_Kelim", MAT_OR_MIKSHE(), 32))
+    perach(f"{nom}_pied", (x, y, Z_BAT + YEREKH_HAUT * TEFAH), TIGE_R)
 
 
 def menora_tige(nom, x, y):
@@ -5542,7 +5589,7 @@ def menora_tige(nom, x, y):
     et trois coupes, un bouton et une fleur dans les trois derniers."""
     z = lambda t: Z_BAT + t * TEFAH
     haut = (0, 0, 1)
-    cyl_between(f"{nom}_tige", (x, y, z(2.2)), (x, y, z(SOMMET + 0.05)), TIGE_R, "70_Kelim", verts=24)
+    cyl_between(f"{nom}_tige", (x, y, z(YEREKH_HAUT - 0.1)), (x, y, z(SOMMET + 0.05)), TIGE_R, "70_Kelim", MAT_OR_MIKSHE(), verts=24)
     gavia(f"{nom}_tige_0", (x, y, z(5) + H_GAVIA / 2), haut, TIGE_R)
     kaftor(f"{nom}_tige_0", (x, y, z(5) + H_GAVIA + H_KAFTOR / 2), haut, TIGE_R)
     perach(f"{nom}_tige_0", (x, y, z(6) - H_PERACH), TIGE_R)
@@ -5557,8 +5604,8 @@ def menora_branche(nom, chemin):
     """Une branche : trois coupes, un bouton, puis la fleur (Beit HaBe'hira 3:2), aux mêmes
     distances sous la lampe que sur la tige — leur place le long de la branche : CHOIX."""
     for i, (p, q) in enumerate(zip(chemin, chemin[1:])):
-        cyl_between(f"{nom}_{i}", p[:], q[:], BRANCHE_R, "70_Kelim", verts=16)
-    or_cisele(sphere(f"{nom}_noeud", *chemin[-1], BRANCHE_R * 1.05, "70_Kelim", MAT_OR(), segs=16))
+        cyl_between(f"{nom}_{i}", p[:], q[:], BRANCHE_R, "70_Kelim", MAT_OR_MIKSHE(), verts=24)
+    or_cisele(sphere(f"{nom}_noeud", *chemin[-1], BRANCHE_R * 1.05, "70_Kelim", MAT_OR_MIKSHE(), segs=16))
     longueur = sum((q - p).length for p, q in zip(chemin, chemin[1:]))
     kaftor(nom, *point_du_chemin(chemin, longueur - SOUS_KAFTOR), BRANCHE_R)
     for j, sous in enumerate(SOUS_GEVIIM):
@@ -5576,12 +5623,21 @@ def chemin_branche(x, y, h, ecart):
 
 def menora_ner(nom, sommet, vers):
     """La fleur et son ner « כְּמִין בָּזֵךְ » (Rashi sur Shemot 25:31), fixé à la branche
-    (Beit HaBe'hira 3:7), bec tourné vers `vers`. Rend la pointe du bec, où brûle la mèche."""
-    perach(nom, sommet, BRANCHE_R * 1.5)
+    (Beit HaBe'hira 3:7), bec tourné vers `vers`, l'huile et la mèche couchée dans le bec.
+    Rend le bout de la mèche, où brûle la flamme."""
+    perach(nom, sommet, BRANCHE_R)
     base = Vector(sommet) + Vector((0, 0, 0.12 * TEFAH))
-    or_cisele(revolution_axe(f"{nom}_ner", base, (0, 0, 1), NER_PROFIL, "70_Kelim", MAT_OR(), 48,
+    or_cisele(revolution_axe(f"{nom}_ner", base, (0, 0, 1), NER_PROFIL, "70_Kelim", MAT_OR_MIKSHE(), 48,
                              depart=vers, forme=bec))
-    return base + Vector(vers).normalized() * 1.65 * NER_R + Vector((0, 0, NER_H + FLAMME_DEMI))
+    shemen = revolution_axe(f"{nom}_ner_shemen", base, (0, 0, 1),
+                            [(0.8 * NER_R, (NIVEAU_SHEMEN - 0.05) * NER_H), (0.8 * NER_R, NIVEAU_SHEMEN * NER_H)],
+                            "70_Kelim", MAT_SHEMEN(), 48, depart=vers, forme=lambda th, _: bec(th, NIVEAU_SHEMEN))
+    v = Vector(vers).normalized()
+    bout = base + v * 1.62 * NER_R + Vector((0, 0, NER_H + 0.08 * TEFAH))
+    petila = cyl_between(f"{nom}_ner_petila", (base + v * 0.7 * NER_R + Vector((0, 0, 0.6 * NER_H)))[:], bout[:],
+                         PETILA_R, "70_Kelim", MAT_PETILA(), verts=8)
+    shemen["sans_biseau"] = petila["sans_biseau"] = True
+    return bout
 
 
 def menora(nom, x, y, allumee):

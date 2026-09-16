@@ -220,29 +220,73 @@ function allumerBraises(points) {
 }
 
 function vaciller(dt) {
-  if (!braise) return;
   vacillement += dt;
   const t = vacillement;
+  TEMPS_FLAMME.value = t;
+  if (lumiereMenora) {
+    lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
+  }
+  if (!braise) return;
   const souffle = 0.86 + 0.09 * Math.sin(t * 1.7) + 0.05 * Math.sin(t * 4.3 + 1.0) + 0.04 * (Math.random() - 0.5);
   braise.intensity = BRAISE.intensite * souffle;
 }
 
 // L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
 const MENORA = { couleur: 0xffb36b, intensite: 150, portee: 18, carte: 512 };
-const FLAMME = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc27a).multiplyScalar(9) });
+// Une flamme d'huile d'olive sur mèche de lin : quatre centimètres, le pied bleu, le coeur
+// blanc, le manteau orangé qui s'efface vers la pointe. Additive, sans profondeur écrite.
+const PROFIL_FLAMME = [[0, -0.003], [0.0035, 0.0], [0.0068, 0.007], [0.0075, 0.013],
+                       [0.0062, 0.022], [0.0034, 0.032], [0.0008, 0.04], [0, 0.043]]
+  .map(([r, y]) => new THREE.Vector2(r, y));
+const HAUTEUR_FLAMME = 0.043;
+const TEMPS_FLAMME = { value: 0 };
+let lumiereMenora = null;
+
+function materiauFlamme(phase) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uTemps: TEMPS_FLAMME, uPhase: { value: phase } },
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: /* glsl */`
+      uniform float uTemps; uniform float uPhase;
+      varying float vHauteur; varying vec3 vN; varying vec3 vVue;
+      void main(){
+        vec3 p = position;
+        vHauteur = clamp(p.y / ${HAUTEUR_FLAMME}, 0.0, 1.0);
+        float h2 = vHauteur * vHauteur;
+        p.y *= 1.0 + 0.10 * sin(uTemps * 8.3 + uPhase) + 0.05 * sin(uTemps * 19.0 + uPhase * 2.1);
+        p.x += (0.6 * sin(uTemps * 6.1 + uPhase) + 0.4 * sin(uTemps * 14.3 + uPhase * 1.7)) * 0.0022 * h2;
+        p.z += (0.6 * cos(uTemps * 5.3 + uPhase * 0.7) + 0.4 * sin(uTemps * 11.9 + uPhase)) * 0.0018 * h2;
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        vN = normalMatrix * normal; vVue = -mv.xyz;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */`
+      varying float vHauteur; varying vec3 vN; varying vec3 vVue;
+      void main(){
+        float face = abs(dot(normalize(vN), normalize(vVue)));
+        vec3 coeur = vec3(3.4, 2.7, 1.5), manteau = vec3(2.0, 0.75, 0.18), pied = vec3(0.12, 0.22, 0.85);
+        vec3 c = mix(manteau, coeur, smoothstep(0.45, 0.95, face) * (1.0 - smoothstep(0.35, 0.85, vHauteur)));
+        c = mix(pied, c, smoothstep(0.02, 0.22, vHauteur));
+        float voile = smoothstep(0.05, 0.6, face) * (1.0 - 0.7 * smoothstep(0.6, 1.0, vHauteur));
+        gl_FragColor = vec4(c * voile, 1.0);
+      }`,
+  });
+}
 
 function allumerMenora(flammes) {
   if (!flammes?.length) return;
-  const forme = new THREE.ConeGeometry(0.022, 0.08, 8);
+  const forme = new THREE.LatheGeometry(PROFIL_FLAMME, 16);
   const centre = new THREE.Vector3();
-  for (const p of flammes) {
-    const flamme = new THREE.Mesh(forme, FLAMME);
+  flammes.forEach((p, i) => {
+    const flamme = new THREE.Mesh(forme, materiauFlamme(i * 2.39));
     flamme.position.set(...p);
     scene.add(flamme);
+    horsGeometrie.push(flamme);
     centre.add(flamme.position);
-  }
-  const lumiere = new THREE.PointLight(MENORA.couleur, MENORA.intensite, MENORA.portee, 2);
-  lumiere.position.copy(centre.divideScalar(flammes.length));
+  });
+  const lumiere = lumiereMenora = new THREE.PointLight(MENORA.couleur, MENORA.intensite, MENORA.portee, 2);
+  // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
+  lumiere.position.copy(centre.divideScalar(flammes.length)).add(new THREE.Vector3(0, 0.35, 0));
   lumiere.castShadow = PROFIL.menora.ombre;
   // La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
   lumiere.shadow.autoUpdate = false;
@@ -254,9 +298,10 @@ function allumerMenora(flammes) {
   scene.add(lumiere);
 }
 
-// Le dôme est le seul objet qui n'entre pas dans la passe de géométrie : il enveloppe
-// la scène, et il l'occluerait tout entière.
-const rendu = chaine(renderer, scene, camera, [ciel]);
+// Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
+// tout entière. Les flammes de la Menora non plus : elles ne sont pas une surface à ombrer.
+const horsGeometrie = [ciel];
+const rendu = chaine(renderer, scene, camera, horsGeometrie);
 
 // La résolution suit ce que la machine tient. Baisser la définition d'un tiers coûte
 // une image plus douce ; la garder coûte le mouvement, qui est ce qu'on est venu voir.
