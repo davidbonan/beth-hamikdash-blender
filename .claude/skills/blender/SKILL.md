@@ -175,7 +175,8 @@ nommer.
 L'export **cuit l'occlusion du ciel** avant d'aplatir les matières
 (`beit_hamikdash_occlusion.py`) : chaque concept d'architecture — aire ≥ 50 m², au moins 10
 texels par face, hors Kodesh HaKodashim qui a sa pénombre — perd d'abord ses faces collées
-contre une autre (cachées, elles cuisaient noires et perçaient sur mobile), puis reçoit une couche UV `Occlusion` et une carte `visite/occlusion/<concept>.webp`,
+contre une autre, ou les fait reculer d'1 cm si le recouvrement n'est que partiel (cachées, elles
+cuisaient noires), puis reçoit une couche UV `Occlusion` et une carte `visite/occlusion/<concept>.webp`,
 que `reperes.json` liste sous `occlusion` et que la visite pose en `aoMap`. Cuite au double
 puis réduite en WebP à perte (`cwebp` sur le PATH), portée 8 m, 3 m dans le Heikhal où la
 sonde de `visite/sonde.js` écarte déjà le ciel. C'est l'essentiel du temps de l'export :

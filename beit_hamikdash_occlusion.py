@@ -8,7 +8,7 @@ import time
 import bmesh
 import bpy
 import numpy as np
-from mathutils import geometry
+from mathutils import Vector, geometry
 from mathutils.bvhtree import BVHTree
 
 SORTIE = pathlib.Path(__file__).resolve().parent / "visite" / "occlusion"
@@ -77,16 +77,28 @@ class Collees:
                 triangles.append([base + i for i in tri.vertices])
                 self.face_de.append(premiere + tri.polygon_index)
                 self.faces[premiere + tri.polygon_index][0].append([sommets[i] for i in triangles[-1]])
+        self.aires = [sum(geometry.area_tri(*t) for t in triangles_) for triangles_, _ in self.faces]
         self.arbre = BVHTree.FromPolygons(sommets, triangles)
         self.retirees = set()
 
-    def couverte(self, k):
-        triangles, normale = self.faces[k]
-        if normale.length == 0:
-            return False
-        return all(self.couvert(point, k) for triangle in triangles for point in points_temoins(triangle))
+    def temoins(self, k):
+        return (point for triangle in self.faces[k][0] for point in points_temoins(triangle))
 
-    def couvert(self, point, k):
+    def couverte(self, k):
+        return self.faces[k][1].length > 0 and all(self.couvrante(point, k) is not None for point in self.temoins(k))
+
+    # Recouverte en partie seulement, elle reste ; la plus petite des deux recule derrière l'autre.
+    def a_reculer(self, k):
+        return self.faces[k][1].length > 0 and not self.mince(k) and any(
+            (g := self.couvrante(point, k)) is not None and g[1] <= TOLERANCE and (self.aires[g[0]], -g[0]) > (self.aires[k], -k)
+            for point in self.temoins(k))
+
+    def mince(self, k):
+        triangle, normale = self.faces[k][0][0], self.faces[k][1]
+        centre = sum(triangle, triangle[0] * 0) / 3
+        return self.arbre.ray_cast(centre - normale * TOLERANCE, -normale, 2 * COLLEE)[0] is not None
+
+    def couvrante(self, point, k):
         normale = self.faces[k][1]
         for position, _, t, _ in self.arbre.find_nearest_range(point, COLLEE):
             g = self.face_de[t]
@@ -95,15 +107,24 @@ class Collees:
             ecart = position - point
             devant = ecart.dot(normale)
             if -TOLERANCE <= devant <= COLLEE and (ecart - normale * devant).length <= TOLERANCE:
-                return True
-        return False
+                return g, abs(devant)
+        return None
 
 
-def retirer_cachees(objets):
-    collees = Collees(objets)
-    for k in range(len(collees.faces)):
-        if collees.couverte(k):
-            collees.retirees.add(k)
+def reculer(objets, collees, reculees):
+    for obj in objets:
+        vers_local = obj.matrix_world.inverted_safe().to_3x3()
+        deplacements = {}
+        for k in reculees:
+            o, i = collees.origines[k]
+            if o is obj:
+                for sommet in obj.data.polygons[i].vertices:
+                    deplacements[sommet] = deplacements.get(sommet, Vector()) - collees.faces[k][1] * COLLEE
+        for sommet, deplacement in deplacements.items():
+            obj.data.vertices[sommet].co += vers_local @ deplacement
+
+
+def retirer(objets, collees):
     for obj in objets:
         indices = {i for k, (o, i) in enumerate(collees.origines) if o is obj and k in collees.retirees}
         maillage = bmesh.new()
@@ -112,7 +133,17 @@ def retirer_cachees(objets):
         bmesh.ops.delete(maillage, geom=[maillage.faces[i] for i in indices], context="FACES_ONLY")
         maillage.to_mesh(obj.data)
         maillage.free()
-    print(f"  {len(collees.retirees)} faces cachées retirées sur {len(collees.faces)}")
+
+
+def separer_collees(objets):
+    collees = Collees(objets)
+    for k in range(len(collees.faces)):
+        if collees.couverte(k):
+            collees.retirees.add(k)
+    reculees = [k for k in range(len(collees.faces)) if k not in collees.retirees and collees.a_reculer(k)]
+    reculer(objets, collees, reculees)
+    retirer(objets, collees)
+    print(f"  faces collées sur {len(collees.faces)} : {len(collees.retirees)} retirées, {len(reculees)} reculées de {COLLEE * 100:.0f} cm")
 
 
 def preparer_cycles():
@@ -185,7 +216,7 @@ def cuire_occlusion(fusionnes):
     for ancienne in SORTIE.glob("*.webp"):
         ancienne.unlink()
     choisis = list(retenus(fusionnes))
-    retirer_cachees([obj for _, obj, _ in choisis])
+    separer_collees([obj for _, obj, _ in choisis])
     preparer_cycles()
     cartes = {}
     debut = time.time()

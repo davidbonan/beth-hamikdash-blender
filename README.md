@@ -877,7 +877,10 @@ version précédente, même glb, même pose.
   face couverte à moins d'1 cm par une face tournée du même côté, en tous ses points témoins
   (un tous les 25 cm sur sa vraie triangulation), sort du maillage ; de deux faces confondues,
   une seule. Dos à dos, les faces restent : chacune est dans le volume de l'autre, invisible.
-  1 882 faces sur 125 750.
+  Recouvertes en partie seulement — un socle qui s'arrête au nu de l'embrasure d'une porte
+  mais déborde du mur —, les deux restaient et noircissaient ensemble : la plus petite
+  recule d'1 cm derrière l'autre, sauf dans un volume de moins de 2 cm. 1 882 faces retirées
+  et 2 332 reculées sur 125 750, ~1,5 min de plus à l'export.
 - **Le Heikhal reflète la salle, pas le ciel** (`visite/sonde.js`) : une carte cubique
   rendue une fois au chargement depuis le milieu des kelim, soleil, ciel et lampes éteints
   — la Menora seule, un rebond, intensité 0,5. L'or étant métallique, c'est son reflet qui
@@ -885,6 +888,9 @@ version précédente, même glb, même pose.
   d'occlusion ramenée à 3 m dans la salle, où la sonde écarte déjà le ciel. `sculptures_murs`
   court sur les parois des deux pièces : ce qui sort du Heikhal est détaché au chargement et
   garde le ciel assombri du Kodesh HaKodashim.
+  Le profil léger s'en passe : sur iPhone 16 Plus (Safari, iOS 18.7), rendue au chargement,
+  elle noircissait toute la visite hors le ciel — vérifié sur l'appareil, visite propre sans
+  elle. Le Heikhal y garde le reflet du ciel.
 - **Non mesuré** : le temps par image. Rien n'est retiré — la SSAO de `chaine.js` reste,
   pour les contacts et les figurants — et la cuisson ajoute une lecture de texture ; aucun
   gain de performance n'est à attendre de ce changement.

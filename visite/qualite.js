@@ -17,14 +17,15 @@ const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const leger = demande === "basse"
   || (demande !== "haute" && (tactile || (navigator.hardwareConcurrency || 8) <= 4));
 
+// `sonde` : rendue sur iPhone (Safari iOS 18), la carte cubique du Heikhal noircit toute la visite.
 // `halo` absent = pas de passe du tout, et pas seulement une force nulle : les cinq
 // niveaux de flou de la passe sont alloués par son constructeur, qu'elle serve ou non.
 export const PROFIL = leger
   ? { dprMax: 1.5, echelleMin: 0.75, profondeurLog: false, grainLeger: true,
       ombres: { taille: 1024, portee: 26, penombre: false }, occlusion: 6,
       halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, menora: { ombre: false }, figurants: { ombre: false },
-      fumee: { pas: 16, octaves: 2 } }
+      fumee: { pas: 16, octaves: 2 }, sonde: false }
   : { dprMax: 2, echelleMin: 0.7, profondeurLog: true, grainLeger: false,
       ombres: { taille: 2048, portee: 40, penombre: true }, occlusion: 12,
       halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, menora: { ombre: true }, figurants: { ombre: true },
-      fumee: { pas: 48, octaves: 3 } };
+      fumee: { pas: 48, octaves: 3 }, sonde: true };
