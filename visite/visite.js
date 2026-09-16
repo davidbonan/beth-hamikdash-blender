@@ -28,6 +28,7 @@ const RAYON = 0.38;       // demi-largeur du marcheur
 const MARCHE = 0.5 * 0.48; // 1/2 ama
 const MONTEE = AMA + 0.02;
 const CHUTE = 0.60;        // au-delà, il n'y a pas de sol : le pas est refusé
+const FENTE = 0.25;        // un pied : le vide plus étroit que lui s'enjambe sans y penser
 // Ce qu'un repère d'entrée peut manquer son sol, en plus ou en moins. Il donne sa
 // hauteur à la main, et la fenêtre de la marche est celle d'un pas : trois des neuf
 // étaient 2,5 amot au-dessus de leur dallage, et on s'y posait en l'air.
@@ -76,8 +77,12 @@ const echouer = (quoi) => {
 addEventListener("error", (e) => echouer(e.message || e.error));
 addEventListener("unhandledrejection", (e) => echouer(e.reason?.message || e.reason));
 
+// Le cachet que le build appose sur ./visite.js voyage jusqu'ici : les données qu'on
+// demande par un nom construit le portent comme celles qu'il a pu réécrire.
+const VERSION = new URL(import.meta.url).search;
+
 async function json(chemin, obligatoire = true) {
-  const r = await fetch(chemin);
+  const r = await fetch(chemin + VERSION);
   if (!r.ok) {
     if (obligatoire) throw new Error(`${chemin} : ${r.status}`);
     return null;                                  // encyclopédie encore incomplète
@@ -397,6 +402,14 @@ function solEn(x, z, piedsY) {
   return solSous(sonde.set(x, piedsY + MONTEE, z), MONTEE + CHUTE);
 }
 
+// Le pas qui arrive sur du vide regarde un pied plus loin dans le même sens : une fente
+// plus étroite qu'un pied ne fait tomber personne. Un quart d'ama d'air sépare la tête
+// du kevesh de l'autel (Zeva'him 62b), un cheveu le petit kevesh du sovev — et le rayon
+// de sol, tiré en un point, y tombait à chaque fois : l'autel ne se montait pas.
+function solEnjambe(x, z, piedsY, direction) {
+  return solEn(x, z, piedsY) ?? solEn(x + direction.x * FENTE, z + direction.z * FENTE, piedsY);
+}
+
 // Le rayon de garde part AU-DESSUS de ce qui est franchissable. Plus bas, il heurtait
 // la deuxième marche avant qu'on ait gravi la première : les degrés du 'Heil et de
 // Nikanor font 1/2 ama — 0,24 m — et un corps de 0,38 m de rayon en couvre deux. Tout
@@ -458,7 +471,7 @@ function marcher(dt) {
     const distance = Math.min(reste, SOUS_PAS);
     reste -= distance;
     const x = camera.position.x + pas.x * distance, z = camera.position.z + pas.z * distance;
-    const sol = murDevant(camera.position, piedsY, pas, distance) ? null : solEn(x, z, piedsY);
+    const sol = murDevant(camera.position, piedsY, pas, distance) ? null : solEnjambe(x, z, piedsY, pas);
     if (sol === null) {                            // un mur, ou le vide : le pas est refusé
       lisse.set(0, 0, 0);                          // et l'élan avec, sinon il pousse contre
       cible = null;

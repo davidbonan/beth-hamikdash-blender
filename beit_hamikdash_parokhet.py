@@ -12,7 +12,7 @@ du tissage qui la montre — « אֲרִיגָה שֶׁל שְׁתֵּי קִי�
 fils dont l'une passe devant l'autre là où le dessin le veut. Chaque cordon porte les
 quatre laines (Shekalim 8:5) ; ce qui change d'une face à l'autre, c'est celle qui
 affleure : le fond montre ses tekhelet et argaman, la figure ses lin et tola'at shani.
-Le lion de la Porte d'Ishtar, blanc et fauve sur l'émail bleu, en est le contemporain.
+Le lion du sceau de Shema, serviteur de Yarovam, en est le contemporain hébreu.
 
 Les figures ne sont plus dessinées ici. Des contours lissés en aplats, si juste soit
 le motif, sortaient en autocollants : chaque partie d'une seule couleur, chaque bord
@@ -50,10 +50,15 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, bombe, cadrer, distance, ecrire, figure,  # noqa: E402
                                   flouter, lire_rgb, reechantillonner, remplir)
-from beit_hamikdash_contours import (ATTACHE_REGIME, BRAS, CORPS_KERUV, ECAILLE, FUT,  # noqa: E402
-                                     LARGEURS_BRAS, PALMES, PLIS, REGIME, TETE_DOUBLE, TRONC, aile,
-                                     corolle, courbe, ellipse, lisser, palme, poser, poser_lame,
-                                     ruban)
+from beit_hamikdash_contours import (BRAS, CORPS_KERUV, DATTE, EPIS,  # noqa: E402
+                                     LARGEURS_BRAS, LARGEURS_QUEUE, LION_COTES, LION_CORPS,
+                                     LION_CRINIERE, LION_FLANC, LION_GUEULE, LION_HOUPPE,
+                                     LION_MACHOIRE, LION_NASEAU, LION_OEIL, LION_OREILLE,
+                                     LION_PATTES_CACHEES, LION_PATTES_VUES, LION_QUEUE, LION_RANGS,
+                                     LION_SOURCIL, LION_TETE, LION_VOLUTE_EPAULE,
+                                     LION_VOLUTE_HANCHE, PALMES, PLIS, TETE_DOUBLE, TRONC, aile,
+                                     chevrons, corolle, courbe, criniere, ellipse, epi, folioles,
+                                     lisser, palme, pied, poser, poser_lame, ruban, ruban_effile, volute)
 
 LARGEUR_PX = 2048
 NOM = f"parokhet_{LARGEUR_PX}"
@@ -145,69 +150,51 @@ def creature_ailee():
     return parties
 
 
-# Le lion marchant des frises d'Orient : corps long, dos presque droit, poitrail
-# profond, ventre relevé, queue en S ramenée au-dessus de la croupe. Il regarde vers
-# les u croissants.
-LION_CORPS = ((0.40, 0.58), (0.44, 0.66), (0.36, 0.72), (0.22, 0.75), (0.02, 0.74),
-              (-0.18, 0.72), (-0.36, 0.71), (-0.50, 0.66), (-0.56, 0.56), (-0.54, 0.44),
-              (-0.46, 0.36), (-0.30, 0.33), (-0.10, 0.32), (0.10, 0.33), (0.28, 0.36),
-              (0.40, 0.44))
-# Front, oreille, mufle, et l'entaille de la gueule entrouverte sous le nez.
-LION_TETE = ((0.36, 0.56), (0.40, 0.70), (0.48, 0.80), (0.55, 0.87), (0.61, 0.84),
-             (0.65, 0.78), (0.75, 0.77), (0.84, 0.72), (0.88, 0.64), (0.84, 0.58),
-             (0.74, 0.57), (0.80, 0.52), (0.72, 0.47), (0.60, 0.47), (0.48, 0.50))
-LION_QUEUE = ((-0.48, 0.64), (-0.58, 0.70), (-0.65, 0.80), (-0.63, 0.90), (-0.55, 0.95))
-# Une patte : cuisse, genou, canon, et la patte qui s'élargit au sol, (u de l'axe, z).
-LION_PATTE = ((-0.055, 0.38), (0.055, 0.38), (0.040, 0.20), (0.030, 0.08), (0.075, 0.0),
-              (-0.065, 0.0), (-0.035, 0.08), (-0.055, 0.20))
-# (axe, foulée, hauteur du bombé) : les deux pattes du côté du regard sont en pleine
-# marche, les deux autres passent derrière, un peu plus bas dans l'étoffe.
-LION_PATTES = ((0.22, -0.05, 0.60), (-0.30, 0.05, 0.60), (0.34, 0.08, 0.75), (-0.42, -0.08, 0.75))
-# Les traits du fond qui dessinent l'épaule et la hanche sur le corps clair.
-LION_TRAITS = (((0.14, 0.38), (0.21, 0.48), (0.17, 0.60), (0.06, 0.67)),
-               ((-0.26, 0.36), (-0.22, 0.46), (-0.29, 0.58), (-0.42, 0.65)))
-
-
 def lion():
-    """Le lion de la frise — « וּפְנֵי כְפִיר » (Ye'hezkel 41:19), et le lion du revers d'un
-    maassé 'hoshev (Rashi sur Yoma 72b). De profil, marchant : corps de lin, crinière
-    et houppe cramoisies."""
+    """Le lion du sceau de Shema (beit_hamikdash_contours.py), tissé : corps de lin,
+    crinière, toupet et fond de gueule cramoisis, dessin intérieur en fils du fond. Les
+    parties se posent du plus lointain au plus proche — les pattes du côté caché, la
+    queue, le corps, puis la tête et les pattes du côté vu."""
     parties = []
-    for axe, foulee, hauteur in LION_PATTES:
-        patte = [(axe + du + foulee * (1.0 - dz / 0.38), dz) for du, dz in LION_PATTE]
-        parties.append((lisser(patte, passes=2), hauteur, CLAIR))
-    parties += [(lisser(LION_CORPS, passes=2), 0.75, CLAIR),
-                (ellipse(-0.40, 0.45, 0.13, 0.11), 0.75, CLAIR),
-                (ruban(courbe(LION_QUEUE), 0.045), 0.70, CLAIR),
-                (ellipse(-0.53, 0.96, 0.07, 0.055), 0.80, CHAUD),
-                (corolle(0.40, 0.66, 0.27, 16), 0.90, CHAUD),
-                (corolle(0.34, 0.50, 0.17, 12), 0.90, CHAUD),
-                (lisser(LION_TETE, passes=1), 1.0, CLAIR)]
-    for trait in LION_TRAITS:
-        parties.append((ruban(courbe(trait), TRAIT), BOMBE_TRAIT, FOND))
+    for axe, largeurs in LION_PATTES_CACHEES:
+        parties += [(ruban_effile(axe, largeurs), 0.58, CLAIR), (pied(axe), 0.58, CLAIR)]
+    parties += [(ruban_effile(LION_QUEUE, LARGEURS_QUEUE), 0.68, CLAIR),
+                (lisser(LION_CORPS, passes=2), 0.76, CLAIR),
+                (criniere(*LION_HOUPPE, meches=9, creux=0.80), 0.82, CHAUD),
+                (criniere(*LION_CRINIERE), 0.88, CHAUD),
+                (lisser(LION_OREILLE, passes=2), 0.95, CLAIR),
+                (lisser(LION_GUEULE, passes=1), 0.62, CHAUD),
+                (lisser(LION_TETE, passes=1), 1.0, CLAIR),
+                (lisser(LION_MACHOIRE, passes=1), 0.94, CLAIR)]
+    for axe, largeurs in LION_PATTES_VUES:
+        parties += [(ruban_effile(axe, largeurs), 0.80, CLAIR), (pied(axe), 0.80, CLAIR)]
+    for fil in LION_RANGS + LION_COTES + (LION_FLANC, LION_SOURCIL, LION_NASEAU):
+        parties.append((ruban(courbe(fil), TRAIT), BOMBE_TRAIT, FOND))
+    for spirale, depart in ((LION_VOLUTE_EPAULE, 2.2), (LION_VOLUTE_HANCHE, -0.6)):
+        parties.append((ruban(volute(*spirale, depart=depart), TRAIT), BOMBE_TRAIT, FOND))
+    parties.append((ellipse(*LION_OEIL), BOMBE_TRAIT, FOND))
     return parties
 
 
 def timora():
     """Le dattier — « וְתִמֹרֹת » (Melakhim I 6:29), et « תִמֹרָה בֵּין כְּרוּב לִכְרוּב » (Ye'hezkel
     41:18) : entre deux keruvim, une timora. Celle des parois (beit_hamikdash_contours.py),
-    tissée : fût pourpre à écailles du fond, palmes de lin nervurées, dattes cramoisies."""
+    tissée : fût pourpre à chevrons du fond, palmes de lin découpées en folioles, régimes
+    de dattes cramoisies pendus en épis."""
     parties = [(TRONC, 0.6, POURPRE)]
-    for k in range(int(FUT / ECAILLE) - 1):
-        z = ECAILLE * k + 0.02
-        for sens in (-1, 1):
-            parties.append((ruban([(sens * -0.04, z), (sens * 0.04, z + 0.08)], 0.008), BOMBE_TRAIT, FOND))
+    for chevron in chevrons():
+        parties.append((ruban(chevron, 0.008), BOMBE_TRAIT, FOND))
     for inclinaison, longueur, retombee in PALMES[::-1]:
         for sens in ((1,) if inclinaison == 0 else (-1, 1)):
             axe, largeurs = palme(sens * inclinaison, longueur, retombee)
-            parties.append((lisser(ruban(axe, largeurs), passes=2), 0.8, CLAIR))
-            parties.append((ruban(axe[2:-2], 0.008), BOMBE_TRAIT, FOND))
+            parties.append((folioles(axe, largeurs), 0.8, CLAIR))
+            parties.append((ruban(axe[3:-9], 0.005), BOMBE_TRAIT, FOND))
     for sens in (-1, 1):
-        parties.append((ruban([(sens * 0.03, FUT + 0.01), (sens * ATTACHE_REGIME[0], ATTACHE_REGIME[1] + 0.02)],
-                              0.022), 0.7, POURPRE))
-        for du, dz, r in REGIME:
-            parties.append((ellipse(sens * ATTACHE_REGIME[0] + du, ATTACHE_REGIME[1] + dz, r * 0.9, r * 1.3),
-                            0.7, CHAUD))
+        for ecart, longueur in EPIS:
+            fil, dattes = epi(ecart, longueur)
+            parties.append((ruban([(sens * u, z) for u, z in fil], 0.011), 0.70, POURPRE))
+            for u, z in dattes:
+                parties.append((ellipse(sens * u, z, *DATTE), 0.74, CHAUD))
     return parties
 
 
@@ -215,17 +202,19 @@ def timora():
 # c'est elle que le guide ne porte qu'à moitié. La manière est celle des tapisseries de
 # l'Orient ancien — laines plates, contours en fil, dessin intérieur en fils contrastés.
 TISSAGE = "Re-weave this {sujet} as a genuine ancient Near-Eastern woven wool tapestry " \
-          "figure of the Iron Age (in the spirit of the Ishtar Gate lions, Pazyryk textiles, " \
-          "Phoenician and Syrian tapestry): flat woven wool with a visible fine weft, bold " \
+          "figure of the Iron Age (in the spirit of Hebrew and Phoenician seals, Syrian " \
+          "tapestry and Pazyryk textiles): flat woven wool with a visible fine weft, bold " \
           "simplified outlines in a darker thread, decorative interior patterning in " \
           "contrasting threads, stylised and geometric, no shading, no gold, no yellow, no " \
           "green, no black. Use ONLY these wool colours: deep blue-violet, purple, crimson, " \
           "and ivory linen. Keep exactly this composition, pose, proportions and framing: " \
           "{iconographie} Flat pure bright green (#00FF00) background all around the figure, " \
           "orthographic front view, no text, no border, no frame."
-# (guide, cadre carré autour de la figure, largeur en part de la hauteur, sujet, iconographie)
+# (guide, cadre carré autour de la figure, sujet, iconographie). Le cadre suit la
+# convention de `cadrer` : la figure y tient du pied en z = 0 au sommet en z = 1, centrée
+# sur u = 0 — le guide montré au modèle cadre alors exactement comme le tissage sera relu.
 MOTIFS = {
-    "creature": (creature_ailee, (-0.6, -0.1, 0.6, 1.1), 1.10, "winged child figure",
+    "creature": (creature_ailee, (-0.6, -0.1, 0.6, 1.1), "winged child figure",
                  "a standing child seen from the front, child-like proportions with a large "
                  "head, a long plain crimson tunic with a patterned belt and simple vertical "
                  "folds down to the feet, arms along the body with ivory hands visible, two "
@@ -234,17 +223,30 @@ MOTIFS = {
                  "carrying TWO faces in profile, one looking left and one looking right "
                  "(Janus-like), with a plain headband, no hair, no beard. IMPORTANT: the faces "
                  "are perfectly smooth and blank, with no eyes, no nose, no mouth."),
-    "timora": (timora, (-0.6, -0.1, 0.6, 1.1), 1.00, "date palm tree, as on the Bar Kokhba coins",
-               "a straight purple trunk with a scale pattern, flared foot, a crown of exactly "
-               "seven fronds of ivory linen — the middle one upright, the others bending down "
-               "in smooth arcs — each with a fine violet midrib, and two clusters of crimson "
-               "dates hanging from the crown on either side of the trunk."),
-    "lion": (lion, (-0.80, -0.25, 0.90, 1.45), 1.52, "striding lion",
-             "a lion in profile walking to the right, body of ivory linen, a full crimson "
-             "mane in stylised locks around the head and chest, a half-open muzzle, a small "
-             "ear, four legs in stride with the paws on the ground, a long tail curving up "
-             "in an S over the rump ending in a crimson tuft, shoulder and haunch drawn as "
-             "lines in the violet ground thread."),
+    "timora": (timora, (-0.6, -0.1, 0.6, 1.1), "date palm tree, as on the Bar Kokhba coins",
+               "a straight purple trunk marked with stacked chevron scars of cut frond bases "
+               "and a flared foot, and a crown of exactly seven fronds of ivory linen — the "
+               "middle one upright, the others bending down in arcs. IMPORTANT: every frond "
+               "is deeply CUT INTO SEPARATE POINTED LEAFLETS along both sides of a fine violet "
+               "midrib, like a feather or a comb, never a smooth leaf and never a flower "
+               "petal; the leaflets are narrow, straight and angled towards the tip. Hanging "
+               "from the crown on either side of the trunk, three slender purple strands per "
+               "side drooping down along the trunk, each strung with small oval crimson dates "
+               "— hanging spikes, not a round bunch of grapes."),
+    "lion": (lion, (-0.80, -0.30, 0.80, 1.30), "roaring royal lion of Judah",
+             "a lion in strict profile facing right, in the manner of the Hebrew seal of "
+             "Shema servant of Jeroboam from Megiddo: massive and regal, ROARING with the "
+             "jaws WIDE OPEN showing bared fangs and a crimson mouth, the head held at the "
+             "height of the back, a heavy brow ridge over a small almond eye, a short rounded "
+             "ear set back. Body of ivory linen: deep chest, hollow flank drawn up in front "
+             "of a heavy haunch, long dipped back. A full crimson mane of POINTED LOCKS in "
+             "tiered rows encircling the head and falling over the chest — rows of pointed "
+             "tufts, never rounded petals and never a flower. Four legs each at its own "
+             "angle, the foreleg advanced and the hind leg thrusting with a bent hock, broad "
+             "paws flat on the ground. Long tail raised in an S above the back, ending in a "
+             "crimson tuft that touches the tail. Interior drawing in the violet ground "
+             "thread: a spiral volute on the shoulder and another on the haunch, three curved "
+             "rib lines, the fold of the groin, the rows of the mane."),
 }
 
 
@@ -329,8 +331,9 @@ def composition():
     de Shlomo (Melakhim I 7:29, 36)."""
     (b0, b1), (c0, c1), (h0, h1) = REGISTRES["bas"], REGISTRES["centre"], REGISTRES["haut"]
     # La timora du centre est aussi grande que les corps des keruvim le permettent : ses
-    # palmes s'ouvrent sur 0,41 de sa hauteur de chaque côté. Les registres haut et bas
-    # restent nettement plus petits que le centre, sinon la hiérarchie s'écrase.
+    # palmes s'ouvrent sur 0,35 de sa hauteur de chaque côté, le lion sur 0,68 — mesuré
+    # sur les tissages. Les registres haut et bas restent nettement plus petits que le
+    # centre, sinon la hiérarchie s'écrase.
     return [("timora", 0.0, b0 + 1.4, 5.0, 1), ("lion", -5.6, b0 + 1.8, 3.9, 1), ("lion", 5.6, b0 + 1.8, 3.9, -1),
             ("timora", 0.0, c0 + 1.4, 6.0, 1),
             ("creature", -4.5, c0 + 1.4, 8.2, 1), ("creature", 4.5, c0 + 1.4, 8.2, 1),
@@ -374,7 +377,7 @@ def sauver_png(chemin, rgb):
 
 
 def guider(nom):
-    dessiner, cadre, _, _, _ = MOTIFS[nom]
+    dessiner, cadre, _, _ = MOTIFS[nom]
     relief, faces = rasteriser(dessiner(), cadre, TUILE_PX, TUILE_PX / (cadre[2] - cadre[0]))
     sauver_png(GUIDES / f"{nom}.png", ombrer(relief, faces, relief > 0))
     print(f"  {nom:8s} guide : tissages/guides/{nom}.png")
@@ -384,7 +387,7 @@ def tisser_figure(nom):
     """Fait tisser le guide de `nom` par gpt-image-2 et pose la figure dans `tissages/`."""
     sys.path.insert(0, str(RACINE / ".claude" / "skills" / "fal-video"))
     import fal_commun  # noqa: E402
-    _, _, _, sujet, iconographie = MOTIFS[nom]
+    _, _, sujet, iconographie = MOTIFS[nom]
     cle = fal_commun.cle_api()
     corps = {"prompt": TISSAGE.format(sujet=sujet, iconographie=iconographie),
              "image_urls": [fal_commun.televerse(str(GUIDES / f"{nom}.png"), cle)],
@@ -413,7 +416,7 @@ def faces_de(rgb, masque, pas=32):
 
 def figure_tissee(nom):
     """(relief, faces, masque) d'une figure tissée, posée dans le cadre de son motif."""
-    _, cadre, _, _, _ = MOTIFS[nom]
+    _, cadre, _, _ = MOTIFS[nom]
     rgb = lire_rgb(TISSAGES / f"{nom}.png")
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     dedans = figure(~((g > r + VERT) & (g > b + VERT)))
@@ -441,7 +444,7 @@ def tisser():
     relief, faces = rasteriser(ornements(), (-LARGEUR / 2, 0.0, LARGEUR / 2, HAUTEUR), largeur, echelle)
     figures = {nom: figure_tissee(nom) for nom in MOTIFS}
     for nom, u, z0, h, sens in composition():
-        _, (cu0, cz0, cu1, cz1), _, _, _ = MOTIFS[nom]
+        _, (cu0, cz0, cu1, cz1), _, _ = MOTIFS[nom]
         relief_fig, faces_fig, masque_fig = figures[nom]
         echelle_fig = TUILE_PX / (cu1 - cu0)
         # Le bloc de la carte que le cadre couvre, et pour chacun de ses pixels le

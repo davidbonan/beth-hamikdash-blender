@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les onze scripts
+## Les douze scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -30,6 +30,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_export.py` | images clés couleur + profondeur, ou planche de contrôle | `renders/blockout/` ou `renders/planche/`, **et le .blend** |
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
+| `beit_hamikdash_marche.py` | **lit** la scène et rejoue la règle de marche de la visite : où l'on passe à pied, où l'on bute et pourquoi | `renders/marche/marche.png` |
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json` |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |

@@ -21,16 +21,16 @@ import * as THREE from "three";
 // qu'elle sait, l'écart d'un point au suivant.
 // L'étoffe n'a pas de couleur : la sienne est dictée, pas photographiée.
 const JEUX = {
-  pierre: { moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
-  enduit: { moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
-  bois: { moyenne: [0.3205, 0.1855, 0.0867], rugosite: 0.9154 },
-  metal: { moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
-  marbre: { moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
-  etoffe: {},
+  pierre: { couleur: "matieres/pierre_c_1024.webp", normale: "matieres/pierre_n_1024.webp", moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
+  enduit: { couleur: "matieres/enduit_c_1024.webp", normale: "matieres/enduit_n_1024.webp", moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
+  bois: { couleur: "matieres/bois_c_1024.webp", normale: "matieres/bois_n_1024.webp", moyenne: [0.3205, 0.1855, 0.0867], rugosite: 0.9154 },
+  metal: { couleur: "matieres/metal_c_1024.webp", normale: "matieres/metal_n_1024.webp", moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
+  marbre: { couleur: "matieres/marbre_c_1024.webp", normale: "matieres/marbre_n_1024.webp", moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
+  etoffe: { normale: "matieres/etoffe_n_1024.webp" },
 };
 
 export async function nappes() {
-  const chargeur = new THREE.TextureLoader().setPath("./matieres/");
+  const chargeur = new THREE.TextureLoader();
 
   const regler = (texture, espace) => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -44,8 +44,8 @@ export async function nappes() {
   const jeux = new Map();
   await Promise.all(Object.entries(JEUX).map(async ([nom, jeu]) => {
     const [couleur, normale] = await Promise.all([
-      jeu.moyenne ? chargeur.loadAsync(`${nom}_c_1024.webp`) : null,
-      chargeur.loadAsync(`${nom}_n_1024.webp`),
+      jeu.couleur ? chargeur.loadAsync(jeu.couleur) : null,
+      chargeur.loadAsync(jeu.normale),
     ]);
     jeux.set(nom, {
       normale: regler(normale, THREE.NoColorSpace),
@@ -57,12 +57,12 @@ export async function nappes() {
   // Le motif tissé des Parokhot, que `beit_hamikdash_parokhet.py` écrit : r = hauteur
   // du bombé, (g, b) = face du tissage qui affleure, alpha = figure. Une seule carte
   // aux dimensions du rideau, lue en coordonnées de rideau et jamais répétée.
-  const motif = regler(await chargeur.loadAsync("parokhet_2048.webp"), THREE.NoColorSpace);
+  const motif = regler(await chargeur.loadAsync("matieres/parokhet_2048.webp"), THREE.NoColorSpace);
   motif.wrapS = motif.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("parokhet", { motif });
   // Les gravures des parois, que `beit_hamikdash_gravures.py` écrit : trois tuiles —
   // keruv, timora, fleuron — lues par les UV de chaque plaque. Gris = hauteur du modelé.
-  const gravures = regler(await chargeur.loadAsync("gravures_2048.webp"), THREE.NoColorSpace);
+  const gravures = regler(await chargeur.loadAsync("matieres/gravures_2048.webp"), THREE.NoColorSpace);
   gravures.wrapS = gravures.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("gravures", { motif: gravures });
   return jeux;

@@ -14,27 +14,46 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
+# Les pages sont la seule porte d'entrée et gardent leur URL nue : elles se revalident
+# à chaque visite, et ramènent les URL signées du jour. Tout ce qu'elles citent porte
+# l'empreinte de son contenu (empreintes.py) — changer un fichier change son URL, donc
+# rien de ce qui est gardé sous ces URL-là ne peut être périmé, et rien n'a à expirer.
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
-  for = "/visite/*.json"
+  for = "/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/visite/*.glb"
+  for = "/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/visite/matieres/*"
+  for = "/*.json"
   [headers.values]
-    Cache-Control = "public, max-age=604800, stale-while-revalidate=2592000"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/visite/plans/*"
+  for = "/*.glb"
   [headers.values]
-    Cache-Control = "public, max-age=604800, stale-while-revalidate=2592000"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

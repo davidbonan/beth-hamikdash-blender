@@ -21,7 +21,7 @@ const TRAITES = {
   menahot: "Menachot", menachot: "Menachot",
   "baba batra": "Bava Batra", "bava batra": "Bava Batra",
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
-  "yerushalmi yoma": "Jerusalem Talmud Yoma",
+  sanhedrin: "Sanhedrin", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
   pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim",
 };
 const OUVRAGES = {
@@ -52,6 +52,21 @@ const OUVRAGES = {
   "divrei hayamim i": "I Chronicles",
   "yerushalmi soucca": "Jerusalem Talmud Sukkah",
   "rambam maasse hakorbanot": "Mishneh Torah, Sacrificial Procedure",
+  "rambam sanhedrin": "Mishneh Torah, The Sanhedrin and the Penalties within Their Jurisdiction",
+  "rambam mikvaot": "Mishneh Torah, Immersion Pools",
+  "rambam avodat yom hakippurim": "Mishneh Torah, Service on the Day of Atonement",
+  "yerushalmi yoma": "Jerusalem Talmud Yoma",
+  "tosefta sanhedrin": "Tosefta Sanhedrin",
+  "avot derabbi natan": "Avot DeRabbi Natan",
+  avot: "Pirkei Avot",
+  zekharia: "Zechariah", "melakhim ii": "II Kings",
+  "rashi sur divrei hayamim ii": "Rashi on II Chronicles",
+};
+// Un commentaire porte le livre commenté dans sa cote : « Bartenura », « Middot 3:3 ».
+const COMMENTAIRES = {
+  bartenura: "Bartenura on Mishnah", "tosfot yom tov": "Tosafot Yom Tov on Mishnah",
+  "tiferet israel": "Yachin on Mishnah", rashash: "Rashash on Mishnah", boaz: "Boaz on Mishnah",
+  radak: "Radak on", "metsoudat david": "Metzudat David on",
 };
 
 const pele = (s) => (s || "").toLowerCase().normalize("NFD")
@@ -60,8 +75,18 @@ const pele = (s) => (s || "").toLowerCase().normalize("NFD")
 const url = (tref) => "https://www.sefaria.org/" +
   encodeURIComponent(tref.replace(/ /g, "_")).replace(/%2C/g, ",").replace(/%3A/g, ":");
 
+function lienCommentaire(commentaire, ref) {
+  const cote = /^(?:sur )?(.+) (\d[\d:–-]*)$/.exec((ref || "").trim());
+  if (!cote) return null;
+  const livre = pele(cote[1]);
+  const commente = TRAITES[livre] ?? OUVRAGES[livre];
+  return commente ? url(`${commentaire} ${commente} ${cote[2]}`) : null;
+}
+
 function lienSefaria(oeuvre, ref) {
   const clef = pele(oeuvre);
+  if (COMMENTAIRES[clef]) return lienCommentaire(COMMENTAIRES[clef], ref);
+  if (clef === "rambam") return lienSefaria(`Rambam ${ref.replace(/ [\d:–-]+$/, "")}`, ref.match(/[\d:–-]+$/)?.[0]);
   const direct = OUVRAGES[clef];
   if (direct) return url(`${direct} ${ref}`);
   const traite = TRAITES[clef.replace(/^(mishna|mishnah|talmud) /, "")];

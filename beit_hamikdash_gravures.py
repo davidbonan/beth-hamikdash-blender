@@ -46,10 +46,9 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (ATTACHE_REGIME, BRAS, CORPS_KERUV, ECAILLE, FUT,  # noqa: E402
-                                     LARGEURS_BRAS, PALMES, PLIS, REGIME, TETE_DOUBLE, TRONC, aile,
-                                     corolle, ellipse, lisser, normales, palme, poser, poser_lame,
-                                     ruban)
+from beit_hamikdash_contours import (BRAS, CORPS_KERUV, DATTE, EPIS, LARGEURS_BRAS, PALMES,  # noqa: E402
+                                     PLIS, TETE_DOUBLE, TRONC, aile, chevrons, corolle, ellipse,
+                                     epi, folioles, lisser, palme, poser, poser_lame, ruban)
 
 TUILE_PX = 1024
 ATLAS_PX = 2 * TUILE_PX
@@ -65,9 +64,12 @@ RONDEUR, GRAIN, PART_MODELE, SEUIL_FOND = 0.05, 0.004, 0.5, 0.02
 CADRE_DEBOUT = (-0.6, -0.1, 0.6, 1.1)
 FONDU = 0.005            # en part de la hauteur : 2 cm sur un keruv de paroi
 # Simplification de la silhouette, en part de la hauteur : 1,5 cm sur un keruv de paroi,
-# 1 cm sur la timora d'un jambage. Le fleuron fait 22 cm et court par centaines : le
+# 2 cm sur la timora d'un jambage. Le fleuron fait 22 cm et court par centaines : le
 # chanfrein et l'export dédoublent chaque sommet, et c'est là que le glb se gagne.
-TOLERANCE = {"keruv": 0.005, "timora": 0.005, "fleuron": 0.02}
+# La timora est découpée en folioles depuis qu'elle est un vrai dattier, et sa silhouette
+# a quintuplé : 0,010 en ôte un tiers sans en perdre une. Au-delà, les dents s'effacent
+# palme par palme — à 0,014 la moitié des palmes est ressortie en lame lisse.
+TOLERANCE = {"keruv": 0.005, "timora": 0.010, "fleuron": 0.02}
 
 
 # --- Le keruv : debout, de face, deux ailes levées, un crâne à deux profils. ------------
@@ -122,39 +124,23 @@ def keruv(planche):
 NIVEAU_FUT, NIVEAU_PALME, NIVEAU_REGIME = 0.4, 0.25, 0.55
 
 
-def nervures(planche, axe, largeurs):
-    """La nervure médiane, et les folioles en arête de poisson, qui s'arrêtent bien avant
-    le bord de la palme : c'est le bord dentelé qui faisait la scie."""
-    planche.graver(axe[2:-2], 0.006, 0.3)
-    n = normales(axe)
-    for k in range(4, len(axe) - 3, 2):
-        (u, z), (nu, nz), w = axe[k], n[k], largeurs[k]
-        (u1, z1) = axe[k + 1]
-        tu, tz = u1 - u, z1 - z
-        l = math.hypot(tu, tz) or 1.0
-        for cote in (-1, 1):
-            planche.graver([(u, z), (u + cote * nu * w * 0.6 + tu / l * 0.7 * w,
-                                     z + cote * nz * w * 0.6 + tz / l * 0.7 * w)], 0.005, 0.3)
-
-
 def timora(planche):
     planche.bomber(TRONC, NIVEAU_FUT, 1.0, 0.05)
-    for k in range(-3, 14):
-        z = ECAILLE * k
-        for sens in (-1, 1):
-            planche.graver([(sens * -0.08, z), (sens * 0.08, z + 0.16)], 0.006, 0.35)
+    for chevron in chevrons():
+        planche.graver(chevron, 0.007, 0.35)
     for inclinaison, longueur, retombee in PALMES[::-1]:
         for sens in ((1,) if inclinaison == 0 else (-1, 1)):
             axe, largeurs = palme(sens * inclinaison, longueur, retombee)
-            planche.bomber(lisser(ruban(axe, largeurs), passes=2), NIVEAU_PALME, 1.0, 0.035)
-            nervures(planche, axe, largeurs)
+            planche.bomber(folioles(axe, largeurs), NIVEAU_PALME, 1.0, 0.035)
+            # La nervure seule : les folioles ne sont plus des arêtes de poisson gravées
+            # dans un bord lisse, c'est le contour lui-même qui les découpe.
+            planche.graver(axe[3:-9], 0.005, 0.3)
     for sens in (-1, 1):
-        # La tige du régime part de la couronne ; les dattes pendent le long du fût.
-        planche.bomber(ruban([(sens * 0.03, FUT + 0.01), (sens * ATTACHE_REGIME[0], ATTACHE_REGIME[1] + 0.02)],
-                             [0.012, 0.010]), NIVEAU_REGIME, 0.7, 0.01)
-        for du, dz, r in REGIME:
-            planche.bomber(ellipse(sens * ATTACHE_REGIME[0] + du, ATTACHE_REGIME[1] + dz, r * 0.9, r * 1.3),
-                           NIVEAU_REGIME, 0.7, 0.015)
+        for ecart, longueur in EPIS:
+            fil, dattes = epi(ecart, longueur)
+            planche.bomber(ruban([(sens * u, z) for u, z in fil], 0.011), NIVEAU_REGIME, 0.7, 0.01)
+            for u, z in dattes:
+                planche.bomber(ellipse(sens * u, z, *DATTE), NIVEAU_REGIME, 0.7, 0.015)
 
 
 # --- Le fleuron : la rosette à six pétales, celle des ossuaires de Jérusalem. -----------
@@ -199,9 +185,14 @@ MOTIFS = {
               "(Janus-like), with a plain headband, no beard, no crown. IMPORTANT: the "
               "faces are left perfectly smooth and blank, with no eyes, no nose, no mouth."),
     "timora": (timora, CADRE_DEBOUT, (1, 1), "date palm tree, as on the Bar Kokhba coins",
-               "a straight trunk with scale pattern, flared foot, a crown of exactly seven "
-               "fronds — the middle one upright, the others bending down in smooth arcs —, "
-               "and two clusters of dates hanging from the crown on either side of the trunk."),
+               "a straight trunk marked with stacked chevron scars of cut frond bases and a "
+               "flared foot, and a crown of exactly seven fronds — the middle one upright, the "
+               "others bending down in arcs. IMPORTANT: every frond is deeply CUT INTO SEPARATE "
+               "POINTED LEAFLETS along both sides of a grooved midrib, like a feather or a "
+               "comb, never a smooth leaf and never a flower petal; the leaflets are narrow, "
+               "straight and angled towards the tip. Hanging from the crown on either side of "
+               "the trunk, three slender strands per side drooping down along the trunk, each "
+               "strung with small oval dates — hanging spikes, not a round bunch of grapes."),
     "fleuron": (fleuron, (-0.6, -0.1, 0.6, 1.1), (0, 0), "six-petal rosette",
                 "an open six-petal compass-drawn rosette filling the frame, as on Jerusalem "
                 "ossuaries, a round raised heart in the centre, each petal a carved lobe "

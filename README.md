@@ -33,6 +33,7 @@ dernière à droite.*
 | `beit_hamikdash_export.py` | Images clés : planche de contrôle 640 × 360 (`-- --planche`), ou fichiers de production couleur + profondeur 1920 × 1080. Seul script qui sauvegarde le .blend. |
 | `beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
 | `beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre. Ne reconstruit rien. |
+| `beit_hamikdash_marche.py` | Rejoue la règle de marche de la visite sur une grille posée sur la scène et dit où l'on passe à pied, où l'on bute et pourquoi — marche trop haute, vide, fente, mur. Ne reconstruit rien. |
 | `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun et les points d'entrée. Lit le .blend, ne le réécrit pas. |
 | `beit_hamikdash_figures.py` | Les figurants de la visite — cohanim au Kiyor, au kevesh et au pied de l'autel, douze Léviim sur le Doukhan, fidèles dans l'Ezrat Nashim. Corps MakeHuman (CC0), vêtus et animés ; écrit `visite/figures.glb` et `visite/figures.json`. Ni le .blend ni le film ne les voient. |
 | `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
@@ -109,7 +110,10 @@ Un serveur est nécessaire : la page est un module ES, `file://` ne la charge pa
 
 **En ligne.** Netlify déploie ce dépôt sur https://bethhamikdach.com à chaque push sur
 `main` : `construire_site.sh` assemble `dist/` — les pages de `site/` et la visite filtrée
-sous `dist/visite/` — et `netlify.toml` dit le reste. La visite est servie à `/visite/` ;
+sous `dist/visite/` —, `empreintes.py` appose sur chaque URL d'asset l'empreinte de son
+contenu (`visite.js?v=03a1168a`), et `netlify.toml` dit le reste : les pages se revalident
+à chaque visite, tout ce qu'elles citent est `immutable`. Une modification se voit donc
+sans vider le cache, sur mobile comme ailleurs. La visite est servie à `/visite/` ;
 l'accueil (`site/accueil.py`) monte les degrés de sainteté en images du film sur une scène
 épinglée — chaque vue se fond dans la suivante au fil du défilement (animations CSS au
 défilement, repli en fondu par classes ailleurs), la nuit tombe degré après degré, et le
@@ -294,8 +298,12 @@ les douze degrés du 'Heil, les quinze marches de Nikanor, et l'autel se contour
 degrés font ½ ama — 0,24 m — et c'est cette valeur qui commande la règle de collision :
 la garde se place juste au-dessus de la hauteur franchissable et sa portée reste plus
 courte qu'une marche n'est profonde, sinon elle heurte la marche suivante avant qu'on ait
-gravi la première. **`V` bascule en vol libre** (`Espace` monter, `C` descendre) : un
-modèle se regarde aussi d'où l'on n'a pas le droit de se tenir.
+gravi la première. Le pas qui arrive sur du vide regarde un pied plus loin — 0,25 m —
+dans le même sens : une fente plus étroite qu'un pied ne fait tomber personne. C'est ce
+qui fait monter sur l'autel : un quart d'ama d'air sépare la tête du kevesh de l'autel
+(*Zeva'him* 62b), un cheveu le petit kevesh du sovev, et le rayon de sol, tiré en un
+point, y tombait à chaque fois. **`V` bascule en vol libre** (`Espace` monter, `C`
+descendre) : un modèle se regarde aussi d'où l'on n'a pas le droit de se tenir.
 
 Trois concepts sont traversables : les deux parokhot et les chaînes du Devir — une étoffe
 ne barre pas le passage, et une visite qui s'arrête devant la parokhet n'atteint jamais le
@@ -303,13 +311,23 @@ Kodesh HaKodashim — et le **Soreg**, pour une autre raison : le blockout le po
 sur tout le pourtour, sans les ouvertures qu'il avait (*Middot* 2:3). S'y cogner serait
 buter sur un manque du modèle, pas sur l'architecture.
 
-**Ce que la visite a révélé du blockout.** Marcher dans un modèle en éprouve la
-continuité, ce qu'aucun rendu de caméra ne fait :
+**Ce que la marche a révélé du blockout.** Marcher dans un modèle en éprouve la
+continuité, ce qu'aucun rendu de caméra ne fait — et `beit_hamikdash_marche.py` la
+mesure sans y marcher : il rejoue la règle de collision sur une grille au pas du
+marcheur, relie les cases qu'on enchaîne dans les deux sens, et nomme chaque frontière
+avec sa raison. Ce qu'il dit aujourd'hui :
 
-- **Le seuil de Nikanor n'a pas de sol.** `Azara_sol` s'arrête à `AX1`
-  (`beit_hamikdash_blockout.py:1500`), les quinze marches montent jusqu'à `AX1 + 5`, et le
-  passage de la porte entre les deux — cinq amot sur l'axe même du film — est un vide.
-  À pied, on ne peut pas entrer dans l'Azara par Nikanor.
+- **Tout ce qu'on doit atteindre à pied est d'un seul tenant** — Har HaBayit, degrés du
+  'Heil et ses terrasses, Ezrat Nashim et ses quatre lishkot, quinze marches, seuil de
+  Nikanor, Ezrat Israël, Azara, kevesh, sovev et yessod par leurs petits kevashim, douze
+  degrés, Oulam, Heikhal, Kodesh HaKodashim, lishkot des cours, Beit HaMoked et sa
+  mesiba jusqu'au bain — à une exception près : **le sommet de l'autel**, que le quart
+  d'ama d'air entre la tête du kevesh et l'autel coupait de tout. C'est la règle de
+  marche qui a plié, pas le modèle : voir la fente ci-dessus.
+- **Trois lieux se refusent par choix du modèle**, pas par accident : la gezuztra de
+  l'Ezrat Nashim, dont aucun escalier n'est bâti ; le Beit HaKisse du bain, dont la
+  porte est fermée — c'est ainsi qu'on savait la place prise (*Tamid* 1:1) ; le toit du
+  Beit HaParva, dont la mesiba est une tour pleine.
 - **Le Soreg n'a aucune ouverture** : ses poteaux se suivent tous les 3 amot sur les
   quatre côtés, y compris sur l'axe est.
 

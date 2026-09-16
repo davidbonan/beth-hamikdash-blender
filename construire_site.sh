@@ -14,4 +14,6 @@ rsync -a --delete \
   --include='plans/' --include='plans/*.webp' --exclude='*' \
   "$racine/visite/" "$dist/visite/"
 
+python3 "$racine/empreintes.py" "$dist"
+
 echo "site assemblé dans $dist"

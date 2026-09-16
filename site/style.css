@@ -43,10 +43,12 @@ img { display: block; }
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(to bottom, rgba(16,14,11,.36) 0%, rgba(16,14,11,0) 24%, rgba(16,14,11,.1) 48%, rgba(16,14,11,.78) 76%, var(--nuit) 100%);
 }
-.seuil nav { display: flex; justify-content: flex-end; gap: 2px; padding: calc(14px + env(safe-area-inset-top, 0px)) 0 0; font-size: 14px; }
-.seuil nav a { padding: 6px 10px; text-decoration: none; opacity: .72; border-bottom: 1px solid transparent; }
-.seuil nav a:hover { opacity: 1; }
-.seuil nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
+.barre { display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: calc(14px + env(safe-area-inset-top, 0px)) 0 0; font-size: 14px; }
+.barre nav { display: flex; gap: 2px; }
+.barre a { padding: 6px 10px; text-decoration: none; opacity: .72; border-bottom: 1px solid transparent; }
+.barre a:hover { opacity: 1; }
+.barre nav a[aria-current] { opacity: 1; border-bottom-color: currentColor; }
+.barre .depot { display: flex; padding-bottom: 7px; }
 .titre { grid-row: 3; align-self: end; max-width: 34em; animation: paraitre 1.6s ease .5s both; }
 .titre h1 { display: grid; gap: 2px; line-height: 1; text-shadow: 0 2px 24px rgba(16,14,11,.55); }
 .titre h1 .he {
@@ -282,10 +284,6 @@ img { display: block; }
 .sanctuaire .legende { width: 100%; max-width: var(--colonne); margin: 0 auto; text-shadow: 0 1px 10px rgba(16,14,11,.6); }
 .sanctuaire .legende h3 { font-size: clamp(28px, 3.2vw, 44px); }
 .sanctuaire .action { grid-column: 1 / -1; margin-top: 28px; }
-.sanctuaire footer {
-  position: absolute; inset-inline: var(--marge); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  color: var(--lin-sourd); font-size: 13px;
-}
 @supports (animation-timeline: view()) {
   .sanctuaire .legende > * { animation: paraitre linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
 }
@@ -300,7 +298,7 @@ img { display: block; }
   .ouverture, .legende { grid-template-columns: minmax(0, 1fr); }
   .ouverture { row-gap: 12px; }
   .echelle { display: none; }
-  .seuil nav { justify-content: flex-start; }
+  .barre { justify-content: flex-start; }
   .scene .vue { bottom: auto; height: 56svh; }
   .scene .vue img { object-position: center 40%; }
   .scene::after { background: linear-gradient(to bottom, rgba(16,14,11,.2) 0%, rgba(16,14,11,0) 20%, rgba(16,14,11,0) 40%, var(--nuit) 56%); }

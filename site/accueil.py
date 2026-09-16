@@ -59,6 +59,7 @@ TEXTES = {
         "titre": "Beit HaMikdach, le Temple de Jérusalem en trois dimensions",
         "description": "Le Temple de Jérusalem reconstruit aux cotes de la Mishna. Une visite libre, du Har HaBayit au Kodesh HaKodashim, où chaque pierre cite sa source.",
         "nav_langue": "Langue",
+        "nav_depot": "Le projet sur GitHub",
         "hebreu": "בית המקדש",
         "latin": "Beit HaMikdach",
         "accroche": "Le Temple de Jérusalem, reconstruit en trois dimensions aux cotes de la Mishna. On y entre à pied, on y marche librement, et chaque pierre dit d'où elle vient.",
@@ -108,6 +109,7 @@ TEXTES = {
         "titre": "Beit HaMikdach, the Temple of Jerusalem in three dimensions",
         "description": "The Temple of Jerusalem rebuilt to the measurements of the Mishnah. A free walk from the Har HaBayit to the Kodesh HaKodashim, where every stone cites its source.",
         "nav_langue": "Language",
+        "nav_depot": "The project on GitHub",
         "hebreu": "בית המקדש",
         "latin": "Beit HaMikdach",
         "accroche": "The Temple of Jerusalem, rebuilt in three dimensions to the measurements of the Mishnah. You enter on foot, walk where you like, and every stone tells you where it comes from.",
@@ -157,6 +159,7 @@ TEXTES = {
         "titre": "בית המקדש, סיור תלת־ממדי",
         "description": "בית המקדש משוחזר לפי מידות המשנה. סיור חופשי מהר הבית ועד קודש הקודשים, שבו כל אבן מציינת את מקורה.",
         "nav_langue": "שפה",
+        "nav_depot": "הפרויקט בגיטהאב",
         "hebreu": "בית המקדש",
         "latin": "Beit HaMikdach",
         "accroche": "בית המקדש, משוחזר בתלת־ממד לפי מידות המשנה. נכנסים ברגל, מהלכים בחופשיות, וכל אבן אומרת מניין היא באה.",
@@ -204,8 +207,22 @@ TEXTES = {
 FICHES = {code: json.loads((SITE.parent / "visite" / f"contenu_a{'' if code == 'fr' else '.' + code}.json").read_text(encoding="utf-8"))
           for code in TEXTES}
 
-AUTEUR = {"fr": "David Bonan", "en": "David Bonan", "he": "דוד בונן"}
+DEPOT = "https://github.com/davidbonan/beth-hamikdash-blender"
 TAILLES = "100vw"
+
+MARQUE_GITHUB = (
+    '<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">'
+    '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94 '
+    '-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07 '
+    '-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 '
+    '1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 '
+    '0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>'
+)
+
+
+def lien_depot(t):
+    return (f'<a class="depot" href="{DEPOT}" target="_blank" rel="noopener"'
+            f' title="{t["nav_depot"]}" aria-label="{t["nav_depot"]}">{MARQUE_GITHUB}</a>')
 
 
 def nav_langues(code):
@@ -277,7 +294,6 @@ def sanctuaire(t, degre, vue):
     {volutes}
     <div class="fond">{image(t, degre)}{fumee}<span class="braise"></span><span class="reflet"></span></div>
     {legende(t, degre, action=action).replace("<h3>", f'<h3 id="{degre}-titre">', 1)}
-    <footer><span>© 2026 {AUTEUR[t["code"]]}</span></footer>
   </section>'''
 
 
@@ -374,9 +390,12 @@ def page(code):
       <source media="(max-aspect-ratio: 4/5)" srcset="/images/affiche_portrait_720.webp">
       <img src="/images/affiche_2000.webp" srcset="/images/affiche_1000.webp 1000w, /images/affiche_2000.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
     </picture>
-    <nav aria-label="{t["nav_langue"]}">
-      {nav_langues(code)}
-    </nav>
+    <div class="barre">
+      <nav aria-label="{t["nav_langue"]}">
+        {nav_langues(code)}
+      </nav>
+      {lien_depot(t)}
+    </div>
     <div class="titre">
       <h1><span class="he" lang="he" dir="rtl">{t["hebreu"]}</span><span class="latin" lang="fr">{t["latin"]}</span></h1>
       <p class="accroche">{t["accroche"]}</p>

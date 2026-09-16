@@ -37,8 +37,27 @@ Le script rsync `index.html`, les `.js`, les `.json`, `temple.glb`, `figures.glb
 `--delete`. Le reste de `visite/` (scans, profils de navigateur) ne part pas.
 
 Servie à `/visite/` à la racine du domaine, la page résout ses chemins relatifs sans
-balise `<base>` : la source et le déployé sont identiques. Netlify redirige `/visite`
-→ `/visite/` de lui-même.
+balise `<base>`. Netlify redirige `/visite` → `/visite/` de lui-même.
+
+## Les empreintes, et pourquoi le déployé n'est pas la source
+
+`empreintes.py`, lancé par `construire_site.sh` sur `dist/`, appose sur chaque URL
+d'asset l'empreinte de son contenu : `visite.js?v=03a1168a`, `temple.glb?v=7823c773`.
+C'est la seule différence entre l'arbre de travail et ce que Netlify sert, et elle est
+la raison pour laquelle une modification se voit sans vider le cache — le contenu
+change, l'URL change, et rien de vieux ne peut plus être servi sous ce nom. Les pages
+gardent leur URL nue et se revalident à chaque visite (`netlify.toml`) ; tout le reste
+est `immutable`.
+
+Deux régimes : les médias portent chacun leur propre empreinte, le code et les données
+portent un cachet commun calculé sur tout le site. Les chemins que la visite construit à
+l'exécution (`contenu_${f}.${code}.json`) échappent à la réécriture : `json()` dans
+`visite.js` relit le cachet dans son `import.meta.url` et l'ajoute lui-même. D'où la
+règle — un nouveau média se cite par un littéral entier (`"matieres/pierre_c_1024.webp"`,
+pas `` `${nom}_c_1024.webp` ``), sinon `empreintes.py` ne le voit pas.
+
+En local, servir `visite/` directement marche comme avant : sans build il n'y a pas
+d'empreinte, `import.meta.url` n'a pas de query, et `json()` ajoute une chaîne vide.
 
 ## L'accueil, une montée en images
 
