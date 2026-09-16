@@ -21,7 +21,7 @@ const TRAITES = {
   menahot: "Menachot", menachot: "Menachot",
   "baba batra": "Bava Batra", "bava batra": "Bava Batra",
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
-  sanhedrin: "Sanhedrin", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
+  sanhedrin: "Sanhedrin", negaim: "Negaim", ketoubot: "Ketubot", ketubot: "Ketubot", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
   pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim",
 };
 const OUVRAGES = {
@@ -61,6 +61,8 @@ const OUVRAGES = {
   avot: "Pirkei Avot",
   zekharia: "Zechariah", "melakhim ii": "II Kings",
   "rashi sur divrei hayamim ii": "Rashi on II Chronicles",
+  "rashi sur menachot": "Rashi on Menachot",
+  "rambam sur menahot": "Rambam on Mishnah Menachot", "rambam sur menachot": "Rambam on Mishnah Menachot",
 };
 // Un commentaire porte le livre commenté dans sa cote : « Bartenura », « Middot 3:3 ».
 const COMMENTAIRES = {
@@ -91,7 +93,7 @@ function lienSefaria(oeuvre, ref) {
   if (direct) return url(`${direct} ${ref}`);
   const traite = TRAITES[clef.replace(/^(mishna|mishnah|talmud) /, "")];
   if (!traite) return null;                       // archéologie, choix du projet : pas de cote Sefaria
-  const folio = /^\d+[ab]$/.test((ref || "").trim());
+  const folio = /^\d+[ab](?:[–-]\d*[ab])?$/.test((ref || "").trim());
   return url(`${folio ? traite : "Mishnah " + traite} ${ref}`);
 }
 

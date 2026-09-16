@@ -1,7 +1,7 @@
 {
   "mur_har_habayit": {
     "nom": "Wall of the Har HaBayit",
-    "translit": "Har HaBayit",
+    "translit": "Chomat Har HaBayit",
     "resume": "The Har HaBayit is the sacred enclosure containing the whole Temple complex: a 500-ama square, girded by a wall. Five gates give access to it. The eastern wall is the only low wall, so that the Kohen who burns the para, standing atop the Mount of Olives, can see over it the opening of the Heikhal at the moment of sprinkling.",
     "cotes": [
       "500 × 500 amot (≈ 240 × 240 m at 0.48 m per ama)",
@@ -28,6 +28,16 @@
         "oeuvre": "Middot",
         "ref": "2:4",
         "citation": "all the walls there were high, except the eastern wall, because the Kohen who burns the para stands atop the Mount of Olives, aims, and sees the opening of the Heikhal at the moment the blood is sprinkled."
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:1",
+        "citation": "הַר הַבַּיִת וְהוּא הַר הַמּוֹרִיָּה הָיָה חֲמֵשׁ מֵאוֹת אַמָּה עַל חֲמֵשׁ מֵאוֹת אַמָּה וְהָיָה מֻקָּף חוֹמָה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 2:4",
+        "citation": "חוּץ מִכֹּתֶל מִזְרָחִי. הוּא הַתַּחְתּוֹן לְרַגְלֵי הַר הַבַּיִת"
       }
     ],
     "note": "Tour's choice: nothing blocks the line of sight from the Mount of Olives to the entrance of the Heikhal — no column, no closed gate, no crowd on the east-west axis."
@@ -35,7 +45,7 @@
   "sol_har_habayit": {
     "nom": "Esplanade of the Har HaBayit",
     "translit": "Har HaBayit",
-    "resume": "The ground of the mountain is stone. The Temple complex is not set at its center: the largest open space is to the south, then to the east, then to the north, the smallest to the west. One enters by the right and exits by the left, except mourners or those struck by misfortune, who turn left.",
+    "resume": "The Temple complex is not set at the center of the mountain: the largest open space is to the south, then to the east, then to the north, the smallest to the west. One enters by the right and exits by the left, except someone to whom something has happened — a mourner, an excommunicate —, who goes around by the left.",
     "cotes": [
       "500 × 500 amot (≈ 240 × 240 m)",
       "largest open space in the south, then east, then north, smallest in the west"
@@ -49,9 +59,15 @@
       {
         "oeuvre": "Middot",
         "ref": "2:2",
-        "citation": ""
+        "citation": "חוּץ מִמִּי שֶׁאֵרְעוֹ דָבָר, שֶׁהוּא מַקִּיף לִשְׂמֹאל"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:6",
+        "citation": "הָעֲזָרָה לֹא הָיְתָה מְכֻוֶּנֶת בְּאֶמְצַע הַר הַבַּיִת"
       }
-    ]
+    ],
+    "note": "Tour's choice: the material of the esplanade's ground, which no source gives."
   },
   "soreg": {
     "nom": "Soreg",
@@ -64,7 +80,17 @@
       {
         "oeuvre": "Middot",
         "ref": "2:3",
-        "citation": ""
+        "citation": "לִפְנִים מִמֶּנּוּ, סוֹרֵג, גָּבוֹהַּ עֲשָׂרָה טְפָחִים"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 2:3",
+        "citation": "מְחִצָּה הָעֲשׂוּיָה נְקָבִים נְקָבִים כְּמִטָּה מְסֹרֶגֶת בַּחֲבָלִים, וְהִיא עֲשׂוּיָה מַדְּפֵי עֵץ אֲרֻכִּים וּקְצָרִים שֶׁמַּרְכִּיבִין אוֹתָן זוֹ עַל זוֹ בַּאֲלַכְסוֹן"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:3",
+        "citation": "לְפָנִים מִמֶּנּוּ סוֹרֵג מַקִּיף סְבִיב גָּבְהוֹ עֲשָׂרָה טְפָחִים"
       }
     ]
   },
@@ -81,15 +107,30 @@
       {
         "oeuvre": "Middot",
         "ref": "2:3",
-        "citation": ""
+        "citation": "לִפְנִים מִמֶּנּוּ, הַחֵיל, עֶשֶׂר אַמּוֹת. וּשְׁתֵּים עֶשְׂרֵה מַעֲלוֹת הָיוּ שָׁם"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 2:3",
+        "citation": "מֵאוֹתוֹ סוֹרֵג הָיָה מָקוֹם פָּנוּי עֶשֶׂר אַמּוֹת, וְהוּא נִקְרָא חֵיל"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "6:1",
+        "citation": "וְעוֹלֶה מִן הַחֵיל לְעֶזְרַת הַנָּשִׁים בִּשְׁתֵּים עֶשְׂרֵה מַעֲלוֹת רוּם כָּל מַעֲלָה חֲצִי אַמָּה וְשִׁלְחָהּ חֲצִי אַמָּה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:3",
+        "citation": "וּלְפָנִים מִן הַסּוֹרֵג הַחֵיל [גָּבְהוֹ] עֶשֶׂר אַמּוֹת"
       }
     ],
-    "note": "Tour's choice: the ten amot of the Cheil are measured from the projecting gatehouses of the Azara, the outermost part of the wall. Measured from the wall itself, the Soreg would cut through those gatehouses."
+    "note": "Adopted: a strip ten amot wide, as Bartenura reads it (Middot 2:3). Set aside: the text of the Rambam (Beit HaBechirah 5:3), which reads « הַחֵיל [גָּבְהוֹ] עֶשֶׂר אַמּוֹת », a height; the word is in brackets, a textual variant. Tour's choice: the ten amot of the Cheil are measured from the projecting gatehouses of the Azara, the outermost part of the wall. Measured from the wall itself, the Soreg would cut through those gatehouses."
   },
   "portiques": {
     "nom": "Double Porticoes",
     "translit": "Stav kaful",
-    "resume": "Covered porticoes line the Har HaBayit on all four sides. “The Har HaBayit was a double stav… a stav within a stav” (Pesachim 13b), which Rashi explains: one colonnade runs all around, and inside that circuit another. The model therefore sets two rows of columns along each wall. The same page speaks of the “roof of the itztaba”, on which the two loaves were placed: they are covered. The number of columns, their spacing, profile and height are choices.",
+    "resume": "Covered porticoes line the Har HaBayit on all four sides. “The Har HaBayit was a double stav… a stav within a stav” (Pesachim 13b), which Rashi explains: one colonnade runs all around, and inside that circuit another. The model therefore sets two rows of columns along each wall. The same page speaks of the “roof of the itztaba”, on which the two loaves were placed; Rashi specifies that this roof was built against the rain, and the Rambam says the whole Har HaBayit was covered (Beit HaBechirah 5:1). The number of columns, their spacing, profile and height are choices.",
     "sources": [
       {
         "oeuvre": "Pesachim",
@@ -105,6 +146,16 @@
         "oeuvre": "Pesachim",
         "ref": "13b",
         "citation": "על גג האיצטבא"
+      },
+      {
+        "oeuvre": "Rashi sur Pesachim",
+        "ref": "13b",
+        "citation": "גג האיצטבא - גג היה בנוי למעלה מפני הגשמים"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:1",
+        "citation": "וְכֻלּוֹ הָיָה מְקֹרֶה סְטָיו לְפָנִים מִסְּטָיו"
       }
     ],
     "note": "Tour's choice: no column stands in front of the five gates of the Har HaBayit or on the east-west axis, to keep clear the view that the low east wall is there to allow (Middot 2:4)."
@@ -112,10 +163,10 @@
   "ezrat_nashim": {
     "nom": "Ezrat Nashim",
     "translit": "Ezrat Nashim",
-    "resume": "The Court of the Women is the large open-air court through which one enters the Temple enclosure, east of the Azara. It measures 135 amot on each side, and four roofless chambers occupy its corners. This is where the crowd overflows, since the Ezrat Israel is only 11 amot deep.",
+    "resume": "The Court of the Women is the large court through which one enters the Temple enclosure, east of the Azara. It measures 135 amot on each side, and four roofless chambers occupy its corners.",
     "cotes": [
       "135 × 135 amot (≈ 65 × 65 m)",
-      "open to the sky",
+      "open to the sky (tour's choice)",
       "four roofless corner chambers of 40 × 40 amot"
     ],
     "sources": [
@@ -123,39 +174,75 @@
         "oeuvre": "Middot",
         "ref": "2:5",
         "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:7",
+        "citation": "וְלִפְנֵי הָעֲזָרָה בַּמִּזְרָח הָיְתָה עֶזְרַת הַנָּשִׁים"
       }
-    ]
+    ],
+    "note": "Tour's choice: the court is shown open to the sky, with the crowd gathered in it. Middot 2:5 says only of the four corner chambers that they are roofless, « וְלֹא הָיוּ מְקוֹרוֹת »."
   },
   "porte_est_ezrat_nashim": {
     "nom": "Eastern Gate of the Ezrat Nashim",
-    "resume": "The Ezrat Nashim is entered from the east; to the west, the Gate of Nikanor opens onto the Ezrat Israel."
+    "resume": "The Ezrat Nashim is entered from the east: one comes in through the eastern gate of the Har HaBayit, crosses the Cheil and climbs its twelve steps. Sukkah 5:4 calls this gate “the gate that goes out to the east”. To the west, the Gate of Nikanor opens onto the Ezrat Israel; the gates of the Har HaBayit, the Ezrat Nashim and the Azara, and the entrance of the Heikhal, are aligned.",
+    "translit": "Sha'ar hayotze mizrach",
+    "note": "Adopted: the Gate of Nikanor is the eastern gate of the Azara, which the Rambam (Beit HaBechirah 5:5) also calls Sha'ar HaElyon. Middot 2:6, however, lists a Sha'ar HaElyon among the southern gates; Tosfot Yom Tov (Middot 2:6) reports that the Yerushalmi applies the name to the eastern gate, but holds that the one in Middot 2:6 is in the south.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "עַד שֶׁמַּגִּיעִין לַשַּׁעַר הַיּוֹצֵא מִזְרָח"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "6:1",
+        "citation": "כְּשֶׁאָדָם נִכְנָס מִשַּׁעַר מִזְרָחִי שֶׁל הַר הַבַּיִת מְהַלֵּךְ עַד סוֹף הַחֵיל בְּשָׁוֶה. וְעוֹלֶה מִן הַחֵיל לְעֶזְרַת הַנָּשִׁים בִּשְׁתֵּים עֶשְׂרֵה מַעֲלוֹת"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 2:4",
+        "citation": "שַׁעַר הַר הַבַּיִת כְּנֶגֶד שַׁעַר עֶזְרַת נָשִׁים, וְשַׁעַר עֶזְרַת נָשִׁים כְּנֶגֶד שַׁעַר הָעֲזָרָה הַגְּדוֹלָה, וְשַׁעַר הָעֲזָרָה הַגְּדוֹלָה כְּנֶגֶד פֶּתַח הַהֵיכָל"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:5",
+        "citation": "וְשַׁעַר זֶה הוּא הַנִּקְרָא שַׁעַר הָעֶלְיוֹן וְהוּא שַׁעַר נִיקָנוֹר"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 2:6",
+        "citation": "ול\"נ דודאי שער העליון דהכא בדרום והא דירושלמי שם מושאל לשער שבמזרח"
+      }
+    ]
   },
   "gezuztra": {
     "nom": "Gezuztra (the Gallery)",
     "translit": "Gezuztra",
-    "resume": "A gallery, or balcony, ran along the walls of the Ezrat Nashim. It was added for Simchat Beit HaShoeva. Outside this festival, it stands empty.",
+    "resume": "A gallery, or balcony, ran along the walls of the Ezrat Nashim. It was added for Simchat Beit HaShoeva: the women looked on from above and the men from below, “so that they would not mingle”.",
     "sources": [
       {
         "oeuvre": "Middot",
         "ref": "2:5",
-        "citation": ""
+        "citation": "וַחֲלָקָה הָיְתָה בָּרִאשׁוֹנָה, וְהִקִּיפוּהָ כְצוֹצְרָה, שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן, כְּדֵי שֶׁלֹּא יְהוּ מְעֹרָבִין"
       },
       {
         "oeuvre": "Soucca",
         "ref": "5:2",
-        "citation": ""
+        "citation": "יָרְדוּ לְעֶזְרַת נָשִׁים, וּמְתַקְּנִין שָׁם תִּקּוּן גָּדוֹל"
       },
       {
         "oeuvre": "Soucca",
         "ref": "51b",
-        "citation": ""
+        "citation": "חֲלָקָה הָיְתָה בָּרִאשׁוֹנָה. וְהִקִּיפוּהָ גְּזוּזְטְרָא, וְהִתְקִינוּ שֶׁיְּהוּ נָשִׁים יוֹשְׁבוֹת מִלְמַעְלָה וַאֲנָשִׁים מִלְּמַטָּה"
       }
-    ]
+    ],
+    "note": "Tour's choice: the gallery is shown empty outside the festival; no source says what became of it the rest of the year."
   },
   "lishkat_haetzim": {
     "nom": "Lishkat HaEtzim",
     "translit": "Lishkat HaEtzim",
-    "resume": "Northeast corner chamber of the Ezrat Nashim, roofless, forty amot on each side. Wood is sorted here, and Kohanim unfit for service work here. Not to be confused with the Lishkat HaEtz, on the north side of the Azara.",
+    "resume": "Northeast corner chamber of the Ezrat Nashim, roofless, forty amot on each side. Wood is sorted here, and Kohanim unfit for service work here. Not to be confused with the Lishkat HaEtz, on the north side of the Azara according to Yoma 19a and the Rambam (the standard text of Middot 5:4 places it in the south).",
     "cotes": [
       "40 × 40 amot, roofless",
       "northeast corner of the Ezrat Nashim"
@@ -164,7 +251,17 @@
       {
         "oeuvre": "Middot",
         "ref": "2:5",
-        "citation": ""
+        "citation": "מִזְרָחִית צְפוֹנִית, הִיא הָיְתָה לִשְׁכַּת הָעֵצִים, שֶׁשָּׁם הַכֹּהֲנִים בַּעֲלֵי מוּמִין מַתְלִיעִין הָעֵצִים"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:17",
+        "citation": "וְהַשָּׁלֹשׁ שֶׁבִּצְפוֹן לִשְׁכַּת הַגָּזִית. לִשְׁכַּת הַגּוּלָה. לִשְׁכַּת הָעֵץ"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 5:3",
+        "citation": "נ\"א שבדרום והכי מייתי לה בפ\"ק דיומא דף י\"ט. וכן העתיק הרמב\"ם"
       }
     ]
   },
@@ -181,8 +278,14 @@
         "oeuvre": "Middot",
         "ref": "2:5",
         "citation": ""
+      },
+      {
+        "oeuvre": "Negaïm",
+        "ref": "14:8",
+        "citation": "וְהַמְּצֹרָע טָבַל בְּלִשְׁכַּת הַמְּצֹרָעִים"
       }
-    ]
+    ],
+    "note": "Set aside: R. Yehudah (Negaim 14:8), for whom the metzora « לֹא הָיָה צָרִיךְ טְבִילָה », did not need this immersion."
   },
   "lishkat_hanezirim": {
     "nom": "Lishkat HaNezirim",
@@ -203,7 +306,7 @@
   "lishkat_beit_shemanya": {
     "nom": "Lishkat Beit Shemanya",
     "translit": "Lishkat Beit Shemanya",
-    "resume": "Southwest corner chamber of the Ezrat Nashim, roofless, forty amot on each side. It is the storeroom for oil and wine.",
+    "resume": "Southwest corner chamber of the Ezrat Nashim, roofless, forty amot on each side. According to Abba Shaul, it is the storeroom for oil and wine.",
     "cotes": [
       "40 × 40 amot, roofless",
       "southwest corner of the Ezrat Nashim"
@@ -212,13 +315,19 @@
       {
         "oeuvre": "Middot",
         "ref": "2:5",
-        "citation": ""
+        "citation": "אַבָּא שָׁאוּל אוֹמֵר, שָׁם הָיוּ נוֹתְנִין יַיִן וָשֶׁמֶן, הִיא הָיְתָה נִקְרֵאת לִשְׁכַּת בֵּית שְׁמַנְיָה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:8",
+        "citation": "מַעֲרָבִית דְּרוֹמִית בָּהּ הָיוּ נוֹתְנִין יַיִן וְשֶׁמֶן וְהִיא הָיְתָה נִקְרֵאת לִשְׁכַּת בֵּית שַׁמְנַיָּא"
       }
-    ]
+    ],
+    "note": "Adopted: Abba Shaul (Middot 2:5), followed by the Rambam (Beit HaBechirah 5:8). Set aside: R. Eliezer ben Yaakov, who says « שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת », I have forgotten what it was used for."
   },
   "quinze_marches": {
     "nom": "The Fifteen Steps",
-    "resume": "Fifteen semicircular steps rise from the Ezrat Nashim toward the Ezrat Israel, up to the Gate of Nikanor. The Leviim stand on them to sing the fifteen Shir HaMaalot during Simchat Beit HaShoeva. Beneath the Ezrat Israel, opening onto the Ezrat Nashim, are the chambers where they stored their instruments.",
+    "resume": "Fifteen semicircular steps rise from the Ezrat Nashim to the Ezrat Israel. They correspond to the fifteen Shir HaMaalot of Psalms, and the Leviim stand on them with their instruments to sing during Simchat Beit HaShoeva. Beneath the Ezrat Israel, opening onto the Ezrat Nashim, are the chambers where they stored their instruments.",
     "cotes": [
       "15 semicircular steps"
     ],
@@ -231,34 +340,41 @@
       {
         "oeuvre": "Middot",
         "ref": "2:6",
-        "citation": ""
+        "citation": "וּלְשָׁכוֹת הָיוּ תַחַת עֶזְרַת יִשְׂרָאֵל, וּפְתוּחוֹת לְעֶזְרַת הַנָּשִׁים, שֶׁשָּׁם הַלְוִיִּם נוֹתְנִים כִּנּוֹרוֹת וּנְבָלִים וּמְצִלְתַּיִם וְכָל כְּלֵי שִׁיר"
       },
       {
         "oeuvre": "Soucca",
         "ref": "5:4",
-        "citation": ""
+        "citation": "כְּנֶגֶד חֲמִשָּׁה עָשָׂר שִׁיר הַמַּעֲלוֹת שֶׁבַּתְּהִלִּים, שֶׁעֲלֵיהֶן לְוִיִּים עוֹמְדִין בִּכְלֵי שִׁיר וְאוֹמְרִים שִׁירָה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:5",
+        "citation": "וְשַׁעַר זֶה הוּא הַנִּקְרָא שַׁעַר הָעֶלְיוֹן וְהוּא שַׁעַר נִיקָנוֹר"
       }
-    ]
+    ],
+    "translit": "Chamesh esreh maalot",
+    "note": "The sources set the fifteen steps against the fifteen Shir HaMaalot; they do not say that these psalms were the ones sung there. Sukkah 5:4 calls the gate at the top of the steps Sha'ar HaElyon; the Rambam (Beit HaBechirah 5:5) identifies it with the Gate of Nikanor."
   },
   "shaar_nikanor": {
     "nom": "Gate of Nikanor",
     "translit": "Sha'ar Nikanor",
-    "resume": "The Gate of Nikanor opens the Azara to the east, at the top of the fifteen steps. It is the only gate of the Azara left in bronze when the others were plated with gold, in memory of the miracle of the gates that came from Alexandria. Two small side gates (pishpeshin) flank it. It opens at dawn and stays open throughout the service.",
+    "resume": "The Gate of Nikanor opens the Azara to the east, at the top of the fifteen steps. It is the only gate of the Azara left in bronze when the others were plated with gold, in memory of the miracle of the gates that came from Alexandria; others say it was because its bronze shone like gold. According to Abba Yossi ben Chanan, two small side gates (pishpeshin) flank it.",
     "cotes": [
       "20 amot high × 10 wide (standard dimension of the gates of the Azara)",
-      "two side pishpeshin",
+      "two side pishpeshin, according to Abba Yossi ben Chanan (Middot 2:6)",
       "bronze, against the gold of the other gates"
     ],
     "sources": [
       {
         "oeuvre": "Middot",
         "ref": "2:3",
-        "citation": ""
+        "citation": "כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם, נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעַר נִקָּנוֹר, מִפְּנֵי שֶׁנַּעֲשָׂה בָהֶן נֵס. וְיֵשׁ אוֹמְרִים, מִפְּנֵי שֶׁנְּחֻשְׁתָּן מַצְהִיב"
       },
       {
         "oeuvre": "Middot",
         "ref": "1:4",
-        "citation": ""
+        "citation": "שֶׁבַּמִּזְרָח, שַׁעַר נִקָּנוֹר, וּשְׁתֵּי לְשָׁכוֹת הָיוּ לוֹ"
       },
       {
         "oeuvre": "Yoma",
@@ -268,25 +384,25 @@
       {
         "oeuvre": "Yoma",
         "ref": "38a",
-        "citation": ""
+        "citation": "כְּשֶׁהָלַךְ נִיקָנוֹר לְהָבִיא דְּלָתוֹת מֵאֲלֶכְּסַנְדְּרִיָּא שֶׁל מִצְרַיִם"
       },
       {
         "oeuvre": "Middot",
         "ref": "2:6",
-        "citation": ""
+        "citation": "שֶׁבַּמִּזְרָח, שַׁעַר נִקָּנוֹר. וּשְׁנֵי פִשְׁפָּשִׁים הָיוּ לוֹ, אֶחָד מִימִינוֹ וְאֶחָד מִשְּׂמֹאלוֹ"
       },
       {
         "oeuvre": "Soucca",
         "ref": "5:5",
-        "citation": ""
+        "citation": "שָׁלשׁ לִפְתִיחַת שְׁעָרִים"
       }
     ],
-    "note": "Tour's choice: the gate is shown open, its leaves folded back into the gateway, as during the service. Closed, it would cut the line of sight that the low east wall is there to allow."
+    "note": "Tour's choice: the gate is shown open, its leaves folded back into the gateway, as during the service; Sukkah 5:5 speaks only of trumpet blasts “for the opening of the gates”, without saying how long they stayed open. Closed, it would cut the line of sight that the low east wall is there to allow. The pishpeshin come from the list of thirteen gates of Abba Yossi ben Chanan (Middot 2:6); Middot 1:4 gives Nikanor two lishkot, those of Pinchas HaMalbish and of the Osei Chavitin. Set aside: R. Eliezer ben Yaakov (Yoma 38a), for whom it was a polished bronze, « נְחֹשֶׁת קְלוֹנִיתָא », that shone like gold."
   },
   "azara": {
     "nom": "Azara",
     "translit": "Azara",
-    "resume": "The Azara is the inner court, where the service is performed. It measures 187 amot east to west and 135 north to south. From east to west it is divided into the Ezrat Israel, the Ezrat Kohanim, the Mizbeach, the space between the altar and the Ulam, the Building, then the rear of the Kodesh HaKodashim. The floor is stone slabs; the Kohanim serve there barefoot.",
+    "resume": "The Azara is the inner court, where the service is performed. It measures 187 amot east to west and 135 north to south. From east to west it is divided into the Ezrat Israel, the Ezrat Kohanim, the Mizbeach, the space between the altar and the Ulam, the Building, then the rear of the Kodesh HaKodashim. The floor is laid in rows of stone slabs; the Kohanim serve there barefoot.",
     "cotes": [
       "187 amot (east-west) × 135 amot (north-south) ≈ 90 × 65 m",
       "east → west: Ezrat Israel 11, Ezrat Kohanim 11, Mizbeach 32, between altar and Ulam 22, Building 100, rear of Kodesh HaKodashim 11",
@@ -307,29 +423,39 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:13–15",
         "citation": ""
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Yoma 4:3",
+        "citation": "כָּל שׁוּרָה וְשׁוּרָה שֶׁל אַבְנֵי הָרִצְפָּה קְרוּיָה רֹבֶד"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:5",
+        "citation": "לְהִתְחַמֵּם שָׁם הַכֹּהֲנִים מִפְּנֵי שֶׁהוֹלְכִים יְחֵפִים"
       }
     ],
-    "note": "Adopted: the Rambam's division (Beit HaBechirah 5:13–15). From north to south, Middot 5:2 leaves 25 amot without figures — between the ramp and the wall on one side, for the pillars on the other; the Rambam gives 12.5 to each."
+    "note": "Adopted: the Rambam's division (Beit HaBechirah 5:13–15). From north to south, Middot 5:2 leaves 25 amot without figures — between the ramp and the wall on one side, for the pillars on the other; the Rambam gives 12.5 to each. He also reorders the north side: Middot 5:2 counts rings → tables 4, tables → pillars 4, pillars → wall 8, the Rambam wall → Beit HaMitbachayim 8, Beit HaMitbachayim 12.5, tables 8."
   },
   "portes_azara": {
     "nom": "North and South Gates of the Azara",
     "translit": "Sha'arei HaAzara",
-    "resume": "Seven gates pierce the wall of the Azara: three in the south, three in the north, and Nikanor in the east. They measure twenty amot high by ten wide. They are counted starting from the westernmost: in the south, Sha'ar HaDelek, Sha'ar HaBekhorot, then Sha'ar HaMayim, the easternmost; in the north, Sha'ar HaNitzotz, Sha'ar HaKorban, then Sha'ar Beit HaMoked.",
+    "resume": "Seven gates pierce the wall of the Azara: three in the south, three in the north, and Nikanor in the east. They measure twenty amot high by ten wide. They are counted starting from the westernmost: in the south, Sha'ar HaDelek, Sha'ar HaBekhorot, then Sha'ar HaMayim, the easternmost; in the north, Sha'ar HaNitzotz, Sha'ar HaKorban, then Beit HaMoked.",
     "cotes": [
       "7 gates: 3 in the south, 1 in the east, 3 in the north",
       "20 amot high × 10 wide",
-      "three gate structures 20 amot wide, projecting 12 amot beyond the wall"
+      "three gate structures 20 amot wide, projecting 12 amot beyond the wall (tour's choice, without source)"
     ],
     "sources": [
       {
         "oeuvre": "Middot",
         "ref": "1:4",
-        "citation": ""
+        "citation": "שֶׁבַּדָּרוֹם, שַׁעַר הַדֶּלֶק. שֵׁנִי לוֹ, שַׁעַר הַבְּכוֹרוֹת. שְׁלִישִׁי לוֹ, שַׁעַר הַמָּיִם"
       },
       {
         "oeuvre": "Middot",
         "ref": "1:5",
-        "citation": ""
+        "citation": "וְשֶׁבַּצָּפוֹן, שַׁעַר הַנִּיצוֹץ… שֵׁנִי לוֹ, שַׁעַר הַקָּרְבָּן. שְׁלִישִׁי לוֹ, בֵּית הַמּוֹקֵד"
       },
       {
         "oeuvre": "Middot",
@@ -350,14 +476,19 @@
         "oeuvre": "Yoma",
         "ref": "19a",
         "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:4",
+        "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב. וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"
       }
     ],
-    "note": "Adopted: seven gates, following Middot 1:4. Set aside: the thirteen gates of Abba Yossi ben Chanan (Middot 2:6). The names follow Middot 1:4; in the south, Yoma 19a reads Sha'ar HaDelaka and Sha'ar HaKorban, without changing the place of Sha'ar HaMayim. Tour's choice: the spacing of the gates, which no source gives — only their order is known."
+    "note": "Adopted: seven gates, following Middot 1:4–5. Set aside: the thirteen gates of Abba Yossi ben Chanan (Middot 2:6, Shekalim 6:3); yet it is his list that gives the direction of counting, « סְמוּכִים לַמַּעֲרָב », which the Rambam (Beit HaBechirah 5:4) repeats without the names, while Middot 1:4–5 gives none. The southern names are in Middot 1:4, the northern ones in Middot 1:5; Yoma 19a reads Sha'ar HaDelaka and Sha'ar HaKorban in the south, without changing the place of Sha'ar HaMayim, and Sha'ar Beit HaMoked in the north. Tour's choice: the spacing of the gates, which no source gives, and the 20 × 12 amot gate structure with its twenty steps, which have no source."
   },
   "doukhan": {
     "nom": "Dukhan",
     "translit": "Dukhan",
-    "resume": "The Dukhan is the platform of the Leviim, set at the boundary between the Ezrat Israel and the Ezrat Kohanim, on the one-ama step that separates the two courts, with three half-ama steps. The Leviim stand on it to sing, with their instruments. Never fewer than twelve are counted, and any number may be added beyond that; the Levite children stand below, their heads between the legs of the Leviim.",
+    "resume": "The Dukhan is the platform of the Leviim, set at the boundary between the Ezrat Israel and the Ezrat Kohanim, according to R. Eliezer ben Yaakov (Middot 2:6) on the one-ama step that separates the two courts, with three half-ama steps. The Leviim stand on it to sing, with their instruments. Never fewer than twelve are counted, and any number may be added beyond that. The Levite children, according to R. Eliezer ben Yaakov (Arakhin 2:6), stand below, their heads between the legs of the Leviim.",
     "cotes": [
       "three ½-ama steps",
       "set on the one-ama step that separates the Ezrat Israel and the Ezrat Kohanim",
@@ -373,7 +504,7 @@
       {
         "oeuvre": "Arakhin",
         "ref": "2:6",
-        "citation": ""
+        "citation": "רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, אֵין עוֹלִין לַמִּנְיָן, וְאֵין עוֹמְדִים עַל הַדּוּכָן, אֶלָּא בָאָרֶץ הָיוּ עוֹמְדִין, וְרָאשֵׁיהֶן מִבֵּין רַגְלֵי הַלְוִיִּם"
       },
       {
         "oeuvre": "Arakhin",
@@ -396,12 +527,12 @@
   "ezrat_israel": {
     "nom": "Ezrat Israel and Ezrat Kohanim",
     "translit": "Ezrat Israel",
-    "resume": "Two strips of eleven amot each, east of the Azara: the Ezrat Israel, where the people stand, then the Ezrat Kohanim to the west. A one-ama step separates them — according to others, projections, rashei pispesin — and this is where the Dukhan stands. The people do not cross into the Ezrat Kohanim, except for the semikha, the shechita and the tenufa.",
+    "resume": "Two strips of eleven amot each, east of the Azara: the Ezrat Israel, where the people stand, then the Ezrat Kohanim to the west. According to the first view in the mishna, projections, rashei pispasin, separate them; according to R. Eliezer ben Yaakov, it is a one-ama step, and this is where the Dukhan stands. The people do not cross into the Ezrat Kohanim, except for the semikha, the shechita and the tenufa.",
     "cotes": [
       "Ezrat Israel: 11 amot out of the 187 east to west",
       "Ezrat Kohanim: the next 11 amot to the west",
       "135 amot wide",
-      "one-ama step between the two"
+      "one-ama step between the two, according to R. Eliezer ben Yaakov"
     ],
     "sources": [
       {
@@ -412,7 +543,7 @@
       {
         "oeuvre": "Middot",
         "ref": "2:6",
-        "citation": ""
+        "citation": "וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין עֶזְרַת יִשְׂרָאֵל לְעֶזְרַת הַכֹּהֲנִים. רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, מַעֲלָה הָיְתָה שָׁם, וּגְבוֹהָה אַמָּה, וְהַדּוּכָן נָתוּן עָלֶיהָ"
       },
       {
         "oeuvre": "Kelim",
@@ -423,16 +554,16 @@
     "note": "Adopted: a one-ama step between the Ezrat Israel and the Ezrat Kohanim, carrying the Dukhan, following R. Eliezer ben Yaakov (Middot 2:6). Set aside: the mere row of projections (rashei pispasin) of the first view in the mishna."
   },
   "mizbeach": {
-    "nom": "Mizbeach HaNechoshet",
-    "translit": "Mizbeach HaNechoshet",
-    "resume": "The outer altar, built of stones untouched by iron, joined with plaster and whitewashed with lime twice a year. Its base, the yessod, is 32 amot on each side and one ama high; a one-ama setback gives 30 × 30 up to the sovev, the walkable ledge at six amot; a second setback gives 28 × 28 up to the surface of the fire. Four hollow horns of one cubic ama occupy the corners. It is not centered on the axis of the Heikhal: it is offset nine amot to the south.",
+    "nom": "Mizbeach HaChitzon",
+    "translit": "Mizbeach HaChitzon",
+    "resume": "The outer altar, built of stones untouched by iron, joined with plaster and whitewashed with lime twice a year. Its base, the yessod, is 32 amot on each side and one ama high; a one-ama setback gives 30 × 30 up to the sovev, the walkable ledge at six amot; a second setback gives 28 × 28 up to the surface of the fire. Four hollow horns, one ama by one ama, occupy the corners. It is not centered on the axis of the Heikhal: it is offset nine amot to the south.",
     "cotes": [
       "yessod: 32 × 32 amot, 1 ama high",
       "30 × 30 up to the sovev, at 6 amot high (1 yessod + 5)",
       "28 × 28 up to the surface (ma'arakha)",
-      "keranot: four hollow cubes of one ama at the corners (Rambam Beit HaBe'hira 2:8)",
+      "keranot: four hollow horns, one ama by one ama, at the corners; one ama high in the model, five tefachim according to the Rambam (Beit HaBe'hira 2:8)",
       "1 ama of walkway (makom hilukh haregel), then a 24 × 24 fire zone",
-      "total height 10 amot (≈ 4.8 m): 9 to the surface + 1 for the horn",
+      "total height 10 amot (≈ 4.8 m) in the model: 9 to the surface + 1 for the horn (choice of the tour); according to the Rambam, 58 tefachim in all, of which 9 amot less one tefach up to the ma'arakha (Beit HaBe'hira 2:6, 2:9)",
       "32 amot in both the east-west and north-south division of the Azara",
       "north edge at 60.5 amot from the north wall: center 9 amot south of the axis of the Heikhal"
     ],
@@ -454,8 +585,23 @@
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",
-        "ref": "2",
-        "citation": ""
+        "ref": "2:6",
+        "citation": "וְגֹבַהּ כָּל הַמִּזְבֵּחַ נ\"ח טְפָחִים"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:7",
+        "citation": "עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:8",
+        "citation": "גֹּבַהּ כָּל קֶרֶן וְקֶרֶן חֲמִשָּׁה טְפָחִים. וְרִבּוּעַ כָּל קֶרֶן אַמָּה עַל אַמָּה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:9",
+        "citation": "וְנִמְצָא גָּבְהוֹ מִן הָאָרֶץ עַד מְקוֹם הַמַּעֲרָכָה תֵּשַׁע אַמּוֹת פָּחוֹת טֶפַח"
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",
@@ -464,33 +610,49 @@
       },
       {
         "oeuvre": "Zeva'him",
+        "ref": "58b",
+        "citation": "מִשּׁוּם דְּרַבִּי יְהוּדָה שְׁמַעְנָא לֵיהּ מְמוּצָּע בְּהֶדְיָא"
+      },
+      {
+        "oeuvre": "Zeva'him",
         "ref": "59a",
         "citation": "צפונה"
       }
     ],
-    "note": "Adopted: the altar shifted to the south, its center nine amot south of the axis of the Heikhal. This is what the measurements of Middot 5:2 give as the Rambam reads them, and the view of R. Eliezer ben Yaakov, who wants the “north” — where the most holy offerings are slaughtered — free of everything, even of the altar (Zevachim 59a). Set aside: R. Yehuda's altar centered in front of the Heikhal (Zevachim 58b), which many models follow."
+    "note": "Adopted: the altar shifted to the south, its center nine amot south of the axis of the Heikhal. This is what the measurements of Middot 5:2 give as the Rambam reads them, and the view of R. Eliezer ben Yaakov, who wants the “north” — where the most holy offerings are slaughtered — free of everything, even of the altar (Zevachim 59a). Set aside: R. Yehuda's altar centered in front of the Heikhal (Zevachim 58b), which many models follow, and R. Yosei HaGelili's altar lying entirely in the north (Zevachim 59a). The round figures are those of the first opinion in Middot 3:1, where R. Yosei describes an original altar of 28 × 28 that the returning exiles enlarged by four amot to the south and west; the Rambam counts in tefachim (Beit HaBe'hira 2:7): a yessod of five tefachim, a surface of 28 amot and four tefachim, a ma'arakha of 24 amot and four tefachim. Choice of the tour: the height of ten amot, as nine to the surface plus one for the horn, which the Rambam does not give in this way."
   },
   "hout_hasikra": {
     "nom": "Chut HaSikra",
     "translit": "Chut HaSikra",
     "resume": "A red line runs around the altar at mid-height. It separates the bloods applied above it from those applied below it.",
     "cotes": [
-      "at the midpoint of the altar's height (10 amot total)"
+      "at the midpoint of the altar's height (10 amot in all according to the Rambam, Beit HaBe'hira 2:5)"
     ],
     "sources": [
       {
         "oeuvre": "Middot",
         "ref": "3:1",
-        "citation": ""
+        "citation": "וְחוּט שֶׁל סִקְרָא חוֹגְרוֹ בָאֶמְצַע, לְהַבְדִּיל בֵּין הַדָּמִים הָעֶלְיוֹנִים לַדָּמִים הַתַּחְתּוֹנִים"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:5",
+        "citation": "כֻּלָּן עֶשֶׂר אַמּוֹת גֹּבַהּ כָּל אֶחָד מֵהֶן"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:9",
+        "citation": "וְחוּט שֶׁל סִקְרָה הָיָה חוֹגֵר בְּאֶמְצַע הַמִּזְבֵּחַ [כְּשִׁשָּׁה טְפָחִים מִסּוֹף הַסּוֹבֵב וּלְמַטָּה]"
       }
-    ]
+    ],
+    "note": "Middot 3:1 says only that the line girds the altar at its middle. The Rambam, who counts the altar as 58 tefachim, places it about six tefachim below the top of the sovev (Beit HaBe'hira 2:8–9)."
   },
   "yessod": {
     "nom": "Yesod",
     "translit": "Yesod",
     "resume": "The base of the altar: a step one amah high and one amah wide. It does not go all the way around. It runs along the whole north and the whole west, and extends only one amah onto the south, at the southwest corner, and one amah onto the east, at the northeast corner. The southeast corner has none. The remaining blood of the offerings is poured onto it.",
     "cotes": [
-      "1 amah high, 1 amah wide",
+      "1 amah high, 1 amah wide (Middot 3:1); five tefachim by five according to the Rambam (Beit HaBechirah 2:7)",
       "the whole north and the whole west: 32 amot each",
       "one amah on the south, at the southwest corner; one amah on the east, at the northeast corner",
       "the southeast corner has no yesod"
@@ -515,14 +677,19 @@
         "oeuvre": "Zeva'him",
         "ref": "5:3",
         "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:7",
+        "citation": "עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד"
       }
     ],
-    "note": "Not modelled: the two holes at the southwest corner through which the blood poured on the yesod runs down, and the amah channel that carries it to the Kidron (Middot 3:2)."
+    "note": "Adopted: the one amah of height and width of Middot 3:1. The Rambam gives the yesod five tefachim of height and five of setback (Beit HaBechirah 2:7). Not modelled: the two holes at the southwest corner through which the blood poured on the yesod runs down, and the amah channel that carries it to the Kidron (Middot 3:2)."
   },
   "keranot": {
     "nom": "Keranot",
     "translit": "Keranot",
-    "resume": "The four horns at the corners of the altar top, one amah by one amah, hollow. The blood of the chatat is placed on them, once on each of the four. Inside them, one amah where the kohanim walk, then the place of the fire.",
+    "resume": "The four horns at the corners of the altar top, one amah by one amah, hollow. The blood of the chatat is placed on them, once on each of the four. Beyond them, toward the center, one amah where the kohanim walk, then the place of the fire.",
     "cotes": [
       "one amah by one amah, at the four corners of the top",
       "hollow",
@@ -612,7 +779,7 @@
         "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת"
       }
     ],
-    "note": "Adopted: the sides of the two small ramps according to Rashi (Zevachim 62b), the sovev to the east, the yessod to the west. Choices of the tour: the thickness of the head, the width of the air gap, the sovev ramp starting 18 amot from the altar to leave the place of the deshen free, the placement of the revuva and of the two tables."
+    "note": "Adopted: the sides of the two small ramps according to Rashi (Zevachim 62b), the sovev to the east, the yessod to the west. Set aside on one point: Rashi starts the sovev ramp at the foot of the kevesh; the tour starts it 18 amot from the altar to leave the place of the deshen free. Choices of the tour: the thickness of the head, the width of the air gap, the placement of the revuva and of the two tables."
   },
   "kevashim_ketanim": {
     "nom": "Kevashim ketanim",
@@ -632,7 +799,7 @@
       {
         "oeuvre": "Rashi sur Zeva'him",
         "ref": "62b",
-        "citation": "אותו שפונין בו לסובב יצא במזרחו של כבש… והפונה ליסוד יוצא למערבו"
+        "citation": "אותו שפונין בו לסובב יצא במזרחו של כבש לימין ויוצא ומתחיל בשפולו של כבש ונמשך ועולה באלכסון עד שמגיע לסובב והפונה ליסוד יוצא למערבו"
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",
@@ -640,7 +807,7 @@
         "citation": "וּשְׁנֵי כְּבָשִׁים קְטַנִּים יוֹצְאִים מִמֶּנּוּ שֶׁבָּהֶם פּוֹנִים לַיְסוֹד וְלַסּוֹבֵב"
       }
     ],
-    "note": "Adopted: the sides according to Rashi, the sovev to the east, the yesod to the west. Choices of the tour: their widths (2.5 and 2 amot), and the sovev ramp starting 18 amot from the altar to leave the place of the deshen free."
+    "note": "Adopted: the sides according to Rashi, the sovev to the east, the yesod to the west. Set aside on one point: the same Rashi starts the sovev ramp at the foot of the kevesh; the tour starts it 18 amot from the altar, to leave the place of the deshen free. Choice of the tour: their widths (2.5 and 2 amot)."
   },
   "revouva": {
     "nom": "Revuva",
@@ -660,9 +827,24 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "2:14",
         "citation": "וְחַלּוֹן הָיְתָה בְּמַעֲרָבוֹ שֶׁל כֶּבֶשׁ אַמָּה עַל אַמָּה… עַד שֶׁתַּעֲבֹר צוּרָתָהּ וְתֵצֵא לְבֵית הַשְּׂרֵפָה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 3:3",
+        "citation": "וּבַכֶּבֶשׁ עַצְמוֹ לְמַעֲרָבוֹ הָיָה עוֹמֵד"
+      },
+      {
+        "oeuvre": "Rashi sur Pesachim",
+        "ref": "34a",
+        "citation": "לול קטן - כעין גומא חלולה עשויה בבנין הרצפה"
+      },
+      {
+        "oeuvre": "Boaz",
+        "ref": "Middot 3:3",
+        "citation": "כתב עליו הראב\"ד וז\"ל, לא כי, אלא חלון לבד ורבובה לבד"
       }
     ],
-    "note": "Choices of the tour: its position, 12 amot from the altar, and its height, 2 amot above the ground."
+    "note": "Adopted: a niche in the western face of the kevesh, as read by the Rambam (Beit HaBechirah 2:14) and Bartenura (Middot 3:3). Set aside: Rashi, who puts it in the paving of the Azara, west of the kevesh, in the corner it forms with the altar (on Pesachim 34a); the Raavad, who distinguishes the window from the revuva, and whom Boaz (Middot 3:3) reads as a hollow at the top of the kevesh. Choices of the tour: its position, 12 amot from the altar, and its height, 2 amot above the ground."
   },
   "shulchanot_kevesh": {
     "nom": "The two tables of the kevesh",
@@ -728,7 +910,7 @@
   "melach_rosh": {
     "nom": "The salt on top of the altar",
     "translit": "Melach",
-    "resume": "The third place of salt, on top of the altar. What goes straight up to the fire is salted there: the kometz of the menachot, the levonah and the ketoret.",
+    "resume": "The third place of salt, on top of the altar. There they salt the kometz of the menachot, the levonah and the ketoret, the minchat kohanim, the minchat kohen mashiach, the minchat nesachim and the bird olah.",
     "cotes": [
       "on top of the altar"
     ],
@@ -736,7 +918,7 @@
       {
         "oeuvre": "Mena'hot",
         "ref": "21b",
-        "citation": "בְּרֹאשׁוֹ שֶׁל מִזְבֵּחַ – שֶׁשָּׁם מוֹלְחִין הַקּוֹמֶץ וְהַלְּבוֹנָה וְהַקְּטוֹרֶת"
+        "citation": "בְּרֹאשׁוֹ שֶׁל מִזְבֵּחַ – שֶׁשָּׁם מוֹלְחִין הַקּוֹמֶץ וְהַלְּבוֹנָה וְהַקְּטוֹרֶת, וּמִנְחַת כֹּהֲנִים וּמִנְחַת כֹּהֵן מָשִׁיחַ וּמִנְחַת נְסָכִים, וְעוֹלַת הָעוֹף"
       }
     ],
     "note": "Choices of the tour: its position, on the southern walkway strip east of where the kevesh arrives, and its size. The source names the place, not the spot on the top."
@@ -786,14 +968,19 @@
         "oeuvre": "Tiferet Israël",
         "ref": "Middot 3:3",
         "citation": "ויורדים משם בסולם אל החלל הקטן שתחת היסוד"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "2:11",
+        "citation": "וְהֵן הַנִּקְרָאִין שִׁיתִין שֶׁהַדָּמִים יוֹרְדִין בָּהֶן"
       }
     ],
-    "note": "Adopted: the shit is the cavity beneath the altar into which the wine and water of the libations flow, as Bartenura and the Rambam read it (Middot 3:3). Set aside: the Tiferet Yisrael, for whom it is the cavity into which the blood drains. Not shown: the two blood holes and the channel that carries the blood away (Middot 3:2), and the two bowls on top of the altar (Sukkah 4:9). Tour's choice: the place of the slab, the size of the cavity, the ladder and the duct."
+    "note": "Adopted: the shit is the cavity beneath the altar into which the wine and water of the libations flow, as Bartenura and the Rambam read it in their commentaries on Middot 3:3. In the Mishneh Torah, the Rambam also gives the name shitin to the two holes through which the blood runs down (Beit HaBechirah 2:11). Set aside: the Tiferet Yisrael, for whom it is the cavity into which the blood drains. Not shown: the two blood holes and the channel that carries the blood away (Middot 3:2). Tour's choice: the place of the slab, the size of the cavity, the ladder and the duct."
   },
   "maarakhot": {
     "nom": "The Ma'arakhot",
     "translit": "Ma'arakhot",
-    "resume": "The woodpiles set up on the surface of the altar. According to R. Yosei, three fires burn there, and four on Yom Kippur. In the center is the tapuach, the mound of ash that the logs of the great ma'arakha touch. Smoke rises straight up from them, continuously.",
+    "resume": "The woodpiles set up on the surface of the altar. According to R. Yosei, three fires burn there, and four on Yom Kippur. In the center is the tapuach, the mound of ash that the logs of the great ma'arakha touch. Among the miracles of the Temple, the Mishnah counts that the rain did not put out the fire of the ma'arakha and the wind did not prevail over the column of smoke.",
     "cotes": [
       "surface of the altar: 28 × 28 amot",
       "fire zone: 24 × 24 amot, past the ama of the horns and the ama of walkway",
@@ -831,6 +1018,11 @@
         "oeuvre": "Bartenura",
         "ref": "Yoma 4:6",
         "citation": "וּמוֹסִיפִין בְּיוֹם הַכִּפּוּרִים עוֹד מַעֲרָכָה אַחַת לִטֹּל מִמֶּנָּה גֶּחָלִים לַקְּטֹרֶת לִפְנַי וְלִפְנִים"
+      },
+      {
+        "oeuvre": "Avot",
+        "ref": "5:5",
+        "citation": "וְלֹא כִבּוּ גְשָׁמִים אֵשׁ שֶׁל עֲצֵי הַמַּעֲרָכָה, וְלֹא נָצְחָה הָרוּחַ אֶת עַמּוּד הֶעָשָׁן"
       }
     ]
   },
@@ -882,15 +1074,16 @@
         "citation": "הספלים נתונים אצל הקרן זה לפני זה סמוכין זה לזה אחד לצד מערב ואחד לפנים הימנו דהיינו למזרח"
       }
     ],
-    "note": "Adopted: silver. Rejected: according to R. Yehudah they were of plaster, blackened by the wine (Sukkah 4:9). Choices of the tour: their size, their profile and the direction of the spouts."
+    "note": "Adopted: silver. Rejected: according to R. Yehudah they were of lime, blackened by the wine (Sukkah 4:9). Choices of the tour: their size, their profile and the direction of the spouts."
   },
   "kiyor": {
     "nom": "Kiyor",
     "translit": "Kiyor",
-    "resume": "The bronze basin, mounted on a pedestal, placed between the Ulam and the Mizbeach and offset to the south. Ben Katin fitted it with twelve taps, and a mechanism (mukhani) to lower it into the well during the night.",
+    "resume": "The bronze basin on its stand, placed between the Ulam and the Mizbeach and offset to the south. Ben Katin fitted it with twelve taps, and a mukhani so that its water would not be disqualified overnight: a wheel that lowered it into a well.",
     "cotes": [
       "between the Ulam and the Mizbeach, offset to the south",
-      "twelve taps (Ben Katin's improvement)"
+      "twelve taps (Ben Katin's improvement)",
+      "basin and stand of bronze, like the kiyor of the Mishkan (Shemot 30:18)"
     ],
     "sources": [
       {
@@ -901,7 +1094,7 @@
       {
         "oeuvre": "Yoma",
         "ref": "3:10",
-        "citation": ""
+        "citation": "וְאַף הוּא עָשָׂה מוּכְנִי לַכִּיּוֹר, שֶׁלֹּא יִהְיו מֵימָיו נִפְסָלִין בְּלִינָה"
       },
       {
         "oeuvre": "Tamid",
@@ -912,17 +1105,33 @@
         "oeuvre": "Tamid",
         "ref": "3:8",
         "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "37a",
+        "citation": "מַאי מוּכְנִי? אָמַר אַבָּיֵי: גִּילְגְּלָא דַּהֲוָה מְשַׁקְּעָא לֵיהּ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Tamid 1:4",
+        "citation": "גַּלְגַּל הַסּוֹבֵב שֶׁעַל יָדוֹ מְשַׁקְּעִים הַכִּיּוֹר בַּבּוֹר"
+      },
+      {
+        "oeuvre": "Shemot",
+        "ref": "30:18",
+        "citation": "וְעָשִׂיתָ כִּיּוֹר נְחֹשֶׁת וְכַנּוֹ נְחֹשֶׁת לְרָחְצָה"
       }
-    ]
+    ],
+    "note": "Adopted: the mukhani is a wheel that sinks the kiyor into a well (Abaye, Yoma 37a; Bartenura on Tamid 1:4). Set aside: according to the Rambam, as Bartenura reports, it is an unconsecrated vessel around the kiyor in which the water stays overnight. Mishkan: the bronze and the stand come from Shemot 30:18; the Mishnah says nothing about them."
   },
   "beit_hamitbahayim": {
     "nom": "Beit HaMitbachayim",
     "translit": "Beit HaMitbachayim",
-    "resume": "The slaughtering area, north of the Mizbeach, in three successive strips: first eight low stone pillars (ninnasin) topped with cedar blocks carrying three rows of iron hooks, then eight marble tables, then twenty-four rings fixed to the ground. On Yom Kippur, the bull and the goat are slaughtered there.",
+    "resume": "The slaughtering area, north of the Mizbeach, in three successive strips: first eight low pillars (ninnasin) topped with cedar blocks carrying three rows of iron hooks, then eight marble tables, then twenty-four rings fixed to the ground. It is part of the “north” of the Azara, where the most holy offerings are slaughtered, among them the bull and the goat of Yom Kippur.",
     "cotes": [
       "from the north wall to the first pillar: 8 amot",
-      "the 8 pillars (ninnasin): a 12.5-ama strip",
-      "the 8 marble tables: an 8-ama strip",
+      "the 8 pillars (ninnasin): a 12.5-ama strip (Rambam)",
+      "the 8 marble tables: an 8-ama strip (Rambam)",
       "the 24 rings: a 24-ama strip",
       "from the rings to the Mizbeach: 8 amot"
     ],
@@ -930,12 +1139,12 @@
       {
         "oeuvre": "Middot",
         "ref": "3:5",
-        "citation": ""
+        "citation": "וּמַפְשִׁיטִין עַל שֻׁלְחָנוֹת שֶׁל שַׁיִשׁ שֶׁבֵּין הָעַמּוּדִים"
       },
       {
         "oeuvre": "Middot",
         "ref": "5:2",
-        "citation": ""
+        "citation": "מִן הַטַּבָּעוֹת לַשֻּׁלְחָנוֹת אַרְבַּע, מִן הַשֻּׁלְחָנוֹת וְלַנַּנָּסִין אַרְבַּע"
       },
       {
         "oeuvre": "Tamid",
@@ -945,9 +1154,15 @@
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:13–15",
-        "citation": ""
+        "citation": "בֵּית הַמִּטְבָּחַיִם י\"ב אַמּוֹת וּמֶחֱצָה… מְקוֹם הַשֻּׁלְחָנוֹת שְׁמוֹנֶה אַמּוֹת"
+      },
+      {
+        "oeuvre": "Zeva'him",
+        "ref": "5:1",
+        "citation": "פַּר וְשָׂעִיר שֶׁל יוֹם הַכִּפּוּרִים שְׁחִיטָתָן בַּצָּפוֹן"
       }
-    ]
+    ],
+    "note": "Adopted: the Rambam's division (Beit HaBechirah 5:13–15), which gives 12.5 amot to the ninnasin and 8 to the tables. Set aside: Middot 3:5 and Tamid 3:5 place the tables between the pillars, and Middot 5:2 counts four amot from the rings to the tables, then four from the tables to the ninnasin, with no 12.5-ama strip. Choice of the tour: stone pillars; the Mishnah says only “עַמּוּדִים נַנָּסִין”."
   },
   "tabaot": {
     "nom": "The Tabaot (Rings)",
@@ -975,14 +1190,14 @@
   "lishkat_hagazit": {
     "nom": "Lishkat HaGazit",
     "translit": "Lishkat HaGazit",
-    "resume": "Seat of the Sanhedrin, and place where the lots for the Kohanim were drawn. It straddles the north wall of the Azara, half within the sacred area, half outside it: the wall breaks off across its width, and the boundary is marked on the floor. Two openings, one onto the Azara in the south, the other onto the chol in the east, at the top of twenty steps coming up from the terrace of the Cheil. The Gemara calls them petachim, not sha'arim — they are not gates of the Azara. Its walls are of hewn stone broken by courses of cedar; in the chol half, where the court sits, the floor is of cedar and the far wall is lined with carved cedar panels. In the sacred half, the Kohanim stand in a circle for the drawing of lots, and they come there to read the Shema. The Sanhedrin sits in the chol half, since no one sits in the Azara except the kings of the house of David. It sits in a semicircle, so that the judges see one another: the Nasi in the middle, the Av Beit Din at his right, two scribes standing before them, and three rows of students seated facing the judges. It sits there from the morning Tamid until the evening one; on Shabbat and festivals, it sits on the Cheil. There it judges the Kohanim: one found unfit dresses in black and leaves, one found fit dresses in white and goes in to serve with his brothers.",
+    "resume": "Seat of the Sanhedrin, and place where the lots for the Kohanim were drawn. It straddles the north wall of the Azara, half within the sacred area, half outside it: the wall breaks off across its width, and the boundary is marked on the floor. Two openings, one onto the Azara in the south, the other onto the chol in the east, at the top of twenty steps coming up from the terrace of the Cheil. The Gemara calls them petachim, not sha'arim — they are not gates of the Azara. Its walls are of hewn stone broken by courses of cedar; in the chol half, where the court sits, the floor is of cedar and the far wall is lined with carved cedar panels. In the sacred half, the Kohanim stand in a circle for the drawing of lots, and they come there to read the Shema. The Sanhedrin sits in the chol half, since no one sits in the Azara except the kings of the house of David. It sits in a semicircle, so that the judges see one another: the Nasi in the middle, the Av Beit Din at his right, two scribes standing before them — three according to R. Yehuda —, and three rows of students seated facing the judges. It sits there from the morning Tamid until the evening one; on Shabbat and festivals, it sits on the Cheil. There it judges the Kohanim: one found unfit dresses in black and leaves, one found fit dresses in white and goes in to serve with his brothers.",
     "cotes": [
       "straddling the north wall",
       "half in the sacred area, half outside it, the boundary marked on the floor",
       "two petachim: to the south onto the Azara, to the east onto the Cheil",
       "the Sanhedrin in a semicircle, in the chol half",
       "the Nasi in the middle, the Av Beit Din at his right",
-      "two scribes standing, three rows of students facing the judges"
+      "two scribes standing (three according to R. Yehuda), three rows of students facing the judges"
     ],
     "sources": [
       {
@@ -1058,10 +1273,20 @@
       {
         "oeuvre": "Yoma",
         "ref": "19a",
-        "citation": ""
+        "citation": "שָׁלֹשׁ שֶׁבַּצָּפוֹן: לִשְׁכַּת הָעֵץ, לִשְׁכַּת הַגּוֹלָה, לִשְׁכַּת הַגָּזִית"
+      },
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "4:3",
+        "citation": "רַבִּי יְהוּדָה אוֹמֵר, שְׁלֹשָׁה"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 5:4",
+        "citation": "אבל במקום שפתוחה היא לחול היו מעלות שעליה עולין וממנה יורדין לחול"
       }
     ],
-    "note": "Adopted: on the north side of the Azara, following the reading of Yoma 19a, which the Rambam and Tosafot Yom Tov follow. Set aside: the printed text of Middot 5:4, which places it in the south. Tour's choice: the opening onto the non-sacred area to the east; the decoration, which the Gemara only calls \"like a great basilica\", taken from the Tanakh and not from Roman architecture: courses of cedar beams in the stone as in the walls of Solomon's court, a cedar floor like his hall of judgment, a far wall of framed cedar panels whose rails carry the gourds and flowers of the Bayit, a ceiling of cedar beams; the three tiers and the Nasi's dais; seats modelled on Solomon's throne, with a rounded back and armrests but without its lions, the Nasi's overlaid with gold; the scribes' lecterns and the students' benches; the boundary marked on the floor, by analogy with the Beit HaMoked, of which Middot 1:6 says it. The room shows the layout of the court, not its numbers: seventy-one judges and three rows of students do not fit in it."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Set aside: the orientation of the baraita in Yoma 25a, “the lottery in its east, and the elder sitting in its west,” from which Abaye infers that the sacred half is to the east and the non-sacred half to the west; straddling the north wall, the tour's room has its sacred half to the south and its non-sacred half to the north. Also set aside: R. Yehuda, for whom the scribes are three (Sanhedrin 4:3). Tour's choice: the opening onto the non-sacred area to the east, and its twenty steps — Tosafot Yom Tov (Middot 5:4) says one went up to it by steps, without giving their number; the decoration, which the Gemara only calls \"like a great basilica\", taken from the Tanakh and not from Roman architecture: courses of cedar beams in the stone as in the walls of Solomon's court, a cedar floor like his hall of judgment, a far wall of framed cedar panels whose rails carry the gourds and flowers of the Bayit, a ceiling of cedar beams; the three tiers and the Nasi's dais; seats modelled on Solomon's throne, with a rounded back and armrests but without its lions, the Nasi's overlaid with gold; the scribes' lecterns and the students' benches; the boundary marked on the floor, by analogy with the Beit HaMoked, of which Middot 1:6 says it. The room shows the layout of the court, not its numbers: seventy-one judges and three rows of students do not fit in it."
   },
   "lishkat_hagola": {
     "nom": "Lishkat HaGola",
@@ -1081,20 +1306,20 @@
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:17",
-        "citation": ""
+        "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"
       },
       {
         "oeuvre": "Tosfot Yom Tov",
-        "ref": "Middot 5:3",
-        "citation": ""
+        "ref": "Middot 5:4",
+        "citation": "שבדרום. נ\"א שבצפון והכי מייתי לה בפ\"ק דיומא דף י\"ט"
       }
     ],
-    "note": "Adopted: in the north, with the Lishkat HaGazit and the Lishkat HaEtz, following the reading of Yoma 19a that the Rambam follows; the printed text of Middot 5:4 puts all three in the south. Its opening in the wall is not an eighth gate of the Azara: Middot 1:4 counts only gates. Tour's choice: the well's curb and wheel."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Its opening in the wall is not an eighth gate of the Azara: Middot 1:4 counts only gates. Tour's choice: this single petach, piercing the wall and opening onto the Azara, and the well's curb and wheel."
   },
   "lishkat_haetz": {
     "nom": "Lishkat HaEtz",
     "translit": "Lishkat HaEtz",
-    "resume": "The third chamber of the north, set back in a second row behind the Lishkat HaGazit and the Lishkat HaGola, the roof of the three at the same level. Rabbi Eliezer ben Yaakov, who describes the Temple, says of it: “I have forgotten what it was used for.”",
+    "resume": "The third chamber of the north. Its use is debated in the Mishna: Rabbi Eliezer ben Yaakov, who describes the Temple, says of it: “I have forgotten what it was used for”; Abba Shaul says it was the chamber of the Kohen Gadol, built behind the Lishkat HaGazit and the Lishkat HaGola, the roof of the three at the same level.",
     "cotes": [
       "in the north, set back behind HaGazit and HaGola",
       "across their full width",
@@ -1104,7 +1329,7 @@
       {
         "oeuvre": "Middot",
         "ref": "5:4",
-        "citation": "וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן, וְגַג שְׁלָשְׁתָּן שָׁוֶה"
+        "citation": "אַבָּא שָׁאוּל אוֹמֵר, לִשְׁכַּת כֹּהֵן גָּדוֹל, וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן, וְגַג שְׁלָשְׁתָּן שָׁוֶה"
       },
       {
         "oeuvre": "Middot",
@@ -1114,10 +1339,25 @@
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:17",
-        "citation": ""
+        "citation": "וְלִשְׁכַּת הָעֵץ הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן וְהִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל וְהִיא הַנִּקְרֵאת לִשְׁכַּת פַּרְהֶדְרִין"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "19a",
+        "citation": "אַחַת בַּצָּפוֹן, דִּתְנַן: שֵׁשׁ לְשָׁכוֹת הָיוּ בָּעֲזָרָה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 5:4",
+        "citation": "אוֹתָהּ לִשְׁכַּת הָעֵץ הִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל. וְהִיא לִשְׁכַּת פַּרְהֶדְרִין"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 5:4",
+        "citation": "כתב הר\"ב לשכת פרהדרין כו'. הכי מסיק בגמ' פ\"ק דיומא דף י\"ט"
       }
     ],
-    "note": "Tour's choice: the chamber stands behind the other two, outside the wall, for lack of room in the court — only 17.5 amot remain between the north wall and the Building — although Middot 5:3 places all six chambers “in the Azara.” Its door is also a choice. Set aside: the Rambam (Beit HaBechirah 5:17) identifies it with the Lishkat Parhedrin, the chamber of the Kohen Gadol; the tour treats them as two separate chambers."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Tour's choice: the chamber stands in a second row behind the other two, outside the wall, and its door is designed for the tour. Set aside: the identification with the chamber of the Kohen Gadol. Abba Shaul (Middot 5:4) says it was his chamber; Yoma 19a sees in it one of his two chambers, Parhedrin or Avtinas, without deciding; Bartenura (Middot 5:4) and the Rambam (Beit HaBechirah 5:17) identify it with the Lishkat Parhedrin. The tour places the Lishkat Parhedrin in the south, as a separate chamber."
   },
   "lishkat_hamelach": {
     "nom": "Lishkat HaMelach",
@@ -1137,7 +1377,7 @@
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:17",
-        "citation": ""
+        "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"
       },
       {
         "oeuvre": "Tosfot Yom Tov",
@@ -1145,7 +1385,7 @@
         "citation": "שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה"
       }
     ],
-    "note": "Adopted: in the south, with the Lishkat HaParva and the Lishkat HaMedichin, following the reading of Yoma 19a that the Rambam follows; the printed text of Middot 5:3 puts all three in the north. Their east-west order follows Tosafot Yom Tov. Tour's choice: their position along the wall, the door on the east and the heaps of salt."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Their east-west order follows Tosafot Yom Tov (Middot 5:3). Tour's choice: their position along the wall, the door on the east and the heaps of salt."
   },
   "lishkat_haparva": {
     "nom": "Lishkat HaParva",
@@ -1179,16 +1419,16 @@
       },
       {
         "oeuvre": "Yoma",
-        "ref": "3:4",
-        "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"
+        "ref": "3:6",
+        "citation": "פָּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"
       },
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:17",
-        "citation": ""
+        "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"
       }
     ],
-    "note": "Adopted: the three southern chambers are inside the Azara, not on the terrace of the Cheil, because the Mishna places the immersions of the Kohen Gadol “in the sacred area, on the Parva” (Yoma 3:3); the roof of a building raised outside the precinct is not sanctified (Tosafot Yom Tov on Middot 5:3). Tour's choice: the hides stacked on a bench and the heap of salt. Not shown: the linen sheet and the steps of the bath."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. The three southern chambers are inside the Azara, not on the terrace of the Cheil, because the Mishna places the immersions of the Kohen Gadol “in the sacred area, on the Parva” (Yoma 3:3); the roof of a building raised outside the precinct is not sanctified (Tosafot Yom Tov on Middot 5:3). Tour's choice: the ma'ake of the bath, the hides stacked on a bench and the heap of salt. Not shown: the linen sheet and the steps of the bath."
   },
   "lishkat_hamedichin": {
     "nom": "Lishkat HaMedichin",
@@ -1208,20 +1448,20 @@
       {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:17",
-        "citation": ""
+        "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"
       },
       {
         "oeuvre": "Tosfot Yom Tov",
         "ref": "Middot 5:3",
-        "citation": "שֶׁלֹּא יִתָּכֵן… שֶׁהַכֹּהֵן גָּדוֹל יַעֲלֶה לְבֵית טְבִילָתוֹ דֶּרֶךְ מָקוֹם שֶׁמְּדִיחִין בּוֹ"
+        "citation": "והפתח האחר היה במקום שהוא סמוך לשל פרוה ובפתח ההוא מיד היתה המסבה הזאת"
       }
     ],
-    "note": "Set aside: Tosafot Yom Tov gives this chamber two openings onto the Azara — one for the work, the other so that the Kohen Gadol goes up to the bath without passing where the entrails are rinsed. The tour opens only one, the entrance of the stairway standing in for the second. Tour's choice: the round shape of the stairway (mesiba means “spiral”), the trough and the two marble tables."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Tosafot Yom Tov (Middot 5:3) gives this chamber two openings onto the Azara: one for the work, the other at the foot of the stairway, so that the Kohen Gadol goes up to the bath without passing where the entrails are rinsed; the tour follows this layout, the entrance of the stairway being the second. Not shown: the partition he places along the stairway, so that whoever goes up does not see into the chamber. Tour's choice: the round shape of the stairway (mesiba means “spiral”), the trough and the two marble tables."
   },
   "beit_hamoked": {
     "nom": "Beit HaMoked",
     "translit": "Beit HaMoked",
-    "resume": "The chamber with the perpetual fire, where the Kohanim on duty sleep, at the east end of the north wall of the Azara: it is the third gate counted from the west. It straddles the wall, which breaks off across its width: a large hall at the level of the Azara, its door to the sacred area in the south, the one to the Cheil in the north, at the top of twenty steps. Four small chambers open onto the hall, two in the sacred area, two outside, a marble strip (rashei pispasin) marking the boundary: the lambs for the korban, the showbread, the altar stones hidden by the Hasmoneans, and the descent to the ritual bath. Along the walls, the stone tiers where the elders sleep.",
+    "resume": "The large house where the Kohanim on duty sleep, on the north wall of the Azara: it is the third gate of the north counted by Middot 1:5, the easternmost in the tour. It straddles the wall, which breaks off across its width: a large hall at the level of the Azara, its door to the sacred area in the south, the one to the Cheil in the north, at the top of twenty steps. Four small chambers open onto the hall, two in the sacred area, two outside, a marble strip (rashei pispasin) marking the boundary: the lambs for the korban, the showbread, the altar stones hidden by the Hasmoneans, and the descent to the ritual bath. Along the walls, the stone tiers where the elders sleep.",
     "cotes": [
       "straddling the north wall",
       "two sha'arim: to the south onto the Azara, to the north onto the Cheil",
@@ -1233,7 +1473,7 @@
       {
         "oeuvre": "Middot",
         "ref": "1:5",
-        "citation": ""
+        "citation": "שֵׁנִי לוֹ, שַׁעַר הַקָּרְבָּן. שְׁלִישִׁי לוֹ, בֵּית הַמּוֹקֵד"
       },
       {
         "oeuvre": "Middot",
@@ -1248,7 +1488,7 @@
       {
         "oeuvre": "Middot",
         "ref": "1:8",
-        "citation": ""
+        "citation": "בֵּית הַמּוֹקֵד, כִּפָּה, וּבַיִת גָּדוֹל הָיָה, מֻקָּף רוֹבָדִין שֶׁל אֶבֶן, וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם"
       },
       {
         "oeuvre": "Bartenura",
@@ -1264,9 +1504,29 @@
         "oeuvre": "Tamid",
         "ref": "1:1",
         "citation": ""
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:6",
+        "citation": "שֶׁבֵּית הַמּוֹקֵד קְצָתוֹ בָּנוּי בְּתוֹךְ הָעֲזָרָה הַמְקֻדֶּשֶׁת וּמִקְצָתוֹ בַּחֹל"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:9",
+        "citation": "וּבַיִת גָּדוֹל הָיָה בְּצַד הָעֲזָרָה בִּצְפוֹנָהּ מִבַּחוּץ בֵּין הָעֲזָרָה וְהַחֵיל וְהָיָה בָּנוּי כִּפָּה"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:6",
+        "citation": "וּלְעֻמָּתָן בַּצָּפוֹן סְמוּכִים לַמַּעֲרָב"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:4",
+        "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב"
       }
     ],
-    "note": "Set aside: the kippa of Middot 1:8, often understood as a dome — the tour shows none. Tour's choice: the size of the four small chambers, the placement of the twenty steps and the furnishings."
+    "note": "Adopted: straddling the boundary of the sacred area — two of its chambers “in the sacred area” and two “outside” (Middot 1:6), the building “partly within the Azara” according to Bartenura. Set aside: the Rambam (Beit HaBechirah 5:9), who puts it “on the north of the Azara, outside, between the Azara and the Cheil”; and the kippa of Middot 1:8, a vault for Bartenura (“כִּפָּה ארקוול\"ט”) as for the Rambam (“וְהָיָה בָּנוּי כִּפָּה”) — the tour shows none. Tour's choice: the order of the gates counted from the west, the view of Abba Yossi ben Chanan (Middot 2:6) taken up by the Rambam (5:4), and their even spacing, which puts the Beit HaMoked near the north-east corner; the hall at the level of the Azara, the size of the four small chambers, the placement of the twenty steps and the furnishings."
   },
   "mesiba_bira": {
     "nom": "Mesiba beneath the bira",
@@ -1274,7 +1534,7 @@
     "resume": "The underground passage of the kohen on watch who became impure during the night. From the north-west chamber of the Beit HaMoked, a spiral of steps sinks beneath the Azara; a tunnel lit by lamps on both sides leads to the Beit HaTevila. The bira is the whole Mikdach, and the mesiba runs beneath it. It is not sanctified — a tunnel opening onto the Har HaBayit is not — which is why the impure kohen may walk through it.",
     "cotes": [
       "start: the north-west chamber of the Beit HaMoked, on the non-sacred side",
-      "a spiral of thirty half-ama steps, down to fifteen and a half amot below the Azara",
+      "a spiral of thirty half-ama steps and a last step down to the tunnel floor, fifteen and a half amot below the Azara",
       "a tunnel 3.5 amot wide and 5 high, lamps on both sides",
       "southward, then westward beneath the Beit HaMitbachayim, to the Beit HaTevila"
     ],
@@ -1349,7 +1609,7 @@
   "shaar_hamayim": {
     "nom": "Sha'ar HaMayim",
     "translit": "Sha'ar HaMayim",
-    "resume": "The easternmost of the gates of the south wall of the Azara — three according to Middot 1:4, four according to Middot 2:6. The Lishkat Beit Avtinas is built as an upper floor above it, and the Lishkat Parhedrin adjoins it to the west. Its gate structure is hollow: twenty steps rise inside it from the terrace of the Cheil up to the level of the Azara.",
+    "resume": "The easternmost of the gates of the south wall of the Azara — three according to Middot 1:4, four according to Abba Yossi ben Chanan (Middot 2:6). According to the Jerusalem Talmud (Yoma 1:5), the Lishkat Beit Avtinas is built above it; Yoma 19a places there the first immersion of the Kohen Gadol on Yom Kippur. The tour sets the Lishkat Parhedrin against it to the west. Its gate structure is hollow: twenty steps rise inside it from the terrace of the Cheil up to the level of the Azara.",
     "cotes": [
       "20 amot high × 10 wide",
       "gate structure 20 amot wide, projecting 12 amot from the wall",
@@ -1360,29 +1620,45 @@
       {
         "oeuvre": "Middot",
         "ref": "2:6",
-        "citation": "שְׁעָרִים דְּרוֹמִיִּים סְמוּכִין לַמַּעֲרָב, שַׁעַר הָעֶלְיוֹן, שַׁעַר הַדֶּלֶק, שַׁעַר הַבְּכוֹרוֹת, שַׁעַר הַמָּיִם"
+        "citation": "שְׁעָרִים דְּרוֹמִיִּים סְמוּכִים לַמַּעֲרָב, שַׁעַר הָעֶלְיוֹן, שַׁעַר הַדֶּלֶק, שַׁעַר הַבְּכוֹרוֹת, שַׁעַר הַמָּיִם"
       },
       {
         "oeuvre": "Middot",
         "ref": "1:4",
-        "citation": ""
+        "citation": "שֶׁבַּדָּרוֹם, שַׁעַר הַדֶּלֶק. שֵׁנִי לוֹ, שַׁעַר הַבְּכוֹרוֹת. שְׁלִישִׁי לוֹ, שַׁעַר הַמָּיִם"
       },
       {
         "oeuvre": "Shekalim",
         "ref": "6:3",
-        "citation": ""
+        "citation": "שְׁעָרִים דְּרוֹמִיִּים סְמוּכִין לַמַּעֲרָב"
       },
       {
         "oeuvre": "Yoma",
         "ref": "19a",
-        "citation": ""
+        "citation": "חוּץ מִזּוֹ שֶׁהָיְתָה בַּחוֹל, עַל גַּבֵּי שַׁעַר הַמַּיִם, וּבְצַד לִשְׁכָּתוֹ הָיְתָה"
+      },
+      {
+        "oeuvre": "Yerushalmi Yoma",
+        "ref": "1:5",
+        "citation": "עַל גַּבֵּי שַׁעַר הַמַּיִם הָיְיתָה וְסָמוּךְ לְלִישְׁכָּתוֹ הָיְתָה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:4",
+        "citation": "וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:5",
+        "citation": "כָּל שַׁעַר מֵהֶן הָיָה רָחְבּוֹ עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים אַמָּה"
       }
-    ]
+    ],
+    "note": "Tour's choice: the gate structure of 20 × 12 amot and its twenty steps have no source. Its position, the easternmost, follows the order “near the west” of Abba Yossi ben Chanan (Middot 2:6; Shekalim 6:3), taken up by the Rambam (Beit HaBechirah 5:4); placing the Lishkat Parhedrin west of the gate is also a choice."
   },
   "beit_avtinas": {
     "nom": "Lishkat Beit Avtinas",
     "translit": "Lishkat Beit Avtinas",
-    "resume": "The chamber of the Avtinas family, where the incense is prepared. It is built as an upper floor above Sha'ar HaMayim, at the east end of the south wall, against the Lishkat Parhedrin. The Kohen Gadol is brought there on the eve of Kippur, and it is there that he takes the first ritual bath of the day. Inside, the mortar in which the incense is pounded, the makhteshet — the one from Beit Avtinas is counted, along with the Table and the Menora, among what was carried off to Rome —, and the table where the eleven sammanim are weighed before each is pounded separately. The Avtinas family kept the secret of the incense, and the Mishna counts it to their shame. The Sages dismissed them and brought craftsmen from Alexandria: these knew how to blend the spices, but not how to make the smoke rise — theirs spread out every which way, while that of the Avtinas rose straight as a stick. When recalled, the family came back only for doubled wages. Their reason: they knew the Temple was destined to be destroyed, and feared that an unworthy man would learn the craft and use it for idolatry. They are praised as well: no bride ever went out perfumed from their homes, so that no one would say they perfumed themselves with the incense. After the destruction, one of them handed Rabbi Yochanan ben Nuri the scroll of spices, and Rabbi Akiva said: from now on, it is forbidden to speak ill of them.",
+    "resume": "The chamber of the Avtinas family, where the incense is prepared. According to the Jerusalem Talmud, it is built above Sha'ar HaMayim: the tour sets it as an upper floor on that gate, at the east end of the south wall, against the Lishkat Parhedrin. The Kohen Gadol is brought there on the eve of Kippur. His first immersion of the day takes place close by, “on top of Sha'ar HaMayim, beside his chamber” (Yoma 19a), not in the Avtinas chamber. Inside, the mortar in which the incense is pounded, the makhteshet — the one from Beit Avtinas is counted, along with the Table and the Menora, among what was carried off to Rome —, and the table where the eleven sammanim are weighed before each is pounded separately. The Avtinas family kept the secret of the incense, and the Mishna counts it to their shame. The Sages dismissed them and brought craftsmen from Alexandria: these knew how to blend the spices, but not how to make the smoke rise — theirs spread out every which way, while that of the Avtinas rose straight as a stick. When recalled, the family came back only for doubled wages. Their reason: they knew the Temple was destined to be destroyed, and feared that an unworthy man would learn the craft and use it for idolatry. They are praised as well: no bride ever went out perfumed from their homes, so that no one would say they perfumed themselves with the incense. After the destruction, one of them handed Rabbi Yochanan ben Nuri the scroll of spices, and Rabbi Akiva said: from now on, it is forbidden to speak ill of them.",
     "cotes": [
       "above Sha'ar HaMayim, at the east end of the south wall",
       "one-ama-thick walls",
@@ -1399,7 +1675,12 @@
       {
         "oeuvre": "Yoma",
         "ref": "19a",
-        "citation": "בַּחוֹל, עַל גַּבֵּי שַׁעַר הַמַּיִם, וּבְצַד לִשְׁכָּתוֹ"
+        "citation": "חוּץ מִזּוֹ שֶׁהָיְתָה בַּחוֹל, עַל גַּבֵּי שַׁעַר הַמַּיִם, וּבְצַד לִשְׁכָּתוֹ הָיְתָה"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "19a",
+        "citation": "וְלָא יָדַעְנָא אִי לִשְׁכַּת פַּרְהֶדְרִין בַּצָּפוֹן וְלִשְׁכַּת בֵּית אַבְטִינָס בַּדָּרוֹם, אוֹ לִשְׁכַּת בֵּית אַבְטִינָס בַּצָּפוֹן וְלִשְׁכַּת פַּרְהֶדְרִין בַּדָּרוֹם"
       },
       {
         "oeuvre": "Yoma",
@@ -1470,9 +1751,14 @@
         "oeuvre": "Yoma",
         "ref": "3:3",
         "citation": ""
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 5:4",
+        "citation": "וזו שבצפון של בית אבטינס היא"
       }
     ],
-    "note": "Adopted: “above Sha'ar HaMayim” (Jerusalem Talmud Yoma 1:5) is taken literally — the chamber is an upper story (Tamid 1:1) built on top of the gatehouse. Tour's choice: the table, the scale and the bowls, since the sources name only the mortar. No source says what the mortar was made of; the tour makes it bronze, as the Rambam requires the vessels of the service to be of metal (Beit HaBechirah 1:18)."
+    "note": "Adopted: the Jerusalem Talmud (Yoma 1:5), the only source to put the Avtinas chamber “above Sha'ar HaMayim”; the tour takes it literally and makes it an upper story (Tamid 1:1) built on top of the gatehouse. Open question: Yoma 19a gives the Kohen Gadol two chambers, Parhedrin and Avtinas, one in the north and one in the south, without knowing which is where; its reasoning would put Avtinas in the north before being rejected, and Tosafot Yom Tov (Middot 5:4) also considers Avtinas in the north. By putting both Avtinas and Parhedrin in the south, the tour departs from Yoma 19a. Tour's choice: the one-ama walls, the 3 × 4 window onto the Azara, the table, the scale and the bowls, since the sources name only the mortar. No source says what the mortar was made of; the tour makes it bronze, as the Rambam requires the vessels of the service to be of metal (Beit HaBechirah 1:18)."
   },
   "shaar_hanitzotz": {
     "nom": "Sha'ar HaNitzotz",
@@ -1488,19 +1774,24 @@
       {
         "oeuvre": "Middot",
         "ref": "1:5",
-        "citation": ""
+        "citation": "שֶׁבַּצָּפוֹן, שַׁעַר הַנִּיצוֹץ… שֵׁנִי לוֹ, שַׁעַר הַקָּרְבָּן. שְׁלִישִׁי לוֹ, בֵּית הַמּוֹקֵד"
       },
       {
         "oeuvre": "Middot",
         "ref": "2:6",
         "citation": "וּלְעֻמָּתָן בַּצָּפוֹן סְמוּכִים לַמַּעֲרָב"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:5",
+        "citation": "כָּל שַׁעַר מֵהֶן הָיָה רָחְבּוֹ עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים אַמָּה"
       }
     ],
-    "note": "Tour's choice: the sources give the order of the gates, not their spacing; they are spread evenly. Nothing says either where one climbs from the terrace of the Cheil to the level of the Azara: the tour puts those steps inside the gatehouse."
+    "note": "Tour's choice: the gate structure of 20 × 12 amot and its twenty steps have no source — nothing says where one climbs from the terrace of the Cheil to the level of the Azara. Middot 2:6, where Abba Yossi ben Chanan calls the north gates “near the west,” does not name Sha'ar HaNitzotz: the tour makes it the westernmost by reading the order of Middot 1:5 (Nitzotz, Korban, Beit HaMoked) from west to east. The sources give this order, not the spacing: the gates are spread evenly."
   },
   "beit_hanitzotz": {
     "nom": "Chamber of the Beit HaNitzotz",
-    "resume": "The chamber built as an upper floor (aliyah) above Sha'ar HaNitzotz, on the north wall of the Azara.",
+    "resume": "The chamber built as an upper floor (aliyah) above Sha'ar HaNitzotz, on the north wall of the Azara, where the kohanim keep watch. Middot 1:5 describes this aliyah without naming it; Tamid 1:1 counts the Beit HaNitzotz among the watch posts of the kohanim and makes it an aliyah: the tour identifies the two.",
     "cotes": [
       "aliyah above Sha'ar HaNitzotz"
     ],
@@ -1508,21 +1799,31 @@
       {
         "oeuvre": "Middot",
         "ref": "1:5",
-        "citation": ""
+        "citation": "וַעֲלִיָּה בְנוּיָה עַל גַּבָּיו, שֶׁהַכֹּהֲנִים שׁוֹמְרִים מִלְמַעְלָן וְהַלְוִיִּם מִלְּמַטָּן"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "1:1",
+        "citation": "בִּשְׁלשָׁה מְקוֹמוֹת הַכֹּהֲנִים שׁוֹמְרִים בְּבֵית הַמִּקְדָּשׁ, בְּבֵית אַבְטִינָס, וּבְבֵית הַנִּיצוֹץ, וּבְבֵית הַמּוֹקֵד"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:1",
+        "citation": "בֵּית אַבְטִינָס וּבֵית הַנִּיצוֹץ הָיוּ עֲלִיּוֹת"
       }
     ]
   },
   "lishkat_parhedrin": {
     "nom": "Lishkat Parhedrin",
-    "resume": "The chamber where the Kohen Gadol resides for the seven days preceding Yom Kippur. It is in the south, next to the Avtinas chamber, west of Sha'ar HaMayim.",
+    "resume": "The chamber where the Kohen Gadol resides for the seven days preceding Yom Kippur. The tour places it in the south, against the gate structure of Sha'ar HaMayim, to its west, next to the Avtinas chamber.",
     "cotes": [
-      "in the south, against the gate structure of Sha'ar HaMayim, to its west"
+      "in the south, against the gate structure of Sha'ar HaMayim; to its west: the tour's choice"
     ],
     "sources": [
       {
         "oeuvre": "Yoma",
         "ref": "1:1",
-        "citation": ""
+        "citation": "שִׁבְעַת יָמִים קֹדֶם יוֹם הַכִּפּוּרִים מַפְרִישִׁין כֹּהֵן גָּדוֹל מִבֵּיתוֹ לְלִשְׁכַּת פַּלְהֶדְרִין"
       },
       {
         "oeuvre": "Yerushalmi Yoma",
@@ -1532,20 +1833,40 @@
       {
         "oeuvre": "Yoma",
         "ref": "19a",
-        "citation": "וְלֹא יָדַעְנָא"
+        "citation": "וְלָא יָדַעְנָא אִי לִשְׁכַּת פַּרְהֶדְרִין בַּצָּפוֹן וְלִשְׁכַּת בֵּית אַבְטִינָס בַּדָּרוֹם, אוֹ לִשְׁכַּת בֵּית אַבְטִינָס בַּצָּפוֹן וְלִשְׁכַּת פַּרְהֶדְרִין בַּדָּרוֹם"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "19a",
+        "citation": "וּמִסְתַּבְּרָא דְּלִשְׁכַּת פַּרְהֶדְרִין בַּדָּרוֹם הֲוַאי"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "19a",
+        "citation": "אַלְּמָה לָא? מַטְרְחִינַן לֵיהּ טְפֵי"
       },
       {
         "oeuvre": "Middot",
         "ref": "5:4",
-        "citation": ""
+        "citation": "אַבָּא שָׁאוּל אוֹמֵר, לִשְׁכַּת כֹּהֵן גָּדוֹל, וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 5:4",
+        "citation": "אוֹתָהּ לִשְׁכַּת הָעֵץ הִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל. וְהִיא לִשְׁכַּת פַּרְהֶדְרִין"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:17",
+        "citation": "וְלִשְׁכַּת הָעֵץ הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן וְהִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל וְהִיא הַנִּקְרֵאת לִשְׁכַּת פַּרְהֶדְרִין"
       }
     ],
-    "note": "Open question: Yoma 19a does not know which of the Kohen Gadol's chambers is in the north and which in the south. The tour puts the Lishkat Parhedrin in the south, next to the Avtinas chamber, which the Jerusalem Talmud describes as “above Sha'ar HaMayim, and next to his chamber” (Yoma 1:5)."
+    "note": "Open question: Yoma 19a gives the Kohen Gadol two chambers, Parhedrin and Avtinas, one in the north and one in the south, “and we do not know” which is where; the Gemara finds Parhedrin in the south more plausible, then rejects the argument. Only the Jerusalem Talmud (Yoma 1:5) puts the Avtinas chamber “above Sha'ar HaMayim, and next to his chamber”: the tour sets the Lishkat Parhedrin against it, and so puts both chambers in the south, which Yoma 19a rules out. Set aside: Bartenura (Middot 5:4) and the Rambam (Beit HaBechirah 5:17) identify the Lishkat Parhedrin with the Lishkat HaEtz, in the north, which Abba Shaul says was the chamber of the Kohen Gadol (Middot 5:4). Tour's choice: its place west of the gate."
   },
   "lishkat_osei_chavitin": {
     "nom": "Lishkat Osei Chavitin",
     "translit": "Lishkat Osei Chavitin",
-    "resume": "One of the two chambers flanking the Gate of Nikanor, in the Ezrat Israel — the other being the Lishkat Pinchas HaMalbish. The chavitin are made here, the daily offering of the Kohen Gadol, kneaded, shaped and baked within the sacred enclosure: a table, a hearth, and the flat pan, the machavat.",
+    "resume": "One of the two chambers flanking the Gate of Nikanor, in the Ezrat Israel according to the Rambam (Beit HaBechirah 5:17) — the other being the Lishkat Pinchas HaMalbish. The chavitin are made here, the daily offering of the Kohen Gadol, kneaded, shaped and baked within the sacred enclosure: a table, a hearth, and the pan, the machavat of Leviticus 6:14, flat according to R. Chananya ben Gamliel.",
     "cotes": [
       "against the east wall, south of the Gate of Nikanor",
       "door to the west, onto the Ezrat Israel",
@@ -1565,19 +1886,29 @@
       {
         "oeuvre": "Menachot",
         "ref": "5:8",
-        "citation": "הַמַּרְחֶשֶׁת יֶשׁ לָהּ כִּסּוּי, וְהַמַּחֲבַת אֵין לָהּ כִּסּוּי"
+        "citation": "רַבִּי חֲנַנְיָה בֶן גַּמְלִיאֵל אוֹמֵר, מַרְחֶשֶׁת עֲמֻקָּה וּמַעֲשֶׂיהָ רוֹחֲשִׁים, וּמַחֲבַת צָפָה וּמַעֲשֶׂיהָ קָשִׁים"
+      },
+      {
+        "oeuvre": "Lévitique",
+        "ref": "6:14",
+        "citation": "עַל מַחֲבַת בַּשֶּׁמֶן תֵּעָשֶׂה"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:17",
+        "citation": "וּשְׁתֵּי לְשָׁכוֹת אֲחֵרוֹת הָיוּ שָׁם בְּעֶזְרַת יִשְׂרָאֵל. אַחַת מִימִין שַׁעַר מִזְרָחִי וְהוּא לִשְׁכַּת פִּינְחָס הַמַּלְבִּישׁ. וְאֶחָד מִשְּׂמֹאלוֹ וְהוּא לִשְׁכַּת עוֹשֶׂה חֲבִיתִין"
       }
     ],
-    "note": "Tour's choice: Middot 1:4 does not specify which of the two chambers flanking Nikanor is in the south; the tour puts the chavitin chamber there. The arrangement of the table, hearth and pan is also a choice."
+    "note": "Adopted: the Rambam (Beit HaBechirah 5:17) puts the Lishkat Pinchas “to the right of the eastern gate” and the chavitin chamber “to its left”; for one entering westward, the right is the north, so the chavitin chamber is in the south. Tour's choice: the arrangement of the table, hearth and pan."
   },
   "lishkat_pinchas": {
     "nom": "Lishkat Pinchas HaMalbish",
     "translit": "Lishkat Pinchas HaMalbish",
-    "resume": "One of the two chambers flanking the Gate of Nikanor, in the Ezrat Israel — the other being the Lishkat Osei Chavitin. Pinchas is in charge of the Kohanim's vestments: along the walls, closed cupboards where each watch stores its own.",
+    "resume": "One of the two chambers flanking the Gate of Nikanor, in the Ezrat Israel according to the Rambam (Beit HaBechirah 5:17) — the other being the Lishkat Osei Chavitin. Pinchas is in charge of the Kohanim's vestments: along the walls, closed cupboards where each watch stores its own.",
     "cotes": [
       "against the east wall, north of the Gate of Nikanor",
       "door to the west, onto the Ezrat Israel",
-      "closed cupboards in six rows"
+      "closed cupboards in six rows (the tour's choice)"
     ],
     "sources": [
       {
@@ -1594,18 +1925,23 @@
         "oeuvre": "Rambam Klei HaMikdash",
         "ref": "8:8",
         "citation": "וְשִׁשָּׁה וְתִשְׁעִים חַלּוֹן הָיוּ בַּמִּקְדָּשׁ לְהָנִיחַ בָּהֶן הַבְּגָדִים… וְכֻלָּן סְתוּמוֹת"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:17",
+        "citation": "וּשְׁתֵּי לְשָׁכוֹת אֲחֵרוֹת הָיוּ שָׁם בְּעֶזְרַת יִשְׂרָאֵל. אַחַת מִימִין שַׁעַר מִזְרָחִי וְהוּא לִשְׁכַּת פִּינְחָס הַמַּלְבִּישׁ. וְאֶחָד מִשְּׂמֹאלוֹ וְהוּא לִשְׁכַּת עוֹשֶׂה חֲבִיתִין"
       }
     ],
-    "note": "Tour's choice: Middot 1:4 does not specify which of the two chambers flanking Nikanor is in the north; the tour puts Pinchas's chamber there. The Rambam does not say where the ninety-six garment cabinets were: the tour places them here, with the man in charge of the garments."
+    "note": "Adopted: the Rambam (Beit HaBechirah 5:17) puts the Lishkat Pinchas “to the right of the eastern gate”; for one entering westward, the right is the north. Tour's choice: the Rambam does not say where the ninety-six garment cabinets were, four per watch (Klei HaMikdash 8:8); the tour places them here, with the man in charge of the garments, in six rows."
   },
   "portes_houlda": {
     "nom": "Gates of Chulda",
     "translit": "Sha'arei Chulda",
-    "resume": "The two gates of the south, “used for entering and exiting”: it is through them that the people go up to the Har HaBayit and come back down. The Mishna does not say where they open in the wall, and Middot 2:3 gives every gate a height of 20 amot and a width of 10. Like every gate of the Temple except Tadi, they are capped with a lintel, not an arch, and each of their jambs bears a timora.",
+    "resume": "The two gates of the south, “used for entering and exiting”: it is through them that the people go up to the Har HaBayit and come back down. The Mishna does not say where they open in the wall. Middot 2:3 gives the gates a height of 20 amot and a width of 10, and the Rambam (Beit HaBechirah 5:2) says so explicitly of the gates of the Har HaBayit. Like every gate of the Temple except Tadi, they are capped with a lintel, not an arch. The tour sets a timora on each of their jambs, taken from Ezekiel.",
     "cotes": [
       "two gates, in the south",
       "20 amot high × 10 wide (Middot 2:3); their position along the wall: the tour's choice",
-      "one palm tree per jamb, as at every gate"
+      "one palm tree per jamb (the tour's choice, after Ye'hezkel 40:26)"
     ],
     "sources": [
       {
@@ -1622,13 +1958,19 @@
         "oeuvre": "Ye'hezkel",
         "ref": "40:26",
         "citation": "and palm trees, one on each side, on its jambs."
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:2",
+        "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"
       }
-    ]
+    ],
+    "note": "Tour's choice: the timorot on the jambs come from Ezekiel 40:26, which describes the future Temple; Middot says nothing of them."
   },
   "shaar_tadi": {
     "nom": "Sha'ar Tadi",
     "translit": "Sha'ar Tadi",
-    "resume": "The gate of the north, “which served no purpose.” Yet it is the only gate in the whole Temple whose head is not a lintel: instead of a shkufa laid across it, two stones leaning against each other rest at the top and leave a triangle open. The Mishna counts them, and it is this exception that gets it cited.",
+    "resume": "The gate of the north, “which served no purpose.” According to R. Eliezer ben Yaakov (Middot 1:9), it was nonetheless through it that the kohen who became impure during the night went out. It is also the only gate in the whole Temple whose head is not a lintel: instead of a shkufa laid across it, two stones leaning against each other rest at the top and leave a triangle open. The Mishna counts it among the five gates of the Har HaBayit (Middot 1:3), and notes this exception in Middot 2:3.",
     "cotes": [
       "in the north, out of service",
       "two leaning stones instead of a lintel",
@@ -1644,6 +1986,11 @@
         "oeuvre": "Middot",
         "ref": "2:3",
         "citation": "except the gate of Tadi, where there were two stones leaning against each other."
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "1:9",
+        "citation": "רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, בַּמְּסִבָּה הַהוֹלֶכֶת תַּחַת הַחֵיל יוֹצֵא וְהוֹלֵךְ לוֹ בְּטָדִי"
       }
     ],
     "note": "Adopted: two leaning stones meeting in a point, as the mishna says (Middot 2:3) — not an arch. Tour's choice: their slope and span."
@@ -1651,11 +1998,11 @@
   "shaar_kiponus": {
     "nom": "Sha'ar Kiponus",
     "translit": "Sha'ar Kiponus",
-    "resume": "The gate of the west, likewise “for entering and exiting.” The Mishna gives it its name, its side, and its use, and Middot 2:3 the dimension of every gate; its place in the wall is a choice. Lintel and jambs with timorot as everywhere else.",
+    "resume": "The gate of the west, likewise “for entering and exiting.” The Mishna gives it its name, its side, and its use, and Middot 2:3 the dimension of every gate; its place in the wall is a choice. A lintel, as at every gate except Tadi; the tour sets a timora on each jamb.",
     "cotes": [
       "in the west, entry and exit",
       "10 × 20 amot (Middot 2:3)",
-      "one palm tree per jamb"
+      "one palm tree per jamb (the tour's choice, after Ye'hezkel 40:26)"
     ],
     "sources": [
       {
@@ -1667,7 +2014,18 @@
         "oeuvre": "Ye'hezkel",
         "ref": "40:26",
         "citation": ""
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:3",
+        "citation": "כָּל הַפְּתָחִים וְהַשְּׁעָרִים שֶׁהָיוּ שָׁם, גָּבְהָן עֶשְׂרִים אַמָּה, וְרָחְבָּן עֶשֶׂר אַמּוֹת"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:2",
+        "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"
       }
-    ]
+    ],
+    "note": "Tour's choice: the timorot on the jambs come from Ezekiel 40:26, which describes the future Temple; Middot says nothing of them."
   }
 }

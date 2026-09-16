@@ -2,12 +2,12 @@
   "yam": {
     "he": "ים מוצק",
     "translit": "Yam Mutzak",
-    "resume": "La Mer de bronze de Shlomo : une grande vasque posée sur douze bœufs de bronze, trois tournés vers chaque point cardinal, la croupe vers le centre. Sa lèvre est ouvragée « comme le bord d'une coupe, en fleur de lys », et deux rangs de coloquintes courent sous elle. La visite la place au sud-est du bâtiment, entre les marches de l'Oulam et la rampe du Mizbea'h, à côté du Kiyor de la Mishna.",
+    "resume": "La Mer de bronze de Shlomo : une grande vasque posée sur douze bœufs de bronze, trois tournés vers chaque point cardinal, la croupe vers le centre. Sa lèvre est ouvragée « comme le bord d'une coupe, en fleur de lys », et deux rangs de coloquintes courent sous elle — des bœufs selon Divrei HaYamim II. La visite la reprend du Premier Temple et la place au sud-est du bâtiment, entre les marches de l'Oulam et la rampe du Mizbea'h, à côté du Kiyor de la Mishna.",
     "cotes": [
       "dix amot de bord à bord",
       "cinq amot de haut",
       "trente amot de tour",
-      "deux rangs de coloquintes (peka'im) sous la lèvre",
+      "deux rangs de coloquintes (peka'im) sous la lèvre (Melakhim I 7:24) ; Divrei HaYamim II 4:3 y met deux rangs de bœufs, « וּדְמוּת בְּקָרִים תַּחַת לוֹ »",
       "douze bœufs, trois vers chaque vent, « וְכָל אֲחֹרֵיהֶם בָּיְתָה » — toutes les croupes vers le centre",
       "lèvre « כְּמַעֲשֵׂה שְׂפַת כּוֹס פֶּרַח שׁוֹשָׁן »",
       "au sud-est du bâtiment : « מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב »"
@@ -16,9 +16,9 @@
       {"oeuvre": "Melakhim I", "ref": "7:23-26", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:39", "citation": "מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב"},
       {"oeuvre": "Divrei HaYamim II", "ref": "4:2-6", "citation": ""},
-      {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
+      {"oeuvre": "Menachot", "ref": "98b", "citation": "שֶׁל מֹשֶׁה בָּאֶמְצַע, חֲמִשָּׁה מִימִינוֹ, וַחֲמִשָּׁה מִשְּׂמֹאלוֹ"}
     ],
-    "note": "Prise de position du projet : la Mer de bronze est un ustensile du Premier Temple, que la Mishna ne mentionne pas. La visite la place dans le Temple de la Mishna, comme Mena'hot 98b range les dix menorot et les dix tables de Shlomo autour de celles de Moïse : les ustensiles des deux Temples cohabitent."
+    "note": "Premier Temple : Melakhim I 7:23-26 ; la Mishna ne la mentionne pas. Prise de position du projet : la visite la place dans le Temple de la Mishna. Mena'hot 98b ne parle que du Premier Temple, où la table et la menora de Moïse se tenaient au milieu des dix de Shlomo (« שֶׁל מֹשֶׁה בָּאֶמְצַע ») ; l'étendre aux ustensiles des deux Temples est un choix de la visite. Les deux récits divergent aussi sur la contenance : deux mille bat (Melakhim I 7:26), trois mille (Divrei HaYamim II 4:5)."
   },
 
   "mekhonot": {
@@ -35,59 +35,62 @@
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "7:27-39", "citation": "חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף הַבַּיִת מִשְּׂמֹאלוֹ"},
       {"oeuvre": "Divrei HaYamim II", "ref": "4:14", "citation": ""},
-      {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
+      {"oeuvre": "Menachot", "ref": "98b", "citation": "שֶׁל מֹשֶׁה בָּאֶמְצַע, חֲמִשָּׁה מִימִינוֹ, וַחֲמִשָּׁה מִשְּׂמֹאלוֹ"}
     ],
-    "note": "Prise de position du projet, comme pour la Mer de bronze : un ustensile du Premier Temple placé dans le Temple de la Mishna, sur le principe de Mena'hot 98b."
+    "note": "Premier Temple : Melakhim I 7:27-39 ; la Mishna ne les mentionne pas. Prise de position du projet, comme pour la Mer de bronze : la visite les place dans le Temple de la Mishna. Mena'hot 98b, qui range les ustensiles de Moïse au milieu de ceux de Shlomo, ne parle que du Premier Temple ; l'étendre au Temple de la Mishna est un choix de la visite."
   },
 
   "yakhin_boaz": {
     "he": "יכין ובועז",
     "translit": "Yakhin ve-Boaz",
-    "resume": "Les deux colonnes de bronze de Shlomo. Un fût creux surmonté d'un chapiteau (koteret) travaillé en lys, ceint de résilles et de chaînettes, et garni de deux rangs de cent grenades. Elles sont dressées « לְאֻלָם הַהֵיכָל » : dans l'Oulam, de chaque côté de la baie — pas devant la façade. Yakhin à droite de la maison (sud), Boaz à sa gauche (nord).",
+    "resume": "Les deux colonnes de bronze de Shlomo, reprises du Premier Temple. Un fût creux surmonté d'un chapiteau (koteret) travaillé en lys, ceint de résilles et de chaînettes, et garni de deux rangs de grenades. Elles sont dressées « לְאֻלָם הַהֵיכָל » : dans l'Oulam selon Radak, Ralbag et Metsoudat David, et non devant la façade. Yakhin à droite de la maison (sud), Boaz à sa gauche (nord).",
     "cotes": [
       "dix-huit amot de fût",
       "douze amot de tour, soit quatre amot de large",
       "creux, paroi de quatre doigts",
       "chapiteau de cinq amot : deux au nu du fût, trois en saillie",
-      "vingt-trois amot en tout",
+      "vingt-trois amot en tout dans le modèle ; vingt-deux et demie selon Radak (sur Divrei HaYamim II 3:15), une demi-ama du fût entrant dans le chapiteau",
       "quatre amot de « מַעֲשֵׂה שׁוֹשַׁן » au sommet du chapiteau",
-      "sept chaînettes (sharsherot) sur le ventre du chapiteau",
-      "deux rangs de cent grenades par colonne",
+      "sept chaînettes (sharsherot) par chapiteau",
+      "deux rangs de cent grenades par colonne (Melakhim I 7:20 et 7:42) ; Yirmeyahou 52:23 en compte « מֵאָה עַל־הַשְּׂבָכָה », dont quatre-vingt-seize tournées vers le dehors",
       "Yakhin au sud (à droite), Boaz au nord (à gauche)"
     ],
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "7:15-22", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:41-42", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:21", "citation": "לְאֻלָם הַהֵיכָל"},
-      {"oeuvre": "Yirmeyahou", "ref": "52:21-23", "citation": ""},
-      {"oeuvre": "Melakhim II", "ref": "25:17", "citation": ""},
-      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": ""},
+      {"oeuvre": "Divrei HaYamim II", "ref": "3:15-17", "citation": "וַיַּעַשׂ לִפְנֵי הַבַּיִת עַמּוּדִים שְׁנַיִם"},
+      {"oeuvre": "Yirmeyahou", "ref": "52:21-23", "citation": "כׇּל־הָרִמּוֹנִים מֵאָה עַל־הַשְּׂבָכָה סָבִיב"},
+      {"oeuvre": "Melakhim II", "ref": "25:17", "citation": "וְקוֹמַת הַכֹּתֶרֶת שָׁלֹשׁ אַמּוֹת"},
+      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": "לאולם ההיכל. כמו באולם ההיכל"},
       {"oeuvre": "Radak", "ref": "sur Melakhim I 7:16", "citation": "שְׁתֵּי אַמּוֹת הַתַּחְתּוֹנוֹת שֶׁל כּוֹתָרוֹת הָיוּ שָׁווֹת לָעַמּוּד"},
       {"oeuvre": "Radak", "ref": "sur Divrei HaYamim II 3:15", "citation": "עַל מִדַּת שְׁנֵי הָעַמּוּדִים הוּא אוֹמֵר"},
+      {"oeuvre": "Rashi sur Divrei HaYamim II", "ref": "3:15", "citation": "וְנִמְצְאוּ כָּל אֶחָד שְׁבַע עֶשְׂרֵה אַמָּה וָחֵצִי"},
       {"oeuvre": "Metsoudat David", "ref": "sur Melakhim I 7:19", "citation": "כִּי הָעַמּוּדִים הָיוּ בְּרֹחַב אַרְבַּע אַמּוֹת"}
     ],
-    "note": "Retenu : les colonnes se dressent à l'intérieur de l'Oulam, de part et d'autre de l'ouverture, et non devant la façade — c'est ainsi que Radak, Ralbag et Metsoudat David lisent « לְאֻלָם הַהֵיכָל ». Comme la Mer de bronze, elles viennent du Premier Temple (principe de Mena'hot 98b). Les trente-cinq amot de Divrei HaYamim II 3:15 mesurent les deux colonnes ensemble, couchées à la coulée, pas la hauteur de chacune (Rashi, Radak)."
+    "note": "Retenu : les colonnes se dressent à l'intérieur de l'Oulam — c'est ainsi que Radak, Ralbag et Metsoudat David lisent « לְאֻלָם הַהֵיכָל ». Divrei HaYamim II 3:15 et 3:17 disent « לִפְנֵי הַבַּיִת » et « עַל־פְּנֵי הַהֵיכָל » : l'Oulam étant lui-même devant le Heikhal, la visite n'y voit pas de contradiction ; leur place de part et d'autre de la baie est un choix de la visite. Premier Temple : Melakhim I 7:15-22 ; Middot ne les mentionne pas. Les trente-cinq amot de Divrei HaYamim II 3:15 mesurent les deux colonnes ensemble, couchées à la coulée, pas la hauteur de chacune (Rashi, Radak). Les trois amot de chapiteau de Melakhim II 25:17 n'en comptent que la partie ouvragée (Radak sur Melakhim I 7:16)."
   },
 
   "mukhni": {
     "he": "מוכני",
     "translit": "Mukhni",
-    "resume": "Le mécanisme installé par Ben Katin au bord du Kiyor : une roue et une chaîne qui font descendre le bassin dans son puits chaque soir, « pour que son eau ne soit pas disqualifiée par la nuit ». La visite en montre un poteau, une potence, une jambe de force, une roue à rayons et une chaîne jusqu'au bord de la cuve.",
+    "resume": "Le mécanisme installé par Ben Katin au bord du Kiyor : une roue qui fait descendre le bassin dans son puits chaque soir, « pour que son eau ne soit pas disqualifiée par la nuit ». La guemara ne nomme que la roue (Yoma 37a) ; le puits vient de Rashi. La visite en montre un poteau, une potence, une jambe de force, une roue à rayons et une chaîne jusqu'au bord de la cuve.",
     "cotes": [],
     "sources": [
       {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁלֹּא יִהְיוּ מֵימָיו נִפְסָלִין בְּלִינָה"},
-      {"oeuvre": "Yoma", "ref": "37a", "citation": ""},
+      {"oeuvre": "Yoma", "ref": "37a", "citation": "מַאי מוּכְנִי? אָמַר אַבָּיֵי: גִּילְגְּלָא דַּהֲוָה מְשַׁקְּעָא לֵיהּ"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "37a", "citation": "גלגל לשקעו בו בבור"},
       {"oeuvre": "Middot", "ref": "3:6", "citation": ""},
       {"oeuvre": "Tamid", "ref": "1:4", "citation": ""},
       {"oeuvre": "Tamid", "ref": "3:8", "citation": ""}
     ],
-    "note": "Choix de la visite : la forme du mécanisme. Les sources en donnent seulement deux traits : une roue (Yoma 37a) et du bois, dont on entendait le bruit (Tamid 1:4). Poteau, potence et chaîne sont dessinés pour la visite."
+    "note": "Choix de la visite : la forme du mécanisme. Les sources en donnent seulement deux traits : une roue (Yoma 37a) et du bois, dont on entendait le bruit (Tamid 1:4). Poteau, potence et chaîne sont dessinés pour la visite ; aucune source ne parle de chaîne."
   },
 
   "magrefa": {
     "he": "מגרפה",
     "translit": "Magrefa",
-    "resume": "Quand les cohanim arrivent entre l'Oulam et le Mizbea'h, l'un d'eux prend la magrefa et la jette à terre. Dans Jérusalem, on n'entend plus son voisin, et ce fracas sert de signal : les cohanim viennent se prosterner, les Léviim chanter, et le chef du ma'amad place les impurs aux portes de l'est (Tamid 5:6). C'est un grand ustensile qu'on jette pour faire du bruit, en forme de pelle à cendres (Bartenura, Tosfot Yom Tov, le Rosh). Le modèle la pose au sol, là où elle tombe.",
+    "resume": "Quand les cohanim arrivent entre l'Oulam et le Mizbea'h, l'un d'eux prend la magrefa et la jette à terre. Dans Jérusalem, on n'entend plus son voisin, et ce fracas sert de signal : les cohanim viennent se prosterner, les Léviim chanter, et le chef du ma'amad place les impurs aux portes de l'est (Tamid 5:6). C'est un grand ustensile qu'on jette pour faire du bruit (Bartenura) ; Tosfot Yom Tov et le Rosh lui donnent la forme d'une pelle à cendres. Le modèle la pose au sol, là où elle tombe.",
     "cotes": [
       "à terre entre l'Oulam et le Mizbea'h, là où on la jette",
       "la forme d'une pelle à cendres : un couvercle de métal mince, avec un manche"
@@ -101,7 +104,7 @@
       {"oeuvre": "Arakhin", "ref": "10b-11a", "citation": "הִיא אַמָּה וּגְבוֹהָ אַמָּה, וְקַתָּא יוֹצָא הֵימֶנָּה, וַעֲשָׂרָה נְקָבִים הָיוּ בָּהּ"},
       {"oeuvre": "Rashash", "ref": "Tamid 5:6", "citation": "פירוש הראב\"ד למסכת תמיד שכתב לעיל בפ\"ג דזאת שבכאן היא עצמה דלעיל"}
     ],
-    "note": "Retenu : une grande pelle qu'on jette pour faire du bruit, selon Bartenura et Tosfot Yom Tov. Écarté : le Raavad, rapporté par le Rashash, pour qui c'est l'instrument de musique à dix trous d'Arakhin 10b-11a, dont on lâchait toutes les voix d'un coup. Choix de la visite : son diamètre, son manche et le bronze."
+    "note": "Retenu : un grand ustensile qu'on jette pour faire du bruit (Bartenura), en forme de pelle à cendres (Tosfot Yom Tov, le Rosh). Écarté : le Raavad, rapporté par le Rashash, pour qui c'est l'instrument de musique à dix trous d'Arakhin 10b-11a, dont on lâchait toutes les voix d'un coup. Choix de la visite : son diamètre, son manche et le bronze."
   },
 
   "candelabres_shoeva": {
@@ -140,10 +143,10 @@
   "sculptures_murs": {
     "he": "כרובים ותמורות ופטורי ציצים",
     "translit": "Keruvim, timorot ou-peturei tzitzim",
-    "resume": "Les reliefs qui couvrent les murs du Heikhal et du Kodesh HaKodashim : des keruvim, des palmiers (timorot) et des fleurs épanouies (peturei tzitzim), en or sur l'or. Ye'hezkel donne l'ordre du motif — une timora entre deux keruvim, et deux visages à chaque keruv. La visite les dispose en trois registres, du sol à 22 amot, séparés par des bandeaux de fleurs.",
+    "resume": "Les reliefs qui couvrent les murs du Heikhal et du Kodesh HaKodashim, repris du Premier Temple : des keruvim, des palmiers (timorot) et des fleurs épanouies (peturei tzitzim), en or sur l'or. Ye'hezkel, qui décrit le Temple futur, donne l'ordre du motif — une timora entre deux keruvim, et deux visages à chaque keruv. La visite les dispose en cinq registres, d'une ama au-dessus du sol à 22 amot, séparés par des bandeaux de fleurs.",
     "cotes": [
-      "trois registres du sol à 22 amot, séparés par des bandeaux de fleurs épanouies",
-      "0,22 ama de saillie",
+      "cinq registres, d'une ama au-dessus du sol à 22 amot, séparés par des bandeaux de fleurs épanouies",
+      "0,05 ama de saillie",
       "« וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב » : une timora entre deux keruvim",
       "« וּשְׁנַיִם פָּנִים לַכְּרוּב » : deux visages par keruv",
       "sur les murs du Heikhal et du Kodesh HaKodashim, « מִלִּפְנִים וְלַחִיצוֹן »"
@@ -151,18 +154,16 @@
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "6:29", "citation": "וְאֵת כָּל קִירוֹת הַבַּיִת מֵסַב קָלַע פִּתּוּחֵי מִקְלְעוֹת כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים, מִלִּפְנִים וְלַחִיצוֹן"},
       {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
-      {"oeuvre": "Middot", "ref": "4:1", "citation": ""}
+      {"oeuvre": "Middot", "ref": "4:1", "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"}
     ],
-    "note": "Choix de la visite : les reliefs montent « du sol jusqu'au-dessus de l'ouverture » (Ye'hezkel 41:20), c'est-à-dire un peu au-delà des vingt amot de la porte du Heikhal (Middot 4:1) ; au-dessus, l'or reste nu. Les trois registres, la saillie et le détail des motifs sont dessinés pour la visite."
+    "note": "Premier Temple : Melakhim I 6:29 ; Middot 4:1 ne parle que d'or, « שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב ». Ye'hezkel 41:18-20 décrit le Temple futur. Choix de la visite : les reliefs montent « du sol jusqu'au-dessus de l'ouverture » (Ye'hezkel 41:20), c'est-à-dire un peu au-delà des vingt amot de la porte du Heikhal (Middot 4:1) ; au-dessus, l'or reste nu. Les cinq registres, la saillie et le détail des motifs sont dessinés pour la visite."
   },
 
   "chaines_devir": {
     "he": "רתוקות זהב",
     "translit": "Ratoukot zahav",
     "resume": "Des chaînes d'or tendues devant le Devir, le Kodesh HaKodashim. Dans la visite : trois chaînettes sous le plafond, tendues d'un mur à l'autre, devant la parokhet.",
-    "cotes": [
-      "trois chaînettes sous le plafond, de mur à mur, devant la parokhet (choix de la visite)"
-    ],
+    "cotes": ["trois chaînettes sous le plafond, de mur à mur, devant la parokhet (choix de la visite)"],
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "6:21", "citation": "וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר"}
     ],
@@ -172,7 +173,7 @@
   "shaar_shushan": {
     "he": "שער המזרחי — שושן הבירה",
     "translit": "Sha'ar HaMizrahi — Shushan HaBira",
-    "resume": "La porte orientale du Har HaBayit, sur l'axe du Temple. Au-dessus d'elle est figurée Suse la capitale, tournée vers le mont des Oliviers. La visite en fait un bas-relief dans la pierre du mur : un rempart et trois tours crénelées.",
+    "resume": "La porte orientale du Har HaBayit. Au-dessus d'elle est figurée Suse la capitale, tournée vers le mont des Oliviers. La visite en fait un bas-relief dans la pierre du mur : un rempart et trois tours crénelées.",
     "cotes": [
       "au-dessus de la porte est du Har HaBayit, tournée vers le mont des Oliviers",
       "un rempart et trois tours crénelées (choix de la visite)"
@@ -180,24 +181,25 @@
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה"}
     ],
-    "note": "Choix de la visite : la Mishna dit que Suse était figurée au-dessus de la porte (Middot 1:3), sans dire comment. Le bas-relief — un rempart et trois tours — est dessiné pour la visite."
+    "note": "Choix de la visite : la Mishna dit que Suse était figurée au-dessus de la porte (Middot 1:3), sans dire comment. Le bas-relief — un rempart et trois tours — est dessiné pour la visite, comme la place de la porte sur l'axe du Temple : Middot ne situe pas les portes dans le mur."
   },
 
   "tavla_helene": {
     "he": "טבלה של זהב",
     "translit": "Tavla shel zahav",
-    "resume": "Une tablette d'or offerte par la reine Hélène, « sur laquelle la parasha de la sota est écrite » : c'est de là que le kohen recopie le passage. La visite la pose sur l'or du mur est de l'Oulam, côté nord.",
+    "resume": "Une tablette d'or offerte par la reine Hélène, « sur laquelle la parasha de la sota est écrite » : c'est sur elle que le kohen se règle pour écrire le rouleau de la sota (Yoma 37b). La visite la pose sur l'or du mur est de l'Oulam, côté nord.",
     "cotes": [],
     "sources": [
-      {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"}
+      {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"},
+      {"oeuvre": "Yoma", "ref": "37b", "citation": "רוֹאֶה וְכוֹתֵב כְּמָה שֶׁכָּתוּב בַּטַּבְלָא"}
     ],
-    "note": "Choix de la visite : la Mishna ne dit pas où était la tablette ; la visite la pose sur l'or du mur est de l'Oulam, côté nord. Les lignes gravées sont décoratives."
+    "note": "Choix de la visite : la Mishna ne dit pas où était la tablette ; la visite la pose sur l'or du mur est de l'Oulam, côté nord. Selon Reish Lakish au nom de R. Yannai (Yoma 37b), elle ne portait la parasha qu'en abrégé, « בְּאָלֶף בֵּית », et le kohen écrit « כְּמָה שֶׁכָּתוּב בַּטַּבְלָא ». Les lignes gravées sont décoratives et ne tranchent pas."
   },
 
   "beit_hahalifot": {
     "he": "בית החליפות",
     "translit": "Beit HaHalifot",
-    "resume": "L'Oulam déborde de quinze amot au nord et au sud du corps du bâtiment, et ces deux débords s'appelaient Beit HaHalifot, « parce qu'on y rangeait les couteaux » : Bartenura explique que les grands couteaux se disaient ‘halafim. Chacune des vingt-quatre michmarot — les équipes de cohanim qui se relayaient chaque semaine — y avait sa niche dans le mur pour ses propres couteaux. Les sacrifices s'égorgent avec un couteau consacré au service, de métal, et assez long pour dépasser le cou de la bête. Une seule niche était murée : celle de Bilga.",
+    "resume": "L'Oulam déborde de quinze amot au nord et au sud du corps du bâtiment, et ces deux débords s'appelaient Beit HaHalifot, « parce qu'on y rangeait les couteaux » : Bartenura explique que les grands couteaux se disaient ‘halafim. Chacune des vingt-quatre michmarot — les équipes de cohanim qui montaient servir chacune une semaine (Rambam, Klei HaMikdash 4:3) — y avait sa niche dans le mur pour ses propres couteaux. On égorge les sacrifices, a priori, avec un couteau des ustensiles du service (Rambam, Ma'asse HaKorbanot 4:7), et ces ustensiles se font en métal (Klei HaMikdash 1:13) ; quand on tranche le cou d'un seul coup, la lame doit dépasser le cou de la bête (Houlin 31a). Une seule niche était murée : celle de Bilga.",
     "cotes": [
       "débord de 15 amot : mur de 5 et 10 d'espace",
       "24 niches, une par michmar"
@@ -209,9 +211,10 @@
       {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "דלכל משמר ומשמר היה שם ארגז מיוחד בכותל לגנוז שם סכיניהן"},
       {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
-      {"oeuvre": "Houlin", "ref": "31a", "citation": "מְלֹא צַוָּאר חוּץ לַצַּוָּאר"}
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "4:3", "citation": "וְעוֹלִין לִירוּשָׁלַיִם לַעֲבוֹדָה מִשְׁמָר לְכָל שַׁבָּת"},
+      {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"}
     ],
-    "note": "Choix de la visite : aucune source ne dit où passe le mur ouest du Beit HaHalifot — la visite le prend dans les 16 amot pour garder le corps du bâtiment à 70. La taille des niches, leur place dans le mur latéral, leur ordre (celui des michmarot de Divrei HaYamim I 24) sont des choix, comme la forme des couteaux, leur fer, leur manche de bronze et leur nombre, deux par niche. Le Rambam prolonge l'Oulam sur toute la longueur du bâtiment et le Raavad le lui conteste ; la visite suit Bartenura."
+    "note": "Choix de la visite : aucune source ne dit où passe le mur ouest du Beit HaHalifot — la visite le prend dans les 16 amot pour garder le corps du bâtiment à 70. La taille des niches, leur place dans le mur latéral, leur ordre (celui des michmarot de Divrei HaYamim I 24) sont des choix, comme la forme des couteaux, leur fer, leur manche de bronze et leur nombre, deux par niche. Le Rambam (Beit HaBe'hira 4:5) compte le mur de l'Oulam et ses dix amot dans la largeur de cent amot, comme s'ils longeaient tout le bâtiment ; le Raavad le conteste (« שלא היה שם כותל לאולם כלל »). La visite suit Middot 4:7 et Bartenura : les quinze amot ne débordent qu'à l'Oulam."
   },
 
   "niche_bilga": {
@@ -262,22 +265,22 @@
   "leviim": {
     "he": "לויים על הדוכן",
     "translit": "Leviim al haDoukhan",
-    "resume": "Les Léviim chantent debout sur le Doukhan, la marche qui sépare l'Ezrat Israël de l'Ezrat Cohanim, chacun avec son instrument. On n'en compte jamais moins de douze : au moins neuf kinorot, deux nevalim et un seul tziltzal. Aux jours de Shlomo, le Tanakh montre les chanteurs « vêtus de lin ». La visite en pose douze, tournés vers le Sanctuaire, de part et d'autre de l'axe qu'on suit en montant de la porte de Nikanor. Au tamid, Ben Arza frappe le tziltzal et les Léviim entrent dans le chant : dans la visite, le tziltzal bat la mesure.",
+    "resume": "Les Léviim chantent debout sur le Doukhan, chacun avec son instrument ; selon R. Eliézer ben Yaakov (Middot 2:6), le Doukhan est posé sur la marche qui sépare l'Ezrat Israël de l'Ezrat Cohanim. On n'en compte jamais moins de douze : au moins neuf kinorot, deux nevalim et un seul tziltzal. Aux jours de Shlomo, le Tanakh montre les chanteurs « vêtus de lin ». La visite en pose douze, tournés vers le Sanctuaire, de part et d'autre de l'axe qu'on suit en montant de la porte de Nikanor. Au tamid, Ben Arza frappe le tziltzal et les Léviim entrent dans le chant : dans la visite, le tziltzal bat la mesure.",
     "cotes": [
       "douze Léviim, jamais moins",
       "neuf kinorot, deux nevalim, un tziltzal",
-      "debout sur le Doukhan, trois marches d'une demi-ama",
+      "debout sur le Doukhan, trois marches d'une demi-ama (R. Eliézer ben Yaakov, Middot 2:6)",
       "vêtus de lin"
     ],
     "sources": [
       {"oeuvre": "Arakhin", "ref": "2:6", "citation": ""},
       {"oeuvre": "Arakhin", "ref": "2:5", "citation": ""},
       {"oeuvre": "Arakhin", "ref": "2:3", "citation": ""},
-      {"oeuvre": "Middot", "ref": "2:6", "citation": ""},
+      {"oeuvre": "Middot", "ref": "2:6", "citation": "מַעֲלָה הָיְתָה שָׁם, וּגְבוֹהָה אַמָּה, וְהַדּוּכָן נָתוּן עָלֶיהָ, וּבָהּ שָׁלשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה"},
       {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
       {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
     ],
-    "note": "Choix de la visite : la Mishna ne dit pas comment les Léviim étaient vêtus ; le lin vient de la dédicace du Temple de Shlomo (Divrei HaYamim II 5:12). La kippa blanche, la place sur la marche du haut, face au Sanctuaire, le passage laissé libre sur l'axe et le balancement sont aussi des choix. Non représentés : les enfants Léviim, qui se tenaient en bas selon R. Eliézer ben Yaakov (Arakhin 2:6)."
+    "note": "Choix de la visite : la Mishna ne dit pas comment les Léviim étaient vêtus ; le lin vient de la dédicace du Temple de Shlomo (Divrei HaYamim II 5:12). La kippa blanche, la place sur la marche du haut, face au Sanctuaire, le passage laissé libre sur l'axe et le balancement sont aussi des choix. Retenu : l'avis de R. Eliézer ben Yaakov (Middot 2:6) — une marche d'une ama sépare l'Ezrat Israël de l'Ezrat Cohanim, et le Doukhan est posé dessus. Selon le premier avis de la michna, les deux cours ne sont séparées que par une rangée de saillies (rashei pispasin). Non représentés : les enfants Léviim, qui se tenaient en bas selon R. Eliézer ben Yaakov (Arakhin 2:6)."
   },
 
   "fideles": {

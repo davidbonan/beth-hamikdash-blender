@@ -2,12 +2,12 @@
   "yam": {
     "nom": "Yam (the Bronze Sea)",
     "translit": "Yam Mutzak",
-    "resume": "The bronze Sea of Shlomo: a large basin resting on twelve bronze oxen, three facing each cardinal direction, their hindquarters toward the center. Its rim is worked “like the brim of a cup, in the shape of a lily flower,” and two rows of gourds run beneath it. The tour places it at the southeast of the building, between the steps of the Ulam and the ramp of the Mizbeach, next to the Kiyor of the Mishna.",
+    "resume": "The bronze Sea of Shlomo: a large basin resting on twelve bronze oxen, three facing each cardinal direction, their hindquarters toward the center. Its rim is worked “like the brim of a cup, in the shape of a lily flower,” and two rows of gourds run beneath it — oxen, according to II Chronicles. The tour takes it from the First Temple and places it at the southeast of the building, between the steps of the Ulam and the ramp of the Mizbeach, next to the Kiyor of the Mishna.",
     "cotes": [
       "ten amot from rim to rim",
       "five amot high",
       "thirty amot in circumference",
-      "two rows of gourds (peka'im) beneath the rim",
+      "two rows of gourds (peka'im) beneath the rim (I Kings 7:24); II Chronicles 4:3 has two rows of oxen there, “וּדְמוּת בְּקָרִים תַּחַת לוֹ”",
       "twelve oxen, three facing each wind, “וְכָל אֲחֹרֵיהֶם בָּיְתָה” — all their hindquarters toward the center",
       "rim “כְּמַעֲשֵׂה שְׂפַת כּוֹס פֶּרַח שׁוֹשָׁן”",
       "at the southeast of the building: “מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב”"
@@ -16,9 +16,9 @@
       {"oeuvre": "Melakhim I", "ref": "7:23-26", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:39", "citation": "מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב"},
       {"oeuvre": "Divrei HaYamim II", "ref": "4:2-6", "citation": ""},
-      {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
+      {"oeuvre": "Menachot", "ref": "98b", "citation": "שֶׁל מֹשֶׁה בָּאֶמְצַע, חֲמִשָּׁה מִימִינוֹ, וַחֲמִשָּׁה מִשְּׂמֹאלוֹ"}
     ],
-    "note": "Project's position: the Bronze Sea is a vessel of the First Temple that the Mishna does not mention. The tour places it in the Temple of the Mishna, just as Menachot 98b sets Shlomo's ten menorot and ten tables around those of Moses: the vessels of both Temples stand together."
+    "note": "First Temple: I Kings 7:23-26; the Mishna does not mention it. Project's position: the tour places it in the Temple of the Mishna. Menachot 98b speaks only of the First Temple, where Moses' table and menora stood among Shlomo's ten (“שֶׁל מֹשֶׁה בָּאֶמְצַע”); extending this to the vessels of both Temples is the tour's choice. The two accounts also differ on its capacity: two thousand bat (I Kings 7:26), three thousand (II Chronicles 4:5)."
   },
 
   "mekhonot": {
@@ -35,58 +35,61 @@
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "7:27-39", "citation": "חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף הַבַּיִת מִשְּׂמֹאלוֹ"},
       {"oeuvre": "Divrei HaYamim II", "ref": "4:14", "citation": ""},
-      {"oeuvre": "Menachot", "ref": "98b", "citation": ""}
+      {"oeuvre": "Menachot", "ref": "98b", "citation": "שֶׁל מֹשֶׁה בָּאֶמְצַע, חֲמִשָּׁה מִימִינוֹ, וַחֲמִשָּׁה מִשְּׂמֹאלוֹ"}
     ],
-    "note": "Project's position, as for the Bronze Sea: a vessel of the First Temple placed in the Temple of the Mishna, on the principle of Menachot 98b."
+    "note": "First Temple: I Kings 7:27-39; the Mishna does not mention them. Project's position, as for the Bronze Sea: the tour places them in the Temple of the Mishna. Menachot 98b, which sets Moses' vessels among Shlomo's, speaks only of the First Temple; extending it to the Temple of the Mishna is the tour's choice."
   },
 
   "yakhin_boaz": {
     "nom": "Yakhin and Boaz",
-    "translit": "Yakhin and Boaz",
-    "resume": "The two bronze columns of Shlomo. A hollow shaft topped by a capital (koteret) worked in lily-form, encircled with lattice-work and chainlets, and adorned with two rows of a hundred pomegranates. They stand “לְאֻלָם הַהֵיכָל”: inside the Ulam, on either side of the opening — not in front of the façade. Yakhin on the right of the House (south), Boaz on its left (north).",
+    "translit": "Yakhin ve-Boaz",
+    "resume": "The two bronze columns of Shlomo, taken from the First Temple. A hollow shaft topped by a capital (koteret) worked in lily-form, encircled with lattice-work and chainlets, and adorned with two rows of pomegranates. They stand “לְאֻלָם הַהֵיכָל”: inside the Ulam according to Radak, Ralbag and Metzudat David, not in front of the façade. Yakhin on the right of the House (south), Boaz on its left (north).",
     "cotes": [
       "eighteen amot of shaft",
       "twelve amot in circumference, that is four amot wide",
       "hollow, four fingers thick",
       "capital of five amot: two flush with the shaft, three projecting",
-      "twenty-three amot in total",
+      "twenty-three amot in total in the model; twenty-two and a half according to Radak (on II Chronicles 3:15), half an ama of the shaft entering the capital",
       "four amot of “מַעֲשֵׂה שׁוֹשַׁן” at the top of the capital",
-      "seven chainlets (sharsherot) on the bulge of the capital",
-      "two rows of a hundred pomegranates per column",
+      "seven chainlets (sharsherot) per capital",
+      "two rows of a hundred pomegranates per column (I Kings 7:20 and 7:42); Jeremiah 52:23 counts “מֵאָה עַל־הַשְּׂבָכָה”, ninety-six of them facing outward",
       "Yakhin to the south (on the right), Boaz to the north (on the left)"
     ],
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "7:15-22", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:41-42", "citation": ""},
       {"oeuvre": "Melakhim I", "ref": "7:21", "citation": "לְאֻלָם הַהֵיכָל"},
-      {"oeuvre": "Yirmeyahou", "ref": "52:21-23", "citation": ""},
-      {"oeuvre": "Melakhim II", "ref": "25:17", "citation": ""},
-      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": ""},
+      {"oeuvre": "Divrei HaYamim II", "ref": "3:15-17", "citation": "וַיַּעַשׂ לִפְנֵי הַבַּיִת עַמּוּדִים שְׁנַיִם"},
+      {"oeuvre": "Yirmeyahou", "ref": "52:21-23", "citation": "כׇּל־הָרִמּוֹנִים מֵאָה עַל־הַשְּׂבָכָה סָבִיב"},
+      {"oeuvre": "Melakhim II", "ref": "25:17", "citation": "וְקוֹמַת הַכֹּתֶרֶת שָׁלֹשׁ אַמּוֹת"},
+      {"oeuvre": "Radak", "ref": "sur Melakhim I 7:21", "citation": "לאולם ההיכל. כמו באולם ההיכל"},
       {"oeuvre": "Radak", "ref": "sur Melakhim I 7:16", "citation": "שְׁתֵּי אַמּוֹת הַתַּחְתּוֹנוֹת שֶׁל כּוֹתָרוֹת הָיוּ שָׁווֹת לָעַמּוּד"},
       {"oeuvre": "Radak", "ref": "sur Divrei HaYamim II 3:15", "citation": "עַל מִדַּת שְׁנֵי הָעַמּוּדִים הוּא אוֹמֵר"},
+      {"oeuvre": "Rashi sur Divrei HaYamim II", "ref": "3:15", "citation": "וְנִמְצְאוּ כָּל אֶחָד שְׁבַע עֶשְׂרֵה אַמָּה וָחֵצִי"},
       {"oeuvre": "Metsoudat David", "ref": "sur Melakhim I 7:19", "citation": "כִּי הָעַמּוּדִים הָיוּ בְּרֹחַב אַרְבַּע אַמּוֹת"}
     ],
-    "note": "Adopted: the columns stand inside the Ulam, on either side of the opening, not in front of the façade — this is how Radak, Ralbag and Metzudat David read “לְאֻלָם הַהֵיכָל.” Like the Bronze Sea, they come from the First Temple (principle of Menachot 98b). The thirty-five amot of II Chronicles 3:15 measure the two columns together, lying down at casting, not the height of each (Rashi, Radak)."
+    "note": "Adopted: the columns stand inside the Ulam — this is how Radak, Ralbag and Metzudat David read “לְאֻלָם הַהֵיכָל.” II Chronicles 3:15 and 3:17 say “לִפְנֵי הַבַּיִת” and “עַל־פְּנֵי הַהֵיכָל”: since the Ulam itself stands in front of the Heikhal, the tour sees no contradiction; their place on either side of the opening is the tour's choice. First Temple: I Kings 7:15-22; Middot does not mention them. The thirty-five amot of II Chronicles 3:15 measure the two columns together, lying down at casting, not the height of each (Rashi, Radak). The three amot of capital in II Kings 25:17 count only its worked part (Radak on I Kings 7:16)."
   },
 
   "mukhni": {
     "nom": "Mukhni of the Kiyor",
     "translit": "Mukhni",
-    "resume": "The mechanism installed by Ben Katin at the edge of the Kiyor: a wheel and a chain that lower the basin into its well every evening, “so that its water not be disqualified by the night.” The tour gives it a post, a crossbeam, a strut, a spoked wheel and a chain reaching to the edge of the basin.",
+    "resume": "The mechanism installed by Ben Katin at the edge of the Kiyor: a wheel that lowers the basin into its well every evening, “so that its water not be disqualified by the night.” The Gemara names only the wheel (Yoma 37a); the well comes from Rashi. The tour gives it a post, a crossbeam, a strut, a spoked wheel and a chain reaching to the edge of the basin.",
     "sources": [
       {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁלֹּא יִהְיוּ מֵימָיו נִפְסָלִין בְּלִינָה"},
-      {"oeuvre": "Yoma", "ref": "37a", "citation": ""},
+      {"oeuvre": "Yoma", "ref": "37a", "citation": "מַאי מוּכְנִי? אָמַר אַבָּיֵי: גִּילְגְּלָא דַּהֲוָה מְשַׁקְּעָא לֵיהּ"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "37a", "citation": "גלגל לשקעו בו בבור"},
       {"oeuvre": "Middot", "ref": "3:6", "citation": ""},
       {"oeuvre": "Tamid", "ref": "1:4", "citation": ""},
       {"oeuvre": "Tamid", "ref": "3:8", "citation": ""}
     ],
-    "note": "Tour's choice: the shape of the mechanism. The sources give only two features: a wheel (Yoma 37a) and wood, whose sound could be heard (Tamid 1:4). Post, crossbeam and chain are designed for the tour."
+    "note": "Tour's choice: the shape of the mechanism. The sources give only two features: a wheel (Yoma 37a) and wood, whose sound could be heard (Tamid 1:4). Post, crossbeam and chain are designed for the tour; no source mentions a chain."
   },
 
   "magrefa": {
     "nom": "Magrefa",
     "translit": "Magrefa",
-    "resume": "When the kohanim reach the space between the Ulam and the Mizbeach, one of them takes the magrefa and throws it to the ground. In Jerusalem no one can hear his neighbour over it, and the crash serves as a signal: the kohanim come to bow down, the Levites to sing, and the head of the ma'amad stands the impure at the eastern gates (Tamid 5:6). It is a large utensil thrown to make a noise, shaped like an ash shovel (Bartenura, Tosafot Yom Tov, the Rosh). The model lays it on the ground where it falls.",
+    "resume": "When the kohanim reach the space between the Ulam and the Mizbeach, one of them takes the magrefa and throws it to the ground. In Jerusalem no one can hear his neighbour over it, and the crash serves as a signal: the kohanim come to bow down, the Levites to sing, and the head of the ma'amad stands the impure at the eastern gates (Tamid 5:6). It is a large utensil thrown to make a noise (Bartenura); Tosafot Yom Tov and the Rosh give it the shape of an ash shovel. The model lays it on the ground where it falls.",
     "cotes": [
       "on the ground between the Ulam and the Mizbeach, where it is thrown",
       "shaped like an ash shovel: a lid of thin metal, with a handle"
@@ -100,7 +103,7 @@
       {"oeuvre": "Arakhin", "ref": "10b-11a", "citation": "הִיא אַמָּה וּגְבוֹהָ אַמָּה, וְקַתָּא יוֹצָא הֵימֶנָּה, וַעֲשָׂרָה נְקָבִים הָיוּ בָּהּ"},
       {"oeuvre": "Rashash", "ref": "Tamid 5:6", "citation": "פירוש הראב\"ד למסכת תמיד שכתב לעיל בפ\"ג דזאת שבכאן היא עצמה דלעיל"}
     ],
-    "note": "Adopted: a large shovel thrown down to make noise, following Bartenura and Tosafot Yom Tov. Set aside: the Raavad, cited by the Rashash, for whom it is the ten-holed musical instrument of Arakhin 10b-11a, all of whose voices were released at once. Tour's choice: its diameter, its handle and the bronze."
+    "note": "Adopted: a large utensil thrown down to make noise (Bartenura), shaped like an ash shovel (Tosafot Yom Tov, the Rosh). Set aside: the Raavad, cited by the Rashash, for whom it is the ten-holed musical instrument of Arakhin 10b-11a, all of whose voices were released at once. Tour's choice: its diameter, its handle and the bronze."
   },
 
   "candelabres_shoeva": {
@@ -139,10 +142,10 @@
   "sculptures_murs": {
     "nom": "Wall Carvings: Keruvim, Palm Trees, Flowers",
     "translit": "Keruvim, timorot u-peturei tzitzim",
-    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The tour arranges them in three registers, from the floor up to 22 amot, separated by bands of flowers.",
+    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim, taken from the First Temple: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel, who describes the future Temple, gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The tour arranges them in five registers, from one amah above the floor up to 22 amot, separated by bands of flowers.",
     "cotes": [
-      "three registers from the floor up to 22 amot, separated by bands of blossoming flowers",
-      "0.22 ama in relief",
+      "five registers, from one amah above the floor up to 22 amot, separated by bands of blossoming flowers",
+      "0.05 ama in relief",
       "“וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב”: one timora between two keruvim",
       "“וּשְׁנַיִם פָּנִים לַכְּרוּב”: two faces per keruv",
       "on the walls of the Heikhal and the Kodesh HaKodashim, “מִלִּפְנִים וְלַחִיצוֹן”"
@@ -150,18 +153,16 @@
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "6:29", "citation": "וְאֵת כָּל קִירוֹת הַבַּיִת מֵסַב קָלַע פִּתּוּחֵי מִקְלְעוֹת כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים, מִלִּפְנִים וְלַחִיצוֹן"},
       {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
-      {"oeuvre": "Middot", "ref": "4:1", "citation": ""}
+      {"oeuvre": "Middot", "ref": "4:1", "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"}
     ],
-    "note": "Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The three registers, the relief depth and the details of the motifs are designed for the tour."
+    "note": "First Temple: I Kings 6:29; Middot 4:1 speaks only of gold, “שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב.” Ezekiel 41:18-20 describes the future Temple. Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The five registers, the relief depth and the details of the motifs are designed for the tour."
   },
 
   "chaines_devir": {
     "nom": "Chains before the Devir",
     "translit": "Ratukot zahav",
     "resume": "Golden chains stretched before the Devir, the Kodesh HaKodashim. In the tour: three chainlets beneath the ceiling, stretched from one wall to the other, before the parokhet.",
-    "cotes": [
-      "three chainlets beneath the ceiling, wall to wall, before the parokhet (the tour's choice)"
-    ],
+    "cotes": ["three chainlets beneath the ceiling, wall to wall, before the parokhet (the tour's choice)"],
     "sources": [
       {"oeuvre": "Melakhim I", "ref": "6:21", "citation": "וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר"}
     ],
@@ -171,7 +172,7 @@
   "shaar_shushan": {
     "nom": "Sha'ar Shushan",
     "translit": "Sha'ar HaMizrachi — Shushan HaBira",
-    "resume": "The eastern gate of the Har HaBayit, on the axis of the Temple. Above it is depicted Shushan the capital, facing the Mount of Olives. The tour renders it as a bas-relief in the stone of the wall: a rampart and three crenellated towers.",
+    "resume": "The eastern gate of the Har HaBayit. Above it is depicted Shushan the capital, facing the Mount of Olives. The tour renders it as a bas-relief in the stone of the wall: a rampart and three crenellated towers.",
     "cotes": [
       "above the east gate of the Har HaBayit, facing the Mount of Olives",
       "a rampart and three crenellated towers (the tour's choice)"
@@ -179,23 +180,24 @@
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה"}
     ],
-    "note": "Tour's choice: the Mishna says Shushan was depicted above the gate (Middot 1:3), without saying how. The bas-relief — a rampart and three towers — is designed for the tour."
+    "note": "Tour's choice: the Mishna says Shushan was depicted above the gate (Middot 1:3), without saying how. The bas-relief — a rampart and three towers — is designed for the tour, as is the gate's position on the axis of the Temple: Middot does not locate the gates within the wall."
   },
 
   "tavla_helene": {
     "nom": "Helena's Tablet",
     "translit": "Tavla shel zahav",
-    "resume": "A golden tablet donated by Queen Helena, “on which the parasha of the sota is written”: it is from this that the Kohen copies out the passage. The tour places it on the gold of the east wall of the Ulam, on the north side.",
+    "resume": "A golden tablet donated by Queen Helena, “on which the parasha of the sota is written”: the Kohen follows it when writing the sota scroll (Yoma 37b). The tour places it on the gold of the east wall of the Ulam, on the north side.",
     "sources": [
-      {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"}
+      {"oeuvre": "Yoma", "ref": "3:10", "citation": "שֶׁפָּרָשַׁת סוֹטָה כְּתוּבָה עָלֶיהָ"},
+      {"oeuvre": "Yoma", "ref": "37b", "citation": "רוֹאֶה וְכוֹתֵב כְּמָה שֶׁכָּתוּב בַּטַּבְלָא"}
     ],
-    "note": "Tour's choice: the Mishna does not say where the tablet was; the tour sets it on the gold of the east wall of the Ulam, on the north side. The engraved lines are decorative."
+    "note": "Tour's choice: the Mishna does not say where the tablet was; the tour sets it on the gold of the east wall of the Ulam, on the north side. According to Reish Lakish in the name of R. Yannai (Yoma 37b), it bore the parasha only in abbreviated form, “בְּאָלֶף בֵּית,” and the Kohen writes “כְּמָה שֶׁכָּתוּב בַּטַּבְלָא.” The engraved lines are decorative and do not decide the question."
   },
 
   "beit_hahalifot": {
     "nom": "Beit HaHalifot (the knife chambers)",
     "translit": "Beit HaHalifot",
-    "resume": "The Ulam extends fifteen amot north and south beyond the body of the building, and these two extensions were called Beit HaHalifot, “because the knives were stored there”: Bartenura explains that large knives were called ‘halafim. Each of the twenty-four mishmarot — the teams of Kohanim who took turns week by week — had its own niche in the wall for its knives. Sacrifices are slaughtered with a knife consecrated to the service, made of metal, and long enough to reach past the animal's neck. Only one niche was walled up: Bilga's.",
+    "resume": "The Ulam extends fifteen amot north and south beyond the body of the building, and these two extensions were called Beit HaHalifot, “because the knives were stored there”: Bartenura explains that large knives were called ‘halafim. Each of the twenty-four mishmarot — the teams of Kohanim who each came up to serve for a week (Rambam, Klei HaMikdash 4:3) — had its own niche in the wall for its knives. Sacrifices are slaughtered, a priori, with a knife from the vessels of the service (Rambam, Ma'aseh HaKorbanot 4:7), and those vessels are made of metal (Klei HaMikdash 1:13); when the neck is cut in a single stroke, the blade must reach past the animal's neck (Chullin 31a). Only one niche was walled up: Bilga's.",
     "cotes": [
       "15-amot extension: a 5-amot wall and 10 of space",
       "24 niches, one per mishmar"
@@ -207,9 +209,10 @@
       {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "דלכל משמר ומשמר היה שם ארגז מיוחד בכותל לגנוז שם סכיניהן"},
       {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
-      {"oeuvre": "Houlin", "ref": "31a", "citation": "מְלֹא צַוָּאר חוּץ לַצַּוָּאר"}
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "4:3", "citation": "וְעוֹלִין לִירוּשָׁלַיִם לַעֲבוֹדָה מִשְׁמָר לְכָל שַׁבָּת"},
+      {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"}
     ],
-    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam extends the Ulam along the whole building and the Raavad disputes it; the tour follows Bartenura."
+    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam (Beit HaBechirah 4:5) counts the Ulam wall and its ten amot within the hundred-amot width, as if they ran along the whole building; the Raavad disputes it (“שלא היה שם כותל לאולם כלל”). The tour follows Middot 4:7 and Bartenura: the fifteen amot project only at the Ulam."
   },
 
   "niche_bilga": {
@@ -260,22 +263,22 @@
   "leviim": {
     "nom": "Leviim on the Dukhan",
     "translit": "Leviim al haDukhan",
-    "resume": "The Leviim sing standing on the Dukhan, the step that separates the Ezrat Israel from the Ezrat Kohanim, each with his instrument. Never fewer than twelve are counted: at least nine kinorot, two nevalim and a single tziltzal. In the days of Shlomo, the Tanakh shows the singers “clothed in linen.” The tour places twelve of them, facing the Sanctuary, on either side of the axis one follows coming up from the Nikanor Gate. At the tamid, Ben Arza strikes the tziltzal and the Leviim break into song: in the tour, the tziltzal keeps the beat.",
+    "resume": "The Leviim sing standing on the Dukhan, each with his instrument; according to R. Eliezer ben Yaakov (Middot 2:6), the Dukhan stands on the step that separates the Ezrat Israel from the Ezrat Kohanim. Never fewer than twelve are counted: at least nine kinorot, two nevalim and a single tziltzal. In the days of Shlomo, the Tanakh shows the singers “clothed in linen.” The tour places twelve of them, facing the Sanctuary, on either side of the axis one follows coming up from the Nikanor Gate. At the tamid, Ben Arza strikes the tziltzal and the Leviim break into song: in the tour, the tziltzal keeps the beat.",
     "cotes": [
       "twelve Leviim, never fewer",
       "nine kinorot, two nevalim, one tziltzal",
-      "standing on the Dukhan, three half-ama steps",
+      "standing on the Dukhan, three half-ama steps (R. Eliezer ben Yaakov, Middot 2:6)",
       "clothed in linen"
     ],
     "sources": [
       {"oeuvre": "Arakhin", "ref": "2:6", "citation": ""},
       {"oeuvre": "Arakhin", "ref": "2:5", "citation": ""},
       {"oeuvre": "Arakhin", "ref": "2:3", "citation": ""},
-      {"oeuvre": "Middot", "ref": "2:6", "citation": ""},
+      {"oeuvre": "Middot", "ref": "2:6", "citation": "מַעֲלָה הָיְתָה שָׁם, וּגְבוֹהָה אַמָּה, וְהַדּוּכָן נָתוּן עָלֶיהָ, וּבָהּ שָׁלשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה"},
       {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
       {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
     ],
-    "note": "Tour's choice: the Mishna does not say how the Leviim were dressed; the linen comes from the dedication of Shlomo's Temple (II Chronicles 5:12). The white kippa, the place on the top step facing the Sanctuary, the passage left open on the axis and the swaying are also choices. Not shown: the Levite children, who stood below according to R. Eliezer ben Yaakov (Arakhin 2:6)."
+    "note": "Tour's choice: the Mishna does not say how the Leviim were dressed; the linen comes from the dedication of Shlomo's Temple (II Chronicles 5:12). The white kippa, the place on the top step facing the Sanctuary, the passage left open on the axis and the swaying are also choices. Adopted: the view of R. Eliezer ben Yaakov (Middot 2:6) — a one-ama step separates the Ezrat Israel from the Ezrat Kohanim, and the Dukhan stands on it. According to the first view in the mishna, the two courts are separated only by a row of projections (rashei pispasin). Not shown: the Levite children, who stood below according to R. Eliezer ben Yaakov (Arakhin 2:6)."
   },
 
   "fideles": {
