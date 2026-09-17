@@ -188,6 +188,22 @@ $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --sans-occlusion
 Sans cuisson, le .glb sort sans couche `Occlusion` et `reperes.json` sans cartes : la visite
 reste cohérente, simplement sans occlusion cuite. À relancer sans l'option avant de publier.
 
+Un concept peut cuire sa **lumière indirecte** à la place de son occlusion : le ciel vu de la
+visite (ramené au tiers du soleil au sol, `DIFFUS`) et tout ce qui rebondit, soleil compris,
+sur la même couche UV. Carte `visite/lumiere/<concept>.webp` (irradiance ÷ `echelle`, en sRGB),
+listée sous `lumiere` dans `reperes.json`, posée en `lightMap` : elle remplace dans `matieres.js`
+l'hémisphère, le diffus de l'environnement et l'occlusion. Le soleil direct reste calculé.
+
+```bash
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere azara,oulam
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere azara,oulam --lumiere-seule   # itération
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout                          # toute la visite, ~1 h 10
+```
+
+`--lumiere-seule` garde les cartes d'occlusion de `reperes.json` au lieu de les recuire : seule la
+lumière cuit. Le dépliage est recalculé à l'identique tant que la géométrie ne bouge pas ; après une
+retouche du blockout, relancer sans l'option.
+
 ## Les figurants
 
 `beit_hamikdash_figures.py` lit le .blend et écrit `visite/figures.glb` et `visite/figures.json`

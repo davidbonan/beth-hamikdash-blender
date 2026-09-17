@@ -25,6 +25,8 @@ const englobe = (b, autre) => surface(autre) < surface(b)
 const contient = (cadrage, x, z) =>
   x >= cadrage.min[0] && x <= cadrage.max[0] && z >= cadrage.min[1] && z <= cadrage.max[1];
 
+export const lieuxSouterrains = (cadrages) => new Set(cadrages.filter((c) => c.coupe < 0).flatMap((c) => c.lieux));
+
 export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, allerEntree }) {
   const bouton = document.querySelector("#minicarte");
   const fenetre = document.querySelector("#plan");
@@ -34,7 +36,7 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, 
   let ici = cadrages[0];
   let pose = null;
 
-  const souterrains = new Set(cadrages.filter((c) => c.coupe < 0).flatMap((c) => c.lieux));
+  const souterrains = lieuxSouterrains(cadrages);
   // Du plus petit au plus grand : le premier cadrage de plein air qui contient le visiteur est le plus détaillé.
   const pleinAir = cadrages.filter((c) => !c.lieux)
     .sort((a, b) => largeurDe(a) * hauteurDe(a) - largeurDe(b) * hauteurDe(b));

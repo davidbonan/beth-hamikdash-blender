@@ -4,7 +4,8 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import { habiller, assombrir, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
-import { cartesOcclusion } from "./occlusion.js";
+import { cartesLumiere, cartesOcclusion } from "./occlusion.js";
+import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
@@ -14,7 +15,7 @@ import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
 import { initiation } from "./initiation.js";
 import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
-import { plan } from "./plan.js";
+import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
@@ -136,7 +137,8 @@ const CONCEPTS = await conceptsEn(langue());
 // 4,8 cm du placage d'or à trois cents mètres.
 const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance" });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.68;
+const EXPOSITION_DEHORS = 0.68;
+renderer.toneMappingExposure = EXPOSITION_DEHORS;
 EXPOSITION.value = renderer.toneMappingExposure;
 renderer.shadowMap.enabled = true;
 // Le profil lourd ne s'en sert pas : `ombres.js` y remplace la lecture de la carte
@@ -182,12 +184,11 @@ scene.environment = environnement(renderer);
 const FOV_HORIZONTAL = 94;
 const FOV_VERTICAL = [50, 80];
 const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 900);
-// Une lampe discrète accrochée à la tête : sans elle l'Oulam et les ta'im, sans fenêtre
-// ouvrante dans le blockout, sont noirs. Dans le Heikhal c'est la Menora qui éclaire ;
-// dans le Kodesh HaKodashim, rien d'autre que les braises de la ma'hta.
+// La lampe de tête, là seulement où la lumière cuite laisse noir ; l'emprise du Heikhal couvre aussi ses cellules.
 const LAMPE_TETE = 6;
-const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5 };
-const lampe = new THREE.PointLight(0xffe9c4, LAMPE_TETE, 26, 1.7);
+const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5, taim: LAMPE_TETE,
+  ...Object.fromEntries([...lieuxSouterrains(CADRAGES_DU_PLAN)].map((lieu) => [lieu, LAMPE_TETE])) };
+const lampe = new THREE.PointLight(0xffe9c4, 0, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
 
@@ -332,7 +333,7 @@ const enMegaoctets = (octets) =>
 // Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
 // attendre ensuite doublerait l'attente d'un visiteur en 4G.
 const chargeur = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-const [gltf, jeux, occlusions] = await Promise.all([
+const [gltf, jeux, occlusions, lumieres] = await Promise.all([
   chargeur.loadAsync("./temple.glb", (e) => {
       if (!e.lengthComputable) return;
       jauge.style.width = `${(e.loaded / e.total) * 100}%`;
@@ -340,6 +341,7 @@ const [gltf, jeux, occlusions] = await Promise.all([
     }),
   nappes(),
   cartesOcclusion(reperes.occlusion),
+  cartesLumiere(reperes.lumiere),
 ]);
 ecrire(etat, "preparation");
 scene.add(gltf.scene);
@@ -389,9 +391,11 @@ gltf.scene.traverse((o) => {
   o.receiveShadow = true;
   if (!brut) {
     const occlusion = occlusions.get(o.userData.concept);
-    // Une matière est partagée entre concepts ; sa carte d'occlusion et son reflet ne le sont pas.
-    if (occlusion || sousSonde.has(o)) o.material = o.material.clone();
+    const lumiere = lumieres.get(o.userData.concept);
+    // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
+    if (occlusion || lumiere || sousSonde.has(o)) o.material = o.material.clone();
     if (occlusion) o.material.aoMap = occlusion;
+    if (lumiere) Object.assign(o.material, { lightMap: lumiere.texture, lightMapIntensity: lumiere.echelle });
     if (sousSonde.has(o)) materiauxHeikhal.push(o.material);
   }
   if (!brut && !habillees.has(o.material.uuid)) {
@@ -401,6 +405,7 @@ gltf.scene.traverse((o) => {
   obstacles.push(o);
   if (!TRAVERSABLES.has(o.userData.concept)) murs.push(o);
 });
+const oeilAdapte = adaptation(obstacles);
 
 if (!brut) sonderHeikhal(renderer, scene, {
   kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
@@ -978,8 +983,16 @@ function ajusterEchelle(dt) {
 }
 
 const lieuOccupe = () => lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
+let lieuPresent = null;
+// La lampe garde l'éclat qu'on lui voyait avant que l'œil ne s'adapte.
 function accorderLampe(lieu) {
-  lampe.intensity += ((LAMPE_PAR_LIEU[lieu] ?? LAMPE_TETE) - lampe.intensity) * 0.25;
+  lampe.intensity += ((LAMPE_PAR_LIEU[lieu] ?? 0) / oeilAdapte.facteur - lampe.intensity) * 0.25;
+}
+// Le Heikhal et le Kodesh HaKodashim s'éclairent à leurs lampes, réglées sans adaptation.
+const SANS_ADAPTATION = new Set(["heikhal", "kodesh_hakodashim"]);
+function accorderExposition(dt) {
+  const facteur = SANS_ADAPTATION.has(lieuPresent) ? oeilAdapte.relacher(dt) : oeilAdapte.accorder(camera.position, dt);
+  renderer.toneMappingExposure = EXPOSITION.value = EXPOSITION_DEHORS * facteur;
 }
 
 let film = null;
@@ -988,7 +1001,11 @@ renderer.setAnimationLoop(() => {
   if (film) {
     film.avancer(dt);
     piedsY = camera.position.y - OEIL;
-    if (++image % 4 === 0) accorderLampe(lieuOccupe());
+    if (++image % 4 === 0) {
+      lieuPresent = lieuOccupe();
+      accorderLampe(lieuPresent);
+    }
+    accorderExposition(dt);
     ajusterEchelle(dt);
     dessiner(dt);
     return;
@@ -1015,14 +1032,15 @@ renderer.setAnimationLoop(() => {
       survol.style.left = `${p.clientX}px`;
       survol.style.top = `${p.clientY + 20}px`;
     }
-    const lieu = lieuOccupe();
-    accorderLampe(lieu);
+    lieuPresent = lieuOccupe();
+    accorderLampe(lieuPresent);
     position.textContent = brut
       ? `${(camera.position.x / AMA).toFixed(0)} · ` +
         `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
-      : (lieu ? CONCEPTS.get(lieu).nom : "");
-    planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieu);
+      : (lieuPresent ? CONCEPTS.get(lieuPresent).nom : "");
+    planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieuPresent);
   }
+  accorderExposition(dt);
   dessiner(dt);
 });
 

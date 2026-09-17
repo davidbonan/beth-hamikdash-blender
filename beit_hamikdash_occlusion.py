@@ -1,4 +1,4 @@
-"""Cuit l'occlusion du ciel des concepts de la visite dans Cycles : couche UV « Occlusion » et visite/occlusion/<concept>.webp."""
+"""Cuit dans Cycles, par concept de la visite, l'occlusion du ciel (visite/occlusion/) ou la lumière indirecte (visite/lumiere/), sur la couche UV « Occlusion »."""
 import math
 import pathlib
 import subprocess
@@ -12,6 +12,7 @@ from mathutils import Vector, geometry
 from mathutils.bvhtree import BVHTree
 
 SORTIE = pathlib.Path(__file__).resolve().parent / "visite" / "occlusion"
+SORTIE_LUMIERE = SORTIE.with_name("lumiere")
 COUCHE = "Occlusion"
 
 # Plus fin qu'un texel (barreaux, treillis du soreg), un objet prend l'ombre de ses faces cachées et vire au noir.
@@ -33,6 +34,26 @@ TOLERANCE = 0.0005
 RETRAIT = 0.98
 PAS_TEMOIN = 0.25
 PAS_MAX = 128
+
+# Le soleil de visite/visite.js et le ciel vu de visite/ciel.js, en repère Blender : (x, y, z) three = (x, z, -y).
+SOLEIL = Vector((150.0, -55.0, 58.0)).normalized()
+SOLEIL_COULEUR = 0xFFD6A0
+SOLEIL_FORCE = 4.9
+DIAMETRE_SOLEIL = 0.0093
+CIEL = {"haut": 0x4D7FB8, "bas": 0xD8DCD4, "sol": 0xA89C86, "horizon": 6.0}
+# Ciel clair, soleil à 20° : le ciel pose au sol de l'ordre du tiers de ce qu'y pose le soleil. Le dôme vu, lui, est réglé pour l'écran.
+DIFFUS = 0.33
+# Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
+SATURATION_CIEL = 0.5
+# La Menora et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
+LAMPES = {"flammes": {"couleur": 0xFFB36B, "intensite": 150.0, "hauteur": 0.35},
+          "braises": {"couleur": 0xFF7A2A, "intensite": 18.0 * 0.86, "hauteur": 0.0}}
+# Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
+ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
+ECHANTILLONS_LUMIERE = 1024
+TOUS = "tout"
+# Un rayon réfléchi par l'or vers la pierre tombe rarement, et fort : sans borne il laisse des étincelles dans la carte.
+BORNE_INDIRECTE = 4.0
 
 
 def aire(obj):
@@ -160,6 +181,119 @@ def preparer_cycles():
         scene.world = bpy.data.worlds.new("Occlusion")
 
 
+def lineaire(hexa):
+    srgb = np.array([(hexa >> decalage & 0xFF) / 255 for decalage in (16, 8, 0)])
+    return np.where(srgb <= 0.04045, srgb / 12.92, ((srgb + 0.055) / 1.055) ** 2.4)
+
+
+def radiance_du_ciel(directions):
+    hauteur = directions[:, 2:3]
+    haut, bas, sol = (lineaire(CIEL[teinte]) for teinte in ("haut", "bas", "sol"))
+    dessus = bas + (haut - bas) * np.clip(hauteur, 0.0, 1.0) ** 0.55
+    dessous = bas + (sol - bas) * np.minimum(-hauteur * CIEL["horizon"], 1.0)
+    vers_soleil = np.maximum(directions @ np.array(SOLEIL), 0.0)[:, None]
+    halo = np.array([1.0, 0.84, 0.58]) * (0.10 * vers_soleil ** 4 + 0.45 * vers_soleil ** 160)
+    radiance = np.where(hauteur > 0.0, dessus, dessous) + halo
+    gris = (radiance @ [0.2126, 0.7152, 0.0722])[:, None]
+    return gris + (radiance - gris) * SATURATION_CIEL
+
+
+def poser_ciel(scene, largeur=1024):
+    """Le ciel en image équirectangulaire, ramené à DIFFUS."""
+    hauteur = largeur // 2
+    azimut = (0.5 - (np.arange(largeur) + 0.5) / largeur) * 2 * np.pi
+    elevation = ((np.arange(hauteur) + 0.5) / hauteur - 0.5) * np.pi
+    az, el = np.meshgrid(azimut, elevation)
+    directions = np.stack([np.cos(el) * np.cos(az), np.cos(el) * np.sin(az), np.sin(el)], axis=-1).reshape(-1, 3)
+    radiance = radiance_du_ciel(directions)
+    angle_solide = (np.cos(el).ravel() * (2 * np.pi / largeur) * (np.pi / hauteur))[:, None]
+    au_sol = (radiance * np.maximum(directions[:, 2:3], 0.0) * angle_solide).sum(axis=0) @ [0.2126, 0.7152, 0.0722]
+    force = DIFFUS * SOLEIL_FORCE * SOLEIL.z / au_sol
+
+    image = bpy.data.images.new("Ciel", largeur, hauteur, float_buffer=True, is_data=True)
+    image.pixels.foreach_set(np.concatenate([radiance, np.ones((len(radiance), 1))], axis=1).astype(np.float32).ravel())
+    monde = bpy.data.worlds.new("Ciel")
+    monde.use_nodes = True
+    arbre = monde.node_tree
+    texture = arbre.nodes.new("ShaderNodeTexEnvironment")
+    texture.image = image
+    fond = arbre.nodes["Background"]
+    fond.inputs["Strength"].default_value = force
+    arbre.links.new(texture.outputs["Color"], fond.inputs["Color"])
+    scene.world = monde
+    print(f"  ciel à {force:.2f} fois le dôme vu : {au_sol * force:.2f} au sol contre {SOLEIL_FORCE * SOLEIL.z:.2f} de soleil")
+
+
+def poser_soleil(scene):
+    lampe = bpy.data.lights.new("Soleil", "SUN")
+    lampe.energy = SOLEIL_FORCE
+    lampe.color = tuple(lineaire(SOLEIL_COULEUR))
+    lampe.angle = DIAMETRE_SOLEIL
+    soleil = bpy.data.objects.new("Soleil", lampe)
+    soleil.rotation_euler = SOLEIL.to_track_quat("Z", "Y").to_euler()
+    scene.collection.objects.link(soleil)
+    return soleil
+
+
+# Une lampe ponctuelle de Cycles de P watts a l'intensité P / 4π : c'est ainsi qu'elle rend les candela de la visite.
+def poser_lampes(scene, points):
+    sources = []
+    for nature, positions in points.items():
+        if not positions:
+            continue
+        reglage = LAMPES[nature]
+        x, y, z = np.mean(positions, axis=0)
+        lampe = bpy.data.lights.new(nature, "POINT")
+        lampe.energy = 4 * math.pi * reglage["intensite"]
+        lampe.color = tuple(lineaire(reglage["couleur"]))
+        lampe.shadow_soft_size = 0.0
+        lampe.use_soft_falloff = False
+        source = bpy.data.objects.new(nature, lampe)
+        source.location = (x, -z, y + reglage["hauteur"])
+        scene.collection.objects.link(source)
+        sources.append(source)
+    return sources
+
+
+def accorder_matieres():
+    """L'albédo de la visite, et aucune émission : les lampes de la visite sont posées à part, en lampes."""
+    for mat in bpy.data.materials:
+        if mat.node_tree is None:
+            continue
+        for noeud in mat.node_tree.nodes:
+            if noeud.bl_idname == "ShaderNodeBsdfPrincipled":
+                noeud.inputs["Emission Strength"].default_value = 0.0
+            elif noeud.bl_idname == "ShaderNodeEmission":
+                noeud.inputs["Strength"].default_value = 0.0
+        facteur = ALBEDO_VISITE.get(mat.name)
+        bsdf = next((n for n in mat.node_tree.nodes if n.bl_idname == "ShaderNodeBsdfPrincipled"), None)
+        if facteur is None or bsdf is None:
+            continue
+        entree = bsdf.inputs["Base Color"]
+        produit = mat.node_tree.nodes.new("ShaderNodeMixRGB")
+        produit.blend_type = "MULTIPLY"
+        produit.inputs["Factor"].default_value = 1.0
+        produit.inputs["Color2"].default_value = (*facteur, 1.0)
+        if entree.links:
+            mat.node_tree.links.new(entree.links[0].from_socket, produit.inputs["Color1"])
+        else:
+            produit.inputs["Color1"].default_value = entree.default_value
+        mat.node_tree.links.new(produit.outputs["Color"], entree)
+
+
+def eclairer(scene, points):
+    """Ciel, soleil, lampes et matières de la cuisson de lumière ; renvoie les sources, éteintes."""
+    poser_ciel(scene)
+    sources = [poser_soleil(scene), *poser_lampes(scene, points)]
+    for source in sources:
+        source.hide_render = True
+    accorder_matieres()
+    scene.cycles.sample_clamp_indirect = BORNE_INDIRECTE
+    scene.cycles.caustics_reflective = False
+    scene.cycles.caustics_refractive = False
+    return sources
+
+
 def deplier(obj, taille):
     obj.data.uv_layers.active = obj.data.uv_layers.new(name=COUCHE)
     for o in bpy.context.view_layer.objects:
@@ -173,9 +307,7 @@ def deplier(obj, taille):
     return len(obj.data.uv_layers) - 1
 
 
-def cuire(obj, taille, portee):
-    bpy.context.scene.world.light_settings.distance = portee
-    image = bpy.data.images.new(obj.name, taille, taille, float_buffer=True, is_data=True)
+def cuire(obj, image, **passe):
     noeuds = []
     for fente in obj.material_slots:
         if fente.material is None or fente.material.node_tree is None:
@@ -185,49 +317,129 @@ def cuire(obj, taille, portee):
         noeud.image = image
         arbre.nodes.active = noeud
         noeuds.append((arbre, noeud))
-    bpy.ops.object.bake(type="AO", margin=4, margin_type="EXTEND", use_clear=True, uv_layer=COUCHE)
+    bpy.ops.object.bake(margin=4, margin_type="EXTEND", use_clear=True, uv_layer=COUCHE, **passe)
     for arbre, noeud in noeuds:
         arbre.nodes.remove(noeud)
-    return image
+    pixels = np.empty(len(image.pixels), dtype=np.float32)
+    image.pixels.foreach_get(pixels)
+    return pixels.reshape(image.size[1], image.size[0], 4)
+
+
+def cuire_occlusion_de(obj, taille, portee):
+    bpy.context.scene.world.light_settings.distance = portee
+    image = bpy.data.images.new(obj.name, taille, taille, float_buffer=True, is_data=True)
+    pixels = cuire(obj, image, type="AO")
+    bpy.data.images.remove(image)
+    return pixels
+
+
+# La passe Diffuse sans couleur rend E/π, et la lightMap de three attend l'irradiance E.
+def cuire_lumiere_de(obj, taille, sources):
+    """Le ciel qui arrive sans rebond, et tout ce qui rebondit, sources comprises ; leur lumière directe reste à la visite."""
+    scene = bpy.context.scene
+    scene.cycles.samples = ECHANTILLONS_LUMIERE
+    image = bpy.data.images.new(obj.name, taille, taille, float_buffer=True, is_data=True)
+    for source in sources:
+        source.hide_render = False
+    rebonds = cuire(obj, image, type="DIFFUSE", pass_filter={"INDIRECT"})[..., :3].copy()
+    for source in sources:
+        source.hide_render = True
+    ciel = cuire(obj, image, type="DIFFUSE", pass_filter={"DIRECT"})[..., :3]
+    bpy.data.images.remove(image)
+    scene.cycles.samples = ECHANTILLONS
+    return math.pi * (rebonds + ciel)
 
 
 # Cuite au double puis réduite : la réduction efface le bruit de Cycles, qui doublait le poids du WebP.
-def ecrire(image, chemin, taille, brut):
-    pixels = np.empty(len(image.pixels), dtype=np.float32)
-    image.pixels.foreach_get(pixels)
-    pixels = pixels.reshape(-1, 4)
-    pixels[:, 1:3] = pixels[:, :1]
-    pixels[:, 3] = 1.0
-    png = brut / f"{chemin.stem}.png"
-    sortie = bpy.data.images.new(chemin.stem, image.size[0], image.size[1], is_data=True)
-    sortie.pixels.foreach_set(np.clip(pixels, 0.0, 1.0).ravel())
+def ecrire_png(pixels, png):
+    hauteur, largeur = pixels.shape[:2]
+    sortie = bpy.data.images.new(png.stem, largeur, hauteur, is_data=True)
+    sortie.pixels.foreach_set(np.clip(pixels, 0.0, 1.0).astype(np.float32).ravel())
     sortie.filepath_raw = str(png)
     sortie.file_format = "PNG"
     sortie.save()
     bpy.data.images.remove(sortie)
-    bpy.data.images.remove(image)
+
+
+def ecrire(pixels, chemin, taille, brut):
+    pixels = pixels.copy()
+    pixels[..., 1:3] = pixels[..., :1]
+    pixels[..., 3] = 1.0
+    png = brut / f"{chemin.stem}.png"
+    ecrire_png(pixels, png)
     subprocess.run(["cwebp", "-quiet", "-noalpha", "-resize", str(taille), str(taille), "-q", "85",
                     str(png), "-o", str(chemin)], check=True)
 
 
-def cuire_occlusion(fusionnes):
-    """Cuit les concepts retenus ; renvoie {concept: {"carte", "canal"}} pour reperes.json."""
-    SORTIE.mkdir(parents=True, exist_ok=True)
-    for ancienne in SORTIE.glob("*.webp"):
+# Réduite en linéaire, avant l'encodage : moyenné après, le bruit de Cycles assombrirait la carte. Renvoie l'échelle à rendre à la visite.
+def ecrire_lumiere(irradiance, chemin, brut):
+    hauteur, largeur = irradiance.shape[:2]
+    reduite = irradiance.reshape(hauteur // 2, 2, largeur // 2, 2, 3).mean(axis=(1, 3))
+    echelle = max(math.ceil(np.percentile(reduite, 99.9) * 4) / 4, 0.25)
+    relative = np.clip(reduite / echelle, 0.0, 1.0)
+    srgb = np.where(relative <= 0.0031308, relative * 12.92, 1.055 * relative ** (1 / 2.4) - 0.055)
+    png = brut / f"{chemin.stem}.png"
+    ecrire_png(np.concatenate([srgb, np.ones((*srgb.shape[:2], 1))], axis=-1), png)
+    subprocess.run(["cwebp", "-quiet", "-noalpha", "-sharp_yuv", "-q", "90", str(png), "-o", str(chemin)], check=True)
+    return echelle
+
+
+def vider(dossier):
+    dossier.mkdir(parents=True, exist_ok=True)
+    for ancienne in dossier.glob("*.webp"):
         ancienne.unlink()
+
+
+def garder_occlusions(gardees, ident):
+    """La carte déjà cuite d'un concept ; valable tant que sa géométrie, donc son dépliage, n'a pas changé."""
+    carte = gardees.get(ident)
+    if carte is None or not (SORTIE.parent / carte["carte"]).exists():
+        raise ValueError(f"{ident} n'a pas de carte d'occlusion à garder : relancer la cuisson complète")
+    return carte
+
+
+def cuire_occlusion(fusionnes, eclaires=frozenset(), gardees=None, lampes=None):
+    """Cuit les concepts retenus, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
+
+    `gardees` (l'`occlusion` d'un reperes.json) garde ces cartes-là au lieu de les recuire : seule la lumière cuit.
+    `lampes` : {"flammes": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
+    Renvoie ({concept: {"carte", "canal"}}, {concept: {"carte", "canal", "echelle"}}) pour reperes.json."""
     choisis = list(retenus(fusionnes))
+    if TOUS in eclaires:
+        eclaires = {ident for ident, _, _ in choisis}
+    inconnus = set(eclaires) - {ident for ident, _, _ in choisis}
+    if inconnus:
+        raise ValueError(f"lumière demandée sur des concepts qui ne se cuisent pas : {sorted(inconnus)}")
+    occlusions, lumieres = {}, {}
+    if gardees is None:
+        vider(SORTIE)
+    else:
+        occlusions = {ident: garder_occlusions(gardees, ident) for ident, _, _ in choisis if ident not in eclaires}
+        for ident in eclaires:
+            (SORTIE / f"{ident}.webp").unlink(missing_ok=True)
+    vider(SORTIE_LUMIERE)
     separer_collees([obj for _, obj, _ in choisis])
     preparer_cycles()
-    cartes = {}
+    sources = eclairer(bpy.context.scene, lampes or {}) if eclaires else []
     debut = time.time()
     with tempfile.TemporaryDirectory() as brut:
         for ident, obj, taille in choisis:
-            portee = PORTEE_SOUS_SONDE if ident in SOUS_SONDE else PORTEE
             canal = deplier(obj, 2 * taille)
-            chemin = SORTIE / f"{ident}.webp"
-            ecrire(cuire(obj, 2 * taille, portee), chemin, taille, pathlib.Path(brut))
-            cartes[ident] = {"carte": f"occlusion/{ident}.webp", "canal": canal}
-            print(f"  occlusion {ident:26s} {taille:5d} px  {portee:.0f} m  {chemin.stat().st_size / 1e3:5.0f} ko")
-    poids = sum(f.stat().st_size for f in SORTIE.glob("*.webp")) / 1e6
-    print(f"  {len(cartes)} cartes d'occlusion, {poids:.1f} Mo, {time.time() - debut:.0f} s")
-    return cartes
+            depart = time.time()
+            if ident in eclaires:
+                chemin = SORTIE_LUMIERE / f"{ident}.webp"
+                echelle = ecrire_lumiere(cuire_lumiere_de(obj, 2 * taille, sources), chemin, pathlib.Path(brut))
+                lumieres[ident] = {"carte": f"lumiere/{ident}.webp", "canal": canal, "echelle": echelle}
+                print(f"  lumière   {ident:26s} {taille:5d} px  ×{echelle:.2f}  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s")
+            elif gardees is not None:
+                if occlusions[ident]["canal"] != canal:
+                    raise ValueError(f"{ident} : le dépliage a changé de canal, relancer la cuisson complète")
+            else:
+                portee = PORTEE_SOUS_SONDE if ident in SOUS_SONDE else PORTEE
+                chemin = SORTIE / f"{ident}.webp"
+                ecrire(cuire_occlusion_de(obj, 2 * taille, portee), chemin, taille, pathlib.Path(brut))
+                occlusions[ident] = {"carte": f"occlusion/{ident}.webp", "canal": canal}
+                print(f"  occlusion {ident:26s} {taille:5d} px  {portee:.0f} m  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s")
+    poids = sum(f.stat().st_size for dossier in (SORTIE, SORTIE_LUMIERE) for f in dossier.glob("*.webp")) / 1e6
+    print(f"  {len(occlusions)} cartes d'occlusion, {len(lumieres)} de lumière, {poids:.1f} Mo, {time.time() - debut:.0f} s")
+    return occlusions, lumieres

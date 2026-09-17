@@ -948,8 +948,9 @@ export function habiller(materiau, horloges, jeux) {
       // La teinte d'un minéral se pose APRÈS l'éclairage : son exposant dépend de la
       // clarté reçue. Le relief, lui, se tempère sur la lumière du ciel seule — celle
       // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
+      // La lumière cuite remplace le ciel sans direction, et prend le relief que ce ciel donne à la normale du grain.
       .replace("#include <lights_fragment_end>", /* glsl */`
-        #ifdef TEMPERE
+        #if defined(TEMPERE) || defined(USE_LIGHTMAP)
           const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
           vec3 cielPlat = getAmbientLightIrradiance(ambientLightColor);
           #if NUM_HEMI_LIGHTS > 0
@@ -959,20 +960,37 @@ export function habiller(materiau, horloges, jeux) {
           #if defined(USE_ENVMAP) && defined(STANDARD) && defined(ENVMAP_TYPE_CUBE_UV)
             cielPlat += getIBLIrradiance(nonPerturbedNormal);
           #endif
-          float mTemperance = temperance(dot(reflectedLight.directDiffuse
-                                             + cielPlat * BRDF_Lambert(material.diffuseColor), LUMA));
+          vec3 mSansDirection = cielPlat;
+          vec3 mCielRelief = irradiance + iblIrradiance;
+          #ifdef USE_LIGHTMAP
+            mSansDirection = lightMapIrradiance;
+            mCielRelief -= lightMapIrradiance;
+          #endif
           // Sans ciel (la sonde du Heikhal l'éteint), 0/0 : les GPU d'iPhone en tirent un NaN que le halo étale.
           float mCiel = dot(cielPlat, LUMA);
-          float mReliefCiel = mCiel > 1e-4
-            ? pow(max(dot(irradiance + iblIrradiance, LUMA), 1e-4) / mCiel, mTemperance - 1.0)
-            : 1.0;
+          float mRelief = mCiel > 1e-4 ? max(dot(mCielRelief, LUMA), 1e-4) / mCiel : 1.0;
+        #endif
+        #ifdef TEMPERE
+          float mTemperance = temperance(dot(reflectedLight.directDiffuse
+                                             + mSansDirection * BRDF_Lambert(material.diffuseColor), LUMA));
+          float mReliefCiel = pow(mRelief, mTemperance - 1.0);
           irradiance *= mReliefCiel;
           iblIrradiance *= mReliefCiel;
+        #endif
+        #ifdef USE_LIGHTMAP
+          #ifdef TEMPERE
+            vec3 mCuite = lightMapIrradiance * mRelief * mReliefCiel * mPenombre;
+          #else
+            vec3 mCuite = lightMapIrradiance * mRelief * mPenombre;
+          #endif
         #endif
         irradiance *= mPenombre;
         iblIrradiance *= mPenombre;
         radiance *= mPenombre;
         #include <lights_fragment_end>
+        #ifdef USE_LIGHTMAP
+          reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
+        #endif
         #ifdef TEMPERE
           vec3 mTeinteVue = pow(mTeinte, vec3(mTemperance));
           reflectedLight.directDiffuse *= mTeinteVue;

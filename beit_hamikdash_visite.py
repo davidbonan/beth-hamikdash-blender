@@ -11,9 +11,13 @@ Il produit deux fichiers :
     visite/temple.glb    la géométrie, un maillage par concept
     visite/reperes.json  l'emprise de chaque concept, les points d'entrée et les cartes d'occlusion
     visite/occlusion/    l'occlusion du ciel cuite par Cycles (`beit_hamikdash_occlusion.py`)
+    visite/lumiere/      la lumière indirecte cuite par Cycles, pour les concepts de `--lumiere`
 
 `-- --sans-occlusion` saute la cuisson (quelques minutes) : le .glb sort alors sans couche
 d'occlusion, et reperes.json sans cartes, ce qui reste cohérent.
+`-- --lumiere azara,oulam` cuit ces concepts en lumière indirecte plutôt qu'en occlusion, `-- --lumiere tout` tous.
+`-- --lumiere-seule` ne cuit qu'elle et garde les cartes d'occlusion du reperes.json en place : la
+géométrie ne doit pas avoir changé depuis leur cuisson.
 
 Le lien géométrie ↔ encyclopédie passe par `visite/concepts.json` : chaque concept y
 déclare les préfixes de noms d'objets qui lui appartiennent, le préfixe le plus long
@@ -242,6 +246,10 @@ def lampes(prefixe):
             for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
+def option(nom):
+    return sys.argv[sys.argv.index(nom) + 1] if nom in sys.argv else None
+
+
 def main():
     DOSSIER.mkdir(exist_ok=True)
     regles = concepts()
@@ -272,7 +280,11 @@ def main():
         print(f"  {ident:26s} {len(objets):5d} volumes")
 
     # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
-    occlusion = {} if "--sans-occlusion" in sys.argv else cuire_occlusion(fusionnes)
+    eclaires = frozenset(filter(None, (option("--lumiere") or "").split(",")))
+    gardees = (json.loads((DOSSIER / "reperes.json").read_text(encoding="utf-8"))["occlusion"]
+               if "--lumiere-seule" in sys.argv else None)
+    occlusion, lumiere = ({}, {}) if "--sans-occlusion" in sys.argv else cuire_occlusion(
+        fusionnes, eclaires, gardees, {"flammes": flammes, "braises": braises})
 
     for mat in bpy.data.materials:
         aplatir(mat)
@@ -313,6 +325,7 @@ def main():
         "flammes": flammes,
         "braises": braises,
         "occlusion": occlusion,
+        "lumiere": lumiere,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))

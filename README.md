@@ -34,8 +34,8 @@ dernière à droite.*
 | `beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
 | `beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre. Ne reconstruit rien. |
 | `beit_hamikdash_marche.py` | Rejoue la règle de marche de la visite sur une grille posée sur la scène et dit où l'on passe à pied, où l'on bute et pourquoi — marche trop haute, vide, fente, mur. Ne reconstruit rien. |
-| `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun, les points d'entrée et l'occlusion cuite. Lit le .blend, ne le réécrit pas. |
-| `beit_hamikdash_occlusion.py` | L'occlusion du ciel cuite par Cycles sur l'architecture de la visite : une couche UV et une carte WebP par concept. Appelé par le précédent. |
+| `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun, les points d'entrée et la lumière cuite. Lit le .blend, ne le réécrit pas. |
+| `beit_hamikdash_occlusion.py` | La lumière indirecte (ou l'occlusion du ciel) cuite par Cycles sur l'architecture de la visite : une couche UV et une carte WebP par concept. Appelé par le précédent. |
 | `beit_hamikdash_figures.py` | Les figurants de la visite — cohanim au Kiyor, au kevesh et au pied de l'autel, douze Léviim sur le Doukhan, fidèles dans l'Ezrat Nashim. Corps MakeHuman (CC0), vêtus et animés ; écrit `visite/figures.glb` et `visite/figures.json`. Ni le .blend ni le film ne les voient. |
 | `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
 | `beit_hamikdash_keruvim.py` | Les deux keruvim de la kaporet : enfants MakeHuman agenouillés, mains jointes, ailes plumées ; écrit `keruvim.blend`, que le blockout lit. À relancer après toute modification de ce script, puis reconstruire la scène. |
@@ -93,7 +93,8 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur. |
-| `visite/occlusion.js` | Pose les cartes d'occlusion cuites en `aoMap` : elles n'assombrissent que la lumière sans direction. |
+| `visite/occlusion.js` | Charge les cartes cuites : la lumière indirecte, posée en `lightMap`, et l'occlusion, en `aoMap`. |
+| `visite/adaptation.js` | L'œil qui s'habitue : l'exposition monte à mesure que le ciel se ferme autour du visiteur. |
 | `visite/sonde.js` | Le reflet du Heikhal : la salle rendue une fois depuis le milieu des kelim, éclairée par la seule Menora, remplace le ciel pour ce qui s'y trouve. |
 | `visite/concepts.json` | **La charnière.** Un concept par entrée : son identifiant, sa zone, les préfixes de noms d'objets Blender qui lui appartiennent, et `lieu` quand on s'y tient — la barre en donne alors le nom et le plan le dessine. |
 | `visite/contenu_a.json`, `_b`, `_c` | L'encyclopédie : résumé, cotes, sources. Trois fichiers parce qu'ils ont été relevés en trois passes ; le viewer les fusionne au chargement. |
@@ -102,11 +103,12 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/langue.js` | La langue : le choix au premier passage, retenu dans le navigateur, et le sélecteur à drapeau de la barre. |
 | `visite/memoire.js` | Ce que le navigateur retient d'une visite à l'autre — la langue, l'initiation suivie —, sans casser quand le stockage est refusé. |
 | `visite/temple.glb` | Géométrie exportée, compressée meshopt. Artefact — se regénère, et son poids avec : l'export l'annonce en dernière ligne. |
-| `visite/reperes.json` | Emprise de chaque concept, entrées du menu « Aller à… », vues que « Un élément… » prend pour les concepts que le recul automatique cadre mal (les gros volumes, les creux souterrains), et position des flammes de la Menora, cartes d'occlusion et couche UV de chacune. Chaque entrée ou vue nomme ce qu'elle `cadre` ; sans position, le navigateur recule jusqu'à le faire tenir dans le champ. Artefact. |
-| `visite/occlusion/` | Une carte d'occlusion par concept d'architecture, WebP. Artefact de l'export. |
+| `visite/reperes.json` | Emprise de chaque concept, entrées du menu « Aller à… », vues que « Un élément… » prend pour les concepts que le recul automatique cadre mal (les gros volumes, les creux souterrains), et position des flammes de la Menora, cartes de lumière et d'occlusion et couche UV de chacune. Chaque entrée ou vue nomme ce qu'elle `cadre` ; sans position, le navigateur recule jusqu'à le faire tenir dans le champ. Artefact. |
+| `visite/lumiere/` | Une carte de lumière indirecte par concept d'architecture, WebP. Artefact de l'export. |
+| `visite/occlusion/` | Une carte d'occlusion par concept que l'export n'a pas cuit en lumière, WebP. Artefact de l'export. |
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py   # regénère temple.glb, reperes.json, occlusion/
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout   # regénère temple.glb, reperes.json, lumiere/
 cd visite && python3 -m http.server 8777                       # puis http://127.0.0.1:8777/
 ```
 
@@ -895,6 +897,43 @@ version précédente, même glb, même pose.
 - **Non mesuré** : le temps par image. Rien n'est retiré — la SSAO de `chaine.js` reste,
   pour les contacts et les figurants — et la cuisson ajoute une lecture de texture ; aucun
   gain de performance n'est à attendre de ce changement.
+
+### La lumière indirecte cuite (17/09)
+
+L'occlusion assombrissait le ciel sans rien renvoyer : une ombre ne recevait jamais le
+soleil que lui rendent les murs voisins, et la lumière hémisphérique, l'appoint et la
+couleur `sol` du ciel en tenaient lieu. `-- --lumiere tout` cuit à la place, par concept,
+l'irradiance E que la visite n'a pas : le ciel qui arrive sans rebond, et tout ce qui
+rebondit — soleil, Menora, braises. Le soleil direct et les lampes restent en temps réel.
+
+- **Unités vérifiées sur plans témoins.** La passe Diffuse de Cycles sans couleur rend E/π,
+  la `lightMap` de three attend E ; une lampe ponctuelle de P watts a l'intensité P / 4π.
+  Ciel au sol 0,55 pour 0,55 visé, soleil 1,674 pour 1,672 attendu.
+- **Le ciel qui éclaire** est le dôme vu, désaturé de moitié et ramené au tiers du soleil
+  au sol (`DIFFUS`, ordre de grandeur d'un ciel clair, non mesuré) : entier, il bleuissait
+  les ombres des cours.
+- **L'albédo de la visite.** Rendus depuis la même caméra, la visite est 7 à 12 % plus
+  claire que Cycles sur le marbre d'Hérode et le dallage : la cuisson prend ces rapports, pour que le rebond ait la couleur qu'on voit. Le jaune du rebond sous
+  les assises de l'Oulam n'en vient pas : c'est l'ambre du soleil renvoyé par le marbre.
+- **Dans `matieres.js`,** la carte remplace l'hémisphère, le diffus de l'environnement et
+  l'occlusion ; elle prend le relief que le ciel donne à la normale du grain, tempéré comme
+  avant. Le reflet de l'environnement et la sonde du Heikhal restent.
+- **L'œil s'habitue.** Cuite juste, une salle couverte est noire à l'exposition du plein
+  soleil — la Lishkat HaGazit était devenue noire, et une exposition ×5 la rendait lisible ;
+  le ciel hémisphérique la remplissait avant. Trois rayons par image, sur 48 directions de la demi-sphère haute et
+  40 m de portée, mesurent la part du ciel ouverte autour de l'œil (0,15 ms sur un Mac) :
+  de 0 à 0,10 dans les salles, de 0,19 à 0,48 dans les cours. L'exposition monte jusqu'à
+  ×5 de 0,2 à 0,02, en fondu d'une seconde. Le Heikhal et le Kodesh HaKodashim, réglés à
+  leurs lampes, n'en ont pas. Vue du portique, une salle reste sombre : c'est dedans que
+  l'œil s'y fait.
+- **La lampe de tête s'éteint dehors et sous l'Oulam**, où elle ne posait plus qu'une tache ;
+  elle reste dans les ta'im et sous terre, où rien n'entre, divisée par l'adaptation pour
+  garder son éclat, et à 0,6 et 0,5 dans le Heikhal — dont l'emprise couvre aussi les
+  cellules — et le Kodesh HaKodashim.
+- **Coût.** 53 cartes, 2,1 Mo de WebP (1,8 Mo d'occlusion avant), 68 min de cuisson. `--lumiere-seule` recuit la lumière en gardant les occlusions — 10 min au test : le dépliage ressort à l'identique (4 coordonnées sur 3,5 millions bougent d'un
+  demi-texel).
+- **Non vérifié** : le rendu et le temps par image sur téléphone ; les intérieurs des lishkot ;
+  le feu du Beit HaMoked, qui n'a pas de lampe dans la visite et n'éclaire donc rien.
 
 ## Licence
 

@@ -12,7 +12,8 @@ rsync -a --delete \
   --include='*.js' --include='*.json' --include='mini_*.png' \
   --include='matieres/' --include='matieres/*.webp' \
   --include='plans/' --include='plans/*.webp' \
-  --include='occlusion/' --include='occlusion/*.webp' --exclude='*' \
+  --include='occlusion/' --include='occlusion/*.webp' \
+  --include='lumiere/' --include='lumiere/*.webp' --exclude='*' \
   "$racine/visite/" "$dist/visite/"
 
 python3 "$racine/empreintes.py" "$dist"
