@@ -29,8 +29,10 @@ boîtes d'un mur percé.
 import json
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import bpy
 
 RACINE = pathlib.Path(__file__).resolve().parent
@@ -240,12 +242,27 @@ def lampes(prefixe):
             for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
+def livrer(chantier):
+    """Remplace l'export servi par celui du chantier, cartes d'abord, reperes.json en dernier : la visite reste servie pendant la cuisson."""
+    reperes = json.loads((chantier / "reperes.json").read_text(encoding="utf-8"))
+    cartes = {c["carte"] for nature in ("occlusion", "lumiere") for c in reperes[nature].values()}
+    for carte in chantier.glob("*/*.webp"):
+        destination = DOSSIER / carte.relative_to(chantier)
+        destination.parent.mkdir(exist_ok=True)
+        shutil.move(carte, destination)
+    shutil.move(chantier / "temple.glb", DOSSIER / "temple.glb")
+    shutil.move(chantier / "reperes.json", DOSSIER / "reperes.json")
+    for nature in ("occlusion", "lumiere"):
+        for ancienne in (DOSSIER / nature).glob("*.webp"):
+            if f"{nature}/{ancienne.name}" not in cartes:
+                ancienne.unlink()
+
+
 def option(nom):
     return sys.argv[sys.argv.index(nom) + 1] if nom in sys.argv else None
 
 
-def main():
-    DOSSIER.mkdir(exist_ok=True)
+def exporter(chantier):
     regles = concepts()
     connus = {ident for _, ident in regles}
     flammes, braises = lampes("Menora_flamme"), lampes("Machta_braise")
@@ -278,7 +295,7 @@ def main():
     gardees = (json.loads((DOSSIER / "reperes.json").read_text(encoding="utf-8"))["occlusion"]
                if "--lumiere-seule" in sys.argv else None)
     occlusion, lumiere = ({}, {}) if "--sans-occlusion" in sys.argv else cuire_occlusion(
-        fusionnes, eclaires, gardees, {"flammes": flammes, "braises": braises})
+        fusionnes, chantier, eclaires, gardees, {"flammes": flammes, "braises": braises})
 
     for mat in bpy.data.materials:
         aplatir(mat)
@@ -286,7 +303,7 @@ def main():
     vues = [en_metres(v, emprises) for v in VUES]
 
     bpy.ops.export_scene.gltf(
-        filepath=str(DOSSIER / "temple.glb"),
+        filepath=str(chantier / "temple.glb"),
         export_format="GLB",
         export_extras=True,
         export_yup=True,
@@ -308,9 +325,9 @@ def main():
         export_animations=False,
     )
 
-    comprimer(DOSSIER / "temple.glb")
+    comprimer(chantier / "temple.glb")
 
-    (DOSSIER / "reperes.json").write_text(json.dumps({
+    (chantier / "reperes.json").write_text(json.dumps({
         "ama": AMA,
         "emprises": emprises,
         "entrees": entrees,
@@ -335,8 +352,15 @@ def main():
             print(f"    {racine:44s} {combien:5d}")
     if absents:
         print(f"\n{len(absents)} concepts déclarés sans géométrie : {', '.join(absents)}")
-    taille = (DOSSIER / "temple.glb").stat().st_size / 1e6
+    taille = (chantier / "temple.glb").stat().st_size / 1e6
     print(f"\n{len(groupes)} maillages · temple.glb {taille:.1f} Mo")
+
+
+def main():
+    DOSSIER.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="visite_") as chantier:
+        exporter(pathlib.Path(chantier))
+        livrer(pathlib.Path(chantier))
 
 
 if __name__ == "__main__":

@@ -11,8 +11,7 @@ import numpy as np
 from mathutils import Vector, geometry
 from mathutils.bvhtree import BVHTree
 
-SORTIE = pathlib.Path(__file__).resolve().parent / "visite" / "occlusion"
-SORTIE_LUMIERE = SORTIE.with_name("lumiere")
+VISITE = pathlib.Path(__file__).resolve().parent / "visite"
 COUCHE = "Occlusion"
 
 # Plus fin qu'un texel (barreaux, treillis du soreg), un objet prend l'ombre de ses faces cachées et vire au noir.
@@ -50,7 +49,8 @@ LAMPES = {"flammes": {"couleur": 0xFFB36B, "intensite": 150.0, "hauteur": 0.35},
           "braises": {"couleur": 0xFF7A2A, "intensite": 18.0 * 0.86, "hauteur": 0.0}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
-ECHANTILLONS_LUMIERE = 1024
+# Mesuré contre 2048 sur la carte réduite : à 512 l'Oulam s'écarte de 1,4 niveau sRGB en moyenne, contre 1,2 à 1024, en 2,5 fois moins de temps.
+ECHANTILLONS_REBONDS = 512
 TOUS = "tout"
 # Un rayon réfléchi par l'or vers la pierre tombe rarement, et fort : sans borne il laisse des étincelles dans la carte.
 BORNE_INDIRECTE = 4.0
@@ -337,16 +337,17 @@ def cuire_occlusion_de(obj, taille, portee):
 def cuire_lumiere_de(obj, taille, sources):
     """Le ciel qui arrive sans rebond, et tout ce qui rebondit, sources comprises ; leur lumière directe reste à la visite."""
     scene = bpy.context.scene
-    scene.cycles.samples = ECHANTILLONS_LUMIERE
+    scene.cycles.samples = ECHANTILLONS_REBONDS
     image = bpy.data.images.new(obj.name, taille, taille, float_buffer=True, is_data=True)
     for source in sources:
         source.hide_render = False
     rebonds = cuire(obj, image, type="DIFFUSE", pass_filter={"INDIRECT"})[..., :3].copy()
     for source in sources:
         source.hide_render = True
+    # Le ciel direct, échantillonné par importance, ne bouge plus au-delà de 256.
+    scene.cycles.samples = ECHANTILLONS
     ciel = cuire(obj, image, type="DIFFUSE", pass_filter={"DIRECT"})[..., :3]
     bpy.data.images.remove(image)
-    scene.cycles.samples = ECHANTILLONS
     return math.pi * (rebonds + ciel)
 
 
@@ -384,22 +385,16 @@ def ecrire_lumiere(irradiance, chemin, brut):
     return echelle
 
 
-def vider(dossier):
-    dossier.mkdir(parents=True, exist_ok=True)
-    for ancienne in dossier.glob("*.webp"):
-        ancienne.unlink()
-
-
 def garder_occlusions(gardees, ident):
     """La carte déjà cuite d'un concept ; valable tant que sa géométrie, donc son dépliage, n'a pas changé."""
     carte = gardees.get(ident)
-    if carte is None or not (SORTIE.parent / carte["carte"]).exists():
+    if carte is None or not (VISITE / carte["carte"]).exists():
         raise ValueError(f"{ident} n'a pas de carte d'occlusion à garder : relancer la cuisson complète")
     return carte
 
 
-def cuire_occlusion(fusionnes, eclaires=frozenset(), gardees=None, lampes=None):
-    """Cuit les concepts retenus, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
+def cuire_occlusion(fusionnes, chantier, eclaires=frozenset(), gardees=None, lampes=None):
+    """Cuit les concepts retenus dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
     `gardees` (l'`occlusion` d'un reperes.json) garde ces cartes-là au lieu de les recuire : seule la lumière cuit.
     `lampes` : {"flammes": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
@@ -411,13 +406,11 @@ def cuire_occlusion(fusionnes, eclaires=frozenset(), gardees=None, lampes=None):
     if inconnus:
         raise ValueError(f"lumière demandée sur des concepts qui ne se cuisent pas : {sorted(inconnus)}")
     occlusions, lumieres = {}, {}
-    if gardees is None:
-        vider(SORTIE)
-    else:
+    if gardees is not None:
         occlusions = {ident: garder_occlusions(gardees, ident) for ident, _, _ in choisis if ident not in eclaires}
-        for ident in eclaires:
-            (SORTIE / f"{ident}.webp").unlink(missing_ok=True)
-    vider(SORTIE_LUMIERE)
+    sortie, sortie_lumiere = chantier / "occlusion", chantier / "lumiere"
+    sortie.mkdir(parents=True, exist_ok=True)
+    sortie_lumiere.mkdir(parents=True, exist_ok=True)
     separer_collees([obj for _, obj, _ in choisis])
     preparer_cycles()
     sources = eclairer(bpy.context.scene, lampes or {}) if eclaires else []
@@ -427,19 +420,19 @@ def cuire_occlusion(fusionnes, eclaires=frozenset(), gardees=None, lampes=None):
             canal = deplier(obj, 2 * taille)
             depart = time.time()
             if ident in eclaires:
-                chemin = SORTIE_LUMIERE / f"{ident}.webp"
+                chemin = sortie_lumiere / f"{ident}.webp"
                 echelle = ecrire_lumiere(cuire_lumiere_de(obj, 2 * taille, sources), chemin, pathlib.Path(brut))
                 lumieres[ident] = {"carte": f"lumiere/{ident}.webp", "canal": canal, "echelle": echelle}
-                print(f"  lumière   {ident:26s} {taille:5d} px  ×{echelle:.2f}  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s")
+                print(f"  lumière   {ident:26s} {taille:5d} px  ×{echelle:.2f}  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s", flush=True)
             elif gardees is not None:
                 if occlusions[ident]["canal"] != canal:
                     raise ValueError(f"{ident} : le dépliage a changé de canal, relancer la cuisson complète")
             else:
                 portee = PORTEE_SOUS_SONDE if ident in SOUS_SONDE else PORTEE
-                chemin = SORTIE / f"{ident}.webp"
+                chemin = sortie / f"{ident}.webp"
                 ecrire(cuire_occlusion_de(obj, 2 * taille, portee), chemin, taille, pathlib.Path(brut))
                 occlusions[ident] = {"carte": f"occlusion/{ident}.webp", "canal": canal}
-                print(f"  occlusion {ident:26s} {taille:5d} px  {portee:.0f} m  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s")
-    poids = sum(f.stat().st_size for dossier in (SORTIE, SORTIE_LUMIERE) for f in dossier.glob("*.webp")) / 1e6
+                print(f"  occlusion {ident:26s} {taille:5d} px  {portee:.0f} m  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s", flush=True)
+    poids = sum(f.stat().st_size for dossier in (sortie, sortie_lumiere) for f in dossier.glob("*.webp")) / 1e6
     print(f"  {len(occlusions)} cartes d'occlusion, {len(lumieres)} de lumière, {poids:.1f} Mo, {time.time() - debut:.0f} s")
     return occlusions, lumieres
