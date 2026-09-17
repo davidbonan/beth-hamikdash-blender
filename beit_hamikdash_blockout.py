@@ -33,6 +33,7 @@ from mathutils import Matrix, Vector, noise
 # PARAMÈTRES
 # ----------------------------------------------------------------------------
 AMA = 0.48            # mètres par ama  (alternatives : 0.525 Ritmeyer, 0.576 Hazon Ish)
+TEFAH = 1 / 6
 FPS = 24
 MENORA_DROITE = True  # CHOIX : True = branches droites en diagonale (Rambam/Rashi), False = courbes
 GEVIIM_RENVERSES = True  # CHOIX : True = coupes bouche en bas (dessin du Rambam), False = « מלמטה צר » (son commentaire)
@@ -1257,6 +1258,11 @@ MAT_CENDRE = lambda: enduit("Cendre", (0.40, 0.38, 0.36))        # tapoua'h et d
 MAT_ARGENT = lambda: metal("Argent", (0.90, 0.90, 0.91), 0.3)
 MAT_CHAUX = lambda: enduit("Chaux_blanche", (0.95, 0.95, 0.92))
 MAT_LECHEM = lambda: enduit("Lechem_afui", (0.52, 0.30, 0.12))    # matsa cuite dans l'Azara (Mena'hot 5:1, 11:2)
+MAT_SOLET = lambda: enduit("Solet", (0.92, 0.89, 0.80))           # fleur de farine des mena'hot (Ma'asse HaKorbanot 13:2)
+MAT_TEVEN = lambda: enduit("Teven", (0.62, 0.52, 0.30))           # paille de l'enclos des agneaux (Arakhin 2:5)
+MAT_KLAF = lambda: enduit("Klaf", (0.78, 0.70, 0.54))             # rouleaux lus au Cohen Gadol (Yoma 1:6)
+MAT_LAINE = lambda: etoffe("Laine", (0.50, 0.42, 0.32))           # « אִישׁ כִּסְתּוֹ בָאָרֶץ » (Tamid 1:1)
+MAT_AVNET = lambda: etoffe("Avnet_kilayim", (0.40, 0.21, 0.30))   # « וְהָאַבְנֵט לְבַדּוֹ רָקוּם בְּצֶמֶר » (Klei HaMikdash 8:1)
 MAT_CHAUX_FEU = lambda: enduit_noirci("Chaux_noircie", (0.95, 0.95, 0.92), (Z_AZ + 7.5, Z_AZ + 10.5))
 # Le dallage est SOUS les murs en valeur, mais dans LEUR pierre : à 0,57 neutre il
 # rendait 62 % de la clarté du parement avec le quart de son chroma, et du côté froid
@@ -2680,6 +2686,17 @@ def chaine(name, p0, p1, R, col, mat=None, tube=None, majeur=10, mineur=6):
         tore(f"{name}_{k:02d}", p.x, p.y, p.z, R, tube or R * 0.32, col, mat,
              rotation=axe.to_track_quat('Z', 'Y').to_euler(), majeur=majeur, mineur=mineur)
 
+def ner_sur_tablette(name, x, y, normale, z, col):
+    """Tablette de pierre sortant du mur en (x, y), lampe de terre et flamme dessus.
+    `normale` : le sens où le mur regarde le passage."""
+    nx, ny = normale
+    x0, x1 = sorted((x, x + nx * 0.4)) if nx else (x - 0.4, x + 0.4)
+    y0, y1 = sorted((y, y + ny * 0.4)) if ny else (y - 0.4, y + 0.4)
+    box(f"{name}_tablette", x0, x1, y0, y1, z - 0.2, z, col)
+    cx, cy = x + nx * 0.2, y + ny * 0.2
+    cyl(f"{name}_lampe", cx, cy, z, z + 0.15, 0.16, col, MAT_TERRE_CUITE(), verts=10)
+    cone(f"{name}_flamme", cx, cy, z + 0.15, z + 0.45, 0.06, 0.0, col, braise("Braise"), verts=8)
+
 def _poser(pieces, x, y, z0, lacet):
     """Pièces bâties à l'origine, posées en (x, y, z0) amot et tournées de `lacet`
     autour de la verticale — silhouettes et keruvim.
@@ -3167,6 +3184,22 @@ for _s, _x in enumerate((106.0, 118.0, 130.0)):
                 _xk = _x + 0.6 + _k * 1.8
                 cyl_between(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_xk, 57.7, _z), (_xk, 60.9, _z),
                             0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+# Le tri lui-même : le vrac qui arrive près de la porte, les billots des cohanim qui l'examinent
+# — hors de l'Azara, rien n'interdit de s'asseoir —, et le bois véreux écarté à part. CHOIX :
+# places, nombres, et que le rebut attende là.
+for _tas, (_cx, _cy, _n) in (("vrac", (112.0, 42.0, 14)), ("pasoul", (132.0, 36.0, 8))):
+    for _k in range(_n):
+        _cle = f"Lishkat_Etzim_NE_{_tas}_{_k}"
+        _a, _r = math.tau * alea(_cle), 2.5 * alea(_cle, 1)
+        _cap, _long = math.pi * alea(_cle, 2), 3 + 3 * alea(_cle, 3)
+        _x, _y, _z = _cx + _r * math.cos(_a), _cy + _r * math.sin(_a), Z_EZN + 0.3 + 0.55 * (_k // 5)
+        _dx, _dy = _long / 2 * math.cos(_cap), _long / 2 * math.sin(_cap)
+        cyl_between(_cle, (_x - _dx, _y - _dy, _z), (_x + _dx, _y + _dy, _z),
+                    0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+for _k in range(3):
+    _a = math.radians(200 + 70 * _k)
+    cyl(f"Lishkat_Etzim_NE_billot_{_k}", 112 + 6.5 * math.cos(_a), 42 + 6.5 * math.sin(_a),
+        Z_EZN, Z_EZN + 1.2, 0.7, "10_EzratNashim", MAT_CHENE(), verts=12)
 # SUD-EST, Lishkat HaNezirim : « מְבַשְּׁלִין אֶת שַׁלְמֵיהֶן, וּמְגַלְּחִין אֶת שְׂעָרָן,
 # וּמְשַׁלְּחִים תַּחַת הַדּוּד » — le chaudron et son foyer. C'est le seul feu de l'Ezrat
 # Nashim en dehors de Simhat Beit HaShoeva.
@@ -3180,6 +3213,20 @@ box("Lishkat_Nezirim_SE_braises", DOUD_X - 3, DOUD_X + 3, DOUD_Y - 3, DOUD_Y + 3
 revolution("Lishkat_Nezirim_SE_doud", DOUD_X, DOUD_Y, Z_EZN + 2.4,
            [(0.0, 0.0), (1.8, 0.4), (2.6, 1.6), (2.7, 2.4), (2.5, 2.45),
             (2.4, 1.7), (1.6, 0.5), (0.0, 0.15)], "10_EzratNashim", MAT_BRONZE(), verts=24)
+# « וְסַל מַצּוֹת סֹלֶת חַלֹּת… וּרְקִיקֵי מַצּוֹת » (Bamidbar 6:15), dix de chaque — « חוּץ מֵחַלּוֹת
+# תּוֹדָה וְהַנְּזִירוּת, שֶׁהֵן בָּאוֹת עֶשֶׂר עֶשֶׂר » (Mena'hot 6:5). Le panier sur une table de pierre, les
+# galettes épaisses en deux piles, les minces en deux autres. Table, panier, formes : CHOIX.
+box("Lishkat_Nezirim_SE_table", 108, 114, -40, -37.5, Z_EZN, Z_EZN + 1.5, "10_EzratNashim")
+SAL_X, SAL_Y, SAL_Z = 111.0, -38.75, Z_EZN + 1.5
+revolution("Lishkat_Nezirim_SE_sal", SAL_X, SAL_Y, SAL_Z,
+           [(0.0, 0.0), (0.8, 0.0), (0.95, 0.5), (0.88, 0.5), (0.74, 0.06), (0.0, 0.06)],
+           "10_EzratNashim", MAT_CHENE(), verts=20)
+for _k, (_dx, _dy, _genre, _r, _ep) in enumerate(((-0.3, -0.3, "halla", 0.26, 0.09), (0.3, -0.3, "halla", 0.26, 0.09),
+                                                  (-0.3, 0.3, "rakik", 0.28, 0.03), (0.3, 0.3, "rakik", 0.28, 0.03))):
+    for _p in range(5):
+        _z = SAL_Z + 0.06 + _p * _ep
+        cyl(f"Lishkat_Nezirim_SE_{_genre}_{_k}{_p}", SAL_X + _dx, SAL_Y + _dy, _z, _z + _ep, _r,
+            "10_EzratNashim", MAT_LECHEM(), verts=12)
 # NORD-OUEST, Lishkat HaMetzoraïm : la Michna ne lui donne qu'un nom, mais une autre
 # le meuble — « וְהַמְּצֹרָע טָבַל בְּלִשְׁכַּת הַמְּצֹרָעִים, בָּא וְעָמַד בְּשַׁעַר נִקָּנוֹר »
 # (Negaïm 14:8). C'est un mikvé, et la seule eau de la cour. Sa cote minimale est
@@ -3214,6 +3261,16 @@ for _r, (_y, _n, _devant_porte) in enumerate(((-62.0, 10, False), (-59.4, 10, Fa
             continue
         revolution(f"Lishkat_Shemanya_SO_jarre_{_r}{_k}", _x, _y, Z_EZN,
                    JARRE, "10_EzratNashim", MAT_TERRE_CUITE(), verts=14)
+# Le vin et l'huile se mesurent : « שֶׁבַע מִדּוֹת שֶׁל לַח הָיוּ בַמִּקְדָּשׁ. הִין, וַחֲצִי הַהִין, וּשְׁלִישִׁית הַהִין,
+# וּרְבִיעִית הַהִין, לֹג, וַחֲצִי לֹג, וּרְבִיעִית לֹג » (Mena'hot 9:2). Le hin vaut douze log ; les sept
+# mesures ont donc le rayon de la racine cubique de leur contenance. Qu'elles soient rangées ici,
+# leur bronze et la taille du hin : CHOIX — la Michna dit seulement qu'elles étaient au Mikdash.
+box("Lishkat_Shemanya_SO_table", 7.5, 9.3, -50.5, -42.5, Z_EZN, Z_EZN + 1.5, "10_EzratNashim")
+for _k, _log in enumerate((12, 6, 4, 3, 1, 0.5, 0.25)):
+    _r = 0.22 * (_log / 12) ** (1 / 3)
+    revolution(f"Lishkat_Shemanya_SO_mida_{_k}", 8.4, -49.8 + 1.1 * _k, Z_EZN + 1.5,
+               [(0.0, 0.0), (_r, 0.0), (_r, 1.3 * _r), (0.88 * _r, 1.3 * _r), (0.88 * _r, 0.05), (0.0, 0.05)],
+               "10_EzratNashim", MAT_BRONZE(), verts=16)
 # Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
 # entre les chambres d'angle — elle traversait leurs murs. Colonnes, architrave, corniche
 # et balustrade sont des CHOIX (Rambam, Beit HaBe'hira 1:11) ; la frise de fleurons
@@ -3540,9 +3597,50 @@ for cote, mur, sens in (("O", MK_X0, 1), ("E", MK_X1, -1)):
             Z_AZ, Z_AZ + KITON_H, "80_Lishkot")
     box(f"Beit_HaMoked_kitonot_{cote}_plafond", *sorted((mur, salle + sens * CLOISON)),
         KITONOT_Y0, KITONOT_Y1, Z_AZ + KITON_H, Z_AZ + KITON_H + CLOISON, "80_Lishkot")
-# Sud-ouest, « לִשְׁכַּת טְלָאֵי קָרְבָּן » : vide. Sud-est, « לִשְׁכַּת עוֹשֵׂי לֶחֶם הַפָּנִים » : une table.
-box("Beit_HaMoked_kiton_SE_table", MK_X1 - 3.5, MK_X1 - 1, KITONOT_Y[0][0] + 1,
-    KITONOT_Y[0][1] - 1, Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
+KITON_SUD_Y0, KITON_SUD_Y1 = KITONOT_Y[0]
+KITON_BAIE_Y = (KITON_SUD_Y0 + KITON_SUD_Y1) / 2
+# Sud-ouest, « לִשְׁכַּת טְלָאֵי קָרְבָּן » : « אֵין פּוֹחֲתִין מִשִּׁשָּׁה טְלָאִים הַמְבֻקָּרִין בְּלִשְׁכַּת הַטְּלָאִים »
+# (Arakhin 2:5). La scène n'a pas d'animaux : l'enclos seul — mangeoire de pierre, paille, barrière
+# basse dans la baie. CHOIX. Tamid 3:3 met la chambre au nord-ouest ; la scène suit Middot 1:6.
+EVUS = (MK_X0 + 0.25, MK_X0 + 1.05, KITON_SUD_Y0 + 0.75, KITON_SUD_Y1 - 0.75)
+dalle_trouee("Beit_HaMoked_kiton_SO_evus", MK_X0, MK_X0 + 1.3, KITON_SUD_Y0 + 0.5, KITON_SUD_Y1 - 0.5,
+             Z_AZ, Z_AZ + 1.3, EVUS, "80_Lishkot")
+box("Beit_HaMoked_kiton_SO_evus_teven", *EVUS, Z_AZ, Z_AZ + 1.1, "80_Lishkot", MAT_TEVEN())
+for k in range(5):
+    cle = f"Beit_HaMoked_kiton_SO_teven_{k}"
+    x, y, cote = MK_X0 + 1.6 + 2.2 * alea(cle), KITON_SUD_Y0 + 0.3 + 5.2 * alea(cle, 1), 1 + 0.8 * alea(cle, 2)
+    box(cle, x, x + cote, y, y + cote, Z_AZ, Z_AZ + 0.05, "80_Lishkot", MAT_TEVEN())
+BARRIERE_X = MK_X0 + KITON_L + CLOISON / 2
+for k, z in enumerate((0.5, 1.1, 1.7)):
+    cyl_between(f"Beit_HaMoked_kiton_SO_barriere_{k}", (BARRIERE_X, KITON_BAIE_Y - 1, Z_AZ + z),
+                (BARRIERE_X, KITON_BAIE_Y + 1, Z_AZ + z), 0.08, "80_Lishkot", MAT_CHENE(), verts=8)
+# Sud-est, « לִשְׁכַּת עוֹשֵׂי לֶחֶם הַפָּנִים », du côté du קדש : « לִישָׁתָן וַעֲרִיכָתָן בַּחוּץ, וַאֲפִיָּתָן בִּפְנִים »
+# (Mena'hot 11:2) — le four est ici, le pétrin ailleurs. « וּבִטְפוּס הָיָה עוֹשֶׂה אוֹתָן. וּכְשֶׁהוּא רָדָן, נוֹתְנָן
+# בִּטְפוּס » (11:1) : deux moules sur la table, au format du pain, « אָרְכָּן עֲשָׂרָה וְרָחְבָּן חֲמִשָּׁה, וְקַרְנוֹתָיו
+# שֶׁבַע אֶצְבָּעוֹת » (11:4), et la pelle qui le retire. Four, pelle, fer des moules : CHOIX.
+box("Beit_HaMoked_kiton_SE_table", MK_X1 - 1.5, MK_X1, KITON_SUD_Y0 + 0.3, KITON_SUD_Y0 + 4.1,
+    Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
+TFUS_L, TFUS_P, TFUS_H, TFUS_EP = 10 * TEFAH, 5 * TEFAH, 7 / 4 * TEFAH, 0.04
+TFUS_X = MK_X1 - 0.75
+for k in range(2):
+    y0 = KITON_SUD_Y0 + 0.45 + k * (TFUS_L + 0.2)
+    box(f"Beit_HaMoked_kiton_SE_tfus_{k}", TFUS_X - TFUS_P / 2, TFUS_X + TFUS_P / 2, y0, y0 + TFUS_L,
+        Z_AZ + 1.5, Z_AZ + 1.5 + TFUS_EP, "80_Lishkot", MAT_FER())
+    for cote, s in (("O", -1), ("E", 1)):
+        xp = TFUS_X + s * TFUS_P / 2
+        box(f"Beit_HaMoked_kiton_SE_tfus_{k}_paroi_{cote}", xp, xp - s * TFUS_EP, y0, y0 + TFUS_L,
+            Z_AZ + 1.5, Z_AZ + 1.5 + TFUS_H, "80_Lishkot", MAT_FER())
+TANUR_X, TANUR_Y = MK_X1 - 1.9, KITON_SUD_Y1 - 1.4
+revolution("Beit_HaMoked_kiton_SE_tanur", TANUR_X, TANUR_Y, Z_AZ,
+           [(0.0, 0.0), (1.1, 0.0), (1.0, 1.6), (0.72, 2.2), (0.52, 2.2), (0.8, 1.6), (0.9, 0.25), (0.0, 0.25)],
+           "80_Lishkot", MAT_TERRE_CUITE(), verts=20)
+cyl("Beit_HaMoked_kiton_SE_tanur_gahalim", TANUR_X, TANUR_Y, Z_AZ + 0.25, Z_AZ + 0.45, 0.8,
+    "80_Lishkot", braise("Braise"), verts=16)
+MARDE_X = MK_X1 - KITON_L + 0.4
+cyl_between("Beit_HaMoked_kiton_SE_marde", (MARDE_X, KITON_SUD_Y1 - 0.2, Z_AZ + 0.9),
+            (MARDE_X, KITON_SUD_Y1 - 0.1, Z_AZ + 4.2), 0.05, "80_Lishkot", MAT_CHENE(), verts=8)
+box("Beit_HaMoked_kiton_SE_marde_kaf", MARDE_X - 0.3, MARDE_X + 0.3, KITON_SUD_Y1 - 0.25, KITON_SUD_Y1 - 0.15,
+    Z_AZ + 0.05, Z_AZ + 0.95, "80_Lishkot", MAT_CHENE())
 # Nord-est, « בָּהּ גָּנְזוּ בְנֵי חַשְׁמוֹנַאי אֶת אַבְנֵי הַמִּזְבֵּחַ שֶׁשִּׁקְּצוּם מַלְכֵי יָוָן » : les pierres entassées.
 for k, (dx, dy, dz) in enumerate(((0.0, 0.0, 0), (1.8, 0.1, 0), (0.3, 1.2, 0), (1.6, 1.3, 0),
                                   (0.1, 0.3, 1), (1.6, 1.1, 1), (0.8, 0.8, 2))):
@@ -3559,6 +3657,20 @@ for cote, mur, sens in (("O", MK_X0, 1), ("E", MK_X1, -1)):
         for rang, (saillie, zb, zh) in enumerate(((1.5, 0, 1), (0.75, 1, 2))):
             box(f"Beit_HaMoked_rovad_{vestibule}{cote}_{rang}", *sorted((mur, mur + sens * saillie)),
                 va, vb, Z_AZ + zb, Z_AZ + zh, "80_Lishkot")
+# « וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם… וּפִרְחֵי כְהֻנָּה אִישׁ כִּסְתּוֹ בָאָרֶץ » (Tamid 1:1) : les anciens sur les
+# rovadim, les jeunes à terre sur leurs « כָּרִים וּכְסָתוֹת » (Bartenura ad loc.). En plein jour la literie
+# est roulée — les anciens sur leur gradin, les jeunes en piles contre les kitonot. Côté 'hol, nombre,
+# laine : CHOIX.
+for cote, mur, sens in (("O", MK_X0, 1), ("E", MK_X1, -1)):
+    cyl_between(f"Beit_HaMoked_keset_zaken_{cote}", (mur + sens * 1.125, KITONOT_Y1 + 0.4, Z_AZ + 1.3),
+                (mur + sens * 1.125, MK_Y1 - 0.4, Z_AZ + 1.3), 0.3, "80_Lishkot", MAT_LAINE(), verts=12)
+    box(f"Beit_HaMoked_kar_zaken_{cote}", mur, mur + sens * 0.7, KITONOT_Y1 + 1, KITONOT_Y1 + 3,
+        Z_AZ + 2, Z_AZ + 2.25, "80_Lishkot", MAT_LAINE())
+    face = mur + sens * (KITON_L + CLOISON)
+    for pile, (ya, yb) in enumerate(((AXE_MUR_N + 0.8, AXE_MUR_N + 2.8), (KITONOT_Y1 - 2.8, KITONOT_Y1 - 0.8))):
+        for rouleau, (d, z) in enumerate(((0.3, 0.28), (0.86, 0.28), (0.58, 0.76))):
+            cyl_between(f"Beit_HaMoked_keset_perach_{cote}{pile}{rouleau}", (face + sens * d, ya, Z_AZ + z),
+                        (face + sens * d, yb, Z_AZ + z), 0.28, "80_Lishkot", MAT_LAINE(), verts=12)
 # « מָקוֹם הָיָה שָׁם, אַמָּה עַל אַמָּה, וְטַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ » (Middot 1:9) :
 # la dalle sous laquelle pendent les clefs de l'Azara. Sa place, près du שער : CHOIX.
 TAVLA_X, TAVLA_Y = PORTE_MOKED, MK_Y0 + 3
@@ -3872,6 +3984,21 @@ for k in range(6):
                 0.04, "80_Lishkot", MAT_CEDRE(), verts=6)
 cyl_between("Lishkat_HaGola_galgal_corde", (BOR_X + 0.9, BOR_Y, GALGAL_Z), (BOR_X + 0.9, BOR_Y, Z_EZN + 2.5),
             0.04, "80_Lishkot", MAT_CHENE(), verts=6)
+# « וּמְמַלְּאִים מִבּוֹר הַגּוֹלָה… בַּגַּלְגַּל בְּשַׁבָּת » (Erouvin 10:14) ; son eau est « מַיִם מְתוּקִים לִשְׁתִיָּה »,
+# l'amma servant au rinçage (R. Shemaya sur Middot 5:4). Le seau posé sur la margelle, l'auge où on le
+# vide, les cruches qu'on y remplit pour la cour. Seau, auge, cruches : CHOIX.
+revolution("Lishkat_HaGola_dli", BOR_X - 1.7, BOR_Y, Z_AZ + 1.3,
+           [(0.0, 0.0), (0.3, 0.0), (0.36, 0.6), (0.32, 0.6), (0.26, 0.05), (0.0, 0.05)],
+           "80_Lishkot", MAT_CHENE(), verts=16)
+GL_X0, GL_Y0, GL_Y1 = GOLA_X0 + LISHKA_PAREMENT, AY1 + T, NORD_Y1 - LISHKA_PAREMENT
+SHOKET = (GL_X0 + 0.25, GL_X0 + 1.15, GL_Y0 + 1.75, GL_Y1 - 1.75)
+dalle_trouee("Lishkat_HaGola_shoket", GL_X0, GL_X0 + 1.4, GL_Y0 + 1.5, GL_Y1 - 1.5, Z_AZ, Z_AZ + 1.3,
+             SHOKET, "80_Lishkot")
+box("Lishkat_HaGola_shoket_mayim", *SHOKET, Z_AZ, Z_AZ + 1.1, "80_Lishkot", MAT_EAU())
+for k in range(4):
+    revolution(f"Lishkat_HaGola_kad_{k}", GL_X0 + 2.2, GL_Y0 + 2 + 1.6 * k, Z_AZ,
+               [(0.0, 0.0), (0.22, 0.0), (0.35, 0.4), (0.3, 0.75), (0.12, 0.95), (0.15, 1.02), (0.0, 1.0)],
+               "80_Lishkot", MAT_TERRE_CUITE(), verts=14)
 # Lishkat HaEtz, en second rang : « וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), sur la
 # largeur des deux autres. Elle ne tient pas dans l'Azara : à son droit, entre le mur nord
 # et le Heikhal, il reste 32,5 amot (70 de corps, Middot 4:7), et cette bande est le
@@ -3990,6 +4117,46 @@ PARHEDRIN_X1 = SM_X0 - ECART_LISHKA
 lishka("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1,
        Z_EZN, Z_AZ + 15, "80_Lishkot", [Porte("S", *PORTE_LISHKA, Z_EZN)], adossee="N")
 maake("Lishkat_Parhedrin", PARHEDRIN_X1 - 15, PARHEDRIN_X1, BA_Y0, BA_Y1, Z_AZ + 15, "80_Lishkot")
+# « שֶׁהַלִּשְׁכָּה הַזֹּאת הָיְתָה בֵּית דִּירָה לְכֹהֵן גָּדוֹל בְּשִׁבְעַת יְמֵי הַהַפְרָשָׁה » (Rambam, Mezouza 6:6) : la
+# seule chambre du Mikdash à mezouza, « בַּטֶּפַח הַסָּמוּךְ לַחוּץ בִּתְחִלַּת שְׁלִישׁ הָעֶלְיוֹן שֶׁל גֹּבַהּ הַשַּׁעַר…
+# עַל יְמִין הַנִּכְנָס » (6:12) — qui entre par le sud l'a à sa droite, sur le jambage est —, dans un tuyau
+# de bois (5:6). Un logement, donc un lit. « מָסְרוּ לוֹ זְקֵנִים… וְקוֹרִין לְפָנָיו » (Yoma 1:3) : le banc des
+# anciens. « בְּאִיּוֹב וּבְעֶזְרָא וּבְדִבְרֵי הַיָּמִים » et Daniel (1:6) : quatre rouleaux, l'un ouvert sur le
+# pupitre. On l'y garde éveillé jusqu'au matin (1:7) : deux lampes. Formes, places, cotes : CHOIX.
+PH_X0, PH_X1 = PARHEDRIN_X1 - 15 + LISHKA_PAREMENT, PARHEDRIN_X1 - LISHKA_PAREMENT
+PH_Y0, PH_Y1 = BA_Y0 + LISHKA_PAREMENT, BA_Y1
+MEZUZA_X = PARHEDRIN_X1 - 7.5 + PORTE_LISHKA[0] / 2 - 0.06
+MEZUZA_Y, MEZUZA_Z = BA_Y0 + TEFAH / 2, Z_EZN + PORTE_LISHKA[1] * 2 / 3
+cyl("Lishkat_Parhedrin_mezuza", MEZUZA_X, MEZUZA_Y, MEZUZA_Z, MEZUZA_Z + 0.5, 0.05,
+    "80_Lishkot", MAT_CEDRE(), verts=8)
+MITA = (PH_X0, PH_X0 + 1.8, PH_Y0 + 2, PH_Y0 + 6)
+for k, (x, y) in enumerate(((MITA[0] + 0.15, MITA[2] + 0.15), (MITA[1] - 0.15, MITA[2] + 0.15),
+                            (MITA[0] + 0.15, MITA[3] - 0.15), (MITA[1] - 0.15, MITA[3] - 0.15))):
+    cyl(f"Lishkat_Parhedrin_mita_regel_{k}", x, y, Z_EZN, Z_EZN + 0.9, 0.08, "80_Lishkot", MAT_CEDRE(), verts=8)
+box("Lishkat_Parhedrin_mita", *MITA, Z_EZN + 0.9, Z_EZN + 1.15, "80_Lishkot", MAT_CEDRE())
+box("Lishkat_Parhedrin_mita_keset", MITA[0] + 0.05, MITA[1] - 0.05, MITA[2] + 0.05, MITA[3] - 0.05,
+    Z_EZN + 1.15, Z_EZN + 1.4, "80_Lishkot", MAT_LAINE())
+box("Lishkat_Parhedrin_mita_kar", MITA[0] + 0.3, MITA[1] - 0.3, MITA[3] - 0.7, MITA[3] - 0.15,
+    Z_EZN + 1.4, Z_EZN + 1.6, "80_Lishkot", MAT_LIN())
+box("Lishkat_Parhedrin_safsal_zekenim", PH_X0 + 3.5, PH_X1 - 2.5, PH_Y1 - 1, PH_Y1, Z_EZN, Z_EZN + 1, "80_Lishkot")
+PUPITRE_X, PUPITRE_Y, PUPITRE_Z = (PH_X0 + PH_X1) / 2, PH_Y1 - 3.5, Z_EZN + 2.3
+cyl("Lishkat_Parhedrin_pupitre_pied", PUPITRE_X, PUPITRE_Y, Z_EZN, PUPITRE_Z, 0.08, "80_Lishkot", MAT_CEDRE(), verts=8)
+box("Lishkat_Parhedrin_pupitre", PUPITRE_X - 0.5, PUPITRE_X + 0.5, PUPITRE_Y - 0.4, PUPITRE_Y + 0.4,
+    PUPITRE_Z, PUPITRE_Z + 0.06, "80_Lishkot", MAT_CEDRE())
+box("Lishkat_Parhedrin_megila_iyov_yeria", PUPITRE_X - 0.3, PUPITRE_X + 0.3, PUPITRE_Y - 0.3, PUPITRE_Y + 0.3,
+    PUPITRE_Z + 0.06, PUPITRE_Z + 0.07, "80_Lishkot", MAT_KLAF())
+for cote, s in (("O", -1), ("E", 1)):
+    cyl_between(f"Lishkat_Parhedrin_megila_iyov_{cote}", (PUPITRE_X + s * 0.35, PUPITRE_Y - 0.32, PUPITRE_Z + 0.13),
+                (PUPITRE_X + s * 0.35, PUPITRE_Y + 0.32, PUPITRE_Z + 0.13), 0.07, "80_Lishkot", MAT_KLAF(), verts=10)
+MADAF_Y, MADAF_Z = PH_Y0 + 2.5, Z_EZN + 2.8
+box("Lishkat_Parhedrin_madaf", PH_X1 - 0.6, PH_X1, MADAF_Y - 1, MADAF_Y + 1, MADAF_Z - 0.1, MADAF_Z,
+    "80_Lishkot", MAT_CEDRE())
+for k, sefer in enumerate(("ezra", "divrei_hayamim", "daniel")):
+    y = MADAF_Y - 0.6 + 0.6 * k
+    cyl_between(f"Lishkat_Parhedrin_megila_{sefer}", (PH_X1 - 0.55, y, MADAF_Z + 0.11),
+                (PH_X1 - 0.05, y, MADAF_Z + 0.11), 0.11, "80_Lishkot", MAT_KLAF(), verts=10)
+for cote, x, normale in (("O", PH_X0, (1, 0)), ("E", PH_X1, (-1, 0))):
+    ner_sur_tablette(f"Lishkat_Parhedrin_ner_{cote}", x, PH_Y1 - 2, normale, Z_EZN + 5, "80_Lishkot")
 
 # Les deux lishkot de Sha'ar Nikanor, dans l'Ezrat Israël, de part et d'autre de la
 # porte est : « וּשְׁתֵּי לְשָׁכוֹת הָיוּ לוֹ, אַחַת מִימִינוֹ וְאַחַת מִשְּׂמֹאלוֹ, אַחַת לִשְׁכַּת
@@ -4010,6 +4177,8 @@ CHALON, PAS_CHALON = 1.0, 1.35
 PC_X0 = LISHKA_NIKANOR_X0 + LISHKA_PAREMENT
 PC_Y0, PC_Y1 = (LISHKOT_NIKANOR["Pinchas_HaMalbish"][0] + LISHKA_PAREMENT,
                 LISHKOT_NIKANOR["Pinchas_HaMalbish"][1] - LISHKA_PAREMENT)
+CHALONOT_OUVERTES = {(1, 6): ("mikhnasayim", "מכנסים"), (1, 7): ("avnet", "אבנט"),
+                     (2, 6): ("kutonot", "כתנות"), (2, 7): ("mitznafot", "מצנפות")}
 for r in range(6):
     z = Z_EZI + 0.6 + PAS_CHALON * r
     for k in range(4):
@@ -4023,8 +4192,36 @@ for r in range(6):
         devant_guichet = any(y < b + 0.3 and y + CHALON > a - 0.3 for _, a, b in PISHPESHIM)
         if devant_guichet and z < Z_EZI + H_PISHPESH + 0.4:
             continue
+        if (r, k) in CHALONOT_OUVERTES:
+            continue
         box(f"Lishkat_Pinchas_HaMalbish_chalon_E{r}{k}", AX1 - 0.15, AX1, y, y + CHALON,
             z, z + CHALON, "80_Lishkot", MAT_CEDRE())
+# « וּכְשֶׁיִּכָּנְסוּ אַנְשֵׁי מִשְׁמָר לַעֲבוֹדָה… פּוֹתְחִין חַלּוֹנוֹתֵיהֶן כָּל יְמֵי שַׁבָּתָן » (Klei HaMikdash 8:8) : les
+# quatre du mishmar de service sont ouverts, un vêtement par placard, « כָּל הַמִּכְנָסַיִם בְּחַלּוֹן אֶחָד וְכָתוּב
+# עָלָיו מִכְנְסַיִם » (8:9), et « שֵׁם כָּל מִשְׁמָר כָּתוּב עַל חַלּוֹנוֹתָיו » (8:8). Seuls ces quatre portent leurs
+# inscriptions. CHOIX : Yehoyariv, premier des mishmarot (Divrei HaYamim I 24:7), et quel placard garde quoi.
+MISHMAR_DE_SERVICE = "יהויריב"
+for (r, k), (vetement, _) in CHALONOT_OUVERTES.items():
+    nom = f"Lishkat_Pinchas_HaMalbish_chalon_E{r}{k}"
+    y, z = PC_Y0 + 0.4 + PAS_CHALON * k, Z_EZI + 0.6 + PAS_CHALON * r
+    for cote, bornes in (("bas", (y, y + CHALON, z, z + 0.06)), ("haut", (y, y + CHALON, z + CHALON - 0.06, z + CHALON)),
+                         ("S", (y, y + 0.06, z, z + CHALON)), ("N", (y + CHALON - 0.06, y + CHALON, z, z + CHALON))):
+        box(f"{nom}_{cote}", AX1 - 0.6, AX1, bornes[0], bornes[1], bornes[2], bornes[3], "80_Lishkot", MAT_CEDRE())
+    box(f"{nom}_delet", AX1 - 1.6, AX1 - 0.6, y + CHALON, y + CHALON + 0.08, z, z + CHALON, "80_Lishkot", MAT_CEDRE())
+    fond = z + 0.06
+    if vetement == "avnet":
+        for i in range(3):
+            tore(f"{nom}_avnet_{i}", AX1 - 0.3, y + CHALON / 2, fond + 0.05 + 0.1 * i, 0.2, 0.05,
+                 "80_Lishkot", MAT_AVNET(), majeur=16, mineur=6)
+        continue
+    for i in range(4):
+        box(f"{nom}_{vetement}_{i}", AX1 - 0.5, AX1 - 0.1, y + 0.15, y + CHALON - 0.15,
+            fond + 0.09 * i, fond + 0.09 * i + 0.08, "80_Lishkot", MAT_LIN())
+graver([(f"Lishkat_Pinchas_HaMalbish_ketav_E{r}{k}", ketav, AX1, PC_Y0 + 0.4 + PAS_CHALON * k + CHALON / 2,
+         Z_EZI + 0.6 + PAS_CHALON * r - 0.17) for (r, k), (_, ketav) in CHALONOT_OUVERTES.items()]
+       + [("Lishkat_Pinchas_HaMalbish_ketav_mishmar", MISHMAR_DE_SERVICE, AX1,
+           PC_Y0 + 0.4 + PAS_CHALON * 6.5 + CHALON / 2, Z_EZI + 0.6 + PAS_CHALON * 3 - 0.17)],
+       "80_Lishkot", taille=0.12, saillie=0.01)
 # « חביתי כהן גדול לישתן ועריכתן ואפייתן בפנים » (Mena'hot 11:3), « עַל־מַחֲבַת בַּשֶּׁמֶן תֵּעָשֶׂה »
 # (Vayikra 6:14), « וְהַמַּחֲבַת אֵין לָהּ כִּסּוּי » (Mena'hot 5:8) : la table où l'on pétrit, le foyer
 # et la ma'havat plate posée sur ses braises. Formes et cotes : CHOIX.
@@ -4037,8 +4234,37 @@ box("Lishkat_Osei_Chavitin_braises", AX1 - 2.2, AX1 - 0.4, OC_Y0 + 0.6, OC_Y0 + 
 revolution("Lishkat_Osei_Chavitin_machvat", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.25,
            [(0.0, 0.0), (0.85, 0.0), (0.9, 0.1), (0.84, 0.1), (0.0, 0.04)],
            "80_Lishkot", MAT_BRONZE(), verts=24)
-box("Lishkat_Osei_Chavitin_table", AX1 - 1.6, AX1 - 0.2, OC_Y1 - 4, OC_Y1 - 1,
+# Le Rambam détaille le geste (Ma'asse HaKorbanot 13:2-4) : « מֵבִיא עִשָּׂרוֹן שָׁלֵם… וְחוֹצֵהוּ בַּחֲצִי עִשָּׂרוֹן
+# שֶׁבַּמִּקְדָּשׁ », « שְׁלֹשֶׁת לוֹגִין שֶׁמֶן », « וְחוֹלְטָהּ בְּרוֹתְחִין » — un second feu, et l'eau qui bout dessus —,
+# « מְחַלֵּק הַשְּׁלֹשָׁה לוֹגִין בִּרְבִיעִית שֶׁבַּמִּקְדָּשׁ », « נִמְצְאוּ שְׁתֵּים עֶשְׂרֵה חַלּוֹת », puis « קוֹלֶה אוֹתָהּ עַל
+# הַמַּחֲבַת ». Sur la table : les douze galettes, les deux mesures, la jarre des trois log ; une galette
+# sur la ma'havat. Formes, bronze des mesures, places : CHOIX.
+box("Lishkat_Osei_Chavitin_table", AX1 - 1.6, AX1 - 0.2, OC_Y0 + 3.4, OC_Y0 + 7,
     Z_EZI, Z_EZI + 1.5, "80_Lishkot", MAT_MARBRE())
+cyl("Lishkat_Osei_Chavitin_machvat_halla", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.29, Z_EZI + 1.36, 0.3,
+    "80_Lishkot", MAT_LECHEM(), verts=16)
+Z_TABLE_CHAVITIN = Z_EZI + 1.5
+for k in range(12):
+    cyl(f"Lishkat_Osei_Chavitin_halla_{k:02d}", AX1 - 1.45 + 0.33 * (k % 4), OC_Y0 + 3.7 + 0.35 * (k // 4),
+        Z_TABLE_CHAVITIN, Z_TABLE_CHAVITIN + 0.06, 0.15, "80_Lishkot", MAT_LECHEM(), verts=12)
+for nom, y, r, h in (("chatzi_isaron", OC_Y0 + 5.6, 0.2, 0.3), ("reviit", OC_Y0 + 6.3, 0.07, 0.1)):
+    revolution(f"Lishkat_Osei_Chavitin_{nom}", AX1 - 0.6, y, Z_TABLE_CHAVITIN,
+               [(0.0, 0.0), (r, 0.0), (r, h), (0.88 * r, h), (0.88 * r, 0.03), (0.0, 0.03)],
+               "80_Lishkot", MAT_BRONZE(), verts=16)
+cone("Lishkat_Osei_Chavitin_chatzi_isaron_solet", AX1 - 0.6, OC_Y0 + 5.6, Z_TABLE_CHAVITIN + 0.03,
+     Z_TABLE_CHAVITIN + 0.36, 0.17, 0.05, "80_Lishkot", MAT_SOLET(), verts=12)
+revolution("Lishkat_Osei_Chavitin_kad_shemen", AX1 - 1.2, OC_Y0 + 6.0, Z_TABLE_CHAVITIN,
+           [(0.0, 0.0), (0.18, 0.02), (0.3, 0.3), (0.27, 0.55), (0.11, 0.7), (0.13, 0.78), (0.0, 0.76)],
+           "80_Lishkot", MAT_TERRE_CUITE(), verts=14)
+box("Lishkat_Osei_Chavitin_foyer_rotchin", AX1 - 2.4, AX1 - 0.2, OC_Y1 - 2.6, OC_Y1 - 0.4,
+    Z_EZI, Z_EZI + 1.1, "80_Lishkot")
+box("Lishkat_Osei_Chavitin_braises_rotchin", AX1 - 2.2, AX1 - 0.4, OC_Y1 - 2.4, OC_Y1 - 0.6,
+    Z_EZI + 1.1, Z_EZI + 1.25, "80_Lishkot", braise("Braise"))
+revolution("Lishkat_Osei_Chavitin_yora", AX1 - 1.3, OC_Y1 - 1.5, Z_EZI + 1.25,
+           [(0.0, 0.0), (0.45, 0.02), (0.65, 0.35), (0.62, 0.8), (0.56, 0.8), (0.58, 0.36), (0.42, 0.08), (0.0, 0.08)],
+           "80_Lishkot", MAT_BRONZE(), verts=20)
+cyl("Lishkat_Osei_Chavitin_yora_mayim", AX1 - 1.3, OC_Y1 - 1.5, Z_EZI + 1.9, Z_EZI + 1.95, 0.54,
+    "80_Lishkot", MAT_EAU(), verts=20)
 
 # --- Les trois lishkot du sud (Middot 5:3) : HaMelah, HaParva, HaMedi'hin. Elles sont
 #     DANS l'Azara, contre la face intérieure du mur, et non sur la terrasse du 'Heil
@@ -4077,6 +4303,17 @@ for k in range(4):
     cle = f"Lishkat_HaMelach_sel_{k}"
     cone(cle, MELACH_X[0] + LISHKA_PAREMENT + 1.6 + 3 * k, SUD_INT[0] + 1.7, Z_AZ,
          Z_AZ + 1.2 + 0.5 * alea(cle, 1), 1.1 + 0.4 * alea(cle), 0.2, "80_Lishkot", MAT_SEL(), verts=16)
+# « וּבִשְׁלֹשָׁה מְקוֹמוֹת הָיוּ נוֹתְנִין הַמֶּלַח. בְּלִשְׁכַּת הַמֶּלַח. וְעַל גַּבֵּי הַכֶּבֶשׁ. וּבְרֹאשׁוֹ שֶׁל מִזְבֵּחַ », et ce sel
+# est « מִשֶּׁל צִבּוּר » (Rambam, Issourei Mizbea'h 5:13) : ce qui monte au kevesh et à l'autel part d'ici.
+# Trois paniers remplis, près de la porte. Le Rambam met ici la salaison des peaux, que Middot 5:3
+# donne à la Parva ; la scène suit Middot. Paniers et places : CHOIX.
+for k in range(3):
+    x, y = MELACH_X[1] - LISHKA_PAREMENT - 1.5 - 1.2 * k, SUD_INT[1] - LISHKA_PAREMENT - 0.6
+    revolution(f"Lishkat_HaMelach_kuppa_{k}", x, y, Z_AZ,
+               [(0.0, 0.0), (0.4, 0.0), (0.52, 0.6), (0.46, 0.6), (0.36, 0.06), (0.0, 0.06)],
+               "80_Lishkot", MAT_CHENE(), verts=16)
+    cone(f"Lishkat_HaMelach_kuppa_{k}_melach", x, y, Z_AZ + 0.06, Z_AZ + 0.75, 0.47, 0.08,
+         "80_Lishkot", MAT_SEL(), verts=16)
 # HaParva, « שָׁם הָיוּ מוֹלְחִין עוֹרוֹת קָדָשִׁים » : les peaux empilées sur une banquette, et le sel.
 PV_X0, PV_X1 = PARVA_X[0] + LISHKA_PAREMENT, PARVA_X[1] - LISHKA_PAREMENT
 box("Lishkat_HaParva_banquette", PV_X0 + 1, PV_X1 - 3, SUD_INT[0], SUD_INT[0] + 2.5,
@@ -4090,6 +4327,21 @@ for pile in range(3):
             "80_Lishkot", MAT_PEAU())
 cone("Lishkat_HaParva_sel", PV_X1 - 2, SUD_INT[0] + 5, Z_AZ, Z_AZ + 1.1, 1.3, 0.2,
      "80_Lishkot", MAT_SEL(), verts=16)
+# Le geste lui-même : une peau étendue au sol sous son sel, deux autres qui sèchent sur une perche contre
+# le mur ouest. Les peaux sont aux cohanim, « וְעוֹרוֹת קָדְשֵׁי קָדָשִׁים לַכֹּהֲנִים » (Zeva'him 12:3), d'où les
+# piles. Perche, tréteaux, places : CHOIX.
+box("Lishkat_HaParva_peau_meluha", PV_X0 + 1.5, PV_X0 + 5.5, SUD_INT[0] + 3.7, SUD_INT[0] + 6.5,
+    Z_AZ, Z_AZ + 0.06, "80_Lishkot", MAT_PEAU())
+box("Lishkat_HaParva_peau_meluha_melach", PV_X0 + 1.8, PV_X0 + 5.2, SUD_INT[0] + 4, SUD_INT[0] + 6.2,
+    Z_AZ + 0.06, Z_AZ + 0.09, "80_Lishkot", MAT_SEL())
+MOT_X, MOT_Y0, MOT_Y1, MOT_Z = PV_X0 + 0.7, SUD_INT[0] + 3, SUD_INT[0] + 7.6, Z_AZ + 3
+for cote, y in (("S", MOT_Y0), ("N", MOT_Y1)):
+    cyl(f"Lishkat_HaParva_mot_amud_{cote}", MOT_X, y, Z_AZ, MOT_Z + 0.1, 0.1, "80_Lishkot", MAT_CHENE(), verts=8)
+cyl_between("Lishkat_HaParva_mot", (MOT_X, MOT_Y0, MOT_Z), (MOT_X, MOT_Y1, MOT_Z), 0.08, "80_Lishkot", MAT_CHENE(), verts=8)
+for k, y in enumerate((MOT_Y0 + 0.4, MOT_Y0 + 2.5)):
+    for cote, s in (("O", -1), ("E", 1)):
+        box(f"Lishkat_HaParva_peau_tluya_{k}{cote}", MOT_X + s * 0.1, MOT_X + s * 0.16, y, y + 1.8,
+            MOT_Z - 1.6, MOT_Z, "80_Lishkot", MAT_PEAU())
 # HaMedi'hin, « שֶׁשָּׁם הָיוּ מְדִיחִין קִרְבֵי הַקֳּדָשִׁים » : une auge d'eau contre le mur, deux tables.
 MD_X0, MD_X1 = MEDICHIN_X[0] + LISHKA_PAREMENT, MEDICHIN_X[1] - LISHKA_PAREMENT
 AUGE = (MD_X0 + 2, MD_X1 - 2, SUD_INT[0] + 0.5, SUD_INT[0] + 1.7)
@@ -4099,6 +4351,15 @@ box("Lishkat_HaMedichin_auge_eau", *AUGE, Z_AZ, Z_AZ + 0.9, "80_Lishkot", MAT_EA
 for cote, xa in (("O", MD_X0), ("E", MD_X1 - 1.5)):
     box(f"Lishkat_HaMedichin_table_{cote}", xa, xa + 1.5, SUD_INT[0] + 3.5, SUD_INT[0] + 7,
         Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
+    for k in range(2):
+        revolution(f"Lishkat_HaMedichin_table_{cote}_keara_{k}", xa + 0.75, SUD_INT[0] + 4.3 + 1.9 * k, Z_AZ + 1.5,
+                   [(0.0, 0.0), (0.3, 0.0), (0.55, 0.3), (0.5, 0.3), (0.27, 0.05), (0.0, 0.05)],
+                   "80_Lishkot", MAT_BRONZE(), verts=16)
+# « וְהַכֶּרֶס מְדִיחִין אוֹתָהּ בְּבֵית מְדִיחִין כָּל צָרְכָּהּ » (Tamid 4:2), et c'est l'eau de l'amma qui rince,
+# celle du puits de la Gola étant bue (R. Shemaya sur Middot 5:4) : l'eau arrive dans l'auge par un bec.
+# Bec et bassines : CHOIX.
+cyl_between("Lishkat_HaMedichin_tzinor", ((MD_X0 + MD_X1) / 2, SUD_INT[0], Z_AZ + 2.3),
+            ((MD_X0 + MD_X1) / 2, SUD_INT[0] + 1.1, Z_AZ + 2.05), 0.1, "80_Lishkot", MAT_BRONZE(), verts=10)
 # Le bain rituel sur le toit du Beit HaParva — « וְעַל גַּגָּהּ הָיָה בֵית הַטְּבִילָה לְכֹהֵן
 # גָּדוֹל בְּיוֹם הַכִּפּוּרִים » (Middot 5:3). Maake parce que ce toit est un lieu de service
 # (Rambam, Rotzea'h 11:2). Le drap de bouts tendu entre lui et le peuple (Yoma 3:4)
@@ -4199,12 +4460,14 @@ moulure("Azara_couronnement_sud", AX0 - T, AX1, AY0 - T, AY0, Z_AZ + H_MUR, CORN
 # Le socle ne se pose que du côté de la cour : dehors, ces murs soutiennent dix amot de
 # remblai et leur pied est sur la terrasse du 'Heil, pas sur le dallage de l'Azara. Il
 # saute les baies — une porte n'a pas de pied de mur en travers — et les corps bâtis.
+LISHKOT_NIKANOR_EMPRISES = [(y0 - LISHKA_DEBORD, y1 + LISHKA_DEBORD) for y0, y1 in LISHKOT_NIKANOR.values()]
 moulure("Azara_socle_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, SOCLE, "20_Azara",
-        mitres=("deborde", "deborde"), cotes=(True, False), reserve=[(-5, 5)])
+        mitres=("deborde", "deborde"), cotes=(True, False), reserve=[(-5, 5)] + LISHKOT_NIKANOR_EMPRISES)
 moulure("Azara_socle_ouest", AX0 - T, AX0, AY0, AY1, Z_AZ, SOCLE, "20_Azara",
         mitres=("bute", "bute"), cotes=(False, True))
+LISHKOT_COUR_SUD = [(x0 - LISHKA_DEBORD, x1 + LISHKA_DEBORD) for x0, x1 in (MELACH_X, PARVA_X, MEDICHIN_X)]
 for _nm, _y0, _y1, _cotes, _corps in (("nord", AY1, AY1 + T, (True, False), CORPS_NORD),
-                                      ("sud", AY0 - T, AY0, (False, True), CORPS_SUD)):
+                                      ("sud", AY0 - T, AY0, (False, True), CORPS_SUD + LISHKOT_COUR_SUD)):
     moulure(f"Azara_socle_{_nm}", AX0 - T, AX1, _y0, _y1, Z_AZ, SOCLE, "20_Azara",
             mitres=("deborde", "bute"), cotes=_cotes,
             reserve=_corps + [(p - 5, p + 5) for p in OUVERTURES[_nm]])
@@ -4222,7 +4485,6 @@ moulure("Azara_bandeau_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, BANDEAU, "20_
 # demie plus bas, a les siens sur le mur est.
 PORTES_EN_CADRE = {nm: [(p - 5 - ENCADREMENT_SHAAR, p + 5 + ENCADREMENT_SHAAR) for p in OUVERTURES[nm]]
                    for nm in OUVERTURES}
-LISHKOT_COUR_SUD = [(x0 - LISHKA_DEBORD, x1 + LISHKA_DEBORD) for x0, x1 in (MELACH_X, PARVA_X, MEDICHIN_X)]
 for nm, paroi, corps in (("nord", ("x", AY1, -1), CORPS_NORD),
                          ("sud", ("x", AY0, 1), CORPS_SUD + LISHKOT_COUR_SUD)):
     ordre_de_pilastres(f"Azara_pilastre_{nm}", paroi, (AX0, X_DOUKHAN), (Z_AZ, SOUS_CORNICHE),
@@ -4622,18 +4884,6 @@ massif_evide("EzratNashim_sol", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_EZN - 1, Z
              VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN)], "10_EzratNashim", MAT_SOL())
 massif_evide("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN - 1,
              VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN)], "00_HarHabayit")
-
-
-def ner_sur_tablette(name, x, y, normale, z, col):
-    """Tablette de pierre sortant du mur en (x, y), lampe de terre et flamme dessus.
-    `normale` : le sens où le mur regarde le passage."""
-    nx, ny = normale
-    x0, x1 = sorted((x, x + nx * 0.4)) if nx else (x - 0.4, x + 0.4)
-    y0, y1 = sorted((y, y + ny * 0.4)) if ny else (y - 0.4, y + 0.4)
-    box(f"{name}_tablette", x0, x1, y0, y1, z - 0.2, z, col)
-    cx, cy = x + nx * 0.2, y + ny * 0.2
-    cyl(f"{name}_lampe", cx, cy, z, z + 0.15, 0.16, col, MAT_TERRE_CUITE(), verts=10)
-    cone(f"{name}_flamme", cx, cy, z + 0.15, z + 0.45, 0.06, 0.0, col, braise("Braise"), verts=8)
 
 
 escalier_a_vis("Mesiba_bira_vis", (PX0 + PX1) / 2, (PY0 + PY1) / 2, (PX1 - PX0) / 2,
@@ -5404,7 +5654,6 @@ for suffixe, xa, xb, ya, yb in POURTOUR_TOIT:
 #     à 2.5 amot des murs. Table au NORD, Menora au SUD, autel d'or entre les deux, vers l'est.
 XU = -125
 # Shoul'han 2 × 1 × 1.5, longueur E-O (Rambam Beit HaBe'hira 3:12), à 2,5 amot du mur nord (Yoma 33b)
-TEFAH = 1 / 6
 YS0, YS1 = 6.5, 7.5
 Z_TABLE = Z_BAT + 1.5
 # Le'hem hapanim (Rambam Temidin 5:9 ; Mena'hot 11:4, 94b, 96a) : pain de 10 × 5 tefa'him, posé en

@@ -119,9 +119,10 @@ const FAMILLES = {
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
   Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS, Cedre_lambris: LAMBRIS,
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
-  Peau: ETOFFE,
+  Peau: ETOFFE, Laine: ETOFFE, Avnet_kilayim: ETOFFE,
   Eau_Kiyor: EAU,
   Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
+  Solet: ENDUIT, Teven: ENDUIT, Klaf: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE,
 };
 

@@ -964,6 +964,36 @@ rebondit — soleil, Menora, braises. Le soleil direct et les lampes restent en 
 - **Non vérifié** : le rendu et le temps par image sur téléphone ; les intérieurs des lishkot ;
   le feu du Beit HaMoked, qui n'a pas de lampe dans la visite et n'éclaire donc rien.
 
+### Les lishkot meublées (17/09)
+
+Hors HaGazit, Avtinas et le Beit HaTevila, les chambres étaient des boîtes vides ou presque.
+Elles reçoivent ce que les sources y mettent, un jour ordinaire en plein jour ; formes, cotes
+et places restent des CHOIX, la présence de chaque objet ne l'est pas (fiche §3, §5).
+
+- **Lishkat Parhedrin** : la mezouza du seul logement du Mikdash (Rambam *Mezouza* 6:6, 6:12),
+  le lit, le banc des anciens (*Yoma* 1:3), le pupitre et les rouleaux d'Iyov, Ezra, Divrei
+  HaYamim et Daniel (1:6), deux lampes pour la nuit de veille (1:7).
+- **Beit HaMoked** : l'enclos des agneaux sans animaux (*Arakhin* 2:5) ; le four, les moules et
+  la pelle du le'hem hapanim (*Mena'hot* 11:1-4) ; la literie roulée des anciens et des
+  pir'hei kehouna (*Tamid* 1:1, Bartenura).
+- **Lishkat Pin'has HaMalbish** : les quatre placards du mishmar de service ouverts, un vêtement
+  chacun, leurs inscriptions et le nom du mishmar (*Klei HaMikdash* 8:8-9).
+- **Lishkat Osei 'Havitin** : les douze 'hallot, le demi-issaron et le quart de log, la jarre
+  des trois log, l'eau qui bout sur un second feu (*Ma'asse HaKorbanot* 13:2-4).
+- **HaGola, HaMela'h, HaParva, HaMedi'hin** et les chambres d'angle de l'Ezrat Nashim : seau,
+  auge et cruches ; paniers de sel ; peaux salées et séchées ; bec d'eau et bassines ; vrac,
+  billots et rebut du bois ; panier du nazir ; mesures des liquides.
+- **Laissées vides, exprès** : la Lishkat HaEtz (« שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת ») et le Beit
+  HaNitzotz, où les sources ne mettent que des gardes.
+- **Le socle de l'Azara traversait cinq chambres.** Il sautait les corps de porte, pas les
+  lishkot : celui du mur est passait dans Pin'has et Osei 'Havitin, à hauteur des placards ;
+  celui du mur sud dans HaMela'h, HaParva et HaMedi'hin. Il saute maintenant leurs emprises.
+- **Divergences notées** : *Tamid* 3:3 ne donne pas les mêmes chambres au Beit HaMoked que
+  *Middot* 1:6 ; le Rambam sale les peaux dans la Lishkat HaMela'h, *Middot* 5:3 dans la Parva.
+  La scène suit *Middot*.
+- **Non fait** : la cuisson de la lumière et l'export de la visite, à relancer (`--lumiere` sur
+  les concepts touchés) ; `temple.glb` et `visite/lumiere/` ne montrent pas encore ces meubles.
+
 ## Licence
 
 - **Code** — scripts Python, JavaScript, shell et `visite/index.html` : [MIT](LICENSE).
