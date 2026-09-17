@@ -28,12 +28,28 @@ import * as THREE from "three";
 // reprend le dessus : la cour repasse en aplat pâle, l'inverse de ce qu'on cherche.
 export const SOLEIL = new THREE.Vector3(150, 58, 55).normalize();
 
-// Le brouillard porte la couleur du BAS du ciel, et pas une autre : accordé au dôme
-// il éloigne, désaccordé il salit. Il commence à six mètres et pas à deux cents : sans
-// lui, un mur à quarante mètres avait exactement le contraste d'une marche à deux, et
-// la cour entière se lisait en maquette. Ce qui sépare les plans à cette distance-là,
-// ce n'est pas le voile mais la perte de contraste qu'il apporte.
-export const BRUME = new THREE.Fog(0xd8dcd4, 6, 700);
+// L'AIR, et pas un brouillard. Un brouillard linéaire pose la même teinte à la même
+// distance dans toutes les directions : un calque gris sur l'image. L'air est plus dense
+// en bas qu'en haut, et ce qu'il ajoute à une chose lointaine est le ciel qu'on voit
+// derrière elle. Chaque fragment reçoit donc l'épaisseur d'air traversée depuis l'œil —
+// une densité qui décroît en exponentielle avec la hauteur, intégrée le long du rayon —,
+// et ce qu'elle cache se remplace par le dôme VU dans la direction regardée.
+//
+// `densite` est celle du dallage de l'Azara (y = 0), par mètre : 0,004 laisse 80 % d'un mur
+// à soixante mètres et 40 % des portiques d'en face. À 0,0018 l'Oulam vu de l'Ezrat Nashim
+// gardait le contraste du premier plan : c'est cette perte de contraste, pas la teinte du
+// voile, qui sépare les plans d'une cour. `epaisseur` est la hauteur où l'air a perdu les
+// deux tiers de sa densité : vu d'en haut, le pied des portiques se voile plus que leur
+// faîte. `effacement` finit le travail avant que la caméra ne coupe à 900 m : un bord
+// tranché net sur le ciel se lirait en décor.
+//
+// Le voile n'a pas la même couleur des deux côtés du ciel. La brume diffuse vers l'avant :
+// regardée dans l'axe du soleil elle est plus claire et ambrée, dos à lui plus froide que
+// le ciel qui la nourrit. Cet écart ne vaut que pour l'air proche et s'éteint au loin, où
+// le voile rejoint le dôme exactement : c'est ce qui fond l'horizon au lieu d'y tracer
+// une ligne.
+const AIR = { densite: 4e-3, epaisseur: 110, effacement: [620, 880],
+              froid: [0.90, 0.94, 1.06], chaud: [1.20, 1.08, 0.92] };
 
 const VU = { haut: 0x4d7fb8, bas: 0xd8dcd4, sol: 0xa89c86, ambiance: 1.0,
              soleil: 2.2, etendue: 7e-5, horizon: 6.0 };
@@ -60,6 +76,16 @@ const VU = { haut: 0x4d7fb8, bas: 0xd8dcd4, sol: 0xa89c86, ambiance: 1.0,
 const ECLAIRANT = { haut: 0xb2aa9c, bas: 0xe0d9c9, sol: 0xcdc0a8, ambiance: 0.45,
                     soleil: 3.5, etendue: 1.6e-3, horizon: 26.0 };
 
+// Le dégradé des deux dômes, et le ciel que l'air ajoute à ce qu'il éloigne.
+const DEGRADE = /* glsl */`
+  vec3 degradeCiel(float h, float s, vec3 haut, vec3 bas, vec3 sol, float ambiance, float horizon){
+    vec3 c = ambiance * (h > 0.0 ? mix(bas, haut, pow(h, 0.55))
+                                 : mix(bas, sol, min(-h * horizon, 1.0)));
+    // Trois portées : la moitié du ciel se réchauffe vers le soleil, le halo se
+    // resserre autour, le disque tient dans son étendue.
+    return c + vec3(1.00, 0.84, 0.58) * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
+  }`;
+
 function dome(rayon, teintes) {
   return new THREE.Mesh(
     new THREE.SphereGeometry(rayon, 64, 32),
@@ -81,14 +107,11 @@ function dome(rayon, teintes) {
         uniform vec3 hautCiel, basCiel, solCiel, dirSoleil;
         uniform float ambiance, soleil, etendue, horizon;
         varying vec3 vD;
+        ${DEGRADE}
         void main(){
-          vec3 d = normalize(vD); float h = d.y;
-          vec3 c = ambiance * (h > 0.0 ? mix(basCiel, hautCiel, pow(h, 0.55))
-                                      : mix(basCiel, solCiel, min(-h * horizon, 1.0)));
+          vec3 d = normalize(vD);
           float s = max(dot(d, dirSoleil), 0.0);
-          // Trois portées : la moitié du ciel se réchauffe vers le soleil, le halo se
-          // resserre autour, le disque tient dans son étendue.
-          c += vec3(1.00, 0.84, 0.58) * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
+          vec3 c = degradeCiel(d.y, s, hautCiel, basCiel, solCiel, ambiance, horizon);
           c += vec3(1.00, 0.95, 0.86) * soleil
              * smoothstep(1.0 - etendue, 1.0 - 0.3 * etendue, s);
           gl_FragColor = vec4(c, 1.0);
@@ -107,4 +130,42 @@ export function environnement(renderer) {
   const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, ECLAIRANT)), 0.04, 0.1, 200);
   pmrem.dispose();
   return cible.texture;
+}
+
+const litteral = (c) => `vec3(${c.map((x) => x.toFixed(4)).join(", ")})`;
+
+// La brume de three remplacée à la source : toute matière qui la reçoit — pierre, or,
+// étoffes, figurants — passe par le même air, et `scene.fog = null` l'éteint encore.
+// Le rayon vient de la position vue, que toute matière écrit, skinnée ou non.
+export function brumer(scene) {
+  const teinte = (hex) => litteral(new THREE.Color(hex).toArray());
+  Object.assign(THREE.ShaderChunk, {
+    fog_pars_vertex: "#ifdef USE_FOG\nvarying vec3 vRayonAir;\n#endif",
+    fog_vertex: "#ifdef USE_FOG\nvRayonAir = mvPosition.xyz * mat3(viewMatrix);\n#endif",
+    fog_pars_fragment: /* glsl */`
+      #ifdef USE_FOG
+        uniform float fogDensity;
+        varying vec3 vRayonAir;
+        ${DEGRADE}
+        vec3 voiler(vec3 couleur, vec3 rayon){
+          float longueur = length(rayon);
+          vec3 d = rayon / max(longueur, 1e-4);
+          // Moyenne de e^(-y/H) le long du rayon : (1 - e^-m)/m avec m = Δy/H, 1 - m/2 à plat.
+          float m = rayon.y / ${AIR.epaisseur.toFixed(1)};
+          float moyenne = abs(m) > 1e-3 ? (1.0 - exp(-m)) / m : 1.0 - 0.5 * m;
+          float epaisseur = fogDensity * exp(-cameraPosition.y / ${AIR.epaisseur.toFixed(1)}) * longueur * moyenne;
+          float transmis = exp(-epaisseur)
+            * (1.0 - smoothstep(${AIR.effacement[0].toFixed(1)}, ${AIR.effacement[1].toFixed(1)}, longueur));
+          float versSoleil = dot(d, ${litteral(SOLEIL.toArray())});
+          vec3 ciel = degradeCiel(d.y, max(versSoleil, 0.0), ${teinte(VU.haut)}, ${teinte(VU.bas)},
+                                 ${teinte(VU.sol)}, ${VU.ambiance.toFixed(3)}, ${VU.horizon.toFixed(3)});
+          float cote = versSoleil * 0.5 + 0.5;
+          vec3 air = mix(${litteral(AIR.froid)}, ${litteral(AIR.chaud)}, cote * cote);
+          return mix(ciel * mix(vec3(1.0), air, transmis), couleur, transmis);
+        }
+      #endif`,
+    fog_fragment: "#ifdef USE_FOG\ngl_FragColor.rgb = voiler(gl_FragColor.rgb, vRayonAir);\n#endif",
+  });
+  scene.fog = new THREE.FogExp2(VU.bas, AIR.densite);
+  return scene.fog;
 }

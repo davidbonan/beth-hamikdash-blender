@@ -17,7 +17,6 @@
  */
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
-import { SOLEIL } from "./ciel.js";
 import { assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
@@ -138,7 +137,6 @@ varying vec3 vMonde;
 varying vec3 vNMonde;
 uniform int uFamille;
 uniform float uTemps;
-uniform vec3 uSoleil;
 uniform vec3 uPenombreMin, uPenombreMax;
 varying float vPixel;
 
@@ -873,7 +871,7 @@ export function habiller(materiau, horloges, jeux) {
   const famille = FAMILLES[gravure ? materiau.name.slice(0, -"_grave".length) : materiau.name];
   if (!famille) return;
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
-                      uSoleil: { value: SOLEIL }, uHauteurImage: HAUTEUR_IMAGE,
+                      uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
   materiau.userData.uniformes = uniformes;
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
@@ -1010,20 +1008,7 @@ export function habiller(materiau, horloges, jeux) {
       // qui ne depend pas du pixel voisin et ne grouille donc jamais.
       .replace("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
-        normal = normalize(normal - mat3(viewMatrix) * mPente);`)
-      // Le voile n'a pas la meme couleur dans les deux moities du ciel. La brume
-      // diffuse vers l'avant : regardee dans l'axe du soleil elle est plus claire et
-      // ambree, regardee dos a lui elle est plus froide que le ciel qui la nourrit.
-      // C'est cet ecart qui fait lire une distance, bien plus que le voile lui-meme —
-      // un voile d'une seule teinte se lit en calque gris pose sur l'image.
-      .replace("#include <fog_fragment>", /* glsl */`
-        #ifdef USE_FOG
-          float versSoleil = dot(normalize(vMonde - cameraPosition), uSoleil) * 0.5 + 0.5;
-          vec3 voile = fogColor * mix(vec3(0.90, 0.94, 1.06), vec3(1.20, 1.08, 0.92),
-                                      versSoleil * versSoleil);
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, voile,
-                                 smoothstep(fogNear, fogFar, vFogDepth));
-        #endif`);
+        normal = normalize(normal - mat3(viewMatrix) * mPente);`);
   };
   materiau.customProgramCacheKey = () => `mikdash-${famille}-${drapeaux}`;
 }

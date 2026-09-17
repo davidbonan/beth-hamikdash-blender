@@ -8,7 +8,7 @@ import { cartesLumiere, cartesOcclusion } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
-import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
+import { SOLEIL, brumer, domeVu, environnement } from "./ciel.js";
 import { regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
@@ -147,7 +147,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = BRUME;
+const brume = brumer(scene);
+// L'air d'une salle couverte ou d'un souterrain ne voit pas le ciel : il n'en rend rien.
+const AIR_DEHORS = brume.density;
+const SANS_CIEL = new Set(["oulam", "heikhal", "kodesh_hakodashim", "taim", "aliyah", "mesiba",
+                           "mesiba_bira", "beit_hatevila"]);
 
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
@@ -994,6 +998,9 @@ function accorderExposition(dt) {
   const facteur = SANS_ADAPTATION.has(lieuPresent) ? oeilAdapte.relacher(dt) : oeilAdapte.accorder(camera.position, dt);
   renderer.toneMappingExposure = EXPOSITION.value = EXPOSITION_DEHORS * facteur;
 }
+function accorderAir(lieu) {
+  brume.density += ((SANS_CIEL.has(lieu) ? 0 : AIR_DEHORS) - brume.density) * 0.25;
+}
 
 let film = null;
 renderer.setAnimationLoop(() => {
@@ -1004,6 +1011,7 @@ renderer.setAnimationLoop(() => {
     if (++image % 4 === 0) {
       lieuPresent = lieuOccupe();
       accorderLampe(lieuPresent);
+      accorderAir(lieuPresent);
     }
     accorderExposition(dt);
     ajusterEchelle(dt);
@@ -1034,6 +1042,7 @@ renderer.setAnimationLoop(() => {
     }
     lieuPresent = lieuOccupe();
     accorderLampe(lieuPresent);
+    accorderAir(lieuPresent);
     position.textContent = brut
       ? `${(camera.position.x / AMA).toFixed(0)} · ` +
         `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
