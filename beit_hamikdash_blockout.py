@@ -2957,16 +2957,6 @@ for y in (HY0 + 15, HY0 + 30):
     box(f"Portique_sud_sabliere_{y:+.0f}", HX0, HX1, y - 0.6, y + 0.6,
         Z_HAR + 23.8, Z_HAR + 25, "00_HarHabayit", MAT_CEDRE())
 
-# 'Heil : 12 marches de 0.5 × 0.5 (Middot 2:3) côté est, l'accès principal (les trois
-# autres côtés se bâtissent avec le soreg, plus bas, où leur cote est connue). Elles
-# montent du dallage au niveau de l'Ezrat Nashim et s'arrêtent contre la face est de
-# son mur (x 145) : posées 5 amot plus à l'ouest, elles étaient enfouies dans le
-# podium. Le soreg qui borde le 'Heil se construit avec les lishkot, plus bas : sa
-# ligne se mesure depuis les corps de porte, qui débordent des murs.
-for i in range(12):
-    box(f"Heil_marche_{i:02d}", 150.5 - i * 0.5, 151 - i * 0.5, -67.5, 67.5,
-        Z_HAR, Z_HAR + 0.5 * (i + 1), "00_HarHabayit")
-
 # ----------------------------------------------------------------------------
 # 01 — LE PAYS : collines de Jérusalem, la ville, les oliviers
 #   Rien n'était modélisé au-delà du Har HaBayit : le Temple se lisait posé sur une
@@ -4418,20 +4408,26 @@ for nm, xa, xb, ya, yb in (("sud", SX0, SX1, SY0, SY0 + 0.2),
         else:
             box(f"Soreg_{nm}_poteau_{k:03d}", xa - 0.05, xb + 0.05, c - 0.15, c + 0.15,
                 Z_HAR, Z_HAR + SOREG_H + 0.15, "00_HarHabayit", MAT_CHENE())
-# La terrasse du 'Heil sur les trois autres côtés : le sol y est celui de l'Ezrat Nashim
-# (Z_EZN), et ses douze marches descendent vers le soreg comme à l'est, en laissant les
-# mêmes quatre amot de plat devant lui. À l'ouest, dix amot de 'Heil ne laissent pas de
+# 'Heil : 12 marches de 0.5 × 0.5 (Middot 2:3) sur ses quatre côtés. À l'est, l'accès
+# principal, elles montent contre la face est du mur de l'Ezrat Nashim (x 145). Au nord et
+# au sud, la terrasse du 'Heil : le sol y est celui de l'Ezrat Nashim (Z_EZN), et ses
+# douze marches descendent vers le soreg en laissant quatre amot de plat devant lui. À l'ouest, dix amot de 'Heil ne laissent pas de
 # terrasse : les marches montent jusqu'au pied du podium. Les corps de porte et lishkot
 # du pourtour sont posés sur cette terrasse, leur porte sur le 'Heil s'ouvre dessus.
 HEIL_MARCHES = 12
 for cote, ya, yb, vides in (("nord", AY1 + T, POURTOUR_Y1, [(*PUITS_MESIBA, Z_HAR, Z_AZ)]),
                             ("sud", -POURTOUR_Y1, AY0 - T, [])):
-    massif_evide(f"Heil_terrasse_{cote}", AX0 - T, SX1 - 4, ya, yb, Z_HAR, Z_EZN, vides, "00_HarHabayit")
+    massif_evide(f"Heil_terrasse_{cote}", AX0 - T, EX1 + 5, ya, yb, Z_HAR, Z_EZN, vides, "00_HarHabayit")
+# Chaque marche est un cadre autour du plateau (podium et terrasses) : la volée tourne les
+# angles sans rupture. Les longs côtés portent les angles, l'est et l'ouest s'arrêtent contre eux.
 for i in range(HEIL_MARCHES):
     z = Z_HAR + 0.5 * (i + 1)
-    box(f"Heil_marche_nord_{i:02d}", SX0 + 4, SX1 - 4, SY1 - 4 - 0.5 * (i + 1), SY1 - 4 - 0.5 * i, Z_HAR, z, "00_HarHabayit")
-    box(f"Heil_marche_sud_{i:02d}", SX0 + 4, SX1 - 4, SY0 + 4 + 0.5 * i, SY0 + 4 + 0.5 * (i + 1), Z_HAR, z, "00_HarHabayit")
-    box(f"Heil_marche_ouest_{i:02d}", SX0 + 4 + 0.5 * i, SX0 + 4 + 0.5 * (i + 1), -POURTOUR_Y1, POURTOUR_Y1, Z_HAR, z, "00_HarHabayit")
+    haut, pied = 0.5 * (HEIL_MARCHES - 1 - i), 0.5 * (HEIL_MARCHES - i)
+    x0, x1, y1 = AX0 - T - pied, EX1 + 5 + pied, POURTOUR_Y1 + haut
+    box(f"Heil_marche_nord_{i:02d}", x0, x1, POURTOUR_Y1 + haut, POURTOUR_Y1 + pied, Z_HAR, z, "00_HarHabayit")
+    box(f"Heil_marche_sud_{i:02d}", x0, x1, -POURTOUR_Y1 - pied, -POURTOUR_Y1 - haut, Z_HAR, z, "00_HarHabayit")
+    box(f"Heil_marche_ouest_{i:02d}", x0, AX0 - T - haut, -y1, y1, Z_HAR, z, "00_HarHabayit")
+    box(f"Heil_marche_est_{i:02d}", EX1 + 5 + haut, x1, -y1, y1, Z_HAR, z, "00_HarHabayit")
 # De la terrasse aux portes latérales : dix amot, vingt marches de « רוּם מַעֲלָה חֲצִי אַמָּה
 # וְשִׁלְחָהּ חֲצִי אַמָּה » (Middot 2:3), sur la largeur de la baie. Devant les trois portes
 # sans corps de porte ; Nitzotz et Mayim montent dans le leur, et le Beit HaMoked a les

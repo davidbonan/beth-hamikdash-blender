@@ -49,8 +49,9 @@ LAMPES = {"flammes": {"couleur": 0xFFB36B, "intensite": 150.0, "hauteur": 0.35},
           "braises": {"couleur": 0xFF7A2A, "intensite": 18.0 * 0.86, "hauteur": 0.0}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
-# Mesuré contre 2048 sur la carte réduite : à 512 l'Oulam s'écarte de 1,4 niveau sRGB en moyenne, contre 1,2 à 1024, en 2,5 fois moins de temps.
-ECHANTILLONS_REBONDS = 512
+ECHANTILLONS_REBONDS = 1024
+# L'adaptatif s'arrête au bruit, pas au plafond : à 0.02 l'Ezrat Nashim cuit deux fois plus vite pour 1,7 niveau sRGB d'écart.
+SEUIL_REBONDS = 0.02
 TOUS = "tout"
 # Un rayon réfléchi par l'or vers la pierre tombe rarement, et fort : sans borne il laisse des étincelles dans la carte.
 BORNE_INDIRECTE = 4.0
@@ -342,7 +343,9 @@ def cuire_occlusion_de(obj, taille, portee):
 def cuire_lumiere_de(obj, taille, sources):
     """Le ciel qui arrive sans rebond, et tout ce qui rebondit, sources comprises ; leur lumière directe reste à la visite."""
     scene = bpy.context.scene
+    seuil_scene = scene.cycles.adaptive_threshold
     scene.cycles.samples = ECHANTILLONS_REBONDS
+    scene.cycles.adaptive_threshold = SEUIL_REBONDS
     image = bpy.data.images.new(obj.name, taille, taille, float_buffer=True, is_data=True)
     for source in sources:
         source.hide_render = False
@@ -351,6 +354,7 @@ def cuire_lumiere_de(obj, taille, sources):
         source.hide_render = True
     # Le ciel direct, échantillonné par importance, ne bouge plus au-delà de 256.
     scene.cycles.samples = ECHANTILLONS
+    scene.cycles.adaptive_threshold = seuil_scene
     ciel = cuire(obj, image, type="DIFFUSE", pass_filter={"DIRECT"})[..., :3]
     bpy.data.images.remove(image)
     return math.pi * (rebonds + ciel)
