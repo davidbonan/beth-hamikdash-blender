@@ -88,6 +88,25 @@ img { display: block; }
 @keyframes balayer { to { transform: translateX(130%); } }
 @keyframes balayer-rtl { to { transform: translateX(-130%); } }
 
+/* ---- la kavana ---- */
+.kavana {
+  min-height: 92svh; display: grid; place-content: center; justify-items: center; text-align: center;
+  padding: clamp(96px, 16vh, 180px) var(--marge); scroll-snap-align: center;
+}
+.kavana::before { content: ""; width: 1px; height: clamp(56px, 10vh, 104px); margin-bottom: 28px; background: linear-gradient(to bottom, transparent, var(--or)); }
+.kavana .source { font-family: "Marcellus", serif; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--or); }
+:root[lang="he"] .kavana .source { font-family: "Frank Ruhl Libre", serif; font-size: 16px; letter-spacing: .04em; }
+.kavana blockquote { margin: 26px 0 0; max-width: 42em; }
+.kavana .he { font-family: "Frank Ruhl Libre", serif; font-size: clamp(24px, 3vw, 42px); line-height: 1.45; color: var(--lin-sourd); text-wrap: balance; }
+.kavana .he mark { background: none; color: var(--or-clair); }
+.kavana .he br + mark { display: inline-block; text-wrap: balance; }
+.kavana .traduction { max-width: 34em; margin: 26px auto 0; font-style: italic; font-size: clamp(17px, 1.5vw, 20px); line-height: 1.55; }
+.kavana cite { font-style: normal; }
+@media (min-width: 861px) { .kavana .he mark { white-space: nowrap; } }
+@supports (animation-timeline: view()) {
+  .kavana > *, .kavana blockquote > * { animation: paraitre linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
+}
+
 /* ---- les lishkot ---- */
 .lishkot { position: relative; scroll-snap-align: start; }
 .plongee { position: relative; display: flex; flex-direction: column; }
@@ -309,7 +328,7 @@ img { display: block; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .seuil .affiche img, .titre, .titre h1 .he, .entrer::after, .scene .vue img, .degres .legende, .fumee, .braise, .reflet, .sanctuaire .fond img, .sanctuaire .legende > *, .repere[aria-current]::before { animation: none; }
+  .seuil .affiche img, .titre, .titre h1 .he, .entrer::after, .scene .vue img, .degres .legende, .fumee, .braise, .reflet, .sanctuaire .fond img, .sanctuaire .legende > *, .repere[aria-current]::before, .kavana > *, .kavana blockquote > * { animation: none; }
   .fumee { opacity: .6; }
   html { scroll-snap-type: none; }
   .scene, .entrer-ici, .echelle li, .echelle a { transition: none; }

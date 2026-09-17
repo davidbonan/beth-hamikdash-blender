@@ -10,6 +10,9 @@ et le Kodesh HaKodashim en finale. Chaque légende mène à la visite, à la vue
 
 Avant la montée, les lishkot : une plongée sur les cours (site/images/lishkot_*.webp, caméra
 ACC_09_Lishkot), un repère par chambre à sa place projetée dans le cadre.
+
+Deux kavanot en encadrent le parcours, sur fond nuit : Choulhan Aroukh OH 95:2 après le seuil,
+Berakhot 30a avant le Kodesh HaKodashim.
 """
 import json
 from pathlib import Path
@@ -65,6 +68,10 @@ TEXTES = {
         "accroche": "Le Temple de Jérusalem, reconstruit en trois dimensions aux cotes de la Mishna. On y entre à pied, on y marche librement, et chaque pierre dit d'où elle vient.",
         "entrer": "Entrer dans la visite",
         "entrer_note": "Gratuit, sans installation. Dix minutes ou une heure.",
+        "kavanot": {
+            "amida": ("Il doit incliner un peu la tête, les yeux baissés vers la terre, et se considérer comme s'il se tenait dans le Beit HaMikdach ; et dans son cœur, se tourner vers le haut, vers le ciel.", "Choul'han Aroukh, Ora'h 'Haïm 95:2"),
+            "makom_ehad": ("Celui qui se tient hors de la terre d'Israël dirige son cœur vers la terre d'Israël ; en terre d'Israël, vers Jérusalem ; à Jérusalem, vers le Beit HaMikdach ; dans le Beit HaMikdach, vers le Kodesh HaKodashim ; dans le Kodesh HaKodashim, vers le Beit HaKaporet… Ainsi tout Israël dirige son cœur vers un seul lieu.", "Berakhot 30a"),
+        },
         "degres_titre": "Les degrés de sainteté",
         "ouverture": "Du Har HaBayit au Kodesh HaKodashim, la Mishna Kelim compte les degrés de sainteté. À chacun, moins de monde entre.",
         "voir": "Voir dans la visite",
@@ -115,6 +122,10 @@ TEXTES = {
         "accroche": "The Temple of Jerusalem, rebuilt in three dimensions to the measurements of the Mishnah. You enter on foot, walk where you like, and every stone tells you where it comes from.",
         "entrer": "Enter the tour",
         "entrer_note": "Free, nothing to install. Ten minutes or an hour.",
+        "kavanot": {
+            "amida": ("He should bow his head slightly, his eyes cast down toward the earth, and consider himself as if standing in the Beit HaMikdash; and in his heart direct himself upward, toward heaven.", "Shulchan Arukh, Orach Chayim 95:2"),
+            "makom_ehad": ("One standing outside the Land of Israel directs his heart toward the Land of Israel; in the Land of Israel, toward Jerusalem; in Jerusalem, toward the Beit HaMikdash; in the Beit HaMikdash, toward the Kodesh HaKodashim; in the Kodesh HaKodashim, toward the Beit HaKaporet… Thus all Israel direct their hearts toward one place.", "Berakhot 30a"),
+        },
         "degres_titre": "The degrees of holiness",
         "ouverture": "From the Har HaBayit to the Kodesh HaKodashim, Mishnah Kelim counts the degrees of holiness. At each one, fewer may enter.",
         "voir": "See it in the tour",
@@ -165,6 +176,10 @@ TEXTES = {
         "accroche": "בית המקדש, משוחזר בתלת־ממד לפי מידות המשנה. נכנסים ברגל, מהלכים בחופשיות, וכל אבן אומרת מניין היא באה.",
         "entrer": "כניסה לסיור",
         "entrer_note": "חינם, ללא התקנה. עשר דקות או שעה.",
+        "kavanot": {
+            "amida": ("", "שולחן ערוך, אורח חיים צה, ב"),
+            "makom_ehad": ("", "ברכות ל, א"),
+        },
         "degres_titre": "מעלות הקדושה",
         "ouverture": "מהר הבית ועד קודש הקודשים מונה משנה כלים את מעלות הקדושה. בכל מעלה נכנסים פחות.",
         "voir": "לראות בסיור",
@@ -297,6 +312,24 @@ def sanctuaire(t, degre, vue):
   </section>'''
 
 
+KAVANOT = {
+    "amida": "צריך שיכוף ראשו מעט שיהיו עיניו למטה לארץ <mark>ויחשוב כאלו עומד בבית המקדש</mark> ובלבו יכוין למעלה לשמים",
+    "makom_ehad": "היה עומד בחוץ לארץ יכוין את לבו כנגד ארץ ישראל… היה עומד בבית קדשי הקדשים יכוין את לבו כנגד בית הכפורת…<br><mark>נמצאו כל ישראל מכוונין את לבם למקום אחד</mark>",
+}
+
+
+def kavana(t, passage):
+    traduction, source = t["kavanot"][passage]
+    if traduction:
+        traduction = f'\n      <p class="traduction">{traduction}</p>'
+    return f'''<section class="kavana" aria-label="{source}">
+    <p class="source"><cite>{source}</cite></p>
+    <blockquote>
+      <p class="he" lang="he" dir="rtl">{KAVANOT[passage]}</p>{traduction}
+    </blockquote>
+  </section>'''
+
+
 def nom_chambre(t, chambre):
     hebreu = FICHES["fr"][chambre]["he"]
     if t["code"] == "he":
@@ -403,6 +436,8 @@ def page(code):
     </div>
   </header>
 
+  {kavana(t, "amida")}
+
   {lishkot(t)}
 
   <section class="montee" aria-labelledby="montee-titre">
@@ -420,6 +455,8 @@ def page(code):
       </ol>
     </div>
   </section>
+
+  {kavana(t, "makom_ehad")}
 
   {sanctuaire(t, *dernier)}
 </main>
