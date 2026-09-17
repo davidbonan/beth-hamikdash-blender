@@ -161,13 +161,21 @@ Six jeux, tous CC0, refabriqués par `beit_hamikdash_nappes.py` : *worn_rock_nat
 n'en tire que son terni : une feuille BATTUE a des creux, et
 une tôle scannée n'en a pas — le martelage est écrit, comme l'appareil.
 
-**Les arêtes.** Le blockout porte 5 561 chanfreins, que l'export jetait tous. Les six
-collections qu'on longe à bout de bras — Mizbea'h, Oulam, Heikhal, Kodesh HaKodashim,
-Aron, kelim — les gardent maintenant, à UN segment : une pierre de taille a un arêtier,
-pas un congé, et c'est aussi moitié moins cher. Le reste garde ses arêtes vives : à
-l'enceinte ou à la ville, on ne s'approche jamais assez pour que 3 cm se voient.
-La facture est de 272 000 à 746 000 triangles et de 2,7 à 6,7 Mo — mais 0,4 ms sur 8,7
-au rendu, mesuré ici : ce chanfrein coûte du poids, pas des images.
+**Les arêtes.** Le blockout porte ses chanfreins sur toute l'architecture, et l'export les
+cuit tous, à UN segment : une pierre de taille a un arêtier, pas un congé. Les six
+collections qu'on longe à bout de bras — Mizbea'h, Oulam, Heikhal, Kodesh HaKodashim, Aron,
+kelim — les avaient seules ; l'Azara, l'Ezrat Nashim, les lishkot et le Har HaBayit sortaient
+en arêtes vives, et c'est justement là qu'on marche le long des murs, des portes et des
+marches.
+La visite les ramène à **0,03 ama** (`LARGEUR_CHANFREIN`), kelim et Aron gardant leurs
+0,015 : à 0,06, la largeur du film, le chanfrein couvre trois ou quatre pixels à quelques
+mètres, éclairé à mi-chemin entre ses deux faces, et se lit en dégradé mou — un congé. À 0,03
+il redevient un liseré franc. Les normales n'y sont pour rien : les faces restent plates
+jusque dans le .glb.
+Le « un segment » ne tenait pas : le graphe de dépendances était lu avant le passage à un
+segment, et rendait encore les deux du blockout. Corrigé, les six collections d'origine
+coûtent deux fois moins, ce qui paie les quatre nouvelles. Mesuré sur un export sans
+occlusion : de 2 563 000 à 2 025 000 triangles, et de 22,7 à 18,9 Mo.
 
 **La lumière.** Ce qui restait de « vieille 3D » ne tenait plus à la matière mais à la
 formation de l'image. Quatre choses, mesurées avant d'être crues.
@@ -258,9 +266,7 @@ reporte dans les miroirs `.en` et `.he`**. `python3 beit_hamikdash_traductions.p
 qui manque ou a dérivé — un concept nouveau, une cote ajoutée, une source changée — et
 sort en erreur tant qu'il en reste. Une langue non traduite retombe sur le français.
 
-**Ce que la visite ne prend pas.** Les 5 960 modificateurs Bevel (à appliquer, la scène
-passe de 132 000 à 743 000 faces et le fichier de 3,8 à 76 Mo, pour un chanfrein de 3 cm
-invisible à hauteur d'homme), les lumières de rendu, le pays, les caméras et la fumée —
+**Ce que la visite ne prend pas.** Les lumières de rendu, le pays, les caméras et la fumée —
 mise en scène, pas architecture.
 
 **Les matières.** L'export n'emporte de chaque matière Blender que sa couleur de base :
