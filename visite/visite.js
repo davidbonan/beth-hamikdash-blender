@@ -7,7 +7,7 @@ import { nappes } from "./nappes.js";
 import { cartesOcclusion } from "./occlusion.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
-import { SOLEIL, BRUME, domeVu, environnement } from "./ciel.js";
+import { SOLEIL, brumer, domeVu, environnement } from "./ciel.js";
 import { regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
@@ -145,7 +145,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = BRUME;
+const brume = brumer(scene);
+// L'air d'une salle couverte ou d'un souterrain ne voit pas le ciel : il n'en rend rien.
+const AIR_DEHORS = brume.density;
+const SANS_CIEL = new Set(["oulam", "heikhal", "kodesh_hakodashim", "taim", "aliyah", "mesiba",
+                           "mesiba_bira", "beit_hatevila"]);
 
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
@@ -981,6 +985,9 @@ const lieuOccupe = () => lieuEn(corps.set(camera.position.x, piedsY + 1, camera.
 function accorderLampe(lieu) {
   lampe.intensity += ((LAMPE_PAR_LIEU[lieu] ?? LAMPE_TETE) - lampe.intensity) * 0.25;
 }
+function accorderAir(lieu) {
+  brume.density += ((SANS_CIEL.has(lieu) ? 0 : AIR_DEHORS) - brume.density) * 0.25;
+}
 
 let film = null;
 renderer.setAnimationLoop(() => {
@@ -988,7 +995,11 @@ renderer.setAnimationLoop(() => {
   if (film) {
     film.avancer(dt);
     piedsY = camera.position.y - OEIL;
-    if (++image % 4 === 0) accorderLampe(lieuOccupe());
+    if (++image % 4 === 0) {
+      const lieu = lieuOccupe();
+      accorderLampe(lieu);
+      accorderAir(lieu);
+    }
     ajusterEchelle(dt);
     dessiner(dt);
     return;
@@ -1017,6 +1028,7 @@ renderer.setAnimationLoop(() => {
     }
     const lieu = lieuOccupe();
     accorderLampe(lieu);
+    accorderAir(lieu);
     position.textContent = brut
       ? `${(camera.position.x / AMA).toFixed(0)} · ` +
         `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`

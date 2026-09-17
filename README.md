@@ -179,10 +179,33 @@ reprendrait le dessus ; le rapport soleil/ciel est donc rouvert en même temps (
 
 Le brouillard commençait à **220 m**. Dans l'Azara rien n'est à plus de soixante : son
 facteur valait exactement zéro sur toute vue de cour, un mur à quarante mètres avait le
-contraste d'une marche à deux, et l'œil lisait une maquette. Il commence à **six mètres**,
-et il n'a pas la même couleur des deux côtés du ciel — la brume diffuse vers l'avant :
-regardée dans l'axe du soleil elle est claire et ambrée, dos à lui plus froide que le ciel
-qui la nourrit. C'est cet écart qui fait lire une distance, pas le voile.
+contraste d'une marche à deux, et l'œil lisait une maquette. Avancé à six mètres, il restait
+un brouillard linéaire : la même teinte à la même distance dans toutes les directions, 2 %
+à soixante mètres, et un calque gris sur le lointain.
+
+C'est maintenant **de l'air** (`brumer`, dans `ciel.js`). Sa densité vaut **0,004 par
+mètre** au dallage de l'Azara et décroît en exponentielle avec la hauteur (**110 m** pour en
+perdre les deux tiers) ; elle est intégrée analytiquement le long de chaque rayon, sans
+volume ni pas de marche — un mur à soixante mètres garde 80 % de son contraste, les
+portiques d'en face 40 %, et vu d'en haut leur pied se voile plus que leur faîte. À 0,0018,
+essayé d'abord, l'Oulam vu de l'Ezrat Nashim gardait le contraste du premier plan. Ce que
+l'air cache se remplace par **le dôme qu'on voit, dans la direction regardée** — le même
+dégradé, écrit une fois (`degradeCiel`) — et non par une couleur : au loin le voile rejoint
+le ciel exactement, et l'horizon se fond au lieu d'y tracer une ligne. Un effacement de 620
+à 880 m finit le travail avant que la caméra ne coupe à 900.
+
+Près de l'œil, le voile n'a pas la même couleur des deux côtés du ciel — la brume diffuse
+vers l'avant : regardée dans l'axe du soleil elle est claire et ambrée, dos à lui plus
+froide que le ciel qui la nourrit. C'est cet écart qui fait lire une distance, pas le voile ;
+il s'éteint à mesure que l'air s'épaissit, pour que le lointain retombe sur le ciel.
+
+Les chunks `fog_*` de three sont remplacés à la source : pierre, or, étoffes et figurants
+passent par le même air, et la sonde du Heikhal l'éteint toujours en coupant `scene.fog`.
+Le rayon s'y tire de la position vue, que toute matière écrit, skinnée ou non. Sous un
+toit ou sous terre — Oulam, Heikhal, Kodesh HaKodashim, ta'im, aliyah, mesiba, mesiba
+sous la bira, Beit HaTevila — la densité descend à zéro, au rythme de la lampe de tête :
+cet air-là ne voit pas le ciel. Laissé à 0,004, il posait au fond de la mesiba un voile
+bleu-gris sur la roche noire, et grisait l'ombre du Heikhal vue depuis l'Oulam.
 
 L'environnement que le métal réfléchissait n'avait **pas de soleil** : un dégradé à trois
 couleurs, sans disque et sans horizon franc. Un métal dont le reflet ne contient aucune
