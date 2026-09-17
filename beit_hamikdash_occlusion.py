@@ -70,8 +70,13 @@ def retenus(fusionnes):
     for ident, obj in sorted(fusionnes.items()):
         surface = aire(obj)
         taille = taille_de(surface)
-        if ident not in EXCLUS and surface >= AIRE_MIN and taille * taille / len(obj.data.polygons) >= TEXELS_PAR_FACE_MIN:
-            yield ident, obj, taille
+        if ident in EXCLUS or surface < AIRE_MIN:
+            continue
+        # Compté sans chanfrein : il multiplie les faces sans rendre l'objet plus fin.
+        if taille * taille / obj["faces_sans_chanfrein"] < TEXELS_PAR_FACE_MIN:
+            print(f"  écarté    {ident:26s} {obj['faces_sans_chanfrein']} faces pour {taille} px", flush=True)
+            continue
+        yield ident, obj, taille
 
 
 def points_temoins(triangle):

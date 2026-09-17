@@ -142,6 +142,8 @@ def chanfreiner(gardes):
     Un seul segment : une pierre de taille a un ARÊTIER, pas un congé. Le blockout en
     pose deux pour les passes Normal de l'i2i, ce qui arrondit — et double la facture.
     """
+    for objet in gardes:
+        objet["faces_sans_chanfrein"] = len(objet.data.polygons)
     biseautes = [o for o in gardes if o.modifiers]
     for objet in biseautes:
         for modificateur in objet.modifiers:
@@ -199,12 +201,15 @@ def aplatir(mat):
 def fusionner(nom, objets):
     """Un seul maillage pour tout un concept, portant son identifiant en propriété."""
     tete = objets[0]
+    # `object.join` ne garde que les propriétés de l'objet actif.
+    faces_sans_chanfrein = sum(o["faces_sans_chanfrein"] for o in objets)
     if len(objets) > 1:
         with bpy.context.temp_override(active_object=tete, selected_editable_objects=objets):
             bpy.ops.object.join()
     tete.name = nom
     tete.data.name = nom
     tete["concept"] = nom
+    tete["faces_sans_chanfrein"] = faces_sans_chanfrein
     return tete
 
 
