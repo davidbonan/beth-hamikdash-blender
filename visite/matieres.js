@@ -961,8 +961,11 @@ export function habiller(materiau, horloges, jeux) {
           #endif
           float mTemperance = temperance(dot(reflectedLight.directDiffuse
                                              + cielPlat * BRDF_Lambert(material.diffuseColor), LUMA));
-          float mReliefCiel = pow(dot(irradiance + iblIrradiance, LUMA) / dot(cielPlat, LUMA),
-                                  mTemperance - 1.0);
+          // Sans ciel (la sonde du Heikhal l'éteint), 0/0 : les GPU d'iPhone en tirent un NaN que le halo étale.
+          float mCiel = dot(cielPlat, LUMA);
+          float mReliefCiel = mCiel > 1e-4
+            ? pow(max(dot(irradiance + iblIrradiance, LUMA), 1e-4) / mCiel, mTemperance - 1.0)
+            : 1.0;
           irradiance *= mReliefCiel;
           iblIrradiance *= mReliefCiel;
         #endif

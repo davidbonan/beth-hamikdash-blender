@@ -371,7 +371,7 @@ gltf.scene.traverse((o) => {
   o.userData.concept = conceptDe(o);
   maillages.push(o);
 });
-const sousSonde = new Set(brut || !PROFIL.sonde ? [] : separerDuHeikhal(
+const sousSonde = new Set(brut ? [] : separerDuHeikhal(
   maillages.filter((o) => DANS_HEIKHAL.has(o.userData.concept)), EMPRISES.get("heikhal")));
 
 gltf.scene.traverse((o) => {
@@ -402,7 +402,7 @@ gltf.scene.traverse((o) => {
   if (!TRAVERSABLES.has(o.userData.concept)) murs.push(o);
 });
 
-if (!brut && PROFIL.sonde) sonderHeikhal(renderer, scene, {
+if (!brut) sonderHeikhal(renderer, scene, {
   kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
   materiaux: materiauxHeikhal,
   eteints: [soleil, appoint, lampe, ciel, cielAmbiant],

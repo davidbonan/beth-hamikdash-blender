@@ -888,9 +888,10 @@ version précédente, même glb, même pose.
   d'occlusion ramenée à 3 m dans la salle, où la sonde écarte déjà le ciel. `sculptures_murs`
   court sur les parois des deux pièces : ce qui sort du Heikhal est détaché au chargement et
   garde le ciel assombri du Kodesh HaKodashim.
-  Le profil léger s'en passe : sur iPhone 16 Plus (Safari, iOS 18.7), rendue au chargement,
-  elle noircissait toute la visite hors le ciel — vérifié sur l'appareil, visite propre sans
-  elle. Le Heikhal y garde le reflet du ciel.
+  Ciel éteint, la tempérance du relief des pierres (`matieres.js`) divisait 0 par 0 : le Mac
+  en tire 1, l'iPhone 16 Plus (Safari, iOS 18.7) un NaN — mesuré sur l'appareil, 7 311 pixels
+  sur une face de la carte, que le PMREM puis le halo étalaient en noir sur toute la visite.
+  Sans ciel, le relief n'est plus tempéré.
 - **Non mesuré** : le temps par image. Rien n'est retiré — la SSAO de `chaine.js` reste,
   pour les contacts et les figurants — et la cuisson ajoute une lecture de texture ; aucun
   gain de performance n'est à attendre de ce changement.
