@@ -41,12 +41,8 @@ AMA = 0.48
 COLLECTIONS = ("00_HarHabayit", "10_EzratNashim", "20_Azara", "30_Mizbeach", "40_Ulam",
                "50_Heikhal", "60_KodeshHakodashim", "65_Aron", "70_Kelim", "80_Lishkot")
 
-# Les collections qui gardent leur chanfrein. Ce sont celles qu'on longe à bout de bras :
-# une arête vive n'accroche aucune lumière, et c'est ce qui trahit le plus sûrement une
-# maquette. Ailleurs — l'enceinte, les cours, la ville — on ne s'approche jamais assez
-# pour que 3 cm se voient, et le chanfrein n'y serait qu'un tiers de fichier en plus.
-CHANFREIN = ("30_Mizbeach", "40_Ulam", "50_Heikhal", "60_KodeshHakodashim",
-             "65_Aron", "70_Kelim")
+# En mètres. Le blockout chanfreine à 0.06 ama pour le film ; à hauteur d'homme, ce liseré-là se lit en congé.
+LARGEUR_CHANFREIN = 0.03 * AMA
 
 # En amot. `cadre` : concepts à montrer entiers ; sans `position`, le navigateur recule le long du `cap` (0 = est, 90 = nord).
 Z_HAR, Z_EZN, Z_AZ, Z_BAT = -16.0, -10.0, 0.0, 6.0
@@ -129,7 +125,10 @@ def comprimer(glb, options=()):
 
 
 def chanfreiner(gardes):
-    """Cuit les chanfreins de près, jette les autres. À faire AVANT la fusion.
+    """Cuit les chanfreins. À faire AVANT la fusion.
+
+    Une arête vive n'accroche aucune lumière, et c'est ce qui trahit le plus sûrement une
+    maquette : à hauteur d'homme, le long des murs des cours comme au pied du Mizbea'h.
 
     `object.join` ne garde que les modificateurs de l'objet actif : un chanfrein encore
     en attente au moment de la fusion est perdu sans bruit. Et l'export ne peut pas s'en
@@ -139,23 +138,18 @@ def chanfreiner(gardes):
     Un seul segment : une pierre de taille a un ARÊTIER, pas un congé. Le blockout en
     pose deux pour les passes Normal de l'i2i, ce qui arrondit — et double la facture.
     """
-    proches = {o for nom in CHANFREIN if (c := bpy.data.collections.get(nom))
-               for o in c.objects if o in gardes}
-    deps = bpy.context.evaluated_depsgraph_get()
-    cuits = 0
-    for objet in gardes:
-        if not objet.modifiers:
-            continue
-        if objet not in proches:
-            objet.modifiers.clear()
-            continue
+    biseautes = [o for o in gardes if o.modifiers]
+    for objet in biseautes:
         for modificateur in objet.modifiers:
             if modificateur.type == "BEVEL":
                 modificateur.segments = 1
+                modificateur.width = min(modificateur.width, LARGEUR_CHANFREIN)
+    # Lu après le passage à un segment : pris avant, il rendait encore les deux du blockout.
+    deps = bpy.context.evaluated_depsgraph_get()
+    for objet in biseautes:
         objet.data = bpy.data.meshes.new_from_object(objet.evaluated_get(deps))
         objet.modifiers.clear()
-        cuits += 1
-    print(f"  {cuits} volumes chanfreinés, {len(gardes) - cuits} laissés vifs")
+    print(f"  {len(biseautes)} volumes chanfreinés, {len(gardes) - len(biseautes)} sans chanfrein")
 
 
 def concepts():
@@ -284,8 +278,7 @@ def main():
         export_format="GLB",
         export_extras=True,
         export_yup=True,
-        # `chanfreiner` a déjà cuit ce qui devait l'être et jeté le reste : il ne
-        # subsiste aucun modificateur à appliquer.
+        # `chanfreiner` a déjà cuit les chanfreins : il ne subsiste aucun modificateur à appliquer.
         export_apply=False,
         export_cameras=False,
         export_lights=False,
