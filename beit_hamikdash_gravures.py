@@ -8,8 +8,8 @@
 (6:35) : la figure est CREUSÉE, et l'or épouse le creusé. Un bas-relief se lit à son
 modelé — les volumes qui bombent, les plans qui s'étagent, les sillons qui séparent une
 penne de la suivante — et non à sa découpe : une plaque plate au contour parfait reste
-un emporte-pièce. Le blockout ne pose donc plus qu'UNE plaque par figure, à sa
-silhouette ; tout le modelé est ici, dans une carte que la plaque lit par ses UV.
+un emporte-pièce. Le blockout ne taille donc qu'UN fond par figure, à sa
+silhouette ; tout le modelé est ici, dans une carte que ce fond lit par ses UV.
 
 Le modelé lui-même n'est plus dessiné ici. Des contours lissés et des dômes, si juste
 soit le motif, sortent en clip-art : chaque partie bombe de la même parabole, chaque
@@ -46,9 +46,9 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (BRAS, CORPS_KERUV, DATTE, EPIS, LARGEURS_BRAS, PALMES,  # noqa: E402
-                                     PLIS, TETE_DOUBLE, TRONC, aile, chevrons, corolle, ellipse,
-                                     epi, folioles, lisser, palme, poser, poser_lame, ruban)
+from beit_hamikdash_contours import (BRAS, CORPS_KERUV, LARGEURS_BRAS, PLIS, TETE_DOUBLE,  # noqa: E402
+                                     aile, bezier, corolle, ellipse, folioles, largeurs_palme,
+                                     lisser, poser, poser_lame, ruban, symetrique)
 
 TUILE_PX = 1024
 ATLAS_PX = 2 * TUILE_PX
@@ -66,9 +66,9 @@ FONDU = 0.005            # en part de la hauteur : 2 cm sur un keruv de paroi
 # Simplification de la silhouette, en part de la hauteur : 1,5 cm sur un keruv de paroi,
 # 2 cm sur la timora d'un jambage. Le fleuron fait 22 cm et court par centaines : le
 # chanfrein et l'export dédoublent chaque sommet, et c'est là que le glb se gagne.
-# La timora est découpée en folioles depuis qu'elle est un vrai dattier, et sa silhouette
-# a quintuplé : 0,010 en ôte un tiers sans en perdre une. Au-delà, les dents s'effacent
-# palme par palme — à 0,014 la moitié des palmes est ressortie en lame lisse.
+# Les palmes de la timora sont découpées en folioles, et sa silhouette a quintuplé : 0,010
+# en ôte un tiers sans en perdre une. Au-delà, les dents s'effacent palme par palme — à
+# 0,014 la moitié des palmes est ressortie en lame lisse.
 TOLERANCE = {"keruv": 0.005, "timora": 0.010, "fleuron": 0.02}
 
 
@@ -119,28 +119,32 @@ def keruv(planche):
     planche.graver([(-0.10, 0.92), (0.0, 0.932), (0.10, 0.92)], 0.010, 0.4)
 
 
-# --- La timora : le dattier (beit_hamikdash_contours.py), et ses sillons. ---------------
+# --- La timora : une palmette, sept palmes en éventail sur une base en cloche. ----------
 
-NIVEAU_FUT, NIVEAU_PALME, NIVEAU_REGIME = 0.4, 0.25, 0.55
+# « כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל » (Rashi sur Ye'hezkel 40:16) et « דמות ענפי אילן וחריותיו »
+# (Ralbag sur Melakhim I 6:29) : l'ornement peut n'être que les palmes, sans fût ni
+# régimes. Le dattier entier, à 2,9 amot entre deux keruvim, se lisait en dessin d'arbre.
+# Chaque palme part droite de la naissance puis s'ouvre en fontaine : (point de contrôle,
+# pointe) de la demi-palmette droite, la palme du milieu d'abord. Des palmes en rayons
+# droits se lisaient en feuille de chanvre. La dernière paire retombe vers le pied, sous
+# les 0,36 de demi-largeur que le dattier tenait : le pas des parois (PAS_KIR) ne bouge pas.
+NAISSANCE = (0.0, 0.18)
+BASE = symetrique([(0.0, NAISSANCE[1] + 0.02), (0.05, NAISSANCE[1] + 0.02), (0.035, 0.09),
+                   (0.07, 0.0), (0.0, 0.0)])
+PALMETTE = (((0.0, 0.60), (0.0, 0.97)), ((0.10, 0.98), (0.26, 0.78)),
+            ((0.20, 0.82), (0.36, 0.48)), ((0.26, 0.56), (0.36, 0.20)))
+NIVEAU_BASE, NIVEAU_PALME = 0.4, 0.25
 
 
 def timora(planche):
-    planche.bomber(TRONC, NIVEAU_FUT, 1.0, 0.05)
-    for chevron in chevrons():
-        planche.graver(chevron, 0.007, 0.35)
-    for inclinaison, longueur, retombee in PALMES[::-1]:
-        for sens in ((1,) if inclinaison == 0 else (-1, 1)):
-            axe, largeurs = palme(sens * inclinaison, longueur, retombee)
-            planche.bomber(folioles(axe, largeurs), NIVEAU_PALME, 1.0, 0.035)
+    for (u1, z1), (u2, z2) in PALMETTE[::-1]:
+        for sens in ((1,) if u2 == 0 else (-1, 1)):
+            axe = bezier(NAISSANCE, (sens * u1, z1), (sens * u2, z2), 32)
+            planche.bomber(folioles(axe, largeurs_palme(len(axe))), NIVEAU_PALME, 1.0, 0.035)
             # La nervure seule : les folioles ne sont plus des arêtes de poisson gravées
             # dans un bord lisse, c'est le contour lui-même qui les découpe.
             planche.graver(axe[3:-9], 0.005, 0.3)
-    for sens in (-1, 1):
-        for ecart, longueur in EPIS:
-            fil, dattes = epi(ecart, longueur)
-            planche.bomber(ruban([(sens * u, z) for u, z in fil], 0.011), NIVEAU_REGIME, 0.7, 0.01)
-            for u, z in dattes:
-                planche.bomber(ellipse(sens * u, z, *DATTE), NIVEAU_REGIME, 0.7, 0.015)
+    planche.bomber(BASE, NIVEAU_BASE, 1.0, 0.03)
 
 
 # --- Le fleuron : la rosette à six pétales, celle des ossuaires de Jérusalem. -----------
@@ -184,15 +188,15 @@ MOTIFS = {
               "carrying TWO faces in profile, one looking left and one looking right "
               "(Janus-like), with a plain headband, no beard, no crown. IMPORTANT: the "
               "faces are left perfectly smooth and blank, with no eyes, no nose, no mouth."),
-    "timora": (timora, CADRE_DEBOUT, (1, 1), "date palm tree, as on the Bar Kokhba coins",
-               "a straight trunk marked with stacked chevron scars of cut frond bases and a "
-               "flared foot, and a crown of exactly seven fronds — the middle one upright, the "
-               "others bending down in arcs. IMPORTANT: every frond is deeply CUT INTO SEPARATE "
-               "POINTED LEAFLETS along both sides of a grooved midrib, like a feather or a "
-               "comb, never a smooth leaf and never a flower petal; the leaflets are narrow, "
-               "straight and angled towards the tip. Hanging from the crown on either side of "
-               "the trunk, three slender strands per side drooping down along the trunk, each "
-               "strung with small oval dates — hanging spikes, not a round bunch of grapes."),
+    "timora": (timora, CADRE_DEBOUT, (1, 1), "palmette of palm fronds",
+               "a fan of exactly seven palm fronds springing from a small bell-shaped base, "
+               "with no trunk and no dates: the middle frond upright, the three pairs on "
+               "either side curving outward and drooping more and more, the lowest pair "
+               "falling back down to the level of the base. IMPORTANT: every frond is deeply "
+               "CUT INTO SEPARATE POINTED LEAFLETS along both sides of a grooved midrib, like "
+               "a feather or a comb, never a smooth leaf, never a flower petal and never a "
+               "stiff Greek anthemion; the leaflets are narrow, straight and angled towards "
+               "the tip."),
     "fleuron": (fleuron, (-0.6, -0.1, 0.6, 1.1), (0, 0), "six-petal rosette",
                 "an open six-petal compass-drawn rosette filling the frame, as on Jerusalem "
                 "ossuaries, a round raised heart in the centre, each petal a carved lobe "

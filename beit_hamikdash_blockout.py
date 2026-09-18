@@ -1541,29 +1541,55 @@ def _repere(paroi):
     return (lambda u, z, d: Vector((c + sens * d, u, z))), Vector((0, 1, 0)), Vector((sens, 0, 0))
 
 
+def _contour_oriente(paroi, contour, uv):
+    """Les points du contour sur le nu de la paroi, tournés dans le sens direct vu du
+    dehors, avec leurs `uv` et la normale sortante. Le contour a le droit d'être
+    concave — l'orientation se prend sur l'aire entière, qu'un test au premier sommet
+    donnerait à l'envers sur une corolle."""
+    point, _, normale = _repere(paroi)
+    nu = [point(u, z, 0.0) for u, z in contour]
+    aire = Vector((0.0, 0.0, 0.0))
+    for k in range(1, len(nu) - 1):
+        aire += (nu[k] - nu[0]).cross(nu[k + 1] - nu[0])
+    if aire.dot(normale) < 0:
+        return nu[::-1], uv and uv[::-1], normale
+    return nu, uv, normale
+
+
 def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None, uv=None):
     """Un contour libre tracé dans le plan de la paroi, sorti d'elle de `d0` à `d1`,
     `uv` (une coordonnée par point du contour) allant aux deux faces.
 
     Une silhouette d'un seul tenant, et non un assemblage de plaques rectangulaires :
     c'est le contour qui fait lire la figure, et c'est lui que la passe Normal donne au
-    styliseur. Le contour a le droit d'être concave — l'orientation se prend sur l'aire
-    entière, qu'un test au premier sommet donnerait à l'envers sur une corolle.
+    styliseur.
     """
-    point, _, normale = _repere(paroi)
-    fond = [point(u, z, d0) for u, z in contour]
-    aire = Vector((0.0, 0.0, 0.0))
-    for k in range(1, len(fond) - 1):
-        aire += (fond[k] - fond[0]).cross(fond[k + 1] - fond[0])
-    if aire.dot(normale) < 0:
-        fond.reverse()
-        uv = uv and uv[::-1]
-    n = len(fond)
-    saillie = normale * (d1 - d0)
-    verts = [tuple(p) for p in fond] + [tuple(p + saillie) for p in fond]
+    nu, uv, normale = _contour_oriente(paroi, contour, uv)
+    n = len(nu)
+    verts = [tuple(p + normale * d0) for p in nu] + [tuple(p + normale * d1) for p in nu]
     faces = [list(range(n))[::-1], list(range(n, 2 * n))]
     faces += [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
     return mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE(), uv and uv + uv)
+
+
+# Chaque taille laisse ici son contour ; `creuser_les_parois` en ouvre le trou dans ce
+# qui la porte, une fois la scène bâtie.
+_TAILLES = []
+
+
+def _taille_profil(nom, paroi, contour, profondeur, col, mat=None, uv=None):
+    """Un contour taillé DANS la paroi : le fond à `profondeur` sous le nu, et les flancs
+    qui y descendent, tournés vers la figure. Pas de dessus — c'est le trou que
+    `creuser_les_parois` ouvre dans le support."""
+    nu, uv, normale = _contour_oriente(paroi, contour, uv)
+    n = len(nu)
+    verts = [tuple(p - normale * profondeur) for p in nu] + [tuple(p) for p in nu]
+    faces = [list(range(n))]
+    faces += [[n + k, n + (k + 1) % n, (k + 1) % n, k] for k in range(n)]
+    o = mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE(), uv and uv + uv)
+    o["taille"] = True
+    _TAILLES.append((paroi, contour, profondeur))
+    return o
 
 
 # --- Les trois figures gravées du Bayit, et le palmier de tous ses jambages :
@@ -1582,9 +1608,10 @@ def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None, uv=None):
 #     tracées sur la carte même. Des plaques empilées, aussi bien découpées fussent-elles,
 #     se lisaient en emporte-pièce : seul le chanfrein prenait la lumière.
 BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
-SAILLIE_KIR = 0.05        # saillie de la plaque : 2,5 cm, ce qu'un bas-relief d'ossuaire sort
-                          # de sa dalle. À 0,16 la figure se lisait encore posée sur le mur,
-                          # comme appliquée ; ici elle est prise dans le plaquage
+# « פִּתּוּחֵי מִקְלְעוֹת » : « חֲקוּקֵי צוּרַת כְּרוּבִים » (Rashi), « לא שהיו בולטין » (Radak) — la
+# figure est TAILLÉE dans la paroi, rien n'en sort. Son modelé bombe au fond de la taille
+# sans jamais revenir au nu, et c'est le flanc tourné vers elle qui en trace le contour.
+PROFONDEUR_KIR = 0.05     # 2,5 cm, la moitié du placage d'or de 0,1 ama
 PAS_KIR = 3.7             # pas visé d'une figure, en amot : entre un keruv (large d'une
                           # hauteur) et une timora (0,7), il reste 1,3 ama d'or nu
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
@@ -1633,7 +1660,7 @@ def matiere_gravee(mat):
 
 
 def _relief_grave(nom, paroi, motif, u, z0, h, col, mat=None):
-    """La plaque d'une figure gravée : sa silhouette, sortie de SAILLIE_KIR, posée en
+    """La taille d'une figure gravée : sa silhouette, enfoncée de PROFONDEUR_KIR, posée en
     (u, z0) à la hauteur `h`, et dont chaque sommet vise la tuile du motif dans l'atlas."""
     fiche = GRAVURES[motif]
     u0, z_bas, u1, _ = fiche["cadre"]
@@ -1642,7 +1669,7 @@ def _relief_grave(nom, paroi, motif, u, z0, h, col, mat=None):
     contour = [(u + du * h, z0 + dz * h) for du, dz in fiche["silhouette"]]
     uv = [(ou + taille * (du - u0) / cadre, ov + taille * (dz - z_bas) / cadre)
           for du, dz in fiche["silhouette"]]
-    return _relief_profil(nom, paroi, contour, 0.0, SAILLIE_KIR, col, matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
+    return _taille_profil(nom, paroi, contour, PROFONDEUR_KIR, col, matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
 
 
 def largeur_gravure(motif):
@@ -1653,9 +1680,9 @@ def largeur_gravure(motif):
 
 
 def timora(nom, paroi, u, z0, h, col, mat=None):
-    """« תִּמֹרָה » : le dattier — Rashi et Radak lisent דקלים —, fût à écailles, sept
-    palmes, deux régimes de dattes, comme sur les monnaies de Bar Kokhba
-    (`beit_hamikdash_gravures.py`).
+    """« תִּמֹרָה » : une palmette, sept palmes en fontaine sur une base en cloche —
+    « כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל » (Rashi sur Ye'hezkel 40:16), « ענפי אילן וחריותיו »
+    (Ralbag sur Melakhim I 6:29) — (`beit_hamikdash_gravures.py`).
 
     Sur l'or du Bayit elle est dorée et `mat` reste vide ; sur le jambage d'une porte
     du Har HaBayit, que nulle source ne dore, elle se taille dans la pierre du mur.
@@ -1680,12 +1707,20 @@ def petur_tzitz(nom, paroi, u, z, r, col, mat=None):
     return o
 
 
+# Les deux traits d'un bandeau, en amot au-dessus de son bas : entre le bord et la
+# corolle, qui en laisse 0,044 de chaque côté — deux tailles qui se touchent ne font
+# plus qu'un trou.
+TRAITS_BANDEAU = ((0.012, 0.036), (BANDEAU_KIR - 0.036, BANDEAU_KIR - 0.012))
+
+
 def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
     """Un bandeau de fleurons en travers d'une paroi : ce qui tient les registres.
-    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser."""
-    _relief_profil(f"{nom}_listel", paroi,
-                   [(u0, z), (u1, z), (u1, z + BANDEAU_KIR), (u0, z + BANDEAU_KIR)],
-                   0.0, SAILLIE_KIR * 0.4, col, mat)
+    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser.
+    Deux traits taillés le bordent, et non un listel qui sortirait du nu."""
+    for bord, (zb, zh) in enumerate(TRAITS_BANDEAU):
+        _taille_profil(f"{nom}_trait_{bord}", paroi,
+                       [(u0, z + zb), (u1, z + zb), (u1, z + zh), (u0, z + zh)],
+                       PROFONDEUR_KIR * 0.4, col, mat)
     n = max(1, round((u1 - u0) / PAS_KIR))
     pas = (u1 - u0) / n
     for i in range(n):
@@ -4414,25 +4449,133 @@ MY0, MY1 = -25, 7            # CHOIX : centre 9 amot au sud de l'axe, bord nord 
 # הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת וּבַמִּזְרָח אַמָּה אַחַת » (Middot 3:1 ; fiche §6). Tout le
 # nord et tout l'ouest, une ama à l'angle sud-ouest sur le sud, une ama à l'angle
 # nord-est sur l'est ; le corps descend donc jusqu'au sol sur les faces est et sud.
-box("Mizbeach_yessod_N", MX0 + 1, MX1, MY1 - 1, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_yessod_O", MX0, MX0 + 1, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_yessod_S", MX0 + 1, MX0 + 2, MY0, MY0 + 1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_yessod_E", MX1 - 1, MX1, MY1 - 2, MY1 - 1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_corps", MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_haut", MX0 + 2, MX1 - 2, MY0 + 2, MY1 - 2, Z_AZ + 6, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX_FEU())
+# « אֲבָנִים שְׁלֵמוֹת, שֶׁלֹּא הוּנַף עֲלֵיהֶן בַּרְזֶל… לֹא הָיוּ סָדִין אוֹתָן בְּכָפִיס שֶׁל בַּרְזֶל » (Middot 3:4) :
+# des pierres brutes sous une chaux posée sans truelle — ni face dressée, ni arête vive.
+BOSSE_CHAUX, ONDE_CHAUX, PAS_CHAUX = 0.06, 1.3, 0.5
+# Ce qu'un bloc s'enfonce dans ce qui le porte, et ce qu'un voisin mord dans sa face : la bosse n'ouvre jamais de jour.
+REPRISE_CHAUX = 0.3
+# Un sommet de l'arrondi tous les 15° : la tangente de 45° à 90°, portée sur le rayon.
+ARRONDI_CHAUX = (0.0, 0.42, 0.73, 1.0)
+DECALAGE_CHAUX = Vector((5.2, 1.3, 7.7))
+
+def _cotes_chaux(a, b, r_bas, r_haut):
+    n = max(1, round((b - a - r_bas - r_haut) / PAS_CHAUX))
+    pas = [a + r_bas + (b - a - r_bas - r_haut) * k / n for k in range(n + 1)]
+    bouts = [a + r_bas * f for f in ARRONDI_CHAUX] + [b - r_haut * f for f in ARRONDI_CHAUX]
+    return sorted({round(c, 6) for c in pas + bouts})
+
+def _sur_la_chaux(p, dedans, r, ecart=0.0):
+    """Le point p de la face dressée, porté sur l'arrondi de rayon r autour de `dedans` puis bossué.
+
+    La bosse se lit en coordonnées de monde : deux blocs qui se continuent ondulent ensemble.
+    Le dessus reste presque plan — on y pose les gzirin, et les pieds l'ont foulé.
+    """
+    c = Vector([min(max(p[k], dedans[0][k]), dedans[1][k]) for k in range(3)])
+    n = (Vector(p) - c).normalized()
+    q = Vector(p) / ONDE_CHAUX
+    bosse = noise.noise(q) + 0.4 * noise.noise(q * 2.7 + DECALAGE_CHAUX)
+    return c + n * (r + ecart + BOSSE_CHAUX * bosse * (1.0 - 0.7 * n.z * n.z))
+
+def _dedans_chaux(x0, x1, y0, y1, z0, z1, r, ouvert=()):
+    """La boîte que l'arrondi entoure. Un côté `ouvert` est enfoui dans un voisin : il ne s'arrondit pas."""
+    rayon = {cote: 0.0 if cote in ouvert else r for cote in ("x0", "x1", "y0", "y1")}
+    return ((x0 + rayon["x0"], y0 + rayon["y0"], z0 - REPRISE_CHAUX),
+            (x1 - rayon["x1"], y1 - rayon["y1"], z1 - r)), rayon
+
+def bloc_de_chaux(name, x0, x1, y0, y1, z0, z1, col, mat, r=0.12, ouvert=(), creux=0.0):
+    """Boîte de chaux ouverte en dessous et enfoncée de REPRISE_CHAUX dans ce qui la porte.
+
+    `ouvert` : les côtés ("x0", "x1", "y0", "y1") qui continuent dans un bloc voisin, sans face ni arrondi —
+    deux faces jointives bossuées en sens contraires ouvriraient un jour entre elles.
+    `creux` : l'épaisseur de paroi d'un bloc percé de haut en bas, comme une keren.
+    """
+    (dedans, rayon) = _dedans_chaux(x0, x1, y0, y1, z0, z1, r, ouvert)
+    trou = (x0 + creux, x1 - creux, y0 + creux, y1 - creux)
+    xs = sorted(set(_cotes_chaux(x0, x1, rayon["x0"], rayon["x1"]) + ([trou[0], trou[1]] if creux else [])))
+    ys = sorted(set(_cotes_chaux(y0, y1, rayon["y0"], rayon["y1"]) + ([trou[2], trou[3]] if creux else [])))
+    zs = _cotes_chaux(z0 - REPRISE_CHAUX, z1, 0.0, r)
+    index, verts, faces = {}, [], []
+
+    def sommet(p):
+        if p not in index:
+            index[p] = len(verts)
+            verts.append(tuple(_sur_la_chaux(p, dedans, r)))
+        return index[p]
+
+    def grille(us, vs, point):
+        for i in range(len(us) - 1):
+            for j in range(len(vs) - 1):
+                faces.append([sommet(point(us[i], vs[j])), sommet(point(us[i + 1], vs[j])),
+                              sommet(point(us[i + 1], vs[j + 1])), sommet(point(us[i], vs[j + 1]))])
+
+    def perce(u, v):
+        return creux and trou[0] < u < trou[1] and trou[2] < v < trou[3]
+
+    for i in range(len(xs) - 1):
+        for j in range(len(ys) - 1):
+            if not perce((xs[i] + xs[i + 1]) / 2, (ys[j] + ys[j + 1]) / 2):
+                faces.append([sommet((xs[i], ys[j], z1)), sommet((xs[i + 1], ys[j], z1)),
+                              sommet((xs[i + 1], ys[j + 1], z1)), sommet((xs[i], ys[j + 1], z1))])
+    if "x1" not in ouvert:
+        grille(ys, zs, lambda u, v: (x1, u, v))
+    if "x0" not in ouvert:
+        grille(zs, ys, lambda u, v: (x0, v, u))
+    if "y1" not in ouvert:
+        grille(zs, xs, lambda u, v: (v, y1, u))
+    if "y0" not in ouvert:
+        grille(xs, zs, lambda u, v: (u, y0, v))
+    if creux:
+        # Le puits descend jusque sous le dessus qui porte le bloc : c'est lui qui en fait le fond.
+        bord = ([(x, trou[2]) for x in xs if trou[0] <= x <= trou[1]]
+                + [(trou[1], y) for y in ys if trou[2] < y <= trou[3]]
+                + [(x, trou[3]) for x in reversed(xs) if trou[0] <= x < trou[1]]
+                + [(trou[0], y) for y in reversed(ys) if trou[2] < y < trou[3]])
+        fond = len(verts)
+        verts += [(x, y, z0 - REPRISE_CHAUX) for x, y in bord]
+        for k in range(len(bord)):
+            suivant = (k + 1) % len(bord)
+            faces.append([sommet((*bord[k], z1)), sommet((*bord[suivant], z1)), fond + suivant, fond + k])
+    o = mesh_from_pydata(name, verts, faces, col, mat)
+    o.data.shade_smooth()
+    o["sans_biseau"] = True
+    return o
+
+def ceinture_de_chaux(name, bloc, z0, z1, col, mat, r=0.12):
+    """Bande peinte entre z0 et z1 sur les flancs du bloc de bornes `bloc` : sans épaisseur, elle en suit chaque bosse."""
+    x0, x1, y0, y1 = bloc[:4]
+    dedans, _ = _dedans_chaux(*bloc, r)
+    xs, ys = _cotes_chaux(x0, x1, r, r), _cotes_chaux(y0, y1, r, r)
+    tour = ([(x, y0) for x in xs] + [(x1, y) for y in ys[1:]]
+            + [(x, y1) for x in reversed(xs[:-1])] + [(x0, y) for y in reversed(ys[1:-1])])
+    n = len(tour)
+    verts = [tuple(_sur_la_chaux((x, y, z), dedans, r, ecart=0.02)) for z in (z0, z1) for x, y in tour]
+    faces = [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
+    o = mesh_from_pydata(name, verts, faces, col, mat)
+    o.data.shade_smooth()
+    o["sans_biseau"] = True
+    return o
+
+# Le yessod est une seule bande de chaux : ses tronçons se continuent par leurs côtés ouverts, et mordent dans le corps.
+bloc_de_chaux("Mizbeach_yessod_N", MX0 + 1 + REPRISE_CHAUX, MX1, MY1 - 1 - REPRISE_CHAUX, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y0"))
+bloc_de_chaux("Mizbeach_yessod_O", MX0, MX0 + 1 + REPRISE_CHAUX, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x1",))
+bloc_de_chaux("Mizbeach_yessod_S", MX0 + 1 + REPRISE_CHAUX, MX0 + 2, MY0, MY0 + 1 + REPRISE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y1"))
+bloc_de_chaux("Mizbeach_yessod_E", MX1 - 1 - REPRISE_CHAUX, MX1, MY1 - 2, MY1 - 1 - REPRISE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y1"))
+CORPS = (MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ, Z_AZ + 6)
+bloc_de_chaux("Mizbeach_corps", *CORPS, "30_Mizbeach", MAT_CHAUX())
+bloc_de_chaux("Mizbeach_haut", MX0 + 2, MX1 - 2, MY0 + 2, MY1 - 2, Z_AZ + 6, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX_FEU())
 # « וְאַרְבַּע הַקְּרָנוֹת חֲלוּלוֹת הָיוּ מִתּוֹכָן » (Rambam Beit HaBe'hira 2:8, 2:16) : quatre murets
 # d'une ama cube autour d'un vide. Épaisseur des murets : CHOIX.
 PAROI_KEREN = 0.25
 for (nm, x, y) in [("SE", MX1 - 3, MY0 + 2), ("NE", MX1 - 3, MY1 - 3), ("NO", MX0 + 2, MY1 - 3), ("SO", MX0 + 2, MY0 + 2)]:
-    for cote, xa, xb, ya, yb in (("S", x, x + 1, y, y + PAROI_KEREN), ("N", x, x + 1, y + 1 - PAROI_KEREN, y + 1),
-                                 ("O", x, x + PAROI_KEREN, y + PAROI_KEREN, y + 1 - PAROI_KEREN),
-                                 ("E", x + 1 - PAROI_KEREN, x + 1, y + PAROI_KEREN, y + 1 - PAROI_KEREN)):
-        box(f"Keren_{nm}_{cote}", xa, xb, ya, yb, Z_AZ + 9, Z_AZ + 10, "30_Mizbeach", MAT_CHAUX_FEU())
+    bloc_de_chaux(f"Keren_{nm}", x, x + 1, y, y + 1, Z_AZ + 9, Z_AZ + 10, "30_Mizbeach", MAT_CHAUX_FEU(),
+                  r=0.06, creux=PAROI_KEREN)
 # « וְחוּט שֶׁל סִקְרָא חוֹגְרוֹ בָאֶמְצַע » (Middot 3:1) : la ligne rouge à mi-hauteur, qui sépare
 # les sangs d'en haut des sangs d'en bas — le seul trait de couleur sur la chaux.
-for nm, xa, xb, ya, yb in (("E", MX1 - 1, MX1 - 0.97, MY0 + 1, MY1 - 1), ("O", MX0 + 0.97, MX0 + 1, MY0 + 1, MY1 - 1),
-                           ("N", MX0 + 1, MX1 - 1, MY1 - 1, MY1 - 0.97), ("S", MX0 + 1, MX1 - 1, MY0 + 0.97, MY0 + 1)):
-    box(f"Mizbeach_sikra_{nm}", xa, xb, ya, yb, Z_AZ + 4.95, Z_AZ + 5.05, "30_Mizbeach", MAT_SIKRA())
+ceinture_de_chaux("Mizbeach_sikra", CORPS, Z_AZ + 4.95, Z_AZ + 5.05, "30_Mizbeach", MAT_SIKRA())
 # Trois ma'arakhot chaque jour et quatre à Kippour, l'avis de R. Yossi (Yoma 4:6 ; Rambam
 # Temidin ouMousafin 2:4-5) : la grande à l'est, celle de la ketoret à l'angle sud-ouest
 # (Tamid 2:4-5), celle du kiyoum haesh, et à Kippour celle des braises de la ketoret du
@@ -4570,8 +4713,9 @@ box("Kevesh_rosh", KX0, KX1, MY0, MY0 + 2 - AVIR_KEVESH, Z_AZ + 8, Z_AZ + 9, "30
 # descend en biais jusqu'à l'angle, sur le yessod de l'ouest et celui du sud. Le sovev part à 18 amot
 # de l'autel et non du pied, pour laisser au sol la place du deshen à dix amot du pied
 # (Tamid 1:4). Largeurs et départ : CHOIX.
-wedge_ramp("Kevesh_katan_sovev", KX1, KX1 + 2.5, MY0 - 18, MY0 + 1 - NIMA, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
-wedge_ramp_oblique("Kevesh_katan_yessod", KX0 - 2, MX0, 2, KY0, MY0 - NIMA, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
+# La nima se compte depuis la bosse de la chaux, pas depuis la face dressée.
+wedge_ramp("Kevesh_katan_sovev", KX1, KX1 + 2.5, MY0 - 18, MY0 + 1 - NIMA - BOSSE_CHAUX, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
+wedge_ramp_oblique("Kevesh_katan_yessod", KX0 - 2, MX0, 2, KY0, MY0 - NIMA - BOSSE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
 # « וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף; עַל שֶׁל שַׁיִשׁ הָיוּ נוֹתְנִים אֶת הָאֵבָרִים, עַל
 # שֶׁל כֶּסֶף כְּלֵי שָׁרֵת » (Shekalim 6:4 ; Rambam 2:15). Cotes, celles des tables du Beit
 # HaMitba'haïm ; place, à l'ouest de la rampe du yessod : CHOIX.
@@ -4657,7 +4801,11 @@ cyl_between("Magrefa_manche", (MAGREFA_X + MAGREFA_R - 0.1, MAGREFA_Y, Z_AZ + 0.
 # פֶּרַח שׁוֹשָׁן », deux rangs de coloquintes sous la lèvre, douze bœufs, trois vers chaque
 # vent, « וְכָל אֲחֹרֵיהֶם בָּיְתָה ». « מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב » (7:39) :
 # au sud-est du bâtiment, entre les marches de l'Oulam et la rampe.
-YAM_X, YAM_Y, YAM_Z = -63, -40, Z_AZ + 2.2
+# Les bœufs, taureaux d'un mètre trente au garrot (CHOIX), croupes à YAM_CROUPE du centre
+# et côte à côte à YAM_ECART : les rangs de deux vents voisins ne se touchent pas au coin.
+# La cuve pose sur leurs reins, là où son fond remonte à la hauteur du dos.
+YAM_X, YAM_Y, YAM_Z = -63, -40, Z_AZ + 2.15
+YAM_CROUPE, YAM_ECART = 2.3, 1.5
 YAM = [(0.6, 0.0), (3.6, 0.5), (4.5, 1.6), (4.75, 3.2), (4.7, 3.9), (5.0, 4.6), (5.2, 5.0),
        (4.95, 5.0), (4.6, 4.4), (4.45, 3.0), (3.6, 1.0), (0.0, 0.6)]
 revolution("Yam", YAM_X, YAM_Y, YAM_Z, YAM, "30_Mizbeach", MAT_BRONZE(), verts=48)
@@ -4669,30 +4817,38 @@ for rang, z in enumerate((3.55, 3.85)):
                "30_Mizbeach", MAT_BRONZE(), segs=6)
 
 
-def boeuf(name, x, y, z0, d, col, mat):
-    """Bœuf de la Mer : tête vers `d` (vecteur cardinal), croupe vers le centre."""
-    dx, dy = d
-    px, py = -dy, dx
-
-    def pt(le_long, en_travers):
-        return x + dx * le_long + px * en_travers, y + dy * le_long + py * en_travers
-
-    (ax, ay), (bx, by) = pt(0, -0.5), pt(2.4, 0.5)
-    box(f"{name}_corps", ax, bx, ay, by, z0 + 1.0, z0 + 2.1, col, mat)
-    (ax, ay), (bx, by) = pt(2.3, -0.28), pt(3.0, 0.28)
-    box(f"{name}_tete", ax, bx, ay, by, z0 + 1.55, z0 + 2.1, col, mat)
-    for k, (l, t) in enumerate(((0.35, -0.32), (0.35, 0.32), (2.0, -0.32), (2.0, 0.32))):
-        cx, cy = pt(l, t)
-        cyl(f"{name}_patte_{k}", cx, cy, z0, z0 + 1.0, 0.13, col, mat, verts=8)
-    for k, s in enumerate((-1, 1)):
-        (ax, ay), (bx, by) = pt(2.85, s * 0.2), pt(2.95, s * 0.55)
-        cyl_between(f"{name}_corne_{k}", (ax, ay, z0 + 2.1), (bx, by, z0 + 2.5), 0.04, col, mat, verts=6)
+SHOR_BLEND = pathlib.Path(__file__).resolve().parent / "shor.blend"
 
 
-for nm, d in (("E", (1, 0)), ("N", (0, 1)), ("O", (-1, 0)), ("S", (0, -1))):
-    for k, t in enumerate((-1.5, 0.0, 1.5)):
-        boeuf(f"Yam_shor_{nm}{k}", YAM_X + d[0] * 3.0 - d[1] * t, YAM_Y + d[1] * 3.0 + d[0] * t, Z_AZ, d,
-              "30_Mizbeach", MAT_BRONZE())
+def shor():
+    """Le bœuf de la Mer, lu dans `shor.blend`.
+
+    C'est `beit_hamikdash_shor.py` qui le modèle, en champ de distance polygonisé. Le
+    maillage est en mètres, dans le repère du bœuf : origine au sol sous la pointe des
+    fesses, +x vers le mufle.
+    """
+    with bpy.data.libraries.load(str(SHOR_BLEND)) as (_, charge):
+        charge.meshes = ["Shor"]
+    return charge.meshes[0]
+
+
+def yam_bakar(col, mat):
+    """Les douze bœufs, trois par vent, croupes vers le centre, tête vers le dehors."""
+    modele = shor()
+    for nom, (dx, dy) in (("E", (1, 0)), ("N", (0, 1)), ("O", (-1, 0)), ("S", (0, -1))):
+        for k, t in enumerate((-YAM_ECART, 0.0, YAM_ECART)):
+            me = modele.copy()
+            me.materials.clear()
+            me.materials.append(mat)
+            o = _objet(f"Yam_shor_{nom}{k}", me, col)
+            o["sans_biseau"] = True
+            _poser([o], YAM_X + dx * YAM_CROUPE - dy * t, YAM_Y + dy * YAM_CROUPE + dx * t, Z_AZ,
+                   math.atan2(dy, dx))
+    bpy.data.meshes.remove(modele)
+
+
+yam_bakar("30_Mizbeach", MAT_BRONZE())
+
 # Les dix mekhonot (Melakhim I 7:27-39) : socles de bronze de 4 × 4 × 3 sur quatre roues
 # d'une ama et demie, panneaux à lions, bœufs et keruvim (ici : leurs cadres seulement),
 # et une cuve de quatre amot sur chacun. « חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף
@@ -7659,6 +7815,76 @@ for nom_collection, largeur_biseau in BISEAU.items():
     collection = bpy.data.collections.get(nom_collection)
     if collection:
         biseauter(collection, largeur_biseau)
+
+# ----------------------------------------------------------------------------
+# TAILLES
+#   Chaque support perd le trou de ses tailles par un booléen posé APRÈS le biseau,
+#   pour que le bord de la taille reste vif. La visite évalue les deux ensemble
+#   (beit_hamikdash_visite.py, `chanfreiner`).
+# ----------------------------------------------------------------------------
+MARGE_TAILLE = 0.01       # amot : l'outil passe le nu et le fond, sans quoi le booléen laisse une pellicule
+OUTILS = "99_Outils"
+
+
+def _prisme_taille(paroi, contour, profondeur):
+    """Sommets (en amot) et faces du volume qu'une taille retire à son support."""
+    nu, _, normale = _contour_oriente(paroi, contour, None)
+    n = len(nu)
+    verts = ([tuple(p - normale * (profondeur + MARGE_TAILLE)) for p in nu]
+             + [tuple(p + normale * MARGE_TAILLE) for p in nu])
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    faces += [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
+    return verts, faces
+
+
+def _emprise(coins):
+    return tuple(map(min, zip(*coins))), tuple(map(max, zip(*coins)))
+
+
+def _porte_la_taille(support, taille, paroi, profondeur):
+    """Le support a sa face sur le nu de la paroi, et assez d'épaisseur derrière pour la
+    taille — ni ce qui se tient devant le mur, ni la maçonnerie derrière le placage."""
+    axe, c, sens = paroi
+    i = 1 if axe == "x" else 0
+    face = support[1][i] if sens > 0 else -support[0][i]
+    fond = support[0][i] if sens > 0 else -support[1][i]
+    nu = m(c) * sens
+    if abs(face - nu) > m(MARGE_TAILLE) or fond > nu - m(profondeur):
+        return False
+    return all(taille[0][j] < support[1][j] and support[0][j] < taille[1][j] for j in range(3) if j != i)
+
+
+def creuser_les_parois():
+    """Ouvre dans chaque support le trou des tailles qui l'entament : un outil par
+    support, fait de toutes ses tailles, soustrait par un modificateur."""
+    supports = [(o, _emprise([o.matrix_world @ Vector(c) for c in o.bound_box]))
+                for o in scene.objects if o.type == 'MESH' and not o.get("taille")]
+    par_support, sans_support = {}, 0
+    for paroi, contour, profondeur in _TAILLES:
+        verts, faces = _prisme_taille(paroi, contour, profondeur)
+        emprise = _emprise([tuple(m(c) for c in v) for v in verts])
+        porteurs = [support for support, sienne in supports
+                    if _porte_la_taille(sienne, emprise, paroi, profondeur)]
+        sans_support += not porteurs
+        for support in porteurs:
+            par_support.setdefault(support, []).append((verts, faces))
+    for support, prismes in par_support.items():
+        verts, faces = [], []
+        for v, f in prismes:
+            faces += [[len(verts) + i for i in face] for face in f]
+            verts += v
+        outil = mesh_from_pydata(f"Outil_{support.name}", verts, faces, OUTILS)
+        outil.hide_render = True
+        outil.display_type = 'WIRE'
+        booleen = support.modifiers.new("Taille", 'BOOLEAN')
+        booleen.operation = 'DIFFERENCE'
+        booleen.solver = 'EXACT'
+        booleen.use_self = True   # sans lui, les parois du Kodesh HaKodashim s'évaluaient vides
+        booleen.object = outil
+    print(f"  {len(_TAILLES)} tailles creusées dans {len(par_support)} supports, {sans_support} sans support")
+
+
+creuser_les_parois()
 
 # ----------------------------------------------------------------------------
 # ÉCLAIRAGE, CIEL ET MOTEUR

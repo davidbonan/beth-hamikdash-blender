@@ -22,7 +22,7 @@ import { assemblage } from "./ombres.js";
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
-      LAMBRIS = 16, MIKSHE = 17, KOTEL_HERODIEN = 18, KOTEL_OMEYYADE = 19, KOTEL_MAMELOUK = 20;
+      LAMBRIS = 16, MIKSHE = 17, CHAUX = 18, KOTEL_HERODIEN = 19, KOTEL_OMEYYADE = 20, KOTEL_MAMELOUK = 21;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
@@ -73,8 +73,8 @@ vec3 grossirFil(vec3 p, vec3 n){
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
-                   13: "pierre", 14: "pierre", 15: "pierre", 18: "pierre", 19: "pierre", 20: "pierre",
-                   3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois" };
+                   13: "pierre", 14: "pierre", 15: "pierre", 19: "pierre", 20: "pierre", 21: "pierre",
+                   3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois", 18: "enduit" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
 // marbre, gazit scié — prend la même pierre que le reste, en moins appuyé : c'est cette
@@ -96,7 +96,9 @@ const CARREAU = {
   1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
   3: [1.6, 0.34, 0.14, 0.60, 0.70], 17: [1.6, 0.34, 0.14, 0.60, 0.70],
   4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
-  7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
+  7: [1.4, 0.75, 0.35, 0.90, 0.50],
+  // La chaux du Mizbea'h porte son relief elle-même ; la photo n'y ajoute que le grain, et sous la cendre presque rien.
+  18: [1.4, 0.45, 0.25, 0.90, 0.50], 8: [1.4, 0.20, 0.20, 0.50, 0.40],
   // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
   9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.4, 0.28, 0.28, 1.20, 0.65],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
@@ -104,7 +106,7 @@ const CARREAU = {
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
   // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
   13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
-  18: [2.4, 0.28, 0.28, 1.20, 0.65], 19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65],
+  19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65], 21: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
   15: [1.0, 0.60, 0.40, 1.60, 0.70],
   // Le lambris de cèdre prend la photo du bois trois fois plus grande et presque sans nœuds :
@@ -124,7 +126,7 @@ const FAMILLES = {
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Peau: ETOFFE, Laine: ETOFFE, Avnet_kilayim: ETOFFE,
   Eau_Kiyor: EAU,
-  Chaux_blanche: ENDUIT, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
+  Chaux_blanche: CHAUX, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
   Solet: ENDUIT, Teven: ENDUIT, Klaf: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE,
 };
@@ -208,6 +210,18 @@ float grain(vec3 p, float largeur){
 }
 #endif
 
+// Le bruit de valeur suit la grille des axes, et un seuil l'y lit en carrés : chaque octave tourne, aucune ne s'aligne sur une face.
+const mat3 TOUR = mat3(0.00, 0.80, 0.60, -0.80, 0.36, -0.48, -0.60, -0.48, 0.64);
+float grainOblique(vec3 p, float largeur){
+  vec3 a = TOUR * p, b = TOUR * a * 2.03;
+#ifdef GRAIN_LEGER
+  return (0.5 * octave(a, largeur) + 0.25 * octave(b, largeur * 2.03)) / GRAIN_PLEIN;
+#else
+  vec3 c = TOUR * b * 1.975;
+  return (0.5 * octave(a, largeur) + 0.25 * octave(b, largeur * 2.03) + 0.125 * octave(c, largeur * 4.01)) / GRAIN_PLEIN;
+#endif
+}
+
 // Posé par matiere() avant tout motif : ce que couvre le pixel au point ombré, sans dérivée d'écran.
 struct Regard { vec3 vue; float incidence; float pixel; };
 Regard regard;
@@ -267,7 +281,7 @@ const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 const float CREUX_M = 0.020;
 // Part de la coulure qu'un parement garde : la muraille et la ville entière, le Temple lavé la moitié. COULURE_EXPOSEE du blockout.
 const float COULURE_EXPOSEE = 0.16;
-float exposition(){ return uFamille == 11 || uFamille == 14 || uFamille >= 18 ? 1.0 : 0.5; }
+float exposition(){ return uFamille == 11 || uFamille == 14 || uFamille >= 19 ? 1.0 : 0.5; }
 // Le Kotel au-dessus de sa place : Hérode, les Omeyyades, puis les petites assises, chaque
 // bande calée sur son premier lit. Mêmes valeurs que APPAREILS_KOTEL du blockout, en amot.
 const float Z_PLACE_KOTEL = -51.5833, Z_KOTEL_OMEYYADE = -35.5417, Z_KOTEL_MAMELOUK = -28.875;
@@ -625,6 +639,77 @@ void facettesAmande(vec3 P, vec3 N, inout vec3 pente, inout float rugo){
   rugo += (d - 0.35) * 0.04 * fin;
 }
 
+// Le dessus du Mizbea'h, en mètres de three (x, z) : 28 amot au carré, de x -52 à -24 et y -23 à 5 dans le blockout.
+const vec4 SOMMET_MIZBEACH = vec4(-52.0 * AMA, -24.0 * AMA, -5.0 * AMA, 23.0 * AMA);
+const float HAUT_MIZBEACH = 9.0 * AMA;
+
+// Chaux sur pierres brutes (Middot 3:4) : la bosse d'une pierre, le grain du geste, et le pied sali par la cour.
+void chaux(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
+  float pixel = empreinteMax();
+  vec3 t1 = normalize(abs(N.y) > 0.7 ? vec3(1.0, 0.0, 0.0) : cross(N, vec3(0.0, 1.0, 0.0)));
+  vec3 t2 = cross(N, t1);
+  vec3 q = P * 3.2, r = P * 13.0 + 7.3;
+  float e = 0.12;
+  float h = grainOblique(q, pixel * 3.2), g = grainOblique(r, pixel * 13.0);
+  pente = ((grainOblique(q + t1 * e, pixel * 3.2) - h) * t1 + (grainOblique(q + t2 * e, pixel * 3.2) - h) * t2) * (0.16 / e)
+        + ((grainOblique(r + t1 * e, pixel * 13.0) - g) * t1 + (grainOblique(r + t2 * e, pixel * 13.0) - g) * t2) * (0.05 / e);
+  float couche = grainOblique(P * 0.7 + 3.1, pixel * 0.7);
+  teinte = vec3(1.0 + (h - 0.5) * 0.05 + (couche - 0.5) * 0.07);
+  float pied = (1.0 - smoothstep(0.0, 0.7 * AMA, P.y)) * (1.0 - abs(N.y));
+  teinte *= mix(vec3(1.0), OMBRE_JOINT, pied * 0.30 * (0.6 + 0.8 * g));
+  rugo = (g - 0.5) * 0.08;
+}
+
+// Le sang d'une semaine sur la chaux : « כָּל עֶרֶב שַׁבָּת מְלַבְּנִים אוֹתוֹ בְמַפָּה מִפְּנֵי הַדָּמִים » (Middot 3:4).
+// Séché, il brunit ; mince, il ne laisse qu'un lavis rosé. Coins et cotes du blockout, en mètres de three (x, z).
+const vec3 SANG = vec3(0.40, 0.09, 0.07), LAVIS_SANG = vec3(0.80, 0.58, 0.52);
+const vec2 ZERIQA_NE = vec2(-23.0 * AMA, -6.0 * AMA), ZERIQA_SO = vec2(-53.0 * AMA, 24.0 * AMA);
+const vec2 YESSOD_SO = vec2(-54.0 * AMA, 25.0 * AMA);
+
+// Deux jets en diagonale, sous la ligne rouge, qui prennent le coin « כְּמִין גַּ״ם » (Rambam, Ma'asse HaKorbanot 5:6).
+float zeriqa(vec3 P, vec2 coin, float pixel){
+  float le_long = length(P.xz - coin) / AMA;
+  float hauteur = P.y / AMA;
+  float bord = (grainOblique(P * 2.2 + coin.xyx, pixel * 2.2) - 0.5) * 0.9;
+  float jet = 1.0 - smoothstep(0.55, 1.0, length(vec2(le_long / 1.7, (hauteur - 3.4) / 1.1)) + bord);
+  float gouttes = smoothstep(0.66, 0.74, grainOblique(P * 16.0 + 4.0, pixel * 16.0))
+                * (1.0 - smoothstep(1.1, 1.8, length(vec2(le_long / 1.7, (hauteur - 3.4) / 1.3))));
+  // Ce qui n'a pas pris coule jusqu'au yessod, en filets.
+  float filet = smoothstep(0.62, 0.70, grainOblique(vec3(P.x * 7.0, P.y * 0.35, P.z * 7.0), pixel * 7.0))
+              * (1.0 - smoothstep(1.0, 1.5, le_long)) * step(hauteur, 3.4) * smoothstep(0.9, 1.3, hauteur);
+  return clamp(max(jet, max(gouttes, filet * 0.8)), 0.0, 1.0) * step(1.02, hauteur) * step(hauteur, 4.95);
+}
+
+// Le sang des 'hatatot, au doigt sur l'arête de chaque keren, « וְיוֹרֵד כְּנֶגֶד חֻדָּהּ שֶׁל קֶרֶן » (ibid. 5:7).
+float arete(vec3 P, vec2 coin, float pixel){
+  float loin = length(P.xz - coin) / AMA;
+  float fin = 8.6 + 1.0 * grainOblique(vec3(coin * 3.0, 1.0), 0.0) + (grainOblique(P * 5.0, pixel * 5.0) - 0.5) * 0.6;
+  return (1.0 - smoothstep(0.12, 0.40, loin + (grainOblique(P * 9.0, pixel * 9.0) - 0.5) * 0.25))
+       * smoothstep(fin, fin + 0.4, P.y / AMA);
+}
+
+void sang(vec3 P, vec3 N, inout vec3 teinte, inout float rugo){
+  float pixel = empreinteMax(), debout = 1.0 - abs(N.y);
+  float tache = 0.0;
+  if (uFamille == 18) {
+    tache = max(zeriqa(P, ZERIQA_NE, pixel), zeriqa(P, ZERIQA_SO, pixel)) * debout;
+    // Les shirayim, versés sur le yessod ouest et sud, gagnent les deux « חֳטָמִין » du coin sud-ouest (Middot 3:2).
+    float versant = length(P.xz - YESSOD_SO) / AMA + (grainOblique(P * 1.6 + 9.0, pixel * 1.6) - 0.5) * 3.0;
+    float flaque = (1.0 - smoothstep(2.0, 7.0, versant))
+                 * smoothstep(0.7, 0.9, N.y) * (1.0 - smoothstep(1.05, 1.25, P.y / AMA)) * step(0.9, P.y / AMA);
+    tache = max(tache, flaque * 0.9);
+  } else {
+    for (int k = 0; k < 4; k++) {
+      vec2 coin = vec2(k < 2 ? -24.0 : -52.0, k % 2 == 0 ? -5.0 : 23.0) * AMA;
+      tache = max(tache, arete(P, coin, pixel) * 0.85);
+    }
+  }
+  if (tache <= 0.0) return;
+  float epais = grainOblique(P * 3.0 + 1.7, pixel * 3.0);
+  teinte *= mix(vec3(1.0), mix(LAVIS_SANG, SANG, smoothstep(0.3, 0.8, epais) * 0.8 + 0.2), tache);
+  rugo -= tache * 0.12;
+}
+
 void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec3 feu){
   teinte = vec3(1.0); pente = vec3(0.0); rugo = 0.0; feu = vec3(1.0);
   // Où la nappe se prend pour ce point, et ce que ce point en garde de relief : un
@@ -654,13 +739,13 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
     rugo -= usure * 0.18;
   }
-  else if (uFamille == 18) {
+  else if (uFamille == 19) {
     appareil(P - vec3(0.0, Z_PLACE_KOTEL * AMA, 0.0), N, Appareil(2.2917, 2.0, 6.0, DEBORD, 0.02, 0.3), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 19) {
+  else if (uFamille == 20) {
     appareil(P - vec3(0.0, Z_KOTEL_OMEYYADE * AMA, 0.0), N, Appareil(1.6667, 1.5, 2.5, DEBORD, JOINT, 0.0), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 20) {
+  else if (uFamille == 21) {
     appareil(P - vec3(0.0, Z_KOTEL_MAMELOUK * AMA, 0.0), N, Appareil(0.9926, 1.0, 1.6, DEBORD, JOINT, 0.0), teinte, pente, rugo, photo);
   }
   else if (uFamille == 11) {          // la ville : de la pierre de pays, pas du gazit
@@ -779,54 +864,55 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     float coeur = fente * creux * souffle * (1.0 - cendre);
     feu = vec3(0.85 * coeur) * (vec3(1.0) + vec3(0.0, 0.5, 1.1) * coeur * coeur);
   }
+  else if (uFamille == 18) {
+    chaux(P, N, teinte, pente, rugo);
+    sang(P, N, teinte, rugo);
+  }
   else if (uFamille == 8) {                                   // chaux noircie par le feu
-    // La bande du blockout, à l'ama près : enduit_noirci la pose de 7,5 à 10,5 amot,
-    // et le Mizbea'h en tire ce que la fiche lui demande — une masse blanche, noircie
-    // au sommet seulement (Middot 3:4 : il est blanchi deux fois l'an). Le seuil d'ici
-    // partait de 40 cm : il prenait le bloc haut ENTIER, du sovev aux kranot, et il ne
-    // restait plus un blanc sur l'autel pour dire qu'on l'entretient.
+    chaux(P, N, teinte, pente, rugo);
+    float pixel = empreinteMax();
+    // La bande du blockout (enduit_noirci, 7,5 à 10,5 amot) : blanchi deux fois l'an (Middot 3:4), il n'est noir qu'en haut.
     float montee = smoothstep(7.5 * AMA, 10.5 * AMA, P.y);
-    // Le bord du dépôt se RONGE, il ne se fond pas : on perturbe la frontière PUIS on
-    // la seuille, au lieu de multiplier le dépôt par un nuage. Multiplié, il rendait
-    // des bavures d'aérographe ; rongé, il rend une limite de suie.
-    float paroi = smoothstep(0.06, 0.62,
-                             montee + (grainNorme(P * vec3(3.2, 1.1, 3.2)) - 0.5) * 0.45);
-    // Le dessus est l'âtre : les ma'arakhot y brûlent à même la chaux, et le feu y prend
-    // tout. Le sovev est horizontal lui aussi, mais trois amot plus bas — la bande ne
-    // l'atteint pas, et c'est elle, pas la normale, qui décide qui est un âtre.
-    float dessus = smoothstep(0.5, 0.9, N.y) * smoothstep(0.30, 0.50, montee);
-    float prise = max(paroi, dessus);
-    // Le dessus n'est pas de la chaux salie, c'est un LIT DE CENDRE : elle s'y amasse en
-    // tas d'une demi-ama que le balai et le vent déplacent, et la suie ne se voit
-    // qu'entre eux. Le tas se prend au seuil SERRÉ d'un bruit brouillé par une octave
-    // fine : un seuil large redonne le nuage, et c'est le nuage qui se lisait en image
-    // agrandie. Ici le bord est net et déchiqueté — un bord de dépôt.
-    vec3 c = P * 3.0;
-    float cendre = smoothstep(0.54, 0.74,
-                              grainNorme(c) + (grainNorme(P * 13.0) - 0.5) * 0.5) * dessus;
-    // Et le tas a une ÉPAISSEUR : sa pente sort du même bruit, dérivé à la main. Sans
-    // elle, deux gris posés à plat restent une image, si fin qu'en soit le grain ; avec
-    // elle le soleil de l'Azara écrit le bord de chaque tas, et le dessus devient une
-    // matière. Le relief ne va pas sur la paroi : ce gradient est celui d'un plan.
-    float e = 0.06;
-    pente = vec3(grainNorme(c + vec3(e, 0.0, 0.0)) - grainNorme(c - vec3(e, 0.0, 0.0)), 0.0,
-                 grainNorme(c + vec3(0.0, 0.0, e)) - grainNorme(c - vec3(0.0, 0.0, e)))
-          * (0.20 / e) * dessus;
-    // La moucheture ne mord que là où il y a déjà de la suie : semée sur la chaux nette
-    // elle la salissait au lieu de la brûler.
-    float mouchete = grainNorme(P * 26.0) - 0.5;
-    float suie = clamp(prise * (0.90 + mouchete * 0.28), 0.0, 1.0);
-    teinte = mix(mix(vec3(1.0), NOIR_SUIE, suie),
-                 GRIS_CENDRE * (1.0 + mouchete * 0.30), cendre * 0.62);
-    rugo = 0.06 + suie * 0.16 + cendre * 0.10;
+    // La fumée passe la lèvre et redescend en coulées inégales : un seuil qui suit un bruit étiré en hauteur et
+    // lui-même déformé — sans la déformation, les coulées tombaient au même pas, en dents de scie.
+    vec3 fil = P * vec3(1.1, 0.22, 1.1) + (grainOblique(P * 0.7 + 23.0, pixel * 0.7) - 0.5) * 2.5;
+    float coulee = grainOblique(fil, pixel * 1.1) * (0.7 + 0.3 * grainOblique(P * vec3(4.0, 0.8, 4.0), pixel * 4.0));
+    float seuil = 0.32 - 0.30 * coulee;
+    float paroi = smoothstep(seuil, seuil + 0.16, montee) * (0.60 + 0.40 * grainOblique(P * 0.9, pixel * 0.9));
+    float dessus = smoothstep(0.5, 0.9, N.y) * step(HAUT_MIZBEACH - 0.1, P.y);
+    // « אַמָּה… מְקוֹם הַקְּרָנוֹת, אַמָּה… מְקוֹם הִלּוּךְ רַגְלֵי הַכֹּהֲנִים » (Middot 3:1) : deux amot de bord, et le feu au-delà.
+    vec4 s = SOMMET_MIZBEACH;
+    float bord = min(min(P.x - s.x, s.y - P.x), min(P.z - s.z, s.w - P.z)) / AMA;
+    float foule = smoothstep(0.8, 1.2, bord) * (1.0 - smoothstep(1.8, 2.3, bord));
+    float feuLit = smoothstep(1.8, 2.6, bord);
+    // Le feu cuit la chaux par plaques, et le passage des cohanim la garde plus claire.
+    float brulure = mix(0.55, 1.0, grainOblique(P * 0.45 + 11.0, pixel * 0.45)) * mix(0.75, 1.0, feuLit) * (1.0 - 0.35 * foule);
+    float suie = max(paroi, dessus * brulure);
+    // La cendre se couche en congères d'une ama que le vent tourne : un champ lent, déformé par un plus lent encore.
+    // Le passage est balayé ; la cendre ne s'y garde qu'en poussière.
+    vec3 derive = vec3(grainOblique(P * 0.25, pixel * 0.25), 0.0, grainOblique(P * 0.25 + 5.0, pixel * 0.25)) - 0.5;
+    vec3 c = P * 0.9 + derive * 2.2;
+    float epaisseur = grainOblique(c, pixel * 0.9);
+    // Le bord d'une congère est poudreux : le seuil tremble d'une octave fine, sans descendre jusqu'au grain.
+    float bordCendre = epaisseur + (grainOblique(P * 4.5 + 2.0, pixel * 4.5) - 0.5) * 0.14;
+    float cendre = smoothstep(0.45, 0.62, bordCendre) * dessus * mix(0.25, 1.0, max(feuLit, 1.0 - foule));
+    float ec = 0.10;
+    pente += vec3(grainOblique(c + vec3(ec, 0.0, 0.0), pixel * 0.9) - epaisseur, 0.0,
+                  grainOblique(c + vec3(0.0, 0.0, ec), pixel * 0.9) - epaisseur) * (0.10 / ec) * cendre;
+    // De près, la chaux brûlée et la cendre ont un grain ; il s'efface avec le pixel au lieu de moucheter.
+    float poudre = grainOblique(P * 7.0, pixel * 7.0) - 0.5, fin = grainOblique(P * 29.0, pixel * 29.0) - 0.5;
+    vec3 brule = mix(vec3(1.0), NOIR_SUIE * (1.0 + poudre * 0.35 + fin * 0.25), suie);
+    teinte *= mix(brule, GRIS_CENDRE * (1.0 + poudre * 0.18 + fin * 0.14), cendre * 0.85);
+    rugo += suie * 0.16 + cendre * 0.10;
+    sang(P, N, teinte, rugo);
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
-  if (uFamille == 1 || uFamille == 10 || uFamille == 11 || uFamille == 14 || uFamille >= 18) patiner(P, N, exposition(), teinte, rugo);
+  if (uFamille == 1 || uFamille == 10 || uFamille == 11 || uFamille == 14 || uFamille >= 19) patiner(P, N, exposition(), teinte, rugo);
 #ifdef GRAVURE
   // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
   // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y
-  // (le -z de three) sur un mur ouest — et v monte. Les flancs de la plaque, hauts de
-  // 4 cm, ne portent pas de modelé.
+  // (le -z de three) sur un mur ouest — et v monte. Les flancs de la taille ne portent
+  // pas de modelé.
   {
     vec3 tu = abs(N.z) > abs(N.x) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, -1.0);
     vec2 pas = vec2(TEXEL_GRAVURE, 0.0);
@@ -889,7 +975,6 @@ export function habiller(materiau, horloges, jeux) {
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
-  materiau.userData.uniformes = uniformes;
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === BRAISE) {
     materiau.color = new THREE.Color(CHARBON);
@@ -1010,9 +1095,9 @@ export function habiller(materiau, horloges, jeux) {
         #include <lights_fragment_end>
         #ifdef USE_LIGHTMAP
           reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
-          // Une pierre sous un toit reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue. Un métal voit la cour.
+          // Sous un toit, pierre ou or reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue.
           #ifdef REFLET_DU_CIEL
-            reflectedLight.indirectSpecular *= mix(clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0), 1.0, metalnessFactor);
+            reflectedLight.indirectSpecular *= clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0);
           #endif
         #endif
         #ifdef TEMPERE

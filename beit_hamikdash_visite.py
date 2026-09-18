@@ -17,8 +17,10 @@ Il produit deux fichiers :
 d'occlusion, et reperes.json sans cartes, ce qui reste cohérent.
 `-- --lumiere azara,oulam` cuit ces concepts en lumière indirecte plutôt qu'en occlusion, `-- --lumiere tout` tous.
 `-- --pays` n'exporte que `visite/pays.glb` : la ville et le relief de `01_Pays`, que la visite charge après le Temple.
-`-- --lumiere-seule` ne cuit qu'elle et garde les cartes d'occlusion du reperes.json en place : la
-géométrie ne doit pas avoir changé depuis leur cuisson.
+`-- --recuire [azara,oulam]` ne recuit en lumière que ces concepts, ceux dont la carte ne correspond
+plus à la scène, et leurs voisins (`beit_hamikdash_recuisson.py`) ; les autres cartes restent.
+`-- --simuler`, avec `--recuire`, dit ce qui serait recuit et combien de temps, sans rien cuire.
+Une seule cuisson à la fois sur la machine, worktrees compris.
 
 Le lien géométrie ↔ encyclopédie passe par `visite/concepts.json` : chaque concept y
 déclare les préfixes de noms d'objets qui lui appartiennent, le préfixe le plus long
@@ -27,6 +29,7 @@ objets deviennent une soixantaine —, ce qui donne au navigateur autant de dess
 qu'il y a de choses à nommer, et fait du clic un concept plutôt qu'une des cinq
 boîtes d'un mur percé.
 """
+import contextlib
 import json
 import pathlib
 import re
@@ -38,7 +41,8 @@ import bpy
 
 RACINE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RACINE))
-from beit_hamikdash_occlusion import cuire_occlusion  # noqa: E402
+from beit_hamikdash_occlusion import cuire_occlusion, reglages_de_la_lumiere, retenus, separer_collees  # noqa: E402
+from beit_hamikdash_recuisson import Recuisson, empreinte, verrou  # noqa: E402
 
 DOSSIER = RACINE / "visite"
 AMA = 0.48
@@ -306,6 +310,36 @@ def option(nom):
     return sys.argv[sys.argv.index(nom) + 1] if nom in sys.argv else None
 
 
+def recuisson_demandee():
+    """None sans `--recuire`, sinon les concepts nommés après lui, peut-être aucun."""
+    if "--recuire" not in sys.argv:
+        return None
+    suite = sys.argv[sys.argv.index("--recuire") + 1:]
+    return frozenset(suite[0].split(",")) if suite and not suite[0].startswith("--") else frozenset()
+
+
+def cuire(fusionnes, chantier, lampes):
+    """(occlusion, lumière, empreintes) pour reperes.json ; None quand `--simuler` s'arrête au plan de recuisson."""
+    choisis = list(retenus(fusionnes))
+    eclaires = frozenset(filter(None, (option("--lumiere") or "").split(",")))
+    demandes, recuisson, gardees = recuisson_demandee(), None, None
+    if demandes is not None:
+        if eclaires:
+            raise ValueError("--recuire choisit lui-même ce qui cuit en lumière : ne pas y joindre --lumiere")
+        precedent = json.loads((DOSSIER / "reperes.json").read_text(encoding="utf-8"))
+        recuisson = Recuisson(precedent, demandes, {ident for ident, _, _ in choisis})
+    separer_collees([obj for _, obj, _ in choisis])
+    reglages = reglages_de_la_lumiere(lampes)
+    tailles = {ident: taille for ident, _, taille in choisis}
+    empreintes = {ident: empreinte(obj, tailles.get(ident, 0), reglages) for ident, obj in fusionnes.items()}
+    if recuisson is not None:
+        eclaires = recuisson.cibles(fusionnes, empreintes)
+        if "--simuler" in sys.argv:
+            return None
+        gardees = recuisson.gardees(eclaires)
+    return (*cuire_occlusion(choisis, chantier, eclaires, lampes, gardees), empreintes)
+
+
 def exporter(chantier):
     regles = concepts()
     connus = {ident for _, ident in regles}
@@ -313,6 +347,8 @@ def exporter(chantier):
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
+    # Avant le tri : les outils des tailles (99_Outils) ne sont pas gardés, et leurs booléens les lisent.
+    chanfreiner(gardes)
     for o in list(bpy.data.objects):
         if o not in gardes:
             bpy.data.objects.remove(o, do_unlink=True)
@@ -325,8 +361,6 @@ def exporter(chantier):
             ident = "_non_classe"
         groupes.setdefault(ident, []).append(o)
 
-    chanfreiner(gardes)
-
     emprises, fusionnes = {}, {}
     for ident in sorted(groupes):
         objets = sorted(groupes[ident], key=lambda o: o.name)
@@ -335,11 +369,11 @@ def exporter(chantier):
         print(f"  {ident:26s} {len(objets):5d} volumes")
 
     # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
-    eclaires = frozenset(filter(None, (option("--lumiere") or "").split(",")))
-    gardees = (json.loads((DOSSIER / "reperes.json").read_text(encoding="utf-8"))["occlusion"]
-               if "--lumiere-seule" in sys.argv else None)
-    occlusion, lumiere = ({}, {}) if "--sans-occlusion" in sys.argv else cuire_occlusion(
-        fusionnes, chantier, eclaires, gardees, {"flammes": flammes, "braises": braises})
+    cartes = ({}, {}, {}) if "--sans-occlusion" in sys.argv else cuire(
+        fusionnes, chantier, {"flammes": flammes, "braises": braises})
+    if cartes is None:
+        return False
+    occlusion, lumiere, empreintes = cartes
 
     for mat in bpy.data.materials:
         aplatir(mat)
@@ -380,6 +414,7 @@ def exporter(chantier):
         "braises": braises,
         "occlusion": occlusion,
         "lumiere": lumiere,
+        "empreintes": empreintes,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     absents = sorted(connus - set(groupes))
@@ -398,6 +433,7 @@ def exporter(chantier):
         print(f"\n{len(absents)} concepts déclarés sans géométrie : {', '.join(absents)}")
     taille = (chantier / "temple.glb").stat().st_size / 1e6
     print(f"\n{len(groupes)} maillages · temple.glb {taille:.1f} Mo")
+    return True
 
 
 PAYS = "01_Pays"
@@ -431,9 +467,11 @@ def main():
     DOSSIER.mkdir(exist_ok=True)
     if "--pays" in sys.argv:
         return exporter_pays()
-    with tempfile.TemporaryDirectory(prefix="visite_") as chantier:
-        exporter(pathlib.Path(chantier))
-        livrer(pathlib.Path(chantier))
+    sans_cuisson = "--sans-occlusion" in sys.argv or "--simuler" in sys.argv
+    with contextlib.nullcontext() if sans_cuisson else verrou(), \
+            tempfile.TemporaryDirectory(prefix="visite_") as chantier:
+        if exporter(pathlib.Path(chantier)):
+            livrer(pathlib.Path(chantier))
 
 
 if __name__ == "__main__":
