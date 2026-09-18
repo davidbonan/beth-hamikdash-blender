@@ -1634,12 +1634,12 @@
     "_non_classe": {
       "carte": "lumiere/_non_classe.webp",
       "canal": 0,
-      "echelle": 1.75
+      "echelle": 1.5
     },
     "aliyah": {
       "carte": "lumiere/aliyah.webp",
       "canal": 0,
-      "echelle": 0.75
+      "echelle": 1.0
     },
     "azara": {
       "carte": "lumiere/azara.webp",
@@ -1649,7 +1649,7 @@
     "batiment": {
       "carte": "lumiere/batiment.webp",
       "canal": 0,
-      "echelle": 1.75
+      "echelle": 1.5
     },
     "beit_avtinas": {
       "carte": "lumiere/beit_avtinas.webp",
@@ -1689,7 +1689,7 @@
     "doukhan": {
       "carte": "lumiere/doukhan.webp",
       "canal": 0,
-      "echelle": 0.75
+      "echelle": 1.0
     },
     "douze_marches_oulam": {
       "carte": "lumiere/douze_marches_oulam.webp",
@@ -1754,7 +1754,7 @@
     "lishkat_haetzim": {
       "carte": "lumiere/lishkat_haetzim.webp",
       "canal": 1,
-      "echelle": 1.5
+      "echelle": 1.75
     },
     "lishkat_hagazit": {
       "carte": "lumiere/lishkat_hagazit.webp",
@@ -1829,7 +1829,7 @@
     "mesiba_bira": {
       "carte": "lumiere/mesiba_bira.webp",
       "canal": 0,
-      "echelle": 1.5
+      "echelle": 1.75
     },
     "mizbeach": {
       "carte": "lumiere/mizbeach.webp",
@@ -1909,7 +1909,7 @@
     "shaar_shushan": {
       "carte": "lumiere/shaar_shushan.webp",
       "canal": 1,
-      "echelle": 2.0
+      "echelle": 2.25
     },
     "shaar_tadi": {
       "carte": "lumiere/shaar_tadi.webp",
