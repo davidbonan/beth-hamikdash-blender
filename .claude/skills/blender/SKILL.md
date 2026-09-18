@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les treize scripts
+## Les quatorze scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -32,7 +32,8 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
 | `beit_hamikdash_marche.py` | **lit** la scène et rejoue la règle de marche de la visite : où l'on passe à pied, où l'on bute et pourquoi | `renders/marche/marche.png` |
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
-| `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel dans Cycles, appelé par le précédent | `visite/occlusion/*.webp` |
+| `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
+| `beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
@@ -194,15 +195,8 @@ sur la même couche UV. Carte `visite/lumiere/<concept>.webp` (irradiance ÷ `ec
 listée sous `lumiere` dans `reperes.json`, posée en `lightMap` : elle remplace dans `matieres.js`
 l'hémisphère, le diffus de l'environnement et l'occlusion. Le soleil direct reste calculé.
 
-```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere azara,oulam
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere azara,oulam --lumiere-seule   # itération
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout                          # toute la visite, ~40 min
-```
-
-`--lumiere-seule` garde les cartes d'occlusion de `reperes.json` au lieu de les recuire : seule la
-lumière cuit. Le dépliage est recalculé à l'identique tant que la géométrie ne bouge pas ; après une
-retouche du blockout, relancer sans l'option.
+Toute cuisson — ciblée (`--recuire`) ou complète (`--lumiere tout`) — passe par le skill
+**cuisson** : il dit quoi recuire après une retouche, et qu'une seule cuisson tourne à la fois.
 
 ## Les figurants
 

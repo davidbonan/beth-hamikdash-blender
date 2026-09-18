@@ -446,33 +446,29 @@ def ecrire_lumiere(irradiance, chemin, brut):
     return echelle
 
 
-def garder_occlusions(gardees, ident):
-    """La carte déjà cuite d'un concept ; valable tant que sa géométrie, donc son dépliage, n'a pas changé."""
-    carte = gardees.get(ident)
-    if carte is None or not (VISITE / carte["carte"]).exists():
-        raise ValueError(f"{ident} n'a pas de carte d'occlusion à garder : relancer la cuisson complète")
-    return carte
+def reglages_de_la_lumiere(lampes):
+    """Ce qui fait la lumière de toutes les cartes à la fois : le changer les invalide toutes."""
+    return repr((TEXEL, TAILLE, ECHANTILLONS, PORTEE, PORTEE_SOUS_SONDE, SOLEIL[:], SOLEIL_COULEUR, SOLEIL_FORCE,
+                 DIAMETRE_SOLEIL, CIEL, DIFFUS, SATURATION_CIEL, LAMPES, ALBEDO_VISITE, ECHANTILLONS_REBONDS,
+                 SEUIL_REBONDS, BORNE_INDIRECTE, lampes))
 
 
-def cuire_occlusion(fusionnes, chantier, eclaires=frozenset(), gardees=None, lampes=None):
-    """Cuit les concepts retenus dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
+def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardees=None):
+    """Cuit les concepts de `retenus`, faces collées séparées, dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
-    `gardees` (l'`occlusion` d'un reperes.json) garde ces cartes-là au lieu de les recuire : seule la lumière cuit.
+    `gardees` ({"occlusion": {...}, "lumiere": {...}} d'un reperes.json) garde ces cartes-là au lieu de les recuire.
     `lampes` : {"flammes": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
-    Renvoie ({concept: {"carte", "canal"}}, {concept: {"carte", "canal", "echelle"}}) pour reperes.json."""
-    choisis = list(retenus(fusionnes))
+    Renvoie ({concept: {"carte", "canal", "secondes"}}, {concept: {"carte", "canal", "echelle", "secondes"}}) pour reperes.json."""
     if TOUS in eclaires:
         eclaires = {ident for ident, _, _ in choisis}
     inconnus = set(eclaires) - {ident for ident, _, _ in choisis}
     if inconnus:
         raise ValueError(f"lumière demandée sur des concepts qui ne se cuisent pas : {sorted(inconnus)}")
-    occlusions, lumieres = {}, {}
-    if gardees is not None:
-        occlusions = {ident: garder_occlusions(gardees, ident) for ident, _, _ in choisis if ident not in eclaires}
+    gardees = gardees or {"occlusion": {}, "lumiere": {}}
+    occlusions, lumieres = dict(gardees["occlusion"]), dict(gardees["lumiere"])
     sortie, sortie_lumiere = chantier / "occlusion", chantier / "lumiere"
     sortie.mkdir(parents=True, exist_ok=True)
     sortie_lumiere.mkdir(parents=True, exist_ok=True)
-    separer_collees([obj for _, obj, _ in choisis])
     preparer_cycles()
     sources = eclairer(bpy.context.scene, lampes or {}) if eclaires else []
     debut = time.time()
@@ -483,17 +479,16 @@ def cuire_occlusion(fusionnes, chantier, eclaires=frozenset(), gardees=None, lam
             if ident in eclaires:
                 chemin = sortie_lumiere / f"{ident}.webp"
                 echelle = ecrire_lumiere(cuire_lumiere_de(obj, 2 * taille, sources), chemin, pathlib.Path(brut))
-                lumieres[ident] = {"carte": f"lumiere/{ident}.webp", "canal": canal, "echelle": echelle}
+                lumieres[ident] = {"carte": f"lumiere/{ident}.webp", "canal": canal, "echelle": echelle,
+                                   "secondes": round(time.time() - depart)}
                 print(f"  lumière   {ident:26s} {taille:5d} px  ×{echelle:.2f}  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s", flush=True)
-            elif gardees is not None:
-                if occlusions[ident]["canal"] != canal:
-                    raise ValueError(f"{ident} : le dépliage a changé de canal, relancer la cuisson complète")
-            else:
+            elif ident not in occlusions and ident not in lumieres:
                 portee = PORTEE_SOUS_SONDE if ident in SOUS_SONDE else PORTEE
                 chemin = sortie / f"{ident}.webp"
                 ecrire(cuire_occlusion_de(obj, 2 * taille, portee), chemin, taille, pathlib.Path(brut))
-                occlusions[ident] = {"carte": f"occlusion/{ident}.webp", "canal": canal}
+                occlusions[ident] = {"carte": f"occlusion/{ident}.webp", "canal": canal,
+                                     "secondes": round(time.time() - depart)}
                 print(f"  occlusion {ident:26s} {taille:5d} px  {portee:.0f} m  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s", flush=True)
     poids = sum(f.stat().st_size for dossier in (sortie, sortie_lumiere) for f in dossier.glob("*.webp")) / 1e6
-    print(f"  {len(occlusions)} cartes d'occlusion, {len(lumieres)} de lumière, {poids:.1f} Mo, {time.time() - debut:.0f} s")
+    print(f"  {len(occlusions) + len(lumieres)} cartes, dont {len(eclaires)} recuites en lumière, {poids:.1f} Mo cuits, {time.time() - debut:.0f} s")
     return occlusions, lumieres
