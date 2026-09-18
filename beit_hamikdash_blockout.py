@@ -4510,25 +4510,133 @@ MY0, MY1 = -25, 7            # CHOIX : centre 9 amot au sud de l'axe, bord nord 
 # הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת וּבַמִּזְרָח אַמָּה אַחַת » (Middot 3:1 ; fiche §6). Tout le
 # nord et tout l'ouest, une ama à l'angle sud-ouest sur le sud, une ama à l'angle
 # nord-est sur l'est ; le corps descend donc jusqu'au sol sur les faces est et sud.
-box("Mizbeach_yessod_N", MX0 + 1, MX1, MY1 - 1, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_yessod_O", MX0, MX0 + 1, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_yessod_S", MX0 + 1, MX0 + 2, MY0, MY0 + 1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_yessod_E", MX1 - 1, MX1, MY1 - 2, MY1 - 1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_corps", MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
-box("Mizbeach_haut", MX0 + 2, MX1 - 2, MY0 + 2, MY1 - 2, Z_AZ + 6, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX_FEU())
+# « אֲבָנִים שְׁלֵמוֹת, שֶׁלֹּא הוּנַף עֲלֵיהֶן בַּרְזֶל… לֹא הָיוּ סָדִין אוֹתָן בְּכָפִיס שֶׁל בַּרְזֶל » (Middot 3:4) :
+# des pierres brutes sous une chaux posée sans truelle — ni face dressée, ni arête vive.
+BOSSE_CHAUX, ONDE_CHAUX, PAS_CHAUX = 0.06, 1.3, 0.5
+# Ce qu'un bloc s'enfonce dans ce qui le porte, et ce qu'un voisin mord dans sa face : la bosse n'ouvre jamais de jour.
+REPRISE_CHAUX = 0.3
+# Un sommet de l'arrondi tous les 15° : la tangente de 45° à 90°, portée sur le rayon.
+ARRONDI_CHAUX = (0.0, 0.42, 0.73, 1.0)
+DECALAGE_CHAUX = Vector((5.2, 1.3, 7.7))
+
+def _cotes_chaux(a, b, r_bas, r_haut):
+    n = max(1, round((b - a - r_bas - r_haut) / PAS_CHAUX))
+    pas = [a + r_bas + (b - a - r_bas - r_haut) * k / n for k in range(n + 1)]
+    bouts = [a + r_bas * f for f in ARRONDI_CHAUX] + [b - r_haut * f for f in ARRONDI_CHAUX]
+    return sorted({round(c, 6) for c in pas + bouts})
+
+def _sur_la_chaux(p, dedans, r, ecart=0.0):
+    """Le point p de la face dressée, porté sur l'arrondi de rayon r autour de `dedans` puis bossué.
+
+    La bosse se lit en coordonnées de monde : deux blocs qui se continuent ondulent ensemble.
+    Le dessus reste presque plan — on y pose les gzirin, et les pieds l'ont foulé.
+    """
+    c = Vector([min(max(p[k], dedans[0][k]), dedans[1][k]) for k in range(3)])
+    n = (Vector(p) - c).normalized()
+    q = Vector(p) / ONDE_CHAUX
+    bosse = noise.noise(q) + 0.4 * noise.noise(q * 2.7 + DECALAGE_CHAUX)
+    return c + n * (r + ecart + BOSSE_CHAUX * bosse * (1.0 - 0.7 * n.z * n.z))
+
+def _dedans_chaux(x0, x1, y0, y1, z0, z1, r, ouvert=()):
+    """La boîte que l'arrondi entoure. Un côté `ouvert` est enfoui dans un voisin : il ne s'arrondit pas."""
+    rayon = {cote: 0.0 if cote in ouvert else r for cote in ("x0", "x1", "y0", "y1")}
+    return ((x0 + rayon["x0"], y0 + rayon["y0"], z0 - REPRISE_CHAUX),
+            (x1 - rayon["x1"], y1 - rayon["y1"], z1 - r)), rayon
+
+def bloc_de_chaux(name, x0, x1, y0, y1, z0, z1, col, mat, r=0.12, ouvert=(), creux=0.0):
+    """Boîte de chaux ouverte en dessous et enfoncée de REPRISE_CHAUX dans ce qui la porte.
+
+    `ouvert` : les côtés ("x0", "x1", "y0", "y1") qui continuent dans un bloc voisin, sans face ni arrondi —
+    deux faces jointives bossuées en sens contraires ouvriraient un jour entre elles.
+    `creux` : l'épaisseur de paroi d'un bloc percé de haut en bas, comme une keren.
+    """
+    (dedans, rayon) = _dedans_chaux(x0, x1, y0, y1, z0, z1, r, ouvert)
+    trou = (x0 + creux, x1 - creux, y0 + creux, y1 - creux)
+    xs = sorted(set(_cotes_chaux(x0, x1, rayon["x0"], rayon["x1"]) + ([trou[0], trou[1]] if creux else [])))
+    ys = sorted(set(_cotes_chaux(y0, y1, rayon["y0"], rayon["y1"]) + ([trou[2], trou[3]] if creux else [])))
+    zs = _cotes_chaux(z0 - REPRISE_CHAUX, z1, 0.0, r)
+    index, verts, faces = {}, [], []
+
+    def sommet(p):
+        if p not in index:
+            index[p] = len(verts)
+            verts.append(tuple(_sur_la_chaux(p, dedans, r)))
+        return index[p]
+
+    def grille(us, vs, point):
+        for i in range(len(us) - 1):
+            for j in range(len(vs) - 1):
+                faces.append([sommet(point(us[i], vs[j])), sommet(point(us[i + 1], vs[j])),
+                              sommet(point(us[i + 1], vs[j + 1])), sommet(point(us[i], vs[j + 1]))])
+
+    def perce(u, v):
+        return creux and trou[0] < u < trou[1] and trou[2] < v < trou[3]
+
+    for i in range(len(xs) - 1):
+        for j in range(len(ys) - 1):
+            if not perce((xs[i] + xs[i + 1]) / 2, (ys[j] + ys[j + 1]) / 2):
+                faces.append([sommet((xs[i], ys[j], z1)), sommet((xs[i + 1], ys[j], z1)),
+                              sommet((xs[i + 1], ys[j + 1], z1)), sommet((xs[i], ys[j + 1], z1))])
+    if "x1" not in ouvert:
+        grille(ys, zs, lambda u, v: (x1, u, v))
+    if "x0" not in ouvert:
+        grille(zs, ys, lambda u, v: (x0, v, u))
+    if "y1" not in ouvert:
+        grille(zs, xs, lambda u, v: (v, y1, u))
+    if "y0" not in ouvert:
+        grille(xs, zs, lambda u, v: (u, y0, v))
+    if creux:
+        # Le puits descend jusque sous le dessus qui porte le bloc : c'est lui qui en fait le fond.
+        bord = ([(x, trou[2]) for x in xs if trou[0] <= x <= trou[1]]
+                + [(trou[1], y) for y in ys if trou[2] < y <= trou[3]]
+                + [(x, trou[3]) for x in reversed(xs) if trou[0] <= x < trou[1]]
+                + [(trou[0], y) for y in reversed(ys) if trou[2] < y < trou[3]])
+        fond = len(verts)
+        verts += [(x, y, z0 - REPRISE_CHAUX) for x, y in bord]
+        for k in range(len(bord)):
+            suivant = (k + 1) % len(bord)
+            faces.append([sommet((*bord[k], z1)), sommet((*bord[suivant], z1)), fond + suivant, fond + k])
+    o = mesh_from_pydata(name, verts, faces, col, mat)
+    o.data.shade_smooth()
+    o["sans_biseau"] = True
+    return o
+
+def ceinture_de_chaux(name, bloc, z0, z1, col, mat, r=0.12):
+    """Bande peinte entre z0 et z1 sur les flancs du bloc de bornes `bloc` : sans épaisseur, elle en suit chaque bosse."""
+    x0, x1, y0, y1 = bloc[:4]
+    dedans, _ = _dedans_chaux(*bloc, r)
+    xs, ys = _cotes_chaux(x0, x1, r, r), _cotes_chaux(y0, y1, r, r)
+    tour = ([(x, y0) for x in xs] + [(x1, y) for y in ys[1:]]
+            + [(x, y1) for x in reversed(xs[:-1])] + [(x0, y) for y in reversed(ys[1:-1])])
+    n = len(tour)
+    verts = [tuple(_sur_la_chaux((x, y, z), dedans, r, ecart=0.02)) for z in (z0, z1) for x, y in tour]
+    faces = [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
+    o = mesh_from_pydata(name, verts, faces, col, mat)
+    o.data.shade_smooth()
+    o["sans_biseau"] = True
+    return o
+
+# Le yessod est une seule bande de chaux : ses tronçons se continuent par leurs côtés ouverts, et mordent dans le corps.
+bloc_de_chaux("Mizbeach_yessod_N", MX0 + 1 + REPRISE_CHAUX, MX1, MY1 - 1 - REPRISE_CHAUX, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y0"))
+bloc_de_chaux("Mizbeach_yessod_O", MX0, MX0 + 1 + REPRISE_CHAUX, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x1",))
+bloc_de_chaux("Mizbeach_yessod_S", MX0 + 1 + REPRISE_CHAUX, MX0 + 2, MY0, MY0 + 1 + REPRISE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y1"))
+bloc_de_chaux("Mizbeach_yessod_E", MX1 - 1 - REPRISE_CHAUX, MX1, MY1 - 2, MY1 - 1 - REPRISE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y1"))
+CORPS = (MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ, Z_AZ + 6)
+bloc_de_chaux("Mizbeach_corps", *CORPS, "30_Mizbeach", MAT_CHAUX())
+bloc_de_chaux("Mizbeach_haut", MX0 + 2, MX1 - 2, MY0 + 2, MY1 - 2, Z_AZ + 6, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX_FEU())
 # « וְאַרְבַּע הַקְּרָנוֹת חֲלוּלוֹת הָיוּ מִתּוֹכָן » (Rambam Beit HaBe'hira 2:8, 2:16) : quatre murets
 # d'une ama cube autour d'un vide. Épaisseur des murets : CHOIX.
 PAROI_KEREN = 0.25
 for (nm, x, y) in [("SE", MX1 - 3, MY0 + 2), ("NE", MX1 - 3, MY1 - 3), ("NO", MX0 + 2, MY1 - 3), ("SO", MX0 + 2, MY0 + 2)]:
-    for cote, xa, xb, ya, yb in (("S", x, x + 1, y, y + PAROI_KEREN), ("N", x, x + 1, y + 1 - PAROI_KEREN, y + 1),
-                                 ("O", x, x + PAROI_KEREN, y + PAROI_KEREN, y + 1 - PAROI_KEREN),
-                                 ("E", x + 1 - PAROI_KEREN, x + 1, y + PAROI_KEREN, y + 1 - PAROI_KEREN)):
-        box(f"Keren_{nm}_{cote}", xa, xb, ya, yb, Z_AZ + 9, Z_AZ + 10, "30_Mizbeach", MAT_CHAUX_FEU())
+    bloc_de_chaux(f"Keren_{nm}", x, x + 1, y, y + 1, Z_AZ + 9, Z_AZ + 10, "30_Mizbeach", MAT_CHAUX_FEU(),
+                  r=0.06, creux=PAROI_KEREN)
 # « וְחוּט שֶׁל סִקְרָא חוֹגְרוֹ בָאֶמְצַע » (Middot 3:1) : la ligne rouge à mi-hauteur, qui sépare
 # les sangs d'en haut des sangs d'en bas — le seul trait de couleur sur la chaux.
-for nm, xa, xb, ya, yb in (("E", MX1 - 1, MX1 - 0.97, MY0 + 1, MY1 - 1), ("O", MX0 + 0.97, MX0 + 1, MY0 + 1, MY1 - 1),
-                           ("N", MX0 + 1, MX1 - 1, MY1 - 1, MY1 - 0.97), ("S", MX0 + 1, MX1 - 1, MY0 + 0.97, MY0 + 1)):
-    box(f"Mizbeach_sikra_{nm}", xa, xb, ya, yb, Z_AZ + 4.95, Z_AZ + 5.05, "30_Mizbeach", MAT_SIKRA())
+ceinture_de_chaux("Mizbeach_sikra", CORPS, Z_AZ + 4.95, Z_AZ + 5.05, "30_Mizbeach", MAT_SIKRA())
 # Trois ma'arakhot chaque jour et quatre à Kippour, l'avis de R. Yossi (Yoma 4:6 ; Rambam
 # Temidin ouMousafin 2:4-5) : la grande à l'est, celle de la ketoret à l'angle sud-ouest
 # (Tamid 2:4-5), celle du kiyoum haesh, et à Kippour celle des braises de la ketoret du
@@ -4666,8 +4774,9 @@ box("Kevesh_rosh", KX0, KX1, MY0, MY0 + 2 - AVIR_KEVESH, Z_AZ + 8, Z_AZ + 9, "30
 # descend en biais jusqu'à l'angle, sur le yessod de l'ouest et celui du sud. Le sovev part à 18 amot
 # de l'autel et non du pied, pour laisser au sol la place du deshen à dix amot du pied
 # (Tamid 1:4). Largeurs et départ : CHOIX.
-wedge_ramp("Kevesh_katan_sovev", KX1, KX1 + 2.5, MY0 - 18, MY0 + 1 - NIMA, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
-wedge_ramp_oblique("Kevesh_katan_yessod", KX0 - 2, MX0, 2, KY0, MY0 - NIMA, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
+# La nima se compte depuis la bosse de la chaux, pas depuis la face dressée.
+wedge_ramp("Kevesh_katan_sovev", KX1, KX1 + 2.5, MY0 - 18, MY0 + 1 - NIMA - BOSSE_CHAUX, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX())
+wedge_ramp_oblique("Kevesh_katan_yessod", KX0 - 2, MX0, 2, KY0, MY0 - NIMA - BOSSE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX())
 # « וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף; עַל שֶׁל שַׁיִשׁ הָיוּ נוֹתְנִים אֶת הָאֵבָרִים, עַל
 # שֶׁל כֶּסֶף כְּלֵי שָׁרֵת » (Shekalim 6:4 ; Rambam 2:15). Cotes, celles des tables du Beit
 # HaMitba'haïm ; place, à l'ouest de la rampe du yessod : CHOIX.

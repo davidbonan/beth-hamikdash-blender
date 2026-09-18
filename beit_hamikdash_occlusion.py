@@ -19,6 +19,8 @@ COUCHE = "Occlusion"
 AIRE_MIN = 50.0
 TEXELS_PAR_FACE_MIN = 10
 TEXEL = 0.2
+# Une masse de chaux blanche sans joint ne cache aucun texel : à 20 cm, le Mizbea'h se lisait en pixels.
+TEXEL_DE = {"mizbeach": 0.03}
 TAILLE = (128, 2048)
 ECHANTILLONS = 256
 PORTEE = 8.0
@@ -68,16 +70,16 @@ def aire(obj):
 
 
 # Le texel de 20 cm dit la taille ; un concept fin la relève jusqu'à tenir ses TEXELS_PAR_FACE_MIN, et n'est écarté que si le plafond n'y suffit plus.
-def taille_de(surface, faces):
+def taille_de(surface, faces, texel):
     pour_faces = math.sqrt(faces * TEXELS_PAR_FACE_MIN)
-    voulue = 2 ** math.ceil(math.log2(max(math.sqrt(surface) / TEXEL, pour_faces, 1)))
+    voulue = 2 ** math.ceil(math.log2(max(math.sqrt(surface) / texel, pour_faces, 1)))
     return min(max(voulue, TAILLE[0]), TAILLE[1])
 
 
 def retenus(fusionnes):
     for ident, obj in sorted(fusionnes.items()):
         surface = aire(obj)
-        taille = taille_de(surface, obj["faces_sans_chanfrein"])
+        taille = taille_de(surface, obj["faces_sans_chanfrein"], TEXEL_DE.get(ident, TEXEL))
         if ident in EXCLUS or surface < AIRE_MIN:
             continue
         # Compté sans chanfrein : il multiplie les faces sans rendre l'objet plus fin.
