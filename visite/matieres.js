@@ -874,7 +874,6 @@ export function habiller(materiau, horloges, jeux) {
   const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
-  materiau.userData.uniformes = uniformes;
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === BRAISE) {
     materiau.color = new THREE.Color(CHARBON);

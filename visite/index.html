@@ -56,12 +56,20 @@
   /* Le Temple qu'on attend, flou, plutôt qu'un écran noir : l'aperçu de 32 px en ligne couvre l'attente de apercu.jpg. */
   #chargement::before {
     content: ""; position: absolute; inset: -40px; z-index: -1;
-    background: url(apercu.jpg) center / cover, url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAEQAAAAD/wAARCAARACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwAJCQkJCQkQCQkQFhAQEBYeFhYWFh4mHh4eHh4mLiYmJiYmJi4uLi4uLi4uNzc3Nzc3QEBAQEBISEhISEhISEhI/9sAQwELDAwSERIfEREfSzMqM0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tL/90ABAAC/9oADAMBAAIRAxEAPwDcVopF2oyMTxxvzj8TivOLrRku9QmlHALE57D8q9FluTsY+d5yqpIIAAB/CuP1aeWw0M3Vq5SV5VG5Tg4IORXDUk01GPU64JWbZgahoD6U1vcnlXO4YzghT74616NaTQtagOyKV4535x26HFcLFf3WpaGJb2RpXjmZAWOcLtBArqNEvG8pR53lBl5JAIyv1rSN/hkRK26P/9CS9/1cn+4K5XxB/wAgKP8A67D/ANBNdVe/6uT/AHBXK+IP+QFH/wBdh/6Ca4n/ABInUvgZkaZ/yBpf+u4/9BrpdA+6v/Aq5rTP+QNL/wBdx/6DXS6B91f+BVt9uRn9lH//2Q==) center / cover;
-    filter: blur(18px) brightness(.4);
+    background: url(apercu.jpg) center / cover, url(data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgICAkICQsLCwsLCw0MDQ0NDQ0NDQ0NDQ0ODg4REREODg4NDQ4OEBARERITEhERERETExQUFBgYFxccHB0iIin/xAB/AAEBAQEBAAAAAAAAAAAAAAAEBQYHAwEBAQEBAAAAAAAAAAAAAAAABAIFAxAAAgECBAMGBQUBAAAAAAAAAQIDEQAEBSESsgY0MXNBgVETdLE1MiIkoWGRFEIRAAEDAwMDBQEAAAAAAAAAAAEDEQACMRIhwTKxcYEzkQRBYXL/wAARCAARACADASIAAhEAAxEA/9oADAMBAAIRAxEAPwC9zHjIFhEcRw7+8al4oFjptpoTVu30Gul8okyWfMp2lwrLKXJO3/oUUn18AP2vRcx5k2IlxEokUgike0uUXQAU3qjaeJKip1uXkeOiy/FLJiiViRI6+0hdt7xehOurajsvOVzSTGOpbIi7vGp41VF7WHiAh5fzXCSJifZP6eRXalKjY1TXX+CL6Nm0UcmFE9YR+AFWj3M1VJB3bh4adhuXiczOKwgly9giPJLC4eLYd3+YFaUNKVFBVdSRXsv3yDGvj8pVDRnWN4T4VIH4+dCv9XHxVlKyTWAG+rH9cS16KQAz6+0xGZ9O3n8rFP8AZL3ycAtuZ9O3n8rFP9kvfJwC1K+pT46zilxPfaaLKvpa/HJwJauUeln71uGy5V9LX45OBLVyj0s/etw2VPmv/R6RClk+24n/2Q==) center / cover;
+    filter: blur(4px); animation: approche 24s ease-out both;
   }
+  /* Assombri derrière le texte seulement : l'or et le marbre gardent leur éclat aux bords. */
+  #chargement::after {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse 45% 35% at 50% 50%, rgba(13,12,11,.65), rgba(13,12,11,0)),
+                linear-gradient(rgba(13,12,11,.1), rgba(13,12,11,.3) 50%, rgba(13,12,11,.6));
+  }
+  @keyframes approche { from { transform: scale(1); } to { transform: scale(1.06); } }
+  @media (prefers-reduced-motion: reduce) { #chargement::before { animation: none; } }
   #chargement.parti { opacity: 0; pointer-events: none; }
-  #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; }
-  #chargement p { margin: 0; color: #b3aa9b; font-size: 13px; }
+  #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  #chargement p { margin: 0; color: #d6cebf; font-size: 13px; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
   #restant { min-height: 1.4em; font-variant-numeric: tabular-nums; }
   #jauge { width: 260px; max-width: 70vw; height: 2px; background: #2a2724; overflow: hidden; }
   #jauge i { display: block; height: 100%; width: 0; background: var(--or); transition: width .3s ease; }

@@ -1,6 +1,6 @@
 # Beit HaMikdash
 
-![Beit HaMikdash](hero.png)
+![Beit HaMikdash](hero.jpg)
 
 Le Beit HaMikdash bâti en volumes, à l'échelle, depuis les sources — puis filmé plan
 par plan. Le dépôt donne trois choses : une **scène Blender générée par script**, un

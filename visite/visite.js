@@ -338,13 +338,15 @@ const [gltf, jeux, occlusions, lumieres] = await Promise.all([
   chargeur.loadAsync("./temple.glb", (e) => {
       if (!e.lengthComputable) return;
       jauge.style.width = `${(e.loaded / e.total) * 100}%`;
-      restant.textContent = texte("restant").replace("{mo}", enMegaoctets(e.total - e.loaded));
+      restant.textContent = e.loaded < e.total ? texte("restant").replace("{mo}", enMegaoctets(e.total - e.loaded)) : "";
     }),
   nappes(),
   cartesOcclusion(reperes.occlusion),
   cartesLumiere(reperes.lumiere),
 ]);
 ecrire(etat, "preparation");
+// La préparation qui suit ne rend pas la main : sans cette image, « préparation… » ne s'affichait jamais.
+await new Promise((image) => requestAnimationFrame(() => requestAnimationFrame(image)));
 scene.add(gltf.scene);
 // Three ne calcule les matrices monde qu'au premier rendu, et un rayon ne les calcule
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
