@@ -995,7 +995,7 @@ function accorderLampe(lieu) {
 const SANS_ADAPTATION = new Set(["heikhal", "kodesh_hakodashim"]);
 function accorderExposition(dt) {
   oeilAdapte.mesurer(camera.position);
-  const facteur = SANS_ADAPTATION.has(lieuPresent) ? oeilAdapte.relacher(dt) : oeilAdapte.accorder(dt);
+  const facteur = SANS_ADAPTATION.has(lieuPresent) ? oeilAdapte.relacher(dt) : oeilAdapte.accorder(dt, rendu.luminance);
   renderer.toneMappingExposure = EXPOSITION.value = EXPOSITION_DEHORS * facteur;
 }
 // L'air ne rend que le ciel : sous un toit il n'a rien à rendre, et son voile couvrait le cèdre des lishkot.

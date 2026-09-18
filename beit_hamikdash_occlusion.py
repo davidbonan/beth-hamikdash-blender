@@ -269,13 +269,17 @@ def poser_lampes(scene, points):
 
 
 def accorder_matieres():
-    """L'albédo de la visite, et aucune émission : les lampes de la visite sont posées à part, en lampes."""
+    """L'albédo de la visite, aucune émission, aucun métal : les lampes de la visite sont posées à part, en lampes."""
     for mat in bpy.data.materials:
         if mat.node_tree is None:
             continue
-        for noeud in mat.node_tree.nodes:
+        for noeud in list(mat.node_tree.nodes):
             if noeud.bl_idname == "ShaderNodeBsdfPrincipled":
                 noeud.inputs["Emission Strength"].default_value = 0.0
+                # Diffuse pèse (1 - metallic), l'or cuisait noir ; un lien, car l'export relit la valeur par défaut.
+                sans_metal = mat.node_tree.nodes.new("ShaderNodeValue")
+                sans_metal.outputs[0].default_value = 0.0
+                mat.node_tree.links.new(sans_metal.outputs[0], noeud.inputs["Metallic"])
             elif noeud.bl_idname == "ShaderNodeEmission":
                 noeud.inputs["Strength"].default_value = 0.0
         facteur = ALBEDO_VISITE.get(mat.name)

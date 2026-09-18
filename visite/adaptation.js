@@ -1,4 +1,4 @@
-// L'œil qui s'habitue : la lumière cuite est physique, l'exposition monte donc à mesure que le ciel se ferme autour de lui.
+// L'œil qui s'habitue : sous un toit il vise la lumière qu'il reçoit vraiment, et d'autant plus que le ciel se ferme autour de lui.
 // La fermeture qu'il mesure sert aussi à l'air de ciel.js, qui n'a rien à rendre là où le ciel ne se voit plus.
 import * as THREE from "three";
 
@@ -7,7 +7,9 @@ const RAYONS_PAR_IMAGE = 3;
 const PORTEE = 40;
 const OUVERTURE_FERMEE = 0.02;
 const OUVERTURE_DEHORS = 0.2;
-const ADAPTATION_MAX = 5;
+const ADAPTATION_MAX = 12;
+// La luminance moyenne que l'œil cherche à retrouver sous un toit, dans le linéaire de la scène.
+const CLE = 0.12;
 const CONSTANTE_DE_TEMPS = 1.2;
 
 // La demi-sphère haute, horizon compris : une salle s'éclaire par sa porte autant que par son ciel.
@@ -48,7 +50,11 @@ export function adaptation(obstacles) {
       fermeture = 1 - THREE.MathUtils.smoothstep(ouvertureEn(oeil), OUVERTURE_FERMEE, OUVERTURE_DEHORS);
       return fermeture;
     },
-    accorder: (dt) => tendreVers(ADAPTATION_MAX ** fermeture, dt),
+    accorder(dt, luminance) {
+      if (luminance === null) return facteur;
+      const voulu = THREE.MathUtils.clamp(CLE / luminance, 1, ADAPTATION_MAX);
+      return tendreVers(voulu ** fermeture, dt);
+    },
     relacher: (dt) => tendreVers(1, dt),
   };
 }

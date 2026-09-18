@@ -30,6 +30,7 @@ import { PROFIL } from "./qualite.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+import { Pass, FullScreenQuad } from "three/addons/postprocessing/Pass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { FXAAShader } from "three/addons/shaders/FXAAShader.js";
@@ -356,6 +357,53 @@ const ETALONNAGE = {
     }`,
 };
 
+// La PHOTOMÉTRIE : ce que l'œil reçoit vraiment, lu dans le linéaire avant toute
+// exposition. Moyenne géométrique, comme un posemètre : une porte au soleil dans le
+// champ tire l'œil vers le bas sans que ses quelques pixels ne décident de tout.
+// Chaque case de la grille en moyenne 8 × 8 ; la grille est relue toutes les
+// quelques images, l'adaptation mettant de toute façon plus d'une seconde à suivre.
+const GRILLE = 16;
+const RELUE_TOUTES = 6;
+const PHOTOMETRIE = new THREE.ShaderMaterial({
+  uniforms: { tDiffuse: { value: null } },
+  vertexShader: OCCLUSION.vertexShader,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse;
+    varying vec2 vUv;
+    void main(){
+      vec2 coin = vUv - 0.5 / ${GRILLE}.0;
+      float somme = 0.0;
+      for (int i = 0; i < 8; i++) for (int j = 0; j < 8; j++) {
+        vec3 c = texture2D(tDiffuse, coin + (vec2(i, j) + 0.5) / (8.0 * ${GRILLE}.0)).rgb;
+        somme += log(max(dot(c, vec3(0.2126, 0.7152, 0.0722)), 1e-4));
+      }
+      gl_FragColor = vec4(somme / 64.0, 0.0, 0.0, 1.0);
+    }`,
+});
+
+class Photometre extends Pass {
+  constructor() {
+    super();
+    this.needsSwap = false;
+    this.cible = new THREE.WebGLRenderTarget(GRILLE, GRILLE, { type: THREE.FloatType, depthBuffer: false });
+    this.cases = new Float32Array(GRILLE * GRILLE * 4);
+    this.quad = new FullScreenQuad(PHOTOMETRIE);
+    this.images = 0;
+    this.luminance = null;
+  }
+
+  render(renderer, writeBuffer, readBuffer) {
+    if (this.images++ % RELUE_TOUTES) return;
+    PHOTOMETRIE.uniforms.tDiffuse.value = readBuffer.texture;
+    renderer.setRenderTarget(this.cible);
+    this.quad.render(renderer);
+    renderer.readRenderTargetPixels(this.cible, 0, 0, GRILLE, GRILLE, this.cases);
+    let somme = 0;
+    for (let i = 0; i < this.cases.length; i += 4) somme += this.cases[i];
+    this.luminance = Math.exp(somme / (GRILLE * GRILLE));
+  }
+}
+
 /**
  * `horsGeo` : ce qui ne doit pas entrer dans la passe de géométrie. Le dôme de ciel
  * en fait partie — il enveloppe la scène, et il occluerait tout.
@@ -380,6 +428,9 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   voile.uniforms.tFumee.value = cibleFumee.texture;
   voile.enabled = false;
   composeur.addPass(voile);
+  // Avant le halo : c'est la lumière de la scène qu'on mesure, pas son débordement.
+  const photometre = new Photometre();
+  composeur.addPass(photometre);
 
   // Le halo passe AVANT la sortie, donc avant le tonemapping : la cible du composeur
   // est en demi-flottant et garde le linéaire, et c'est là seulement que le soleil sur
@@ -460,5 +511,5 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     composeur.render();
   }
 
-  return { rendre, redimensionner, enfumer };
+  return { rendre, redimensionner, enfumer, get luminance() { return photometre.luminance; } };
 }

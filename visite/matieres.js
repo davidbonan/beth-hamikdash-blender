@@ -994,9 +994,9 @@ export function habiller(materiau, horloges, jeux) {
         #include <lights_fragment_end>
         #ifdef USE_LIGHTMAP
           reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
-          // Une pierre sous un toit reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue. Un métal voit la cour.
+          // Sous un toit, pierre ou or reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue.
           #ifdef REFLET_DU_CIEL
-            reflectedLight.indirectSpecular *= mix(clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0), 1.0, metalnessFactor);
+            reflectedLight.indirectSpecular *= clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0);
           #endif
         #endif
         #ifdef TEMPERE
