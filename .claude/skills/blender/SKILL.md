@@ -21,7 +21,7 @@ Corollaire : le .blend sur le disque date du dernier **export** —
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
-## Les quatorze scripts
+## Les quinze scripts
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
@@ -35,6 +35,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
 | `beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
 | `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
+| `beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `shor.blend` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
 | `beit_hamikdash_gravures.py` | les figures gravées des parois (keruv, timora, fleuron) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour poser une plaque par figure | `visite/matieres/gravures_2048.webp`, `gravures.json` |
@@ -110,6 +111,13 @@ modification de ce script, le relancer puis reconstruire la scène :
 
 ```bash
 $BLENDER -b -P beit_hamikdash_keruvim.py
+```
+
+Même chose pour les douze bœufs du Yam : le blockout lit `shor.blend`, écrit par
+`beit_hamikdash_shor.py` (~5 s, numpy de Blender). Après toute retouche du bœuf :
+
+```bash
+$BLENDER -b -P beit_hamikdash_shor.py
 ```
 
 Même logique pour le motif des Parokhot : il n'est pas de la géométrie mais une carte,

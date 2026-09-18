@@ -4862,7 +4862,11 @@ cyl_between("Magrefa_manche", (MAGREFA_X + MAGREFA_R - 0.1, MAGREFA_Y, Z_AZ + 0.
 # פֶּרַח שׁוֹשָׁן », deux rangs de coloquintes sous la lèvre, douze bœufs, trois vers chaque
 # vent, « וְכָל אֲחֹרֵיהֶם בָּיְתָה ». « מִכֶּתֶף הַבַּיִת הַיְמָנִית קֵדְמָה מִמּוּל נֶגֶב » (7:39) :
 # au sud-est du bâtiment, entre les marches de l'Oulam et la rampe.
-YAM_X, YAM_Y, YAM_Z = -63, -40, Z_AZ + 2.2
+# Les bœufs, taureaux d'un mètre trente au garrot (CHOIX), croupes à YAM_CROUPE du centre
+# et côte à côte à YAM_ECART : les rangs de deux vents voisins ne se touchent pas au coin.
+# La cuve pose sur leurs reins, là où son fond remonte à la hauteur du dos.
+YAM_X, YAM_Y, YAM_Z = -63, -40, Z_AZ + 2.15
+YAM_CROUPE, YAM_ECART = 2.3, 1.5
 YAM = [(0.6, 0.0), (3.6, 0.5), (4.5, 1.6), (4.75, 3.2), (4.7, 3.9), (5.0, 4.6), (5.2, 5.0),
        (4.95, 5.0), (4.6, 4.4), (4.45, 3.0), (3.6, 1.0), (0.0, 0.6)]
 revolution("Yam", YAM_X, YAM_Y, YAM_Z, YAM, "30_Mizbeach", MAT_BRONZE(), verts=48)
@@ -4874,30 +4878,38 @@ for rang, z in enumerate((3.55, 3.85)):
                "30_Mizbeach", MAT_BRONZE(), segs=6)
 
 
-def boeuf(name, x, y, z0, d, col, mat):
-    """Bœuf de la Mer : tête vers `d` (vecteur cardinal), croupe vers le centre."""
-    dx, dy = d
-    px, py = -dy, dx
-
-    def pt(le_long, en_travers):
-        return x + dx * le_long + px * en_travers, y + dy * le_long + py * en_travers
-
-    (ax, ay), (bx, by) = pt(0, -0.5), pt(2.4, 0.5)
-    box(f"{name}_corps", ax, bx, ay, by, z0 + 1.0, z0 + 2.1, col, mat)
-    (ax, ay), (bx, by) = pt(2.3, -0.28), pt(3.0, 0.28)
-    box(f"{name}_tete", ax, bx, ay, by, z0 + 1.55, z0 + 2.1, col, mat)
-    for k, (l, t) in enumerate(((0.35, -0.32), (0.35, 0.32), (2.0, -0.32), (2.0, 0.32))):
-        cx, cy = pt(l, t)
-        cyl(f"{name}_patte_{k}", cx, cy, z0, z0 + 1.0, 0.13, col, mat, verts=8)
-    for k, s in enumerate((-1, 1)):
-        (ax, ay), (bx, by) = pt(2.85, s * 0.2), pt(2.95, s * 0.55)
-        cyl_between(f"{name}_corne_{k}", (ax, ay, z0 + 2.1), (bx, by, z0 + 2.5), 0.04, col, mat, verts=6)
+SHOR_BLEND = pathlib.Path(__file__).resolve().parent / "shor.blend"
 
 
-for nm, d in (("E", (1, 0)), ("N", (0, 1)), ("O", (-1, 0)), ("S", (0, -1))):
-    for k, t in enumerate((-1.5, 0.0, 1.5)):
-        boeuf(f"Yam_shor_{nm}{k}", YAM_X + d[0] * 3.0 - d[1] * t, YAM_Y + d[1] * 3.0 + d[0] * t, Z_AZ, d,
-              "30_Mizbeach", MAT_BRONZE())
+def shor():
+    """Le bœuf de la Mer, lu dans `shor.blend`.
+
+    C'est `beit_hamikdash_shor.py` qui le modèle, en champ de distance polygonisé. Le
+    maillage est en mètres, dans le repère du bœuf : origine au sol sous la pointe des
+    fesses, +x vers le mufle.
+    """
+    with bpy.data.libraries.load(str(SHOR_BLEND)) as (_, charge):
+        charge.meshes = ["Shor"]
+    return charge.meshes[0]
+
+
+def yam_bakar(col, mat):
+    """Les douze bœufs, trois par vent, croupes vers le centre, tête vers le dehors."""
+    modele = shor()
+    for nom, (dx, dy) in (("E", (1, 0)), ("N", (0, 1)), ("O", (-1, 0)), ("S", (0, -1))):
+        for k, t in enumerate((-YAM_ECART, 0.0, YAM_ECART)):
+            me = modele.copy()
+            me.materials.clear()
+            me.materials.append(mat)
+            o = _objet(f"Yam_shor_{nom}{k}", me, col)
+            o["sans_biseau"] = True
+            _poser([o], YAM_X + dx * YAM_CROUPE - dy * t, YAM_Y + dy * YAM_CROUPE + dx * t, Z_AZ,
+                   math.atan2(dy, dx))
+    bpy.data.meshes.remove(modele)
+
+
+yam_bakar("30_Mizbeach", MAT_BRONZE())
+
 # Les dix mekhonot (Melakhim I 7:27-39) : socles de bronze de 4 × 4 × 3 sur quatre roues
 # d'une ama et demie, panneaux à lions, bœufs et keruvim (ici : leurs cadres seulement),
 # et une cuve de quatre amot sur chacun. « חָמֵשׁ עַל כֶּתֶף הַבַּיִת מִיָּמִין וְחָמֵשׁ עַל כֶּתֶף
