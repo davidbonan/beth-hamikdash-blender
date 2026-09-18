@@ -197,7 +197,7 @@ l'hémisphère, le diffus de l'environnement et l'occlusion. Le soleil direct re
 ```bash
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere azara,oulam
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere azara,oulam --lumiere-seule   # itération
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout                          # toute la visite, ~1 h 10
+$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout                          # toute la visite, ~40 min
 ```
 
 `--lumiere-seule` garde les cartes d'occlusion de `reperes.json` au lieu de les recuire : seule la

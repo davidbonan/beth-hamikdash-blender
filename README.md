@@ -963,8 +963,19 @@ rebondit — soleil, Menora, braises. Le soleil direct et les lampes restent en 
   elle reste dans les ta'im et sous terre, où rien n'entre, divisée par l'adaptation pour
   garder son éclat, et à 0,6 et 0,5 dans le Heikhal — dont l'emprise couvre aussi les
   cellules — et le Kodesh HaKodashim.
-- **Coût.** 53 cartes, 2,1 Mo de WebP (1,8 Mo d'occlusion avant), 68 min de cuisson. `--lumiere-seule` recuit la lumière en gardant les occlusions — 10 min au test : le dépliage ressort à l'identique (4 coordonnées sur 3,5 millions bougent d'un
+- **Coût.** 53 cartes, 2,5 Mo de WebP (1,8 Mo d'occlusion avant), 39 min de cuisson et 42 min d'export. `--lumiere-seule` recuit la lumière en gardant les occlusions — 10 min au test : le dépliage ressort à l'identique (4 coordonnées sur 3,5 millions bougent d'un
   demi-texel).
+- **Ce qui coûte, ce n'est pas le plafond d'échantillons, c'est le seuil de bruit.** Cycles
+  échantillonne en adaptatif : de 256 à 2048 échantillons, l'Ezrat Nashim ne passait que de
+  284 à 405 s. Le seuil, lui, commande tout — 884 s à 0,005, 416 s à 0,01, 224 s à 0,02,
+  138 s à 0,04. À **0,02** (`SEUIL_REBONDS`), la carte s'écarte de 1,7 niveau sRGB en moyenne
+  d'une référence à 0,002, et la cuisson tombe de moitié. La passe du ciel, elle, ne bouge
+  plus au-delà de 256 échantillons. Cuire en 2048² plutôt qu'en 4096² irait cinq fois plus
+  vite et n'est pas une option : 6,5 niveaux d'écart moyen et des franges au bord des îlots UV.
+- **La cuisson ne vide plus `visite/`.** Elle écrit ses cartes, son .glb et son reperes.json
+  dans un dossier temporaire, et `livrer` remplace le tout à la fin, cartes d'abord et
+  reperes.json en dernier : la visite servie garde sa lumière pendant les 40 min de cuisson,
+  au lieu de réclamer des cartes effacées au premier texel.
 - **Non vérifié** : le rendu et le temps par image sur téléphone ; les intérieurs des lishkot ;
   le feu du Beit HaMoked, qui n'a pas de lampe dans la visite et n'éclaire donc rien.
 
