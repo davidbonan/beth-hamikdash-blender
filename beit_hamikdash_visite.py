@@ -339,6 +339,8 @@ def exporter(chantier):
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
+    # Avant le tri : les outils des tailles (99_Outils) ne sont pas gardés, et leurs booléens les lisent.
+    chanfreiner(gardes)
     for o in list(bpy.data.objects):
         if o not in gardes:
             bpy.data.objects.remove(o, do_unlink=True)
@@ -350,8 +352,6 @@ def exporter(chantier):
             orphelins.append(o.name)
             ident = "_non_classe"
         groupes.setdefault(ident, []).append(o)
-
-    chanfreiner(gardes)
 
     emprises, fusionnes = {}, {}
     for ident in sorted(groupes):

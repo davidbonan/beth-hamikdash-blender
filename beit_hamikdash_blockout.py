@@ -1521,29 +1521,55 @@ def _repere(paroi):
     return (lambda u, z, d: Vector((c + sens * d, u, z))), Vector((0, 1, 0)), Vector((sens, 0, 0))
 
 
+def _contour_oriente(paroi, contour, uv):
+    """Les points du contour sur le nu de la paroi, tournés dans le sens direct vu du
+    dehors, avec leurs `uv` et la normale sortante. Le contour a le droit d'être
+    concave — l'orientation se prend sur l'aire entière, qu'un test au premier sommet
+    donnerait à l'envers sur une corolle."""
+    point, _, normale = _repere(paroi)
+    nu = [point(u, z, 0.0) for u, z in contour]
+    aire = Vector((0.0, 0.0, 0.0))
+    for k in range(1, len(nu) - 1):
+        aire += (nu[k] - nu[0]).cross(nu[k + 1] - nu[0])
+    if aire.dot(normale) < 0:
+        return nu[::-1], uv and uv[::-1], normale
+    return nu, uv, normale
+
+
 def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None, uv=None):
     """Un contour libre tracé dans le plan de la paroi, sorti d'elle de `d0` à `d1`,
     `uv` (une coordonnée par point du contour) allant aux deux faces.
 
     Une silhouette d'un seul tenant, et non un assemblage de plaques rectangulaires :
     c'est le contour qui fait lire la figure, et c'est lui que la passe Normal donne au
-    styliseur. Le contour a le droit d'être concave — l'orientation se prend sur l'aire
-    entière, qu'un test au premier sommet donnerait à l'envers sur une corolle.
+    styliseur.
     """
-    point, _, normale = _repere(paroi)
-    fond = [point(u, z, d0) for u, z in contour]
-    aire = Vector((0.0, 0.0, 0.0))
-    for k in range(1, len(fond) - 1):
-        aire += (fond[k] - fond[0]).cross(fond[k + 1] - fond[0])
-    if aire.dot(normale) < 0:
-        fond.reverse()
-        uv = uv and uv[::-1]
-    n = len(fond)
-    saillie = normale * (d1 - d0)
-    verts = [tuple(p) for p in fond] + [tuple(p + saillie) for p in fond]
+    nu, uv, normale = _contour_oriente(paroi, contour, uv)
+    n = len(nu)
+    verts = [tuple(p + normale * d0) for p in nu] + [tuple(p + normale * d1) for p in nu]
     faces = [list(range(n))[::-1], list(range(n, 2 * n))]
     faces += [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
     return mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE(), uv and uv + uv)
+
+
+# Chaque taille laisse ici son contour ; `creuser_les_parois` en ouvre le trou dans ce
+# qui la porte, une fois la scène bâtie.
+_TAILLES = []
+
+
+def _taille_profil(nom, paroi, contour, profondeur, col, mat=None, uv=None):
+    """Un contour taillé DANS la paroi : le fond à `profondeur` sous le nu, et les flancs
+    qui y descendent, tournés vers la figure. Pas de dessus — c'est le trou que
+    `creuser_les_parois` ouvre dans le support."""
+    nu, uv, normale = _contour_oriente(paroi, contour, uv)
+    n = len(nu)
+    verts = [tuple(p - normale * profondeur) for p in nu] + [tuple(p) for p in nu]
+    faces = [list(range(n))]
+    faces += [[n + k, n + (k + 1) % n, (k + 1) % n, k] for k in range(n)]
+    o = mesh_from_pydata(nom, verts, faces, col, mat or MAT_OR_PLAQUE(), uv and uv + uv)
+    o["taille"] = True
+    _TAILLES.append((paroi, contour, profondeur))
+    return o
 
 
 # --- Les trois figures gravées du Bayit, et le palmier de tous ses jambages :
@@ -1562,9 +1588,10 @@ def _relief_profil(nom, paroi, contour, d0, d1, col, mat=None, uv=None):
 #     tracées sur la carte même. Des plaques empilées, aussi bien découpées fussent-elles,
 #     se lisaient en emporte-pièce : seul le chanfrein prenait la lumière.
 BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
-SAILLIE_KIR = 0.05        # saillie de la plaque : 2,5 cm, ce qu'un bas-relief d'ossuaire sort
-                          # de sa dalle. À 0,16 la figure se lisait encore posée sur le mur,
-                          # comme appliquée ; ici elle est prise dans le plaquage
+# « פִּתּוּחֵי מִקְלְעוֹת » : « חֲקוּקֵי צוּרַת כְּרוּבִים » (Rashi), « לא שהיו בולטין » (Radak) — la
+# figure est TAILLÉE dans la paroi, rien n'en sort. Son modelé bombe au fond de la taille
+# sans jamais revenir au nu, et c'est le flanc tourné vers elle qui en trace le contour.
+PROFONDEUR_KIR = 0.05     # 2,5 cm, la moitié du placage d'or de 0,1 ama
 PAS_KIR = 3.7             # pas visé d'une figure, en amot : entre un keruv (large d'une
                           # hauteur) et une timora (0,7), il reste 1,3 ama d'or nu
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
@@ -1613,7 +1640,7 @@ def matiere_gravee(mat):
 
 
 def _relief_grave(nom, paroi, motif, u, z0, h, col, mat=None):
-    """La plaque d'une figure gravée : sa silhouette, sortie de SAILLIE_KIR, posée en
+    """La taille d'une figure gravée : sa silhouette, enfoncée de PROFONDEUR_KIR, posée en
     (u, z0) à la hauteur `h`, et dont chaque sommet vise la tuile du motif dans l'atlas."""
     fiche = GRAVURES[motif]
     u0, z_bas, u1, _ = fiche["cadre"]
@@ -1622,7 +1649,7 @@ def _relief_grave(nom, paroi, motif, u, z0, h, col, mat=None):
     contour = [(u + du * h, z0 + dz * h) for du, dz in fiche["silhouette"]]
     uv = [(ou + taille * (du - u0) / cadre, ov + taille * (dz - z_bas) / cadre)
           for du, dz in fiche["silhouette"]]
-    return _relief_profil(nom, paroi, contour, 0.0, SAILLIE_KIR, col, matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
+    return _taille_profil(nom, paroi, contour, PROFONDEUR_KIR, col, matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
 
 
 def largeur_gravure(motif):
@@ -1633,9 +1660,9 @@ def largeur_gravure(motif):
 
 
 def timora(nom, paroi, u, z0, h, col, mat=None):
-    """« תִּמֹרָה » : le dattier — Rashi et Radak lisent דקלים —, fût à écailles, sept
-    palmes, deux régimes de dattes, comme sur les monnaies de Bar Kokhba
-    (`beit_hamikdash_gravures.py`).
+    """« תִּמֹרָה » : une palmette, sept palmes en fontaine sur une base en cloche —
+    « כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל » (Rashi sur Ye'hezkel 40:16), « ענפי אילן וחריותיו »
+    (Ralbag sur Melakhim I 6:29) — (`beit_hamikdash_gravures.py`).
 
     Sur l'or du Bayit elle est dorée et `mat` reste vide ; sur le jambage d'une porte
     du Har HaBayit, que nulle source ne dore, elle se taille dans la pierre du mur.
@@ -1660,12 +1687,20 @@ def petur_tzitz(nom, paroi, u, z, r, col, mat=None):
     return o
 
 
+# Les deux traits d'un bandeau, en amot au-dessus de son bas : entre le bord et la
+# corolle, qui en laisse 0,044 de chaque côté — deux tailles qui se touchent ne font
+# plus qu'un trou.
+TRAITS_BANDEAU = ((0.012, 0.036), (BANDEAU_KIR - 0.036, BANDEAU_KIR - 0.012))
+
+
 def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
     """Un bandeau de fleurons en travers d'une paroi : ce qui tient les registres.
-    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser."""
-    _relief_profil(f"{nom}_listel", paroi,
-                   [(u0, z), (u1, z), (u1, z + BANDEAU_KIR), (u0, z + BANDEAU_KIR)],
-                   0.0, SAILLIE_KIR * 0.4, col, mat)
+    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser.
+    Deux traits taillés le bordent, et non un listel qui sortirait du nu."""
+    for bord, (zb, zh) in enumerate(TRAITS_BANDEAU):
+        _taille_profil(f"{nom}_trait_{bord}", paroi,
+                       [(u0, z + zb), (u1, z + zb), (u1, z + zh), (u0, z + zh)],
+                       PROFONDEUR_KIR * 0.4, col, mat)
     n = max(1, round((u1 - u0) / PAS_KIR))
     pas = (u1 - u0) / n
     for i in range(n):
@@ -6638,6 +6673,76 @@ for nom_collection, largeur_biseau in BISEAU.items():
     collection = bpy.data.collections.get(nom_collection)
     if collection:
         biseauter(collection, largeur_biseau)
+
+# ----------------------------------------------------------------------------
+# TAILLES
+#   Chaque support perd le trou de ses tailles par un booléen posé APRÈS le biseau,
+#   pour que le bord de la taille reste vif. La visite évalue les deux ensemble
+#   (beit_hamikdash_visite.py, `chanfreiner`).
+# ----------------------------------------------------------------------------
+MARGE_TAILLE = 0.01       # amot : l'outil passe le nu et le fond, sans quoi le booléen laisse une pellicule
+OUTILS = "99_Outils"
+
+
+def _prisme_taille(paroi, contour, profondeur):
+    """Sommets (en amot) et faces du volume qu'une taille retire à son support."""
+    nu, _, normale = _contour_oriente(paroi, contour, None)
+    n = len(nu)
+    verts = ([tuple(p - normale * (profondeur + MARGE_TAILLE)) for p in nu]
+             + [tuple(p + normale * MARGE_TAILLE) for p in nu])
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    faces += [[k, (k + 1) % n, n + (k + 1) % n, n + k] for k in range(n)]
+    return verts, faces
+
+
+def _emprise(coins):
+    return tuple(map(min, zip(*coins))), tuple(map(max, zip(*coins)))
+
+
+def _porte_la_taille(support, taille, paroi, profondeur):
+    """Le support a sa face sur le nu de la paroi, et assez d'épaisseur derrière pour la
+    taille — ni ce qui se tient devant le mur, ni la maçonnerie derrière le placage."""
+    axe, c, sens = paroi
+    i = 1 if axe == "x" else 0
+    face = support[1][i] if sens > 0 else -support[0][i]
+    fond = support[0][i] if sens > 0 else -support[1][i]
+    nu = m(c) * sens
+    if abs(face - nu) > m(MARGE_TAILLE) or fond > nu - m(profondeur):
+        return False
+    return all(taille[0][j] < support[1][j] and support[0][j] < taille[1][j] for j in range(3) if j != i)
+
+
+def creuser_les_parois():
+    """Ouvre dans chaque support le trou des tailles qui l'entament : un outil par
+    support, fait de toutes ses tailles, soustrait par un modificateur."""
+    supports = [(o, _emprise([o.matrix_world @ Vector(c) for c in o.bound_box]))
+                for o in scene.objects if o.type == 'MESH' and not o.get("taille")]
+    par_support, sans_support = {}, 0
+    for paroi, contour, profondeur in _TAILLES:
+        verts, faces = _prisme_taille(paroi, contour, profondeur)
+        emprise = _emprise([tuple(m(c) for c in v) for v in verts])
+        porteurs = [support for support, sienne in supports
+                    if _porte_la_taille(sienne, emprise, paroi, profondeur)]
+        sans_support += not porteurs
+        for support in porteurs:
+            par_support.setdefault(support, []).append((verts, faces))
+    for support, prismes in par_support.items():
+        verts, faces = [], []
+        for v, f in prismes:
+            faces += [[len(verts) + i for i in face] for face in f]
+            verts += v
+        outil = mesh_from_pydata(f"Outil_{support.name}", verts, faces, OUTILS)
+        outil.hide_render = True
+        outil.display_type = 'WIRE'
+        booleen = support.modifiers.new("Taille", 'BOOLEAN')
+        booleen.operation = 'DIFFERENCE'
+        booleen.solver = 'EXACT'
+        booleen.use_self = True   # sans lui, les parois du Kodesh HaKodashim s'évaluaient vides
+        booleen.object = outil
+    print(f"  {len(_TAILLES)} tailles creusées dans {len(par_support)} supports, {sans_support} sans support")
+
+
+creuser_les_parois()
 
 # ----------------------------------------------------------------------------
 # ÉCLAIRAGE, CIEL ET MOTEUR

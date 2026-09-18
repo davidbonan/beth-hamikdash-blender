@@ -321,10 +321,15 @@ def palme(inclinaison, longueur, retombee):
     p1 = (p0[0] + 0.5 * longueur * math.sin(a), p0[1] + 0.5 * longueur * math.cos(a))
     p2 = (p0[0] + longueur * math.sin(a), p0[1] + longueur * (math.cos(a) - retombee))
     axe = bezier(p0, p1, p2, 32)
-    n = len(axe) - 1
-    largeurs = [0.005 + 0.070 * (1.0 - k / n) ** 0.55 * min(1.0, 0.45 + 4.0 * k / n)
-                for k in range(len(axe))]
-    return axe, largeurs
+    return axe, largeurs_palme(len(axe))
+
+
+def largeurs_palme(points):
+    """La portée des folioles en chacun des `points` d'une nervure, de la base à la
+    pointe : large à la base, effilée à la pointe."""
+    n = points - 1
+    return [0.005 + 0.070 * (1.0 - k / n) ** 0.55 * min(1.0, 0.45 + 4.0 * k / n)
+            for k in range(points)]
 
 
 def folioles(axe, largeurs):

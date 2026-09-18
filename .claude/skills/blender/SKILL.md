@@ -38,7 +38,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `shor.blend` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
-| `beit_hamikdash_gravures.py` | les figures gravées des parois (keruv, timora, fleuron) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour poser une plaque par figure | `visite/matieres/gravures_2048.webp`, `gravures.json` |
+| `beit_hamikdash_gravures.py` | les figures gravées des parois (keruv, timora, fleuron) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour tailler chaque figure dans sa paroi | `visite/matieres/gravures_2048.webp`, `gravures.json` |
 | `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
@@ -139,8 +139,8 @@ d'or, les vantaux du Heikhal et les jambages des portes des cours — `beit_hami
 la silhouette de chaque figure tracée sur la carte même, à partir des trois tuiles taillées
 de `gravures/` (keruv, timora, fleuron : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
 versionnés parce qu'un modèle ne rend jamais deux fois la même image — la luminance donne le
-modelé, la distance au bord le volume). Le blockout **lit ce JSON** pour poser une seule
-plaque par figure, à sa silhouette, dont les UV visent la tuile ; sans lui il s'arrête net.
+modelé, la distance au bord le volume). Le blockout **lit ce JSON** pour tailler chaque
+figure à sa silhouette, un fond dont les UV visent la tuile ; sans lui il s'arrête net.
 La rasterisation commune aux deux cartes est `beit_hamikdash_carte.py`.
 
 ```bash

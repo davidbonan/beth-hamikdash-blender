@@ -896,8 +896,8 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 #ifdef GRAVURE
   // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
   // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y
-  // (le -z de three) sur un mur ouest — et v monte. Les flancs de la plaque, hauts de
-  // 4 cm, ne portent pas de modelé.
+  // (le -z de three) sur un mur ouest — et v monte. Les flancs de la taille ne portent
+  // pas de modelé.
   {
     vec3 tu = abs(N.z) > abs(N.x) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 0.0, -1.0);
     vec2 pas = vec2(TEXEL_GRAVURE, 0.0);
