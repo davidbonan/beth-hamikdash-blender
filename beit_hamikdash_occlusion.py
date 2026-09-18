@@ -1,4 +1,5 @@
 """Cuit dans Cycles, par concept de la visite, l'occlusion du ciel (visite/occlusion/) ou la lumière indirecte (visite/lumiere/), sur la couche UV « Occlusion »."""
+import ctypes
 import math
 import pathlib
 import subprocess
@@ -56,6 +57,9 @@ SEUIL_REBONDS = 0.02
 TOUS = "tout"
 # Un rayon réfléchi par l'or vers la pierre tombe rarement, et fort : sans borne il laisse des étincelles dans la carte.
 BORNE_INDIRECTE = 4.0
+# oidn.h : OIDN_DEVICE_TYPE_CPU et OIDN_FORMAT_FLOAT3.
+OIDN_CPU = 1
+OIDN_FLOAT3 = 3
 
 
 def aire(obj):
@@ -359,8 +363,47 @@ def cuire_lumiere_de(obj, taille, sources):
     scene.cycles.samples = ECHANTILLONS
     scene.cycles.adaptive_threshold = seuil_scene
     ciel = cuire(obj, image, type="DIFFUSE", pass_filter={"DIRECT"})[..., :3]
+    normales = cuire(obj, image, type="NORMAL", normal_space="OBJECT")[..., :3] * 2.0 - 1.0
     bpy.data.images.remove(image)
-    return math.pi * (rebonds + ciel)
+    return debruiter(math.pi * (rebonds + ciel), normales)
+
+
+# Dans une salle qui ne voit le jour que par sa porte, le bruit de Cycles reste dans la carte et l'interpolation l'étale en nuages sur la pierre.
+def debruiter(irradiance, normales):
+    """L'irradiance débruitée par l'OIDN de Blender ; les normales cuites empêchent une île de l'atlas de baver sur sa voisine."""
+    oidn = ctypes.CDLL(str(pathlib.Path(bpy.app.binary_path).parents[1] / "Resources" / "lib" / "libOpenImageDenoise.dylib"))
+    oidn.oidnNewDevice.restype = ctypes.c_void_p
+    oidn.oidnNewFilter.restype = ctypes.c_void_p
+    oidn.oidnNewFilter.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+    oidn.oidnSetSharedFilterImage.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_void_p, ctypes.c_int,
+                                              *[ctypes.c_size_t] * 5]
+    oidn.oidnSetFilterBool.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_bool]
+    for fonction in ("oidnCommitDevice", "oidnReleaseDevice", "oidnCommitFilter", "oidnExecuteFilter", "oidnReleaseFilter"):
+        getattr(oidn, fonction).argtypes = [ctypes.c_void_p]
+    oidn.oidnGetDeviceError.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_char_p)]
+
+    hauteur, largeur = irradiance.shape[:2]
+    # L'irradiance n'a pas d'albédo : un albédo blanc laisse les normales seules guider le filtre.
+    images = {"color": np.ascontiguousarray(irradiance, dtype=np.float32),
+              "albedo": np.ones((hauteur, largeur, 3), dtype=np.float32),
+              "normal": np.ascontiguousarray(normales, dtype=np.float32),
+              "output": np.empty((hauteur, largeur, 3), dtype=np.float32)}
+    appareil = oidn.oidnNewDevice(OIDN_CPU)
+    oidn.oidnCommitDevice(appareil)
+    filtre = oidn.oidnNewFilter(appareil, b"RT")
+    for nom, image in images.items():
+        oidn.oidnSetSharedFilterImage(filtre, nom.encode(), image.ctypes.data, OIDN_FLOAT3, largeur, hauteur, 0, 0, 0)
+    oidn.oidnSetFilterBool(filtre, b"hdr", True)
+    oidn.oidnSetFilterBool(filtre, b"cleanAux", True)
+    oidn.oidnCommitFilter(filtre)
+    oidn.oidnExecuteFilter(filtre)
+    message = ctypes.c_char_p()
+    erreur = oidn.oidnGetDeviceError(appareil, ctypes.byref(message))
+    oidn.oidnReleaseFilter(filtre)
+    oidn.oidnReleaseDevice(appareil)
+    if erreur:
+        raise RuntimeError(f"OIDN : {message.value.decode()}")
+    return np.maximum(images["output"], 0.0)
 
 
 # Cuite au double puis réduite : la réduction efface le bruit de Cycles, qui doublait le poids du WebP.

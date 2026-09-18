@@ -910,6 +910,8 @@ export function habiller(materiau, horloges, jeux) {
     + (gravure ? "#define GRAVURE\n" : "")
     + (rayonFil ? "#define FIL\n" : "");
 
+  // La sonde du Heikhal pose son propre reflet, celui de la salle : ce n'est plus le ciel qu'il faut éteindre.
+  const refletDuCiel = () => (materiau.envMap ? "" : "#define REFLET_DU_CIEL\n");
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
     nuanceur.vertexShader = nuanceur.vertexShader
@@ -924,7 +926,7 @@ export function habiller(materiau, horloges, jeux) {
                "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n");
 
     nuanceur.fragmentShader = nuanceur.fragmentShader
-      .replace("#include <common>", "#include <common>\n" + drapeaux + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
+      .replace("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
       .replace("#include <shadowmap_pars_fragment>",
                PROFIL.ombres.penombre ? assemblage() : "#include <shadowmap_pars_fragment>")
       // Les maillages sont exportés sans normales : three les tire des dérivées.
@@ -977,10 +979,14 @@ export function habiller(materiau, horloges, jeux) {
           iblIrradiance *= mReliefCiel;
         #endif
         #ifdef USE_LIGHTMAP
+          // La carte n'a pas de direction : sa lumière vient d'en haut et un peu de l'œil, que le relief se lise dans les deux sens.
+          const float VENUE_HAUT = 1.0, VENUE_OEIL = 0.5, RELIEF_CUIT = 2.5;
+          vec3 mVenue = normalize(nonPerturbedNormal + VENUE_HAUT * normalize(mat3(viewMatrix)[1]) + VENUE_OEIL * geometryViewDir);
+          float mReliefCuit = max(1.0 + RELIEF_CUIT * ((1.0 + dot(normal, mVenue)) / (1.0 + dot(nonPerturbedNormal, mVenue)) - 1.0), 0.0);
           #ifdef TEMPERE
-            vec3 mCuite = lightMapIrradiance * mRelief * mReliefCiel * mPenombre;
+            vec3 mCuite = lightMapIrradiance * pow(max(mRelief * mReliefCuit, 1e-4), mTemperance) * mPenombre;
           #else
-            vec3 mCuite = lightMapIrradiance * mRelief * mPenombre;
+            vec3 mCuite = lightMapIrradiance * mRelief * mReliefCuit * mPenombre;
           #endif
         #endif
         irradiance *= mPenombre;
@@ -989,6 +995,10 @@ export function habiller(materiau, horloges, jeux) {
         #include <lights_fragment_end>
         #ifdef USE_LIGHTMAP
           reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
+          // Une pierre sous un toit reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue. Un métal voit la cour.
+          #ifdef REFLET_DU_CIEL
+            reflectedLight.indirectSpecular *= mix(clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0), 1.0, metalnessFactor);
+          #endif
         #endif
         #ifdef TEMPERE
           vec3 mTeinteVue = pow(mTeinte, vec3(mTemperance));
@@ -1011,5 +1021,5 @@ export function habiller(materiau, horloges, jeux) {
         #include <normal_fragment_maps>
         normal = normalize(normal - mat3(viewMatrix) * mPente);`);
   };
-  materiau.customProgramCacheKey = () => `mikdash-${famille}-${drapeaux}`;
+  materiau.customProgramCacheKey = () => `mikdash-${famille}-${drapeaux}${refletDuCiel()}`;
 }
