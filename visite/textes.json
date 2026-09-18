@@ -160,7 +160,8 @@
       "kiyor": "ליד הכיור",
       "oulam": "תחת תקרת האולם",
       "heikhal": "בתוך ההיכל",
-      "kodesh_hakodashim": "קודש הקודשים"
+      "kodesh_hakodashim": "קודש הקודשים",
+      "place_kotel": "רחבת הכותל"
     },
     "oeuvres": {
       "Arakhin": "ערכין",
@@ -228,7 +229,10 @@
       "Yirmeyahou": "ירמיהו",
       "Yoma": "יומא",
       "Zekharia": "זכריה",
-      "Zeva'him": "זבחים"
+      "Zeva'him": "זבחים",
+      "Shemot Rabba": "שמות רבה",
+      "Shir HaShirim Rabba": "שיר השירים רבה",
+      "Teshouvot HaRadbaz II": "שו\"ת הרדב\"ז ח\"ב"
     }
   },
   "en": {
@@ -316,7 +320,8 @@
       "kiyor": "At the Kiyor",
       "oulam": "Under the Ulam",
       "heikhal": "In the Heikhal",
-      "kodesh_hakodashim": "Kodesh HaKodashim"
+      "kodesh_hakodashim": "Kodesh HaKodashim",
+      "place_kotel": "Western Wall Plaza"
     },
     "oeuvres": {
       "Arakhin": "Arakhin",
@@ -384,7 +389,10 @@
       "Yirmeyahou": "Jeremiah",
       "Yoma": "Yoma",
       "Zekharia": "Zechariah",
-      "Zeva'him": "Zevachim"
+      "Zeva'him": "Zevachim",
+      "Shemot Rabba": "Shemot Rabbah",
+      "Shir HaShirim Rabba": "Shir HaShirim Rabbah",
+      "Teshouvot HaRadbaz II": "Responsa of the Radbaz, vol. II"
     }
   }
 }

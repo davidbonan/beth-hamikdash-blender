@@ -173,7 +173,7 @@ scene.add(appoint);
 // entre son `near` et son `far`.
 const RECUL_SOLEIL = 200;
 
-const ciel = domeVu(760);
+const ciel = domeVu(5700);
 scene.add(ciel);
 // L'or est métallique : sans environnement à réfléchir, il rend noir.
 scene.environment = environnement(renderer);
@@ -184,7 +184,7 @@ scene.environment = environnement(renderer);
 // au-delà de 80° un portrait étroit tournerait au fisheye.
 const FOV_HORIZONTAL = 94;
 const FOV_VERTICAL = [50, 80];
-const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 900);
+const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 6000);
 // La lampe de tête, là seulement où la lumière cuite laisse noir ; l'emprise du Heikhal couvre aussi ses cellules.
 const LAMPE_TETE = 6;
 const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5, taim: LAMPE_TETE,
@@ -450,6 +450,25 @@ function poserFigurants({ scene: troupe, animations }) {
   scene.add(troupe);
 }
 const figurantsPrets = chargeur.loadAsync("./figures.glb").then(poserFigurants);
+
+// Jérusalem autour du Temple descend en dernier : on s'y pose aussi, et on s'y cogne.
+function poserPays({ scene: pays }) {
+  pays.updateMatrixWorld(true);
+  pays.traverse((o) => {
+    if (!o.isMesh) return;
+    o.geometry.computeBoundsTree({ maxLeafTris: 24 });
+    o.castShadow = true;
+    o.receiveShadow = true;
+    if (!brut && !habillees.has(o.material.uuid)) {
+      habillees.add(o.material.uuid);
+      habiller(o.material, horloges, jeux);
+    }
+    obstacles.push(o);
+    murs.push(o);
+  });
+  scene.add(pays);
+}
+chargeur.loadAsync("./pays.glb").then(poserPays);
 
 // ---------------------------------------------------------------------------
 // marche

@@ -25,6 +25,82 @@
       "lieu": true
     },
     {
+      "id": "esplanade_herode",
+      "nom": "Esplanade d'Hérode",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Herode_esplanade"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "mur_herode",
+      "nom": "Mur d'Hérode",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Herode_mur"
+      ]
+    },
+    {
+      "id": "kotel",
+      "nom": "Kotel",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Kotel"
+      ]
+    },
+    {
+      "id": "place_kotel",
+      "nom": "Place du Kotel",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Kotel_place",
+        "Arret_bus_kotel"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "arche_wilson",
+      "nom": "Arche de Wilson",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Wilson"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "pont_maghrebins",
+      "nom": "Pont des Maghrébins",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Maghrebins"
+      ]
+    },
+    {
+      "id": "netilat_yadayim",
+      "nom": "Netilat yadayim",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Kotel_place_netilat"
+      ]
+    },
+    {
+      "id": "menora_d_or",
+      "nom": "Menora d'or",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Menora_d_or"
+      ]
+    },
+    {
+      "id": "porat_yosef",
+      "nom": "Yeshiva Porat Yosef",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Porat_Yosef"
+      ]
+    },
+    {
       "id": "soreg",
       "nom": "Soreg",
       "zone": "har_habayit",

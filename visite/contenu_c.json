@@ -298,5 +298,149 @@
       {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת נָשִׁים מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם"}
     ],
     "note": "Prise de position du projet : les fidèles ne portent pas de costume d'époque. Ils sont vêtus comme leur communauté s'habille aujourd'hui pour Kippour — costume et chapeau, costume et talith, costume et kippa. C'est un parti pris, pas une reconstitution. La tenue des femmes, robe et foulard, et les gestes des figures sont aussi des choix."
+  },
+
+  "kotel": {
+    "he": "הכותל המערבי",
+    "translit": "HaKotel HaMa'aravi",
+    "resume": "Le mur occidental d'aujourd'hui, face auquel on prie. C'est un tronçon du mur de soutènement ouest de l'esplanade telle qu'Hérode l'a agrandie : le Har HaBayit de cinq cents amot de la Mishna est plus à l'est, à l'intérieur. Le midrash dit que la Shekhina ne quitte jamais le mur occidental, et qu'il ne sera jamais détruit ; le Radbaz lit ce mur-là comme le mur ouest de l'Azara, à onze amot derrière le Kodesh HaKodashim.",
+    "cotes": [
+      "dix-neuf mètres au-dessus de sa place",
+      "au-dessus de la place, sept assises d'Hérode à marges ciselées, quatre omeyyades de pierres plus petites, puis dix-sept petites assises mameloukes et postérieures",
+      "tracé et place d'après OpenStreetMap"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shemot Rabba",
+        "ref": "2:2",
+        "citation": "לְעוֹלָם אֵין הַשְּׁכִינָה זָזָה מִכֹּתֶל מַעֲרָבִי"
+      },
+      {
+        "oeuvre": "Shir HaShirim Rabba",
+        "ref": "2:9:4",
+        "citation": "אַחַר כֹּתֶל מַעֲרָבִי שֶׁל בֵּית הַמִּקְדָּשׁ, לָמָּה שֶׁנִּשְׁבַּע לוֹ הַקָּדוֹשׁ בָּרוּךְ הוּא שֶׁאֵינוֹ חָרֵב לְעוֹלָם"
+      },
+      {
+        "oeuvre": "Teshouvot HaRadbaz II",
+        "ref": "648",
+        "citation": "בי\"א אמה שבין כותל מערבי לאחורי קדש הקדשים"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:1",
+        "citation": "הַר הַבַּיִת הָיָה חֲמֵשׁ מֵאוֹת אַמָּה עַל חֲמֵשׁ מֵאוֹת אַמָּה"
+      },
+      {
+        "oeuvre": "Teshouvot HaRadbaz II",
+        "ref": "691",
+        "citation": "הַדָּבָר בָּרוּר שֶׁתַּחַת הַכִּיפָּה שָׁם אֶבֶן הַשְּׁתִיָּה בְּלִי סָפֵק"
+      }
+    ],
+    "note": "Choix de la visite : le Kotel est le mur de l'esplanade d'Hérode, pas celui du Har HaBayit de Middot 2:1 — aucune source rabbinique vérifiée ne l'identifie au mur des cinq cents amot. Le Temple est calé sur le rocher du Dôme, la Even HaShetiya selon le Radbaz (Teshouvot II, 691). Écarté : faire du Kotel le mur ouest de Middot, qui mettrait le rocher sous le Mizbea'h, contre le Radbaz. Choix de la visite : la hauteur des assises, qui remplit les dix-neuf mètres ; le décompte des assises vient de l'archéologie, pas du corpus."
+  },
+  "place_kotel": {
+    "he": "רחבת הכותל",
+    "translit": "Re'havat HaKotel",
+    "resume": "La place de prière d'aujourd'hui, au pied du Kotel, dix-neuf mètres sous l'esplanade. Elle est bordée de murs de soutènement : la ville haute est au-dessus d'elle. Elle a deux niveaux : contre le Kotel, l'aire de prière, creusée en 1968 ; à l'ouest, la place haute des visiteurs, soixante centimètres au-dessus, derrière un muret à parapet que deux brèches ouvrent. De son coin nord-ouest, un escalier monte au quartier juif, et un passage couvert mène à la rue HaGaï ; au nord, les salles couvertes de l'arche de Wilson ; au sud-ouest, un passage vers Batei Ma'hasse ; au sud, par les contrôles, le chemin de la porte des Ordures, et le pont des Maghrébins qui monte à l'esplanade.",
+    "cotes": [
+      "contour et tracé de l'escalier d'après OpenStreetMap",
+      "le quartier juif, vingt-deux mètres au-dessus de la place (projet d'ascenseur de la rue Tiferet Israël)",
+      "deux niveaux depuis 1968 : l'aire de prière abaissée d'environ deux mètres, puis l'écart avec la place haute ramené à soixante centimètres ; le muret qui les sépare, d'environ quatre-vingt-dix centimètres, porte depuis 1979 un parapet de pierre d'un mètre (S. Bahat, Cathedra 174, 2020)",
+      "les passages vers la rue HaGaï, Batei Ma'hasse et la porte des Ordures, et les brèches du muret, d'après OpenStreetMap",
+      "le mobilier d'après OpenStreetMap : postes de netilat yadayim, fontaines, mehitsa, muret de l'aire de prière, clôtures, contrôles de sécurité, arrêt de bus « הכותל המערבי »",
+      "un millier de chaises de plastique blanc, livrées en 2020 (thekotel.org)",
+      "Aish HaTorah, en face du Kotel : sept étages au-dessus de la place (aish.com)"
+    ],
+    "note": "Choix de la visite : sa cote. Le relief à trente mètres de la visite lisse les dix-neuf mètres du mur en pente douce ; la place est posée à la hauteur visible du Kotel sous sa crête. L'escalier monte d'un trait jusqu'au sol que le relief donne au bout de son tracé, entre deux murs ; ses degrés font seize centimètres. Le mobilier : hauteur des clôtures et des murets, mehitsa d'un mètre quatre-vingts, nombre et place des chaises, étagères de siddourim. Les maisons qui la bordent lui montrent des étages de trois mètres vingt et des baies cintrées : une trame, pas un relevé. Le relief de la visite met son coin nord-ouest — police, toilettes, entrée des tunnels du Kotel — au-dessus d'elle : leurs portes sont ramenées au pied du mur le plus proche. Ce relief met la place elle-même treize mètres trop haut : les trois passages vers la ville s'arrêtent après quatre mètres couverts, sans dire à quelle cote ils la rejoignent ; leur largeur de trois mètres cinquante, leur hauteur, la pente à un pour douze de l'entrée des hommes et les degrés de celle des femmes sont des choix ; le dernier tronçon du muret d'OSM, le long de la pente, n'est pas bâti. La place haute est posée à plat."
+  },
+  "esplanade_herode": {
+    "he": "הר הבית",
+    "translit": "Har HaBayit",
+    "resume": "L'esplanade d'aujourd'hui, telle qu'Hérode l'a agrandie. La Mishna ne compte que cinq cents amot de côté ; la visite pose ce carré dans le contour actuel, le Kodesh HaKodashim sur le rocher du Dôme, et dalle le reste au même niveau.",
+    "cotes": [
+      "contour d'après OpenStreetMap",
+      "cote : la médiane du relief actuel dans le contour"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "2:1",
+        "citation": "הַר הַבַּיִת הָיָה חֲמֵשׁ מֵאוֹת אַמָּה עַל חֲמֵשׁ מֵאוֹת אַמָּה"
+      },
+      {
+        "oeuvre": "Teshouvot HaRadbaz II",
+        "ref": "691",
+        "citation": "הַדָּבָר בָּרוּר שֶׁתַּחַת הַכִּיפָּה שָׁם אֶבֶן הַשְּׁתִיָּה בְּלִי סָפֵק"
+      }
+    ],
+    "note": "Choix de la visite : le Temple garde l'est vrai de Middot 2:4 ; le contour actuel est tourné de six degrés, et son mur est passe une dizaine de mètres en dedans de l'angle nord-est du carré. Rien n'y est bâti : l'esplanade est au Temple."
+  },
+  "mur_herode": {
+    "resume": "Le mur de soutènement de l'esplanade d'Hérode, sur le contour d'aujourd'hui. Il descend jusqu'au terrain, et monte au-dessus du dallage là où la ville est plus haute que lui, au nord.",
+    "cotes": [
+      "parapet de quatre amot au-dessus du dallage (choix de la visite)"
+    ],
+    "note": "Choix de la visite : son appareil est celui de l'enceinte de Middot, faute d'autre modèle."
+  },
+  "arche_wilson": {
+    "he": "קשת וילסון",
+    "translit": "Keshet Wilson",
+    "resume": "Au nord de la place, les salles de prière couvertes sous la chaussée qui mène à la porte de la Chaîne. Le Kotel s'y poursuit sous une grande arche qui part de lui : elle portait autrefois un pont vers l'esplanade, au-dessus de la rue qui longeait le mur.",
+    "cotes": [
+      "portée de l'arche : treize mètres",
+      "sa clé : 6,1 m au-dessus du sol d'aujourd'hui",
+      "emprise des salles d'après OpenStreetMap",
+      "un aron qui garde plus de cent sifrei Torah et une bibliothèque, de la rénovation de 2005–2008 ; le ner tamid, allumé en 2010 (thekotel.org)",
+      "un puits qui montre quatorze assises sous le sol (Wikipedia)"
+    ],
+    "note": "Choix de la visite : la voûte est un plein cintre qui court sur toute la longueur des salles, et le reste de leur emprise est plein jusqu'au dallage de l'esplanade. Les cotes viennent de l'archéologie, relevés de Wilson compris, pas d'une source du corpus. Le mobilier et sa place : l'aron au fond, sous la clé — contre le Kotel, la voûte descend sous le mètre —, la bibliothèque le long du flanc ouest, le puits près de l'entrée."
+  },
+  "pont_maghrebins": {
+    "he": "גשר המוגרבים",
+    "translit": "Gesher HaMugrabim",
+    "resume": "Le pont de bois qui monte du sud de la place à la porte des Maghrébins, la seule par où l'on entre aujourd'hui sur l'esplanade sans être musulman. Il remplace depuis 2007 la rampe de terre qui s'est effondrée en 2004.",
+    "cotes": [
+      "tracé d'après OpenStreetMap",
+      "trois mètres de large, garde-corps d'un mètre dix (choix de la visite)"
+    ],
+    "note": "Choix de la visite : le tablier monte d'un trait de la place au dallage, et la rampe de terre est arasée sous lui ; la porte est une brèche dans le parapet du mur d'Hérode."
+  },
+
+  "netilat_yadayim": {
+    "he": "נטילת ידיים",
+    "translit": "Netilat yadayim",
+    "resume": "Les deux postes où l'on se lave les mains avant d'entrer dans l'aire de prière, sur la place haute, au bord du muret qui la ferme : des robinets et des natlot, les gobelets qui versent l'eau. Un écho du Kiyor, la cuve de bronze où les cohanim se lavaient mains et pieds avant le service.",
+    "cotes": [
+      "emplacement des deux postes d'après OpenStreetMap"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "30:19", "citation": "וְרָחֲצוּ אַהֲרֹן וּבָנָיו מִמֶּנּוּ אֶת יְדֵיהֶם וְאֶת רַגְלֵיהֶם"}
+    ],
+    "note": "Choix de la visite : leur forme. Aucune source trouvée ne la décrit ; la visite en fait une vasque ronde de pierre autour d'un fût qui porte huit robinets, les natlot posées sur le bord."
+  },
+
+  "menora_d_or": {
+    "he": "מנורת הזהב",
+    "translit": "Menorat HaZahav",
+    "resume": "La menora d'or de l'Institut du Temple, sur l'escalier qui descend du quartier juif vers la place, face au Har HaBayit : faite pour servir dans un Temple rebâti. Plus de deux mètres, une demi-tonne dont quarante-cinq kilos d'or, trois pieds et sept branches, sous une vitrine.",
+    "cotes": [
+      "emplacement d'après OpenStreetMap",
+      "plus de deux mètres, une demi-tonne, 45 kg d'or (joelfeld.com)"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "25:32", "citation": "וְשִׁשָּׁה קָנִים יֹצְאִים מִצִּדֶּיהָ שְׁלֹשָׁה קְנֵי מְנֹרָה מִצִּדָּהּ הָאֶחָד וּשְׁלֹשָׁה קְנֵי מְנֹרָה מִצִּדָּהּ הַשֵּׁנִי"}
+    ],
+    "note": "Choix de la visite : son nœud. OpenStreetMap en porte deux, et l'autre tombe dans l'emprise d'un bâtiment. Ses branches sont cintrées comme celles de la menora exposée ; l'Institut en a fait une seconde, à branches droites, d'après le dessin du Rambam (Israel365 News), et c'est ce dessin que suit la Menora du Heikhal de la visite. La vitrine n'est pas modélisée."
+  },
+
+  "porat_yosef": {
+    "he": "ישיבת פורת יוסף",
+    "translit": "Yeshivat Porat Yosef",
+    "resume": "La yeshiva qui domine la place au sud-ouest, face au Kotel. Le bâtiment de Moshe Safdie monte sur dix étages d'est en ouest ; ses murs de pierre ferment des salles cintrées, et des coupoles de béton préfabriqué le coiffent en série.",
+    "cotes": [
+      "emprise d'après OpenStreetMap",
+      "dix étages, coupoles de béton préfabriqué (archives Moshe Safdie, université McGill)"
+    ],
+    "note": "Choix de la visite : ses dix étages sont comptés depuis son pied, à trois mètres vingt ; ses baies et le pas de ses coupoles sont une trame, pas un relevé."
   }
 }

@@ -296,5 +296,149 @@
       {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת נָשִׁים מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם"}
     ],
     "note": "Project's position: the worshippers are not in period costume. They are dressed as their community dresses today for Yom Kippur — suit and hat, suit and tallit, suit and kippa. This is a deliberate stance, not a reconstruction. The women's dress and headscarf and the figures' gestures are also choices."
+  },
+  "kotel": {
+    "nom": "Kotel (Western Wall)",
+    "translit": "HaKotel HaMa'aravi",
+    "resume": "Today's Western Wall, where Jews pray. It is a section of the western retaining wall of the platform as Herod enlarged it: the Mishna's Har HaBayit of five hundred amot lies further east, inside. The midrash says the Shekhina never leaves the western wall and that it will never be destroyed; the Radbaz reads this wall as the western wall of the Azara, eleven amot behind the Kodesh HaKodashim.",
+    "cotes": [
+      "nineteen metres above its plaza",
+      "above the plaza, seven Herodian courses with drafted margins, four Umayyad courses of smaller stones, then seventeen small Mamluk and later courses",
+      "line and plaza from OpenStreetMap"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shemot Rabba",
+        "ref": "2:2",
+        "citation": "לְעוֹלָם אֵין הַשְּׁכִינָה זָזָה מִכֹּתֶל מַעֲרָבִי"
+      },
+      {
+        "oeuvre": "Shir HaShirim Rabba",
+        "ref": "2:9:4",
+        "citation": "אַחַר כֹּתֶל מַעֲרָבִי שֶׁל בֵּית הַמִּקְדָּשׁ, לָמָּה שֶׁנִּשְׁבַּע לוֹ הַקָּדוֹשׁ בָּרוּךְ הוּא שֶׁאֵינוֹ חָרֵב לְעוֹלָם"
+      },
+      {
+        "oeuvre": "Teshouvot HaRadbaz II",
+        "ref": "648",
+        "citation": "בי\"א אמה שבין כותל מערבי לאחורי קדש הקדשים"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:1",
+        "citation": "הַר הַבַּיִת הָיָה חֲמֵשׁ מֵאוֹת אַמָּה עַל חֲמֵשׁ מֵאוֹת אַמָּה"
+      },
+      {
+        "oeuvre": "Teshouvot HaRadbaz II",
+        "ref": "691",
+        "citation": "הַדָּבָר בָּרוּר שֶׁתַּחַת הַכִּיפָּה שָׁם אֶבֶן הַשְּׁתִיָּה בְּלִי סָפֵק"
+      }
+    ],
+    "note": "Choice of the tour: the Kotel is the wall of Herod's platform, not that of the Har HaBayit of Middot 2:1 — no verified rabbinic source identifies it with the five-hundred-amot wall. The Temple is set on the rock of the Dome, the Even HaShetiya according to the Radbaz (Responsa II, 691). Set aside: making the Kotel the western wall of Middot, which would put the rock under the Mizbeach, against the Radbaz. Choice of the tour: the height of the courses, which fills the nineteen metres; the count of courses comes from archaeology, not from the corpus."
+  },
+  "place_kotel": {
+    "nom": "Western Wall Plaza",
+    "translit": "Rechavat HaKotel",
+    "resume": "Today's prayer plaza at the foot of the Kotel, nineteen metres below the platform. Retaining walls surround it: the upper city stands above it. It has two levels: against the Kotel, the prayer area, dug out in 1968; to the west, the visitors' upper plaza, sixty centimetres higher, behind a low wall with a parapet that two gaps open. From its north-west corner a stairway climbs to the Jewish Quarter, and a covered passage leads to HaGai Street; to the north are the covered halls of Wilson's Arch; to the south-west, a passage towards Batei Machaseh; to the south, through the security checks, the way to the Dung Gate, and the Mughrabi Bridge climbing to the platform.",
+    "cotes": [
+      "outline and stairway line from OpenStreetMap",
+      "the Jewish Quarter, twenty-two metres above the plaza (elevator project from Tiferet Yisrael Street)",
+      "two levels since 1968: the prayer area lowered by about two metres, then the step to the upper plaza reduced to sixty centimetres; the low wall between them, about ninety centimetres high, has carried a one-metre stone parapet since 1979 (S. Bahat, Cathedra 174, 2020)",
+      "the passages to HaGai Street, Batei Machaseh and the Dung Gate, and the gaps in the low wall, from OpenStreetMap",
+      "the furniture from OpenStreetMap: netilat yadayim stations, fountains, mechitza, low wall of the prayer area, fences, security checks, the \"HaKotel HaMa'aravi\" bus stop",
+      "a thousand white plastic chairs, delivered in 2020 (thekotel.org)",
+      "Aish HaTorah, facing the Kotel: seven storeys above the plaza (aish.com)"
+    ],
+    "note": "Choice of the tour: its level. The tour's thirty-metre terrain smooths the wall's nineteen metres into a gentle slope; the plaza is set at the visible height of the Kotel below its top. The stairway climbs in one flight, between two walls, to the ground the terrain gives at the end of its line; its steps are sixteen centimetres high. The furniture: height of the fences and low walls, a mechitza one metre eighty high, number and placing of the chairs, siddur shelves. The houses around it show it storeys of three metres twenty and arched windows: a pattern, not a survey. The tour's terrain puts its north-west corner — police, toilets, entrance to the Western Wall Tunnels — above it: their doors are brought to the foot of the nearest wall. That terrain puts the plaza itself thirteen metres too high: the three passages to the city stop after four covered metres, without saying at what level they reach it; their width of three metres fifty, their height, the one-in-twelve slope of the men's entrance and the steps of the women's are choices; the last stretch of the OSM low wall, along the slope, is not built. The upper plaza is laid flat."
+  },
+  "esplanade_herode": {
+    "nom": "Herod's platform",
+    "translit": "Har HaBayit",
+    "resume": "Today's platform, as Herod enlarged it. The Mishna counts only five hundred amot a side; the tour sets that square inside the present outline, the Kodesh HaKodashim on the rock of the Dome, and paves the rest at the same level.",
+    "cotes": [
+      "outline from OpenStreetMap",
+      "level: the median of today's terrain inside the outline"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "2:1",
+        "citation": "הַר הַבַּיִת הָיָה חֲמֵשׁ מֵאוֹת אַמָּה עַל חֲמֵשׁ מֵאוֹת אַמָּה"
+      },
+      {
+        "oeuvre": "Teshouvot HaRadbaz II",
+        "ref": "691",
+        "citation": "הַדָּבָר בָּרוּר שֶׁתַּחַת הַכִּיפָּה שָׁם אֶבֶן הַשְּׁתִיָּה בְּלִי סָפֵק"
+      }
+    ],
+    "note": "Choice of the tour: the Temple keeps the true east of Middot 2:4; the present outline is turned by six degrees, and its eastern wall runs about ten metres inside the north-east corner of the square. Nothing is built on it: the platform belongs to the Temple."
+  },
+  "mur_herode": {
+    "nom": "Herod's wall",
+    "resume": "The retaining wall of Herod's platform, on today's outline. It goes down to the ground, and rises above the paving where the city is higher than it, to the north.",
+    "cotes": [
+      "parapet four amot above the paving (choice of the tour)"
+    ],
+    "note": "Choice of the tour: its masonry is that of the wall of Middot, for lack of another model."
+  },
+  "arche_wilson": {
+    "nom": "Wilson's Arch",
+    "translit": "Keshet Wilson",
+    "resume": "North of the plaza, the covered prayer halls under the causeway leading to the Chain Gate. The Kotel continues there under a great arch springing from it: it once carried a bridge to the platform, above the street that ran along the wall.",
+    "cotes": [
+      "span of the arch: thirteen metres",
+      "its crown: 6.1 m above today's floor",
+      "outline of the halls from OpenStreetMap",
+      "an ark holding more than a hundred Torah scrolls and a library, from the 2005–2008 renovation; the ner tamid, lit in 2010 (thekotel.org)",
+      "a shaft showing fourteen courses below the floor (Wikipedia)"
+    ],
+    "note": "Choice of the tour: the vault is a semicircle running the whole length of the halls, and the rest of their outline is solid up to the platform's paving. The dimensions come from archaeology, Wilson's surveys included, not from a source of the corpus. The furniture and its placing: the ark at the far end, under the crown — against the Kotel the vault drops below one metre —, the library along the western side, the shaft near the entrance."
+  },
+  "pont_maghrebins": {
+    "nom": "Mughrabi Bridge",
+    "translit": "Gesher HaMugrabim",
+    "resume": "The wooden bridge climbing from the south of the plaza to the Mughrabi Gate, the only gate through which non-Muslims enter the platform today. Since 2007 it has replaced the earthen ramp that collapsed in 2004.",
+    "cotes": [
+      "line from OpenStreetMap",
+      "three metres wide, parapets one metre ten high (choice of the tour)"
+    ],
+    "note": "Choice of the tour: the deck climbs in one stretch from the plaza to the paving, and the earthen ramp is cut down beneath it; the gate is a gap in the parapet of Herod's wall."
+  },
+
+  "netilat_yadayim": {
+    "nom": "Netilat yadayim",
+    "translit": "Netilat yadayim",
+    "resume": "The two stations where one washes one's hands before entering the prayer area, on the upper plaza, by the low wall that closes it: taps and natlot, the cups that pour the water. An echo of the Kiyor, the bronze basin where the kohanim washed their hands and feet before the service.",
+    "cotes": [
+      "location of the two stations from OpenStreetMap"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "30:19", "citation": "וְרָחֲצוּ אַהֲרֹן וּבָנָיו מִמֶּנּוּ אֶת יְדֵיהֶם וְאֶת רַגְלֵיהֶם"}
+    ],
+    "note": "Choice of the tour: their shape. No source found describes it; the tour makes each a round stone basin around a column carrying eight taps, the natlot set on the rim."
+  },
+
+  "menora_d_or": {
+    "nom": "The golden Menorah",
+    "translit": "Menorat HaZahav",
+    "resume": "The Temple Institute's golden menorah, on the stairway down from the Jewish Quarter to the plaza, facing the Har HaBayit: made to serve in a rebuilt Temple. Over two metres tall, half a ton including forty-five kilograms of gold, three feet and seven branches, in a glass case.",
+    "cotes": [
+      "location from OpenStreetMap",
+      "over two metres, half a ton, 45 kg of gold (joelfeld.com)"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "25:32", "citation": "וְשִׁשָּׁה קָנִים יֹצְאִים מִצִּדֶּיהָ שְׁלֹשָׁה קְנֵי מְנֹרָה מִצִּדָּהּ הָאֶחָד וּשְׁלֹשָׁה קְנֵי מְנֹרָה מִצִּדָּהּ הַשֵּׁנִי"}
+    ],
+    "note": "Choice of the tour: its node. OpenStreetMap carries two, and the other falls inside a building's footprint. Its branches are curved like those of the menorah on display; the Institute made a second one with straight branches after the Rambam's drawing (Israel365 News), and that drawing is what the tour's Menorah in the Heikhal follows. The glass case is not modelled."
+  },
+
+  "porat_yosef": {
+    "nom": "Porat Yosef Yeshiva",
+    "translit": "Yeshivat Porat Yosef",
+    "resume": "The yeshiva overlooking the plaza from the south-west, facing the Kotel. Moshe Safdie's building rises ten storeys from east to west; its stone walls enclose vaulted halls, and precast concrete domes crown it in series.",
+    "cotes": [
+      "footprint from OpenStreetMap",
+      "ten storeys, precast concrete domes (Moshe Safdie archive, McGill University)"
+    ],
+    "note": "Choice of the tour: its ten storeys are counted from its foot, at three metres twenty; its openings and the spacing of its domes are a pattern, not a survey."
   }
 }

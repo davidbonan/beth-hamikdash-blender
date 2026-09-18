@@ -22,13 +22,14 @@ import { assemblage } from "./ombres.js";
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
-      LAMBRIS = 16, MIKSHE = 17;
+      LAMBRIS = 16, MIKSHE = 17, KOTEL_HERODIEN = 18, KOTEL_OMEYYADE = 19, KOTEL_MAMELOUK = 20;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
   "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Voile"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
-const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE, ROCHE]);
+const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE, ROCHE,
+                          KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping, tenue à jour par visite.js.
@@ -72,7 +73,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
-                   13: "pierre", 14: "pierre", 15: "pierre",
+                   13: "pierre", 14: "pierre", 15: "pierre", 18: "pierre", 19: "pierre", 20: "pierre",
                    3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
@@ -103,6 +104,7 @@ const CARREAU = {
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
   // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
   13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
+  18: [2.4, 0.28, 0.28, 1.20, 0.65], 19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
   15: [1.0, 0.60, 0.40, 1.60, 0.70],
   // Le lambris de cèdre prend la photo du bois trois fois plus grande et presque sans nœuds :
@@ -112,6 +114,7 @@ const CARREAU = {
 
 const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
+  Pierre_kotel_herodien: KOTEL_HERODIEN, Pierre_kotel_omeyyade: KOTEL_OMEYYADE, Pierre_kotel_mamelouk: KOTEL_MAMELOUK,
   Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: MARBRE_HERODE,
   Or: METAL, Or_plaque: METAL, Or_mikshe: MIKSHE, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
@@ -264,7 +267,10 @@ const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 const float CREUX_M = 0.020;
 // Part de la coulure qu'un parement garde : la muraille et la ville entière, le Temple lavé la moitié. COULURE_EXPOSEE du blockout.
 const float COULURE_EXPOSEE = 0.16;
-float exposition(){ return uFamille == 11 || uFamille == 14 ? 1.0 : 0.5; }
+float exposition(){ return uFamille == 11 || uFamille == 14 || uFamille >= 18 ? 1.0 : 0.5; }
+// Le Kotel au-dessus de sa place : Hérode, les Omeyyades, puis les petites assises, chaque
+// bande calée sur son premier lit. Mêmes valeurs que APPAREILS_KOTEL du blockout, en amot.
+const float Z_PLACE_KOTEL = -51.5833, Z_KOTEL_OMEYYADE = -35.5417, Z_KOTEL_MAMELOUK = -28.875;
 
 // Ce que le feu laisse sur la chaux du Mizbea'h, en écart multiplicatif sur elle. La
 // suie est du CARBONE : elle n'a pas de couleur, et le blockout la peint chaude —
@@ -648,6 +654,15 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
     rugo -= usure * 0.18;
   }
+  else if (uFamille == 18) {
+    appareil(P - vec3(0.0, Z_PLACE_KOTEL * AMA, 0.0), N, Appareil(2.2917, 2.0, 6.0, DEBORD, 0.02, 0.3), teinte, pente, rugo, photo);
+  }
+  else if (uFamille == 19) {
+    appareil(P - vec3(0.0, Z_KOTEL_OMEYYADE * AMA, 0.0), N, Appareil(1.6667, 1.5, 2.5, DEBORD, JOINT, 0.0), teinte, pente, rugo, photo);
+  }
+  else if (uFamille == 20) {
+    appareil(P - vec3(0.0, Z_KOTEL_MAMELOUK * AMA, 0.0), N, Appareil(0.9926, 1.0, 1.6, DEBORD, JOINT, 0.0), teinte, pente, rugo, photo);
+  }
   else if (uFamille == 11) {          // la ville : de la pierre de pays, pas du gazit
     appareil(P, N, Appareil(0.8, 1.5, 2.5, DEBORD, JOINT, LISERE), teinte, pente, rugo, photo);
   }
@@ -806,7 +821,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo = 0.06 + suie * 0.16 + cendre * 0.10;
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
-  if (uFamille == 1 || uFamille == 10 || uFamille == 11 || uFamille == 14) patiner(P, N, exposition(), teinte, rugo);
+  if (uFamille == 1 || uFamille == 10 || uFamille == 11 || uFamille == 14 || uFamille >= 18) patiner(P, N, exposition(), teinte, rugo);
 #ifdef GRAVURE
   // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
   // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y

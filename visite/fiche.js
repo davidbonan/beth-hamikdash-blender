@@ -63,6 +63,8 @@ const OUVRAGES = {
   "rashi sur divrei hayamim ii": "Rashi on II Chronicles",
   "rashi sur menachot": "Rashi on Menachot",
   "rambam sur menahot": "Rambam on Mishnah Menachot", "rambam sur menachot": "Rambam on Mishnah Menachot",
+  "shemot rabba": "Shemot Rabbah", "shir hashirim rabba": "Shir HaShirim Rabbah",
+  "teshouvot haradbaz ii": "Teshuvot HaRadbaz Volume 2",
 };
 // Un commentaire porte le livre commenté dans sa cote : « Bartenura », « Middot 3:3 ».
 const COMMENTAIRES = {

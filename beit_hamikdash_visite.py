@@ -16,6 +16,7 @@ Il produit deux fichiers :
 `-- --sans-occlusion` saute la cuisson (quelques minutes) : le .glb sort alors sans couche
 d'occlusion, et reperes.json sans cartes, ce qui reste cohérent.
 `-- --lumiere azara,oulam` cuit ces concepts en lumière indirecte plutôt qu'en occlusion, `-- --lumiere tout` tous.
+`-- --pays` n'exporte que `visite/pays.glb` : la ville et le relief de `01_Pays`, que la visite charge après le Temple.
 `-- --lumiere-seule` ne cuit qu'elle et garde les cartes d'occlusion du reperes.json en place : la
 géométrie ne doit pas avoir changé depuis leur cuisson.
 
@@ -52,6 +53,7 @@ LARGEUR_CHANFREIN = 0.03 * AMA
 
 # En amot. `cadre` : concepts à montrer entiers ; sans `position`, le navigateur recule le long du `cap` (0 = est, 90 = nord).
 Z_HAR, Z_EZN, Z_AZ, Z_BAT = -16.0, -10.0, 0.0, 6.0
+Z_PLACE_KOTEL = -51.58
 
 REPERES = [
     dict(id="har_habayit", nom="Har HaBayit, sur l'axe est",
@@ -77,6 +79,10 @@ REPERES = [
     # Les badim touchent la parokhet (Yoma 54a) : l'Aron ne se voit entier que de flanc, depuis le mur sud.
     dict(id="kodesh_hakodashim", nom="Kodesh HaKodashim",
          cadre=["aron", "kaporet", "even_hashetiya"], cap=90, sol=Z_BAT, recul_max=9.0),
+    # Au sud-ouest de la place : ailleurs, le Kotel et le nord cachent le Heikhal. La place est à
+    # Z_PLACE_KOTEL du blockout : le dallage d'Hérode moins les dix-neuf mètres du mur.
+    dict(id="place_kotel", nom="Place du Kotel",
+         position=(-482.1, -399.9, Z_PLACE_KOTEL), cap=47, tangage=10),
 ]
 
 # Ce que « Un élément… » et le plan montrent de `<id>` quand le recul automatique n'y suffit pas ; une cour ne tient entière qu'en vol.
@@ -88,6 +94,8 @@ VUES = [
                 "lishkat_hametzoraim", "lishkat_beit_shemanya", "quinze_marches"],
          cap=180, sol=60.0, recul_max=300.0, vol=True),
     dict(id="vue_sol_har_habayit", position=(187.5, -291.7, 163.4), cap=131, tangage=-23.5, vol=True),
+    dict(id="vue_place_kotel", position=(-482.1, -399.9, Z_PLACE_KOTEL), cap=47, tangage=10),
+    dict(id="vue_arche_wilson", position=(-382.1, -281.2, Z_PLACE_KOTEL), cap=83, tangage=8),
     dict(id="vue_heikhal", cadre=["menora", "shulchan", "mizbeach_hazahav"], cap=180, sol=Z_BAT,
          recul_max=24.0),
     dict(id="vue_kiyor", cadre=["kiyor"], cap=135, sol=Z_AZ, recul_max=8.0),
@@ -392,8 +400,37 @@ def exporter(chantier):
     print(f"\n{len(groupes)} maillages · temple.glb {taille:.1f} Mo")
 
 
+PAYS = "01_Pays"
+
+
+def exporter_pays():
+    """`visite/pays.glb` : Jérusalem autour du Temple, chargée après lui. Pas de concept,
+    pas de chanfrein, pas de cuisson : c'est un décor, qu'on voit de loin. Les oliviers,
+    deux objets chacun, sont fondus en un seul maillage."""
+    gardes = [o for o in bpy.data.collections[PAYS].objects if o.type == "MESH"]
+    for o in list(bpy.data.objects):
+        if o not in gardes:
+            bpy.data.objects.remove(o, do_unlink=True)
+    oliviers = [o for o in gardes if o.name.startswith("Olivier_")]
+    if oliviers:
+        with bpy.context.temp_override(active_object=oliviers[0], selected_editable_objects=oliviers):
+            bpy.ops.object.join()
+        oliviers[0].name = "Oliviers"
+    for mat in bpy.data.materials:
+        aplatir(mat)
+    glb = DOSSIER / "pays.glb"
+    bpy.ops.export_scene.gltf(filepath=str(glb), export_format="GLB", export_yup=True,
+                              export_apply=False, export_cameras=False, export_lights=False,
+                              export_materials="EXPORT", export_normals=True,
+                              export_texcoords=False, export_skins=False, export_animations=False)
+    comprimer(glb)
+    print(f"\n{len(bpy.data.objects)} maillages · pays.glb {glb.stat().st_size / 1e6:.1f} Mo")
+
+
 def main():
     DOSSIER.mkdir(exist_ok=True)
+    if "--pays" in sys.argv:
+        return exporter_pays()
     with tempfile.TemporaryDirectory(prefix="visite_") as chantier:
         exporter(pathlib.Path(chantier))
         livrer(pathlib.Path(chantier))

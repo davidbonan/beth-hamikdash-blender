@@ -19,6 +19,7 @@ Sources : Middot 1–5, Yoma 3–5, Rambam Hilkhot Beit HaBe'hira 1–4.
 Les choix entre avis divergents sont signalés par "# CHOIX".
 """
 
+import array
 import bpy
 import json
 import math
@@ -27,7 +28,7 @@ import re
 import sys
 import zlib
 from typing import NamedTuple
-from mathutils import Matrix, Vector, noise
+from mathutils import Matrix, Vector, geometry, noise
 
 
 # ----------------------------------------------------------------------------
@@ -203,6 +204,13 @@ def material(name, rgb):
         _bsdf(mat).inputs["Roughness"].default_value = 0.7
     return mat
 
+def vitre(name, rgb):
+    """Verre sombre : une baie vue du dehors ne rend que son reflet."""
+    mat, neuf = _neuf(name, rgb)
+    if neuf:
+        _bsdf(mat).inputs["Roughness"].default_value = 0.08
+    return mat
+
 # Appareil : le Temple est bâti d'אַבְנֵי גָזִית, et le Tanakh les mesure —
 # « וּמְיֻסָּד אֲבָנִים יְקָרוֹת אֲבָנִים גְּדֹלוֹת אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת »
 # (Melakhim I 7:10). Deux longueurs, pas une : le verset les nomme toutes les deux, et
@@ -244,6 +252,7 @@ class Appareil(NamedTuple):
     debord: float
     joint: float
     lisere: float
+    origine: float = 0.0      # la cote d'un lit, en amot
 
 
 APPAREIL_GAZIT = Appareil(ASSISE, PIERRE_LONG, DEBORD_ASSISE, JOINT, LISERE)
@@ -387,9 +396,9 @@ def _tailler(mat, appareil):
     La parité des assises reste le « אַפֵּיק שָׂפָה וְעַיֵּיל שָׂפָה » de *Soucca* 51b : une assise
     en léger débord, la suivante en retrait, « כי היכי דלקבל סידא ». D'où `debord`.
     """
-    assise, longueurs, _, joint, lisere = appareil
+    assise, longueurs, _, joint, lisere, origine = appareil
     z, u, aplat = _parement(mat)
-    rang, ecart_z = _module(mat, z, assise)
+    rang, ecart_z = _module(mat, _calc(mat, "SUBTRACT", z, m(origine)), assise)
     numero = _calc(mat, "FLOOR", rang)
     parite = _calc(mat, "MODULO", numero, 2.0)
     tire_assise = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, 120)
@@ -1329,6 +1338,16 @@ MAT_FER = lambda: metal("Fer", (0.30, 0.29, 0.28), 0.6)            # crochets de
 # de la façade ; polie, elle prend le ciel et se lit en arête. La matière ne change pas.
 MAT_FER_LAME = lambda: metal("Fer_lame", (0.62, 0.62, 0.63), 0.18)
 MAT_SIKRA = lambda: material("Sikra", (0.55, 0.10, 0.06))          # le 'hout hasikra (Middot 3:1)
+# Les abords du Kotel d'aujourd'hui.
+MAT_INOX = lambda: metal("Inox", (0.72, 0.72, 0.73), 0.25)
+MAT_PLASTIQUE = lambda: material("Plastique_blanc", (0.88, 0.88, 0.86))
+MAT_VITRE = lambda: vitre("Vitre", (0.05, 0.06, 0.07))
+MAT_BETON = lambda: material("Beton", (0.70, 0.68, 0.64))
+MAT_PORTIQUE = lambda: material("Portique", (0.55, 0.56, 0.58))
+MAT_BORNE_INCENDIE = lambda: material("Borne_incendie", (0.60, 0.10, 0.08))
+MAT_RELIURES = (lambda: material("Reliure_rouge", (0.35, 0.08, 0.07)),
+                lambda: material("Reliure_bleue", (0.08, 0.12, 0.30)),
+                lambda: material("Reliure_noire", (0.06, 0.05, 0.05)))
 
 # ----------------------------------------------------------------------------
 # VOLUMES
@@ -1440,6 +1459,9 @@ def _lisser(o, cotes):
     o["pli_vif"] = pli
     return o
 
+FACES_BOITE = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4],
+               [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]
+
 def box(name, x0, x1, y0, y1, z0, z1, col="20_Azara", mat=None):
     """Boîte définie par ses bornes en amot."""
     x0, x1 = min(x0, x1), max(x0, x1)
@@ -1447,9 +1469,7 @@ def box(name, x0, x1, y0, y1, z0, z1, col="20_Azara", mat=None):
     z0, z1 = min(z0, z1), max(z0, z1)
     verts = [(x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
              (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1)]
-    faces = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4],
-             [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]
-    return mesh_from_pydata(name, verts, faces, col, mat)
+    return mesh_from_pydata(name, verts, FACES_BOITE, col, mat)
 
 def prism(name, poly, z0, z1, col, mat=None):
     """Extrusion verticale d'un polygone 2D (liste de (x,y) en amot)."""
@@ -2960,122 +2980,6 @@ for i, x in enumerate(plage(HX0 + 2.5, HX1 - 2.5, 5)):
 for y in (HY0 + 15, HY0 + 30):
     box(f"Portique_sud_sabliere_{y:+.0f}", HX0, HX1, y - 0.6, y + 0.6,
         Z_HAR + 23.8, Z_HAR + 25, "00_HarHabayit", MAT_CEDRE())
-
-# ----------------------------------------------------------------------------
-# 01 — LE PAYS : collines de Jérusalem, la ville, les oliviers
-#   Rien n'était modélisé au-delà du Har HaBayit : le Temple se lisait posé sur une
-#   mer (README, ciel physique écarté pour cela), et au plan 14b la grue découvrait
-#   par-dessus le mur un vide que le styliseur remplissait à sa guise — collines,
-#   maisons et terrasses différentes d'une image à l'autre. Les prompts des plans 1
-#   et 14b les nomment (« mist in the Kidron valley, olive terraces and low
-#   flat-roofed houses on the hills ») : ils ont maintenant une géométrie.
-#   Le relief est un CHOIX lissé sur les cotes réelles, en amot depuis l'esplanade
-#   (740 m) : Kidron 650, mont des Oliviers 810, Tyropéon 700, ville haute 770,
-#   collines de l'ouest 800 et plus. Aucune source halakhique ici.
-# ----------------------------------------------------------------------------
-PAYS = "01_Pays"
-
-
-def _profil(u, points):
-    """Interpolation en cosinus entre (abscisse, cote) triées : des collines, pas des toits."""
-    if u <= points[0][0]:
-        return points[0][1]
-    for (u0, z0), (u1, z1) in zip(points, points[1:]):
-        if u <= u1:
-            t = (u - u0) / (u1 - u0)
-            return z0 + (z1 - z0) * (1 - math.cos(math.pi * t)) / 2
-    return points[-1][1]
-
-
-# Vers l'ouest la crête est tenue sous la ligne de toit du plan 1 (à 850 amot, le
-# faîte à 100 est vu 0,35° sous l'horizontale ; une colline à 3000 amot doit rester
-# sous 60 pour passer dessous) : le Sanctuaire garde sa silhouette sur le ciel.
-RELIEF_EO = [(-6000, 60), (-3000, 60), (-1300, 49), (-517, -97), (HX0, -45),
-             (HX1, -60), (733, -200), (2383, 132), (4000, 60), (6000, 30)]
-RELIEF_NS = [(-6000, -60), (-2000, -130), (HY0 - 800, -80), (HY0, 0), (HY1, 0),
-             (HY1 + 600, 35), (2000, 55), (6000, 80)]
-
-
-def hors_esplanade(x, y):
-    """Distance au rectangle du Har HaBayit (négative dedans)."""
-    return max(HX0 - x, x - HX1, HY0 - y, y - HY1)
-
-
-def altitude(x, y):
-    """Cote du sol naturel en (x, y), en amot. Sous l'esplanade, enfoui dans la roche ;
-    à moins de 80 amot de ses murs, tenu sous le dallage pour que le pays ne remonte
-    jamais par-dessus la crête de soutènement."""
-    marge = hors_esplanade(x, y)
-    if marge < 2:
-        return Z_HAR - 8
-    z = (_profil(x, RELIEF_EO) + _profil(y, RELIEF_NS)
-         + 5 * math.sin(x / 90) * math.sin(y / 110)
-         + 3 * math.sin(x / 37 + 1.3) * math.cos(y / 29 + 0.4)
-         + 1.5 * math.sin((x + y) / 13))
-    if marge < 80:
-        z = min(z, Z_HAR - 4 - (80 - marge) * 0.1)
-    return z
-
-
-def relief(name, x0, x1, y0, y1, pas, col, mat):
-    """Nappe du sol naturel, une face par case de `pas` amot."""
-    xs, ys = plage(x0, x1, pas), plage(y0, y1, pas)
-    n = len(xs)
-    verts = [(x, y, altitude(x, y)) for y in ys for x in xs]
-    faces = [[j * n + i, j * n + i + 1, (j + 1) * n + i + 1, (j + 1) * n + i]
-             for j in range(len(ys) - 1) for i in range(n - 1)]
-    return mesh_from_pydata(name, verts, faces, col, mat)
-
-
-def maison(nom, x, y, col):
-    """Maison à toit plat, enfoncée dans la pente ; un étage en retrait une fois sur trois."""
-    z = altitude(x, y)
-    l, p = 5 + 8 * alea(nom, 1), 5 + 8 * alea(nom, 2)
-    h = 4 + 4 * alea(nom, 3)
-    box(nom, x - l / 2, x + l / 2, y - p / 2, y + p / 2, z - 2.5, z + h, col, MAT_MAISON())
-    if alea(nom, 4) < 0.35:
-        box(f"{nom}_etage", x - l / 2 + 1, x + l / 2 - 2, y - p / 2 + 1, y + p / 2 - 1,
-            z + h, z + h + 3, col, MAT_MAISON())
-
-
-def olivier(nom, x, y, col):
-    z = altitude(x, y)
-    r = 1.6 + 1.4 * alea(nom, 1)
-    cyl(f"{nom}_tronc", x, y, z - 0.5, z + 1.6, 0.25, col, MAT_TRONC(), verts=6)
-    sphere(f"{nom}_houppier", x, y, z + 1.6 + r * 0.8, r, col, MAT_FEUILLAGE(), segs=8)
-
-
-def _densite_ville(x, y):
-    """Où la ville est : dense à l'ouest (ville haute) et au sud (cité de David),
-    clairsemée sur le mont des Oliviers — villages et tombeaux."""
-    if x > HX1 + 200:
-        return 0.22
-    if x < HX0 - 30 or y < HY0 - 30:
-        return 0.85
-    return 0.5
-
-
-relief("Pays_relief", -6000, 6000, -6000, 6000, 50, PAYS, MAT_TERRE())
-for i in range(2600):
-    nom = f"Maison_{i:04d}"
-    x, y = -3800 + 7300 * alea(nom, 5), -3800 + 7300 * alea(nom, 6)
-    if hors_esplanade(x, y) < 70 or altitude(x, y) < -175:   # le fond des vallées : jardins
-        continue
-    if alea(nom, 0) < _densite_ville(x, y):
-        maison(nom, x, y, PAYS)
-# Le mont des Oliviers d'abord, puis quelques bosquets sur les autres pentes.
-for i in range(1300):
-    nom = f"Olivier_{i:04d}"
-    x, y = HX1 + 120 + 3000 * alea(nom, 5), -2400 + 4800 * alea(nom, 6)
-    if hors_esplanade(x, y) < 60 or altitude(x, y) < -185 or alea(nom, 0) > 0.7:
-        continue
-    olivier(nom, x, y, PAYS)
-for i in range(400):
-    nom = f"Olivier_ouest_{i:04d}"
-    x, y = -3500 + 3200 * alea(nom, 5), -3000 + 6000 * alea(nom, 6)
-    if hors_esplanade(x, y) < 60 or altitude(x, y) < -175 or alea(nom, 0) > 0.3:
-        continue
-    olivier(nom, x, y, PAYS)
 
 # ----------------------------------------------------------------------------
 # 10 — EZRAT NASHIM (135 × 135), Middot 2:5
@@ -6219,6 +6123,1244 @@ machta_lueur = lampe("Machta_braise", 'POINT', (m(ARON_X_MACHTA), 0.0, m(Z_MACHT
 machta_lueur.data.energy = 8
 machta_lueur.data.color = (1.0, 0.45, 0.15)
 machta_lueur.data.shadow_soft_size = m(0.12)
+
+# ----------------------------------------------------------------------------
+# 01 — LE PAYS : Jérusalem aujourd'hui autour du Temple
+#   Relief, bâtiments, murailles, esplanade et Kotel réels, tirés par
+#   beit_hamikdash_pays.py dans `pays/` (OpenStreetMap, Mapzen Terrain Tiles), en mètres
+#   autour du rocher du Dôme. Le calage est une décision de la scène et se prend ici,
+#   après le Kodesh HaKodashim : c'est la Even HaShetiya qui l'ancre.
+# ----------------------------------------------------------------------------
+PAYS = "01_Pays"
+PAYS_DOSSIER = pathlib.Path(__file__).resolve().parent / "pays"
+PAYS_DONNEES = json.loads((PAYS_DOSSIER / "pays.json").read_text())
+# Le rocher du Dôme est la Even HaShetiya, « שֶׁהָיְתָה שָׁם מִימוֹת נְבִיאִים רִאשׁוֹנִים » (Yoma 5:2) :
+# CHOIX, l'identification courante. Le Temple garde l'est vrai, celui de la ligne de
+# mire de la para (Middot 2:4) ; le Haram actuel est tourné de 6°, et son mur est passe
+# alors une dizaine de mètres en dedans de l'angle nord-est du carré. ORIENTATION, en
+# degrés, tourne la géographie autour du rocher.
+ORIENTATION = 0.0
+# L'esplanade actuelle devient Z_HAR : médiane du relief dans le Haram, 740,2 m.
+ALTITUDE_HAR = 740.2
+PARAPET_HAR = 4          # la crête du mur d'Hérode au-dessus du dallage, CHOIX
+H_KOTEL = 19             # m : ce que le Kotel montre au-dessus de sa place
+Z_PLACE_KOTEL = Z_HAR + PARAPET_HAR - H_KOTEL / AMA
+# Deux niveaux depuis 1968 : l'aire de prière creusée contre le Kotel, la place haute des
+# visiteurs à l'ouest ; l'écart, ramené de 2,5 m à 60 cm, est tenu par un muret d'environ
+# 90 cm que coiffe depuis 1979 un parapet de pierre d'un mètre (S. Bahat, Cathedra 174, 2020).
+Z_PLACE_HAUTE = Z_PLACE_KOTEL + 0.6 / AMA
+PARAPET_DE_PRIERE = 1 / AMA
+EPAISSEUR_HAR = 4        # le mur d'Hérode, dallage compris sous sa crête : CHOIX
+# Au-dessus de la place, sept assises d'Hérode à marges ciselées de 5 à 20 cm, quatre
+# omeyyades de pierres plus petites sans marges, puis dix-sept petites, mameloukes et
+# après (Wikipedia, « Western Wall »). Hauteurs d'assise : CHOIX qui remplit les 19 m ;
+# à 1,1 m de haut et d'épaisseur, les 2 à 8 tonnes d'une pierre d'Hérode font 1 à 3 m.
+Z_KOTEL_OMEYYADE = Z_PLACE_KOTEL + 7 * 1.1 / AMA
+Z_KOTEL_MAMELOUK = Z_KOTEL_OMEYYADE + 4 * 0.8 / AMA
+APPAREILS_KOTEL = (
+    ("Kotel_herodien", Appareil(1.1 / AMA, (2.0, 6.0), DEBORD_ASSISE, 0.02, 0.3, Z_PLACE_KOTEL), Z_KOTEL_OMEYYADE),
+    ("Kotel_omeyyade", Appareil(0.8 / AMA, (1.5, 2.5), DEBORD_ASSISE, JOINT, 0.0, Z_KOTEL_OMEYYADE), Z_KOTEL_MAMELOUK),
+    ("Kotel_mamelouk", Appareil((Z_HAR + PARAPET_HAR - Z_KOTEL_MAMELOUK) / 17, (1.0, 1.6), DEBORD_ASSISE, JOINT, 0.0,
+                               Z_KOTEL_MAMELOUK), math.inf),
+)
+H_MURAILLE, EPAISSEUR_MURAILLE = 12 / AMA, 3 / AMA   # murailles de Soliman, CHOIX
+
+
+class Relief(NamedTuple):
+    x0: float
+    y0: float
+    pas: float
+    n: int
+    altitudes: array.array
+
+
+def _lire_relief():
+    r = PAYS_DONNEES["relief"]
+    altitudes = array.array("f")
+    altitudes.frombytes((PAYS_DOSSIER / "relief.f32").read_bytes())
+    return Relief(r["origine"][0], r["origine"][1], r["pas"], r["n"], altitudes)
+
+
+RELIEF = _lire_relief()
+
+
+def vers_scene(est, nord):
+    """Mètres autour du rocher → amot de la scène."""
+    a = math.radians(ORIENTATION)
+    x, y = est * math.cos(a) - nord * math.sin(a), est * math.sin(a) + nord * math.cos(a)
+    return SHETIYA_CENTRE[0] + x / AMA, SHETIYA_CENTRE[1] + y / AMA
+
+
+def depuis_scene(x, y):
+    a = math.radians(ORIENTATION)
+    u, v = m(x - SHETIYA_CENTRE[0]), m(y - SHETIYA_CENTRE[1])
+    return u * math.cos(a) + v * math.sin(a), -u * math.sin(a) + v * math.cos(a)
+
+
+def cote(altitude_m):
+    return Z_HAR + (altitude_m - ALTITUDE_HAR) / AMA
+
+
+def sol_naturel(x, y):
+    """Cote du relief réel en (x, y) de la scène, interpolée, en amot."""
+    est, nord = depuis_scene(x, y)
+    u, v = (est - RELIEF.x0) / RELIEF.pas, (nord - RELIEF.y0) / RELIEF.pas
+    i = min(max(int(u), 0), RELIEF.n - 2)
+    j = min(max(int(v), 0), RELIEF.n - 2)
+    fu, fv = min(max(u - i, 0), 1), min(max(v - j, 0), 1)
+    z = RELIEF.altitudes
+    k = j * RELIEF.n + i
+    bas = z[k] * (1 - fu) + z[k + 1] * fu
+    haut = z[k + RELIEF.n] * (1 - fu) + z[k + RELIEF.n + 1] * fu
+    return cote(bas * (1 - fv) + haut * fv)
+
+
+def _direct(anneau):
+    """L'anneau dans le sens trigonométrique."""
+    aire = sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(anneau, anneau[1:] + anneau[:1]))
+    return anneau if aire > 0 else anneau[::-1]
+
+
+def _dans(p, anneau):
+    x, y = p
+    dedans = False
+    for (x0, y0), (x1, y1) in zip(anneau, anneau[1:] + anneau[:1]):
+        if (y0 > y) != (y1 > y) and x < x0 + (y - y0) * (x1 - x0) / (y1 - y0):
+            dedans = not dedans
+    return dedans
+
+
+def _fraction_sur_le_segment(p, a, b):
+    ab = (b[0] - a[0], b[1] - a[1])
+    long2 = ab[0] ** 2 + ab[1] ** 2
+    return 0 if long2 == 0 else max(0, min(1, ((p[0] - a[0]) * ab[0] + (p[1] - a[1]) * ab[1]) / long2))
+
+
+def _distance_au_segment(p, a, b):
+    t = _fraction_sur_le_segment(p, a, b)
+    return math.dist(p, (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])))
+
+
+def _distance_a_l_anneau(p, anneau):
+    return min(_distance_au_segment(p, a, b) for a, b in zip(anneau, anneau[1:] + anneau[:1]))
+
+
+def _distance_a_la_trace(p, trace):
+    return min(_distance_au_segment(p, a, b) for a, b in zip(trace, trace[1:]))
+
+
+def _abscisses(trace):
+    s = [0.0]
+    for a, b in zip(trace, trace[1:]):
+        s.append(s[-1] + math.dist(a, b))
+    return s
+
+
+def _abscisse_du_plus_proche(p, trace):
+    """L'abscisse curviligne, sur la trace, du point le plus proche de `p`."""
+    s = _abscisses(trace)
+    k = min(range(len(trace) - 1), key=lambda k: _distance_au_segment(p, trace[k], trace[k + 1]))
+    return s[k] + _fraction_sur_le_segment(p, trace[k], trace[k + 1]) * (s[k + 1] - s[k])
+
+
+def _point_a_l_abscisse(trace, abscisse):
+    """Le point de la trace à l'abscisse donnée, et la direction de son tronçon."""
+    s = _abscisses(trace)
+    k = max(0, min(len(trace) - 2, next((k for k in range(len(s) - 1) if abscisse <= s[k + 1]), len(s) - 2)))
+    a, b = trace[k], trace[k + 1]
+    t = (abscisse - s[k]) / max(s[k + 1] - s[k], 1e-9)
+    long_ = max(math.dist(a, b), 1e-9)
+    return ((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])),
+            ((b[0] - a[0]) / long_, (b[1] - a[1]) / long_))
+
+
+def _plus_proche_sur_la_trace(p, trace):
+    return _point_a_l_abscisse(trace, _abscisse_du_plus_proche(p, trace))[0]
+
+
+def _plus_proche_sur_l_anneau(p, anneau):
+    a, b = min(zip(anneau, anneau[1:] + anneau[:1]), key=lambda e: _distance_au_segment(p, *e))
+    t = _fraction_sur_le_segment(p, a, b)
+    return (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]))
+
+
+def _dans_le_carre(x, y, marge=0):
+    return HX0 - marge <= x <= HX1 + marge and HY0 - marge <= y <= HY1 + marge
+
+
+def _anneau_scene(anneau_m):
+    return _direct([vers_scene(*p) for p in anneau_m])
+
+
+HARAM = _anneau_scene(PAYS_DONNEES["haram"])
+PLACE_KOTEL = _anneau_scene(PAYS_DONNEES["place_kotel"])
+KOTEL = [vers_scene(*p) for p in PAYS_DONNEES["kotel"]]
+SALLES_WILSON = _anneau_scene(PAYS_DONNEES["salles_wilson"])
+PONT_MAGHREBINS = [vers_scene(*p) for p in PAYS_DONNEES["pont_maghrebins"]]
+ESCALIER_PLACE = ([_plus_proche_sur_l_anneau(vers_scene(*PAYS_DONNEES["escalier_place"][0]), PLACE_KOTEL)]
+                  + [vers_scene(*p) for p in PAYS_DONNEES["escalier_place"]])
+PORTEE_WILSON, CLE_WILSON = 13 / AMA, 6.1 / AMA    # l'arche : portée, et sa clé au-dessus du sol d'aujourd'hui
+LARGEUR_PONT, GARDE_CORPS = 3 / AMA, 1.1 / AMA
+CONTREMARCHE, LARGEUR_ESCALIER = 0.16 / AMA, 3.5 / AMA
+
+
+def volumes(name, pieces, col, mat):
+    """Un maillage de prismes : chaque pièce est (anneau, trous, z0, z1), anneaux en amot.
+    Flancs et dessus ; le dessous est enterré. Le dessus est triangulé trous compris."""
+    verts, faces = [], []
+    for anneau, trous, z0, z1 in pieces:
+        anneaux = [_direct(anneau)] + [_direct(t)[::-1] for t in trous]
+        for r in anneaux:
+            base = len(verts)
+            n = len(r)
+            verts += [(x, y, z0) for x, y in r] + [(x, y, z1) for x, y in r]
+            faces += [[base + i, base + (i + 1) % n, base + n + (i + 1) % n, base + n + i]
+                      for i in range(n)]
+        toit = [Vector((x, y, z1)) for r in anneaux for x, y in r]
+        base = len(verts)
+        verts += [tuple(v) for v in toit]
+        for a, b, c in geometry.tessellate_polygon([[Vector((x, y, z1)) for x, y in r] for r in anneaux]):
+            pa, pb, pc = toit[a], toit[b], toit[c]
+            haut = (pb - pa).cross(pc - pa).z >= 0
+            faces.append([base + a, base + b, base + c] if haut else [base + a, base + c, base + b])
+    return mesh_from_pydata(name, verts, faces, col, mat)
+
+
+MAILLE_PAYS = PAYS_DONNEES["relief"]["pas"] * math.sqrt(2) / AMA
+
+
+def _creuse_pour_la_place(p):
+    """Dans la place ou les salles de Wilson, ou à moins d'une maille : une maille à cheval
+    sur leur bord remontait en talus au-dessus du dallage. Le soutènement, aussi épais,
+    couvre ce qu'on abaisse."""
+    return any(_dans(p, anneau) or _distance_a_l_anneau(p, anneau) < MAILLE_PAYS
+               for anneau in (PLACE_KOTEL, SALLES_WILSON))
+
+
+Z_HAUT_ESCALIER = sol_naturel(*ESCALIER_PLACE[-1])
+
+
+def _z_escalier(abscisse):
+    return Z_PLACE_HAUTE + (Z_HAUT_ESCALIER - Z_PLACE_HAUTE) * abscisse / _abscisses(ESCALIER_PLACE)[-1]
+
+
+def _sol_le_long_de_l_escalier(p, z):
+    """Le relief à une maille de l'escalier descend sous ses degrés, que ses murs couvrent."""
+    if _distance_a_la_trace(p, ESCALIER_PLACE) >= MAILLE_PAYS:
+        return z
+    return min(z, _z_escalier(_abscisse_du_plus_proche(p, ESCALIER_PLACE)) - 1)
+
+
+def _nappe_du_pays():
+    """Le relief réel sur sa grille, abaissé sous la place du Kotel et ses abords — le relief à 30 m la
+    lisse en pente, et ses dix-neuf mètres y disparaissaient. Sous l'esplanade, chaque
+    nœud prend le plus bas de ses voisins du dehors : une maille à cheval sur le mur
+    reste ainsi sous lui au lieu de monter en talus devant son parement."""
+    n = RELIEF.n
+    touches = HARAM + PLACE_KOTEL + SALLES_WILSON + ESCALIER_PLACE
+    x_min = min(x for x, _ in touches) - 2 * MAILLE_PAYS
+    x_max = max(x for x, _ in touches) + 2 * MAILLE_PAYS
+    y_min = min(y for _, y in touches) - 2 * MAILLE_PAYS
+    y_max = max(y for _, y in touches) + 2 * MAILLE_PAYS
+    verts, dessous = [], []
+    for j in range(n):
+        for i in range(n):
+            x, y = vers_scene(RELIEF.x0 + i * RELIEF.pas, RELIEF.y0 + j * RELIEF.pas)
+            z = cote(RELIEF.altitudes[j * n + i])
+            if x_min < x < x_max and y_min < y < y_max:
+                if _dans((x, y), HARAM) or _dans_le_carre(x, y):
+                    dessous.append(j * n + i)
+                elif _creuse_pour_la_place((x, y)):
+                    z = Z_PLACE_KOTEL - 1
+                else:
+                    z = _sol_le_long_de_l_escalier((x, y), z)
+            verts.append((x, y, z))
+    enfouis = set(dessous)
+    for k in dessous:
+        i, j = k % n, k // n
+        voisins = [verts[jj * n + ii][2] for jj in range(j - 2, j + 3) for ii in range(i - 2, i + 3)
+                   if jj * n + ii not in enfouis]
+        verts[k] = (*verts[k][:2], min(voisins + [Z_HAR - 1]) if voisins else Z_HAR - 8)
+    faces = [[j * n + i, j * n + i + 1, (j + 1) * n + i + 1, (j + 1) * n + i]
+             for j in range(n - 1) for i in range(n - 1)]
+    return mesh_from_pydata("Pays_relief", verts, faces, PAYS, MAT_TERRE())
+
+
+def _travees(anneau, pas):
+    """Le dedans d'un anneau en bandes horizontales de `pas` : (y0, y1, [(x0, x1)])."""
+    y_bas = HY0 - pas * math.ceil((HY0 - min(y for _, y in anneau)) / pas)
+    bandes = []
+    for y0 in plage(y_bas, max(y for _, y in anneau), pas):
+        yc = y0 + pas / 2
+        xs = sorted(x0 + (yc - ya) * (x1 - x0) / (yb - ya)
+                    for (x0, ya), (x1, yb) in zip(anneau, anneau[1:] + anneau[:1])
+                    if (ya > yc) != (yb > yc))
+        bandes.append((y0, y0 + pas, list(zip(xs[::2], xs[1::2]))))
+    return bandes
+
+
+def esplanade_herode():
+    """Le dallage du Haram actuel autour du carré de Middot, au niveau du sien. Les bandes
+    s'arrêtent en dents contre le contour : la crête du mur les couvre."""
+    pas = EPAISSEUR_HAR
+    pieces = []
+    for y0, y1, spans in _travees(HARAM, pas):
+        for xa, xb in spans:
+            coupe = [(xa, xb)]
+            if HY0 <= (y0 + y1) / 2 <= HY1:
+                coupe = [(a, b) for a, b in ((xa, min(xb, HX0)), (max(xa, HX1), xb)) if b > a]
+            pieces += [([(a, y0), (b, y0), (b, y1), (a, y1)], [], Z_HAR - 1, Z_HAR) for a, b in coupe]
+    volumes("Herode_esplanade", pieces, "00_HarHabayit", MAT_SOL())
+
+
+def _pres_du_kotel(p, marge=6):
+    return _distance_a_l_anneau(p, KOTEL) < marge
+
+
+def _porte_des_maghrebins(a, b):
+    """Où le pont des Maghrébins passe le segment a-b du mur, ou None."""
+    p, q = PONT_MAGHREBINS[-2], PONT_MAGHREBINS[-1]
+    au_dela = (2 * q[0] - p[0], 2 * q[1] - p[1])
+    return geometry.intersect_line_line_2d(Vector(p), Vector(au_dela), Vector(a), Vector(b))
+
+
+def _travees_du_mur(a, b, z1):
+    """(début, fin, crête) le long du segment, en fractions : la porte des Maghrébins
+    arase le mur au dallage sur la largeur du pont."""
+    porte = _porte_des_maghrebins(a, b)
+    if porte is None:
+        return [(0, 1, z1)]
+    t, demi = math.dist(a, porte) / math.dist(a, b), LARGEUR_PONT / 2 / math.dist(a, b)
+    a0, a1 = max(0, t - demi), min(1, t + demi)
+    return [(0, a0, z1), (a0, a1, Z_HAR), (a1, 1, z1)]
+
+
+def murs_herode():
+    """Le contour du Haram en mur de soutènement, du pied au-dessus du dallage — plus haut
+    là où la ville dépasse l'esplanade (au nord). Le pied suit le terrain le plus bas au
+    dehors, échantillonné le long du segment ; celui du Kotel descend jusqu'à sa place."""
+    anneau = HARAM
+    mur, kotel = [], []
+    for a, b in zip(anneau, anneau[1:] + anneau[:1]):
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        long_ = math.hypot(dx, dy)
+        if long_ < 1e-6:
+            continue
+        nx, ny = -dy / long_ * EPAISSEUR_HAR, dx / long_ * EPAISSEUR_HAR
+        pas = max(1, math.ceil(long_ / 10))
+        dehors = [sol_naturel(a[0] + dx * k / pas - nx / EPAISSEUR_HAR * 6,
+                              a[1] + dy * k / pas - ny / EPAISSEUR_HAR * 6) for k in range(pas + 1)]
+        milieu = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+        if _dans_le_carre(*milieu):
+            continue
+        du_kotel = _pres_du_kotel(milieu)
+        z0 = (Z_PLACE_KOTEL if du_kotel else min(dehors)) - 3
+        for t0, t1, z1 in _travees_du_mur(a, b, max(Z_HAR + PARAPET_HAR, max(dehors) + 1)):
+            p, q = (a[0] + dx * t0, a[1] + dy * t0), (a[0] + dx * t1, a[1] + dy * t1)
+            piece = ([p, q, (q[0] + nx, q[1] + ny), (p[0] + nx, p[1] + ny)], [], z0, z1)
+            (kotel if du_kotel else mur).append(piece)
+    volumes("Herode_mur", mur, "00_HarHabayit", MAT_MURAILLE())
+    bas = -math.inf
+    for nom, appareil, haut in APPAREILS_KOTEL:
+        bande = [(anneau, trous, max(z0, bas), min(z1, haut)) for anneau, trous, z0, z1 in kotel
+                 if z1 > bas and z0 < haut]
+        volumes(nom, bande, "00_HarHabayit", _exposer(pierre(f"Pierre_{nom.lower()}", CALCAIRE, appareil)))
+        bas = haut
+
+
+def _troncons_hors(points, ouvert):
+    """Les suites de points consécutifs où `ouvert` est faux."""
+    troncons, courant = [], []
+    for p in points:
+        if not ouvert(p):
+            courant.append(p)
+            continue
+        if len(courant) > 1:
+            troncons.append(courant)
+        courant = []
+    return troncons + ([courant] if len(courant) > 1 else [])
+
+
+def soutenement(anneau, z_pied, ouvert, epaisseur=MAILLE_PAYS, portee=12):
+    """Un massif contre chaque côté d'une place creusée, du pied jusqu'au terrain que le
+    relief garde à `portee` amot au dehors — sans lui, un talus de terre. Interrompu là
+    où `ouvert` : contre le mur d'Hérode, une salle ou un escalier."""
+    pieces = []
+    for a, b in zip(anneau, anneau[1:] + anneau[:1]):
+        long_ = math.dist(a, b)
+        if long_ < 1e-6:
+            continue
+        ux, uy = (b[1] - a[1]) / long_, -(b[0] - a[0]) / long_
+        n = math.ceil(long_)
+        points = [(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n) for k in range(n + 1)]
+        for troncon in _troncons_hors(points, ouvert):
+            p, q = troncon[0], troncon[-1]
+            haut = max(sol_naturel(x + ux * portee, y + uy * portee) for x, y in (p, troncon[len(troncon) // 2], q))
+            if haut <= z_pied + 1:
+                continue
+            pieces.append(([p, q, (q[0] + ux * epaisseur, q[1] + uy * epaisseur),
+                            (p[0] + ux * epaisseur, p[1] + uy * epaisseur)], [], z_pied, haut + 0.5))
+    return pieces
+
+
+def _contre(*anneaux):
+    return lambda p: any(_distance_a_l_anneau(p, anneau) < 3 for anneau in anneaux)
+
+
+def _z_pont(abscisse):
+    """Le tablier monte de la place au dallage ; son dernier tronçon passe la porte à plat."""
+    montee = _abscisses(PONT_MAGHREBINS)[-2]
+    return Z_PLACE_HAUTE + (Z_HAR - Z_PLACE_HAUTE) * min(abscisse / montee, 1)
+
+
+def _sous_le_pont(piece, epaisseur=0.4):
+    """Le massif arasé sous le tablier qui le survole : c'est la rampe de terre d'avant 2004."""
+    anneau, trous, z0, z1 = piece
+    survoles = [p for p in anneau if _distance_a_la_trace(p, PONT_MAGHREBINS) < MAILLE_PAYS]
+    if not survoles:
+        return piece
+    plafond = min(_z_pont(_abscisse_du_plus_proche(p, PONT_MAGHREBINS)) for p in survoles) - epaisseur - 1
+    return anneau, trous, z0, max(z0 + 1, min(z1, plafond))
+
+
+def place_du_kotel():
+    volumes("Kotel_place", [(AIRE_DE_PRIERE, [], Z_PLACE_KOTEL - 1, Z_PLACE_KOTEL),
+                            (PLACE_HAUTE, [], Z_PLACE_KOTEL - 1, Z_PLACE_HAUTE)], "00_HarHabayit", MAT_SOL())
+    ouvert = lambda p: (_contre(HARAM, SALLES_WILSON)(p)
+                        or _distance_a_la_trace(p, ESCALIER_PLACE) < LARGEUR_ESCALIER / 2
+                        or any(math.dist(p, b.centre) < LARGEUR_PASSAGE / 2 for b in BOUCHES))
+    bords = soutenement(PLACE_KOTEL, Z_PLACE_KOTEL - 1, ouvert)
+    pieces = [_sous_le_pont(p) for p in bords]
+    pieces += soutenement(SALLES_WILSON, Z_PLACE_KOTEL - 1, _contre(HARAM, PLACE_KOTEL))
+    volumes("Kotel_place_soutenement", pieces, "00_HarHabayit", MAT_MURAILLE())
+    marches_de_l_aire_de_priere()
+    passages_de_la_place(bords)
+    pont_des_maghrebins()
+    salles_de_wilson()
+    escalier_de_la_place()
+    interieur_de_wilson()
+    facades_de_la_place([p for p in bords if _sous_le_pont(p) is p])
+    mobilier_de_la_place()
+    arret_de_bus()
+    menora_d_or()
+
+
+def _poutre(a, b, za, zb, gauche, droite, hauteur):
+    """Les huit sommets d'une boîte le long de a-b, sous FACES_BOITE : de `droite` à `gauche`
+    en travers (à gauche du sens de marche), d'une sous-face qui va de `za` à `zb`."""
+    long_ = max(math.dist(a, b), 1e-9)
+    nx, ny = -(b[1] - a[1]) / long_, (b[0] - a[0]) / long_
+    bas = [(a, za, droite), (b, zb, droite), (b, zb, gauche), (a, za, gauche)]
+    return ([(p[0] + nx * d, p[1] + ny * d, z) for p, z, d in bas]
+            + [(p[0] + nx * d, p[1] + ny * d, z + hauteur) for p, z, d in bas])
+
+
+def _fondre(morceaux):
+    """Des (sommets, faces) mis dans un seul maillage."""
+    verts, faces = [], []
+    for v, f in morceaux:
+        faces += [[len(verts) + i for i in face] for face in f]
+        verts += v
+    return verts, faces
+
+
+def _assembler(boites):
+    return _fondre((huit, FACES_BOITE) for huit in boites)
+
+
+def pont_des_maghrebins(epaisseur=0.4, entraxe=8):
+    """Le pont de bois de 2007, de la place à la porte des Maghrébins : tablier, garde-corps
+    et pieux, sur la trace OSM ; le tablier monte d'un trait."""
+    trace = PONT_MAGHREBINS
+    s = _abscisses(trace)
+    demi = LARGEUR_PONT / 2
+    boites = []
+    for k, (a, b) in enumerate(zip(trace, trace[1:])):
+        za, zb = _z_pont(s[k]), _z_pont(s[k + 1])
+        boites.append(_poutre(a, b, za - epaisseur, zb - epaisseur, demi, -demi, epaisseur))
+        for cote in (-1, 1):
+            boites.append(_poutre(a, b, za, zb, cote * demi + 0.15, cote * demi - 0.15, GARDE_CORPS))
+    for abscisse in plage(entraxe / 2, s[-2], entraxe):
+        (x, y), (tx, ty) = _point_a_l_abscisse(trace, abscisse)
+        for cote in (-1, 1):
+            p = (x + ty * cote * (demi - 0.4), y - tx * cote * (demi - 0.4))
+            boites.append(_poutre((p[0] - tx * 0.2, p[1] - ty * 0.2), (p[0] + tx * 0.2, p[1] + ty * 0.2),
+                                  Z_PLACE_KOTEL - 1, Z_PLACE_KOTEL - 1, 0.2, -0.2,
+                                  _z_pont(abscisse) - epaisseur - Z_PLACE_KOTEL + 1))
+    mesh_from_pydata("Maghrebins_pont", *_assembler(boites), "00_HarHabayit", MAT_CHENE())
+
+
+def _face_du_kotel(anneau):
+    """Le côté de l'anneau le long du Kotel, orienté de la place vers le nord : (a, b)."""
+    a, b = min(zip(anneau, anneau[1:] + anneau[:1]),
+               key=lambda e: _distance_a_l_anneau(((e[0][0] + e[1][0]) / 2, (e[0][1] + e[1][1]) / 2), HARAM))
+    return (a, b) if _distance_a_l_anneau(a, PLACE_KOTEL) < _distance_a_l_anneau(b, PLACE_KOTEL) else (b, a)
+
+
+def _extrusion(profil, origine, u, v, longueur):
+    """Un profil (v, z) fermé, sens direct, extrudé de `longueur` le long de u : flancs et
+    deux bouts."""
+    def monde(pv, pz, pu):
+        return (origine[0] + u[0] * pu + v[0] * pv, origine[1] + u[1] * pu + v[1] * pv, pz)
+    n = len(profil)
+    verts = [monde(pv, pz, 0) for pv, pz in profil] + [monde(pv, pz, longueur) for pv, pz in profil]
+    faces = [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
+    for a, b, c in geometry.tessellate_polygon([[Vector((pv, pz, 0)) for pv, pz in profil]]):
+        direct = ((profil[b][0] - profil[a][0]) * (profil[c][1] - profil[a][1])
+                  - (profil[b][1] - profil[a][1]) * (profil[c][0] - profil[a][0])) > 0
+        faces += [[a, c, b], [n + a, n + b, n + c]] if direct else [[a, b, c], [n + a, n + c, n + b]]
+    if u[0] * v[1] - u[1] * v[0] < 0:
+        faces = [f[::-1] for f in faces]
+    return verts, faces
+
+
+def _repere_de_wilson():
+    """Le coin des salles au Kotel côté place, u le long du Kotel vers le nord, v vers l'ouest :
+    (coin, u, v, longueur, largeur)."""
+    a, b = _face_du_kotel(SALLES_WILSON)
+    longueur = math.dist(a, b)
+    u = ((b[0] - a[0]) / longueur, (b[1] - a[1]) / longueur)
+    v = (-u[1], u[0])
+    if _dans((a[0] + v[0] * 5, a[1] + v[1] * 5), HARAM):
+        v = (u[1], -u[0])
+    return a, u, v, longueur, max((p[0] - a[0]) * v[0] + (p[1] - a[1]) * v[1] for p in SALLES_WILSON)
+
+
+WILSON = _repere_de_wilson()
+NAISSANCE_WILSON = Z_PLACE_KOTEL + CLE_WILSON - PORTEE_WILSON / 2
+
+
+def _point_de_wilson(pu, pv):
+    a, u, v, _, _ = WILSON
+    return (a[0] + u[0] * pu + v[0] * pv, a[1] + u[1] * pu + v[1] * pv)
+
+
+def _sous_la_voute(pv):
+    """La cote de l'intrados à `pv` du Kotel."""
+    rayon = PORTEE_WILSON / 2
+    return NAISSANCE_WILSON + math.sqrt(max(0.0, rayon ** 2 - (pv - rayon) ** 2))
+
+
+def salles_de_wilson(segments=16):
+    """Les salles de prière couvertes au nord de la place, sous la chaussée qui mène à la
+    porte de la Chaîne : l'arche de Wilson y part du Kotel, treize mètres de portée, et sa
+    clé est à 6,1 m du sol d'aujourd'hui ; sa voûte court sur toute la longueur des salles.
+    Le reste de leur emprise, jusqu'au dallage, est plein."""
+    a, u, v, longueur, largeur = WILSON
+    rayon, pied = PORTEE_WILSON / 2, Z_PLACE_KOTEL - 1
+    arche = [(rayon - rayon * math.cos(math.pi * k / segments), NAISSANCE_WILSON + rayon * math.sin(math.pi * k / segments))
+             for k in range(segments + 1)]
+    profil = [(PORTEE_WILSON, pied), (largeur, pied), (largeur, Z_HAR), (0, Z_HAR)] + arche
+    mesh_from_pydata("Wilson_arche", *_extrusion(profil, a, u, v, longueur), "00_HarHabayit", MAT_MURAILLE())
+    coin = _point_de_wilson
+    sol =[coin(0, 0), coin(longueur, 0), coin(longueur, PORTEE_WILSON), coin(0, PORTEE_WILSON)]
+    fond = [coin(longueur - 1, 0), coin(longueur, 0), coin(longueur, PORTEE_WILSON), coin(longueur - 1, PORTEE_WILSON)]
+    volumes("Wilson_sol", [(sol, [], pied, Z_PLACE_KOTEL)], "00_HarHabayit", MAT_SOL())
+    volumes("Wilson_fond", [(fond, [], pied, Z_PLACE_KOTEL + CLE_WILSON)], "00_HarHabayit", MAT_MURAILLE())
+
+
+def escalier_de_la_place(pas_des_murs=6):
+    """Du coin nord-ouest de la place au quartier juif, sur la trace OSM : des degrés pleins
+    entre deux murs qui retiennent le relief, jusqu'au sol où la trace arrive."""
+    trace = ESCALIER_PLACE
+    longueur = _abscisses(trace)[-1]
+    n = max(1, round((Z_HAUT_ESCALIER - Z_PLACE_HAUTE) / CONTREMARCHE))
+    demi = LARGEUR_ESCALIER / 2
+    boites = []
+    for k in range(n):
+        (p, _), (q, _) = (_point_a_l_abscisse(trace, longueur * k / n),
+                          _point_a_l_abscisse(trace, longueur * (k + 1) / n))
+        z = Z_PLACE_HAUTE + (Z_HAUT_ESCALIER - Z_PLACE_HAUTE) * (k + 1) / n
+        boites.append(_poutre(p, q, Z_PLACE_KOTEL - 1, Z_PLACE_KOTEL - 1, demi, -demi, z - Z_PLACE_KOTEL + 1))
+    mesh_from_pydata("Kotel_place_escalier", *_assembler(boites), "00_HarHabayit", MAT_SOL())
+    murs = []
+    for s0 in plage(0, longueur, pas_des_murs):
+        s1 = min(longueur, s0 + pas_des_murs)
+        if s1 - s0 < 1e-6:
+            continue
+        (p, _), (q, _) = _point_a_l_abscisse(trace, s0), _point_a_l_abscisse(trace, s1)
+        for bord, dehors in ((demi, demi + MAILLE_PAYS), (-demi - MAILLE_PAYS, -demi)):
+            huit = _poutre(p, q, 0, 0, dehors, bord, 0)
+            terrain = max(sol_naturel(x, y) for x, y, _ in huit[:4])
+            haut = max(terrain + 0.5, _z_escalier(s1) + GARDE_CORPS)
+            murs.append(([(x, y) for x, y, _ in huit[:4]], [], Z_PLACE_KOTEL - 1, haut))
+    volumes("Kotel_place_escalier_murs", murs, "00_HarHabayit", MAT_MURAILLE())
+
+
+# Ce qui meuble la place et ses bords, chaque chose à son point OSM. Là où OSM ne dit que
+# « il y a un robinet ici », la forme est un CHOIX, dit dans la fonction qui la construit.
+ABORDS = PAYS_DONNEES["abords_kotel"]
+MENORA = "n3971775380"           # l'autre nœud « המנורה » tombe dans l'emprise d'un bâtiment
+MURET_DE_PRIERE, MEHITSA, CLOTURE_DES_FEMMES = "w45081552", "w45081551", "w394161620"
+MUR_ANTIBRUIT = "w288016728"
+PORAT_YOSEF = "w290726629"
+ETAGE, REZ, BAIE = 3.2 / AMA, 4.2 / AMA, 3.5 / AMA
+
+
+def _abords(genre):
+    return [[vers_scene(*p) for p in a["points"]] for a in ABORDS if a["genre"] == genre]
+
+
+def _trace_osm(osm):
+    return next([vers_scene(*p) for p in a["points"]] for a in ABORDS if a["osm"] == osm)
+
+
+def _coupe_par_le_muret():
+    """La place coupée le long du muret de prière — sans son dernier tronçon, qui file vers les
+    salles de Wilson le long de la pente des hommes —, prolongé au sud jusqu'au coin de la
+    clôture des femmes et au nord tout droit jusqu'au bord : (aire de prière, place haute,
+    brèche des femmes, brèche des hommes). Les brèches sont les trouées qu'OSM laisse entre le
+    muret et ce qui le prolonge."""
+    ligne = _trace_osm(MURET_DE_PRIERE)[:-1]
+    anneau, n = PLACE_KOTEL, len(PLACE_KOTEL)
+    sud = min(range(n), key=lambda i: math.dist(anneau[i], ligne[0]))
+    haut = ligne[-1]
+    (x0, y0), (x1, y1) = vers_scene(0, 0), vers_scene(0, 1000)
+    loin = Vector((haut[0] + x1 - x0, haut[1] + y1 - y0))
+    croisements = [(k, geometry.intersect_line_line_2d(Vector(haut), loin, Vector(anneau[k]), Vector(anneau[(k + 1) % n])))
+                   for k in range(n)]
+    k, nord = min(((k, tuple(x)) for k, x in croisements if x is not None), key=lambda e: math.dist(haut, e[1]))
+    avant = [anneau[(sud + i) % n] for i in range((k - sud) % n + 1)] + [nord]
+    arriere = [anneau[(sud - i) % n] for i in range((sud - k - 1) % n + 1)] + [nord]
+    pres_du_kotel = lambda cote: min(_distance_a_la_trace(p, KOTEL) for p in cote)
+    priere, haute = sorted((avant, arriere), key=pres_du_kotel)
+    retour = ligne[::-1]
+    return priere + retour, haute + retour, (ligne[0], anneau[sud]), (haut, nord)
+
+
+AIRE_DE_PRIERE, PLACE_HAUTE, BRECHE_DES_FEMMES, BRECHE_DES_HOMMES = _coupe_par_le_muret()
+PENTE_DES_HOMMES = 12    # longueur pour un de hauteur, la pente des rampes accessibles : CHOIX
+LARGEUR_PASSAGE, HAUTEUR_PASSAGE, PROFONDEUR_PASSAGE = 3.5 / AMA, 3.2 / AMA, 4 / AMA
+
+
+class Bouche(NamedTuple):
+    centre: tuple
+    dehors: tuple
+
+
+def _bouche(trace, marge=1 / AMA):
+    """Où un passage d'OSM quitte la place : sur le côté le plus proche de sa trace, assez long
+    pour la porte, sans mordre sur ses coins."""
+    anneau = PLACE_KOTEL
+    cotes = [(a, b) for a, b in zip(anneau, anneau[1:] + anneau[:1]) if math.dist(a, b) > LARGEUR_PASSAGE + 2 * marge]
+    points = [_point_a_l_abscisse(trace, s)[0] for s in plage(0, _abscisses(trace)[-1], 1)] + [trace[-1]]
+    a, b = min(cotes, key=lambda e: min(_distance_au_segment(p, *e) for p in points))
+    p = min(points, key=lambda p: _distance_au_segment(p, a, b))
+    long_ = math.dist(a, b)
+    s = min(max(_fraction_sur_le_segment(p, a, b) * long_, LARGEUR_PASSAGE / 2 + marge), long_ - LARGEUR_PASSAGE / 2 - marge)
+    t = ((b[0] - a[0]) / long_, (b[1] - a[1]) / long_)
+    centre = (a[0] + t[0] * s, a[1] + t[1] * s)
+    dehors = (t[1], -t[0]) if not _dans((centre[0] + t[1], centre[1] - t[0]), anneau) else (-t[1], t[0])
+    return Bouche(centre, dehors)
+
+
+BOUCHES = [_bouche([vers_scene(*p) for p in trace]) for trace in PAYS_DONNEES["passages_place"].values()]
+
+
+def _vers_l_aire(breche):
+    """La brèche orientée l'aire de prière à sa gauche."""
+    a, b = breche
+    milieu = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+    return (a, b) if _dans(_devant(milieu, _cap(a, b), 0, 1), AIRE_DE_PRIERE) else (b, a)
+
+
+def _pente_des_hommes():
+    """L'axe de la pente, du haut de la brèche vers l'aire de prière : (haut, bas)."""
+    a, b = _vers_l_aire(BRECHE_DES_HOMMES)
+    milieu = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+    return milieu, _devant(milieu, _cap(a, b), 0, (Z_PLACE_HAUTE - Z_PLACE_KOTEL) * PENTE_DES_HOMMES)
+
+
+def marches_de_l_aire_de_priere(contremarche=0.15 / AMA, giron=0.35 / AMA):
+    """Des degrés descendent à l'aire de prière par la brèche des femmes, une pente par celle
+    des hommes. Le giron : CHOIX."""
+    n = round((Z_PLACE_HAUTE - Z_PLACE_KOTEL) / contremarche)
+    a, b = _vers_l_aire(BRECHE_DES_FEMMES)
+    boites = []
+    for k in range(n - 1):
+        z = Z_PLACE_HAUTE - (Z_PLACE_HAUTE - Z_PLACE_KOTEL) * (k + 1) / n
+        boites.append(_poutre(a, b, Z_PLACE_KOTEL - 1, Z_PLACE_KOTEL - 1, (k + 1) * giron, k * giron, z - Z_PLACE_KOTEL + 1))
+    mesh_from_pydata("Kotel_place_marches", *_assembler(boites), "00_HarHabayit", MAT_SOL())
+    haut, bas = _pente_des_hommes()
+    demi = math.dist(*BRECHE_DES_HOMMES) / 2
+    pente = _poutre(haut, bas, Z_PLACE_HAUTE - 1, Z_PLACE_KOTEL - 1, demi, -demi, 1)
+    mesh_from_pydata("Kotel_place_pente", *_assembler([pente]), "00_HarHabayit", MAT_SOL())
+
+
+def passages_de_la_place(bords, recouvrement=2):
+    """Les passages d'OSM vers la rue HaGaï, Batei Ma'hasse et la porte des Ordures, percés
+    dans le soutènement : couverts sur la profondeur d'une porte, bouchés au-delà — le relief du
+    modèle, qui met la place elle-même treize mètres trop haut, ne dit pas à quelle cote ils
+    rejoignent la ville. Largeur, hauteur, profondeur : CHOIX."""
+    demi, cote = LARGEUR_PASSAGE / 2, LARGEUR_PASSAGE / 2 + recouvrement
+    murs, sols = [], []
+    for bouche in BOUCHES:
+        tetes = [z1 for anneau, _, _, z1 in bords if _distance_a_l_anneau(bouche.centre, anneau) < LARGEUR_PASSAGE]
+        if not tetes:
+            continue
+        haut = max(tetes)
+        entree = bouche.centre
+        fond = _devant(entree, _cap((0, 0), bouche.dehors), PROFONDEUR_PASSAGE)
+        bout = _devant(entree, _cap((0, 0), bouche.dehors), MAILLE_PAYS)
+        pied = Z_PLACE_KOTEL - 1
+        sols.append(_poutre(entree, fond, pied, pied, demi, -demi, Z_PLACE_HAUTE - pied))
+        murs += [_poutre(entree, fond, pied, pied, cote, demi, haut - pied),
+                 _poutre(entree, fond, pied, pied, -demi, -cote, haut - pied),
+                 _poutre(fond, bout, pied, pied, cote, -cote, haut - pied)]
+        if haut > Z_PLACE_HAUTE + HAUTEUR_PASSAGE:
+            linteau = Z_PLACE_HAUTE + HAUTEUR_PASSAGE
+            murs.append(_poutre(entree, fond, linteau, linteau, cote, -cote, haut - linteau))
+    mesh_from_pydata("Kotel_place_passages", *_assembler(murs), "00_HarHabayit", MAT_MURAILLE())
+    mesh_from_pydata("Kotel_place_passages_sol", *_assembler(sols), "00_HarHabayit", MAT_SOL())
+
+
+def _sur_la_place(p):
+    return _dans(p, PLACE_KOTEL) or _distance_a_l_anneau(p, PLACE_KOTEL) < 2
+
+
+def _sol_de_la_place(p):
+    return Z_PLACE_KOTEL if _dans(p, AIRE_DE_PRIERE) or _distance_a_l_anneau(p, AIRE_DE_PRIERE) < 0.5 else Z_PLACE_HAUTE
+
+
+def _sol_du_detail(p):
+    return _sol_de_la_place(p) if _sur_la_place(p) else sol_naturel(*p)
+
+
+def _cap(de, vers):
+    return math.atan2(vers[1] - de[1], vers[0] - de[0])
+
+
+def _devant(p, cap, avant, travers=0.0):
+    """Le point à `avant` sur le cap et `travers` à sa gauche."""
+    c, s = math.cos(cap), math.sin(cap)
+    return (p[0] + c * avant - s * travers, p[1] + s * avant + c * travers)
+
+
+def _pave(centre, cap, longueur, largeur, z0, z1):
+    """Une boîte de z0 à z1, `longueur` le long du cap (radians), `largeur` en travers."""
+    a, b = _devant(centre, cap, -longueur / 2), _devant(centre, cap, longueur / 2)
+    return _poutre(a, b, z0, z0, largeur / 2, -largeur / 2, z1 - z0), FACES_BOITE
+
+
+def _fut(centre, z0, z1, r, cotes=8):
+    anneau = _cercle(*centre, r, cotes)
+    n = len(anneau)
+    verts = [(x, y, z0) for x, y in anneau] + [(x, y, z1) for x, y in anneau]
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    return verts, faces + [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
+
+
+def _coupole(centre, z, r, cotes=12, rangs=4):
+    anneaux = [[(x, y, z + r * math.sin(math.pi / 2 * k / rangs))
+                for x, y in _cercle(*centre, r * math.cos(math.pi / 2 * k / rangs), cotes)] for k in range(rangs)]
+    verts = [p for anneau in anneaux for p in anneau] + [(*centre, z + r)]
+    faces = [[k * cotes + i, k * cotes + (i + 1) % cotes, (k + 1) * cotes + (i + 1) % cotes, (k + 1) * cotes + i]
+             for k in range(rangs - 1) for i in range(cotes)]
+    sommet, dernier = len(verts) - 1, (rangs - 1) * cotes
+    return verts, faces + [[dernier + i, dernier + (i + 1) % cotes, sommet] for i in range(cotes)]
+
+
+def _baie(p, q, s, z0, largeur, hauteur, saillie):
+    """Une baie cintrée plaquée sur le mur p→q, à `s` de p, de son seuil z0 à sa clé, tournée
+    du côté gauche de p→q ; `saillie` devant le parement."""
+    t = ((q[0] - p[0]) / math.dist(p, q), (q[1] - p[1]) / math.dist(p, q))
+    n = (-t[1], t[0])
+    r = largeur / 2
+    contour = [(-r, 0), (r, 0)] + [(r * math.cos(math.pi * k / 6), hauteur - r + r * math.sin(math.pi * k / 6))
+                                   for k in range(7)]
+    def monde(ds, dz, d):
+        return (p[0] + t[0] * (s + ds) + n[0] * d, p[1] + t[1] * (s + ds) + n[1] * d, z0 + dz)
+    k = len(contour)
+    verts = [monde(ds, dz, saillie) for ds, dz in contour] + [monde(ds, dz, -0.02) for ds, dz in contour]
+    faces = [list(range(k))[::-1], list(range(k, 2 * k))]
+    return verts, faces + [[i, (i + 1) % k, k + (i + 1) % k, k + i] for i in range(k)]
+
+
+def _chaise(p, cap, z):
+    """Chaise de plastique blanc tournée vers le cap : assise, dossier, quatre pieds."""
+    assise, pied = 0.45 / AMA, 0.03 / AMA
+    morceaux = [_pave(p, cap, assise, assise, z + 0.42 / AMA, z + 0.46 / AMA),
+                _pave(_devant(p, cap, -assise / 2), cap, 0.04 / AMA, assise, z + 0.46 / AMA, z + 0.9 / AMA)]
+    return morceaux + [_pave(_devant(p, cap, sa * assise * 0.42, st * assise * 0.42), cap, pied, pied, z, z + 0.42 / AMA)
+                       for sa in (-1, 1) for st in (-1, 1)]
+
+
+def _table(p, cap, z):
+    plateau = [_pave(p, cap, 0.5 / AMA, 0.8 / AMA, z + 0.72 / AMA, z + 0.76 / AMA)]
+    return plateau + [_pave(_devant(p, cap, sa * 0.2 / AMA, st * 0.35 / AMA), cap, 0.04 / AMA, 0.04 / AMA, z, z + 0.72 / AMA)
+                      for sa in (-1, 1) for st in (-1, 1)]
+
+
+def _bibliotheque(nom, p, cap, longueur, hauteur, z, rayon=0.4 / AMA, profondeur=0.35 / AMA):
+    """Un meuble ouvert vers le cap : (planches, [livres de chaque reliure]). Les livres vont par
+    paquets d'une même reliure, d'une hauteur chacun."""
+    planche = 0.03 / AMA
+    bois = [_pave(_devant(p, cap, -profondeur / 2), cap, planche, longueur, z, z + hauteur)]
+    bois += [_pave(_devant(p, cap, 0, t * longueur / 2), cap, profondeur, planche, z, z + hauteur) for t in (-1, 1)]
+    niveaux = plage(0, hauteur - rayon, rayon)
+    bois += [_pave(p, cap, profondeur, longueur, z + h, z + h + planche) for h in niveaux + [hauteur - planche]]
+    livres = [[] for _ in MAT_RELIURES]
+    for i, h in enumerate(niveaux):
+        x = -longueur / 2 + planche
+        while True:
+            k = f"{nom}_{i}_{x:.2f}"
+            paquet = (0.1 + 0.25 * alea(k)) / AMA
+            if x + paquet > longueur / 2 - planche:
+                break
+            haut = min(rayon - 0.06 / AMA, (0.2 + 0.12 * alea(k, 1)) / AMA)
+            livres[int(alea(k, 2) * len(livres))].append(
+                _pave(_devant(p, cap, 0, -(x + paquet / 2)), cap, 0.22 / AMA, paquet - 0.01 / AMA,
+                      z + h + planche, z + h + planche + haut))
+            x += paquet
+    return bois, livres
+
+
+def _poser(nom, morceaux, mat, col="00_HarHabayit"):
+    if morceaux:
+        mesh_from_pydata(nom, *_fondre(morceaux), col, mat)
+
+
+def _poser_les_livres(nom, livres, col="00_HarHabayit"):
+    for k, (paquets, mat) in enumerate(zip(livres, MAT_RELIURES)):
+        _poser(f"{nom}_{k}", paquets, mat(), col)
+
+
+def interieur_de_wilson():
+    """La salle sous l'arche : l'aron qui garde plus de cent sifrei Torah, la bibliothèque et
+    les rayonnages de la rénovation de 2005–2008, le ner tamid allumé en 2010, et le puits qui
+    montre quatorze assises sous le sol (Wikipedia, « Wilson's Arch » ; thekotel.org). Leur
+    place dans la salle, le mobilier et ses mesures : CHOIX."""
+    _, u, v, longueur, _ = WILSON
+    vers_kotel, le_long, en_travers = math.atan2(-v[1], -v[0]), math.atan2(u[1], u[0]), math.atan2(v[1], v[0])
+    z = Z_PLACE_KOTEL
+    # Contre le Kotel, la voûte descend sous le mètre : l'aron est au fond, sous la clé.
+    fond, axe = longueur - 1, PORTEE_WILSON / 2
+    aron = _point_de_wilson(fond - 0.55 / AMA, axe)
+    _poser("Wilson_aron", [_pave(aron, en_travers, 5.4 / AMA, 1.1 / AMA, z, z + 0.3 / AMA),
+                           _pave(aron, en_travers, 5 / AMA, 0.9 / AMA, z + 0.3 / AMA, z + 3.2 / AMA),
+                           _pave(aron, en_travers, 5.4 / AMA, 1.1 / AMA, z + 3.2 / AMA, z + 3.45 / AMA)], MAT_CHENE())
+    ner = _point_de_wilson(fond - 1.8 / AMA, axe)
+    _poser("Wilson_ner_tamid", [_fut(ner, z + 3.7 / AMA, z + 3.95 / AMA, 0.12 / AMA),
+                                _fut(ner, z + 3.95 / AMA, _sous_la_voute(axe), 0.01 / AMA, 4)], MAT_BRONZE())
+
+    puits = _point_de_wilson(longueur * 0.25, 2.8 / AMA)
+    cote = 2 / AMA
+    _poser("Wilson_puits", [_pave(puits, le_long, cote, cote, z, z + 0.01 / AMA)], material("Puits", (0.02, 0.02, 0.02)))
+    garde = [_pave(_devant(puits, le_long + a, cote / 2), le_long + a + math.pi / 2, cote, 0.05 / AMA,
+                   z + 1.0 / AMA, z + 1.05 / AMA) for a in (0, math.pi / 2, math.pi, 3 * math.pi / 2)]
+    garde += [_fut(_devant(puits, le_long, sa * cote / 2, st * cote / 2), z, z + 1.05 / AMA, 0.03 / AMA, 6)
+              for sa in (-1, 1) for st in (-1, 1)]
+    _poser("Wilson_puits_garde_corps", garde, MAT_INOX())
+
+    bois, livres = [], [[] for _ in MAT_RELIURES]
+    for k, pu in enumerate(plage(1.5 / AMA, longueur - 2.5 / AMA, 2.2 / AMA)):
+        b, l = _bibliotheque(f"Wilson_biblio_{k}", _point_de_wilson(pu, PORTEE_WILSON - 1.2 / AMA),
+                             vers_kotel, 2 / AMA, 1.9 / AMA, z)
+        bois += b
+        livres = [a + c for a, c in zip(livres, l)]
+    _poser("Wilson_bibliotheque", bois, MAT_CHENE())
+    _poser_les_livres("Wilson_livres", livres)
+
+    chaises, tables = [], []
+    for pu in plage(2 / AMA, longueur - 2 / AMA, 1.6 / AMA):
+        for pv in plage(2.6 / AMA, PORTEE_WILSON - 2.4 / AMA, 1.4 / AMA):
+            p = _point_de_wilson(pu, pv)
+            if pu > fond - 3 / AMA or math.dist(p, puits) < 2.5 / AMA:
+                continue
+            nom = f"Wilson_chaise_{pu:.0f}_{pv:.0f}"
+            if alea(nom) < 0.12:
+                tables += _table(p, vers_kotel, z)
+            elif alea(nom, 1) < 0.75:
+                chaises += _chaise(p, vers_kotel + 0.4 * (alea(nom, 2) - 0.5), z)
+    _poser("Wilson_chaises", chaises, MAT_PLASTIQUE())
+    _poser("Wilson_tables", tables, MAT_PLASTIQUE())
+
+
+def _murs_de_facade(pieces):
+    """Le parement de chaque massif qui borde la place, côté place : (p, q, cote du haut),
+    p→q laissant la place à gauche."""
+    return [(anneau[0], anneau[1], z1) for anneau, _, _, z1 in pieces]
+
+
+def _portes_sur(murs, portes, portee=25 / AMA):
+    """Chaque porte d'OSM ramenée au mur le plus proche : (index du mur, abscisse). Le relief
+    du modèle met le coin nord-ouest de la place — police, toilettes, tunnels — au-dessus de
+    la place : leurs portes viennent sur son pourtour."""
+    places = []
+    for porte in portes:
+        k = min(range(len(murs)), key=lambda k: _distance_au_segment(porte, *murs[k][:2]))
+        p, q, _ = murs[k]
+        if _distance_au_segment(porte, p, q) < portee:
+            places.append((k, _fraction_sur_le_segment(porte, p, q) * math.dist(p, q)))
+    return places
+
+
+def _face_de_wilson_sur_la_place():
+    """Le bout plein des salles, de la voûte à leur flanc ouest, la place à gauche."""
+    _, u, _, _, largeur = WILSON
+    p, q = _point_de_wilson(0, PORTEE_WILSON), _point_de_wilson(0, largeur)
+    place = (p[0] - u[0] * 2, p[1] - u[1] * 2)
+    gauche = (q[0] - p[0]) * (place[1] - p[1]) - (q[1] - p[1]) * (place[0] - p[0]) > 0
+    return (p, q) if gauche else (q, p)
+
+
+def facades_de_la_place(pieces):
+    """Les maisons qui bordent la place lui montrent des étages, pas un mur de soutènement :
+    baies cintrées sur appuis de pierre, un rez-de-chaussée plus haut, et les portes d'OSM —
+    police, toilettes, tunnels du Kotel, cuisine de Colel Chabad — ramenées au pied du mur le
+    plus proche. Hauteur d'étage, pas des baies et forme : CHOIX ; Aish HaTorah compte sept
+    étages au-dessus de la place, Porat Yosef dix (aish.com ; archives Safdie, McGill)."""
+    murs = _murs_de_facade(pieces) + [(*_face_de_wilson_sur_la_place(), Z_PLACE_KOTEL + REZ)]
+    bouche = (_point_de_wilson(0, 0), _point_de_wilson(0, PORTEE_WILSON))
+    portes = [p for genre in ("entree", "toilettes", "police", "soupe_populaire") for (p, *_) in _abords(genre)
+              if _distance_au_segment(p, *bouche) > 3 / AMA]
+    placees = _portes_sur(murs, portes)
+    vitres, appuis, battants, cadres = [], [], [], []
+    for k, s in placees:
+        p, q, _ = murs[k]
+        seuil = _sol_de_la_place(_devant(_point_a_l_abscisse([p, q], s)[0], _cap(p, q), 0, 1 / AMA))
+        cadres.append(_baie(p, q, s, seuil, 2.1 / AMA, 3.2 / AMA, 0.02 / AMA))
+        battants.append(_baie(p, q, s, seuil, 1.5 / AMA, 2.8 / AMA, 0.05 / AMA))
+    for k, (p, q, haut) in enumerate(murs[:-1]):
+        longueur = math.dist(p, q)
+        n = int(longueur / BAIE)
+        if n == 0 or haut - Z_PLACE_KOTEL < REZ:
+            continue
+        cap = _cap(p, q)
+        for i in range(n):
+            s = (longueur - (n - 1) * BAIE) / 2 + i * BAIE
+            if any(kk == k and abs(ss - s) < 2.5 / AMA for kk, ss in placees):
+                continue
+            seuils = ([Z_PLACE_KOTEL + 1 / AMA] if i % 2 else [])
+            seuils += [Z_PLACE_KOTEL + REZ + e * ETAGE + 0.9 / AMA for e in range(int((haut - Z_PLACE_KOTEL - REZ) / ETAGE))]
+            for seuil in seuils:
+                if seuil + 2.4 / AMA > haut:
+                    break
+                vitres.append(_baie(p, q, s, seuil, 1.1 / AMA, 1.8 / AMA, 0.02 / AMA))
+                appui = _devant((p[0] + (q[0] - p[0]) * s / longueur, p[1] + (q[1] - p[1]) * s / longueur),
+                                cap, 0, 0.07 / AMA)
+                appuis.append(_pave(appui, cap, 1.3 / AMA, 0.14 / AMA, seuil - 0.08 / AMA, seuil))
+    _poser("Kotel_place_fenetres", vitres, MAT_VITRE())
+    _poser("Kotel_place_appuis", appuis + cadres, MAT_PIERRE())
+    _poser("Kotel_place_portes", battants, MAT_CHENE())
+
+
+def _ligne(trace, hauteur, epaisseur):
+    return [(_poutre(a, b, _sol_du_detail(a) - 0.3, _sol_du_detail(b) - 0.3, epaisseur / 2, -epaisseur / 2,
+                     hauteur + 0.3), FACES_BOITE) for a, b in zip(trace, trace[1:]) if math.dist(a, b) > 1e-6]
+
+
+def _poteaux(trace, pas, hauteur, r):
+    s = _abscisses(trace)
+    return [_fut(p, _sol_du_detail(p), _sol_du_detail(p) + hauteur, r, 6)
+            for p, _ in (_point_a_l_abscisse(trace, a) for a in plage(0, s[-1], pas))]
+
+
+def _dans_l_aire_de_priere(p):
+    """À l'est du muret de pierre qui sépare la place haute de l'aire de prière, au nord de la
+    clôture de bois du côté des femmes, et pas contre le Kotel."""
+    if not _dans(p, PLACE_KOTEL) or _dans(p, SALLES_WILSON) or _distance_a_la_trace(p, KOTEL) < 1.5 / AMA:
+        return False
+    muret = _trace_osm(MURET_DE_PRIERE)
+    a, b = next(((a, b) for a, b in zip(muret, muret[1:]) if min(a[1], b[1]) <= p[1] <= max(a[1], b[1])), (None, None))
+    if a is None or p[0] < a[0] + (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1] or 1e-9):
+        return False
+    femmes = _trace_osm(CLOTURE_DES_FEMMES)
+    return all(p[1] > a[1] + (b[1] - a[1]) * (p[0] - a[0]) / (b[0] - a[0] or 1e-9)
+               for a, b in zip(femmes, femmes[1:]) if min(a[0], b[0]) <= p[0] <= max(a[0], b[0]))
+
+
+def mobilier_de_la_place():
+    """Le mobilier d'OSM, sur la place et à ses entrées."""
+    pierre, inox = [], []
+    for k, (p,) in enumerate(_abords("netilat_yadayim")):
+        # La forme des postes n'est documentée nulle part : CHOIX, une vasque ronde autour d'un
+        # fût qui porte huit robinets, les natlot posées sur le bord.
+        z = _sol_du_detail(p)
+        revolution(f"Kotel_place_netilat_{k}_vasque", *p, z,
+                   [(1.1 / AMA, 0), (1.1 / AMA, 0.8 / AMA), (0.95 / AMA, 0.8 / AMA), (0.95 / AMA, 0.55 / AMA), (0, 0.55 / AMA)],
+                   "00_HarHabayit", MAT_PIERRE(), verts=24)
+        pierre.append(_fut(p, z, z + 1.5 / AMA, 0.25 / AMA))
+        for i in range(8):
+            a = 2 * math.pi * i / 8
+            inox.append(_pave(_devant(p, a, 0.36 / AMA), a, 0.22 / AMA, 0.04 / AMA, z + 1.1 / AMA, z + 1.14 / AMA))
+            inox.append(_fut(_devant(p, a + 0.4, 1.02 / AMA), z + 0.8 / AMA, z + 0.95 / AMA, 0.06 / AMA, 6))
+    _poser("Kotel_place_netilat_futs", pierre, MAT_PIERRE())
+    _poser("Kotel_place_netilat_robinets", inox, MAT_INOX())
+
+    fontaines, becs = [], []
+    for (p,) in _abords("fontaine"):
+        if _sur_la_place(p):
+            z = _sol_de_la_place(p)
+            fontaines.append(_pave(p, 0, 0.45 / AMA, 0.45 / AMA, z, z + 0.95 / AMA))
+            becs.append(_fut(p, z + 0.95 / AMA, z + 1.0 / AMA, 0.2 / AMA))
+    _poser("Kotel_place_fontaines", fontaines, MAT_PIERRE())
+    _poser("Kotel_place_fontaines_becs", becs, MAT_INOX())
+    _poser("Kotel_place_poubelles", [_fut(p, _sol_de_la_place(p), _sol_de_la_place(p) + 0.9 / AMA, 0.25 / AMA)
+                                     for (p,) in _abords("poubelle") if _sur_la_place(p)], MAT_INOX())
+    _poser("Kotel_place_borne_incendie", [_fut(p, _sol_de_la_place(p), _sol_de_la_place(p) + 0.7 / AMA, 0.1 / AMA)
+                                          for (p,) in _abords("borne_incendie") if _sur_la_place(p)],
+           MAT_BORNE_INCENDIE())
+
+    # Le muret de prière tient la place haute et porte son parapet (Bahat) ; son dernier
+    # tronçon, le long de la pente des hommes, n'est pas bâti. Les autres hauteurs de clôtures
+    # et de murets : CHOIX, OSM n'en donne aucune. La mehitsa est de métal (OSM), la clôture du
+    # côté des femmes de bois.
+    muret = _trace_osm(MURET_DE_PRIERE)[:-1]
+    pied, epaisseur = Z_PLACE_KOTEL - 0.3, 0.45 / AMA
+    parapet = [(_poutre(a, b, pied, pied, epaisseur / 2, -epaisseur / 2, Z_PLACE_HAUTE + PARAPET_DE_PRIERE - pied), FACES_BOITE)
+               for a, b in zip(muret, muret[1:])]
+    _poser("Kotel_place_mehitsa", _ligne(_trace_osm(MEHITSA), 1.8 / AMA, 0.06 / AMA), MAT_INOX())
+    _poser("Kotel_place_cloture_bois", _ligne(_trace_osm(CLOTURE_DES_FEMMES), 1.2 / AMA, 0.08 / AMA), MAT_CHENE())
+    clotures = [piece for trace in _abords("cloture") if trace not in (_trace_osm(MEHITSA), _trace_osm(CLOTURE_DES_FEMMES))
+                for piece in _poteaux(trace, 2 / AMA, 1.1 / AMA, 0.04 / AMA) + _ligne(trace, 1.1 / AMA, 0.05 / AMA)]
+    murets = [piece for a in ABORDS if a["genre"] == "muret" and a["osm"] != MURET_DE_PRIERE
+              for piece in _ligne(_trace_osm(a["osm"]), (2.5 if a["osm"] == MUR_ANTIBRUIT else 0.9) / AMA, 0.45 / AMA)]
+    _poser("Kotel_place_clotures", clotures + [p for t in _abords("bornes") for p in _poteaux(t, 1.5 / AMA, 0.9 / AMA, 0.1 / AMA)],
+           MAT_INOX())
+    _poser("Kotel_place_murets", murets + parapet, MAT_PIERRE())
+
+    # Aux entrées, un portique détecteur et le tunnel à rayons X des sacs (Times of Israel),
+    # tournés vers la place.
+    centre = (sum(x for x, _ in PLACE_KOTEL) / len(PLACE_KOTEL), sum(y for _, y in PLACE_KOTEL) / len(PLACE_KOTEL))
+    portiques = []
+    for (p,) in _abords("controle"):
+        z, cap = _sol_du_detail(p), _cap(p, centre)
+        portiques += [_pave(_devant(p, cap, 0, t * 0.5 / AMA), cap, 0.6 / AMA, 0.15 / AMA, z, z + 2.2 / AMA) for t in (-1, 1)]
+        portiques += [_pave(p, cap, 0.6 / AMA, 1.15 / AMA, z + 2.2 / AMA, z + 2.45 / AMA),
+                      _pave(_devant(p, cap, 0, 1.5 / AMA), cap, 2.2 / AMA, 0.9 / AMA, z, z + 1.3 / AMA)]
+    _poser("Kotel_place_controles", portiques, MAT_PORTIQUE())
+
+    # Chaises et tables de plastique blanc : un millier livrées en 2020 (thekotel.org) ; leur
+    # nombre et leur désordre ici : CHOIX. Les étagères de siddourim au bord de l'aire de prière.
+    muret = _trace_osm(MURET_DE_PRIERE)
+    etageres = []
+    for f in (0.15, 0.45, 0.75):
+        p, (tx, ty) = _point_a_l_abscisse(muret, f * _abscisses(muret)[-1])
+        cap = math.atan2(tx, -ty)
+        if not _dans_l_aire_de_priere(_devant(p, cap, 2)):
+            cap += math.pi
+        etageres.append((_devant(p, cap, 0.45 / AMA), cap))
+    bois, livres = [], [[] for _ in MAT_RELIURES]
+    for k, (p, cap) in enumerate(etageres):
+        b, l = _bibliotheque(f"Kotel_place_siddourim_{k}", p, cap, 1.8 / AMA, 1.6 / AMA, Z_PLACE_KOTEL)
+        bois += b
+        livres = [a + c for a, c in zip(livres, l)]
+    _poser("Kotel_place_etageres", bois, MAT_CHENE())
+    _poser_les_livres("Kotel_place_siddourim", livres)
+    obstacles = [p for p, *_ in etageres] + [p for (p,) in _abords("netilat_yadayim")]
+    chaises, tables = [], []
+    xs, ys = [x for x, _ in PLACE_KOTEL], [y for _, y in PLACE_KOTEL]
+    pas = 1.7 / AMA
+    for x in plage(min(xs), max(xs), pas):
+        for y in plage(min(ys), max(ys), pas):
+            nom = f"Kotel_place_chaise_{x:.0f}_{y:.0f}"
+            p = (x + pas * 0.6 * (alea(nom, 3) - 0.5), y + pas * 0.6 * (alea(nom, 4) - 0.5))
+            if (alea(nom) > 0.5 or not _dans_l_aire_de_priere(p) or any(math.dist(p, o) < 3 / AMA for o in obstacles)
+                    or min(_distance_a_la_trace(p, _trace_osm(osm)) for osm in (MEHITSA, CLOTURE_DES_FEMMES, MURET_DE_PRIERE)) < 1 / AMA
+                    or _distance_au_segment(p, *BRECHE_DES_FEMMES) < 2 / AMA
+                    or _distance_au_segment(p, *_pente_des_hommes()) < math.dist(*BRECHE_DES_HOMMES) / 2 + 1 / AMA):
+                continue
+            vers_kotel = _cap(p, _plus_proche_sur_la_trace(p, KOTEL))
+            if alea(nom, 1) < 0.08:
+                tables += _table(p, vers_kotel, Z_PLACE_KOTEL)
+            else:
+                chaises += _chaise(p, vers_kotel + 0.9 * (alea(nom, 2) - 0.5), Z_PLACE_KOTEL)
+    _poser("Kotel_place_chaises", chaises, MAT_PLASTIQUE())
+    _poser("Kotel_place_tables", tables, MAT_PLASTIQUE())
+
+
+def arret_de_bus():
+    """L'arrêt « הכותל המערבי » d'OSM, des lignes 1, 2, 3, 51, 83… : un abri tourné vers la
+    voie des bus la plus proche. L'abri et ses mesures : CHOIX, faute de relevé."""
+    (p,), = _abords("arret_bus")
+    voie = min((t for t in _abords("voie_bus") if len(t) > 1), key=lambda t: _distance_a_la_trace(p, t))
+    cap = _cap(p, _plus_proche_sur_la_trace(p, voie))
+    z = sol_naturel(*p)
+    long_ = 4 / AMA
+    cadre = [_pave(_devant(p, cap, a / AMA, t * long_ / 2), cap, 0.08 / AMA, 0.08 / AMA, z, z + 2.45 / AMA)
+             for a in (-0.7, 0.6) for t in (-1, 1)]
+    cadre += [_pave(_devant(p, cap, -0.05 / AMA), cap, 1.6 / AMA, long_ + 0.2 / AMA, z + 2.4 / AMA, z + 2.5 / AMA),
+              _pave(_devant(p, cap, -0.45 / AMA), cap, 0.4 / AMA, 2.5 / AMA, z + 0.42 / AMA, z + 0.47 / AMA),
+              _fut(_devant(p, cap, 0.6 / AMA, long_ / 2 + 0.8 / AMA), z, z + 2.8 / AMA, 0.04 / AMA, 6),
+              _pave(_devant(p, cap, 0.6 / AMA, long_ / 2 + 0.8 / AMA), cap + math.pi / 2, 0.5 / AMA, 0.03 / AMA,
+                    z + 2.3 / AMA, z + 2.8 / AMA)]
+    _poser("Arret_bus_kotel", cadre, MAT_INOX())
+    _poser("Arret_bus_kotel_vitres", [_pave(_devant(p, cap, -0.7 / AMA), cap, 0.03 / AMA, long_, z + 0.2 / AMA, z + 2.3 / AMA)],
+           MAT_VITRE())
+
+
+def menora_d_or():
+    """La menora d'or de l'Institut du Temple, sur l'escalier du quartier juif vers la place
+    (OSM) : plus de deux mètres, une demi-tonne dont 45 kg d'or, trois pieds et sept branches,
+    sur un socle de pierre, sous une vitrine qu'on ne modélise pas. Celle-ci a les branches
+    cintrées ; l'Institut en a fait une autre, droite, d'après le dessin du Rambam (Israel365
+    News). Dans le plan qui regarde le Har HaBayit."""
+    p = _trace_osm(MENORA)[0]
+    sol = sol_naturel(*p)
+    z = sol + 1 / AMA
+    travers = math.pi / 2
+    _poser("Menora_d_or_socle", [_pave(p, travers, 1.4 / AMA, 0.8 / AMA, sol - 0.3 / AMA, z)], MAT_PIERRE())
+    tige = 0.07 / AMA
+    pieds = [_poutre(p, _devant(p, a, 0.3 / AMA), z + 0.35 / AMA, z, tige / 2, -tige / 2, tige)
+             for a in (0, 2 * math.pi / 3, 4 * math.pi / 3)]
+    branches = []
+    for k in (1, 2, 3):
+        rayon = 0.28 * k / AMA
+        arc = [(rayon * math.cos(math.pi * i / 12), z + 2.0 / AMA - rayon * math.sin(math.pi * i / 12)) for i in range(13)]
+        branches += [_poutre(_devant(p, travers, a), _devant(p, travers, b), za, zb, tige / 2, -tige / 2, tige)
+                     for (a, za), (b, zb) in zip(arc, arc[1:])]
+    lampes = [_fut(_devant(p, travers, c * 0.28 / AMA), z + 2.0 / AMA, z + 2.12 / AMA, 0.06 / AMA) for c in range(-3, 4)]
+    _poser("Menora_d_or", [_pave(p, 0, tige, tige, z + 0.3 / AMA, z + 2.1 / AMA)] + lampes
+           + [(huit, FACES_BOITE) for huit in pieds + branches], MAT_OR())
+
+
+def _le_long_du_haram(trace_m):
+    """Un tronçon de muraille qui suit le Haram : c'est son mur, déjà bâti."""
+    proches = sum(any(math.dist(vers_scene(*p), q) < 15 for q in HARAM) or _dans(vers_scene(*p), HARAM)
+                  for p in trace_m)
+    return proches > 0.6 * len(trace_m)
+
+
+def murailles():
+    """Les murailles de Soliman, un segment par pièce, arasées à H_MURAILLE au-dessus du
+    point bas de chaque segment."""
+    pieces = []
+    for trace in PAYS_DONNEES["murailles"]:
+        if _le_long_du_haram(trace):
+            continue
+        points = [vers_scene(*p) for p in trace]
+        for a, b in zip(points, points[1:]):
+            long_ = math.dist(a, b)
+            if long_ < 1e-6:
+                continue
+            nx = -(b[1] - a[1]) / long_ * EPAISSEUR_MURAILLE / 2
+            ny = (b[0] - a[0]) / long_ * EPAISSEUR_MURAILLE / 2
+            z0 = min(sol_naturel(*a), sol_naturel(*b))
+            pieces.append(([(a[0] - nx, a[1] - ny), (b[0] - nx, b[1] - ny),
+                            (b[0] + nx, b[1] + ny), (a[0] + nx, a[1] + ny)], [],
+                           z0 - 3, z0 + H_MURAILLE))
+    volumes("Murailles", pieces, PAYS, MAT_MURAILLE())
+
+
+def _metres(valeur):
+    try:
+        return float(str(valeur).replace("m", "").strip())
+    except ValueError:
+        return None
+
+
+def hauteur_batiment(etiquettes, cle):
+    """En mètres : la hauteur OSM, sinon ses niveaux, sinon deux à trois niveaux (CHOIX)."""
+    hauteur = _metres(etiquettes.get("height", ""))
+    if hauteur:
+        return hauteur
+    niveaux = _metres(etiquettes.get("building:levels", ""))
+    if niveaux:
+        return 3.2 * niveaux + 1
+    return 6.5 + 4 * alea(cle)
+
+
+TUILE_VILLE = 1000       # amot : les bâtiments sont fondus par tuile
+_AXE_ESCALIER = [_point_a_l_abscisse(ESCALIER_PLACE, s)[0]
+                 for s in plage(0, _abscisses(ESCALIER_PLACE)[-1], 1)]
+
+
+def _barre_l_escalier(anneau):
+    return any(_dans(p, anneau) for p in _AXE_ESCALIER)
+
+
+def _sol_bati(x, y, depsgraph):
+    """Le dessus de ce qui est déjà bâti sous (x, y) — le relief là où il est abaissé autour
+    de la place, un soutènement, la voûte de Wilson —, sinon le relief réel."""
+    z = sol_naturel(x, y)
+    touche, point, *_ = bpy.context.scene.ray_cast(depsgraph, Vector((m(x), m(y), m(z + 1))), Vector((0, 0, -1)))
+    return min(z, point.z / AMA) if touche else z
+
+
+def ville():
+    """Les bâtiments d'OSM hors du Haram, fondus par tuile. Le pied est au point bas de ce
+    qui est bâti sous l'emprise, la hauteur comptée depuis le point haut : sur le relief réel,
+    le pied d'une maison au bord de la place restait au-dessus du relief abaissé."""
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    tuiles = {}
+    for b in json.loads((PAYS_DOSSIER / "batiments.json").read_text()):
+        anneau = [vers_scene(*p) for p in b["anneau"]]
+        cx = sum(x for x, _ in anneau) / len(anneau)
+        cy = sum(y for _, y in anneau) / len(anneau)
+        if (_dans((cx, cy), HARAM) or _dans_le_carre(cx, cy, 2) or _dans((cx, cy), PLACE_KOTEL)
+                or _barre_l_escalier(anneau)):
+            continue
+        if b["osm"] == PORAT_YOSEF:
+            porat_yosef(anneau, [[vers_scene(*p) for p in t] for t in b["trous"]], min(sol_naturel(x, y) for x, y in anneau))
+            continue
+        sols = [_sol_bati(x, y, depsgraph) for x, y in anneau]
+        h = hauteur_batiment(b["etiquettes"], b["osm"]) / AMA
+        piece = (anneau, [[vers_scene(*p) for p in t] for t in b["trous"]], min(sols) - 1, max(sols) + h)
+        tuiles.setdefault((math.floor(cx / TUILE_VILLE), math.floor(cy / TUILE_VILLE)), []).append(piece)
+    for (i, j), pieces in sorted(tuiles.items()):
+        volumes(f"Ville_{i:+d}_{j:+d}", pieces, PAYS, MAT_MAISON())
+    return tuiles
+
+
+def porat_yosef(anneau, trous, pied, etages=10, pas_des_coupoles=4.5 / AMA):
+    """La yeshiva Porat Yosef de Moshe Safdie, au-dessus de la place : dix étages qui montent
+    d'est en ouest face au Kotel, des murs de pierre autour de salles cintrées, et des coupoles
+    de béton préfabriqué en série (archives Safdie, McGill). Comptés depuis son pied ; les baies
+    et le pas des coupoles : CHOIX."""
+    haut = pied + REZ + (etages - 1) * ETAGE
+    volumes("Porat_Yosef", [(anneau, trous, pied - 1, haut)], "00_HarHabayit", MAT_MAISON())
+    vitres = []
+    anneau = _direct(anneau)
+    for p, q in zip(anneau, anneau[1:] + anneau[:1]):
+        longueur = math.dist(p, q)
+        bas = max(sol_naturel(*p), sol_naturel(*q))
+        for i in range(int(longueur / BAIE)):
+            s = (longueur - (int(longueur / BAIE) - 1) * BAIE) / 2 + i * BAIE
+            for e in range(etages):
+                seuil = pied + REZ + (e - 1) * ETAGE + 0.9 / AMA if e else pied + 1 / AMA
+                if seuil > bas and seuil + 2.4 / AMA < haut:
+                    vitres.append(_baie(q, p, longueur - s, seuil, 1.6 / AMA, 2.2 / AMA, 0.02 / AMA))
+    _poser("Porat_Yosef_baies", vitres, MAT_VITRE())
+    xs, ys = [x for x, _ in anneau], [y for _, y in anneau]
+    coupoles = [_coupole((x, y), haut, pas_des_coupoles * 0.4)
+                for x in plage(min(xs), max(xs), pas_des_coupoles) for y in plage(min(ys), max(ys), pas_des_coupoles)
+                if _dans((x, y), anneau) and _distance_a_l_anneau((x, y), anneau) > pas_des_coupoles * 0.5]
+    _poser("Porat_Yosef_coupoles", coupoles, MAT_BETON())
+
+
+def olivier(nom, x, y, col):
+    z = sol_naturel(x, y)
+    r = 1.6 + 1.4 * alea(nom, 1)
+    cyl(f"{nom}_tronc", x, y, z - 0.5, z + 1.6, 0.25, col, MAT_TRONC(), verts=6)
+    sphere(f"{nom}_houppier", x, y, z + 1.6 + r * 0.8, r, col, MAT_FEUILLAGE(), segs=8)
+
+
+def _cases_baties(tuiles, pas=10):
+    cases = set()
+    for pieces in tuiles.values():
+        for anneau, _, _, _ in pieces:
+            xs, ys = [x for x, _ in anneau], [y for _, y in anneau]
+            for i in range(math.floor(min(xs) / pas), math.floor(max(xs) / pas) + 1):
+                for j in range(math.floor(min(ys) / pas), math.floor(max(ys) / pas) + 1):
+                    cases.add((i, j))
+    return cases
+
+
+_nappe_du_pays()
+esplanade_herode()
+murs_herode()
+place_du_kotel()
+murailles()
+CASES_BATIES = _cases_baties(ville())
+# Les oliviers du mont des Oliviers et de la pente du Kidron, là où rien n'est bâti.
+for i in range(1300):
+    nom = f"Olivier_{i:04d}"
+    x, y = HX1 + 120 + 3000 * alea(nom, 5), -2400 + 4800 * alea(nom, 6)
+    if alea(nom, 0) > 0.7 or (math.floor(x / 10), math.floor(y / 10)) in CASES_BATIES:
+        continue
+    olivier(nom, x, y, PAYS)
+
 
 # ----------------------------------------------------------------------------
 # 75 — FIGURES

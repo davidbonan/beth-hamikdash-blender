@@ -40,7 +40,7 @@ export const SOLEIL = new THREE.Vector3(150, 58, 55).normalize();
 // gardait le contraste du premier plan : c'est cette perte de contraste, pas la teinte du
 // voile, qui sépare les plans d'une cour. `epaisseur` est la hauteur où l'air a perdu les
 // deux tiers de sa densité : vu d'en haut, le pied des portiques se voile plus que leur
-// faîte. `effacement` finit le travail avant que la caméra ne coupe à 900 m : un bord
+// faîte. `effacement` finit le travail avant que la caméra ne coupe à 6 km : un bord
 // tranché net sur le ciel se lirait en décor.
 //
 // Le voile n'a pas la même couleur des deux côtés du ciel. La brume diffuse vers l'avant :
@@ -48,7 +48,10 @@ export const SOLEIL = new THREE.Vector3(150, 58, 55).normalize();
 // le ciel qui la nourrit. Cet écart ne vaut que pour l'air proche et s'éteint au loin, où
 // le voile rejoint le dôme exactement : c'est ce qui fond l'horizon au lieu d'y tracer
 // une ligne.
-const AIR = { densite: 4e-3, epaisseur: 110, effacement: [620, 880],
+// `lointain` : passé `pres` mètres, l'épaisseur croît `lointain` fois moins vite. Réglée pour
+// les cours, la densité noyait tout au-delà de cinq cents mètres, la ville autour avec, et le
+// Heikhal vu de la place du Kotel, vingt-cinq mètres plus bas dans un air plus dense.
+const AIR = { densite: 4e-3, epaisseur: 110, effacement: [3800, 5600], pres: 150, lointain: 0.05,
               froid: [0.90, 0.94, 1.06], chaud: [1.20, 1.08, 0.92] };
 
 const VU = { haut: 0x4d7fb8, bas: 0xd8dcd4, sol: 0xa89c86, ambiance: 1.0,
@@ -153,7 +156,8 @@ export function brumer(scene) {
           // Moyenne de e^(-y/H) le long du rayon : (1 - e^-m)/m avec m = Δy/H, 1 - m/2 à plat.
           float m = rayon.y / ${AIR.epaisseur.toFixed(1)};
           float moyenne = abs(m) > 1e-3 ? (1.0 - exp(-m)) / m : 1.0 - 0.5 * m;
-          float epaisseur = fogDensity * exp(-cameraPosition.y / ${AIR.epaisseur.toFixed(1)}) * longueur * moyenne;
+          float traversee = min(longueur, ${AIR.pres.toFixed(1)}) + max(longueur - ${AIR.pres.toFixed(1)}, 0.0) * ${AIR.lointain.toFixed(3)};
+          float epaisseur = fogDensity * exp(-cameraPosition.y / ${AIR.epaisseur.toFixed(1)}) * traversee * moyenne;
           float transmis = exp(-epaisseur)
             * (1.0 - smoothstep(${AIR.effacement[0].toFixed(1)}, ${AIR.effacement[1].toFixed(1)}, longueur));
           float versSoleil = dot(d, ${litteral(SOLEIL.toArray())});
