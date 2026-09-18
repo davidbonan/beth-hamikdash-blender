@@ -1457,7 +1457,12 @@
     "beit_hatevila": {
       "carte": "lumiere/beit_hatevila.webp",
       "canal": 0,
-      "echelle": 4.75
+      "echelle": 4.5
+    },
+    "candelabres_shoeva": {
+      "carte": "lumiere/candelabres_shoeva.webp",
+      "canal": 0,
+      "echelle": 2.0
     },
     "doukhan": {
       "carte": "lumiere/doukhan.webp",
@@ -1478,6 +1483,16 @@
       "carte": "lumiere/ezrat_nashim.webp",
       "canal": 0,
       "echelle": 2.0
+    },
+    "gefen_zahav": {
+      "carte": "lumiere/gefen_zahav.webp",
+      "canal": 0,
+      "echelle": 0.25
+    },
+    "gezuztra": {
+      "carte": "lumiere/gezuztra.webp",
+      "canal": 1,
+      "echelle": 2.25
     },
     "heikhal": {
       "carte": "lumiere/heikhal.webp",
@@ -1564,10 +1579,25 @@
       "canal": 1,
       "echelle": 1.75
     },
+    "lishkat_pinchas": {
+      "carte": "lumiere/lishkat_pinchas.webp",
+      "canal": 1,
+      "echelle": 2.0
+    },
     "maake": {
       "carte": "lumiere/maake.webp",
       "canal": 0,
       "echelle": 3.25
+    },
+    "maarakhot": {
+      "carte": "lumiere/maarakhot.webp",
+      "canal": 0,
+      "echelle": 9.25
+    },
+    "mekhonot": {
+      "carte": "lumiere/mekhonot.webp",
+      "canal": 0,
+      "echelle": 1.25
     },
     "mesiba": {
       "carte": "lumiere/mesiba.webp",
@@ -1613,6 +1643,11 @@
       "carte": "lumiere/portes_azara.webp",
       "canal": 1,
       "echelle": 1.75
+    },
+    "portes_heikhal": {
+      "carte": "lumiere/portes_heikhal.webp",
+      "canal": 1,
+      "echelle": 0.25
     },
     "portes_houlda": {
       "carte": "lumiere/portes_houlda.webp",
@@ -1664,10 +1699,25 @@
       "canal": 0,
       "echelle": 1.25
     },
+    "soreg": {
+      "carte": "lumiere/soreg.webp",
+      "canal": 0,
+      "echelle": 1.5
+    },
     "taim": {
       "carte": "lumiere/taim.webp",
       "canal": 0,
       "echelle": 1.25
+    },
+    "yakhin_boaz": {
+      "carte": "lumiere/yakhin_boaz.webp",
+      "canal": 0,
+      "echelle": 0.25
+    },
+    "yam": {
+      "carte": "lumiere/yam.webp",
+      "canal": 0,
+      "echelle": 1.75
     },
     "yessod": {
       "carte": "lumiere/yessod.webp",

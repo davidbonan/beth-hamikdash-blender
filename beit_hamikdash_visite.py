@@ -257,7 +257,10 @@ def livrer(chantier):
         shutil.move(carte, destination)
     shutil.move(chantier / "temple.glb", DOSSIER / "temple.glb")
     shutil.move(chantier / "reperes.json", DOSSIER / "reperes.json")
+    # Une nature que la cuisson n'a pas ouverte n'a rien recuit — `--sans-occlusion` garde donc ses cartes.
     for nature in ("occlusion", "lumiere"):
+        if not (chantier / nature).is_dir():
+            continue
         for ancienne in (DOSSIER / nature).glob("*.webp"):
             if f"{nature}/{ancienne.name}" not in cartes:
                 ancienne.unlink()

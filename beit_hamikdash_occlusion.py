@@ -25,7 +25,8 @@ PORTEE = 8.0
 PORTEE_SOUS_SONDE = 3.0
 SOUS_SONDE = {"heikhal", "parokhet"}
 # Sa pénombre (matieres.js) suffit ; cuites, ses parois s'assombriraient et pas les plaques de sculptures_murs.
-EXCLUS = {"kodesh_hakodashim"}
+# Celles-ci sont à cheval sur le Heikhal et le KhK : une seule carte pour les deux les mettrait en désaccord.
+EXCLUS = {"kodesh_hakodashim", "sculptures_murs"}
 # Deux faces collées se disputent la profondeur : la cachée cuit noire et perce, mouchetée, sur les GPU mobiles.
 COLLEE = 0.01
 PARALLELE = 0.99
@@ -62,15 +63,17 @@ def aire(obj):
     return sum(p.area for p in obj.data.polygons) * abs(echelle.x * echelle.y * echelle.z) ** (2 / 3)
 
 
-def taille_de(surface):
-    voulue = 2 ** math.ceil(math.log2(max(math.sqrt(surface) / TEXEL, 1)))
+# Le texel de 20 cm dit la taille ; un concept fin la relève jusqu'à tenir ses TEXELS_PAR_FACE_MIN, et n'est écarté que si le plafond n'y suffit plus.
+def taille_de(surface, faces):
+    pour_faces = math.sqrt(faces * TEXELS_PAR_FACE_MIN)
+    voulue = 2 ** math.ceil(math.log2(max(math.sqrt(surface) / TEXEL, pour_faces, 1)))
     return min(max(voulue, TAILLE[0]), TAILLE[1])
 
 
 def retenus(fusionnes):
     for ident, obj in sorted(fusionnes.items()):
         surface = aire(obj)
-        taille = taille_de(surface)
+        taille = taille_de(surface, obj["faces_sans_chanfrein"])
         if ident in EXCLUS or surface < AIRE_MIN:
             continue
         # Compté sans chanfrein : il multiplie les faces sans rendre l'objet plus fin.
