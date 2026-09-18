@@ -1,4 +1,5 @@
 // L'œil qui s'habitue : la lumière cuite est physique, l'exposition monte donc à mesure que le ciel se ferme autour de lui.
+// La fermeture qu'il mesure sert aussi à l'air de ciel.js, qui n'a rien à rendre là où le ciel ne se voit plus.
 import * as THREE from "three";
 
 const DIRECTIONS = 48;
@@ -24,6 +25,7 @@ export function adaptation(obstacles) {
   const ouverts = new Uint8Array(DIRECTIONS).fill(1);
   let suivante = 0;
   let facteur = 1;
+  let fermeture = 0;
 
   function ouvertureEn(oeil) {
     for (let n = 0; n < RAYONS_PAR_IMAGE; n++, suivante = (suivante + 1) % DIRECTIONS) {
@@ -40,10 +42,13 @@ export function adaptation(obstacles) {
 
   return {
     get facteur() { return facteur; },
-    accorder(oeil, dt) {
-      const fermeture = 1 - THREE.MathUtils.smoothstep(ouvertureEn(oeil), OUVERTURE_FERMEE, OUVERTURE_DEHORS);
-      return tendreVers(ADAPTATION_MAX ** fermeture, dt);
+    // 0 à ciel ouvert, 1 sous un toit : relevée à chaque image, quoi que l'exposition en fasse ensuite.
+    get fermeture() { return fermeture; },
+    mesurer(oeil) {
+      fermeture = 1 - THREE.MathUtils.smoothstep(ouvertureEn(oeil), OUVERTURE_FERMEE, OUVERTURE_DEHORS);
+      return fermeture;
     },
+    accorder: (dt) => tendreVers(ADAPTATION_MAX ** fermeture, dt),
     relacher: (dt) => tendreVers(1, dt),
   };
 }

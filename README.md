@@ -212,10 +212,14 @@ il s'éteint à mesure que l'air s'épaissit, pour que le lointain retombe sur l
 Les chunks `fog_*` de three sont remplacés à la source : pierre, or, étoffes et figurants
 passent par le même air, et la sonde du Heikhal l'éteint toujours en coupant `scene.fog`.
 Le rayon s'y tire de la position vue, que toute matière écrit, skinnée ou non. Sous un
-toit ou sous terre — Oulam, Heikhal, Kodesh HaKodashim, ta'im, aliyah, mesiba, mesiba
-sous la bira, Beit HaTevila — la densité descend à zéro, au rythme de la lampe de tête :
-cet air-là ne voit pas le ciel. Laissé à 0,004, il posait au fond de la mesiba un voile
-bleu-gris sur la roche noire, et grisait l'ombre du Heikhal vue depuis l'Oulam.
+toit ou sous terre, la densité descend à zéro : cet air-là ne voit pas le ciel. Laissé à
+0,004, il posait au fond de la mesiba un voile bleu-gris sur la roche noire, et grisait
+l'ombre du Heikhal vue depuis l'Oulam. Elle suit **l'ouverture au ciel que l'œil mesure
+déjà** (`adaptation.js`), et non une liste de concepts écrite à la main : cette liste-là
+avait oublié les lishkot couvertes, et le voile y couvrait le cèdre du lambris — mesuré
+dans la Lishkat HaGazit, un panneau rendait 14/17/23 en sRGB, bleu, contre 4/3/2, brun,
+l'air éteint. Une salle se ferme donc quand son ciel se ferme, et un portique n'en perd
+que ce qu'il en cache.
 
 L'environnement que le métal réfléchissait n'avait **pas de soleil** : un dégradé à trois
 couleurs, sans disque et sans horizon franc. Un métal dont le reflet ne contient aucune

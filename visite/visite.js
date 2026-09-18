@@ -148,10 +148,7 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const brume = brumer(scene);
-// L'air d'une salle couverte ou d'un souterrain ne voit pas le ciel : il n'en rend rien.
 const AIR_DEHORS = brume.density;
-const SANS_CIEL = new Set(["oulam", "heikhal", "kodesh_hakodashim", "taim", "aliyah", "mesiba",
-                           "mesiba_bira", "beit_hatevila"]);
 
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
@@ -995,11 +992,13 @@ function accorderLampe(lieu) {
 // Le Heikhal et le Kodesh HaKodashim s'éclairent à leurs lampes, réglées sans adaptation.
 const SANS_ADAPTATION = new Set(["heikhal", "kodesh_hakodashim"]);
 function accorderExposition(dt) {
-  const facteur = SANS_ADAPTATION.has(lieuPresent) ? oeilAdapte.relacher(dt) : oeilAdapte.accorder(camera.position, dt);
+  oeilAdapte.mesurer(camera.position);
+  const facteur = SANS_ADAPTATION.has(lieuPresent) ? oeilAdapte.relacher(dt) : oeilAdapte.accorder(dt);
   renderer.toneMappingExposure = EXPOSITION.value = EXPOSITION_DEHORS * facteur;
 }
-function accorderAir(lieu) {
-  brume.density += ((SANS_CIEL.has(lieu) ? 0 : AIR_DEHORS) - brume.density) * 0.25;
+// L'air ne rend que le ciel : sous un toit il n'a rien à rendre, et son voile couvrait le cèdre des lishkot.
+function accorderAir() {
+  brume.density += (AIR_DEHORS * (1 - oeilAdapte.fermeture) - brume.density) * 0.25;
 }
 
 let film = null;
@@ -1011,7 +1010,7 @@ renderer.setAnimationLoop(() => {
     if (++image % 4 === 0) {
       lieuPresent = lieuOccupe();
       accorderLampe(lieuPresent);
-      accorderAir(lieuPresent);
+      accorderAir();
     }
     accorderExposition(dt);
     ajusterEchelle(dt);
@@ -1042,7 +1041,7 @@ renderer.setAnimationLoop(() => {
     }
     lieuPresent = lieuOccupe();
     accorderLampe(lieuPresent);
-    accorderAir(lieuPresent);
+    accorderAir();
     position.textContent = brut
       ? `${(camera.position.x / AMA).toFixed(0)} · ` +
         `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
