@@ -97,7 +97,7 @@ const CARREAU = {
   4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
   7: [1.4, 0.75, 0.35, 0.90, 0.50], 8: [1.4, 0.50, 0.35, 0.90, 0.50],
   // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
-  9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.0, 0.34, 0.28, 1.05, 0.58],
+  9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.4, 0.28, 0.28, 1.20, 0.65],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
@@ -262,6 +262,9 @@ const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 // Creux du joint, en mètres : 0,62 de la course de profil sur 2 cm, soit des
 // versants à une trentaine de degrés — une rainure sciée, pas une gorge.
 const float CREUX_M = 0.020;
+// Part de la coulure qu'un parement garde : la muraille et la ville entière, le Temple lavé la moitié. COULURE_EXPOSEE du blockout.
+const float COULURE_EXPOSEE = 0.16;
+float exposition(){ return uFamille == 11 || uFamille == 14 ? 1.0 : 0.5; }
 
 // Ce que le feu laisse sur la chaux du Mizbea'h, en écart multiplicatif sur elle. La
 // suie est du CARBONE : elle n'a pas de couleur, et le blockout la peint chaude —
@@ -475,7 +478,7 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   // lit en défaut de matière ; une coulure se lit en pierre. Et une moucheture par-
   // dessus : le banc donne au bloc SA couleur, mais un bloc d'une seule couleur est un
   // échantillon de nuancier — le calcaire est nué à l'intérieur de chaque pierre.
-  float coulure = 0.16 * smoothstep(0.52, 0.88, grain(vec3(P.x, P.y / 12.0, P.z) / (3.0 * AMA), empreinteMax() / (3.0 * AMA)));
+  float coulure = COULURE_EXPOSEE * exposition() * smoothstep(0.52, 0.88, grain(vec3(P.x, P.y / 12.0, P.z) / (3.0 * AMA), empreinteMax() / (3.0 * AMA)));
   // La moucheture DÉVIE autour d'une moyenne fixe : d'un bloc au suivant c'est son
   // motif qui change, jamais sa valeur. La teinte est l'affaire du banc, et cinq
   // finitions qui s'éclairciraient l'une l'autre rendraient cinq calcaires.
@@ -803,10 +806,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo = 0.06 + suie * 0.16 + cendre * 0.10;
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
-  if (uFamille == 11 || uFamille == 14) { patiner(P, N, 1.0, teinte, rugo); }
-  else if (uFamille == 1 || uFamille == 10) {
-    patiner(P, N, 0.5, teinte, rugo);
-  }
+  if (uFamille == 1 || uFamille == 10 || uFamille == 11 || uFamille == 14) patiner(P, N, exposition(), teinte, rugo);
 #ifdef GRAVURE
   // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
   // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y

@@ -1146,11 +1146,10 @@
     {
       "id": "face_porte_est",
       "nom": "Face à la porte orientale",
-      "cadre": [
-        "porte_est_ezrat_nashim"
-      ],
+      "cap": 180,
+      "tangage": 16,
       "position": [
-        79.2,
+        84.47999999999999,
         -7.68,
         -0.0
       ]
@@ -1181,25 +1180,24 @@
     {
       "id": "azara",
       "nom": "Ezrat Israël",
-      "cadre": [
-        "oulam"
-      ],
+      "cap": 190,
+      "tangage": 12,
       "position": [
-        -6.72,
+        -5.52,
         0.0,
-        -0.0
+        -15.0
       ]
     },
     {
       "id": "mizbeach",
       "nom": "Devant le Mizbea'h",
-      "cadre": [
-        "mizbeach",
-        "kevesh"
-      ],
-      "cap": 135,
-      "sol": 0.0,
-      "recul_max": 28.799999999999997
+      "cap": 130,
+      "tangage": 3,
+      "position": [
+        -7.68,
+        0.0,
+        16.991999999999997
+      ]
     },
     {
       "id": "kiyor",
@@ -1273,15 +1271,26 @@
       "recul_max": 144.0
     },
     {
+      "id": "vue_sol_har_habayit",
+      "cap": 131,
+      "tangage": -23.5,
+      "vol": true,
+      "position": [
+        90.0,
+        78.432,
+        140.016
+      ]
+    },
+    {
       "id": "vue_heikhal",
       "cadre": [
-        "parokhet"
+        "menora",
+        "shulchan",
+        "mizbeach_hazahav"
       ],
-      "position": [
-        -47.519999999999996,
-        2.88,
-        -0.0
-      ]
+      "cap": 180,
+      "sol": 2.88,
+      "recul_max": 11.52
     },
     {
       "id": "vue_kiyor",
@@ -1305,23 +1314,32 @@
     },
     {
       "id": "vue_mizbeach",
-      "cadre": [
-        "mizbeach",
-        "kevesh"
-      ],
-      "cap": 135,
-      "sol": 0.0,
-      "recul_max": 28.799999999999997
+      "cap": 130,
+      "tangage": 3,
+      "position": [
+        -7.68,
+        0.0,
+        16.991999999999997
+      ]
     },
     {
       "id": "vue_oulam",
-      "cadre": [
-        "oulam"
-      ],
+      "cap": 205,
+      "tangage": 20,
       "position": [
-        -4.8,
+        -21.983999999999998,
         0.0,
-        -8.16
+        -12.0
+      ]
+    },
+    {
+      "id": "vue_douze_marches_oulam",
+      "cap": 219,
+      "tangage": 2,
+      "position": [
+        -21.983999999999998,
+        0.0,
+        -9.0
       ]
     },
     {
@@ -1333,6 +1351,210 @@
       "cap": 180,
       "sol": -4.8,
       "recul_max": 19.2
+    },
+    {
+      "id": "vue_lishkat_haetzim",
+      "cap": 90,
+      "tangage": -6,
+      "position": [
+        57.599999999999994,
+        -4.8,
+        -14.783999999999999
+      ]
+    },
+    {
+      "id": "vue_lishkat_hanezirim",
+      "cap": 270,
+      "tangage": -6,
+      "position": [
+        57.599999999999994,
+        -4.8,
+        14.783999999999999
+      ]
+    },
+    {
+      "id": "vue_lishkat_hametzoraim",
+      "cap": 90,
+      "tangage": -6,
+      "position": [
+        12.0,
+        -4.8,
+        -14.783999999999999
+      ]
+    },
+    {
+      "id": "vue_lishkat_beit_shemanya",
+      "cap": 270,
+      "tangage": -6,
+      "position": [
+        12.0,
+        -4.8,
+        14.783999999999999
+      ]
+    },
+    {
+      "id": "vue_taim",
+      "cap": 180,
+      "position": [
+        -55.68,
+        2.88,
+        -9.12
+      ]
+    },
+    {
+      "id": "vue_mesiba",
+      "cap": 180,
+      "tangage": 5,
+      "position": [
+        -48.48,
+        2.88,
+        -13.68
+      ]
+    },
+    {
+      "id": "vue_aliyah",
+      "cap": 0,
+      "position": [
+        -78.0,
+        22.08,
+        -0.0
+      ]
+    },
+    {
+      "id": "vue_lishkat_hagazit",
+      "cap": 90,
+      "position": [
+        -70.992,
+        0.0,
+        -28.32
+      ]
+    },
+    {
+      "id": "vue_lishkat_hagola",
+      "cap": 0,
+      "tangage": -5,
+      "position": [
+        -86.01599999999999,
+        0.0,
+        -37.199999999999996
+      ]
+    },
+    {
+      "id": "vue_lishkat_haetz",
+      "cap": 0,
+      "tangage": 3,
+      "position": [
+        -85.584,
+        -4.8,
+        -45.407999999999994
+      ]
+    },
+    {
+      "id": "vue_lishkat_hamelach",
+      "cap": 0,
+      "position": [
+        -20.496000000000002,
+        0.0,
+        30.383999999999997
+      ]
+    },
+    {
+      "id": "vue_lishkat_haparva",
+      "cap": 270,
+      "tangage": -10,
+      "position": [
+        -39.888,
+        0.0,
+        27.599999999999998
+      ]
+    },
+    {
+      "id": "vue_lishkat_hamedichin",
+      "cap": 270,
+      "tangage": -10,
+      "position": [
+        -50.112,
+        0.0,
+        27.599999999999998
+      ]
+    },
+    {
+      "id": "vue_lishkat_parhedrin",
+      "cap": 270,
+      "position": [
+        -16.08,
+        -4.8,
+        36.0
+      ]
+    },
+    {
+      "id": "vue_lishkat_osei_chavitin",
+      "cap": 0,
+      "tangage": 12,
+      "position": [
+        -9.984,
+        0.0,
+        6.0
+      ]
+    },
+    {
+      "id": "vue_beit_hamoked",
+      "cap": 90,
+      "position": [
+        -5.808,
+        0.0,
+        -28.2
+      ]
+    },
+    {
+      "id": "vue_shaar_hamayim",
+      "cap": 270,
+      "tangage": -8,
+      "position": [
+        -5.808,
+        0.0,
+        29.52
+      ]
+    },
+    {
+      "id": "vue_shaar_hanitzotz",
+      "cap": 90,
+      "tangage": -8,
+      "position": [
+        -58.32,
+        0.0,
+        -31.487999999999996
+      ]
+    },
+    {
+      "id": "vue_beit_avtinas",
+      "cap": 270,
+      "tangage": 20,
+      "position": [
+        -5.808,
+        0.0,
+        15.983999999999998
+      ]
+    },
+    {
+      "id": "vue_beit_hanitzotz",
+      "cap": 97,
+      "tangage": 20,
+      "position": [
+        -55.007999999999996,
+        0.0,
+        -20.016000000000002
+      ]
+    },
+    {
+      "id": "vue_shaar_tadi",
+      "cap": 90,
+      "tangage": 8,
+      "position": [
+        -48.0,
+        -7.68,
+        -75.98400000000001
+      ]
     },
     {
       "id": "vue_mesiba_bira",

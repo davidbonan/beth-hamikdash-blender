@@ -23,6 +23,7 @@ import bpy
 import json
 import math
 import pathlib
+import re
 import sys
 import zlib
 from typing import NamedTuple
@@ -243,6 +244,9 @@ class Appareil(NamedTuple):
     debord: float
     joint: float
     lisere: float
+
+
+APPAREIL_GAZIT = Appareil(ASSISE, PIERRE_LONG, DEBORD_ASSISE, JOINT, LISERE)
 
 
 class Bloc(NamedTuple):
@@ -504,7 +508,7 @@ BANCS_CALCAIRE = ((0.86, 0.87, 0.88), (0.94, 0.94, 0.93),
 COULURE_ENTRETENUE, COULURE_EXPOSEE = 0.08, 0.16
 
 
-def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
+def pierre(name, rgb, appareil=APPAREIL_GAZIT):
     """Calcaire en assises de blocs sciés.
 
     Trois échelles de teinte, et il en faut trois. **Le bloc** d'abord : il tire son
@@ -521,7 +525,6 @@ def pierre(name, rgb, assise=ASSISE, longueurs=PIERRE_LONG):
         return mat
     liens = mat.node_tree.links
     _bsdf(mat).inputs["Roughness"].default_value = 0.78
-    appareil = Appareil(assise, longueurs, DEBORD_ASSISE, JOINT, LISERE)
     parite, _, bloc, fini, creux, champ = _tailler(mat, appareil)
     # Le grain reste dans le champ de la pierre et s'arrête au liseré, qui est ciselé.
     _creuser(mat, _calc(mat, "MULTIPLY", _grain(mat, 0.45), champ), 0.8, 0.035)
@@ -1307,13 +1310,14 @@ MAT_TERRE = lambda: terre("Terre_Jerusalem")
 # La ville, deux tons sous le Temple, et son appareil est domestique : le gazit de
 # huit à dix amot (Melakhim I 7:10) est celui de la maison du Roi et du Bayit, pas
 # celui d'une maison de Jérusalem. Assise et bloc au moellon.
-MAT_MAISON = lambda: _voiler(_exposer(pierre("Maisons", (0.64, 0.55, 0.40), 0.8, (1.5, 2.5))))
+MAT_MAISON = lambda: _voiler(_exposer(pierre("Maisons", (0.64, 0.55, 0.40),
+                                              Appareil(0.8, (1.5, 2.5), DEBORD_ASSISE, JOINT, LISERE))))
 # Les colonnes des portiques : un tambour est UNE pierre, et n'a donc pas de joint
 # vertical. Une longueur de bloc énorme les supprime ; il ne reste que le lit d'un
 # tambour à l'autre. Sur un cylindre, le joint vertical était pire qu'inutile : la face
 # choisit son axe sur la normale (`_parement`), qui bascule quatre fois autour du fût,
 # et la trame sautait quatre fois par colonne.
-MAT_COLONNE = lambda: pierre("Pierre_colonne", CALCAIRE, 1.4, (1e4, 1e4))
+MAT_COLONNE = lambda: pierre("Pierre_colonne", CALCAIRE, Appareil(1.4, (1e4, 1e4), 0.0, JOINT, LISERE))
 MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)))
 MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
 MAT_EAU = lambda: eau("Eau_Kiyor")
@@ -6431,6 +6435,56 @@ if FOULE:
                 if alea(nom, 4) < 0.12:
                     continue
                 figurant(nom, x, -242.5 + cote * dy, Z_HAR, FL, TENUES_AM, desordre=1.2)
+
+# ----------------------------------------------------------------------------
+# DESSUS FOULÉS
+#   Ce qu'on foule est le dallage de la cour, ce qui se tient debout un parement — marche ou dalle.
+# ----------------------------------------------------------------------------
+FOULES = re.compile(r"Heil_(terrasse|marche)_.+|Marche_.+|Doukhan_\d+|Menora_marche_\d+"
+                    r"|Gezuztra_(nord|sud)|Escalier_.+|.+_escalier_\d+|.+_mesiba_\d+"
+                    r"|Mesiba_bira_vis_\d+|Beit_HaTevila_(montee|mikve_marches)_\d+"
+                    r"|Lishkat_Metzoraim_NO_marche_\d+|Lishkat_HaGazit_estrade_.+"
+                    r"|Shaar(HaMayim|HaNitzotz)_terrasse(_.+)?")
+
+
+def _emplacement(me, mat):
+    k = me.materials.find(mat.name)
+    if k < 0:
+        me.materials.append(mat)
+        k = len(me.materials) - 1
+    return k
+
+
+def _dessus(face):
+    return face.normal.z > 0.7
+
+
+def daller_le_dessus(me):
+    parement = me.materials.find("Pierre_claire")
+    if parement < 0:
+        return
+    dallage = _emplacement(me, MAT_SOL())
+    for face in me.polygons:
+        if face.material_index == parement and _dessus(face):
+            face.material_index = dallage
+
+
+def parer_les_flancs(me):
+    dallage = me.materials.find("Sol")
+    if dallage < 0:
+        return
+    parement = _emplacement(me, MAT_PIERRE())
+    for face in me.polygons:
+        if face.material_index == dallage and not _dessus(face):
+            face.material_index = parement
+
+
+for o in bpy.data.objects:
+    if o.type != 'MESH':
+        continue
+    if FOULES.fullmatch(o.name):
+        daller_le_dessus(o.data)
+    parer_les_flancs(o.data)
 
 # ----------------------------------------------------------------------------
 # BISEAU
