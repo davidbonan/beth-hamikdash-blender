@@ -65,7 +65,9 @@ ESQUISSE = "The second image is the approved design sketch: carve the figure in 
 # Le relief d'une tuile taillée : la silhouette bombe sur RONDEUR (en part de la hauteur)
 # depuis son bord, et la luminance, floutée de GRAIN pour ôter le grain du modèle, y
 # ajoute le modelé pour PART_MODELE du tout. Un fond plus noir que SEUIL_FOND est le mur.
-RONDEUR, GRAIN, PART_MODELE, SEUIL_FOND = 0.05, 0.004, 0.5, 0.02
+# GRAIN est au pixel près : un sillon de la taille en fait trois, et floutés de quatre les
+# mains du keruv, ses deux profils et les pennes de sa gaine sortaient en plis sans dessin.
+RONDEUR, GRAIN, PART_MODELE, SEUIL_FOND = 0.05, 0.0015, 0.5, 0.02
 # Le cadre d'une figure debout : un peu plus large qu'elle, du dessous du pied au
 # dessus de la tête, pour que le fondu du bord n'atteigne jamais la tuile voisine.
 CADRE_DEBOUT = (-0.6, -0.1, 0.6, 1.1)
@@ -280,13 +282,18 @@ def relief_taille(nom):
     luminance, masque = cadrer(luminance, figure(luminance > SEUIL_FOND), cadre, TUILE_PX)
     echelle = TUILE_PX / (cadre[2] - cadre[0])
     rayon = max(1, int(round(RONDEUR * echelle)))
-    volume = bombe(distance(masque, rayon) / rayon)
+    dedans = distance(masque, rayon)
+    volume = bombe(dedans / rayon)
     modele = flouter(luminance, max(1, int(round(GRAIN * echelle))))
     # Centiles, pas extrêmes : quelques pixels du bord ou d'un reflet écrasaient tout le modelé.
     bas, haut = np.percentile(modele[masque], (1, 99))
     modele = np.clip((modele - bas) / (haut - bas), 0.0, 1.0)
+    # Le bord se fond parce que le modelé y descend, non parce que la carte entière est floutée :
+    # le bombé y tombe déjà de lui-même, et le flou effaçait tout le modelé pour ce seul ourlet.
+    fondu = max(1, int(round(FONDU * echelle)))
+    modele *= np.clip(dedans / fondu, 0.0, 1.0)
     relief = np.where(masque, (1.0 - PART_MODELE) * volume + PART_MODELE * modele, 0.0)
-    return flouter(relief, max(1, int(round(FONDU * echelle)))).astype(np.float32), masque
+    return flouter(relief, 1).astype(np.float32), masque
 
 
 def graver():
