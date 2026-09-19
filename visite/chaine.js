@@ -381,6 +381,8 @@ const PHOTOMETRIE = new THREE.ShaderMaterial({
     }`,
 });
 
+// La grille se relit quand le GPU l'a finie, pas sur-le-champ : une lecture immédiate l'attendait
+// toutes les six images, et sur iPhone cette attente se voyait en à-coups.
 class Photometre extends Pass {
   constructor() {
     super();
@@ -390,14 +392,35 @@ class Photometre extends Pass {
     this.quad = new FullScreenQuad(PHOTOMETRIE);
     this.images = 0;
     this.luminance = null;
+    this.tampon = null;
+    this.lecture = null;
   }
 
   render(renderer, writeBuffer, readBuffer) {
-    if (this.images++ % RELUE_TOUTES) return;
+    const gl = renderer.getContext();
+    if (this.lecture) this.relever(gl);
+    if (this.images++ % RELUE_TOUTES || this.lecture) return;
     PHOTOMETRIE.uniforms.tDiffuse.value = readBuffer.texture;
     renderer.setRenderTarget(this.cible);
     this.quad.render(renderer);
-    renderer.readRenderTargetPixels(this.cible, 0, 0, GRILLE, GRILLE, this.cases);
+    if (!this.tampon) {
+      this.tampon = gl.createBuffer();
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, this.tampon);
+      gl.bufferData(gl.PIXEL_PACK_BUFFER, this.cases.byteLength, gl.STREAM_READ);
+    }
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, this.tampon);
+    gl.readPixels(0, 0, GRILLE, GRILLE, gl.RGBA, gl.FLOAT, 0);
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+    this.lecture = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+  }
+
+  relever(gl) {
+    if (gl.clientWaitSync(this.lecture, 0, 0) === gl.TIMEOUT_EXPIRED) return;
+    gl.deleteSync(this.lecture);
+    this.lecture = null;
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, this.tampon);
+    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, this.cases);
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     let somme = 0;
     for (let i = 0; i < this.cases.length; i += 4) somme += this.cases[i];
     this.luminance = Math.exp(somme / (GRILLE * GRILLE));
@@ -511,5 +534,13 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     composeur.render();
   }
 
-  return { rendre, redimensionner, enfumer, get luminance() { return photometre.luminance; } };
+  // Compilés hors cible, les nuanceurs prendraient le tonemapping de l'écran : la scène se rend dans le composeur, sans lui.
+  function compiler(objets = scene) {
+    renderer.setRenderTarget(composeur.readBuffer);
+    const prets = renderer.compileAsync(objets, camera, scene);
+    renderer.setRenderTarget(null);
+    return prets;
+  }
+
+  return { rendre, redimensionner, enfumer, compiler, get luminance() { return photometre.luminance; } };
 }

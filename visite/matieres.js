@@ -141,7 +141,6 @@ const CHARBON = 0x6e6660, ORGE = 0xff5a12;
 const COMMUN = /* glsl */`
 varying vec3 vMonde;
 varying vec3 vNMonde;
-uniform int uFamille;
 uniform float uTemps;
 uniform vec3 uPenombreMin, uPenombreMax;
 varying float vPixel;
@@ -281,7 +280,7 @@ const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 const float CREUX_M = 0.020;
 // Part de la coulure qu'un parement garde : la muraille et la ville entière, le Temple lavé la moitié. COULURE_EXPOSEE du blockout.
 const float COULURE_EXPOSEE = 0.16;
-float exposition(){ return uFamille == 11 || uFamille == 14 || uFamille >= 19 ? 1.0 : 0.5; }
+float exposition(){ return FAMILLE == 11 || FAMILLE == 14 || FAMILLE >= 19 ? 1.0 : 0.5; }
 // Le Kotel au-dessus de sa place : Hérode, les Omeyyades, puis les petites assises, chaque
 // bande calée sur son premier lit. Mêmes valeurs que APPAREILS_KOTEL du blockout, en amot.
 const float Z_PLACE_KOTEL = -51.5833, Z_KOTEL_OMEYYADE = -35.5417, Z_KOTEL_MAMELOUK = -28.875;
@@ -691,7 +690,7 @@ float arete(vec3 P, vec2 coin, float pixel){
 void sang(vec3 P, vec3 N, inout vec3 teinte, inout float rugo){
   float pixel = empreinteMax(), debout = 1.0 - abs(N.y);
   float tache = 0.0;
-  if (uFamille == 18) {
+  if (FAMILLE == 18) {
     tache = max(zeriqa(P, ZERIQA_NE, pixel), zeriqa(P, ZERIQA_SO, pixel)) * debout;
     // Les shirayim, versés sur le yessod ouest et sud, gagnent les deux « חֳטָמִין » du coin sud-ouest (Middot 3:2).
     float versant = length(P.xz - YESSOD_SO) / AMA + (grainOblique(P * 1.6 + 9.0, pixel * 1.6) - 0.5) * 3.0;
@@ -728,10 +727,10 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   // pixel se moyenne toute seule ; une normale, non — elle bascule d'un pixel au
   // suivant et la façade se met à grésiller de blocs noirs et blancs.
   float finesse = 1.0 - smoothstep(16.0, 65.0, loin);
-  if (uFamille == 1 || uFamille == 14) {   // le pourtour, et la muraille des 500 amot
+  if (FAMILLE == 1 || FAMILLE == 14) {   // le pourtour, et la muraille des 500 amot
     appareil(P, N, Appareil(ASSISE, 8.0, 10.0, DEBORD, JOINT, LISERE), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 13) {          // le dallage des cours : rangées, et lustre
+  else if (FAMILLE == 13) {          // le dallage des cours : rangées, et lustre
     float usure;
     dalles(P, teinte, pente, rugo, usure, photo);
     // Une dalle passée est plus sombre ET plus lisse. C'est ce lustre, et non la
@@ -739,33 +738,33 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
     rugo -= usure * 0.18;
   }
-  else if (uFamille == 19) {
+  else if (FAMILLE == 19) {
     appareil(P - vec3(0.0, Z_PLACE_KOTEL * AMA, 0.0), N, Appareil(2.2917, 2.0, 6.0, DEBORD, 0.02, 0.3), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 20) {
+  else if (FAMILLE == 20) {
     appareil(P - vec3(0.0, Z_KOTEL_OMEYYADE * AMA, 0.0), N, Appareil(1.6667, 1.5, 2.5, DEBORD, JOINT, 0.0), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 21) {
+  else if (FAMILLE == 21) {
     appareil(P - vec3(0.0, Z_KOTEL_MAMELOUK * AMA, 0.0), N, Appareil(0.9926, 1.0, 1.6, DEBORD, JOINT, 0.0), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 11) {          // la ville : de la pierre de pays, pas du gazit
+  else if (FAMILLE == 11) {          // la ville : de la pierre de pays, pas du gazit
     appareil(P, N, Appareil(0.8, 1.5, 2.5, DEBORD, JOINT, LISERE), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 10) {          // tambour de colonne : pas de joint vertical
+  else if (FAMILLE == 10) {          // tambour de colonne : pas de joint vertical
     // Sur un cylindre le joint vertical était pire qu'inutile : la face choisit son axe
     // sur la normale, qui bascule quatre fois autour du fût, et la trame sautait quatre
     // fois par colonne.
     appareil(P, N, Appareil(1.4, 1.0e4, 1.0e4, 0.0, JOINT, LISERE), teinte, pente, rugo, photo);
   }
-  else if (uFamille == 9) {           // le bâtiment : trois marbres, polis et veinés
+  else if (FAMILLE == 9) {           // le bâtiment : trois marbres, polis et veinés
     marbreHerode(P, N, teinte, pente, rugo, photo);
   }
-  else if (uFamille == 2) {                                   // marbre : veines lentes
+  else if (FAMILLE == 2) {                                   // marbre : veines lentes
     float v = grain(P * vec3(2.2, 5.0, 2.2) + grain(P * 1.1) * 2.0, empreinteMax() * 5.0);
     teinte = vec3(1.0 + (v - 0.5) * 0.13);
     rugo = (v - 0.5) * 0.06;
   }
-  else if (uFamille == 3 || uFamille == 17) {                // métal battu au marteau
+  else if (FAMILLE == 3 || FAMILLE == 17) {                // métal battu au marteau
     // La nappe apporte le terni et les éraflures, pas les creux : une tôle laminée n'en
     // a pas. Or l'or du Heikhal est BATTU, et un creux de marteau ne se voit qu'au
     // reflet — c'est là, et jamais dans la teinte, que se joue le métal.
@@ -779,18 +778,18 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     pente = ((grain(q + t1 * e, empreinteMax() * 6.0) - g) * t1 + (grain(q + t2 * e, empreinteMax() * 6.0) - g) * t2) * (0.055 / e);
     teinte = vec3(1.0 + (g - 0.5) * 0.05);
     rugo = (g - 0.5) * 0.10;
-    if (uFamille == 17) facettesAmande(P, N, pente, rugo);
+    if (FAMILLE == 17) facettesAmande(P, N, pente, rugo);
   }
-  else if (uFamille == 4 || uFamille == 16) {                // bois : fil étiré
+  else if (FAMILLE == 4 || FAMILLE == 16) {                // bois : fil étiré
     // Le fil reste écrit — une planche de cèdre du Heikhal fait 20 amot de haut, et
     // aucune nappe d'un mètre ne porte une veine de cette longueur. Le lambris le garde
     // à moitié : c'est un bois choisi et poli.
-    float fort = uFamille == 16 ? 0.5 : 1.0;
+    float fort = FAMILLE == 16 ? 0.5 : 1.0;
     float f = grain(P * vec3(9.0, 1.1, 9.0), empreinteMax() * 9.0);
     teinte = vec3(1.0 + ((f - 0.5) * 0.18 - fract(f * 7.0) * 0.06) * fort);
     rugo = (f - 0.5) * 0.10 * fort;
   }
-  else if (uFamille == 5) {                                   // étoffe
+  else if (FAMILLE == 5) {                                   // étoffe
     // La trame vient de la nappe : le sinus qui la portait valait 38 périodes au mètre
     // et grésillait dès deux pas de recul, ce qu'aucun mipmap ne pouvait rattraper.
     teinte = vec3(1.0 + (grain(P * 45.0, empreinteMax() * 45.0) - 0.5) * 0.10);
@@ -811,7 +810,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     teinte *= face / FOND_PAROKHET;
 #endif
   }
-  else if (uFamille == 6) {                                   // eau : ride lente
+  else if (FAMILLE == 6) {                                   // eau : ride lente
     // La ride se voit au reflet, pas à la teinte : c'est la seule famille hors pierre
     // dont la hauteur vaille une pente, et son bruit se dérive au pas fini, en monde.
     vec3 q = P * 5.5 + vec3(0.0, uTemps * 0.12, 0.0);
@@ -822,12 +821,12 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     teinte = vec3(1.0 + (r - 0.5) * 0.08);
     rugo = -0.02;
   }
-  else if (uFamille == 7) {                                   // enduit à la chaux
+  else if (FAMILLE == 7) {                                   // enduit à la chaux
     float g = grain(P * 11.0, empreinteMax() * 11.0), fin = grain(P * 47.0, empreinteMax() * 47.0);
     teinte = vec3(1.0 + (g - 0.5) * 0.20 + (fin - 0.5) * 0.09);
     rugo = (g - 0.5) * 0.12;
   }
-  else if (uFamille == 15) {                                  // rocher nu : ni joint ni lit
+  else if (FAMILLE == 15) {                                  // rocher nu : ni joint ni lit
     // Relief dérivé dans le plan de la face, comme le métal.
     vec3 t1 = normalize(abs(N.y) > 0.7 ? vec3(1.0, 0.0, 0.0) : cross(N, vec3(0.0, 1.0, 0.0)));
     vec3 t2 = cross(N, t1);
@@ -838,7 +837,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     teinte = vec3(0.80 + grainNorme(P * 2.2 + 17.0) * 0.40 + (grainNorme(P * 40.0) - 0.5) * 0.12);
     rugo = 0.10;
   }
-  else if (uFamille == 12) {                                  // gehalim : les braises
+  else if (FAMILLE == 12) {                                  // gehalim : les braises
     // Le charbon se lit à deux échelles : des morceaux qui se cassent, et le réseau de
     // fentes où le rouge affleure entre eux. Le maillage ne porte que le tas.
     // Un charbon fait la taille d'un poing, une fente celle d'un doigt : au mètre, le
@@ -864,11 +863,11 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     float coeur = fente * creux * souffle * (1.0 - cendre);
     feu = vec3(0.85 * coeur) * (vec3(1.0) + vec3(0.0, 0.5, 1.1) * coeur * coeur);
   }
-  else if (uFamille == 18) {
+  else if (FAMILLE == 18) {
     chaux(P, N, teinte, pente, rugo);
     sang(P, N, teinte, rugo);
   }
-  else if (uFamille == 8) {                                   // chaux noircie par le feu
+  else if (FAMILLE == 8) {                                   // chaux noircie par le feu
     chaux(P, N, teinte, pente, rugo);
     float pixel = empreinteMax();
     // La bande du blockout (enduit_noirci, 7,5 à 10,5 amot) : blanchi deux fois l'an (Middot 3:4), il n'est noir qu'en haut.
@@ -907,7 +906,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     sang(P, N, teinte, rugo);
   }
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
-  if (uFamille == 1 || uFamille == 10 || uFamille == 11 || uFamille == 14 || uFamille >= 19) patiner(P, N, exposition(), teinte, rugo);
+  if (FAMILLE == 1 || FAMILLE == 10 || FAMILLE == 11 || FAMILLE == 14 || FAMILLE >= 19) patiner(P, N, exposition(), teinte, rugo);
 #ifdef GRAVURE
   // Le modelé d'une plaque gravée, dérivé de la carte au pas du texel. u de la tuile
   // court le long de la paroi — l'axe x de Blender sur un mur nord ou sud, l'axe y
@@ -972,7 +971,7 @@ export function habiller(materiau, horloges, jeux) {
   const gravure = materiau.name.endsWith("_grave");
   const famille = FAMILLES[gravure ? materiau.name.slice(0, -"_grave".length) : materiau.name];
   if (!famille) return;
-  const uniformes = { uFamille: { value: famille }, uTemps: { value: 0 },
+  const uniformes = { uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
@@ -1002,7 +1001,8 @@ export function habiller(materiau, horloges, jeux) {
     uniformes.uRayonFil = { value: rayonFil };
     materiau.transparent = true;
   }
-  const drapeaux = (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
+  const drapeaux = `#define FAMILLE ${famille}\n`
+    + (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
     + (MINERAUX.has(famille) ? "#define TEMPERE\n" : "")
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
@@ -1121,5 +1121,5 @@ export function habiller(materiau, horloges, jeux) {
         #include <normal_fragment_maps>
         normal = normalize(normal - mat3(viewMatrix) * mPente);`);
   };
-  materiau.customProgramCacheKey = () => `mikdash-${famille}-${drapeaux}${refletDuCiel()}`;
+  materiau.customProgramCacheKey = () => `mikdash-${drapeaux}${refletDuCiel()}`;
 }

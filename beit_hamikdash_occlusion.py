@@ -20,7 +20,9 @@ AIRE_MIN = 50.0
 TEXELS_PAR_FACE_MIN = 10
 TEXEL = 0.2
 # Une masse de chaux blanche sans joint ne cache aucun texel : à 20 cm, le Mizbea'h se lisait en pixels.
-TEXEL_DE = {"mizbeach": 0.03}
+TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03}
+# Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
+MALGRE_AIRE = {"yessod"}
 TAILLE = (128, 2048)
 ECHANTILLONS = 256
 PORTEE = 8.0
@@ -80,7 +82,7 @@ def retenus(fusionnes):
     for ident, obj in sorted(fusionnes.items()):
         surface = aire(obj)
         taille = taille_de(surface, obj["faces_sans_chanfrein"], TEXEL_DE.get(ident, TEXEL))
-        if ident in EXCLUS or surface < AIRE_MIN:
+        if ident in EXCLUS or (surface < AIRE_MIN and ident not in MALGRE_AIRE):
             continue
         # Compté sans chanfrein : il multiplie les faces sans rendre l'objet plus fin.
         if taille * taille / obj["faces_sans_chanfrein"] < TEXELS_PAR_FACE_MIN:
@@ -101,7 +103,7 @@ def points_temoins(triangle):
 # Seules les faces tournées du même côté se disputent la profondeur ; dos à dos, chacune est dans le volume de l'autre.
 class Collees:
     def __init__(self, objets):
-        self.faces, self.face_de, self.origines, sommets, triangles = [], [], [], [], []
+        self.faces, self.face_de, self.origines, self.coins, sommets, triangles = [], [], [], [], [], []
         for obj in objets:
             maillage = obj.data
             maillage.calc_loop_triangles()
@@ -109,6 +111,7 @@ class Collees:
             sommets += [obj.matrix_world @ v.co for v in maillage.vertices]
             self.faces += [([], geometry.normal([sommets[base + i] for i in poly.vertices])) for poly in maillage.polygons]
             self.origines += [(obj, poly.index) for poly in maillage.polygons]
+            self.coins += [frozenset(base + i for i in poly.vertices) for poly in maillage.polygons]
             for tri in maillage.loop_triangles:
                 triangles.append([base + i for i in tri.vertices])
                 self.face_de.append(premiere + tri.polygon_index)
@@ -139,7 +142,8 @@ class Collees:
         normale = self.faces[k][1]
         for position, _, t, _ in self.arbre.find_nearest_range(point, COLLEE):
             g = self.face_de[t]
-            if g == k or g in self.retirees or normale.dot(self.faces[g][1]) < PARALLELE:
+            # Une voisine du même maillage n'est pas collée : les témoins d'une petite face frôlent ses arêtes.
+            if g == k or g in self.retirees or normale.dot(self.faces[g][1]) < PARALLELE or not self.coins[k].isdisjoint(self.coins[g]):
                 continue
             ecart = position - point
             devant = ecart.dot(normale)

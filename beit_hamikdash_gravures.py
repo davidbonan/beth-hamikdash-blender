@@ -282,7 +282,8 @@ def relief_taille(nom):
     rayon = max(1, int(round(RONDEUR * echelle)))
     volume = bombe(distance(masque, rayon) / rayon)
     modele = flouter(luminance, max(1, int(round(GRAIN * echelle))))
-    bas, haut = modele[masque].min(), modele[masque].max()
+    # Centiles, pas extrêmes : quelques pixels du bord ou d'un reflet écrasaient tout le modelé.
+    bas, haut = np.percentile(modele[masque], (1, 99))
     modele = np.clip((modele - bas) / (haut - bas), 0.0, 1.0)
     relief = np.where(masque, (1.0 - PART_MODELE) * volume + PART_MODELE * modele, 0.0)
     return flouter(relief, max(1, int(round(FONDU * echelle)))).astype(np.float32), masque

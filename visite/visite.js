@@ -328,6 +328,23 @@ addEventListener("resize", dimensionner);
 // modèle
 // ---------------------------------------------------------------------------
 const obstacles = [];
+
+// Par tranches, et non d'un bloc : une seconde de calcul figeait la page, et un téléphone en met plusieurs.
+const TRANCHE_MS = 30;
+const rendreLaMain = () => new Promise((reprise) => {
+  const canal = new MessageChannel();
+  canal.port1.onmessage = () => reprise();
+  canal.port2.postMessage(null);
+});
+async function construireArbres(maillages) {
+  let debut = performance.now();
+  for (const maillage of maillages) {
+    maillage.geometry.computeBoundsTree({ maxLeafTris: 24 });
+    if (performance.now() - debut < TRANCHE_MS) continue;
+    await rendreLaMain();
+    debut = performance.now();
+  }
+}
 const restant = $("#restant");
 const enMegaoctets = (octets) =>
   new Intl.NumberFormat(langue(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(octets / 1e6);
@@ -345,8 +362,11 @@ const [gltf, jeux, occlusions, lumieres] = await Promise.all([
   cartesLumiere(reperes.lumiere),
 ]);
 ecrire(etat, "preparation");
-// La préparation qui suit ne rend pas la main : sans cette image, « préparation… » ne s'affichait jamais.
-await new Promise((image) => requestAnimationFrame(() => requestAnimationFrame(image)));
+// Sans cette image, « préparation… » ne s'affichait jamais ; un onglet caché n'en donne aucune, d'où le délai.
+await new Promise((suite) => {
+  requestAnimationFrame(() => setTimeout(suite));
+  setTimeout(suite, 200);
+});
 scene.add(gltf.scene);
 // Three ne calcule les matrices monde qu'au premier rendu, et un rayon ne les calcule
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
@@ -383,7 +403,6 @@ gltf.scene.traverse((o) => {
   if (!o.isMesh) return;
   o.geometry.computeBoundingBox();
   o.geometry.computeBoundingSphere();
-  o.geometry.computeBoundsTree({ maxLeafTris: 24 });
   // Tout volume du blockout est une boîte fermée aux normales sortantes : ses faces
   // arrière ne sont jamais celles qu'on voit. Les afficher doublait le travail de
   // fragment, et faisait battre la face arrière du placage d'or contre la face avant
@@ -410,11 +429,17 @@ gltf.scene.traverse((o) => {
 });
 const oeilAdapte = adaptation(obstacles);
 
-if (!brut) sonderHeikhal(renderer, scene, {
-  kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
-  materiaux: materiauxHeikhal,
-  eteints: [soleil, appoint, lampe, ciel, cielAmbiant],
-});
+// Les nuanceurs se compilent hors du fil de la page pendant que les arbres s'y construisent.
+await Promise.all([rendu.compiler(), construireArbres(obstacles)]);
+if (!brut) {
+  sonderHeikhal(renderer, scene, {
+    kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
+    materiaux: materiauxHeikhal,
+    lumieres: [soleil, appoint, lampe, cielAmbiant],
+    caches: [ciel],
+  });
+  await rendu.compiler();                 // le reflet de la salle change les nuanceurs de son or
+}
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
 let melangeur = null;
@@ -440,34 +465,40 @@ function prendreEnMain(figurant) {
   prise.visible = false;
   prise.userData.concept = conceptDe(figurant);
   figurant.add(prise);
-  obstacles.push(prise);
+  return prise;
 }
 
-function poserFigurants({ scene: troupe, animations }) {
+// Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
+async function poserFigurants({ scene: troupe, animations }) {
   melangeur = new THREE.AnimationMixer(troupe);
   for (const clip of animations) melangeur.clipAction(clip).play();
   melangeur.update(0);
   troupe.updateMatrixWorld(true);
-  for (const figurant of troupe.children) prendreEnMain(figurant);
+  const prises = troupe.children.map(prendreEnMain);
+  await rendu.compiler(troupe);
   scene.add(troupe);
+  troupe.updateMatrixWorld(true);
+  obstacles.push(...prises);
 }
 const figurantsPrets = chargeur.loadAsync("./figures.glb").then(poserFigurants);
 
 // Jérusalem autour du Temple descend en dernier : on s'y pose aussi, et on s'y cogne.
-function poserPays({ scene: pays }) {
+async function poserPays({ scene: pays }) {
   pays.updateMatrixWorld(true);
+  const maisons = [];
   pays.traverse((o) => {
     if (!o.isMesh) return;
-    o.geometry.computeBoundsTree({ maxLeafTris: 24 });
     o.castShadow = true;
     o.receiveShadow = true;
     if (!brut && !habillees.has(o.material.uuid)) {
       habillees.add(o.material.uuid);
       habiller(o.material, horloges, jeux);
     }
-    obstacles.push(o);
-    murs.push(o);
+    maisons.push(o);
   });
+  await Promise.all([rendu.compiler(pays), construireArbres(maisons)]);
+  obstacles.push(...maisons);
+  murs.push(...maisons);
   scene.add(pays);
 }
 chargeur.loadAsync("./pays.glb").then(poserPays);
