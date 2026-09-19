@@ -87,6 +87,11 @@ def poser_lame(contour, u, z, angle, taille, sens=1):
     return [(u + taille * (p * du + q * nu), z + taille * (p * dz + q * nz)) for p, q in contour]
 
 
+def reduire(contour, k):
+    """Le contour à l'échelle `k` autour de l'origine de la figure, le pied."""
+    return [(u * k, z * k) for u, z in contour]
+
+
 def ellipse(u, z, ru, rz, points=32):
     return [(u + ru * math.cos(2 * math.pi * k / points), z + rz * math.sin(2 * math.pi * k / points))
             for k in range(points)]
@@ -126,38 +131,50 @@ def aile(pennes=6, passes=3):
     return lisser(attaque + fuite + [(0.0, -0.10)], passes=passes)
 
 
-# Le corps dressé d'une figure debout, à plat, sans bras détachés : encolure, épaule,
-# bras le long du corps, taille, hanche, robe évasée jusqu'à l'ourlet. Moitié droite,
-# du haut de l'axe (l'attache du cou) au bas de l'axe (l'ourlet).
-CORPS_DRESSE = symetrique([
-    (0.000, 0.820), (0.055, 0.820), (0.065, 0.790), (0.150, 0.770), (0.175, 0.700),
-    (0.150, 0.600), (0.095, 0.520), (0.130, 0.420), (0.165, 0.220), (0.185, 0.030),
-    (0.170, 0.000), (0.000, 0.000)])
+# Le keruv est la 'haya de la vision, « וָאֵדַע כִּי כְרוּבִים הֵמָּה » (Ye'hezkel 10:20) : ni
+# robe ni corps d'homme, deux ailes qui couvrent le corps, « וּשְׁתַּיִם מְכַסּוֹת אֵת
+# גְּוִיֹּתֵיהֶנָה » (1:11), des mains d'homme sous les ailes (1:8), et UNE jambe, « וְרַגְלֵיהֶם
+# רֶגֶל יְשָׁרָה » — « נראין כרגל אחת » (Rashi sur Berakhot 10b) —, au pied rond, « רֶגֶל עָגוֹל »
+# (Rashi sur 1:7). Les deux autres ailes, levées, sont posées par chaque figure.
+# Moitié droite de la gaine des ailes croisées, de l'attache du cou au haut de la jambe.
+GAINE_KERUV = symetrique([
+    (0.000, 0.850), (0.080, 0.845), (0.135, 0.805), (0.150, 0.700), (0.140, 0.560),
+    (0.115, 0.420), (0.085, 0.290), (0.055, 0.190), (0.000, 0.170)])
+# La lisière de l'aile du dessus, qui croise la gaine de l'épaule gauche vers la jambe.
+CROISURE = ((-0.140, 0.760), (-0.020, 0.560), (0.050, 0.330), (0.040, 0.200))
+# Les deux mains posées sur la gaine, l'une au-dessus de l'autre : (u, z, ru, rz).
+MAINS = ((-0.050, 0.640, 0.038, 0.030), (0.045, 0.580, 0.038, 0.030))
+JAMBE = ((0.0, 0.180), (0.0, 0.060))
+LARGEUR_JAMBE = 0.050
+SABOT = (0.0, 0.035, 0.036, 0.035)
 
-# Le corps vêtu du keruv, sans les bras : cou, épaules, poitrine, taille, hanches, robe
-# évasée jusqu'à l'ourlet. Moitié droite, du haut du cou à l'axe de l'ourlet. Le
-# CORPS_DRESSE était sans épaules ni cou : une figure de trois mètres se lisait en
-# mannequin de couturière. Le cou monte DANS le crâne, qui le recouvre : arrêté
-# dessous, le lissage le rognait et la tête flottait.
-# Les proportions sont celles d'un ENFANT — « כְּרוּב : כְּרַבְיָא » (Soucca 5b, Rashi Ex. 25:18) :
-# la tête fait un cinquième de la hauteur, les épaules tombent à 0,74, non 0,80.
-CORPS_KERUV = symetrique([
-    (0.000, 0.860), (0.050, 0.860), (0.055, 0.750), (0.165, 0.730), (0.185, 0.680),
-    (0.165, 0.600), (0.140, 0.540), (0.155, 0.470), (0.180, 0.400), (0.210, 0.250),
-    (0.230, 0.100), (0.235, 0.030), (0.000, 0.030)])
-# Le bras droit, le long du corps et un peu fléchi : épaule, coude, poignet.
-BRAS = ((0.150, 0.710), (0.200, 0.580), (0.165, 0.440))
-LARGEURS_BRAS = (0.052, 0.046, 0.036)
-# Les plis de la robe partent de la ceinture et s'écartent vers l'ourlet.
-PLIS = (-1.0, -0.5, 0.0, 0.5, 1.0)
+# La tête : un seul crâne, « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), la face d'homme
+# vers les u négatifs, celle du jeune lion, crinière courte, vers les u positifs (41:19)
+# — et AUCUN TRAIT (§9 de la fiche). Du sommet du crâne, dans le sens des aiguilles.
+TETE_KERUV = [
+    (0.00, 0.95), (0.45, 0.98), (0.90, 0.80), (1.15, 0.50), (1.45, 0.28), (1.52, 0.05),
+    (1.38, -0.18), (1.10, -0.32), (0.85, -0.55), (0.35, -0.62), (0.00, -0.55),
+    (-0.15, -0.42), (-0.75, -0.30), (-1.25, -0.15), (-1.35, 0.10), (-1.20, 0.35),
+    (-0.90, 0.62), (-0.35, 0.88)]
+TETE = (0.0, 0.890, 0.100)   # u, z, taille
+SERRAGE_TETE = 0.70          # le crâne, resserré en largeur : à plat, il se lisait en citron
 
-# La tête double du keruv — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18) : un seul crâne,
-# un profil de chaque côté, museau vers l'extérieur, et AUCUN TRAIT (§9 de la fiche).
-# Deux têtes posées côte à côte se chevauchaient en lunettes ; un crâne à deux faces
-# est ce que le verset décrit. Moitié droite, du sommet du crâne à l'attache du cou.
-TETE_DOUBLE = symetrique([
-    (0.00, 0.90), (0.35, 0.88), (0.90, 0.62), (1.20, 0.35), (1.35, 0.10), (1.25, -0.15),
-    (0.75, -0.30), (0.15, -0.42), (0.00, -0.45)])
+
+def tete_keruv():
+    """La tête posée sur la gaine, lissée UNE fois : c'est le nez et le menton de chaque
+    profil qui la font lire, trois passes en faisaient une miche."""
+    return lisser(poser([(SERRAGE_TETE * u, z) for u, z in TETE_KERUV], *TETE), passes=1)
+
+
+# Les ailes hautes, (u, z) de l'attache, inclinaison sur la verticale, taille. Aux parois
+# elles se tendent presque à l'horizontale jusqu'à la pointe de celles du voisin, au-dessus
+# de la timora : « חֹבְרֹת אִישׁ אֶל אָחִיו » (Ye'hezkel 1:9, 1:11). Sur un vantail ou le
+# rideau, où le keruv est seul, elles se dressent au-dessus de la tête.
+AILES_TENDUES = ((0.11, 0.80), 82, 0.40)
+AILES_DRESSEES = ((0.09, 0.78), 12, 0.42)
+# Les ailes dressées montent au-dessus de la tête, jusqu'à 1,25 : le keruv dressé est
+# dessiné réduit d'autant, pour que la pointe de ses ailes tienne à 1.
+REDUCTION_DRESSE = 0.80
 
 
 # --- Le lion : « וּפְנֵי כְפִיר » (Ye'hezkel 41:19). -----------------------------------------

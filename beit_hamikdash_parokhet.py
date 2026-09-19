@@ -4,7 +4,7 @@
     /Applications/Blender.app/Contents/MacOS/Blender -b -P beit_hamikdash_parokhet.py -- --guides         # les guides
     /Applications/Blender.app/Contents/MacOS/Blender -b -P beit_hamikdash_parokhet.py -- --tisser lion    # une figure
 
-« מַעֲשֵׂה חֹשֵׁב יַעֲשֶׂה אֹתָהּ כְּרֻבִים » (Ex. 26:31) : créatures ailées et lions en alternance,
+« מַעֲשֵׂה חֹשֵׁב יַעֲשֶׂה אֹתָהּ כְּרֻבִים » (Ex. 26:31) : keruvim et lions en alternance,
 tissés dans les mêmes quatre matières, trois laines et le lin — jamais d'or (le verset
 n'en liste que quatre),
 jamais brodés, et sans un visage humain (§9 de la fiche). Une figure TISSÉE n'est pas
@@ -51,21 +51,28 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, bombe, cadrer, distance, ecrire, figure,  # noqa: E402
                                   flouter, lire_rgb, reechantillonner, remplir)
-from beit_hamikdash_contours import (BRAS, CORPS_KERUV, DATTE, EPIS,  # noqa: E402
-                                     LARGEURS_BRAS, LARGEURS_QUEUE, LION_COTES, LION_CORPS,
+from beit_hamikdash_contours import (AILES_DRESSEES, CROISURE, DATTE, EPIS, GAINE_KERUV,  # noqa: E402
+                                     JAMBE, LARGEUR_JAMBE, LARGEURS_QUEUE, LION_COTES, LION_CORPS,
                                      LION_CRINIERE, LION_FLANC, LION_GUEULE, LION_HOUPPE,
                                      LION_MACHOIRE, LION_NASEAU, LION_OEIL, LION_OREILLE,
                                      LION_PATTES_CACHEES, LION_PATTES_VUES, LION_QUEUE, LION_RANGS,
                                      LION_SOURCIL, LION_TETE, LION_VOLUTE_EPAULE,
-                                     LION_VOLUTE_HANCHE, PALMES, PLIS, TETE_DOUBLE, TRONC, aile,
-                                     chevrons, corolle, courbe, criniere, ellipse, epi, folioles,
-                                     lisser, palme, pied, poser, poser_lame, ruban, ruban_effile, volute)
+                                     LION_VOLUTE_HANCHE, MAINS, PALMES, REDUCTION_DRESSE, SABOT, TRONC,
+                                     aile, chevrons, corolle, courbe, criniere, ellipse, epi,
+                                     folioles, lisser, palme, pied, poser_lame, reduire, ruban,
+                                     ruban_effile, tete_keruv, volute)
 
 LARGEUR_PX = 2048
 NOM = f"parokhet_{LARGEUR_PX}"
 TUILE_PX = 1024
 TISSAGES = RACINE / "tissages"
 GUIDES = TISSAGES / "guides"
+# Le keruv tissé suit le keruv taillé des vantaux, montré au modèle avec le guide : c'est
+# lui qui porte la manière — le dessin des plumes, les proportions — que le guide n'a pas.
+ESQUISSES = {"keruv": RACINE / "gravures" / "keruv_dresse.png"}
+ESQUISSE = "The second image is the approved carved design of this figure: weave it in its " \
+           "manner and proportions, but keep the composition, colours and framing of the " \
+           "first image."
 
 # « אָרְכָּהּ אַרְבָּעִים אַמָּה וְרָחְבָּהּ עֶשְׂרִים אַמָּה » (Shekalim 8:5) : la carte est le rideau.
 LARGEUR, HAUTEUR = 20.0, 40.0
@@ -122,32 +129,28 @@ def couleur_face(clarte, rougeur):
 # parties se posent dans l'ordre, chacune couvrant les précédentes. Dans le repère de la
 # figure : hauteur 1, axe en u = 0, pied en z = 0. ---
 
-def creature_ailee():
-    """Créature ailée de face — la figure même du keruv des parois (beit_hamikdash_gravures.py) :
-    corps d'enfant, bras le long du corps, robe à plis, tête double sans traits, deux
-    ailes levées. « כְּרֻבִים » de Ex. 26:31 vaut « צִיּוּרִין שֶׁל בְּרִיּוֹת » (Rashi) ; la tête —
-    « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18) —, un profil de chaque côté. Robe cramoisie,
-    ailes de lin aux couvertures pourpres, bras et tête de lin, ceinture et plis du fond."""
+def keruv():
+    """Le keruv dressé des vantaux (beit_hamikdash_gravures.py), tissé : la 'haya de
+    Ye'hezkel 1 et 10, ailes hautes dressées au-dessus de la tête, gaine des deux ailes
+    croisées sur le corps, mains d'homme, une jambe au pied rond, tête à deux faces SANS
+    TRAITS. « כְּרֻבִים » de Ex. 26:31 vaut « צִיּוּרִין שֶׁל בְּרִיּוֹת » (Rashi). Ailes et gaine
+    de lin aux couvertures pourpres, mains et tête de lin, jambe et sabot cramoisis,
+    lisière et rangs de plumes en fils du fond."""
+    k = REDUCTION_DRESSE
+    (u, z), angle, taille = AILES_DRESSEES
     parties = []
     for sens in (-1, 1):
-        u_aile, z_aile = sens * 0.12, 0.66
-        parties.append((poser_lame(aile(), u_aile, z_aile, 40, 0.40, sens), 0.85, CLAIR))
-        parties.append((poser_lame(aile(5), u_aile, z_aile, 36, 0.20, sens), 1.0, POURPRE))
-    for sens in (-1, 1):
-        parties.append((ellipse(sens * 0.075, 0.02, 0.05, 0.03), 0.8, CLAIR))
-    parties.append((lisser(CORPS_KERUV), 0.75, CHAUD))
-    parties.append((ruban([(-0.14, 0.50), (0.0, 0.49), (0.14, 0.50)], TRAIT), BOMBE_TRAIT, FOND))
-    for s in PLIS:
-        parties.append((ruban([(0.09 * s, 0.47), (0.15 * s, 0.25), (0.20 * s, 0.04)], TRAIT * 0.6),
-                        BOMBE_TRAIT, FOND))
-    for sens in (-1, 1):
-        parties.append((lisser(ruban([(sens * u, z) for u, z in BRAS], sum(LARGEURS_BRAS) / 1.5), passes=2),
-                        0.9, CLAIR))
-        parties.append((ellipse(sens * 0.150, 0.415, 0.038, 0.048), 0.9, CLAIR))
-    # Le crâne à deux profils, un peu resserré, lissé UNE fois : c'est le nez et le menton
-    # de chaque profil qui le font lire.
-    parties.append((lisser(poser([(0.85 * u, z) for u, z in TETE_DOUBLE], 0.0, 0.868, 0.148), passes=1),
-                    1.0, CLAIR))
+        parties.append((reduire(poser_lame(aile(), sens * u, z, angle, taille, sens), k), 0.85, CLAIR))
+        parties.append((reduire(poser_lame(aile(5), sens * u, z, angle, taille * 0.5, sens), k), 1.0, POURPRE))
+    parties += [(reduire(ellipse(*SABOT), k), 0.8, CHAUD),
+                (reduire(ruban(JAMBE, LARGEUR_JAMBE), k), 0.7, CHAUD),
+                (reduire(lisser(GAINE_KERUV), k), 0.75, CLAIR),
+                (reduire(ruban(CROISURE, TRAIT), k), BOMBE_TRAIT, FOND)]
+    for z_rang in (0.74, 0.64, 0.54, 0.44, 0.34, 0.26):
+        rang = [(-0.12, z_rang + 0.03), (0.0, z_rang - 0.02), (0.12, z_rang + 0.03)]
+        parties.append((reduire(ruban(rang, TRAIT * 0.6), k), BOMBE_TRAIT, FOND))
+    parties += [(reduire(ellipse(*main), k), 0.9, CLAIR) for main in MAINS]
+    parties.append((reduire(tete_keruv(), k), 1.0, CLAIR))
     return parties
 
 
@@ -215,15 +218,17 @@ TISSAGE = "Re-weave this {sujet} as a genuine ancient Near-Eastern woven wool ta
 # convention de `cadrer` : la figure y tient du pied en z = 0 au sommet en z = 1, centrée
 # sur u = 0 — le guide montré au modèle cadre alors exactement comme le tissage sera relu.
 MOTIFS = {
-    "creature": (creature_ailee, (-0.6, -0.1, 0.6, 1.1), "winged child figure",
-                 "a standing child seen from the front, child-like proportions with a large "
-                 "head, a long plain crimson tunic with a patterned belt and simple vertical "
-                 "folds down to the feet, arms along the body with ivory hands visible, two "
-                 "large wings of ivory linen raised on either side with clearly separated rows "
-                 "of feathers and purple covert feathers at the root, and ONE single ivory head "
-                 "carrying TWO faces in profile, one looking left and one looking right "
-                 "(Janus-like), with a plain headband, no hair, no beard. IMPORTANT: the faces "
-                 "are perfectly smooth and blank, with no eyes, no nose, no mouth."),
+    "keruv": (keruv, (-0.6, -0.1, 0.6, 1.1), "four-winged cherub",
+              "an awe-inspiring heavenly being of Ezekiel's vision, NOT a human in clothes and "
+              "NOT a Christian angel: no tunic, no garment, no belt. Two tall ivory wings rise "
+              "straight up from the shoulders like two flames, tips high above the head, with "
+              "purple covert feathers at the root and long straight flight feathers. The body "
+              "is a tall ivory sheath of feathers made by two lower wings crossed in front, "
+              "two ivory human hands laid flat on it. Below it ONE single straight crimson leg "
+              "ending in ONE round crimson hoof. ONE ivory head carrying TWO faces in profile, "
+              "a man looking left and a young lion with a short mane looking right. IMPORTANT: "
+              "both faces are perfectly smooth featureless silhouettes, no eyes, no nose "
+              "detail, no mouth."),
     "timora": (timora, (-0.6, -0.1, 0.6, 1.1), "date palm tree, as on the Bar Kokhba coins",
                "a straight purple trunk marked with stacked chevron scars of cut frond bases "
                "and a flared foot, and a crown of exactly seven fronds of ivory linen — the "
@@ -325,8 +330,7 @@ def composition():
     « וְעָשׂוּי כְּרוּבִים וְתִמֹרִים וְתִמֹרָה בֵּין־כְּרוּב לִכְרוּב » (Ye'hezkel 41:18) : la timora
     entre deux keruvim, c'est la composition même des parois du Bayit, et le lion est
     la seconde face du keruv (41:19), tournée vers la timora. Au centre, deux grands
-    keruvim dont les ailes se croisent au-dessus d'une timora — comme celles de la
-    kaporet, « סֹכְכִים בְּכַנְפֵיהֶם » (Ex. 25:20) —, et au-dessus d'eux deux lions en
+    keruvim dressés de part et d'autre d'une timora, et au-dessus d'eux deux lions en
     cortège vers un fleuron. En bas, deux lions vers une timora ; en haut, keruv, timora,
     keruv. Les lions, les keruvim et les timorot sont aussi ceux des panneaux du Temple
     de Shlomo (Melakhim I 7:29, 36)."""
@@ -337,10 +341,10 @@ def composition():
     # centre, sinon la hiérarchie s'écrase.
     return [("timora", 0.0, b0 + 1.4, 5.0, 1), ("lion", -5.6, b0 + 1.8, 3.9, 1), ("lion", 5.6, b0 + 1.8, 3.9, -1),
             ("timora", 0.0, c0 + 1.4, 6.0, 1),
-            ("creature", -4.5, c0 + 1.4, 8.2, 1), ("creature", 4.5, c0 + 1.4, 8.2, 1),
+            ("keruv", -4.5, c0 + 1.4, 8.2, 1), ("keruv", 4.5, c0 + 1.4, 8.2, 1),
             ("lion", -3.3, 23.5, 3.6, 1), ("lion", 3.3, 23.5, 3.6, -1),
             ("timora", 0.0, h0 + 1.7, 4.0, 1),
-            ("creature", -5.6, h0 + 1.5, 4.6, 1), ("creature", 5.6, h0 + 1.5, 4.6, 1)]
+            ("keruv", -5.6, h0 + 1.5, 4.6, 1), ("keruv", 5.6, h0 + 1.5, 4.6, 1)]
 
 
 # --- Les guides, le tissage, la carte. ---
@@ -390,8 +394,10 @@ def tisser_figure(nom):
     import fal_commun  # noqa: E402
     _, _, sujet, iconographie = MOTIFS[nom]
     cle = fal_commun.cle_api()
-    corps = {"prompt": TISSAGE.format(sujet=sujet, iconographie=iconographie),
-             "image_urls": [fal_commun.televerse(str(GUIDES / f"{nom}.png"), cle)],
+    images = [GUIDES / f"{nom}.png"] + ([ESQUISSES[nom]] if nom in ESQUISSES else [])
+    prompt = TISSAGE.format(sujet=sujet, iconographie=iconographie)
+    corps = {"prompt": prompt + (" " + ESQUISSE if nom in ESQUISSES else ""),
+             "image_urls": [fal_commun.televerse(str(image), cle) for image in images],
              "image_size": "square_hd", "quality": "high", "output_format": "png"}
     reponse = fal_commun.genere("openai/gpt-image-2/edit", corps, cle)
     fal_commun.telecharge(reponse["images"][0]["url"], str(TISSAGES / f"{nom}.png"))

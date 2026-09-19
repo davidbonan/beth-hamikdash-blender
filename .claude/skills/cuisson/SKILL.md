@@ -18,7 +18,6 @@ faces collées, taille, couches UV, matières, réglages de lumière (soleil, ci
 ## Règle 1 — recuire ciblé, avec ses impacts
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire --simuler                     # ce qui serait recuit
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire                               # le recuit
 $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire lishkat_hagazit,azara        # + ces concepts, qui doivent se cuire
 ```
@@ -32,13 +31,12 @@ $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire lishka
 | `voisin de X` | sa géométrie passe à moins de `PORTEE_IMPACT` (4 m) de X, avant ou après la retouche : les rebonds de X changent sa lumière |
 
 X peut être un concept sans carte (Kiyor, Menora, ustensiles, trop petits pour cuire) ou disparu :
-la simulation le liste sous « modifiés sans carte à eux » et recuit ses voisins.
+la sortie le liste sous « modifiés sans carte à eux » et recuit ses voisins.
 
 Toutes les autres cartes restent telles quelles. Un réglage de lumière changé change toutes
 les empreintes : `--recuire` recuit alors tout, sans qu'on le demande.
 
-**Toujours `--simuler` d'abord** (~8 min, la préparation de l'export), puis annoncer la liste et
-la durée estimée avant de lancer. Au-delà d'une demi-heure, demander avant de lancer.
+Lancer `--recuire` directement, sans simulation préalable.
 
 Nommer un concept après `--recuire` seulement pour ce que l'empreinte ne voit pas : une retouche
 de `matieres.js` ou d'un nuanceur de la visite, ou une carte qu'on juge fausse.
@@ -64,8 +62,8 @@ file. Le script le garantit : il prend `cuisson.lock` dans le `.git` commun (`fl
 
 Alors : ne pas tuer la cuisson en cours, ne pas contourner le verrou. Dire à l'utilisateur qui
 cuit, depuis quand, et attendre qu'elle finisse ou qu'il décide. `cat "$(git rev-parse --git-common-dir)/cuisson.lock"`
-dit qui tient le verrou (vide : personne). `--simuler` et `--sans-occlusion` ne cuisent pas et
-ne le prennent pas.
+dit qui tient le verrou (vide : personne). `--sans-occlusion` ne cuit pas et
+ne le prend pas.
 
 ## Lancer
 

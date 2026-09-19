@@ -1612,8 +1612,11 @@ BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
 # figure est TAILLÉE dans la paroi, rien n'en sort. Son modelé bombe au fond de la taille
 # sans jamais revenir au nu, et c'est le flanc tourné vers elle qui en trace le contour.
 PROFONDEUR_KIR = 0.05     # 2,5 cm, la moitié du placage d'or de 0,1 ama
-PAS_KIR = 3.7             # pas visé d'une figure, en amot : entre un keruv (large d'une
-                          # hauteur) et une timora (0,7), il reste 1,3 ama d'or nu
+# Le pas d'un keruv à la timora voisine, en amot : 14 pas sur les 40 amot du Heikhal,
+# et les ailes des keruvim d'about touchent les angles. Le Kodesh HaKodashim prend le
+# même pas, pour que ses keruvim aient la taille de ceux du Heikhal.
+PAS_KIR = 40 / 14
+PAS_FLEURON = 3.7         # pas d'un fleuron dans un bandeau, en amot
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
 CARTE_GRAVURES = GRAVURES_JSON.with_name("gravures_2048.webp")
 MODELE_GRAVURE = 0.03     # amot : ce dont le modelé bombe par-dessus la plaque, 1,5 cm sur un
@@ -1691,10 +1694,17 @@ def timora(nom, paroi, u, z0, h, col, mat=None):
 
 
 def keruv_grave(nom, paroi, u, z0, h, col):
-    """« כְּרוּבִים » — « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), et 41:19 tourne chaque
-    profil vers la timora qui le jouxte. Un crâne à deux faces SANS TRAITS, deux ailes
-    levées, le corps vêtu, les bras le long du corps."""
+    """« כְּרוּבִים » — la 'haya de la vision, « וָאֵדַע כִּי כְרוּבִים הֵמָּה » (Ye'hezkel 10:20) :
+    deux ailes qui couvrent le corps, des mains d'homme dessous, une jambe au pied rond
+    (1:7-11), un crâne à deux faces SANS TRAITS, l'homme et le lion, chacune vers la
+    timora qui le jouxte (41:18-19). Ses deux ailes hautes se tendent jusqu'à celles du
+    voisin, au-dessus de la timora : « חֹבְרֹת אִישׁ אֶל אָחִיו » (1:9)."""
     return _relief_grave(nom, paroi, "keruv", u, z0, h, col)
+
+
+def keruv_dresse(nom, paroi, u, z0, h, col):
+    """Le même keruv, seul sur un vantail : ses ailes hautes se dressent au-dessus de la tête."""
+    return _relief_grave(nom, paroi, "keruv_dresse", u, z0, h, col)
 
 
 def petur_tzitz(nom, paroi, u, z, r, col, mat=None):
@@ -1721,7 +1731,7 @@ def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
         _taille_profil(f"{nom}_trait_{bord}", paroi,
                        [(u0, z + zb), (u1, z + zb), (u1, z + zh), (u0, z + zh)],
                        PROFONDEUR_KIR * 0.4, col, mat)
-    n = max(1, round((u1 - u0) / PAS_KIR))
+    n = max(1, round((u1 - u0) / PAS_FLEURON))
     pas = (u1 - u0) / n
     for i in range(n):
         petur_tzitz(f"{nom}_fleuron_{i:02d}", paroi, u0 + pas * (i + 0.5), z + BANDEAU_KIR / 2,
@@ -1744,7 +1754,7 @@ def vantail_sculpte(nom, paroi, u0, u1, z0, z1, col):
     for r in range(REGISTRES_VANTAIL + 1):
         bandeau_fleurons(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
     for r in range(REGISTRES_VANTAIL):
-        motif = keruv_grave if r % 2 == 0 else timora
+        motif = keruv_dresse if r % 2 == 0 else timora
         motif(f"{nom}_{r}", paroi, (u0 + u1) / 2, z0 + r * registre + BANDEAU_KIR,
               registre - BANDEAU_KIR, col)
 
@@ -6033,28 +6043,37 @@ box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim",
 #     (Middot 4:1). Au-dessus, l'or reste nu jusqu'à la corniche : deux registres
 #     flottant à mi-hauteur ne sont dans aucune source.
 CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
-# Cinq registres, et la figure ne remplit que 82 % de ce que le bandeau laisse : 2,9 amot,
-# posée au milieu, de l'or nu dessus et dessous. À trois registres pleins, des keruvim
-# de 6 amot se touchaient par les ailes et le champ se lisait en papier peint massif.
-REGISTRES_KIR = 5         # registres de figures, séparés par des bandeaux de fleurons
-PART_FIGURE_KIR = 0.82    # hauteur d'une figure, en part du registre hors bandeau
+# Trois registres de keruvim monumentaux : leur taille est celle qui fait se toucher les
+# ailes de deux voisins au-dessus de la timora, au pas PAS_KIR.
+REGISTRES_KIR = 3         # registres de figures, séparés par des bandeaux de fleurons
+# La timora se tient sous les pointes d'ailes, pied au niveau du sabot.
+TIMORA_SOUS_AILES = 0.66  # hauteur de la timora, en part de celle du keruv
 
 
 def champ_sculpte(nom, paroi, u0, u1, col):
     """Le champ « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח » d'une paroi : des registres de keruvim et de
-    timorot en alternance stricte, séparés par des bandeaux de fleurons."""
+    timorot en alternance stricte, séparés par des bandeaux de fleurons. Une file commence
+    et finit par un keruv, « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב » (Ye'hezkel 41:18), et se centre
+    sur la paroi."""
     z0, z1 = Z_BAT + CHAMP_KIR[0], Z_BAT + CHAMP_KIR[1]
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_KIR
-    n = max(1, round((u1 - u0) / PAS_KIR))
-    pas = (u1 - u0) / n
+    h = PAS_KIR / (largeur_gravure("keruv") / 2)
+    assert h <= registre - BANDEAU_KIR, f"keruv de {h:.2f} amot dans un registre de {registre - BANDEAU_KIR:.2f}"
+    # Les ailes des deux keruvim d'about s'étendent d'un pas au-delà de leur axe : n + 1 pas
+    # doivent tenir sur la paroi, n impair.
+    n = 2 * int((round(abs(u1 - u0) / PAS_KIR, 6) - 2) // 2) + 1
+    pas = math.copysign(PAS_KIR, u1 - u0)
+    premier = (u0 + u1) / 2 - pas * (n - 1) / 2
     for r in range(REGISTRES_KIR + 1):
         bandeau_fleurons(f"Kir_{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
-    h = (registre - BANDEAU_KIR) * PART_FIGURE_KIR
     for r in range(REGISTRES_KIR):
+        pied = z0 + r * registre + (registre + BANDEAU_KIR - h) / 2
         for i in range(n):
-            motif = keruv_grave if i % 2 == 0 else timora
-            motif(f"Kir_{nom}_{r}{i:02d}", paroi, u0 + pas * (i + 0.5),
-                  z0 + r * registre + (registre + BANDEAU_KIR - h) / 2, h, col)
+            u = premier + pas * i
+            if i % 2 == 0:
+                keruv_grave(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h, col)
+            else:
+                timora(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h * TIMORA_SOUS_AILES, col)
 
 
 PAROIS_OR = [

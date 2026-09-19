@@ -121,20 +121,21 @@ class Collees:
         return (point for triangle in self.faces[k][0] for point in points_temoins(triangle))
 
     def couverte(self, k):
-        return self.faces[k][1].length > 0 and all(self.couvrante(point, k) is not None for point in self.temoins(k))
+        return self.faces[k][1].length > 0 and all(any(self.couvrantes(point, k)) for point in self.temoins(k))
 
     # Recouverte en partie seulement, elle reste ; la plus petite des deux recule derrière l'autre.
     def a_reculer(self, k):
         return self.faces[k][1].length > 0 and not self.mince(k) and any(
-            (g := self.couvrante(point, k)) is not None and g[1] <= TOLERANCE and (self.aires[g[0]], -g[0]) > (self.aires[k], -k)
-            for point in self.temoins(k))
+            devant <= TOLERANCE and (self.aires[g], -g) > (self.aires[k], -k)
+            for point in self.temoins(k) for g, devant in self.couvrantes(point, k))
 
     def mince(self, k):
         triangle, normale = self.faces[k][0][0], self.faces[k][1]
         centre = sum(triangle, triangle[0] * 0) / 3
         return self.arbre.ray_cast(centre - normale * TOLERANCE, -normale, 2 * COLLEE)[0] is not None
 
-    def couvrante(self, point, k):
+    # Toutes, pas la première : l'ordre de `find_nearest_range` suit le BVH de la scène entière.
+    def couvrantes(self, point, k):
         normale = self.faces[k][1]
         for position, _, t, _ in self.arbre.find_nearest_range(point, COLLEE):
             g = self.face_de[t]
@@ -143,8 +144,7 @@ class Collees:
             ecart = position - point
             devant = ecart.dot(normale)
             if -TOLERANCE <= devant <= COLLEE and (ecart - normale * devant).length <= TOLERANCE:
-                return g, abs(devant)
-        return None
+                yield g, abs(devant)
 
 
 def reculer(objets, collees, reculees):

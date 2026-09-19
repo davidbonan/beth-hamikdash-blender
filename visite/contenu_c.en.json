@@ -142,9 +142,9 @@
   "sculptures_murs": {
     "nom": "Wall Carvings: Keruvim, Palm Trees, Flowers",
     "translit": "Keruvim, timorot u-peturei tzitzim",
-    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim, taken from the First Temple: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel, who describes the future Temple, gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The tour arranges them in five registers, from one amah above the floor up to 22 amot, separated by bands of flowers.",
+    "resume": "The reliefs that cover the walls of the Heikhal and the Kodesh HaKodashim, taken from the First Temple: keruvim, palm trees (timorot) and blossoming flowers (peturei tzitzim), gold on gold. Ezekiel, who describes the future Temple, gives the order of the pattern — one timora between two keruvim, and two faces on each keruv. The tour arranges them in three registers, from one amah above the floor up to 22 amot, separated by bands of flowers. The keruv takes the form of the beings of Ezekiel's vision, whom the prophet recognises as keruvim: two wings covering the body, two more stretched out to meet the neighbour's above the palm, human hands and a single leg with a round foot.",
     "cotes": [
-      "five registers, from one amah above the floor up to 22 amot, separated by bands of blossoming flowers",
+      "three registers, from one amah above the floor up to 22 amot, separated by bands of blossoming flowers",
       "0.05 ama in relief",
       "“וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב”: one timora between two keruvim",
       "“וּשְׁנַיִם פָּנִים לַכְּרוּב”: two faces per keruv",
@@ -155,7 +155,7 @@
       {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
       {"oeuvre": "Middot", "ref": "4:1", "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"}
     ],
-    "note": "First Temple: I Kings 6:29; Middot 4:1 speaks only of gold, “שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב.” Ezekiel 41:18-20 describes the future Temple. Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The five registers, the relief depth and the details of the motifs are designed for the tour."
+    "note": "First Temple: I Kings 6:29; Middot 4:1 speaks only of gold, “שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב.” Ezekiel 41:18-20 describes the future Temple. Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The keruvim take the form of the chayot, “וָאֵדַע כִּי כְרוּבִים הֵמָּה” (Ezekiel 10:20): two wings covering the body and two joined to the neighbour's (1:11), human hands under the wings (1:8), a straight leg — “נראין כרגל אחת” (Rashi on Berakhot 10b) — with a round foot (Rashi on 1:7). Tour's choice: the four wings of the chayot given to the wall keruvim, which keep only the faces of a man and a lion (41:19), without features, and their wings joined above the palm. Set aside: a child keruv dressed in a robe — the child's face (Sukkah 5b) is said of the keruvim of the Ark. The three registers, the relief depth and the details of the motifs are designed for the tour."
   },
 
   "chaines_devir": {

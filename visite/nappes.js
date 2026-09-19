@@ -60,8 +60,8 @@ export async function nappes() {
   const motif = regler(await chargeur.loadAsync("matieres/parokhet_2048.webp"), THREE.NoColorSpace);
   motif.wrapS = motif.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("parokhet", { motif });
-  // Les gravures des parois, que `beit_hamikdash_gravures.py` écrit : trois tuiles —
-  // keruv, timora, fleuron — lues par les UV de chaque plaque. Gris = hauteur du modelé.
+  // Les gravures des parois, que `beit_hamikdash_gravures.py` écrit : quatre tuiles —
+  // keruv, keruv dressé, timora, fleuron — lues par les UV de chaque plaque. Gris = hauteur du modelé.
   const gravures = regler(await chargeur.loadAsync("matieres/gravures_2048.webp"), THREE.NoColorSpace);
   gravures.wrapS = gravures.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("gravures", { motif: gravures });

@@ -124,7 +124,7 @@ Même logique pour le motif des Parokhot : il n'est pas de la géométrie mais u
 `visite/matieres/parokhet_2048.webp` (et `parokhet.json`, la palette des quatre laines),
 écrite par `beit_hamikdash_parokhet.py` (~20 s, numpy de Blender, `cwebp` sur le PATH) et
 lue par `parokhet()` du blockout comme par le nuanceur étoffe de la visite. Les figures —
-lion, créature ailée — sont tissées par gpt-image-2 depuis des guides, comme les gravures :
+lion, keruv — sont tissées par gpt-image-2 depuis des guides, comme les gravures :
 `tissages/` est la source versionnée, `--guides` redessine les guides, `--tisser <nom>` fait
 tisser une figure (FAL_AI_KEY dans `.env`). Les contours des guides — les siens et ceux des
 parois du Bayit — vivent dans `beit_hamikdash_contours.py`. Après toute modification :
@@ -136,8 +136,8 @@ $BLENDER -b -P beit_hamikdash_parokhet.py
 Et pour les figures gravées des parois du Bayit — keruvim, timorot, fleurons, sur les murs
 d'or, les vantaux du Heikhal et les jambages des portes des cours — `beit_hamikdash_gravures.py`
 (~5 s) compose l'atlas de modelé `visite/matieres/gravures_2048.webp` **et** `gravures.json`,
-la silhouette de chaque figure tracée sur la carte même, à partir des trois tuiles taillées
-de `gravures/` (keruv, timora, fleuron : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
+la silhouette de chaque figure tracée sur la carte même, à partir des quatre tuiles taillées
+de `gravures/` (keruv aux ailes tendues des murs, keruv dressé des vantaux, timora, fleuron : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
 versionnés parce qu'un modèle ne rend jamais deux fois la même image — la luminance donne le
 modelé, la distance au bord le volume). Le blockout **lit ce JSON** pour tailler chaque
 figure à sa silhouette, un fond dont les UV visent la tuile ; sans lui il s'arrête net.
@@ -150,7 +150,8 @@ $BLENDER -b -P beit_hamikdash_gravures.py -- --tailler timora    # fait retaille
 ```
 
 Le guide d'un motif est son dessin procédural — composition, iconographie, cadrage —
-ombré ; c'est lui que le modèle retaille. Changer un motif, c'est corriger son guide ou
+ombré ; c'est lui que le modèle retaille, avec l'esquisse validée du motif quand
+`gravures/esquisses/` en a une. Changer un motif, c'est corriger son guide ou
 son prompt (`MOTIFS`), retailler, regarder la tuile, puis recomposer l'atlas et reconstruire.
 
 `FOULE = True` en tête du blockout ajoute les figures de Yom Kippour : le peuple dans

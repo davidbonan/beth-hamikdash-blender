@@ -143,9 +143,9 @@
   "sculptures_murs": {
     "he": "כרובים ותמורות ופטורי ציצים",
     "translit": "Keruvim, timorot ou-peturei tzitzim",
-    "resume": "Les reliefs qui couvrent les murs du Heikhal et du Kodesh HaKodashim, repris du Premier Temple : des keruvim, des palmiers (timorot) et des fleurs épanouies (peturei tzitzim), en or sur l'or. Ye'hezkel, qui décrit le Temple futur, donne l'ordre du motif — une timora entre deux keruvim, et deux visages à chaque keruv. La visite les dispose en cinq registres, d'une ama au-dessus du sol à 22 amot, séparés par des bandeaux de fleurs.",
+    "resume": "Les reliefs qui couvrent les murs du Heikhal et du Kodesh HaKodashim, repris du Premier Temple : des keruvim, des palmiers (timorot) et des fleurs épanouies (peturei tzitzim), en or sur l'or. Ye'hezkel, qui décrit le Temple futur, donne l'ordre du motif — une timora entre deux keruvim, et deux visages à chaque keruv. La visite les dispose en trois registres, d'une ama au-dessus du sol à 22 amot, séparés par des bandeaux de fleurs. Le keruv y a la forme des êtres de la vision de Ye'hezkel, que le prophète reconnaît comme des keruvim : deux ailes qui couvrent le corps, deux autres tendues jusqu'à celles du voisin au-dessus du palmier, des mains d'homme et une seule jambe au pied rond.",
     "cotes": [
-      "cinq registres, d'une ama au-dessus du sol à 22 amot, séparés par des bandeaux de fleurs épanouies",
+      "trois registres, d'une ama au-dessus du sol à 22 amot, séparés par des bandeaux de fleurs épanouies",
       "0,05 ama de saillie",
       "« וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב » : une timora entre deux keruvim",
       "« וּשְׁנַיִם פָּנִים לַכְּרוּב » : deux visages par keruv",
@@ -156,7 +156,7 @@
       {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
       {"oeuvre": "Middot", "ref": "4:1", "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"}
     ],
-    "note": "Premier Temple : Melakhim I 6:29 ; Middot 4:1 ne parle que d'or, « שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב ». Ye'hezkel 41:18-20 décrit le Temple futur. Choix de la visite : les reliefs montent « du sol jusqu'au-dessus de l'ouverture » (Ye'hezkel 41:20), c'est-à-dire un peu au-delà des vingt amot de la porte du Heikhal (Middot 4:1) ; au-dessus, l'or reste nu. Les cinq registres, la saillie et le détail des motifs sont dessinés pour la visite."
+    "note": "Premier Temple : Melakhim I 6:29 ; Middot 4:1 ne parle que d'or, « שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב ». Ye'hezkel 41:18-20 décrit le Temple futur. Choix de la visite : les reliefs montent « du sol jusqu'au-dessus de l'ouverture » (Ye'hezkel 41:20), c'est-à-dire un peu au-delà des vingt amot de la porte du Heikhal (Middot 4:1) ; au-dessus, l'or reste nu. Les keruvim ont la forme des 'hayot, « וָאֵדַע כִּי כְרוּבִים הֵמָּה » (Ye'hezkel 10:20) : deux ailes qui couvrent le corps et deux jointes à celles du voisin (1:11), des mains d'homme sous les ailes (1:8), une jambe droite — « נראין כרגל אחת » (Rashi sur Berakhot 10b) — au pied rond (Rashi sur 1:7). Choix de la visite : les quatre ailes des 'hayot données aux keruvim des murs, qui ne gardent que les faces d'homme et de lion (41:19), sans traits, et leurs ailes jointes au-dessus du palmier. Écarté : un keruv enfant vêtu d'une robe — le visage d'enfant (Soucca 5b) est dit des keruvim de l'Arche. Les trois registres, la saillie et le détail des motifs sont dessinés pour la visite."
   },
 
   "chaines_devir": {
