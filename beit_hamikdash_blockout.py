@@ -6342,6 +6342,7 @@ for ns, sy in (("N", 1), ("S", -1)):
 #     l'Arche est là, le Cohen Gadol entre et sort à sa lumière ; enlevée, il entre et sort
 #     à tâtons. Le film la ramène (§8h), et c'est elle qui éclaire la pièce. La lampe se pose
 #     « מֵעַל הַכַּפֹּרֶת מִבֵּין שְׁנֵי הַכְּרֻבִים » (Shemot 25:22), 4,5 W : la pièce reste en pénombre.
+# Le creux entre les deux keruvim ne laisse que ~15 cm autour d'elle : toute retouche de leur maillage se revérifie ici.
 arche_lueur = lampe("Aron_lumiere", 'POINT', (m(KKC), 0.0, m(Z_KAPORET + 1 / 6 + 0.35)))
 arche_lueur.data.energy = 4.5
 arche_lueur.data.color = (1.0, 0.93, 0.82)
