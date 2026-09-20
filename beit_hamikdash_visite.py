@@ -38,6 +38,7 @@ import subprocess
 import sys
 import tempfile
 import bpy
+from mathutils import Matrix, Vector
 
 RACINE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RACINE))
@@ -144,8 +145,14 @@ def comprimer(glb, options=()):
 
     C'est la seule optimisation qui compte sur un téléphone en 4G, et l'export glTF de
     Blender ne sait pas la faire. `-kn` garde les noms de nœuds, qui sont le lien
-    géométrie ↔ encyclopédie ; la quantification est portée à 16 bits parce que le
-    placage d'or ne se tient qu'à 4,8 cm de la pierre qu'il couvre.
+    géométrie ↔ encyclopédie.
+
+    `-vpf` : les positions en flottants, pas en entiers. En entiers, gltfpack pose UNE
+    grille pour tout le fichier, celle de l'étendue de la scène — 604 m depuis que la
+    vieille ville y entre, soit 9,2 mm même à 16 bits. Les keruvim de la kaporet, hauts
+    d'1,2 m et emplumés de pennes de 2,5 mm d'épaisseur, en ressortaient taillés en
+    cubes. En flottants, la précision se rapporte aux coordonnées de chaque maillage et
+    non à l'étendue du pays : recentrés par `recentrer`, ils gardent 6 µm.
 
     `-cc` plutôt que `-c` : l'hébergeur sert le .glb sans compression de transport —
     `curl -I https://bethhamikdach.com/visite/temple.glb` ne renvoie aucun `content-encoding`
@@ -160,7 +167,7 @@ def comprimer(glb, options=()):
     # restait, un dixième de figure en haut de l'atlas, et le modelé glissait sous sa
     # plaque. En flottants, il les laisse telles quelles.
     commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
-                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vn", "12", "-vtf", *options]
+                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vpf", "-vn", "12", "-vtf", *options]
     try:
         subprocess.run(commande, check=True, capture_output=True, timeout=600)
     except (OSError, subprocess.SubprocessError) as erreur:
@@ -253,6 +260,19 @@ def fusionner(nom, objets):
     tete["concept"] = nom
     tete["faces_sans_chanfrein"] = faces_sans_chanfrein
     return tete
+
+
+def recentrer(obj):
+    """Origine au centre de l'emprise : le maillage sort en coordonnées locales, et le
+    nœud glTF porte le reste. Sans ça, un concept est écrit dans les coordonnées du Har
+    HaBayit — la kaporet vers x = −72 m — et la quantification des positions s'y
+    rapporte, même en flottants, au lieu de se rapporter à sa propre taille."""
+    # `bound_box` traîne l'état d'avant la fusion et la séparation des faces collées ;
+    # les sommets, eux, sont à jour.
+    coins = [[fonction(v.co[k] for v in obj.data.vertices) for k in range(3)] for fonction in (min, max)]
+    centre = (Vector(coins[0]) + Vector(coins[1])) / 2
+    obj.data.transform(Matrix.Translation(-centre))
+    obj.matrix_world = obj.matrix_world @ Matrix.Translation(centre)
 
 
 def bornes(obj):
@@ -375,6 +395,11 @@ def exporter(chantier):
         return False
     occlusion, lumiere, empreintes = cartes
 
+    # Après la cuisson : l'empreinte d'un concept tient à ses sommets et à sa matrice
+    # monde, et recentrer avant ferait recuire toutes les cartes sans qu'une seule ait
+    # bougé dans la scène.
+    for obj in fusionnes.values():
+        recentrer(obj)
     for mat in bpy.data.materials:
         aplatir(mat)
     entrees = [en_metres(v, emprises) for v in REPERES]

@@ -5,6 +5,10 @@ l'autre, mains jointes au milieu de la kaporet, tête inclinée vers elle ; des 
 plumées montent des omoplates et se rejoignent en dais au-dessus du milieu (Shemot 25:20).
 Le garçon est un peu plus grand que la fille (Yoma 54a, « זָכָר וּנְקֵבָה » : CHOIX).
 
+Les coiffes MakeHuman sont des cartes trouées par leur alpha, et le keruv est d'or massif :
+seule une coiffe qui épouse le crâne s'y taille. En plaques opaques, `bob02` devenait un
+casque qui mangeait le visage jusqu'aux yeux.
+
 Le blockout ne bâtit pas ces corps : MakeHuman coûte une minute par figure, et le blockout
 se reconstruit en cinq secondes. Il lit `keruvim.blend`, un maillage par keruv, dans le
 repère du keruv du blockout : origine sur la kaporet, -x vers l'autre keruv, z vers le haut,
@@ -286,7 +290,7 @@ def main():
     garcon = keruv("Keruv_garcon", Gabarit(0.92, genre=1.0, age=0.10, muscle=0.5, poids=0.5, peau="young_caucasian_male"),
                    "short02", penche_buste=0.20, penche_tete=0.60, mains_z=0.40, apex_z=0.90)
     fille = keruv("Keruv_fille", Gabarit(0.87, genre=0.0, age=0.10, muscle=0.45, poids=0.5, peau="young_caucasian_female"),
-                  "bob02", penche_buste=0.18, penche_tete=0.60, mains_z=0.38, apex_z=0.87)
+                  "braid01", penche_buste=0.18, penche_tete=0.60, mains_z=0.38, apex_z=0.87)
     for me in (garcon, fille):
         me.use_fake_user = True
     bpy.data.libraries.write(str(SORTIE), {garcon, fille}, fake_user=True, compress=True)
