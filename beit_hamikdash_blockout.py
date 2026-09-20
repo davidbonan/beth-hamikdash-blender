@@ -1592,6 +1592,72 @@ def _taille_profil(nom, paroi, contour, profondeur, col, mat=None, uv=None):
     return o
 
 
+def _sens_direct(paroi):
+    """+1 si un contour tracé dans le sens trigonométrique du plan (u, z) regarde déjà le
+    dehors de la paroi, −1 s'il faut le retourner."""
+    point, _, normale = _repere(paroi)
+    origine = point(0.0, 0.0, 0.0)
+    aire = (point(1.0, 0.0, 0.0) - origine).cross(point(0.0, 1.0, 0.0) - origine)
+    return 1 if aire.dot(normale) > 0 else -1
+
+
+def _taille_repetee(nom, paroi, motif, u0, u1, z0, z1, profondeur, col, mat=None):
+    """Une bande creusée dont le FOND reparcourt la tuile de `motif`, le long de son plus
+    grand côté.
+
+    Une figure isolée vaut une taille ; un cordon qui court sur quarante amot en vaudrait
+    des centaines, et autant de prismes dans l'outil booléen de son support. La bande n'en
+    creuse qu'UNE, et son fond est un ruban de quadrilatères qui reprennent chacun la
+    tuile entière — les sommets se dédoublent à chaque couture, une UV ne sachant pas
+    sauter au milieu d'une face.
+
+    Le motif doit se refermer sur son carré : `corde` et `tresse` sont dessinés, et non
+    taillés par un modèle, exactement pour ça (`beit_hamikdash_gravures.py`).
+    """
+    fiche = GRAVURES[motif]
+    mu0, mz0, mu1, _ = fiche["cadre"]
+    ou, ov, tuile = fiche["tuile"]
+    etendue = mu1 - mu0
+    point, _, normale = _repere(paroi)
+    sens = _sens_direct(paroi)
+    horizontal = abs(u1 - u0) >= abs(z1 - z0)
+    (l0, l1), (c0, c1) = ((u0, u1), (z0, z1)) if horizontal else ((z0, z1), (u0, u1))
+    n = max(1, round(abs(l1 - l0) / abs(c1 - c0)))
+    pas = (l1 - l0) / n
+    verts, faces, uv = [], [], []
+    coins_motif = [(mu0, mz0), (mu1, mz0), (mu1, mz0 + etendue), (mu0, mz0 + etendue)]
+
+    def poser(coins, profond):
+        base = len(verts)
+        ordre = range(4) if sens > 0 else range(3, -1, -1)
+        for k in ordre:
+            u, z = coins[k]
+            verts.append(tuple(point(u, z, 0.0) - normale * profond))
+            du, dz = coins_motif[k]
+            uv.append((ou + tuile * (du - mu0) / etendue, ov + tuile * (dz - mz0) / etendue))
+        return base
+
+    for k in range(n):
+        a, b = l0 + pas * k, l0 + pas * (k + 1)
+        long_court = [(a, c0), (b, c0), (b, c1), (a, c1)]
+        base = poser(long_court if horizontal else [(c, l) for l, c in long_court], profondeur)
+        faces.append([base + i for i in range(4)])
+    # Les flancs, du fond au nu : les mêmes quatre coins, deux fois.
+    cadre = [(u0, z0), (u1, z0), (u1, z1), (u0, z1)]
+    fond = poser(cadre, profondeur)
+    poser(cadre, 0.0)
+    faces += [[fond + 4 + k, fond + 4 + (k + 1) % 4, fond + (k + 1) % 4, fond + k]
+              for k in range(4)]
+    o = mesh_from_pydata(nom, verts, faces, col,
+                         matiere_gravee(mat or MAT_OR_PLAQUE()), uv)
+    o["taille"] = True
+    # Un chanfrein sur une bande de quarante amot en mangerait le cordon et dédoublerait
+    # chaque couture : ce sont ses deux longs bords qui la dessinent, pas son biseau.
+    o["sans_biseau"] = True
+    _TAILLES.append((paroi, cadre, profondeur))
+    return o
+
+
 # --- Les trois figures gravées du Bayit, et le palmier de tous ses jambages :
 #     « כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים » (Melakhim I 6:29 pour les parois, 6:32 et 6:35
 #     pour les vantaux). Ye'hezkel 41:18-19 donne l'ORDRE dans lequel elles alternent —
@@ -1607,33 +1673,44 @@ def _taille_profil(nom, paroi, contour, profondeur, col, mat=None, uv=None):
 #     lit par ses UV : `beit_hamikdash_gravures.py` écrit la carte et les silhouettes,
 #     tracées sur la carte même. Des plaques empilées, aussi bien découpées fussent-elles,
 #     se lisaient en emporte-pièce : seul le chanfrein prenait la lumière.
-BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
+# Le bandeau porte maintenant un cordon ET les fleurs enfilées dessus (`bandeau_guirlande`) :
+# à 0,55 ama les deux se disputaient la même ligne et le cordon sortait en filet sale.
+BANDEAU_KIR = 0.8         # hauteur d'un bandeau, en amot
 # « פִּתּוּחֵי מִקְלְעוֹת » : « חֲקוּקֵי צוּרַת כְּרוּבִים » (Rashi), « לא שהיו בולטין » (Radak) — la
 # figure est TAILLÉE dans la paroi, rien n'en sort. Son modelé bombe au fond de la taille
 # sans jamais revenir au nu, et c'est le flanc tourné vers elle qui en trace le contour.
-PROFONDEUR_KIR = 0.05     # 2,5 cm, la moitié du placage d'or de 0,1 ama
+# 3,4 cm. La taille n'est pas bornée par l'épaisseur du placage : la figure est creusée
+# dans le CÈDRE et l'or vient l'épouser, « מְיֻשָּׁר עַל הַמְּחֻקֶּה » (6:35). À 0,05 le contour
+# d'un keruv de 5,6 amot rendait une ligne d'ombre de 2,5 cm à quinze mètres, et le champ
+# se lisait imprimé sur l'or plutôt que taillé dedans.
+PROFONDEUR_KIR = 0.07
 # Le pas d'un keruv à la timora voisine, en amot : 12 pas sur les 40 amot du Heikhal, et
 # les ailes des keruvim d'about touchent les angles. Le Kodesh HaKodashim prend le même
 # pas, pour que ses keruvim aient la taille de ceux du Heikhal. Le pas règle la taille des
-# figures : à 14 pas le keruv aux ailes levées tombait à 4,8 amot dans un registre qui en
-# tient 6,3, à 10 pas il montait à 6,7 et n'y tenait plus.
-PAS_KIR = 40 / 12
+# figures : le registre et le pas se règlent ENSEMBLE — quatre registres de 4,25 amot
+# utiles et 14 pas donnent une figure de 3,98 qui remplit son registre et touche sa
+# voisine. Trois registres et 12 pas laissaient 0,3 ama d'air sous le keruv mais 2,2 au-
+# dessus de la palmette, et c'est ce vide-là qui faisait le champ fade.
+PAS_KIR = 40 / 14
 PAS_FLEURON = 3.7         # pas d'un fleuron dans un bandeau, en amot
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
-CARTE_GRAVURES = GRAVURES_JSON.with_name("gravures_2048.webp")
-MODELE_GRAVURE = 0.03     # amot : ce dont le modelé bombe par-dessus la plaque, 1,5 cm sur un
+MODELE_GRAVURE = 0.045    # amot : ce dont le modelé bombe par-dessus la plaque, 2,2 cm sur un
                           # keruv de paroi. La visite le prend en part de la hauteur de la
                           # figure (matieres.js, RELIEF_GRAVURE) ; ici c'est le keruv qui règle.
 
 
 def _lire_gravures():
     try:
-        return json.loads(GRAVURES_JSON.read_text(encoding="utf-8"))["motifs"]
+        return json.loads(GRAVURES_JSON.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise SystemExit(f"{GRAVURES_JSON.name} absent : lancer beit_hamikdash_gravures.py d'abord.")
 
 
-GRAVURES = _lire_gravures()
+FICHE_GRAVURES = _lire_gravures()
+GRAVURES = FICHE_GRAVURES["motifs"]
+# L'atlas porte sa taille dans sa fiche : un nom de fichier en dur mentait dès que
+# `beit_hamikdash_gravures.py` changeait de grille.
+CARTE_GRAVURES = GRAVURES_JSON.with_name(f"gravures_{FICHE_GRAVURES['pixels']}.webp")
 _GRAVEES = {}
 
 
@@ -1695,6 +1772,14 @@ def timora(nom, paroi, u, z0, h, col, mat=None):
     return _relief_grave(nom, paroi, "timora", u, z0, h, col, mat)
 
 
+def dekel_grave(nom, paroi, u, z0, h, col, mat=None):
+    """« וְתִמֹרֹת » des PAROIS, que Targum Yonatan rend « צוּרַת דִּקְלִין » (Melakhim I 6:29) :
+    un dattier entier — fût à cicatrices, sept palmes, deux régimes —, celui des monnaies
+    de Bar Kokhba et celui que la parokhet tisse. `timora` reste le chapiteau des
+    jambages, que Rashi décrit sur Ye'hezkel 40:16, un verset qui parle de portes."""
+    return _relief_grave(nom, paroi, "dekel", u, z0, h, col, mat)
+
+
 def keruv_grave(nom, paroi, u, z0, h, col):
     """« כְּרוּבִים » — la 'haya de la vision, « וָאֵדַע כִּי כְרוּבִים הֵמָּה » (Ye'hezkel 10:20) :
     deux ailes qui couvrent le corps, une jambe au pied rond (1:7-11), un crâne à deux
@@ -1718,16 +1803,26 @@ def petur_tzitz(nom, paroi, u, z, r, col, mat=None):
     return o
 
 
-# Les deux traits d'un bandeau, en amot au-dessus de son bas : entre le bord et la
-# corolle, qui en laisse 0,044 de chaque côté — deux tailles qui se touchent ne font
-# plus qu'un trou.
-TRAITS_BANDEAU = ((0.012, 0.036), (BANDEAU_KIR - 0.036, BANDEAU_KIR - 0.012))
+def bouton_grave(nom, paroi, u, z0, h, col, mat=None):
+    """« פְּקָעִים » (Melakhim I 6:18) : le bouton fermé, « כְּמִין כַּפְתּוֹרִים » (Rashi),
+    « בִּיצִים שֶׁשְּׁנֵי רָאשֵׁיהֶם חַדִּים » (Ralbag), qui le rattache aux גְּבִיעִים כַּפְתֹּרִים
+    וּפְרָחִים de la Menora. Debout sur le cordon, pied en `z0`, haut de `h`."""
+    o = _relief_grave(nom, paroi, "bouton", u, z0, h, col, mat)
+    o["sans_biseau"] = True
+    return o
+
+
+# Les deux traits d'un bandeau, en amot au-dessus de son bas : entre le bord et ce que
+# le bandeau porte, qui en laisse de quoi ne pas le toucher — deux tailles qui se
+# touchent ne font plus qu'un trou.
+TRAITS_BANDEAU = ((0.014, 0.042), (BANDEAU_KIR - 0.042, BANDEAU_KIR - 0.014))
 
 
 def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
-    """Un bandeau de fleurons en travers d'une paroi : ce qui tient les registres.
-    Sans lui, les figures flottaient sur un aplat d'or sans une ligne pour les poser.
-    Deux traits taillés le bordent, et non un listel qui sortirait du nu."""
+    """Un bandeau de fleurons isolés, celui de la frise de la gezuztra : une corolle tous
+    les PAS_FLEURON, bordée de deux traits taillés. Les parois du Bayit, elles, portent
+    la guirlande (`bandeau_guirlande`) : le Targum y lit un cordon, pas des fleurs
+    posées seules."""
     for bord, (zb, zh) in enumerate(TRAITS_BANDEAU):
         _taille_profil(f"{nom}_trait_{bord}", paroi,
                        [(u0, z + zb), (u1, z + zb), (u1, z + zh), (u0, z + zh)],
@@ -1737,6 +1832,43 @@ def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
     for i in range(n):
         petur_tzitz(f"{nom}_fleuron_{i:02d}", paroi, u0 + pas * (i + 0.5), z + BANDEAU_KIR / 2,
                     BANDEAU_KIR * 0.42, col, mat)
+
+
+CORDON_BANDEAU = 0.34     # part du bandeau prise par le cordon, traits déduits
+# Les deux tailles se chevauchent sans clignoter parce que leurs fonds sont à deux
+# profondeurs ; posées bord à bord elles se lisaient en rang de fleurs À CÔTÉ du cordon.
+ENFILAGE = 0.16           # part de la fleur qui descend DANS le cordon
+PAS_FLEUR = 1.45          # pas d'une fleur à la suivante dans un bandeau, en amot
+
+
+def bandeau_guirlande(nom, paroi, u0, u1, z, col, mat=None):
+    """« פְּטוּרֵי צִצִּים » tel que le Targum le lit : « אָטוּנִין שׁוֹשַׁנִין », des cordes de
+    fleurs, et Rashi le décompose sur 6:18 — « פְּטוּרֵי לְשׁוֹן חֲבָלִים … צִצִּים לְשׁוֹן
+    פְּרָחִים », « צוּרַת שַׁלְשְׁלָאוֹת ». Le bandeau est donc un CORDON qui court, et des fleurs
+    enfilées dessus ; et puisque Melakhim I 6:18 met les פְּקָעִים — les boutons — au même
+    rang que les צִצִּים, ce qui s'enfile alterne le bouton et la corolle ouverte.
+
+    Ce que le bandeau portait avant — deux traits et une corolle tous les 3,7 amot —
+    laissait les figures flotter sur l'or nu : c'est le cordon, et lui seul, qui les tient.
+    """
+    (_, bas), (haut, _) = TRAITS_BANDEAU
+    cordon = bas + (haut - bas) * CORDON_BANDEAU
+    for bord, (zb, zh) in enumerate(TRAITS_BANDEAU):
+        _taille_profil(f"{nom}_trait_{bord}", paroi,
+                       [(u0, z + zb), (u1, z + zb), (u1, z + zh), (u0, z + zh)],
+                       PROFONDEUR_KIR * 0.4, col, mat)
+    _taille_repetee(f"{nom}_cordon", paroi, "corde", u0, u1, z + bas, z + cordon,
+                    PROFONDEUR_KIR * 0.7, col, mat)
+    n = max(2, round(abs(u1 - u0) / PAS_FLEUR))
+    pas = (u1 - u0) / n
+    fleur = (haut - cordon) * 0.94
+    pied = z + cordon - fleur * ENFILAGE
+    for i in range(n):
+        u = u0 + pas * (i + 0.5)
+        if i % 2 == 0:
+            petur_tzitz(f"{nom}_fleur_{i:02d}", paroi, u, pied + fleur / 2, fleur / 2, col, mat)
+        else:
+            bouton_grave(f"{nom}_fleur_{i:02d}", paroi, u, pied, fleur, col, mat)
 
 
 REGISTRES_VANTAIL = 3     # figures empilées sur un vantail : « תמרה בין כרוב לכרוב »
@@ -1750,12 +1882,15 @@ def vantail_sculpte(nom, paroi, u0, u1, z0, z1, col):
     Un vantail est haut et étroit là où une paroi est large : la file de figures y monte
     au lieu de courir. Ce qui tient, c'est l'ALTERNANCE — « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב »
     (Ye'hezkel 41:18), une timora entre deux keruvim, quel que soit le sens de la file.
+    Et c'est le DATTIER des parois : « כַּאֲשֶׁר עֲשׂוּיִם לַקִּירוֹת » (41:25) — les vantaux
+    portent ce que portent les murs, donc « צוּרַת דִּקְלִין » (Targum sur 6:29) et non le
+    chapiteau des jambages.
     """
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_VANTAIL
     for r in range(REGISTRES_VANTAIL + 1):
-        bandeau_fleurons(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
+        bandeau_guirlande(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
     for r in range(REGISTRES_VANTAIL):
-        motif = keruv_dresse if r % 2 == 0 else timora
+        motif = keruv_dresse if r % 2 == 0 else dekel_grave
         motif(f"{nom}_{r}", paroi, (u0 + u1) / 2, z0 + r * registre + BANDEAU_KIR,
               registre - BANDEAU_KIR, col)
 
@@ -6103,32 +6238,61 @@ box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim",
 #     (Middot 4:1). Au-dessus, l'or reste nu jusqu'à la corniche : deux registres
 #     flottant à mi-hauteur ne sont dans aucune source.
 CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
+CHAMP_HAUT = (22.0, 38.0)  # du haut du champ au bas de la corniche : ce qui restait nu
 # Trois registres de keruvim monumentaux : leur taille est celle qui fait se toucher la
 # pointe d'aile d'un keruv et la palme de la timora voisine, au pas PAS_KIR. Les ailes se
 # lèvent au-dessus de la tête (beit_hamikdash_contours.py) : elles ne rejoignent plus
 # celles du voisin par-dessus la timora, et ce n'est plus leur jonction qui règle la taille.
-REGISTRES_KIR = 3         # registres de figures, séparés par des bandeaux de fleurons
+# Quatre, et non trois : le dattier entier est AUSSI HAUT que le keruv là où la palmette
+# n'en faisait que les deux tiers, et à trois registres les deux figures tombaient à
+# 4,2 amot dans un registre qui en tient 5,9 — plus d'or nu qu'avant. À quatre, la figure
+# remplit son registre et la paroi porte un tiers de figures en plus. Aucune source ne
+# donne le nombre de registres.
+REGISTRES_KIR = 4         # registres de figures, séparés par des guirlandes
 # La timora se tient sous les pointes d'ailes, pied au niveau du sabot.
-TIMORA_SOUS_AILES = 0.66  # hauteur de la timora, en part de celle du keruv
+
+
+# « מֵסַב קָלַע » : « מֻקֶּפֶת צִיּוּרִין » (Rashi 6:29) — le champ est CEINTURÉ, il ne
+# s'arrête pas où la file de figures s'épuise. L'or nu que la file laissait à chaque
+# angle devient donc le montant tressé qui la ferme.
+MONTANT_KIR = 1.4         # largeur maximale d'un montant, en amot
+RESERVE_MONTANT = 0.45    # l'or laissé nu entre le montant et la première figure
+
+
+def _montants(nom, paroi, u0, u1, z0, z1, marge, col):
+    """Les deux montants tressés aux bouts d'un champ, s'il reste de quoi les tailler."""
+    largeur = min(MONTANT_KIR, marge - RESERVE_MONTANT)
+    if largeur <= BANDEAU_KIR / 2:
+        return u0, u1
+    vers = math.copysign(largeur, u1 - u0)
+    for k, bord in enumerate((u0, u1)):
+        _taille_repetee(f"{nom}_montant_{k}", paroi, "tresse", bord,
+                        bord + (vers if k == 0 else -vers), z0, z1, PROFONDEUR_KIR * 0.7, col)
+    return u0 + vers, u1 - vers
 
 
 def champ_sculpte(nom, paroi, u0, u1, col):
     """Le champ « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח » d'une paroi : des registres de keruvim et de
-    timorot en alternance stricte, séparés par des bandeaux de fleurons. Une file commence
-    et finit par un keruv, « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב » (Ye'hezkel 41:18), et se centre
-    sur la paroi."""
+    dattiers en alternance stricte, séparés par des guirlandes, et ceinturé de deux
+    montants tressés. Une file commence et finit par un keruv, « וְתִמֹרָה בֵּין כְּרוּב
+    לִכְרוּב » (Ye'hezkel 41:18), et se centre sur la paroi.
+
+    Les deux figures ont la MÊME hauteur et se touchent au pas : c'est ce qui tient le
+    champ. La palmette, haute des deux tiers du keruv, laissait au-dessus d'elle un vide
+    que rien ne remplissait."""
     z0, z1 = Z_BAT + CHAMP_KIR[0], Z_BAT + CHAMP_KIR[1]
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_KIR
-    h = PAS_KIR / ((largeur_gravure("keruv") + TIMORA_SOUS_AILES * largeur_gravure("timora")) / 2)
+    h = PAS_KIR / ((largeur_gravure("keruv") + largeur_gravure("dekel")) / 2)
     assert h <= registre - BANDEAU_KIR, f"keruv de {h:.2f} amot dans un registre de {registre - BANDEAU_KIR:.2f}"
     # La file se centre sur la paroi, n impair pour qu'elle commence et finisse par un
-    # keruv ; n + 1 pas doivent y tenir, et l'or reste nu de moins d'une ama à chaque angle,
-    # les ailes levées ne couvrant plus qu'un demi-pas de part et d'autre de leur axe.
+    # keruv ; n + 1 pas doivent y tenir, et ce qui reste à chaque angle porte le montant.
     n = 2 * int((round(abs(u1 - u0) / PAS_KIR, 6) - 2) // 2) + 1
     pas = math.copysign(PAS_KIR, u1 - u0)
     premier = (u0 + u1) / 2 - pas * (n - 1) / 2
+    marge = (abs(u1 - u0) - (n - 1) * PAS_KIR - h * largeur_gravure("keruv")) / 2
+    ua, ub = _montants(f"Kir_{nom}", paroi, u0, u1, z0, z1, marge, col)
     for r in range(REGISTRES_KIR + 1):
-        bandeau_fleurons(f"Kir_{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
+        bandeau_guirlande(f"Kir_{nom}_{r}", paroi, ua, ub, z0 + r * registre, col)
     for r in range(REGISTRES_KIR):
         pied = z0 + r * registre + (registre + BANDEAU_KIR - h) / 2
         for i in range(n):
@@ -6136,23 +6300,91 @@ def champ_sculpte(nom, paroi, u0, u1, col):
             if i % 2 == 0:
                 keruv_grave(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h, col)
             else:
-                timora(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h * TIMORA_SOUS_AILES, col)
+                dekel_grave(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h, col)
 
 
+# --- Ce qui monte AU-DESSUS du champ. « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח » (41:20) arrête les
+#     FIGURES à 22 amot ; il n'arrête pas le placage. 41:16 le fait monter plus haut —
+#     « מִקַּרְקָעִית הַחוֹמָה … וְעוֹלֶה לְמַעְלָה עַד הַחַלּוֹנוֹת » (Rashi), et Metzudat David
+#     « וְגַם מִמַּעַל לְהַחַלּוֹנוֹת הָיוּ מְכֻסּוֹת בְּלוּחֵי אֶרֶז » —, et 41:17 dit de quoi il est
+#     fait : « מִדּוֹת », des planches TOUTES D'UNE MÊME MESURE. Rashi : « מְחֻפֶּה נְסָרִים
+#     גְּדוֹלוֹת, עֲשׂוּיוֹת בְּמִדָּה » ; Metzudat David : « עֲשׂוּיוֹת בְּמִדָּה אַחַת זֶה כָּזֶה …
+#     שֶׁלֹּא הָיָה מָקוֹם פָּנוּי מִבְּלִי לוּחוֹת אֶרֶז ».
+#     AUCUNE FIGURE ici : 41:20 ne les met que jusqu'à 22, et deux registres flottant à
+#     mi-hauteur ne sont dans aucune source. Des panneaux et des cordons, rien d'autre.
+#     Les seize amot laissées nues étaient la moitié de la paroi visible.
+RANGS_HAUT = 4            # rangs de panneaux entre le champ et la corniche
+CORDON_HAUT = 0.5         # hauteur d'un cordon en travers, en amot
+TRONCON_MINI = 1.2        # longueur sous laquelle un tronçon de rang ne vaut plus d'être taillé
+RESERVE_PANNEAU = 0.30    # l'or laissé nu autour d'une baie
+
+
+def _hors_baies(ua, ub, z0, z1, baies):
+    """Les tronçons de [ua, ub] qu'aucune baie ne traverse, dans la tranche [z0, z1].
+    Une baie hors de la tranche ne la coupe pas — le Kodesh HaKodashim n'en a aucune."""
+    gauche, droite = min(ua, ub), max(ua, ub)
+    coupes = sorted((min(xa, xb) - RESERVE_PANNEAU, max(xa, xb) + RESERVE_PANNEAU)
+                    for xa, xb, zb, zh in baies
+                    if zb - RESERVE_PANNEAU < z1 and zh + RESERVE_PANNEAU > z0)
+    libre = gauche
+    for xa, xb in coupes:
+        if xa > libre:
+            yield libre, min(xa, droite)
+        libre = max(libre, xb)
+    if libre < droite:
+        yield libre, droite
+
+
+def champ_haut(nom, paroi, u0, u1, baies, col):
+    """Le placage au-dessus du champ : des rangs de panneaux de la mesure, séparés par des
+    cordons en travers, entre les mêmes montants tressés que le champ d'en bas.
+
+    Aucune FIGURE — Ye'hezkel 41:20 ne les met que jusqu'à 22 — mais pas d'or nu non plus,
+    « שֶׁלֹּא הָיָה מָקוֹם פָּנוּי מִבְּלִי לוּחוֹת אֶרֶז » (Metzudat David sur 41:17) ; et le lambris
+    lui-même est « מִקְלַעַת פְּקָעִים וּפְטוּרֵי צִצִּים » (Melakhim I 6:18), d'où le bouton et la
+    fleur taillés au fond de chaque panneau.
+
+    Un rang est UNE bande répétée, non douze panneaux taillés un par un. C'est l'économie
+    du cordon, et c'est elle qui permet quatre rangs de panneaux carrés là où deux rangs de
+    planches de 2,7 sur 6,6 amot ne rendaient rien — une seule marche de 1,5 cm sur une
+    planche d'un mètre trente ne se voit sous aucune lumière.
+    """
+    z0, z1 = Z_BAT + CHAMP_HAUT[0], Z_BAT + CHAMP_HAUT[1]
+    marge = (abs(u1 - u0) - (2 * int((round(abs(u1 - u0) / PAS_KIR, 6) - 2) // 2)) * PAS_KIR) / 2
+    ua, ub = _montants(f"Haut_{nom}", paroi, u0, u1, z0, z1, marge, col)
+    rang = (z1 - z0) / RANGS_HAUT - CORDON_HAUT
+    for r in range(RANGS_HAUT):
+        zb = z0 + r * (rang + CORDON_HAUT)
+        for motif, (bas, haut), creux in (("panneau", (zb, zb + rang), PROFONDEUR_KIR),
+                                          ("corde", (zb + rang, zb + rang + CORDON_HAUT),
+                                           PROFONDEUR_KIR * 0.7)):
+            for k, (a, b) in enumerate(_hors_baies(ua, ub, bas, haut, baies)):
+                if abs(b - a) < TRONCON_MINI:
+                    continue
+                _taille_repetee(f"Haut_{nom}_{motif}_{r}{k}", paroi, motif, a, b,
+                                bas, haut, creux, col)
+
+
+PAROI_EST = ("y", HK0 - EPAISSEUR_PLACAGE, -1)
 PAROIS_OR = [
-    ("Heikhal_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), HK1, HK0, "50_Heikhal"),
-    ("Heikhal_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), HK1, HK0, "50_Heikhal"),
-    ("KhK_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), KK1, KK0, "60_KodeshHakodashim"),
-    ("KhK_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), KK1, KK0, "60_KodeshHakodashim"),
-    ("KhK_O", ("y", KK1 + EPAISSEUR_PLACAGE, 1), -10, 10, "60_KodeshHakodashim"),
+    ("Heikhal_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), HK1, HK0, baies_heikhal(*FENETRE_INT), "50_Heikhal"),
+    ("Heikhal_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), HK1, HK0, baies_heikhal(*FENETRE_INT), "50_Heikhal"),
+    ("KhK_N", ("x", 10 - EPAISSEUR_PLACAGE, -1), KK1, KK0, (), "60_KodeshHakodashim"),
+    ("KhK_S", ("x", -10 + EPAISSEUR_PLACAGE, 1), KK1, KK0, (), "60_KodeshHakodashim"),
+    ("KhK_O", ("y", KK1 + EPAISSEUR_PLACAGE, 1), -10, 10, (), "60_KodeshHakodashim"),
 ]
-for nom, paroi, u0, u1, col in PAROIS_OR:
+for nom, paroi, u0, u1, baies, col in PAROIS_OR:
     champ_sculpte(nom, paroi, u0, u1, col)
+    champ_haut(nom, paroi, u0, u1, baies, col)
 # Le mur est du Heikhal n'a pas de champ : la baie en tient le milieu, les battants
-# intérieurs les côtés (Middot 4:1). « עַד־מֵעַל הַפֶּתַח » n'y laisse que le bandeau qui
-# ferme le champ des murs nord et sud, au-dessus de la baie et des battants.
-bandeau_fleurons("Kir_Heikhal_E_linteau", ("y", HK0 - EPAISSEUR_PLACAGE, -1), -10, 10,
-                 Z_BAT + CHAMP_KIR[1] - BANDEAU_KIR, "50_Heikhal")
+# intérieurs les côtés (Middot 4:1). « עַד־מֵעַל הַפֶּתַח » n'y laisse que la guirlande qui
+# ferme le champ des murs nord et sud, au-dessus de la baie et des battants. Au-dessus,
+# en revanche, l'or y est continu sur les vingt amot de la nef et prend le même
+# panneautage que les trois autres parois — « שֶׁלֹּא הָיָה מָקוֹם פָּנוּי » (Metzudat David
+# sur Ye'hezkel 41:17) ne fait pas d'exception pour un mur.
+bandeau_guirlande("Kir_Heikhal_E_linteau", PAROI_EST, -10, 10,
+                  Z_BAT + CHAMP_KIR[1] - BANDEAU_KIR, "50_Heikhal")
+champ_haut("Heikhal_E", PAROI_EST, -10, 10, (), "50_Heikhal")
 
 # « וַיְעַבֵּר בְּרַתּוּקוֹת זָהָב לִפְנֵי הַדְּבִיר » (Melakhim I 6:21) : des chaînes d'or tendues
 # devant le Devir. Trois chaînettes sous le plafond, de mur à mur, devant la parokhet.

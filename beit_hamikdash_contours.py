@@ -445,3 +445,75 @@ def epi(ecart, longueur):
                  (u0 + ecart, z0 - longueur), 16)
     dattes = [(u + (-1) ** k * DATTE[0] * 0.75, z) for k, (u, z) in enumerate(fil[5::4])]
     return fil, dattes
+
+
+# --- Le bouton et le cordon : « מִקְלַעַת פְּקָעִים וּפְטוּרֵי צִצִּים » (Melakhim I 6:18). ------
+
+# Le verset du lambris de cèdre donne DEUX choses que celui des parois (6:29) ne
+# répète pas, et que le champ ne montrait pas : des פְּקָעִים et une מִקְלַעַת.
+# פְּקָעִים : « כְּמִין כַּפְתּוֹרִים » (Rashi), « חֵיזוּ בֵיעִין » (Targum Yonatan), « צוּרוֹת
+# פְּקוּעוֹת שָׂדֶה » (Radak) — et Ralbag les dessine : « בִּיצִים שֶׁשְּׁנֵי רָאשֵׁיהֶם חַדִּים »,
+# le bouton AVANT qu'il s'ouvre, qu'il rattache aux גְּבִיעִים כַּפְתֹּרִים וּפְרָחִים de la
+# Menora — « וְלַסִּבָּה בְּעֵינָהּ שֶׁהָיוּ אֵלּוּ הַצִּיּוּרִים בַּמְּנוֹרָה הָיוּ בְּזֶה הַמָּקוֹם ».
+# C'est le cycle, et non une corolle répétée, que le bandeau porte donc.
+def bouton(u, z, r):
+    """Le bouton fermé : un œuf effilé aux deux bouts, ventru sous son milieu, sur un
+    calice de trois sépales courts. `r` est sa demi-largeur ; il monte à 2,6 r."""
+    oeuf = lisser(symetrique([(0.00, 2.60), (0.30, 2.16), (0.62, 1.62), (0.86, 1.10),
+                              (0.92, 0.70), (0.74, 0.30), (0.38, 0.08), (0.00, 0.00)]), passes=2)
+    calice = lisser(symetrique([(0.00, 0.46), (0.52, 0.34), (0.86, -0.02), (0.40, -0.22),
+                                (0.00, -0.26)]), passes=2)
+    return ([(u + du * r, z + dz * r) for du, dz in oeuf],
+            [(u + du * r, z + dz * r) for du, dz in calice])
+
+
+# מִקְלַעַת / « קְלִיעַן » (Targum 6:29), « וַחֲבָלִים » (Rashi 6:29), « אָטוּנִין » : le champ est
+# TRESSÉ, et ce sont ces cordes qui le tiennent. Elles se dessinent ici et ne passent
+# par aucun modèle : une torsade est une figure géométrique, que des dômes disent
+# exactement — c'est le vivant (une penne, une foliole) qui demandait la taille.
+def torsade(torsades, axe=0.5, epaisseur=0.86, penche=1.15, recouvrement=1.55):
+    """Les brins d'un cordon horizontal traversant le carré unité, de u = 0 à u = 1, sur
+    `axe` : `torsades` mèches en fuseau, chacune couchée de `penche` fois sa hauteur, qui
+    déborde de `recouvrement` sur sa voisine. C'est ce chevauchement, pris dans l'ordre,
+    qui fait lire une corde tordue plutôt qu'une file de grains — et c'est la PENTE de la
+    mèche qui fait la torsion : droites, les fuseaux sortaient en barreaux.
+
+    Le cordon est PÉRIODIQUE de pas 1/`torsades` et se referme donc sur le carré : deux
+    tuiles posées bout à bout n'ont pas de couture — c'est pour ça qu'il se dessine ici au
+    lieu de se faire tailler. Les mèches débordent des deux bords, et s'y retrouvent.
+    """
+    pas = 1.0 / torsades
+    demi = epaisseur / 2
+    largeur = pas * recouvrement / 2
+    meches = []
+    for k in range(-2, torsades + 2):
+        u = (k + 0.5) * pas
+        bas, haut = (u - penche * demi, axe - demi), (u + penche * demi, axe + demi)
+        meches.append(lisser(_fuseau(bas, haut, largeur), passes=2))
+    return meches
+
+
+def _fuseau(depart, arrivee, demi):
+    """Le contour d'une mèche : une lentille du départ à l'arrivée, la plus large au
+    milieu, effilée aux deux bouts."""
+    du, dz = arrivee[0] - depart[0], arrivee[1] - depart[1]
+    n = math.hypot(du, dz) or 1.0
+    nu, nz = -dz / n, du / n
+    profil = [(t, demi * math.sin(math.pi * t) ** 0.62)
+              for t in (k / 12 for k in range(1, 12))]
+    cote = [(depart[0] + du * t + nu * w, depart[1] + dz * t + nz * w) for t, w in profil]
+    revers = [(depart[0] + du * t - nu * w, depart[1] + dz * t - nz * w)
+              for t, w in reversed(profil)]
+    return [depart] + cote + [arrivee] + revers
+
+
+def guilloche(brins, points=144, amplitude=0.27, croise=2):
+    """Les axes des brins d'une tresse traversant le carré unité : `brins` sinusoïdes
+    décalées, qui se croisent `croise` fois. Un brin passe DESSUS là où il monte : les
+    dessiner dans l'ordre des hauteurs à chaque croisement est ce qui les entrelace,
+    une superposition franche les empilerait."""
+    return [[(k / (points - 1),
+              0.5 + amplitude * math.sin(2 * math.pi * croise * k / (points - 1)
+                                         + 2 * math.pi * b / brins))
+             for k in range(points)]
+            for b in range(brins)]

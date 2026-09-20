@@ -310,10 +310,10 @@ const vec2 TEXEL_PAROKHET = vec2(1.0 / 2048.0, 1.0 / 4096.0);
 // jambage —, et une tuile de l'atlas couvre CADRE_GRAVURE hauteurs de figure sur
 // TAILLE_TUILE d'UV (beit_hamikdash_gravures.py). En part de la hauteur, la pente ne
 // dépend pas de la taille de la plaque : rien à lui transmettre.
-const float RELIEF_GRAVURE = 0.01;
+const float RELIEF_GRAVURE = 0.015;
 const float CADRE_GRAVURE = 1.2;
-const float TAILLE_TUILE = 0.5;
-const float TEXEL_GRAVURE = 1.0 / 2048.0;
+const float TAILLE_TUILE = 1.0 / 3.0;
+const float TEXEL_GRAVURE = 1.0 / 3072.0;
 // La cendre de bois, elle, est claire et froide. C'est le contraste des deux — et non
 // le grain de l'un ou de l'autre — qui fait lire un lit de feu.
 const vec3 GRIS_CENDRE = vec3(0.42, 0.42, 0.43);

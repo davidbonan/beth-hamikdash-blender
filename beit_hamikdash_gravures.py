@@ -26,8 +26,13 @@ Une tuile taillée est un rendu ombré, pas une hauteur : la luminance en donne 
 creux et les arêtes (les sillons sont sombres, les crêtes claires), et c'est la
 distance au bord qui donne le volume d'ensemble — le bombé de la silhouette.
 
-Écrit `visite/matieres/gravures_2048.webp` — un atlas de quatre tuiles de 1024 : gris =
-hauteur du modelé, alpha = masque — et `visite/matieres/gravures.json` : pour chaque
+Deux motifs ne passent par aucun modèle et restent tels que ce script les dessine : le
+cordon et la tresse. Leur manière est géométrique — un compas la dit exactement —, et
+surtout une tuile qui se RÉPÈTE le long d'une paroi doit s'aboucher au pixel avec sa
+voisine, ce qu'aucun modèle ne garantit deux fois de suite.
+
+Écrit `visite/matieres/gravures_3072.webp` — un atlas de trois tuiles de 1024 sur trois :
+gris = hauteur du modelé, alpha = masque — et `visite/matieres/gravures.json` : pour chaque
 motif, le cadre réel que sa tuile couvre, sa place dans l'atlas, et sa silhouette,
 tracée sur le masque même de la carte, pour que la plaque et le modelé coïncident au
 pixel. Tout se donne dans le repère de la figure : hauteur 1, axe en u = 0, pied en z = 0.
@@ -40,6 +45,7 @@ import json
 import math
 import pathlib
 import sys
+import typing
 
 import bpy
 import numpy as np
@@ -47,14 +53,21 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (AILES_DRESSEES, AILES_HAUTES, CROISURE, GAINE_KERUV,  # noqa: E402
-                                     JAMBE, LARGEUR_JAMBE, REDUCTION_DRESSE, REDUCTION_HAUTE,
-                                     SABOT, aile, bezier, corolle, ellipse, folioles,
-                                     largeurs_palme, lisser, meches_de_criniere, plumage,
-                                     poser_lame, reduire, ruban, symetrique, tete_keruv)
+from beit_hamikdash_contours import (AILES_DRESSEES, AILES_HAUTES, CROISURE, DATTE, EPIS,  # noqa: E402
+                                     GAINE_KERUV, JAMBE, LARGEUR_JAMBE, MAINS, PALMES,
+                                     REDUCTION_DRESSE, REDUCTION_HAUTE, SABOT, TRONC, aile,
+                                     bezier, bouton, chevrons, corolle, ellipse, epi, folioles,
+                                     guilloche, largeurs_palme, lisser, meches_de_criniere,
+                                     palme, plumage, poser_lame, reduire, ruban, symetrique,
+                                     tete_keruv, torsade)
 
 TUILE_PX = 1024
-ATLAS_PX = 2 * TUILE_PX
+# Trois tuiles de côté : les quatre figures du champ ne suffisaient plus à le tenir, et
+# le cordon, la tresse et le bouton entrent sans rien coûter aux keruvim — chaque tuile
+# garde ses 1024 pixels. `visite/matieres.js` en tient les deux constantes (TAILLE_TUILE,
+# TEXEL_GRAVURE) et `visite/nappes.js` le nom du fichier.
+GRILLE = 3
+ATLAS_PX = GRILLE * TUILE_PX
 NOM = f"gravures_{ATLAS_PX}"
 TUILES = RACINE / "gravures"
 GUIDES = TUILES / "guides"
@@ -86,7 +99,11 @@ FONDU = 0.005            # en part de la hauteur : 2 cm sur un keruv de paroi
 # Les palmes de la timora sont découpées en folioles, et sa silhouette a quintuplé : 0,010
 # en ôte un tiers sans en perdre une. Au-delà, les dents s'effacent palme par palme — à
 # 0,014 la moitié des palmes est ressortie en lame lisse.
-TOLERANCE = {"keruv": 0.005, "keruv_dresse": 0.005, "timora": 0.010, "fleuron": 0.02}
+# Un motif DESSINÉ (`corde`, `tresse`) a pour silhouette le carré de son cadre : c'est
+# le fond de la taille, et deux tuiles voisines doivent s'aboucher au pixel.
+TOLERANCE = {"keruv": 0.005, "keruv_dresse": 0.005, "timora": 0.010, "fleuron": 0.02,
+             "bouton": 0.02, "dekel": 0.010, "corde": 0.05, "tresse": 0.05,
+             "panneau": 0.05}
 
 
 # --- Le keruv : la 'haya de Ye'hezkel, quatre ailes, une jambe, une tête à deux faces. ---
@@ -97,6 +114,7 @@ TOLERANCE = {"keruv": 0.005, "keruv_dresse": 0.005, "timora": 0.010, "fleuron": 
 # Les niveaux, en unités libres : ce qui est devant est plus haut. L'atlas les ramène
 # tous ensemble à [0, 1], et la visite les lit à la même échelle sur tous les motifs.
 NIVEAU_AILE, NIVEAU_JAMBE, NIVEAU_GAINE, NIVEAU_TETE = 0.0, 0.30, 0.35, 0.65
+NIVEAU_MAIN = 0.58        # les mains PAR-DESSUS la gaine : elles en sortent
 
 
 def ailes_hautes(planche, attache, angle, taille, k=1.0):
@@ -119,6 +137,12 @@ def corps_de_keruv(planche, k=1.0):
     # Les rangs de plumes de la gaine, en chevrons qui descendent vers la jambe.
     for z in (0.74, 0.64, 0.54, 0.44, 0.34, 0.26):
         planche.graver(reduire([(-0.12, z + 0.03), (0.0, z - 0.02), (0.12, z + 0.03)], k), 0.008 * k, 0.3)
+    # « וִידֵי אָדָם מִתַּחַת כַּנְפֵיהֶם » (Ye'hezkel 1:8) : les mains rendues à la paroi. Le
+    # keruv TISSÉ de la parokhet, dont celui-ci est repris, ne les avait jamais perdues ;
+    # et à 4,2 amot dans un registre plein, c'est la seule forme qui rompe la gaine de
+    # plumes — sans elles la figure entière se lit en un seul massif de pennes.
+    for main in MAINS:
+        planche.bomber(reduire(ellipse(*main), k), NIVEAU_MAIN, 0.9, 0.012 * k)
     planche.bomber(reduire(tete_keruv(), k), NIVEAU_TETE, 1.2, 0.022 * k)
     for meche in meches_de_criniere():
         planche.graver(reduire(meche, k), 0.010 * k, 0.35)
@@ -148,7 +172,26 @@ BASE = symetrique([(0.0, NAISSANCE[1] + 0.02), (0.05, NAISSANCE[1] + 0.02), (0.0
                    (0.07, 0.0), (0.0, 0.0)])
 PALMETTE = (((0.0, 0.60), (0.0, 0.97)), ((0.10, 0.98), (0.26, 0.78)),
             ((0.20, 0.82), (0.36, 0.48)), ((0.26, 0.56), (0.36, 0.20)))
-NIVEAU_BASE, NIVEAU_PALME = 0.4, 0.25
+NIVEAU_BASE, NIVEAU_PALME, NIVEAU_COLLIER = 0.4, 0.25, 0.52
+# Le collier de bractées d'où les palmes partent : « כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל » (Rashi sur
+# Ye'hezkel 40:16) est un CHAPITEAU, et un chapiteau a un départ. Sans lui les sept
+# palmes sortaient toutes d'un même point sur une clochette nue, et l'éventail se lisait
+# posé sur son pied au lieu d'en naître. Demi-collier, du milieu vers la droite :
+# (pointe, demi-largeur) de chaque bractée, en part de la taille de la figure.
+BRACTEES = ((0.000, 0.335, 0.042), (0.055, 0.305, 0.038), (0.100, 0.265, 0.033))
+
+
+def _collier():
+    """Les bractées courtes et engainantes du départ des palmes, la médiane d'abord."""
+    for u, z, demi in BRACTEES:
+        for sens in ((1,) if u == 0 else (-1, 1)):
+            pointe = (sens * u, z)
+            yield lisser([(sens * u * 0.35, NAISSANCE[1] - 0.015),
+                          (sens * (u - demi) * 1.1 - sens * 0.012, NAISSANCE[1] + 0.05),
+                          (sens * (u - demi * 0.45), z - 0.045), pointe,
+                          (sens * (u + demi * 0.45), z - 0.045),
+                          (sens * (u + demi) * 1.1 + sens * 0.012, NAISSANCE[1] + 0.05)],
+                         passes=2)
 
 
 def timora(planche):
@@ -160,6 +203,40 @@ def timora(planche):
             # dans un bord lisse, c'est le contour lui-même qui les découpe.
             planche.graver(axe[3:-9], 0.005, 0.3)
     planche.bomber(BASE, NIVEAU_BASE, 1.0, 0.03)
+    for bractee in _collier():
+        planche.bomber(bractee, NIVEAU_COLLIER, 0.7, 0.022)
+
+
+# --- Le dattier des PAROIS : « צוּרַת דִּקְלִין » (Targum Yonatan sur Melakhim I 6:29). -------
+
+# Sur les parois, le Targum ne dit pas « chapiteau » mais des PALMIERS, et Rashi le cite
+# lui-même — « כִּי בְּמַשְׁכְּנָא דִשְׁלֹמֹה הֵן מְתֻרְגָּמוֹת צוּרַת דִּיקְלִין ». Le כּוֹתֶרֶת de Rashi
+# (« דּוֹמֶה לְדֶקֶל ») est dit sur Ye'hezkel 40:16, qui parle des JAMBAGES de portes : `timora`
+# le garde pour eux. La palmette sur les parois laissait 40 % de la hauteur du registre en
+# or nu au-dessus de chaque figure — c'est ce vide, autant que la composition, qui faisait
+# le champ fade.
+# C'est le dattier que la parokhet TISSE déjà (beit_hamikdash_parokhet.py), comme le keruv
+# des parois est celui du rideau : fût droit à cicatrices, sept palmes, deux régimes — les
+# monnaies de Bar Kokhba, et non la palmette assyrienne.
+NIVEAU_FUT, NIVEAU_REGIME = 0.34, 0.30
+
+
+def dekel(planche):
+    planche.bomber(TRONC, NIVEAU_FUT, 0.52, 0.035)
+    for chevron in chevrons():
+        planche.graver(chevron, 0.011, 0.34)
+    for inclinaison, longueur, retombee in PALMES[::-1]:
+        for sens in ((1,) if inclinaison == 0 else (-1, 1)):
+            axe, largeurs = palme(sens * inclinaison, longueur, retombee)
+            planche.bomber(folioles(axe, largeurs), NIVEAU_PALME, 1.0, 0.035)
+            planche.graver(axe[3:-9], 0.005, 0.3)
+    # Les régimes PAR-DESSUS les palmes : ils pendent de la couronne, devant le fût.
+    for sens in (-1, 1):
+        for ecart, longueur in EPIS:
+            fil, dattes = epi(ecart, longueur)
+            planche.bomber(ruban([(sens * u, z) for u, z in fil], 0.011), NIVEAU_REGIME, 0.45, 0.006)
+            for u, z in dattes:
+                planche.bomber(ellipse(sens * u, z, *DATTE), NIVEAU_REGIME, 0.75, 0.011)
 
 
 # --- Le fleuron : la rosette à six pétales, celle des ossuaires de Jérusalem. -----------
@@ -171,12 +248,156 @@ LOBES = 6
 
 
 def fleuron(planche):
-    planche.bomber(corolle(0.0, 0.5, 0.5, LOBES), 0.0, 1.0, 0.12)
+    # Lissée : `corolle` échantillonne huit points par lobe, et six lobes sortaient en
+    # polygone — le modèle a taillé les facettes telles quelles.
+    planche.bomber(lisser(corolle(0.0, 0.5, 0.5, LOBES), passes=1), 0.0, 1.0, 0.12)
     for k in range(LOBES):
         a = math.pi * (2 * k + 1) / LOBES
         planche.graver([(0.10 * math.cos(a), 0.5 + 0.10 * math.sin(a)),
                         (0.40 * math.cos(a), 0.5 + 0.40 * math.sin(a))], 0.022, 0.5)
+        # La nervure du pétale : sans elle chaque lobe sortait en galet lisse, et la
+        # rosette, qui revient par centaines dans les bandeaux, était le motif le moins
+        # taillé du champ pour être le plus répété.
+        milieu = math.pi * 2 * k / LOBES
+        planche.graver([(0.16 * math.cos(milieu), 0.5 + 0.16 * math.sin(milieu)),
+                        (0.44 * math.cos(milieu), 0.5 + 0.44 * math.sin(milieu))], 0.008, 0.28)
+    planche.graver(ellipse(0.0, 0.5, 0.175, 0.175), 0.016, 0.34)
     planche.bomber(ellipse(0.0, 0.5, 0.13, 0.13), 0.6, 1.0, 0.10)
+
+
+# --- Le bouton : « פְּקָעִים » (Melakhim I 6:18), ce que la fleur est avant de s'ouvrir. ---
+
+# Rashi « כְּמִין כַּפְתּוֹרִים », Targum « חֵיזוּ בֵיעִין », Ralbag « בִּיצִים שֶׁשְּׁנֵי רָאשֵׁיהֶם
+# חַדִּים », qui le rattache aux גְּבִיעִים כַּפְתֹּרִים וּפְרָחִים de la Menora. Le bandeau porte
+# donc le CYCLE — bouton, fleur ouverte — et non une seule corolle répétée.
+RAYON_BOUTON = 0.345
+NERVURES_BOUTON = 3
+
+
+def bouton_ferme(planche):
+    oeuf, calice = bouton(0.0, 0.05, RAYON_BOUTON)
+    planche.bomber(calice, 0.0, 0.7, 0.05)
+    planche.bomber(oeuf, 0.35, 1.0, 0.085)
+    for k in range(NERVURES_BOUTON):
+        u = (k - (NERVURES_BOUTON - 1) / 2) * RAYON_BOUTON * 0.52
+        planche.graver([(u * 0.35, 0.05 + RAYON_BOUTON * 0.30),
+                        (u, 0.05 + RAYON_BOUTON * 1.30),
+                        (u * 0.30, 0.05 + RAYON_BOUTON * 2.40)], 0.012, 0.30)
+
+
+# --- Le cordon et la tresse : « קְלִיעַן » (Targum 6:29), « וַחֲבָלִים » (Rashi 6:29). -------
+
+# Ces deux-là ne passent par aucun modèle : une torsade est une figure géométrique, que
+# des dômes disent exactement. La taille par gpt-image-2 existe pour le vivant — une
+# penne, une foliole, un profil —, pas pour ce qu'un compas trace. Et surtout : une tuile
+# qui se RÉPÈTE le long d'une paroi doit s'aboucher au pixel avec sa voisine, ce qu'aucun
+# modèle ne garantit deux fois de suite.
+# Leur cadre est le carré unité : la silhouette est le fond de la taille, et le motif
+# bombe dedans. Deux tuiles posées bout à bout ne font qu'une bande.
+# Le bombé monte sur `rondeur` depuis le bord puis s'aplatit (`bombe`) : au-dessous de la
+# demi-largeur du brin, la mèche sort en limace plate à sommet blanc. La rondeur d'un
+# cordon vaut donc sa demi-largeur, pour que le dôme culmine sur la nervure et nulle part
+# ailleurs.
+CARRE = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
+# Deux torsions par tuile, et non six : la tuile est CARRÉE, donc une bande de 0,33 ama
+# de haut la reparcourt tous les 0,33 amot — à six mèches, chaque torsion tombait à
+# 2,6 cm et le cordon rendait un filet lisse à dix mètres. Le pas d'une torsion vaut à
+# peu près le diamètre de la corde, et c'est ce qui la fait lire comme une corde.
+TORSADES, BRINS = 2, 2
+LARGEUR_BRIN = 0.17
+CROISEMENTS = 1
+DEBORD_ARCHE = 7
+EPAISSEUR_CORDE = 0.72     # le cordon laisse voir le fond de la taille au-dessus et au-dessous :
+                           # à 0,88 les mèches touchent les deux bords, la gorge se réduit
+                           # à un filet et la corde sort en rang de tuiles penchées
+RONDEUR_CORDE = 1.55 / (2 * TORSADES) / 2
+
+
+def corde(planche):
+    """Le cordon tordu : des mèches obliques qui se recouvrent l'une l'autre, toutes du
+    même sens. `bomber` recouvre au lieu d'ajouter, et c'est ce recouvrement, pris dans
+    l'ordre, qui donne son pas à la torsion."""
+    planche.bomber(CARRE, 0.0, 0.0, 0.01)
+    for meche in torsade(TORSADES, epaisseur=EPAISSEUR_CORDE):
+        planche.bomber(meche, 0.0, 1.0, RONDEUR_CORDE)
+
+
+def tresse(planche):
+    """Deux brins qui s'entrelacent : chaque brin passe DESSUS sur une arche sur deux.
+    Posés l'un après l'autre, le second serait au-dessus partout et la tresse se lirait
+    en deux fils superposés ; ce sont les arches hautes, reposées ensuite, qui croisent."""
+    planche.bomber(CARRE, 0.0, 0.0, 0.01)
+    axes = guilloche(BRINS, croise=CROISEMENTS)
+    for axe in axes:
+        planche.bomber(ruban(axe, LARGEUR_BRIN), 0.0, 1.0, LARGEUR_BRIN / 2)
+    for axe in axes:
+        for arche in _arches_hautes(axe):
+            planche.bomber(ruban(arche, LARGEUR_BRIN), 0.0, 1.0, LARGEUR_BRIN / 2)
+
+
+# --- Le panneau du lambris : « לוֹחוֹת עֵץ עֲשׂוּיוֹת בְּמִדָּה אַחַת זֶה כָּזֶה » (Metzudat David
+#     sur Ye'hezkel 41:17), et ce qui y est taillé — « מִקְלַעַת פְּקָעִים וּפְטוּרֵי צִצִּים »
+#     (Melakhim I 6:18), le verset du lambris lui-même, « הַכֹּל אֶרֶז, אֵין אֶבֶן נִרְאָה ».
+#     Le bouton et la fleur ouverte sont donc dans la source de la zone haute, et non
+#     empruntés au champ d'en bas : c'est le même couple, au rang que 6:18 leur donne.
+MARGE_PANNEAU = 0.11       # l'or plein autour du champ, en part de la tuile
+FEUILLURE = 0.055          # la montée du fond depuis le trait du cadre
+NIVEAU_CHAMP = 0.56        # le fond du panneau, sous l'or plein qui l'entoure
+RAYON_PECAIM = 0.105
+RAYON_COROLLE = 0.180
+COEUR_COROLLE = 0.050
+CREUX_COROLLE = 0.60       # le rayon de `corolle` entre deux lobes, en part de son rayon
+
+
+def panneau(planche):
+    """Un panneau de la mesure et la brindille qui y est taillée : le bouton, son brin, la
+    fleur ouverte.
+
+    La tuile est le panneau ET l'or qui l'entoure, chaque bord pris à mi-largeur de ce
+    plein — deux tuiles bout à bout rendent une file de panneaux séparés, sans couture.
+    Le cadre ne se grave pas, il se BOMBE : le fond descend d'un seul coup au trait du
+    cadre puis remonte en feuillure, et ce sont ses deux épaulements qui font voir le
+    panneau. Un rectangle creusé d'une seule marche de 1,5 cm ne rendait rien de face.
+    """
+    dedans = 1.0 - MARGE_PANNEAU
+    planche.bomber(CARRE, 0.0, 1.0, 0.01)
+    planche.bomber(((MARGE_PANNEAU, MARGE_PANNEAU), (dedans, MARGE_PANNEAU),
+                    (dedans, dedans), (MARGE_PANNEAU, dedans)), 0.0, NIVEAU_CHAMP, FEUILLURE)
+    planche.bomber(ruban([(0.5, 0.38), (0.5, 0.62)], 0.026), NIVEAU_CHAMP, 0.22, 0.013)
+    oeuf, calice = bouton(0.5, 0.15, RAYON_PECAIM)
+    planche.bomber(calice, NIVEAU_CHAMP, 0.16, 0.020)
+    planche.bomber(oeuf, NIVEAU_CHAMP, 0.40, 0.034)
+    for k in range(NERVURES_BOUTON):
+        u = 0.5 + (k - (NERVURES_BOUTON - 1) / 2) * RAYON_PECAIM * 0.52
+        planche.graver([(0.5 + (u - 0.5) * 0.35, 0.15 + RAYON_PECAIM * 0.30),
+                        (u, 0.15 + RAYON_PECAIM * 1.30),
+                        (0.5 + (u - 0.5) * 0.30, 0.15 + RAYON_PECAIM * 2.40)], 0.010, 0.30)
+    planche.bomber(lisser(corolle(0.5, 0.68, RAYON_COROLLE, LOBES), passes=1),
+                   NIVEAU_CHAMP, 0.42, 0.050)
+    # Les séparations s'arrêtent DANS le creux entre deux lobes : plus longues, elles
+    # sortaient de la corolle et griffaient le fond du panneau, qui est figure lui aussi.
+    for k in range(LOBES):
+        creux = math.pi * (2 * k + 1) / LOBES
+        milieu = math.pi * 2 * k / LOBES
+        for angle, bout, large in ((creux, CREUX_COROLLE * 0.88, 0.011),
+                                   (milieu, 0.82, 0.008)):
+            planche.graver([(0.5 + COEUR_COROLLE * math.cos(angle), 0.68 + COEUR_COROLLE * math.sin(angle)),
+                            (0.5 + RAYON_COROLLE * bout * math.cos(angle),
+                             0.68 + RAYON_COROLLE * bout * math.sin(angle))], large, 0.40)
+    planche.bomber(ellipse(0.5, 0.68, COEUR_COROLLE, COEUR_COROLLE), NIVEAU_CHAMP + 0.30, 0.15, 0.034)
+
+
+def _arches_hautes(axe):
+    """Les tronçons d'un brin où il est au-dessus de l'axe médian — c'est là, et là
+    seulement, qu'il passe par-dessus l'autre —, débordant de DEBORD_ARCHE points de
+    part et d'autre du croisement : sans ce débord le bout du ruban tombe au MILIEU du
+    brin qu'il croise et y laisse une marche au lieu de passer dessus."""
+    hauts = [k for k, (_, z) in enumerate(axe) if z >= 0.5]
+    for k, indice in enumerate(hauts):
+        if k == 0 or indice != hauts[k - 1] + 1:
+            debut = indice
+        if k == len(hauts) - 1 or hauts[k + 1] != indice + 1:
+            yield axe[max(0, debut - DEBORD_ARCHE):indice + 1 + DEBORD_ARCHE]
 
 
 # --- Les guides, la taille, l'atlas. ------------------------------------------------------
@@ -197,9 +418,13 @@ TAILLE = "Re-sculpt this {sujet} as a genuine hand-carved stone bas-relief in th
 KERUV = ("an awe-inspiring heavenly being of Ezekiel's vision, NOT a human in clothes and NOT "
          "a Christian angel: no tunic, no garment, no belt, no visible torso. The body is a "
          "tall sheath of feathers made by two lower wings wrapped down and crossed in front "
-         "from the shoulders to the shins. NO HANDS, no arms, no fingers anywhere — the "
-         "sheath is closed. Below it ONE single straight rigid leg without knee, ending in "
-         "ONE round calf's hoof. THE WINGS ARE THE GLORY OF THE FIGURE and must be "
+         "from the shoulders to the shins. Just below the shoulders TWO small human HANDS "
+         "come out from under the wings, one on each side, laid flat against the feather "
+         "sheath, palm outwards, fingers together and pointing down — hands ONLY, no arms, "
+         "no wrists, no shoulders, nothing else of a human body anywhere. Below the sheath "
+         "ONE single straight rigid leg without knee, ending in ONE calf's hoof, CLOVEN — "
+         "split down the middle into two blunt toes like an ox's foot, never a ball and "
+         "never a human foot. THE WINGS ARE THE GLORY OF THE FIGURE and must be "
          "magnificent: each wing is built of individual feathers — three graded rows of small "
          "rounded coverts overlapping like roof tiles at the root, then a row of longer "
          "secondaries, then long slender primaries carved one by one to the tip, each with "
@@ -218,29 +443,87 @@ KERUV = ("an awe-inspiring heavenly being of Ezekiel's vision, NOT a human in cl
          "deep heavy jaw, a small round ear set high, and a short mane carved in separate "
          "locks running around the back of the skull down to the neck. Majestic, hieratic, "
          "severe; no halo, no crown, no beard, no palm trees, a single figure alone.")
+class Taille(typing.NamedTuple):
+    """Ce qu'on demande au modèle pour un motif : son sujet, et son iconographie mot à
+    mot — c'est elle que le guide ne porte qu'à moitié."""
+    sujet: str
+    iconographie: str
+
+
+class Motif(typing.NamedTuple):
+    """Un motif de l'atlas : ce qui le dessine, le cadre réel qu'il couvre, sa case dans
+    la grille, et la taille qu'un modèle en fait. `taille` vide = motif DESSINÉ, dont la
+    planche est la tuile : sa manière est géométrique, il n'y a rien à apprendre d'un
+    modèle, et lui seul est sûr de se répéter sans couture."""
+    guide: typing.Callable
+    cadre: tuple
+    case: tuple
+    taille: Taille = None
+
+
 MOTIFS = {
-    "keruv": (keruv, CADRE_DEBOUT, (0, 1), "four-winged cherub",
-              KERUV.format(ailes="Its two upper wings are very large, rising from the "
-                                 "shoulders and opening a little outwards, their tips well "
-                                 "above the head.")),
-    "keruv_dresse": (keruv_dresse, CADRE_DEBOUT, (1, 0), "four-winged cherub",
-                     KERUV.format(ailes="Its two upper wings rise straight up from the "
-                                        "shoulders, tall and narrow like two flames, their "
-                                        "tips high above the head, the flight feathers long, "
-                                        "straight and parallel.")),
-    "timora": (timora, CADRE_DEBOUT, (1, 1), "palmette of palm fronds",
-               "a fan of exactly seven palm fronds springing from a small bell-shaped base, "
-               "with no trunk and no dates: the middle frond upright, the three pairs on "
-               "either side curving outward and drooping more and more, the lowest pair "
-               "falling back down to the level of the base. IMPORTANT: every frond is deeply "
-               "CUT INTO SEPARATE POINTED LEAFLETS along both sides of a grooved midrib, like "
-               "a feather or a comb, never a smooth leaf, never a flower petal and never a "
-               "stiff Greek anthemion; the leaflets are narrow, straight and angled towards "
-               "the tip."),
-    "fleuron": (fleuron, (-0.6, -0.1, 0.6, 1.1), (0, 0), "six-petal rosette",
-                "an open six-petal compass-drawn rosette filling the frame, as on Jerusalem "
-                "ossuaries, a round raised heart in the centre, each petal a carved lobe "
-                "with a central rib."),
+    "keruv": Motif(keruv, CADRE_DEBOUT, (0, 1), Taille(
+        "four-winged cherub",
+        KERUV.format(ailes="Its two upper wings are very large, rising from the "
+                           "shoulders and opening a little outwards, their tips well "
+                           "above the head."))),
+    "keruv_dresse": Motif(keruv_dresse, CADRE_DEBOUT, (1, 0), Taille(
+        "four-winged cherub",
+        KERUV.format(ailes="Its two upper wings rise straight up from the "
+                           "shoulders, tall and narrow like two flames, their "
+                           "tips high above the head, the flight feathers long, "
+                           "straight and parallel."))),
+    "timora": Motif(timora, CADRE_DEBOUT, (1, 1), Taille(
+        "palmette of palm fronds",
+        "a fan of exactly seven palm fronds springing from a small bell-shaped base, "
+        "with no trunk and no dates: the middle frond upright, the three pairs on "
+        "either side curving outward and drooping more and more, the lowest pair "
+        "falling back down to the level of the base. "
+        "READ THIS TWICE, it is the part that gets dropped: between the bell base and "
+        "the fronds there is a COLLAR, carved IN FRONT of them and clearly visible, of "
+        "five short broad bracts that sheathe the neck like the leaf-scales at the top "
+        "of a palm trunk — one upright in the middle, two laid over it on each side, "
+        "each a stubby pointed scale about a fifth of the height of a frond, overlapping "
+        "like tiles. Without that collar the fan sits on a bare bell; with it, it grows "
+        "out of a capital. The bell itself is girdled by two carved rings. "
+        "IMPORTANT: every frond is deeply "
+        "CUT INTO SEPARATE POINTED LEAFLETS along both sides of a grooved midrib, like "
+        "a feather or a comb, never a smooth leaf, never a flower petal and never a "
+        "stiff Greek anthemion; the leaflets are narrow, straight and angled towards "
+        "the tip.")),
+    "fleuron": Motif(fleuron, CADRE_DEBOUT, (0, 0), Taille(
+        "six-petal rosette",
+        "an open six-petal compass-drawn rosette filling the frame, as on Jerusalem "
+        "ossuaries, a round raised heart in the centre ringed by a cut groove, each petal "
+        "a carved lobe with a sharp grooved rib down its middle and a clean cut outline "
+        "separating it from its neighbours.")),
+    "bouton": Motif(bouton_ferme, CADRE_DEBOUT, (2, 0), Taille(
+        "closed flower bud",
+        "a single closed bud standing upright, shaped like an egg with BOTH ENDS DRAWN "
+        "TO A POINT, widest below its middle, seated in a short calyx of three sepals "
+        "that wrap its foot. Three shallow ribs run up the bud from the calyx to the "
+        "point. It is shut: no petal is open, nothing flares out at the top.")),
+    "dekel": Motif(dekel, CADRE_DEBOUT, (2, 2), Taille(
+        "date palm tree",
+        "a single upright date palm seen flat from the front, as on the Bar Kokhba coins: "
+        "a straight slender trunk rising the lower half of the frame, its whole length "
+        "covered in the CHEVRON leaf-scars of cut-off fronds, stacked one above the other "
+        "like a braid, never smooth and never a ring-banded column. "
+        "From its top springs a crown of exactly seven fronds — the middle one upright, "
+        "the three pairs on either side bending outward and drooping more and more, the "
+        "lowest pair falling back below the horizontal. "
+        "IMPORTANT: every frond is deeply CUT INTO SEPARATE POINTED LEAFLETS along both "
+        "sides of a grooved midrib, like a feather or a comb, never a smooth leaf and "
+        "never a stiff Greek anthemion; the leaflets are narrow, straight and angled "
+        "towards the tip. "
+        "READ THIS TWICE, it is the part that gets dropped: TWO clusters of dates hang "
+        "from the crown, one on each side of the trunk, each a few slack strands weighed "
+        "down with small oval fruit, hanging DOWN in front of the trunk and clearly "
+        "separate from the fronds — not a bunch of grapes, not a pinecone. "
+        "No capital, no collar of bracts, no volutes: this is a tree, not an ornament.")),
+    "corde": Motif(corde, (0.0, 0.0, 1.0, 1.0), (2, 1)),
+    "tresse": Motif(tresse, (0.0, 0.0, 1.0, 1.0), (0, 2)),
+    "panneau": Motif(panneau, (0.0, 0.0, 1.0, 1.0), (1, 2)),
 }
 
 
@@ -258,10 +541,8 @@ def ombrer(relief, masque):
 
 
 def guider(nom):
-    tailler, cadre, _, _, _ = MOTIFS[nom]
-    planche = Planche(cadre, TUILE_PX)
-    tailler(planche)
-    relief, masque = planche.relief(FONDU)
+    motif = MOTIFS[nom]
+    relief, masque = _planche(motif).relief(FONDU)
     rgb = ombrer(relief / relief.max(), masque)
     image = bpy.data.images.new(nom, rgb.shape[1], rgb.shape[0], alpha=False)
     image.pixels.foreach_set(np.concatenate([rgb, np.ones(rgb.shape[:2] + (1,))], -1)
@@ -277,7 +558,7 @@ def tailler(nom):
     """Fait tailler le guide de `nom` par gpt-image-2 et pose la tuile dans `gravures/`."""
     sys.path.insert(0, str(RACINE / ".claude" / "skills" / "fal-video"))
     import fal_commun  # noqa: E402
-    _, _, _, sujet, iconographie = MOTIFS[nom]
+    sujet, iconographie = MOTIFS[nom].taille
     cle = fal_commun.cle_api()
     esquisse = ESQUISSES.get(nom)
     images = [GUIDES / f"{nom}.png"] + ([esquisse] if esquisse else [])
@@ -290,9 +571,23 @@ def tailler(nom):
     print(f"  {nom:8s} taillé : gravures/{nom}.png")
 
 
+def _planche(motif):
+    planche = Planche(motif.cadre, TUILE_PX)
+    motif.guide(planche)
+    return planche
+
+
+def relief_dessine(nom):
+    """(relief, masque) d'un motif dessiné : sa planche EST sa tuile. Ni recadrage sur la
+    figure ni bombé depuis le bord — les deux supposent une figure isolée au milieu de sa
+    tuile, quand un cordon touche ses deux bords et doit y retrouver son voisin."""
+    relief, masque = _planche(MOTIFS[nom]).relief(FONDU)
+    return (relief / (relief.max() or 1.0)).astype(np.float32), masque > 0.5
+
+
 def relief_taille(nom):
     """(relief, masque) d'une tuile taillée, posés dans le cadre du motif."""
-    _, cadre, _, _, _ = MOTIFS[nom]
+    cadre = MOTIFS[nom].cadre
     luminance = lire(TUILES / f"{nom}.png")
     luminance, masque = cadrer(luminance, figure(luminance > SEUIL_FOND), cadre, TUILE_PX)
     echelle = TUILE_PX / (cadre[2] - cadre[0])
@@ -315,15 +610,17 @@ def graver():
     atlas = np.zeros((ATLAS_PX, ATLAS_PX), dtype=np.float32)
     masque = np.zeros((ATLAS_PX, ATLAS_PX), dtype=np.float32)
     fiche = {"pixels": ATLAS_PX, "motifs": {}}
-    for nom, (_, cadre, (colonne, ligne), _, _) in MOTIFS.items():
-        relief, dedans = relief_taille(nom)
+    for nom, motif in MOTIFS.items():
+        cadre, (colonne, ligne) = motif.cadre, motif.case
+        relief, dedans = (relief_taille if motif.taille else relief_dessine)(nom)
         l0, c0 = ligne * TUILE_PX, colonne * TUILE_PX
         atlas[l0:l0 + TUILE_PX, c0:c0 + TUILE_PX] = relief
         masque[l0:l0 + TUILE_PX, c0:c0 + TUILE_PX] = dedans
         contour = silhouette(dedans, cadre[:2], TUILE_PX / (cadre[2] - cadre[0]), TOLERANCE[nom])
-        fiche["motifs"][nom] = {"cadre": cadre, "tuile": [colonne * 0.5, ligne * 0.5, 0.5],
+        fiche["motifs"][nom] = {"cadre": cadre,
+                                "tuile": [colonne / GRILLE, ligne / GRILLE, 1 / GRILLE],
                                 "silhouette": [[round(u, 4), round(z, 4)] for u, z in contour]}
-        print(f"  {nom:8s} silhouette : {len(contour)} sommets, modelé jusqu'à {relief.max():.2f}")
+        print(f"  {nom:12s} silhouette : {len(contour)} sommets, modelé jusqu'à {relief.max():.2f}")
     atlas /= atlas.max()
     ecrire(NOM, atlas, masque)
     (SORTIE / "gravures.json").write_text(json.dumps(fiche, separators=(",", ":")), encoding="utf-8")
@@ -334,7 +631,7 @@ if ARGUMENTS[:1] == ["--guides"]:
     for nom in ARGUMENTS[1:] or MOTIFS:
         guider(nom)
 elif ARGUMENTS[:1] == ["--tailler"]:
-    for nom in ARGUMENTS[1:] or MOTIFS:
+    for nom in ARGUMENTS[1:] or [n for n, m in MOTIFS.items() if m.taille]:
         tailler(nom)
 else:
     graver()

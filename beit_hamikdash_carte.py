@@ -26,11 +26,15 @@ def remplir(contour, echelle, hauteur, largeur):
     la ligne fait le reste. Le contour a le droit d'être concave, ce qui est le cas de
     toute figure. Renvoie (tranche de lignes, tranche de colonnes, masque)."""
     points = [(u * echelle, z * echelle) for u, z in contour]
-    z_bas = max(0, int(np.ceil(min(z for _, z in points) - 0.5)))
-    z_haut = min(hauteur, int(np.ceil(max(z for _, z in points) - 0.5)))
-    u_gauche = max(0, int(np.floor(min(u for u, _ in points) - 0.5)))
-    u_droite = min(largeur, int(np.ceil(max(u for u, _ in points) + 0.5)))
-    boite = np.zeros((max(0, z_haut - z_bas), max(0, u_droite - u_gauche) + 1), dtype=np.int32)
+    # Les bornes se rabattent DANS la planche et dans l'ordre : un contour entièrement
+    # hors cadre — les mèches de débord d'une torsade, qui ne sont là que pour que la
+    # tuile s'aboute — donnait un `u_droite` négatif, et `slice(0, -76)` s'enroule en
+    # une tranche large face à un masque vide.
+    z_bas = min(hauteur, max(0, int(np.ceil(min(z for _, z in points) - 0.5))))
+    z_haut = max(z_bas, min(hauteur, int(np.ceil(max(z for _, z in points) - 0.5))))
+    u_gauche = min(largeur, max(0, int(np.floor(min(u for u, _ in points) - 0.5))))
+    u_droite = max(u_gauche, min(largeur, int(np.ceil(max(u for u, _ in points) + 0.5))))
+    boite = np.zeros((z_haut - z_bas, u_droite - u_gauche + 1), dtype=np.int32)
     for (u0, z0), (u1, z1) in zip(points, points[1:] + points[:1]):
         if z0 == z1:
             continue
