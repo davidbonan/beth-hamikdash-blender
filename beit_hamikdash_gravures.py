@@ -299,6 +299,13 @@ def bouton_ferme(planche):
 # cordon vaut donc sa demi-largeur, pour que le dôme culmine sur la nervure et nulle part
 # ailleurs.
 CARRE = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
+
+
+def carre_insere(marge):
+    a, b = marge, 1.0 - marge
+    return ((a, a), (b, a), (b, b), (a, b))
+
+
 # Deux torsions par tuile, et non six : la tuile est CARRÉE, donc une bande de 0,33 ama
 # de haut la reparcourt tous les 0,33 amot — à six mèches, chaque torsion tombait à
 # 2,6 cm et le cordon rendait un filet lisse à dix mètres. Le pas d'une torsion vaut à
@@ -341,7 +348,12 @@ def tresse(planche):
 #     Le bouton et la fleur ouverte sont donc dans la source de la zone haute, et non
 #     empruntés au champ d'en bas : c'est le même couple, au rang que 6:18 leur donne.
 MARGE_PANNEAU = 0.11       # l'or plein autour du champ, en part de la tuile
-FEUILLURE = 0.055          # la montée du fond depuis le trait du cadre
+# Le trait du cadre a une LARGEUR, il n'est pas un contour. Bombé sur une ligne d'un
+# pixel, son fond ne descendait pas à 0 : FONDU l'y remontait à 0,20, le trait sortait à
+# 2,92 cm sous le nu au lieu de 3,36 et sa marche extérieure à 26,7° au lieu de 69°.
+# Une arête d'un pixel ne survit pas à un flou de cinq (mesuré sur l'atlas, 20/09).
+LARGEUR_TRAIT = 0.022      # largeur du trait, en part de la tuile : 3,7 cm sur un panneau
+FEUILLURE = 0.018          # la montée du fond depuis le trait : à 0,055 elle sortait à 5°
 NIVEAU_CHAMP = 0.56        # le fond du panneau, sous l'or plein qui l'entoure
 RAYON_PECAIM = 0.105
 RAYON_COROLLE = 0.180
@@ -359,10 +371,12 @@ def panneau(planche):
     cadre puis remonte en feuillure, et ce sont ses deux épaulements qui font voir le
     panneau. Un rectangle creusé d'une seule marche de 1,5 cm ne rendait rien de face.
     """
-    dedans = 1.0 - MARGE_PANNEAU
-    planche.bomber(CARRE, 0.0, 1.0, 0.01)
-    planche.bomber(((MARGE_PANNEAU, MARGE_PANNEAU), (dedans, MARGE_PANNEAU),
-                    (dedans, dedans), (MARGE_PANNEAU, dedans)), 0.0, NIVEAU_CHAMP, FEUILLURE)
+    # PLAT à 1,0 : avec une épaisseur, `bombe` retombe à zéro sur les dix pixels du bord
+    # et chaque abouchement de deux panneaux porte une gorge parasite au milieu de l'or
+    # plein. `corde` et `tresse` posent leur fond de la même façon, épaisseur nulle.
+    planche.bomber(CARRE, 1.0, 0.0, 0.01)
+    planche.bomber(carre_insere(MARGE_PANNEAU), 0.0, 0.0, 0.01)
+    planche.bomber(carre_insere(MARGE_PANNEAU + LARGEUR_TRAIT), 0.0, NIVEAU_CHAMP, FEUILLURE)
     planche.bomber(ruban([(0.5, 0.38), (0.5, 0.62)], 0.026), NIVEAU_CHAMP, 0.22, 0.013)
     oeuf, calice = bouton(0.5, 0.15, RAYON_PECAIM)
     planche.bomber(calice, NIVEAU_CHAMP, 0.16, 0.020)
