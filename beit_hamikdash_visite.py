@@ -343,7 +343,7 @@ def cuire(fusionnes, chantier, lampes):
 def exporter(chantier):
     regles = concepts()
     connus = {ident for _, ident in regles}
-    flammes, braises = lampes("Menora_flamme"), lampes("Machta_braise")
+    flammes, arche, braises = lampes("Menora_flamme"), lampes("Aron_lumiere"), lampes("Machta_braise")
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
@@ -370,7 +370,7 @@ def exporter(chantier):
 
     # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
     cartes = ({}, {}, {}) if "--sans-occlusion" in sys.argv else cuire(
-        fusionnes, chantier, {"flammes": flammes, "braises": braises})
+        fusionnes, chantier, {"flammes": flammes, "arche": arche, "braises": braises})
     if cartes is None:
         return False
     occlusion, lumiere, empreintes = cartes
@@ -411,6 +411,7 @@ def exporter(chantier):
         "entrees": entrees,
         "vues": vues,
         "flammes": flammes,
+        "arche": arche,
         "braises": braises,
         "occlusion": occlusion,
         "lumiere": lumiere,

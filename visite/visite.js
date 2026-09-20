@@ -193,31 +193,41 @@ const lampe = new THREE.PointLight(0xffe9c4, 0, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
 
-// Les braises de la ma'hta : une lampe qui vacille, à la mesure d'un bassin de charbons —
-// pas d'une flamme. Deux sinus incommensurables et un peu de hasard, jamais une période.
-const BRAISE = { couleur: 0xff7a2a, intensite: 18, portee: 8, carte: 512 };
+// L'Arche éclaire le Kodesh HaKodashim : « עד שלא ניטל הארון היה נכנס ויוצא לאורו של ארון »
+// (Yerushalmi Yoma 5:3, fiche §8e) — une lumière posée entre les keruvim, qui ne vacille
+// pas et dont la portée meurt avant les murs. Les braises de la ma'hta, elles, vacillent à
+// la mesure d'un bassin de charbons — pas d'une flamme : deux sinus incommensurables et un
+// peu de hasard, jamais une période. Elles ne sont plus que le point chaud de la pièce.
+const ARCHE = { couleur: 0xffeed2, intensite: 9, portee: 6, carte: 512 };
+const BRAISE = { couleur: 0xff7a2a, intensite: 6, portee: 8, carte: 512 };
 let braise = null;
 let vacillement = 0;
 
-function allumerBraises(points) {
-  if (!points?.length) return;
-  braise = new THREE.PointLight(BRAISE.couleur, BRAISE.intensite, BRAISE.portee, 2);
-  braise.position.set(...points[0]);
-  braise.castShadow = PROFIL.menora.ombre;
-  braise.shadow.autoUpdate = false;
-  braise.shadow.needsUpdate = true;
-  braise.shadow.mapSize.set(BRAISE.carte, BRAISE.carte);
-  braise.shadow.camera.near = 0.05;
-  braise.shadow.camera.far = BRAISE.portee;
-  braise.shadow.bias = -0.002;
-  scene.add(braise);
-  // « Aucune lumière : le Cohen Gadol s'éclaire à la braise de sa pelle » (fiche §8e). La
-  // pièce n'a aucune ouverture, mais le ciel y entrait quand même — par l'ambiance, par
+// La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
+function poserLampe(reglage, position, ombre) {
+  const lumiere = new THREE.PointLight(reglage.couleur, reglage.intensite, reglage.portee, 2);
+  lumiere.position.copy(position);
+  lumiere.castShadow = ombre;
+  lumiere.shadow.autoUpdate = false;
+  lumiere.shadow.needsUpdate = true;
+  lumiere.shadow.mapSize.set(reglage.carte, reglage.carte);
+  lumiere.shadow.camera.near = 0.05;
+  lumiere.shadow.camera.far = reglage.portee;
+  lumiere.shadow.bias = -0.002;
+  scene.add(lumiere);
+  return lumiere;
+}
+
+function eclairerKodeshHakodashim(arche, braises) {
+  if (!arche?.length || !braises?.length) return;
+  const lumiereArche = poserLampe(ARCHE, new THREE.Vector3(...arche[0]), PROFIL.menora.ombre);
+  braise = poserLampe(BRAISE, new THREE.Vector3(...braises[0]), PROFIL.menora.ombre);
+  // La pièce n'a aucune ouverture, mais le ciel y entrait quand même — par l'ambiance, par
   // le rebond, par l'or qui le réfléchit. La pénombre est dans la pièce, pas dans le
   // temps : elle se lit sur la position de chaque point, et la fumée y prend la lumière
-  // des braises.
+  // des deux sources.
   assombrir(EMPRISES.get("kodesh_hakodashim"));
-  rendu.enfumer(EMPRISES.get("kodesh_hakodashim"), braise.position);
+  rendu.enfumer(EMPRISES.get("kodesh_hakodashim"), braise.position, lumiereArche.position);
 }
 
 function vaciller(dt) {
@@ -285,18 +295,9 @@ function allumerMenora(flammes) {
     horsGeometrie.push(flamme);
     centre.add(flamme.position);
   });
-  const lumiere = lumiereMenora = new THREE.PointLight(MENORA.couleur, MENORA.intensite, MENORA.portee, 2);
   // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
-  lumiere.position.copy(centre.divideScalar(flammes.length)).add(new THREE.Vector3(0, 0.35, 0));
-  lumiere.castShadow = PROFIL.menora.ombre;
-  // La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
-  lumiere.shadow.autoUpdate = false;
-  lumiere.shadow.needsUpdate = true;
-  lumiere.shadow.mapSize.set(MENORA.carte, MENORA.carte);
-  lumiere.shadow.camera.near = 0.05;
-  lumiere.shadow.camera.far = MENORA.portee;
-  lumiere.shadow.bias = -0.002;
-  scene.add(lumiere);
+  const point = centre.divideScalar(flammes.length).add(new THREE.Vector3(0, 0.35, 0));
+  lumiereMenora = poserLampe(MENORA, point, PROFIL.menora.ombre);
 }
 
 // Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
@@ -373,7 +374,7 @@ scene.add(gltf.scene);
 // aucun sol, et la visite s'ouvrait un mètre au-dessus du dallage.
 gltf.scene.updateMatrixWorld(true);
 allumerMenora(reperes.flammes);
-allumerBraises(reperes.braises);
+eclairerKodeshHakodashim(reperes.arche, reperes.braises);
 
 const murs = [];                        // collision : les étoffes en sont exclues
 const horloges = [];                    // uniformes de temps à faire avancer

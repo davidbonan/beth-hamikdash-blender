@@ -50,9 +50,10 @@ CIEL = {"haut": 0x4D7FB8, "bas": 0xD8DCD4, "sol": 0xA89C86, "horizon": 6.0}
 DIFFUS = 0.33
 # Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
 SATURATION_CIEL = 0.5
-# La Menora et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
+# La Menora, l'Arche et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
 LAMPES = {"flammes": {"couleur": 0xFFB36B, "intensite": 150.0, "hauteur": 0.35},
-          "braises": {"couleur": 0xFF7A2A, "intensite": 18.0 * 0.86, "hauteur": 0.0}}
+          "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},
+          "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
 ECHANTILLONS_REBONDS = 1024
@@ -461,7 +462,7 @@ def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardee
     """Cuit les concepts de `retenus`, faces collées séparées, dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
     `gardees` ({"occlusion": {...}, "lumiere": {...}} d'un reperes.json) garde ces cartes-là au lieu de les recuire.
-    `lampes` : {"flammes": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
+    `lampes` : {"flammes": [...], "arche": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
     Renvoie ({concept: {"carte", "canal", "secondes"}}, {concept: {"carte", "canal", "echelle", "secondes"}}) pour reperes.json."""
     if TOUS in eclaires:
         eclaires = {ident for ident, _, _ in choisis}

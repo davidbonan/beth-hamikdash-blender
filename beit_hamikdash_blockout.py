@@ -6275,12 +6275,22 @@ for ns, sy in (("N", 1), ("S", -1)):
     cyl_between(f"Aron_bad_{ns}", (ARON_X0 - 0.5, sy * ARON_Y_BAD, ARON_Z_BAD),
                 (TR0 + 0.10, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
 
+# --- « עַד שֶׁלֹּא נִיטַּל הָאָרוֹן הָיָה נִכְנַס וְיוֹצֵא לְאוֹרוֹ שֶׁלְּאָרוֹן » (Yerushalmi Yoma 5:3) : tant que
+#     l'Arche est là, le Cohen Gadol entre et sort à sa lumière ; enlevée, il entre et sort
+#     à tâtons. Le film la ramène (§8h), et c'est elle qui éclaire la pièce. La lampe se pose
+#     « מֵעַל הַכַּפֹּרֶת מִבֵּין שְׁנֵי הַכְּרֻבִים » (Shemot 25:22), 4,5 W : la pièce reste en pénombre.
+arche_lueur = lampe("Aron_lumiere", 'POINT', (m(KKC), 0.0, m(Z_KAPORET + 1 / 6 + 0.35)))
+arche_lueur.data.energy = 4.5
+arche_lueur.data.color = (1.0, 0.93, 0.82)
+arche_lueur.data.shadow_soft_size = m(0.20)
+
 # --- La ma'hta de Kippour, « בֵּין שְׁנֵי הַבַּדִּים » (Yoma 5:1), posée sur la pierre devant la
 #     face est de l'Arche. Ce jour-là elle est d'or, tient trois kabin, est légère et son
 #     manche est long, pour que l'avant-bras en porte le poids (Yoma 4:4) ; le Cohen Gadol
 #     l'a portée de la main droite (Rambam, Avodat Yom HaKippurim 4:1). Bassin tronconique
 #     de 0,52 à 0,60 ama sur 0,16 de haut, manche rond de 1,1 ama vers l'est, d'où il vient :
-#     formes et cotes sont un CHOIX (fiche §8g). Ses braises sont la seule lumière de la pièce.
+#     formes et cotes sont un CHOIX (fiche §8g). Ses braises brûlent la ketoret ; la lumière
+#     de la pièce vient de l'Arche, elles n'en sont que le point chaud.
 Z_MACHTA = cote_shetiya(ARON_X_MACHTA, 0)
 revolution("Machta_bassin", ARON_X_MACHTA, 0, Z_MACHTA,
            [(0.24, 0.0), (0.26, 0.0), (0.30, 0.16), (0.325, 0.165), (0.325, 0.185), (0.295, 0.185),
@@ -6293,9 +6303,9 @@ Z_POMMEAU = cote_shetiya(X_POMMEAU, 0) + 0.04
 cyl_between("Machta_manche", (ARON_X_MACHTA + 0.28, 0, Z_MACHTA + 0.14), (X_POMMEAU, 0, Z_POMMEAU),
             0.035, ARON, MAT_OR(), verts=12)
 _lisser(sphere("Machta_pommeau", X_POMMEAU, 0, Z_POMMEAU, 0.055, ARON, MAT_OR(), segs=20), 20)
-# 8 W : la lueur d'un bassin de braises (fiche §1, avec les flammes de la Menora à 15).
+# 3 W : ce que pèse un bassin de charbons à côté de l'Arche (fiche §1, flammes de la Menora à 15).
 machta_lueur = lampe("Machta_braise", 'POINT', (m(ARON_X_MACHTA), 0.0, m(Z_MACHTA + 0.22)))
-machta_lueur.data.energy = 8
+machta_lueur.data.energy = 3
 machta_lueur.data.color = (1.0, 0.45, 0.15)
 machta_lueur.data.shadow_soft_size = m(0.12)
 
