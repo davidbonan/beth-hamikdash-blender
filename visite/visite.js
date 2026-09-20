@@ -199,6 +199,7 @@ scene.add(camera);
 // la mesure d'un bassin de charbons — pas d'une flamme : deux sinus incommensurables et un
 // peu de hasard, jamais une période. Elles ne sont plus que le point chaud de la pièce.
 const ARCHE = { couleur: 0xffeed2, intensite: 9, portee: 6, carte: 512 };
+// Remonter `intensite` rallume les stries d'auto-ombre sur la calotte des keruvim : les regarder avant de conclure.
 const BRAISE = { couleur: 0xff7a2a, intensite: 6, portee: 8, carte: 512 };
 let braise = null;
 let vacillement = 0;
