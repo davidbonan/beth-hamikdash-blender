@@ -1683,8 +1683,11 @@ BANDEAU_KIR = 0.8         # hauteur d'un bandeau, en amot
 # dans le CÈDRE et l'or vient l'épouser, « מְיֻשָּׁר עַל הַמְּחֻקֶּה » (6:35). À 0,05 le contour
 # d'un keruv de 5,6 amot rendait une ligne d'ombre de 2,5 cm à quinze mètres, et le champ
 # se lisait imprimé sur l'or plutôt que taillé dedans.
+# Conséquence à connaître, non une borne : 0,07 < EPAISSEUR_PLACAGE (0,1), donc la taille
+# reste DANS l'or et n'atteint pas le mur porteur ; au-delà son booléen y mordrait, et
+# changerait ce que `separer_collees` voit à 2 cm derrière les faces voisines.
 PROFONDEUR_KIR = 0.07
-# Le pas d'un keruv à la timora voisine, en amot : 12 pas sur les 40 amot du Heikhal, et
+# Le pas d'un keruv au dattier voisin, en amot : 14 pas sur les 40 amot du Heikhal, et
 # les ailes des keruvim d'about touchent les angles. Le Kodesh HaKodashim prend le même
 # pas, pour que ses keruvim aient la taille de ceux du Heikhal. Le pas règle la taille des
 # figures : le registre et le pas se règlent ENSEMBLE — quatre registres de 4,25 amot
