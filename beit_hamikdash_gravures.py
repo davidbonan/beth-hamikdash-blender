@@ -19,8 +19,8 @@ l'iconographie, le cadrage, en dômes et sillons — et les fait tailler par gpt
 ossuaires, portes de 'Houlda, frises hérodiennes — ; les tuiles taillées, dans
 `gravures/`, sont la SOURCE : versionnées, parce qu'un modèle ne rend jamais deux fois
 la même image. `--guides` redessine les guides dans `gravures/guides/`, `--tailler`
-en fait tailler un — avec l'esquisse validée du motif, dans `gravures/esquisses/`, s'il
-en a une —, et sans argument l'atlas se compose des tuiles.
+en fait tailler un — avec l'esquisse validée du motif, s'il en a une —, et sans argument
+l'atlas se compose des tuiles.
 
 Une tuile taillée est un rendu ombré, pas une hauteur : la luminance en donne les
 creux et les arêtes (les sillons sont sombres, les crêtes claires), et c'est la
@@ -47,9 +47,10 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (AILES_DRESSEES, AILES_TENDUES, CROISURE, GAINE_KERUV,  # noqa: E402
-                                     JAMBE, LARGEUR_JAMBE, MAINS, REDUCTION_DRESSE, SABOT, aile,
-                                     bezier, corolle, ellipse, folioles, largeurs_palme, lisser,
+from beit_hamikdash_contours import (AILES_DRESSEES, AILES_HAUTES, CROISURE, GAINE_KERUV,  # noqa: E402
+                                     JAMBE, LARGEUR_JAMBE, REDUCTION_DRESSE, REDUCTION_HAUTE,
+                                     SABOT, aile, bezier, corolle, ellipse, folioles,
+                                     largeurs_palme, lisser, meches_de_criniere, plumage,
                                      poser_lame, reduire, ruban, symetrique, tete_keruv)
 
 TUILE_PX = 1024
@@ -59,14 +60,21 @@ TUILES = RACINE / "gravures"
 GUIDES = TUILES / "guides"
 # L'esquisse validée d'un motif, quand il en a une : montrée au modèle avec le guide, elle
 # donne la manière — le dessin des plumes, les proportions — que le guide ne porte pas.
-ESQUISSES = TUILES / "esquisses"
-ESQUISSE = "The second image is the approved design sketch: carve the figure in its manner " \
-           "and proportions, but keep the composition and framing of the first image."
+# Celle des keruvim est le keruv TISSÉ de la parokhet : c'est son dessin, et non une frise
+# d'ailes tendues, qui donne la manière retenue. (Le tissage, lui, a pour esquisse le keruv
+# taillé du vantail : les deux figures se tiennent l'une l'autre, chacune par un fichier.)
+ESQUISSES = {"keruv": RACINE / "tissages" / "keruv.png",
+             "keruv_dresse": RACINE / "tissages" / "keruv.png"}
+ESQUISSE = "The second image is the approved design of this figure, woven in wool: carve " \
+           "THAT drawing in stone — the same crossed feather sheath, the same slender " \
+           "proportions, the same restraint. Ignore its colours, its green background and " \
+           "its woven texture; ignore its hands, and ignore the way its head is drawn. The " \
+           "first image gives the composition and framing to keep."
 # Le relief d'une tuile taillée : la silhouette bombe sur RONDEUR (en part de la hauteur)
 # depuis son bord, et la luminance, floutée de GRAIN pour ôter le grain du modèle, y
 # ajoute le modelé pour PART_MODELE du tout. Un fond plus noir que SEUIL_FOND est le mur.
 # GRAIN est au pixel près : un sillon de la taille en fait trois, et floutés de quatre les
-# mains du keruv, ses deux profils et les pennes de sa gaine sortaient en plis sans dessin.
+# deux profils du keruv et les pennes de ses ailes sortaient en plis sans dessin.
 RONDEUR, GRAIN, PART_MODELE, SEUIL_FOND = 0.05, 0.0015, 0.5, 0.02
 # Le cadre d'une figure debout : un peu plus large qu'elle, du dessous du pied au
 # dessus de la tête, pour que le fondu du bord n'atteigne jamais la tuile voisine.
@@ -83,29 +91,24 @@ TOLERANCE = {"keruv": 0.005, "keruv_dresse": 0.005, "timora": 0.010, "fleuron": 
 
 # --- Le keruv : la 'haya de Ye'hezkel, quatre ailes, une jambe, une tête à deux faces. ---
 
-# La gaine des ailes croisées, les mains, la jambe et la tête sont dans
+# La gaine des ailes croisées, la jambe, la tête et les pennes sont dans
 # beit_hamikdash_contours.py : le guide du keruv tissé du rideau est bâti sur le même corps.
 
 # Les niveaux, en unités libres : ce qui est devant est plus haut. L'atlas les ramène
 # tous ensemble à [0, 1], et la visite les lit à la même échelle sur tous les motifs.
-NIVEAU_AILE, NIVEAU_JAMBE, NIVEAU_GAINE, NIVEAU_MAINS, NIVEAU_TETE = 0.0, 0.30, 0.35, 0.65, 0.65
+NIVEAU_AILE, NIVEAU_JAMBE, NIVEAU_GAINE, NIVEAU_TETE = 0.0, 0.30, 0.35, 0.65
 
 
 def ailes_hautes(planche, attache, angle, taille, k=1.0):
+    """Les deux ailes levées, taillées penne par penne : la lame de l'aile, puis ses rangs
+    de plumes posés dessus en tuiles, des rémiges aux petites couvertures."""
     (u, z) = attache
     for sens in (-1, 1):
         def poser_aile(contour):
             return reduire(poser_lame(contour, sens * u, z, angle, taille, sens), k)
-        planche.bomber(poser_aile(aile()), NIVEAU_AILE, 1.0, 0.05 * k)
-        # Les rémiges : un sillon de chaque entaille du bord de fuite jusqu'au poignet,
-        # et l'arc des couvertures qui les recouvre à la racine.
-        for n in range(6):
-            a = 1.0 - (n + 0.5) / 6
-            longueur = 0.18 + 0.26 * a
-            entaille = (a + 0.05 + 0.55 * longueur * 0.4, -longueur * 0.42)
-            planche.graver(poser_aile([entaille, (0.14, -0.02)]), 0.012 * k, 0.45)
-        planche.graver(poser_aile([(0.10, -0.12), (0.40, -0.14), (0.70, -0.12), (0.96, -0.05)]),
-                       0.010 * k, 0.35)
+        planche.bomber(poser_aile(aile(8)), NIVEAU_AILE, 1.0, 0.05 * k)
+        for contour, rang in plumage():
+            planche.bomber(poser_aile(contour), NIVEAU_AILE + 0.04 + 0.05 * rang, 0.55, 0.018 * k)
 
 
 def corps_de_keruv(planche, k=1.0):
@@ -116,14 +119,14 @@ def corps_de_keruv(planche, k=1.0):
     # Les rangs de plumes de la gaine, en chevrons qui descendent vers la jambe.
     for z in (0.74, 0.64, 0.54, 0.44, 0.34, 0.26):
         planche.graver(reduire([(-0.12, z + 0.03), (0.0, z - 0.02), (0.12, z + 0.03)], k), 0.008 * k, 0.3)
-    for main in MAINS:
-        planche.bomber(reduire(ellipse(*main), k), NIVEAU_MAINS, 0.9, 0.02 * k)
-    planche.bomber(reduire(tete_keruv(), k), NIVEAU_TETE, 1.2, 0.05 * k)
+    planche.bomber(reduire(tete_keruv(), k), NIVEAU_TETE, 1.2, 0.022 * k)
+    for meche in meches_de_criniere():
+        planche.graver(reduire(meche, k), 0.010 * k, 0.35)
 
 
 def keruv(planche):
-    ailes_hautes(planche, *AILES_TENDUES)
-    corps_de_keruv(planche)
+    ailes_hautes(planche, *AILES_HAUTES, REDUCTION_HAUTE)
+    corps_de_keruv(planche, REDUCTION_HAUTE)
 
 
 def keruv_dresse(planche):
@@ -194,20 +197,32 @@ TAILLE = "Re-sculpt this {sujet} as a genuine hand-carved stone bas-relief in th
 KERUV = ("an awe-inspiring heavenly being of Ezekiel's vision, NOT a human in clothes and NOT "
          "a Christian angel: no tunic, no garment, no belt, no visible torso. The body is a "
          "tall sheath of feathers made by two lower wings wrapped down and crossed in front "
-         "from the shoulders to the shins; two human hands emerge from under them, laid flat "
-         "on the sheath. Below it ONE single straight rigid leg without knee, ending in ONE "
-         "round calf's hoof, polished like burnished bronze. ONE head carrying TWO faces in "
-         "profile, a man's profile looking left and a young lion's profile with a short mane "
-         "looking right. IMPORTANT: both faces are perfectly smooth featureless silhouettes, "
-         "no eyes, no nose detail, no mouth, no fangs. {ailes} Every wing in rows of small "
-         "scale-like coverts, then long overlapping flight feathers. Majestic, hieratic, "
-         "severe, in the manner of Israelite and Phoenician ivory carving; no halo, no crown, "
-         "no beard, no palm trees, a single figure alone.")
+         "from the shoulders to the shins. NO HANDS, no arms, no fingers anywhere — the "
+         "sheath is closed. Below it ONE single straight rigid leg without knee, ending in "
+         "ONE round calf's hoof. THE WINGS ARE THE GLORY OF THE FIGURE and must be "
+         "magnificent: each wing is built of individual feathers — three graded rows of small "
+         "rounded coverts overlapping like roof tiles at the root, then a row of longer "
+         "secondaries, then long slender primaries carved one by one to the tip, each with "
+         "its own outline and central shaft, five graded rows at least. EVERY feather ends in "
+         "a POINT, and the tips stay slightly apart, so the edge of the wing is a row of "
+         "sharp points and not a smooth border. {ailes} THE HEAD IS THE HARD PART, read it "
+         "twice: there is ONE SINGLE HEAD, one skull only, and it carries TWO FACES looking "
+         "in opposite directions, a man's profile on the left and a young lion's profile on "
+         "the right, sharing the same cranium back to back, like a janiform head on a coin. "
+         "It must NOT be two heads side by side, NOT two necks, NOT two separate skulls "
+         "touching, NOT one head behind the other. Both faces are BLANK featureless "
+         "silhouettes — no eye, no eyebrow, no nostril, no mouth, nothing carved inside the "
+         "profile, only the outline of brow, nose and chin. The LEFT profile is a man's: "
+         "straight nose, smooth skull, no beard, no wig. The RIGHT profile must be "
+         "unmistakably a YOUNG LION: bulging forehead, short square muzzle jutting forward, "
+         "deep heavy jaw, a small round ear set high, and a short mane carved in separate "
+         "locks running around the back of the skull down to the neck. Majestic, hieratic, "
+         "severe; no halo, no crown, no beard, no palm trees, a single figure alone.")
 MOTIFS = {
     "keruv": (keruv, CADRE_DEBOUT, (0, 1), "four-winged cherub",
-              KERUV.format(ailes="Its two upper wings spread out almost horizontally from the "
-                                 "shoulders, long and straight, the tips slightly lifted, the "
-                                 "long flight feathers hanging below them in stacked bands.")),
+              KERUV.format(ailes="Its two upper wings are very large, rising from the "
+                                 "shoulders and opening a little outwards, their tips well "
+                                 "above the head.")),
     "keruv_dresse": (keruv_dresse, CADRE_DEBOUT, (1, 0), "four-winged cherub",
                      KERUV.format(ailes="Its two upper wings rise straight up from the "
                                         "shoulders, tall and narrow like two flames, their "
@@ -264,8 +279,8 @@ def tailler(nom):
     import fal_commun  # noqa: E402
     _, _, _, sujet, iconographie = MOTIFS[nom]
     cle = fal_commun.cle_api()
-    esquisse = ESQUISSES / f"{nom}.png"
-    images = [GUIDES / f"{nom}.png"] + ([esquisse] if esquisse.exists() else [])
+    esquisse = ESQUISSES.get(nom)
+    images = [GUIDES / f"{nom}.png"] + ([esquisse] if esquisse else [])
     prompt = TAILLE.format(sujet=sujet, iconographie=iconographie)
     corps = {"prompt": prompt + (" " + ESQUISSE if len(images) > 1 else ""),
              "image_urls": [fal_commun.televerse(str(image), cle) for image in images],
