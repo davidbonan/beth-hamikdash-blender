@@ -50,9 +50,10 @@ CIEL = {"haut": 0x4D7FB8, "bas": 0xD8DCD4, "sol": 0xA89C86, "horizon": 6.0}
 DIFFUS = 0.33
 # Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
 SATURATION_CIEL = 0.5
-# La Menora et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
+# La Menora, l'Arche et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
 LAMPES = {"flammes": {"couleur": 0xFFB36B, "intensite": 150.0, "hauteur": 0.35},
-          "braises": {"couleur": 0xFF7A2A, "intensite": 18.0 * 0.86, "hauteur": 0.0}}
+          "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},
+          "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
 ECHANTILLONS_REBONDS = 1024
@@ -317,6 +318,112 @@ def eclairer(scene, points):
     return sources
 
 
+def aire_uv(uv, face):
+    """L'aire de la face dans le carré UV."""
+    u = np.array([uv[b].uv[0] for b in face.loop_indices])
+    v = np.array([uv[b].uv[1] for b in face.loop_indices])
+    return 0.5 * abs(u @ np.roll(v, -1) - v @ np.roll(u, -1))
+
+
+def iles(maillage, uv):
+    """Chaque face avec l'île du dépliage dont elle est : ce qui se tient par une même coordonnée."""
+    parent = list(range(len(maillage.polygons)))
+
+    def racine(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    premiere = {}
+    for face in maillage.polygons:
+        for boucle in face.loop_indices:
+            coin = (round(uv[boucle].uv[0], 6), round(uv[boucle].uv[1], 6))
+            a, b = racine(face.index), racine(premiere.setdefault(coin, face.index))
+            if a != b:
+                parent[a] = b
+    return [racine(i) for i in range(len(maillage.polygons))]
+
+
+def voisines(maillage):
+    """Les faces qui se touchent par une arête."""
+    par_arete = {}
+    for face in maillage.polygons:
+        for arete in face.edge_keys:
+            par_arete.setdefault(arete, []).append(face.index)
+    contact = {}
+    for faces in par_arete.values():
+        for i in faces:
+            contact.setdefault(i, set()).update(f for f in faces if f != i)
+    return contact
+
+
+def application_du_plan(maillage, uv, face):
+    """Le dépliage du plan de `face`, en UV = q0 + M·(p − p0), prolongé hors du plan par M·n = 0."""
+    sommets = [(maillage.vertices[maillage.loops[b].vertex_index].co, Vector(uv[b].uv))
+               for b in face.loop_indices]
+    p0, q0 = sommets[0]
+    ecarts = [(p - p0, q - q0) for p, q in sommets[1:]]
+    e1, d1 = max(ecarts, key=lambda e: e[0].length_squared)
+    e2, d2 = max(ecarts, key=lambda e: e[0].cross(e1).length_squared)
+    base = np.array([e1, e2, face.normal], dtype=np.float64).T
+    if abs(np.linalg.det(base)) < 1e-12:
+        return None
+    return p0, q0, np.array([[d1.x, d2.x, 0.0], [d1.y, d2.y, 0.0]]) @ np.linalg.inv(base)
+
+
+# Une île sous le texel n'est pas une île : la cuisson n'écrit aucun texel dedans, le noir du
+# fond de l'image y reste, et c'est lui que la face lit. Il y en a des centaines par concept —
+# les chanfreins, et surtout les flancs d'une figure gravée et ceux du trou que le booléen
+# ouvre en face : 2,5 cm, sous le texel quelle que soit la carte, neuf cent soixante-trois pour
+# la seule porte de Shushan. Elles se rabattent sur le plan de la face voisine la plus large, où
+# elles s'écrasent le long de l'arête qu'elles partagent avec elle : la lumière d'un flanc
+# devient celle du fond qu'il borde, ce qu'elle est de toute façon à 2,5 cm.
+TEXEL_ILE_MIN = 1.0
+
+
+def rabattre_les_minuscules(obj, taille):
+    """Rabat sur leur voisine les îles que le dépliage laisse sous le texel.
+
+    Une île en découvre une autre : le flanc d'une taille ne touche que son chanfrein, qui
+    est minuscule lui aussi, et ne trouve le fond qu'une fois le chanfrein rabattu dessus.
+    """
+    maillage = obj.data
+    uv = maillage.uv_layers.active.data
+    ile_de = iles(maillage, uv)
+    aires, faces_de = {}, {}
+    for face in maillage.polygons:
+        ile = ile_de[face.index]
+        aires[ile] = aires.get(ile, 0.0) + aire_uv(uv, face) * taille * taille
+        faces_de.setdefault(ile, []).append(face.index)
+    contact = voisines(maillage)
+    minuscules = sorted(i for i, aire in aires.items() if aire < TEXEL_ILE_MIN)
+    while minuscules:
+        restent = []
+        for ile in minuscules:
+            hotes = [maillage.polygons[g] for i in faces_de[ile] for g in contact.get(i, ())
+                     if aires[ile_de[g]] >= TEXEL_ILE_MIN]
+            hote = max(hotes, key=lambda f: f.area) if hotes else None
+            plan = application_du_plan(maillage, uv, hote) if hote else None
+            if plan is None:
+                restent.append(ile)
+                continue
+            p0, q0, application = plan
+            for i in faces_de[ile]:
+                face = maillage.polygons[i]
+                for boucle, sommet in zip(face.loop_indices, face.vertices):
+                    uv[boucle].uv = q0 + Vector(application @ np.array(maillage.vertices[sommet].co - p0))
+            accueil = ile_de[hote.index]
+            aires[accueil] += aires.pop(ile)
+            for i in faces_de.pop(ile):
+                ile_de[i] = accueil
+                faces_de[accueil].append(i)
+        if len(restent) == len(minuscules):
+            return len(restent)
+        minuscules = restent
+    return 0
+
+
 def deplier(obj, taille):
     obj.data.uv_layers.active = obj.data.uv_layers.new(name=COUCHE)
     for o in bpy.context.view_layer.objects:
@@ -327,6 +434,10 @@ def deplier(obj, taille):
     bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=2.0 / taille, area_weight=0.0)
     bpy.ops.uv.pack_islands(margin=2.0 / taille, rotate=True)
     bpy.ops.object.mode_set(mode="OBJECT")
+    # Le rabattage vient APRÈS l'empaquetage, et rien ne le suit : c'est l'empaquetage qui fixe
+    # l'échelle, donc ce qu'une île mesure en texels, et une île rabattue est plate en UV —
+    # réempaqueter derrière, l'atlas entier s'effondrait sur une île d'un texel.
+    rabattre_les_minuscules(obj, taille)
     return len(obj.data.uv_layers) - 1
 
 
@@ -461,7 +572,7 @@ def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardee
     """Cuit les concepts de `retenus`, faces collées séparées, dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
     `gardees` ({"occlusion": {...}, "lumiere": {...}} d'un reperes.json) garde ces cartes-là au lieu de les recuire.
-    `lampes` : {"flammes": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
+    `lampes` : {"flammes": [...], "arche": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
     Renvoie ({concept: {"carte", "canal", "secondes"}}, {concept: {"carte", "canal", "echelle", "secondes"}}) pour reperes.json."""
     if TOUS in eclaires:
         eclaires = {ident for ident, _, _ in choisis}

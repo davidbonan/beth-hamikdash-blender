@@ -6000,13 +6000,72 @@ def kuz(nom, x, y, z):
 menora("Menora", XU, YM, allumee=True)
 kuz("Menora_kuz", XU + 1.8, YM + 0.9, Z_BAT + 0.6)
 
-# --- Les deux Parokhot (Yoma 5:1) : extérieure agrafée au SUD, intérieure au NORD.
+# --- Les deux Parokhot (Yoma 5:1) : « הַחִיצוֹנָה הָיְתָה פְרוּפָה מִן הַדָּרוֹם, וְהַפְּנִימִית מִן הַצָּפוֹן ».
 #     « אָרְכָּהּ אַרְבָּעִים אַמָּה וְרָחְבָּהּ עֶשְׂרִים אַמָּה », « עָבְיָהּ טֶפַח » (Shekalim 8:5).
 PAROKHET_EP = 1 / 6            # טפח : l'épaisseur que la michna donne à l'étoffe
-box("Parokhet_ext", TR0 - PAROKHET_EP, TR0, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
-box("Parokhet_int", TR1, TR1 + PAROKHET_EP, -10, 10, Z_BAT, Z_BAT + 40, "60_KodeshHakodashim", MAT_PAROKHET())
-empty("Parokhet_ext_agrafe_SUD", TR0, -9.5, Z_BAT + 20, "60_KodeshHakodashim")
-empty("Parokhet_int_agrafe_NORD", TR1, 9.5, Z_BAT + 20, "60_KodeshHakodashim")
+PERIFA_BLEND = pathlib.Path(__file__).resolve().parent / "perifa.blend"
+PERIFA_HAUT = 24               # amot : la hauteur que la simulation de tissu tient ; au-dessus, l'étoffe pend à plat
+
+
+def etoffe_en_x(name, contour, x0, x1, col, mat):
+    """Étoffe plane tendue en travers de l'axe E-O : `contour`, des (y, z) en amot dans
+    le sens direct vu de l'est, épaissie de x0 à x1."""
+    n = len(contour)
+    verts = [(x0, y, z) for y, z in contour] + [(x1, y, z) for y, z in contour]
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    faces += [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
+    return mesh_from_pydata(name, verts, faces, col, mat)
+
+
+def perifa(nom):
+    """Le coin replié de la parokhet `nom` et son anneau, lus dans `perifa.blend`.
+
+    C'est `beit_hamikdash_perifa.py` qui les simule en tissu, chacun avec le rideau voisin
+    pour obstacle. Les maillages sont en mètres, dans le repère du coin : x depuis le mur,
+    y vers l'est, z depuis le sol.
+    """
+    with bpy.data.libraries.load(str(PERIFA_BLEND)) as (_, charge):
+        charge.meshes = [f"Perifa_{nom}", f"Perifa_{nom}_keres"]
+    return charge.meshes
+
+
+def coin_replie(name, modele, x_pli, cote, col, mat):
+    """Le coin simulé, posé contre le rideau : x du coin court vers le centre depuis le mur
+    `cote` (+1 nord, -1 sud), y du coin vers l'est. Au sud, ce repère retourne l'espace et
+    les faces se relisent à l'envers."""
+    verts = [(x_pli + v.co.y / AMA, cote * (10 - v.co.x / AMA), Z_BAT + v.co.z / AMA)
+             for v in modele.vertices]
+    faces = [list(f.vertices) if cote > 0 else list(f.vertices)[::-1] for f in modele.polygons]
+    o = mesh_from_pydata(name, verts, faces, col, mat)
+    o.data.shade_smooth()
+    return o
+
+
+def parokhet_perufa(name, nom_coin, x_ouest, cote):
+    """Rideau de mur à mur dont le coin du côté `cote` est relevé par-dessus l'étoffe et
+    tenu par un keres d'or : ce que le repli découvre est le passage.
+
+    « פְּרוּפָה — רֹאשָׁהּ כְּפוּלָה לְצַד הַחִיצוֹן וְנֶאֱחֶזֶת בְּקֶרֶס שֶׁל זָהָב לִהְיוֹת פְּתוּחָה וְעוֹמֶדֶת »
+    (Rashi Yoma 52b ; Bartenura 5:1). Le rideau a la largeur du Heikhal et se replie sur
+    lui-même (Rashash, ibid.) ; Tosfot Yom Tov, qui le fait déborder le long du mur, est écarté.
+    Le pan plat s'arrête où commence le coin simulé, dont les bords y restent épinglés.
+    """
+    def direct(points):                                          # sens direct vu de l'est
+        contour = [(cote * (10 - u), Z_BAT + z) for u, z in points]
+        return contour if cote < 0 else contour[::-1]
+
+    etoffe_en_x(name, direct([(0, PERIFA_HAUT), (20, PERIFA_HAUT), (20, 40), (0, 40)]),
+                x_ouest, x_ouest + PAROKHET_EP, "60_KodeshHakodashim", MAT_PAROKHET())
+    etoffe, anneau = perifa(nom_coin)
+    x_pli = x_ouest + PAROKHET_EP / 2
+    coin_replie(f"{name}_coin", etoffe, x_pli, cote, "60_KodeshHakodashim", MAT_PAROKHET())
+    coin_replie(f"{name}_keres", anneau, x_pli, cote, "60_KodeshHakodashim", MAT_OR())
+    bpy.data.meshes.remove(etoffe)
+    bpy.data.meshes.remove(anneau)
+
+
+parokhet_perufa("Parokhet_ext", "ext", TR0 - PAROKHET_EP, -1)
+parokhet_perufa("Parokhet_int", "int", TR1, +1)
 # Le motif est dans la matière (voir `parokhet`), et le même sur les deux faces. Un
 # maassé 'hoshev en porte un AUTRE au revers — « מצד זה ארי ומצד זה נשר » (Rashi sur Yoma
 # 72b) ; aucun plan ne cadre le revers, et il n'est pas tissé.
@@ -6275,12 +6334,22 @@ for ns, sy in (("N", 1), ("S", -1)):
     cyl_between(f"Aron_bad_{ns}", (ARON_X0 - 0.5, sy * ARON_Y_BAD, ARON_Z_BAD),
                 (TR0 + 0.10, sy * ARON_Y_BAD, ARON_Z_BAD), 0.06, ARON, MAT_OR(), verts=12)
 
+# --- « עַד שֶׁלֹּא נִיטַּל הָאָרוֹן הָיָה נִכְנַס וְיוֹצֵא לְאוֹרוֹ שֶׁלְּאָרוֹן » (Yerushalmi Yoma 5:3) : tant que
+#     l'Arche est là, le Cohen Gadol entre et sort à sa lumière ; enlevée, il entre et sort
+#     à tâtons. Le film la ramène (§8h), et c'est elle qui éclaire la pièce. La lampe se pose
+#     « מֵעַל הַכַּפֹּרֶת מִבֵּין שְׁנֵי הַכְּרֻבִים » (Shemot 25:22), 4,5 W : la pièce reste en pénombre.
+arche_lueur = lampe("Aron_lumiere", 'POINT', (m(KKC), 0.0, m(Z_KAPORET + 1 / 6 + 0.35)))
+arche_lueur.data.energy = 4.5
+arche_lueur.data.color = (1.0, 0.93, 0.82)
+arche_lueur.data.shadow_soft_size = m(0.20)
+
 # --- La ma'hta de Kippour, « בֵּין שְׁנֵי הַבַּדִּים » (Yoma 5:1), posée sur la pierre devant la
 #     face est de l'Arche. Ce jour-là elle est d'or, tient trois kabin, est légère et son
 #     manche est long, pour que l'avant-bras en porte le poids (Yoma 4:4) ; le Cohen Gadol
 #     l'a portée de la main droite (Rambam, Avodat Yom HaKippurim 4:1). Bassin tronconique
 #     de 0,52 à 0,60 ama sur 0,16 de haut, manche rond de 1,1 ama vers l'est, d'où il vient :
-#     formes et cotes sont un CHOIX (fiche §8g). Ses braises sont la seule lumière de la pièce.
+#     formes et cotes sont un CHOIX (fiche §8g). Ses braises brûlent la ketoret ; la lumière
+#     de la pièce vient de l'Arche, elles n'en sont que le point chaud.
 Z_MACHTA = cote_shetiya(ARON_X_MACHTA, 0)
 revolution("Machta_bassin", ARON_X_MACHTA, 0, Z_MACHTA,
            [(0.24, 0.0), (0.26, 0.0), (0.30, 0.16), (0.325, 0.165), (0.325, 0.185), (0.295, 0.185),
@@ -6293,9 +6362,9 @@ Z_POMMEAU = cote_shetiya(X_POMMEAU, 0) + 0.04
 cyl_between("Machta_manche", (ARON_X_MACHTA + 0.28, 0, Z_MACHTA + 0.14), (X_POMMEAU, 0, Z_POMMEAU),
             0.035, ARON, MAT_OR(), verts=12)
 _lisser(sphere("Machta_pommeau", X_POMMEAU, 0, Z_POMMEAU, 0.055, ARON, MAT_OR(), segs=20), 20)
-# 8 W : la lueur d'un bassin de braises (fiche §1, avec les flammes de la Menora à 15).
+# 3 W : ce que pèse un bassin de charbons à côté de l'Arche (fiche §1, flammes de la Menora à 15).
 machta_lueur = lampe("Machta_braise", 'POINT', (m(ARON_X_MACHTA), 0.0, m(Z_MACHTA + 0.22)))
-machta_lueur.data.energy = 8
+machta_lueur.data.energy = 3
 machta_lueur.data.color = (1.0, 0.45, 0.15)
 machta_lueur.data.shadow_soft_size = m(0.12)
 

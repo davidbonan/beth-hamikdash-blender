@@ -172,11 +172,11 @@ const COMPOSITION = {
 // la boîte de la pièce et par la géométrie qu'il rencontre (la distance de la passe
 // d'occlusion), puis parcouru pas à pas : à chaque pas une densité — une nappe qui
 // s'amasse sous le plafond, et la colonne qui monte des braises en ondulant — et la
-// lumière que ce point reçoit des braises, en 1/d². C'est cette lumière-là, reprise par
-// la fumée, qui fait lire l'obscurité : sans elle la pièce n'est qu'un écran noir.
+// lumière que ce point reçoit de l'Arche et des braises, en 1/d². C'est cette lumière-là,
+// reprise par la fumée, qui fait lire l'obscurité : sans elle la pièce n'est qu'un écran noir.
 //
 // Elle passe AVANT le halo, pour la même raison que le halo passe avant la sortie : la
-// lueur des braises dans la fumée est une haute lumière, et c'est elle qui doit déborder.
+// lueur de l'Arche dans la fumée est une haute lumière, et c'est elle qui doit déborder.
 //
 // Le parcours se fait en demi-définition, sur la grille de la passe de géométrie qu'il lit :
 // au quart les volutes perdent leur détail. Il écrit la lumière reprise et, en alpha, ce qui
@@ -185,16 +185,17 @@ const FUMEE = {
   uniforms: { tGeo: { value: null },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
               uBoiteMin: { value: new THREE.Vector3() }, uBoiteMax: { value: new THREE.Vector3() },
-              uBraise: { value: new THREE.Vector3() }, uTemps: { value: 0 },
+              uBraise: { value: new THREE.Vector3() }, uArche: { value: new THREE.Vector3() },
+              uTemps: { value: 0 },
               uVoile: { value: 0.03 }, uVolutes: { value: 1.4 },
-              uLueur: { value: 0.32 }, uLampe: { value: 0.06 } },
+              uLueur: { value: 0.11 }, uLueurArche: { value: 0.22 }, uLampe: { value: 0.06 } },
   defines: { PAS: PROFIL.fumee.pas, OCTAVES: PROFIL.fumee.octaves },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
     uniform sampler2D tGeo;
-    uniform float uTanFov, uAspect, uTemps, uVoile, uVolutes, uLueur, uLampe;
+    uniform float uTanFov, uAspect, uTemps, uVoile, uVolutes, uLueur, uLueurArche, uLampe;
     uniform mat4 uMonde;
-    uniform vec3 uBoiteMin, uBoiteMax, uBraise;
+    uniform vec3 uBoiteMin, uBoiteMax, uBraise, uArche;
     varying vec2 vUv;
 
     float hachage(vec3 p){
@@ -248,17 +249,23 @@ const FUMEE = {
       return uVoile * voile + uVolutes * (volute * panache + 0.4 * colonne);
     }
 
-    // La fumée est blanche : elle prend la couleur de ce qui l'éclaire. Les braises en
-    // 1/d², diffusées vers l'avant — à contre-jour elle brille —, la lampe de tête qui la
-    // fait voir autour de soi, et un fond presque noir.
-    vec3 lumiere(vec3 p, vec3 o, vec3 d){
-      vec3 v = p - uBraise;
+    // Un point source vu à travers la fumée : en 1/d², diffusé vers l'avant — à contre-jour
+    // elle brille. Même diffusion pour les deux sources, c'est la même fumée.
+    vec3 source(vec3 p, vec3 d, vec3 point, vec3 teinte, float force){
+      vec3 v = p - point;
       float d2 = max(dot(v, v), 0.06);
       const float g = 0.5;
       float cosT = dot(v * inversesqrt(d2), d);
       float phase = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * cosT, 1.5);
+      return teinte * (force * phase / d2);
+    }
+
+    // La fumée est blanche : elle prend la couleur de ce qui l'éclaire. L'Arche, les braises,
+    // la lampe de tête qui la fait voir autour de soi, et un fond presque noir.
+    vec3 lumiere(vec3 p, vec3 o, vec3 d){
       float dc = max(distance(p, o), 0.6);
-      return vec3(1.0, 0.62, 0.36) * (uLueur * phase / d2)
+      return source(p, d, uArche, vec3(1.0, 0.93, 0.82), uLueurArche)
+           + source(p, d, uBraise, vec3(1.0, 0.62, 0.36), uLueur)
            + vec3(1.0, 0.95, 0.88) * (uLampe / pow(dc, 1.7))
            + vec3(0.010, 0.009, 0.008);
     }
@@ -493,17 +500,18 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uAspect.value = camera.aspect;
   }
 
-  /** La pièce enfumée (Box3, en mètres) et le point d'où monte la fumée. Le rayon d'un
-   *  pixel qui n'entre pas dans la boîte — ou que la géométrie arrête avant — n'y coûte
-   *  qu'un test, et une pièce hors du champ ne coûte aucune passe. */
+  /** La pièce enfumée (Box3, en mètres), le point d'où monte la fumée et celui qui l'éclaire
+   *  avec lui. Le rayon d'un pixel qui n'entre pas dans la boîte — ou que la géométrie arrête
+   *  avant — n'y coûte qu'un test, et une pièce hors du champ ne coûte aucune passe. */
   let pieceEnfumee = null;
   const champ = new THREE.Frustum();
   const vueProjetee = new THREE.Matrix4();
-  function enfumer(boite, braise) {
+  function enfumer(boite, braise, arche) {
     pieceEnfumee = boite.clone();
     fumee.uniforms.uBoiteMin.value.copy(boite.min);
     fumee.uniforms.uBoiteMax.value.copy(boite.max);
     fumee.uniforms.uBraise.value.copy(braise);
+    fumee.uniforms.uArche.value.copy(arche);
   }
 
   const pieceEnfumeeVue = () => pieceEnfumee !== null && champ.setFromProjectionMatrix(

@@ -63,7 +63,7 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 | Ouverture du Heikhal 20 × 10, ses quatre portes | *Middot* 4:1 | §8b |
 | Dimensions intérieures du Heikhal, hauteur, structure du toit | *Middot* 4:6–7 | §8b |
 | Menora, Shul'han, Mizbea'h HaZahav : position, orientation | *Middot* 4:7 ; *Yoma* 33b ; *Mena'hot* 98b–99a | §8c |
-| Amah Traksin, les deux parokhot et leurs agrafes | *Yoma* 5:1 ; *Middot* 4:7 | §8d |
+| Amah Traksin, les deux parokhot et leurs agrafes (keres d'or) | *Yoma* 5:1 ; Rashi *Yoma* 52b ; *Middot* 4:7 | §8d |
 | Even HaShetiya ; l'Arche enlevée, la pierre à sa place | *Yoma* 5:2 ; *Shekalim* 6:1–2 | §8e |
 | L'Arche cachée sous le Temple, révélée au Temple à venir ; « on n'en fera pas une autre » | *Yoma* 52b–54a ; Rambam *Beit HaBe'hira* 4:1 ; Jér. 3:16 | §8h |
 | Aron : cotes, plaquage, zer, anneaux aux coins supérieurs, badim jamais retirés | Ex. 25:10–15 ; Rashi Ex. 25:12 ; Rambam *Klei HaMikdash* 2:13 | §8h |

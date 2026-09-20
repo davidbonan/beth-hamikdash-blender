@@ -595,7 +595,7 @@ Clé `FAL_AI_KEY` dans le `.env` à la racine.
 ## Règles non négociables
 
 - Aucun visage. Le Cohen Gadol est de dos ou en silhouette ; le sujet est l'architecture et la lumière.
-- Kodesh HaKodashim = obscurité, l'Arche et ses keruvim pris dans la lueur de la braise, fumée ; aucun autre décor, aucun personnage. L'Arche est **fermée**, ses deux keruvim ont des visages d'enfant tournés l'un vers l'autre, ailes au-dessus des têtes (fiche §8h) — jamais d'anges adultes, jamais de tables de la Loi visibles.
+- Kodesh HaKodashim = pénombre, l'Arche et ses keruvim pris dans la lumière que l'Arche donne (« לְאוֹרוֹ שֶׁלְּאָרוֹן », *Yerushalmi Yoma* 5:3, fiche §8e) et dans la lueur de la braise, fumée ; aucun autre décor, aucun personnage. L'Arche est **fermée**, ses deux keruvim ont des visages d'enfant tournés l'un vers l'autre, ailes au-dessus des têtes (fiche §8h) — jamais d'anges adultes, jamais de tables de la Loi visibles.
 - Menora à **7** branches ; Table au **nord**, Menora au **sud** ; autel d'or au centre, sans feu à Kippour.
 - Mizbea'h **blanc** (chaulé) avec **rampe**, jamais d'escalier. Oulam **sans portes**.
 - Quatre vêtements de lin blanc pour tout le service intérieur de Kippour (Lév. 16:4). Les huit vêtements d'or ne se montrent qu'au revêtement, sur la parole « il revêtait les habits d'or » (*Yoma* 3:4, 7:3) — jamais dans un plan intérieur.
@@ -937,7 +937,7 @@ L'occlusion assombrissait le ciel sans rien renvoyer : une ombre ne recevait jam
 soleil que lui rendent les murs voisins, et la lumière hémisphérique, l'appoint et la
 couleur `sol` du ciel en tenaient lieu. `-- --lumiere tout` cuit à la place, par concept,
 l'irradiance E que la visite n'a pas : le ciel qui arrive sans rebond, et tout ce qui
-rebondit — soleil, Menora, braises. Le soleil direct et les lampes restent en temps réel.
+rebondit — soleil, Menora, Arche, braises. Le soleil direct et les lampes restent en temps réel.
 
 - **Unités vérifiées sur plans témoins.** La passe Diffuse de Cycles sans couleur rend E/π,
   la `lightMap` de three attend E ; une lampe ponctuelle de P watts a l'intensité P / 4π.
