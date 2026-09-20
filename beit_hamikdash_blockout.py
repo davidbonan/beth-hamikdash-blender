@@ -1612,10 +1612,12 @@ BANDEAU_KIR = 0.55        # hauteur d'un bandeau, en amot
 # figure est TAILLÉE dans la paroi, rien n'en sort. Son modelé bombe au fond de la taille
 # sans jamais revenir au nu, et c'est le flanc tourné vers elle qui en trace le contour.
 PROFONDEUR_KIR = 0.05     # 2,5 cm, la moitié du placage d'or de 0,1 ama
-# Le pas d'un keruv à la timora voisine, en amot : 14 pas sur les 40 amot du Heikhal,
-# et les ailes des keruvim d'about touchent les angles. Le Kodesh HaKodashim prend le
-# même pas, pour que ses keruvim aient la taille de ceux du Heikhal.
-PAS_KIR = 40 / 14
+# Le pas d'un keruv à la timora voisine, en amot : 12 pas sur les 40 amot du Heikhal, et
+# les ailes des keruvim d'about touchent les angles. Le Kodesh HaKodashim prend le même
+# pas, pour que ses keruvim aient la taille de ceux du Heikhal. Le pas règle la taille des
+# figures : à 14 pas le keruv aux ailes levées tombait à 4,8 amot dans un registre qui en
+# tient 6,3, à 10 pas il montait à 6,7 et n'y tenait plus.
+PAS_KIR = 40 / 12
 PAS_FLEURON = 3.7         # pas d'un fleuron dans un bandeau, en amot
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
 CARTE_GRAVURES = GRAVURES_JSON.with_name("gravures_2048.webp")
@@ -1695,10 +1697,9 @@ def timora(nom, paroi, u, z0, h, col, mat=None):
 
 def keruv_grave(nom, paroi, u, z0, h, col):
     """« כְּרוּבִים » — la 'haya de la vision, « וָאֵדַע כִּי כְרוּבִים הֵמָּה » (Ye'hezkel 10:20) :
-    deux ailes qui couvrent le corps, des mains d'homme dessous, une jambe au pied rond
-    (1:7-11), un crâne à deux faces SANS TRAITS, l'homme et le lion, chacune vers la
-    timora qui le jouxte (41:18-19). Ses deux ailes hautes se tendent jusqu'à celles du
-    voisin, au-dessus de la timora : « חֹבְרֹת אִישׁ אֶל אָחִיו » (1:9)."""
+    deux ailes qui couvrent le corps, une jambe au pied rond (1:7-11), un crâne à deux
+    faces SANS TRAITS, l'homme et le lion, chacune vers la timora qui le jouxte
+    (41:18-19). Ses deux ailes hautes se lèvent au-dessus de la tête, à peine ouvertes."""
     return _relief_grave(nom, paroi, "keruv", u, z0, h, col)
 
 
@@ -6102,8 +6103,10 @@ box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim",
 #     (Middot 4:1). Au-dessus, l'or reste nu jusqu'à la corniche : deux registres
 #     flottant à mi-hauteur ne sont dans aucune source.
 CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
-# Trois registres de keruvim monumentaux : leur taille est celle qui fait se toucher les
-# ailes de deux voisins au-dessus de la timora, au pas PAS_KIR.
+# Trois registres de keruvim monumentaux : leur taille est celle qui fait se toucher la
+# pointe d'aile d'un keruv et la palme de la timora voisine, au pas PAS_KIR. Les ailes se
+# lèvent au-dessus de la tête (beit_hamikdash_contours.py) : elles ne rejoignent plus
+# celles du voisin par-dessus la timora, et ce n'est plus leur jonction qui règle la taille.
 REGISTRES_KIR = 3         # registres de figures, séparés par des bandeaux de fleurons
 # La timora se tient sous les pointes d'ailes, pied au niveau du sabot.
 TIMORA_SOUS_AILES = 0.66  # hauteur de la timora, en part de celle du keruv
@@ -6116,10 +6119,11 @@ def champ_sculpte(nom, paroi, u0, u1, col):
     sur la paroi."""
     z0, z1 = Z_BAT + CHAMP_KIR[0], Z_BAT + CHAMP_KIR[1]
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_KIR
-    h = PAS_KIR / (largeur_gravure("keruv") / 2)
+    h = PAS_KIR / ((largeur_gravure("keruv") + TIMORA_SOUS_AILES * largeur_gravure("timora")) / 2)
     assert h <= registre - BANDEAU_KIR, f"keruv de {h:.2f} amot dans un registre de {registre - BANDEAU_KIR:.2f}"
-    # Les ailes des deux keruvim d'about s'étendent d'un pas au-delà de leur axe : n + 1 pas
-    # doivent tenir sur la paroi, n impair.
+    # La file se centre sur la paroi, n impair pour qu'elle commence et finisse par un
+    # keruv ; n + 1 pas doivent y tenir, et l'or reste nu de moins d'une ama à chaque angle,
+    # les ailes levées ne couvrant plus qu'un demi-pas de part et d'autre de leur axe.
     n = 2 * int((round(abs(u1 - u0) / PAS_KIR, 6) - 2) // 2) + 1
     pas = math.copysign(PAS_KIR, u1 - u0)
     premier = (u0 + u1) / 2 - pas * (n - 1) / 2

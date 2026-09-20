@@ -148,32 +148,87 @@ JAMBE = ((0.0, 0.180), (0.0, 0.060))
 LARGEUR_JAMBE = 0.050
 SABOT = (0.0, 0.035, 0.036, 0.035)
 
-# La tête : un seul crâne, « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), la face d'homme
-# vers les u négatifs, celle du jeune lion, crinière courte, vers les u positifs (41:19)
-# — et AUCUN TRAIT (§9 de la fiche). Du sommet du crâne, dans le sens des aiguilles.
+# La tête : UN SEUL crâne, « וּשְׁנַיִם פָּנִים לַכְּרוּב » (Ye'hezkel 41:18), le profil d'homme
+# vers les u négatifs, celui du jeune lion vers les u positifs (41:19) — et AUCUN TRAIT
+# dans le profil (§9 de la fiche). Le lion se donne par sa MASSE : front bombé, museau
+# court et carré qui avance, mâchoire profonde, crinière qui déborde le crâne en arrière.
+# Un crâne à deux bosses sortait en deux têtes accolées, et deux profils d'homme en
+# miroir en une tête à deux nez. Du sommet du crâne, dans le sens des aiguilles.
 TETE_KERUV = [
-    (0.00, 0.95), (0.45, 0.98), (0.90, 0.80), (1.15, 0.50), (1.45, 0.28), (1.52, 0.05),
-    (1.38, -0.18), (1.10, -0.32), (0.85, -0.55), (0.35, -0.62), (0.00, -0.55),
-    (-0.15, -0.42), (-0.75, -0.30), (-1.25, -0.15), (-1.35, 0.10), (-1.20, 0.35),
-    (-0.90, 0.62), (-0.35, 0.88)]
-TETE = (0.0, 0.890, 0.100)   # u, z, taille
-SERRAGE_TETE = 0.70          # le crâne, resserré en largeur : à plat, il se lisait en citron
+    (0.00, 1.00), (0.52, 0.97), (0.98, 0.82), (1.22, 0.52), (1.32, 0.26), (1.58, 0.12),
+    (1.62, -0.04), (1.44, -0.12), (1.52, -0.30), (1.32, -0.48), (0.86, -0.63),
+    (0.30, -0.75), (0.00, -0.78), (-0.30, -0.75), (-0.80, -0.62), (-1.24, -0.44),
+    (-1.36, -0.24), (-1.22, -0.14), (-1.44, -0.02), (-1.20, 0.18), (-1.30, 0.36),
+    (-1.06, 0.62), (-0.54, 0.92)]
+TETE = (0.0, 0.905, 0.145)   # u, z, taille
+# Les mèches de la crinière, dans le repère de la tête : le contour seul ne suffit pas à
+# nommer le lion, ce sont elles qui le font lire.
+CRINIERE = (((0.30, 0.86), (0.62, 1.02)), ((0.72, 0.74), (1.00, 0.94)),
+            ((0.98, 0.54), (1.28, 0.70)), ((1.06, 0.26), (1.34, 0.36)))
 
 
 def tete_keruv():
     """La tête posée sur la gaine, lissée UNE fois : c'est le nez et le menton de chaque
     profil qui la font lire, trois passes en faisaient une miche."""
-    return lisser(poser([(SERRAGE_TETE * u, z) for u, z in TETE_KERUV], *TETE), passes=1)
+    return lisser(poser(TETE_KERUV, *TETE), passes=1)
+
+
+def meches_de_criniere():
+    """Les mèches de la crinière, posées comme la tête : des traits à graver."""
+    return [[(TETE[0] + u * TETE[2], TETE[1] + z * TETE[2]) for u, z in meche]
+            for meche in CRINIERE]
+
+
+# L'aile penne par penne : cinq rangs, des rémiges aux petites couvertures, dans le repère
+# de la lame (p le long de la nervure, q en travers, positif vers le bord d'attaque) :
+# (nombre, p de la première, p de la dernière, q du talon, longueur, avance de la pointe,
+# demi-largeur). C'est l'étagement des rangs et la pointe de chaque penne qui font l'aile ;
+# une lame rainurée n'en est que l'ombre, et des pennes en travers de la nervure la
+# peignent en arête de poisson — elles se couchent vers la pointe.
+RANGS_PENNES = ((9, 0.16, 0.92, -0.06, 0.30, 0.30, 0.052),
+                (9, 0.13, 0.86, -0.02, 0.23, 0.24, 0.046),
+                (8, 0.10, 0.76, 0.03, 0.16, 0.18, 0.040),
+                (7, 0.08, 0.62, 0.07, 0.11, 0.13, 0.034),
+                (6, 0.06, 0.50, 0.10, 0.08, 0.09, 0.029))
+
+
+def penne(talon, pointe, demi):
+    """Une penne lancéolée, du talon à la pointe : ventrue au tiers, effilée au bout."""
+    (p0, q0), (p1, q1) = talon, pointe
+    dp, dq = p1 - p0, q1 - q0
+    n = math.hypot(dp, dq) or 1.0
+    nu, nq = -dq / n, dp / n
+    profil = ((0.10, 0.55), (0.34, 1.00), (0.66, 0.92), (0.88, 0.52))
+    cote = [(p0 + dp * t + nu * demi * w, q0 + dq * t + nq * demi * w) for t, w in profil]
+    revers = [(p0 + dp * t - nu * demi * w, q0 + dq * t - nq * demi * w)
+              for t, w in reversed(profil)]
+    return lisser([talon] + cote + [pointe] + revers, passes=1)
+
+
+def plumage():
+    """Les pennes d'une aile, dans le repère de la lame : (contour, rang), du rang le plus
+    bas — les rémiges — au plus haut. Les rémiges s'allongent vers la pointe de l'aile,
+    les couvertures gardent leur taille."""
+    plumes = []
+    for rang, (nombre, debut, fin, q, longueur, avance, demi) in enumerate(RANGS_PENNES):
+        for n in range(nombre):
+            t = n / (nombre - 1)
+            part = 0.55 + 0.45 * t if rang < 2 else 1.0
+            p = debut + (fin - debut) * t
+            plumes.append((penne((p, q), (p + avance, q - longueur * part), demi), rang))
+    return plumes
 
 
 # Les ailes hautes, (u, z) de l'attache, inclinaison sur la verticale, taille. Aux parois
-# elles se tendent presque à l'horizontale jusqu'à la pointe de celles du voisin, au-dessus
-# de la timora : « חֹבְרֹת אִישׁ אֶל אָחִיו » (Ye'hezkel 1:9, 1:11). Sur un vantail ou le
-# rideau, où le keruv est seul, elles se dressent au-dessus de la tête.
-AILES_TENDUES = ((0.11, 0.80), 82, 0.40)
+# comme sur un vantail elles se lèvent au-dessus de la tête — à peine ouvertes aux parois,
+# droites sur un vantail et sur le rideau. Tendues à l'horizontale, elles sortaient en aile
+# d'Isis quel que soit le dessin des plumes ; la jonction des pointes d'un keruv à l'autre
+# au-dessus de la timora (« חֹבְרֹת אִישׁ אֶל אָחִיו », Ye'hezkel 1:9) est abandonnée avec elles.
+AILES_HAUTES = ((0.130, 0.745), 26, 0.52)
 AILES_DRESSEES = ((0.09, 0.78), 12, 0.42)
-# Les ailes dressées montent au-dessus de la tête, jusqu'à 1,25 : le keruv dressé est
-# dessiné réduit d'autant, pour que la pointe de ses ailes tienne à 1.
+# Les ailes levées montent au-dessus de la tête, jusqu'à 1,25 : le keruv est dessiné
+# réduit d'autant, pour que la pointe de ses ailes tienne à 1.
+REDUCTION_HAUTE = 0.78
 REDUCTION_DRESSE = 0.80
 
 
