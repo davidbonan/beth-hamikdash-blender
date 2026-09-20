@@ -214,12 +214,11 @@ function poserLampe(reglage, position, ombre) {
   lumiere.shadow.camera.near = 0.05;
   lumiere.shadow.camera.far = reglage.portee;
   lumiere.shadow.bias = -0.002;
-  // Un biais constant écarte autant une face de plein fouet qu'une face rasante, et c'est
-  // la rasante qui se mord : le crâne des keruvim, à un mètre de la lampe de l'Arche, se
-  // couvrait de stries là où il s'éloigne d'elle. Le décalage le long de la normale suit
-  // l'incidence, comme celui du soleil (`ombres.js`). 512 texels pour un cube entier : à
-  // la distance où ces lampes éclairent, un texel vaut le centimètre.
-  lumiere.shadow.normalBias = 0.02;
+  // Pas de `normalBias` ici, contrairement au soleil : ces trois lampes éclairent des
+  // objets plus fins que le décalage qu'il faudrait. Une penne d'aile fait 2,5 mm, et
+  // 2 cm — l'ordre de grandeur qui vaut pour le soleil — la traversent : la lumière
+  // passe sous les ailes, les keruvim perdent l'ombre propre de leur visage et les
+  // marches du Heikhal voient la leur se décoller du sol.
   scene.add(lumiere);
   return lumiere;
 }
