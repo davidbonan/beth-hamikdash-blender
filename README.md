@@ -501,13 +501,13 @@ au-delà du Har HaBayit, le Temple s'y lisait posé sur une mer.
 
 Moteur : Eevee avec **ombres, raytracing écran et fast GI** (sans rebond, les intérieurs
 tombaient en aplat : le Heikhal n'est éclairé que par la Menora et
-quatre fenêtres hautes). Pour les images clés seulement, **`--cycles`** au blockout bascule
+quatre fenêtres hautes). Pour les images clés seulement, **`--rendu-cycles`** au blockout bascule
 en Cycles 128 échantillons, GPU si disponible :
 
 ```bash
 $BLENDER -b beit_hamikdash.blend \
     -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
-    -P beit_hamikdash_export.py -- --cycles
+    -P beit_hamikdash_export.py -- --rendu-cycles
 ```
 
 Deux frames par plan, pas la totalité de la timeline : le film ne sort pas de Blender.

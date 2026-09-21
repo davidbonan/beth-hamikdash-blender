@@ -8,6 +8,7 @@ import pathlib
 import subprocess
 import sys
 
+import bpy
 import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
@@ -17,7 +18,28 @@ from beit_hamikdash_occlusion import VISITE
 RACINE = pathlib.Path(__file__).resolve().parent
 # Au-delà, le rebond d'une paroi retouchée sur sa voisine se perd dans le bruit de la carte : un seul rang de voisins.
 PORTEE_IMPACT = 4.0
+# Être à portée ne suffit pas : encore faut-il peser. Quatre mètres est une distance, pas un
+# impact — une porte à 4 m du mur d'enceinte n'occupe qu'un demi-pour-cent de son hémisphère,
+# et traînait pourtant ses 447 s de cuisson. La carte sort en PNG 8 bits : un échelon y vaut
+# 1/255, soit 0,4 %. Sous le centième d'une borne HAUTE, aucun texel ne peut bouger. Cf. `impact`.
+SEUIL_IMPACT = 0.01
 FACES_DE_BOITE = ((0, 1, 3, 2), (4, 6, 7, 5), (0, 4, 5, 1), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3))
+
+
+_HACHES_IMAGE = {}
+
+
+def signature_image(image):
+    """Le CONTENU du fichier, pas son nom : l'atlas des gravures garde le sien d'une taille
+    à l'autre, et une tuile retaillée doit faire recuire ses porteurs."""
+    chemin = pathlib.Path(bpy.path.abspath(image.filepath)) if image.filepath else None
+    if chemin is None or not chemin.is_file():
+        return f"{image.name}:{tuple(image.size)}:{image.is_dirty}"
+    etat = chemin.stat()
+    cle = (str(chemin), etat.st_size, etat.st_mtime_ns)
+    if cle not in _HACHES_IMAGE:
+        _HACHES_IMAGE[cle] = hashlib.sha1(chemin.read_bytes()).hexdigest()
+    return _HACHES_IMAGE[cle]
 
 
 def signature_matiere(mat):
@@ -27,7 +49,7 @@ def signature_matiere(mat):
     for noeud in sorted(mat.node_tree.nodes, key=lambda n: n.name):
         parties.append(noeud.bl_idname)
         if getattr(noeud, "image", None) is not None:
-            parties.append(noeud.image.name)
+            parties.append(signature_image(noeud.image))
         for entree in noeud.inputs:
             if entree.is_linked or not hasattr(entree, "default_value"):
                 continue
@@ -80,6 +102,28 @@ class Geometrie:
         return bool(self.arbre.overlap(BVHTree.FromPolygons(coins, FACES_DE_BOITE)))
 
 
+def impact(boite, geometrie):
+    """Ce qu'une retouche de `boite` peut faire, AU PLUS, à la lumière de `geometrie`.
+
+    Le facteur de forme de la boîte vue du point le plus exposé du voisin : sa surface
+    apparente sur l'hémisphère de ce point. Même si tout ce que la boîte renvoie changeait du
+    tout au tout, le voisin n'en verrait pas plus que cette part — et le rebond n'est qu'une
+    fraction de sa lumière. C'est donc une borne haute, jamais une estimation.
+    """
+    bas, haut = np.array(boite[0]), np.array(boite[1])
+    ecarts = geometrie.sommets - np.clip(geometrie.sommets, bas, haut)
+    distances = np.linalg.norm(ecarts, axis=1)
+    plus_proche = int(distances.argmin())
+    distance = float(distances[plus_proche])
+    if distance < 1e-6:
+        return 1.0
+    cotes = haut - bas
+    vue = np.abs(ecarts[plus_proche]) / distance
+    apparente = (vue[0] * cotes[1] * cotes[2] + vue[1] * cotes[0] * cotes[2]
+                 + vue[2] * cotes[0] * cotes[1])
+    return float(min(1.0, apparente / (np.pi * distance * distance)))
+
+
 def carte_de(precedent, ident):
     return precedent["lumiere"].get(ident) or precedent["occlusion"].get(ident) or {}
 
@@ -105,15 +149,26 @@ class Recuisson:
             ident: "modifié" for ident in self.modifies(empreintes) - self.demandes}
         marge = Vector((PORTEE_IMPACT,) * 3)
         emprises = self.precedent["emprises"]
-        boites = [(source, bas - marge, haut + marge) for source in sources
+        boites = [(source, (bas, haut)) for source in sources
                   for bas, haut in ([Geometrie(fusionnes[source]).boite()] if source in fusionnes else [])
                   + ([boite_blender(emprises[source])] if source in emprises else [])]
         raisons = {ident: raison for ident, raison in sources.items() if ident in self.cuits}
+        negliges = {}
         for ident in sorted(self.cuits - set(raisons)):
             geometrie = Geometrie(fusionnes[ident])
-            source = next((s for s, bas, haut in boites if geometrie.touche(bas, haut)), None)
-            if source is not None:
-                raisons[ident] = f"voisin de {source}"
+            parts = [(impact(boite, geometrie), source) for source, boite in boites
+                     if geometrie.touche(boite[0] - marge, boite[1] + marge)]
+            if not parts:
+                continue
+            part, source = max(parts)
+            if part >= SEUIL_IMPACT:
+                raisons[ident] = f"voisin de {source} ({part * 100:.0f} %)"
+            else:
+                negliges[ident] = (part, source)
+        if negliges:
+            print(f"\n  voisins écartés, rebond sous {SEUIL_IMPACT * 100:.0f} % : "
+                  + ", ".join(f"{ident} ({part * 100:.1f} % de {source})"
+                              for ident, (part, source) in sorted(negliges.items())))
         hors_cuisson = sorted(set(sources) - self.cuits)
         if hors_cuisson:
             print(f"\n  modifiés sans carte à eux, recuits par leurs voisins : {', '.join(hors_cuisson)}")

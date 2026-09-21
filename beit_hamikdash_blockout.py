@@ -1766,21 +1766,19 @@ def largeur_gravure(motif):
 
 def timora(nom, paroi, u, z0, h, col, mat=None):
     """« תִּמֹרָה » : une palmette, sept palmes en fontaine sur une base en cloche —
-    « כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל » (Rashi sur Ye'hezkel 40:16), « ענפי אילן וחריותיו »
-    (Ralbag sur Melakhim I 6:29) — (`beit_hamikdash_gravures.py`).
+    « ענפי אילן וחריותיו » (Ralbag sur Melakhim I 6:29), « כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל »
+    (Rashi sur Ye'hezkel 40:16) — (`beit_hamikdash_gravures.py`).
+
+    La même figure aux trois emplois : entre deux keruvim sur les parois et les vantaux,
+    « וּפְנֵי אָדָם אֶל־הַתִּמֹרָה » (41:18-19) — c'est le mot du verset, et le keruv y tourne
+    ses faces —, et seule sur le jambage d'une porte. Un dattier entier a été essayé pour
+    les parois ; la palmette rend mieux, et se tient plus près de sa voisine (0,98 du pas
+    contre 0,94).
 
     Sur l'or du Bayit elle est dorée et `mat` reste vide ; sur le jambage d'une porte
     du Har HaBayit, que nulle source ne dore, elle se taille dans la pierre du mur.
     """
     return _relief_grave(nom, paroi, "timora", u, z0, h, col, mat)
-
-
-def dekel_grave(nom, paroi, u, z0, h, col, mat=None):
-    """« וְתִמֹרֹת » des PAROIS, que Targum Yonatan rend « צוּרַת דִּקְלִין » (Melakhim I 6:29) :
-    un dattier entier — fût à cicatrices, sept palmes, deux régimes —, celui des monnaies
-    de Bar Kokhba et celui que la parokhet tisse. `timora` reste le chapiteau des
-    jambages, que Rashi décrit sur Ye'hezkel 40:16, un verset qui parle de portes."""
-    return _relief_grave(nom, paroi, "dekel", u, z0, h, col, mat)
 
 
 def keruv_grave(nom, paroi, u, z0, h, col):
@@ -1885,15 +1883,14 @@ def vantail_sculpte(nom, paroi, u0, u1, z0, z1, col):
     Un vantail est haut et étroit là où une paroi est large : la file de figures y monte
     au lieu de courir. Ce qui tient, c'est l'ALTERNANCE — « וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב »
     (Ye'hezkel 41:18), une timora entre deux keruvim, quel que soit le sens de la file.
-    Et c'est le DATTIER des parois : « כַּאֲשֶׁר עֲשׂוּיִם לַקִּירוֹת » (41:25) — les vantaux
-    portent ce que portent les murs, donc « צוּרַת דִּקְלִין » (Targum sur 6:29) et non le
-    chapiteau des jambages.
+    Et c'est la figure DES PAROIS : « כַּאֲשֶׁר עֲשׂוּיִם לַקִּירוֹת » (41:25) — les vantaux
+    portent ce que portent les murs.
     """
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_VANTAIL
     for r in range(REGISTRES_VANTAIL + 1):
         bandeau_guirlande(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
     for r in range(REGISTRES_VANTAIL):
-        motif = keruv_dresse if r % 2 == 0 else dekel_grave
+        motif = keruv_dresse if r % 2 == 0 else timora
         motif(f"{nom}_{r}", paroi, (u0 + u1) / 2, z0 + r * registre + BANDEAU_KIR,
               registre - BANDEAU_KIR, col)
 
@@ -6246,11 +6243,11 @@ CHAMP_HAUT = (22.0, 38.0)  # du haut du champ au bas de la corniche : ce qui res
 # pointe d'aile d'un keruv et la palme de la timora voisine, au pas PAS_KIR. Les ailes se
 # lèvent au-dessus de la tête (beit_hamikdash_contours.py) : elles ne rejoignent plus
 # celles du voisin par-dessus la timora, et ce n'est plus leur jonction qui règle la taille.
-# Quatre, et non trois : le dattier entier est AUSSI HAUT que le keruv là où la palmette
-# n'en faisait que les deux tiers, et à trois registres les deux figures tombaient à
-# 4,2 amot dans un registre qui en tient 5,9 — plus d'or nu qu'avant. À quatre, la figure
-# remplit son registre et la paroi porte un tiers de figures en plus. Aucune source ne
-# donne le nombre de registres.
+# Quatre, et non trois : keruv et timora sont posés à la MÊME hauteur, celle que leur
+# donne le pas, et à trois registres ils tombaient à 4,2 amot dans un registre qui en
+# tient 5,9 — de l'or nu au-dessus de chaque figure. À quatre, la figure remplit son
+# registre et la paroi porte un tiers de figures en plus. C'est la hauteur commune qui
+# tient le champ, non le dessin. Aucune source ne donne le nombre de registres.
 REGISTRES_KIR = 4         # registres de figures, séparés par des guirlandes
 # La timora se tient sous les pointes d'ailes, pied au niveau du sabot.
 
@@ -6285,7 +6282,7 @@ def champ_sculpte(nom, paroi, u0, u1, col):
     que rien ne remplissait."""
     z0, z1 = Z_BAT + CHAMP_KIR[0], Z_BAT + CHAMP_KIR[1]
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_KIR
-    h = PAS_KIR / ((largeur_gravure("keruv") + largeur_gravure("dekel")) / 2)
+    h = PAS_KIR / ((largeur_gravure("keruv") + largeur_gravure("timora")) / 2)
     assert h <= registre - BANDEAU_KIR, f"keruv de {h:.2f} amot dans un registre de {registre - BANDEAU_KIR:.2f}"
     # La file se centre sur la paroi, n impair pour qu'elle commence et finisse par un
     # keruv ; n + 1 pas doivent y tenir, et ce qui reste à chaque angle porte le montant.
@@ -6303,7 +6300,7 @@ def champ_sculpte(nom, paroi, u0, u1, col):
             if i % 2 == 0:
                 keruv_grave(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h, col)
             else:
-                dekel_grave(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h, col)
+                timora(f"Kir_{nom}_{r}{i:02d}", paroi, u, pied, h, col)
 
 
 # --- Ce qui monte AU-DESSUS du champ. « מֵהָאָרֶץ עַד־מֵעַל הַפֶּתַח » (41:20) arrête les
@@ -6352,9 +6349,12 @@ def champ_haut(nom, paroi, u0, u1, baies, col):
     planches de 2,7 sur 6,6 amot ne rendaient rien — une seule marche de 1,5 cm sur une
     planche d'un mètre trente ne se voit sous aucune lumière.
     """
+    # `Kir_` et non `Haut_` : c'est le préfixe que concepts.json donne à sculptures_murs, et
+    # les deux moitiés d'une paroi doivent tomber dans le MÊME concept — sculptures_murs est
+    # dans EXCLUS, le haut versé ailleurs prenait une carte de lumière que le bas n'a pas.
     z0, z1 = Z_BAT + CHAMP_HAUT[0], Z_BAT + CHAMP_HAUT[1]
     marge = (abs(u1 - u0) - (2 * int((round(abs(u1 - u0) / PAS_KIR, 6) - 2) // 2)) * PAS_KIR) / 2
-    ua, ub = _montants(f"Haut_{nom}", paroi, u0, u1, z0, z1, marge, col)
+    ua, ub = _montants(f"Kir_{nom}_haut", paroi, u0, u1, z0, z1, marge, col)
     rang = (z1 - z0) / RANGS_HAUT - CORDON_HAUT
     for r in range(RANGS_HAUT):
         zb = z0 + r * (rang + CORDON_HAUT)
@@ -6364,7 +6364,7 @@ def champ_haut(nom, paroi, u0, u1, baies, col):
             for k, (a, b) in enumerate(_hors_baies(ua, ub, bas, haut, baies)):
                 if abs(b - a) < TRONCON_MINI:
                     continue
-                _taille_repetee(f"Haut_{nom}_{motif}_{r}{k}", paroi, motif, a, b,
+                _taille_repetee(f"Kir_{nom}_haut_{motif}_{r}{k}", paroi, motif, a, b,
                                 bas, haut, creux, col)
 
 
@@ -8289,9 +8289,13 @@ def moteur_eevee():
 
 
 def moteur_cycles():
-    """`--cycles` : pour les images clés seulement. Trente-huit frames, pas 8472 — le
+    """`--rendu-cycles` : pour les images clés seulement. Trente-huit frames, pas 8472 — le
     film ne sort pas de Blender, et l'occlusion réelle de l'Oulam ou du Kodesh
-    HaKodashim vaut la minute qu'elle coûte."""
+    HaKodashim vaut la minute qu'elle coûte.
+
+    Le nom ne peut pas être `--cycles` : l'addon Cycles analyse tout `sys.argv`, `--` compris,
+    et Blender 5.2 refuse la ligne avant de charger le fichier — « ambiguous option: --cycles
+    could match --cycles-print-stats, --cycles-device »."""
     scene.render.engine = 'CYCLES'
     scene.cycles.samples = 128
     scene.cycles.use_denoising = True
@@ -8322,7 +8326,7 @@ sun.data.angle = math.radians(1.5)
 sun.rotation_euler = (math.radians(90 - 12), 0, math.radians(90 + 15))
 link_to(sun, "91_Lumiere")
 ciel()
-(moteur_cycles if "--cycles" in sys.argv else moteur_eevee)()
+(moteur_cycles if "--rendu-cycles" in sys.argv else moteur_eevee)()
 for vt in ('AgX', 'Filmic'):
     try:
         scene.view_settings.view_transform = vt

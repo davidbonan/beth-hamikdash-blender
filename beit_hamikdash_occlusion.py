@@ -105,12 +105,15 @@ def points_temoins(triangle):
 class Collees:
     def __init__(self, objets):
         self.faces, self.face_de, self.origines, self.coins, sommets, triangles = [], [], [], [], [], []
+        centres = []
         for obj in objets:
             maillage = obj.data
             maillage.calc_loop_triangles()
             base, premiere = len(sommets), len(self.faces)
             sommets += [obj.matrix_world @ v.co for v in maillage.vertices]
             self.faces += [([], geometry.normal([sommets[base + i] for i in poly.vertices])) for poly in maillage.polygons]
+            centres += [sum((sommets[base + i] for i in poly.vertices), Vector()) / len(poly.vertices)
+                        for poly in maillage.polygons]
             self.origines += [(obj, poly.index) for poly in maillage.polygons]
             self.coins += [frozenset(base + i for i in poly.vertices) for poly in maillage.polygons]
             for tri in maillage.loop_triangles:
@@ -120,6 +123,15 @@ class Collees:
         self.aires = [sum(geometry.area_tri(*t) for t in triangles_) for triangles_, _ in self.faces]
         self.arbre = BVHTree.FromPolygons(sommets, triangles)
         self.retirees = set()
+        # La boucle lit `retirees` pendant qu'elle le remplit : l'ordre décide donc qui des deux
+        # faces d'une paire tombe. Pris sur l'indice, cet ordre était CUMULÉ sur toute la scène —
+        # un maillage qui changeait de nombre de faces décalait tous les suivants et faisait
+        # basculer des décisions à l'autre bout du Har HaBayit, donc recuire leurs cartes. La clé
+        # ci-dessous ne tient qu'à la face elle-même : aire, centre, et son rang DANS son objet.
+        self.cles = [(round(self.aires[k], 9), *(round(c, 6) for c in centres[k]),
+                      self.origines[k][0].name, self.origines[k][1])
+                     for k in range(len(self.faces))]
+        self.ordre = sorted(range(len(self.faces)), key=self.cles.__getitem__)
 
     def temoins(self, k):
         return (point for triangle in self.faces[k][0] for point in points_temoins(triangle))
@@ -130,7 +142,7 @@ class Collees:
     # Recouverte en partie seulement, elle reste ; la plus petite des deux recule derrière l'autre.
     def a_reculer(self, k):
         return self.faces[k][1].length > 0 and not self.mince(k) and any(
-            devant <= TOLERANCE and (self.aires[g], -g) > (self.aires[k], -k)
+            devant <= TOLERANCE and self.cles[g] > self.cles[k]
             for point in self.temoins(k) for g, devant in self.couvrantes(point, k))
 
     def mince(self, k):
@@ -178,10 +190,10 @@ def retirer(objets, collees):
 
 def separer_collees(objets):
     collees = Collees(objets)
-    for k in range(len(collees.faces)):
+    for k in collees.ordre:
         if collees.couverte(k):
             collees.retirees.add(k)
-    reculees = [k for k in range(len(collees.faces)) if k not in collees.retirees and collees.a_reculer(k)]
+    reculees = [k for k in collees.ordre if k not in collees.retirees and collees.a_reculer(k)]
     reculer(objets, collees, reculees)
     retirer(objets, collees)
     print(f"  faces collées sur {len(collees.faces)} : {len(collees.retirees)} retirées, {len(reculees)} reculées de {COLLEE * 100:.0f} cm")

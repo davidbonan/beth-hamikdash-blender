@@ -175,7 +175,7 @@ def rendre(scene, groupe, transformation, chemin):
 def rendre_donnees(scene, groupe, chemin):
     """Rendu de données : aucune transformation d'affichage, et un seul échantillon.
 
-    La passe Z ne dépend pas de l'échantillonnage — mais sous Cycles (`--cycles` au
+    La passe Z ne dépend pas de l'échantillonnage — mais sous Cycles (`--rendu-cycles` au
     blockout) elle serait payée au prix des 128 échantillons de l'image couleur, deux
     fois par frame.
     """

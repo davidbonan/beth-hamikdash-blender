@@ -28,7 +28,14 @@ $BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire lishka
 |---|---|
 | `modifié` | son empreinte a changé depuis la dernière cuisson, ou sa carte manque — détecté seul |
 | `demandé` | nommé après `--recuire` : pour ce que l'empreinte ne voit pas |
-| `voisin de X` | sa géométrie passe à moins de `PORTEE_IMPACT` (4 m) de X, avant ou après la retouche : les rebonds de X changent sa lumière |
+| `voisin de X (n %)` | sa géométrie passe à moins de `PORTEE_IMPACT` (4 m) de X, avant ou après la retouche, **et** X pèse au moins `SEUIL_IMPACT` (1 %) dans sa lumière |
+
+Le pourcentage est le facteur de forme de X vu du point le plus exposé du voisin : la part
+de son ciel que X occupe, donc une borne haute de ce que retoucher X peut lui faire. Sous 1 %,
+la carte sort identique — elle est en PNG 8 bits, où un échelon vaut déjà 0,4 % — et le concept
+est écarté ; la sortie le dit sous « voisins écartés ». C'est ce qui empêche une porte de
+traîner les 447 s du mur d'enceinte ou les 462 s du sol du Har HaBayit : 4 m est une distance,
+pas un impact.
 
 X peut être un concept sans carte (Kiyor, Menora, ustensiles, trop petits pour cuire) ou disparu :
 la sortie le liste sous « modifiés sans carte à eux » et recuit ses voisins.
