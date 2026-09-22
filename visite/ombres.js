@@ -55,9 +55,16 @@ const metresParTexel = 2 * PROFIL.ombres.portee / PROFIL.ombres.taille;
 const PENOMBRE = (PROFONDEUR.loin - PROFONDEUR.pres) * DIAMETRE_SOLEIL / metresParTexel;
 // Sous trois texels et demi de rayon, le filtre ne couvre plus le crénelage de la carte : un soleil rasant l'étire en escalier.
 const PENOMBRE_MIN = 3.5;
+// Le disque des prises est fixe, sur l'angle d'or comme l'occlusion : chaque pixel ne fait que le tourner.
+const PRISES = 12;
+const DISQUE = Array.from({ length: PRISES }, (_, i) => {
+  const a = i * 2.39996, r = Math.sqrt((i + 0.5) / PRISES);
+  return `vec2(${(Math.cos(a) * r).toFixed(6)}, ${(Math.sin(a) * r).toFixed(6)})`;
+}).join(", ");
 
 const PCSS = /* glsl */`
 float alea2(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+const vec2 DISQUE[${PRISES}] = vec2[${PRISES}](${DISQUE});
 
 float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
   coord.xyz /= coord.w;
@@ -67,25 +74,45 @@ float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coo
 
   vec2 texel = 1.0 / taille;
   float tour = alea2(gl_FragCoord.xy) * 6.28318;
+  mat2 tourne = mat2(cos(tour), sin(tour), -sin(tour), cos(tour));
   float somme = 0.0, compte = 0.0;
-  for (int i = 0; i < 12; i++) {
-    float a = tour + float(i) * 2.39996;                 // l'angle d'or, comme l'occlusion
-    vec2 o = vec2(cos(a), sin(a)) * sqrt((float(i) + 0.5) / 12.0);
-    float d = unpackRGBAToDepth(texture2D(carte, coord.xy + o * ${RECHERCHE.toFixed(1)} * texel));
+  for (int i = 0; i < ${PRISES}; i++) {
+    float d = unpackRGBAToDepth(texture2D(carte, coord.xy + tourne * DISQUE[i] * ${RECHERCHE.toFixed(1)} * texel));
     if (d < coord.z) { somme += d; compte += 1.0; }
   }
   if (compte < 0.5) return 1.0;                          // rien devant : plein soleil
+  if (compte > ${PRISES - 0.5}) return 0.0;              // tout bouché : l'ombre pleine d'une salle couverte
 
   float large = clamp((coord.z - somme / compte) * ${PENOMBRE.toFixed(2)}, ${PENOMBRE_MIN.toFixed(1)}, ${RECHERCHE.toFixed(1)});
   float ombre = 0.0;
-  for (int i = 0; i < 12; i++) {
-    float a = tour + float(i) * 2.39996;
-    vec2 o = vec2(cos(a), sin(a)) * sqrt((float(i) + 0.5) / 12.0);
-    ombre += texture2DCompare(carte, coord.xy + o * large * texel, coord.z);
+  for (int i = 0; i < ${PRISES}; i++) {
+    ombre += texture2DCompare(carte, coord.xy + tourne * DISQUE[i] * large * texel, coord.z);
   }
-  return ombre / 12.0;
+  return ombre / ${PRISES}.0;
 }
 `;
+
+const APPORT = "RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );";
+
+// La lumière de `info`, son ombre et son apport ne se calculent que sous `garde` : ailleurs l'apport est nul, ombre ou pas.
+function brancher(morceau, info, garde) {
+  const debut = morceau.indexOf(info) + info.length;
+  const fin = morceau.indexOf(APPORT, debut) + APPORT.length;
+  const corps = morceau.slice(debut, fin)
+    .replace(/directLight\.color \*= \( directLight\.visible && receiveShadow \) \? (.*) : 1\.0;/,
+             "if ( receiveShadow ) directLight.color *= $1;");
+  if (debut < info.length || fin < APPORT.length || corps === morceau.slice(debut, fin)) {
+    throw new Error("three a changé lights_fragment_begin : ombres lues partout");
+  }
+  return `${morceau.slice(0, debut)}\n\t\tif ( ${garde} ) {${corps}\n\t\t}${morceau.slice(fin)}`;
+}
+
+// Le ternaire de three est aplati à la compilation : les ombres des lampes se lisaient sur toute l'esplanade, la pénombre sur les faces dos au soleil.
+export function epargner() {
+  THREE.ShaderChunk.lights_fragment_begin = brancher(brancher(THREE.ShaderChunk.lights_fragment_begin,
+    "getPointLightInfo( pointLight, geometryPosition, directLight );", "directLight.visible"),
+    "getDirectionalLightInfo( directionalLight, directLight );", "dot( geometryNormal, directLight.direction ) > 0.0");
+}
 
 /** Le morceau de three, sa fonction mise de côté, la nôtre à sa place. */
 export function assemblage() {

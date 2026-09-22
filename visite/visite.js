@@ -9,7 +9,7 @@ import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { SOLEIL, brumer, domeVu, environnement } from "./ciel.js";
-import { regler as reglerOmbres } from "./ombres.js";
+import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
@@ -163,6 +163,7 @@ scene.add(cielAmbiant);
 // l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
 const soleil = new THREE.DirectionalLight(0xffd6a0, 4.9);
 reglerOmbres(soleil);
+epargnerOmbres();
 scene.add(soleil, soleil.target);
 const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.12);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);

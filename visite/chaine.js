@@ -434,6 +434,37 @@ class Photometre extends Pass {
   }
 }
 
+// Sous Metal, ce qu'un mur cache passait par tout son nuanceur : la profondeur d'abord, un cheveu en retrait, et seul ce qui se voit s'ombre.
+class Profondeur extends Pass {
+  constructor(scene, camera) {
+    super();
+    this.needsSwap = false;
+    this.scene = scene;
+    this.camera = camera;
+    this.materiau = new THREE.MeshBasicMaterial({ colorWrite: false, polygonOffset: true,
+                                                  polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+    this.voiles = [];
+  }
+
+  // Ce qui n'écrit pas sa profondeur — le dôme, les flammes, ce qu'on voit au travers — ne cache rien.
+  render(renderer, _writeBuffer, readBuffer) {
+    this.scene.traverseVisible((o) => {
+      if (o.material && (o.material.transparent || !o.material.depthWrite)) this.voiles.push(o);
+    });
+    for (const o of this.voiles) o.visible = false;
+    const autoClear = renderer.autoClear;
+    renderer.autoClear = false;
+    renderer.setRenderTarget(readBuffer);
+    renderer.clear();
+    this.scene.overrideMaterial = this.materiau;
+    renderer.render(this.scene, this.camera);
+    this.scene.overrideMaterial = null;
+    renderer.autoClear = autoClear;
+    for (const o of this.voiles) o.visible = true;
+    this.voiles.length = 0;
+  }
+}
+
 /**
  * `horsGeo` : ce qui ne doit pas entrer dans la passe de géométrie. Le dôme de ciel
  * en fait partie — il enveloppe la scène, et il occluerait tout.
@@ -446,7 +477,10 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const teinteFond = new THREE.Color();
   const composeur = new EffectComposer(renderer,
     new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
-  composeur.addPass(new RenderPass(scene, camera));
+  composeur.addPass(new Profondeur(scene, camera));
+  const passeScene = new RenderPass(scene, camera);
+  passeScene.clear = false;
+  composeur.addPass(passeScene);
   const passeAO = new ShaderPass(OCCLUSION);
   passeAO.renderToScreen = false;
   const passeComposition = new ShaderPass(COMPOSITION);
@@ -539,7 +573,10 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     voile.enabled = pieceEnfumeeVue();
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
     renderer.setRenderTarget(null);
+    // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
+    scene.matrixWorldAutoUpdate = false;
     composeur.render();
+    scene.matrixWorldAutoUpdate = true;
   }
 
   // Compilés hors cible, les nuanceurs prendraient le tonemapping de l'écran : la scène se rend dans le composeur, sans lui.
