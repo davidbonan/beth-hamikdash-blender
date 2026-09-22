@@ -518,15 +518,17 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   composeur.addPass(etalonnage);
   passeAO.uniforms.tGeo.value = cibleGeo.texture;
 
-  function redimensionner(l, h) {
+  // Un composeur construit sur sa propre cible fige sa définition à 1 : la scène était rendue en CSS, puis agrandie.
+  function redimensionner(l, h, definition) {
     const p = renderer.getPixelRatio();
+    composeur.setPixelRatio(definition);
     composeur.setSize(l, h);
     cibleGeo.setSize(Math.round(l * p * 0.5), Math.round(h * p * 0.5));
     cibleAO.setSize(cibleGeo.width, cibleGeo.height);
     cibleFumee.setSize(cibleGeo.width, cibleGeo.height);
     voile.uniforms.uPas.value.set(1 / cibleFumee.width, 1 / cibleFumee.height);
-    halo?.setSize(l * p, h * p);
-    arretes.material.uniforms.resolution.value.set(1 / (l * p), 1 / (h * p));
+    halo?.setSize(composeur.renderTarget1.width, composeur.renderTarget1.height);
+    arretes.material.uniforms.resolution.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
     passeComposition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
     passeAO.uniforms.uTanFov.value = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
     passeAO.uniforms.uAspect.value = camera.aspect;

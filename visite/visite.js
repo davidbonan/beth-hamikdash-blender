@@ -326,8 +326,9 @@ function dimensionner() {
   // Taille d'abord : sans largeur CSS, la toile vaut 300 px × DPR et élargit la page sur mobile.
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(DPR * echelle);
-  HAUTEUR_IMAGE.value = renderer.domElement.height;
-  rendu.redimensionner(innerWidth, innerHeight);
+  const definition = Math.min(DPR, PROFIL.definitionMax) * echelle;
+  HAUTEUR_IMAGE.value = Math.round(innerHeight * definition);
+  rendu.redimensionner(innerWidth, innerHeight, definition);
 }
 dimensionner();
 addEventListener("resize", dimensionner);
