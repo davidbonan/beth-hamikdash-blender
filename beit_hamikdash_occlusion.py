@@ -51,7 +51,7 @@ DIFFUS = 0.33
 # Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
 SATURATION_CIEL = 0.5
 # La Menora, l'Arche et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
-LAMPES = {"flammes": {"couleur": 0xFFB36B, "intensite": 150.0, "hauteur": 0.35},
+LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 150.0, "hauteur": 0.35},
           "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},
           "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.

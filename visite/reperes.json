@@ -1777,83 +1777,77 @@
   ],
   "occlusion": {},
   "lumiere": {
-    "arche_wilson": {
-      "carte": "lumiere/arche_wilson.webp",
-      "canal": 0,
-      "echelle": 2.0,
-      "secondes": 24
-    },
-    "kotel": {
-      "carte": "lumiere/kotel.webp",
-      "canal": 0,
-      "echelle": 1.5,
-      "secondes": 49
-    },
-    "place_kotel": {
-      "carte": "lumiere/place_kotel.webp",
-      "canal": 0,
-      "echelle": 2.0,
-      "secondes": 441
-    },
-    "pont_maghrebins": {
-      "carte": "lumiere/pont_maghrebins.webp",
-      "canal": 0,
-      "echelle": 1.25,
-      "secondes": 8
-    },
-    "porat_yosef": {
-      "carte": "lumiere/porat_yosef.webp",
-      "canal": 0,
-      "echelle": 1.75,
-      "secondes": 61
-    },
     "_non_classe": {
       "carte": "lumiere/_non_classe.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 82
+      "secondes": 68
+    },
+    "aliyah": {
+      "carte": "lumiere/aliyah.webp",
+      "canal": 0,
+      "echelle": 1.0,
+      "secondes": 14
+    },
+    "arche_wilson": {
+      "carte": "lumiere/arche_wilson.webp",
+      "canal": 0,
+      "echelle": 2.0,
+      "secondes": 18
+    },
+    "azara": {
+      "carte": "lumiere/azara.webp",
+      "canal": 0,
+      "echelle": 2.25,
+      "secondes": 102
+    },
+    "batiment": {
+      "carte": "lumiere/batiment.webp",
+      "canal": 0,
+      "echelle": 2.0,
+      "secondes": 16
     },
     "beit_avtinas": {
       "carte": "lumiere/beit_avtinas.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 9
+      "secondes": 5
     },
     "beit_hahalifot": {
       "carte": "lumiere/beit_hahalifot.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 26
+      "secondes": 20
     },
     "beit_hamitbahayim": {
       "carte": "lumiere/beit_hamitbahayim.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 5
+      "secondes": 4
     },
     "beit_hamoked": {
       "carte": "lumiere/beit_hamoked.webp",
       "canal": 1,
       "echelle": 2.0,
-      "secondes": 29
+      "secondes": 24
     },
     "beit_hanitzotz": {
       "carte": "lumiere/beit_hanitzotz.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 6
+      "secondes": 5
     },
     "beit_hatevila": {
       "carte": "lumiere/beit_hatevila.webp",
       "canal": 0,
       "echelle": 4.75,
-      "secondes": 5
+      "secondes": 4
     },
     "candelabres_shoeva": {
       "carte": "lumiere/candelabres_shoeva.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 7
+      "secondes": 6
     },
     "doukhan": {
       "carte": "lumiere/doukhan.webp",
@@ -1871,187 +1865,247 @@
       "carte": "lumiere/esplanade_herode.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 172
+      "secondes": 173
     },
     "ezrat_israel": {
       "carte": "lumiere/ezrat_israel.webp",
       "canal": 0,
       "echelle": 0.75,
-      "secondes": 8
+      "secondes": 6
     },
     "ezrat_nashim": {
       "carte": "lumiere/ezrat_nashim.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 431
+      "secondes": 287
+    },
+    "gefen_zahav": {
+      "carte": "lumiere/gefen_zahav.webp",
+      "canal": 0,
+      "echelle": 4.5,
+      "secondes": 9
     },
     "gezuztra": {
       "carte": "lumiere/gezuztra.webp",
       "canal": 1,
       "echelle": 2.25,
-      "secondes": 16
+      "secondes": 12
+    },
+    "heikhal": {
+      "carte": "lumiere/heikhal.webp",
+      "canal": 0,
+      "echelle": 4.0,
+      "secondes": 18
     },
     "heil": {
       "carte": "lumiere/heil.webp",
       "canal": 0,
       "echelle": 1.25,
-      "secondes": 55
+      "secondes": 49
     },
     "kaleh_orev": {
       "carte": "lumiere/kaleh_orev.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 7
+      "secondes": 4
     },
     "kevashim_ketanim": {
       "carte": "lumiere/kevashim_ketanim.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 6
+      "secondes": 4
     },
     "kevesh": {
       "carte": "lumiere/kevesh.webp",
       "canal": 0,
       "echelle": 2.5,
-      "secondes": 13
+      "secondes": 5
+    },
+    "kotel": {
+      "carte": "lumiere/kotel.webp",
+      "canal": 0,
+      "echelle": 1.5,
+      "secondes": 27
     },
     "lishkat_beit_shemanya": {
       "carte": "lumiere/lishkat_beit_shemanya.webp",
       "canal": 1,
       "echelle": 2.25,
-      "secondes": 28
+      "secondes": 24
     },
     "lishkat_haetz": {
       "carte": "lumiere/lishkat_haetz.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 31
+      "secondes": 25
     },
     "lishkat_haetzim": {
       "carte": "lumiere/lishkat_haetzim.webp",
       "canal": 1,
       "echelle": 1.5,
-      "secondes": 24
+      "secondes": 21
     },
     "lishkat_hagazit": {
       "carte": "lumiere/lishkat_hagazit.webp",
       "canal": 1,
       "echelle": 1.0,
-      "secondes": 16
+      "secondes": 14
     },
     "lishkat_hagola": {
       "carte": "lumiere/lishkat_hagola.webp",
       "canal": 0,
       "echelle": 1.0,
-      "secondes": 9
+      "secondes": 7
     },
     "lishkat_hamedichin": {
       "carte": "lumiere/lishkat_hamedichin.webp",
       "canal": 1,
       "echelle": 1.5,
-      "secondes": 13
+      "secondes": 9
     },
     "lishkat_hamelach": {
       "carte": "lumiere/lishkat_hamelach.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 18
+      "secondes": 12
     },
     "lishkat_hametzoraim": {
       "carte": "lumiere/lishkat_hametzoraim.webp",
       "canal": 1,
       "echelle": 2.5,
-      "secondes": 32
+      "secondes": 25
     },
     "lishkat_hanezirim": {
       "carte": "lumiere/lishkat_hanezirim.webp",
       "canal": 1,
       "echelle": 3.25,
-      "secondes": 37
+      "secondes": 25
     },
     "lishkat_haparva": {
       "carte": "lumiere/lishkat_haparva.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 22
+      "secondes": 9
     },
     "lishkat_osei_chavitin": {
       "carte": "lumiere/lishkat_osei_chavitin.webp",
       "canal": 1,
       "echelle": 3.75,
-      "secondes": 19
+      "secondes": 12
     },
     "lishkat_parhedrin": {
       "carte": "lumiere/lishkat_parhedrin.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 14
+      "secondes": 10
     },
     "lishkat_pinchas": {
       "carte": "lumiere/lishkat_pinchas.webp",
       "canal": 1,
       "echelle": 2.0,
-      "secondes": 45
+      "secondes": 29
     },
     "maake": {
       "carte": "lumiere/maake.webp",
       "canal": 0,
       "echelle": 3.25,
-      "secondes": 10
+      "secondes": 5
     },
     "maarakhot": {
       "carte": "lumiere/maarakhot.webp",
       "canal": 0,
       "echelle": 9.25,
-      "secondes": 11
+      "secondes": 4
     },
     "mekhonot": {
       "carte": "lumiere/mekhonot.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 98
+      "secondes": 52
     },
     "mesiba": {
       "carte": "lumiere/mesiba.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 24
+      "secondes": 14
     },
     "mesiba_bira": {
       "carte": "lumiere/mesiba_bira.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 8
+      "secondes": 4
     },
     "mizbeach": {
       "carte": "lumiere/mizbeach.webp",
       "canal": 0,
       "echelle": 3.0,
-      "secondes": 137
+      "secondes": 102
     },
     "mur_har_habayit": {
       "carte": "lumiere/mur_har_habayit.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 295
+      "secondes": 239
     },
     "mur_herode": {
       "carte": "lumiere/mur_herode.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 283
+      "secondes": 277
+    },
+    "oulam": {
+      "carte": "lumiere/oulam.webp",
+      "canal": 0,
+      "echelle": 3.75,
+      "secondes": 76
+    },
+    "parokhet": {
+      "carte": "lumiere/parokhet.webp",
+      "canal": 0,
+      "echelle": 4.5,
+      "secondes": 76
+    },
+    "petah_oulam": {
+      "carte": "lumiere/petah_oulam.webp",
+      "canal": 0,
+      "echelle": 2.25,
+      "secondes": 10
+    },
+    "place_kotel": {
+      "carte": "lumiere/place_kotel.webp",
+      "canal": 0,
+      "echelle": 2.0,
+      "secondes": 221
+    },
+    "pont_maghrebins": {
+      "carte": "lumiere/pont_maghrebins.webp",
+      "canal": 0,
+      "echelle": 1.25,
+      "secondes": 5
+    },
+    "porat_yosef": {
+      "carte": "lumiere/porat_yosef.webp",
+      "canal": 0,
+      "echelle": 1.75,
+      "secondes": 38
     },
     "porte_est_ezrat_nashim": {
       "carte": "lumiere/porte_est_ezrat_nashim.webp",
       "canal": 1,
       "echelle": 2.5,
-      "secondes": 7
+      "secondes": 8
     },
     "portes_azara": {
       "carte": "lumiere/portes_azara.webp",
       "canal": 1,
       "echelle": 2.0,
       "secondes": 19
+    },
+    "portes_heikhal": {
+      "carte": "lumiere/portes_heikhal.webp",
+      "canal": 1,
+      "echelle": 3.0,
+      "secondes": 6
     },
     "portes_houlda": {
       "carte": "lumiere/portes_houlda.webp",
@@ -2063,13 +2117,13 @@
       "carte": "lumiere/portiques.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 181
+      "secondes": 182
     },
     "quinze_marches": {
       "carte": "lumiere/quinze_marches.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 10
+      "secondes": 7
     },
     "shaar_hamayim": {
       "carte": "lumiere/shaar_hamayim.webp",
@@ -2099,7 +2153,7 @@
       "carte": "lumiere/shaar_shushan.webp",
       "canal": 1,
       "echelle": 2.25,
-      "secondes": 4
+      "secondes": 5
     },
     "shaar_tadi": {
       "carte": "lumiere/shaar_tadi.webp",
@@ -2111,196 +2165,142 @@
       "carte": "lumiere/sol_har_habayit.webp",
       "canal": 0,
       "echelle": 1.25,
-      "secondes": 273
+      "secondes": 279
     },
     "soreg": {
       "carte": "lumiere/soreg.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 5
-    },
-    "yam": {
-      "carte": "lumiere/yam.webp",
-      "canal": 0,
-      "echelle": 2.75,
-      "secondes": 269
-    },
-    "yessod": {
-      "carte": "lumiere/yessod.webp",
-      "canal": 0,
-      "echelle": 2.5,
-      "secondes": 9
-    },
-    "aliyah": {
-      "carte": "lumiere/aliyah.webp",
-      "canal": 0,
-      "echelle": 1.0,
-      "secondes": 15
-    },
-    "azara": {
-      "carte": "lumiere/azara.webp",
-      "canal": 0,
-      "echelle": 2.25,
-      "secondes": 94
-    },
-    "batiment": {
-      "carte": "lumiere/batiment.webp",
-      "canal": 0,
-      "echelle": 2.0,
-      "secondes": 19
-    },
-    "gefen_zahav": {
-      "carte": "lumiere/gefen_zahav.webp",
-      "canal": 0,
-      "echelle": 4.5,
-      "secondes": 12
-    },
-    "heikhal": {
-      "carte": "lumiere/heikhal.webp",
-      "canal": 0,
-      "echelle": 4.0,
-      "secondes": 25
-    },
-    "oulam": {
-      "carte": "lumiere/oulam.webp",
-      "canal": 0,
-      "echelle": 3.75,
-      "secondes": 86
-    },
-    "parokhet": {
-      "carte": "lumiere/parokhet.webp",
-      "canal": 0,
-      "echelle": 4.75,
-      "secondes": 112
-    },
-    "petah_oulam": {
-      "carte": "lumiere/petah_oulam.webp",
-      "canal": 0,
-      "echelle": 2.25,
-      "secondes": 25
-    },
-    "portes_heikhal": {
-      "carte": "lumiere/portes_heikhal.webp",
-      "canal": 1,
-      "echelle": 3.0,
-      "secondes": 27
+      "secondes": 4
     },
     "taim": {
       "carte": "lumiere/taim.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 136
+      "secondes": 48
     },
     "yakhin_boaz": {
       "carte": "lumiere/yakhin_boaz.webp",
       "canal": 0,
       "echelle": 3.25,
-      "secondes": 23
+      "secondes": 18
+    },
+    "yam": {
+      "carte": "lumiere/yam.webp",
+      "canal": 0,
+      "echelle": 2.75,
+      "secondes": 275
+    },
+    "yessod": {
+      "carte": "lumiere/yessod.webp",
+      "canal": 0,
+      "echelle": 2.5,
+      "secondes": 8
     }
   },
   "empreintes": {
-    "_non_classe": "6bdb90ec36eab2d00c7aebf21d2606eb55f0a6b0",
-    "aliyah": "45f034d866530e929a31cd1250c571f3df8bdc1f",
-    "arche_wilson": "a7bf708799dee35d3f4bf2427013c7f93568eb92",
-    "aron": "2e64df1a8d079477f9558b2c6080fafa4d30bdf7",
-    "azara": "90d2899bfb06ff4716598808494097079e9335f3",
-    "batiment": "18cf77a6ee281834e62bd3fc6fda0d6c4dd14203",
-    "beit_avtinas": "b12b10e84a806d857e61edf006b1ef953f717db6",
-    "beit_hahalifot": "426c69ee9b8eea369542296b6ce319c17c4dc0ed",
-    "beit_hamitbahayim": "0ceb764a21ec33d809b4249266f2969c77dbe01c",
-    "beit_hamoked": "c1d71d247efad80b8aca2721821af5c3fb28307b",
-    "beit_hanitzotz": "4ed122426440a94e0ce08f27ebb30dccd5b4fedb",
-    "beit_hatevila": "866e386e74ceb4c9c1d9d32783e19df30a5e7463",
-    "candelabres_shoeva": "36d7a37d25302f370c5efb5dc2721ef6dd1f8eec",
-    "chaines_devir": "e7ba32bdd9441d5e02323be58400134cfc115426",
-    "contenu_aron": "c4a58572f22eabf0f97d47c5ac1f25d5cfa4822b",
-    "couronne_helene": "70475bdef375b57aceee7837f5779a19fe456a55",
-    "doukhan": "9ab799731d57a0de0c8c886c60105725d842e9f7",
-    "douze_marches_oulam": "85415e841990901a86ac3ad6ea7b2934896d2af3",
-    "esplanade_herode": "68e29ae154b1b7e9c857e0515ce959745608f94b",
-    "even_hashetiya": "c56fd60ac4374f8b5e2d0106eb8f3bed7020773a",
-    "ezrat_israel": "49b89b8a3c6f80ebdb17437462f4cf9fcb4ac79b",
-    "ezrat_nashim": "29f7a334c9feb9c862417bd01c3fd2b163fb2995",
-    "gefen_zahav": "0b320a3320cc3820da8e80523e9f6a1e51b716dd",
-    "gezuztra": "ae0cefb9b9aa46e8aed4c88d1668c46d68b19e33",
-    "heikhal": "82d195a6fd66ad81b7d32b0049768a83011054e2",
-    "heil": "ce9ceba94d1d30bfc6af7af0240481e8f6bf571b",
-    "hout_hasikra": "d3bdc04808bd3f25e469e50a913d99296f4c009f",
-    "kaleh_orev": "e421b1a896f1e1b22f51f6321b0028f844fe8b9f",
-    "kaporet": "6c7322827c97a7135e8fda270e4f06d33796d60d",
-    "keranot": "562a247a738774742382277cbfd86343beb7b162",
-    "kevashim_ketanim": "ab64d08c8c839299dc55489470e56ec84c6fdabb",
-    "kevesh": "ae625151b96393e65d98c335a9667ecb0e7587d8",
-    "kiyor": "f8185ed6f710f5ac77677ea5d7193d63e0bbc618",
-    "kodesh_hakodashim": "caab1abd7560ad9db34254c07334d266da3e8703",
-    "kotel": "ff6505b13d001e0ea851b387a2d9c0da563db253",
-    "lishkat_beit_shemanya": "6d1e1b360b2eeed8a4c16641d89f057140db69b1",
-    "lishkat_haetz": "1302c4ee44c1ad18cc995f537f563d2d4c88d413",
-    "lishkat_haetzim": "d409a504bb0f27df635021c4858f2d4808550170",
-    "lishkat_hagazit": "b6a9d4a1cfa47d2e553c874e17356acc17eb582a",
-    "lishkat_hagola": "4f2e9a536ab8ffddb2d007fe8338eeaadbc69c31",
-    "lishkat_hamedichin": "824d1e5fc2a87bc738ba0753dc44ea35e16d5ba6",
-    "lishkat_hamelach": "7a4403f49dc1f7ad02a11d3d17cdfd5196bf127b",
-    "lishkat_hametzoraim": "da2b2ab63839e30ce1c6b1711763177f88f2c790",
-    "lishkat_hanezirim": "5d457ae0752952b9a99eb621b2fdddc1c1ae7f61",
-    "lishkat_haparva": "797611f339514edc940396fbe09b9fd8c74e55d9",
-    "lishkat_osei_chavitin": "3af0dae9b36b7aea49bd0af4971d57c219031637",
-    "lishkat_parhedrin": "3885be004f6f6a90baa7bb891b248a93381ddc31",
-    "lishkat_pinchas": "9b7f33aef4355ddd94ab0f2d2ddffe68b69a7265",
-    "maake": "4d5a6713144c59fa877e267c4c4a9ad5c8cb264b",
-    "maarakhot": "2093601ef32874a5906e9342c1463f6713b8e9ea",
-    "machta": "1caf3a055b17b80b6d98862caab8ef86fd047e57",
-    "magrefa": "dbf75464737730567b7bf577e6547a6d2e0dd891",
-    "makom_hadeshen": "69db53530b433139c2739cb30e23adb4d40dd385",
-    "mekhonot": "5006fb7fc23a6dfe17f056c5458a04d3c9e514f6",
-    "melach_kevesh": "ce09f5645e63e1afa22f990f8b6124625180b752",
-    "melach_rosh": "e10d7d631ee1962e3e24dea0c23264f1509f6d70",
-    "menora": "2ca9dd38c0cdd415e5c5a97db5102a84fe08083e",
-    "menora_d_or": "0062404121733010c47895f5353209afbe570e24",
-    "mesiba": "a25f9cf6743d6e8db3160f8ac8a0ad738c85b523",
-    "mesiba_bira": "d4b41729c75dd46f1d494a0815083b4d6fe5befb",
-    "mizbeach": "98e397152a4169cd1df57370dc27f644208c9961",
-    "mizbeach_hazahav": "72c40c58ab48206a994afc58801e88a3b98557e3",
-    "mukhni": "1d42d723ac13c7886f2ca932ac3da78513ced3c4",
-    "mur_har_habayit": "fddcf3b8f278de9e63452f92cf31d1a4e2946e3e",
-    "mur_herode": "8a3936e55500dee1f6518fca82f870c7811c4643",
-    "netilat_yadayim": "0316ac6d94da1246f0b439fee4db8f829961b733",
-    "niche_bilga": "4e1783fb66ce424916e9017a011574f9cc023704",
-    "oulam": "14578ca71c3081b75e8ffe6b9f7d68c25abce73f",
-    "parokhet": "7e3f253c7abfd8ba8151cded92efd5cded544aa8",
-    "petah_oulam": "436da667865e4965f7049d839b7bd394e42ac973",
-    "place_kotel": "98b343b136d677f335a8a33c71c0d439ad200914",
-    "pont_maghrebins": "b5591584ccfb69f57e9a4c617b3f9ecb54379f9f",
-    "porat_yosef": "1b03cf2303c632091fc3ad295b116acb8f3c19b7",
-    "porte_est_ezrat_nashim": "417fec1af54607db10d7cd327691318b899f77c4",
-    "portes_azara": "f8128a784af67cca54b32f5fdc80e9c2fdc8c6f5",
-    "portes_heikhal": "48f685671a5902086249a1f080620dbfc4df22d9",
-    "portes_houlda": "e5a97b67ad2668dd8249a6439e31bc23b0e1a003",
-    "portiques": "f80efc451da0ad2918dac54942c05ba1afdb9219",
-    "quinze_marches": "5732f64de4fffdcc7724044cb1758898e291ef85",
-    "revouva": "e7e70c42efe63c1d494999b3023430ba9fc5fa64",
-    "sculptures_murs": "033e46a00bd958d6ac1bfc9782da87a3d2711b13",
-    "sefalim": "e8dcdc9383ba491f64f8a362c7382e2a2e1eba5b",
-    "shaar_hamayim": "e73eaf9cc61bca011fef2945764bea2d3a466a3e",
-    "shaar_hanitzotz": "c5aac1fbf610db6a542bd39bd6996f597ab48eb7",
-    "shaar_kiponus": "4c2cafa84d024091f50e07c7ce1ff5b5ec78a543",
-    "shaar_nikanor": "b83fc642a7ce85f8bb69575b32339e2f0f9d586f",
-    "shaar_shushan": "e2c3a68ca9167b78708758a34e0995b3046f406a",
-    "shaar_tadi": "516874eb0465aba2055913abd77cdc3a33a6c963",
-    "sharsherot_oulam": "06e4c31fbb335dcb94857fbd2c2a0bb7e94d8f2b",
-    "shit": "2314426c7b6a67cb340c0950d715385082d1cb96",
-    "shofarot": "bb914054248b366af6703c5bdecac4cccae190d0",
-    "shulchan": "1f92f46907623951cc0ca14ffebdb83f43bc1289",
-    "shulchanot_kevesh": "83d03de87cff4c4ee071e0a0e5d83652c070bfd5",
-    "sol_har_habayit": "6de4a85d69b27fb8d3d33c755a72dae2fe8d3258",
-    "soreg": "1977d05bdf73431e86174d114ec86c93fbf6b9ba",
-    "tabaot": "56b178ecc4d6b0859e372d850952c3bc65cbd626",
-    "tables_oulam": "b6dac2bc3757630b2eef94696355ed7f20706e20",
-    "taim": "9d788fbcd7385f6aaf669fdd9f8fce5b8d83138f",
-    "tapuach": "645016166154bfe26625efcb1ba9591d5ac0b1c2",
-    "tavla_helene": "4c960eb5326819a1ac5ea244495a38eff64f3e71",
-    "yakhin_boaz": "19299502f68bc0005f16a387e75f972177e96d4f",
-    "yam": "35467435fe891236a12acc1c0f10c51d07e6ddf7",
-    "yessod": "24168de6918658477b280bce2079ea5c076421ab"
+    "_non_classe": "1f87764717d4d2d3c0eb977343a0d2d6e4973e89",
+    "aliyah": "a11e6c8891c52ffa905c60437f581f502c3e30ef",
+    "arche_wilson": "fa2b19a67dc1fa858cbf6a4791b791a2e4cbaefc",
+    "aron": "fe56a3e91ae652e42eddc8f99eb0b8a3a572866c",
+    "azara": "894431c643867b7d8dfd86ccc8481857d8e67cd4",
+    "batiment": "b41a06d0d1144b39d88962870603a9b53e3ff408",
+    "beit_avtinas": "9acbf5417ede36e23b6ccf2b87089ffdcd3cb0f0",
+    "beit_hahalifot": "d9e8d9a99ac8373fb9c8c391c160522651274cdc",
+    "beit_hamitbahayim": "b3084675e84ad1ee52fde6f08748bdbaf279e667",
+    "beit_hamoked": "30c047924323a718fa6f76107bd3f2a64b033752",
+    "beit_hanitzotz": "911efc4b96a0d688b6fea099bad4cd9844800350",
+    "beit_hatevila": "8d28a613760ae06007f64db129f7c046adc80e97",
+    "candelabres_shoeva": "9ee072e6a798921aec034e215e6480e450f36293",
+    "chaines_devir": "a22608708814dfa2b8ba6f6c9e86d1c8eb136de9",
+    "contenu_aron": "bc3955ac68bd5c7a091555ead2bcc9d133c6a9a7",
+    "couronne_helene": "333bf6426aaa0eac7b3b8040cccc78b4f6886757",
+    "doukhan": "f7b989f0a488bca072be4695ff556f3b8f99a41b",
+    "douze_marches_oulam": "3aa42b8ceac6595dc5d4f247676137d884b6a6eb",
+    "esplanade_herode": "20cf238a7ed2577c31c6b59ca3161c868206d520",
+    "even_hashetiya": "4b26af054c3d2a350ef96d1d3afad38b2f023184",
+    "ezrat_israel": "e5b074b0604a33f9170c985f7fc79d7769d3ab08",
+    "ezrat_nashim": "bdbc2250fa052b35ebbcb1610ac7a2d7437ae464",
+    "gefen_zahav": "f1e21875bc473d10be076774ed13e70f43393317",
+    "gezuztra": "d6683acb7e5b3acd54433f30f7a775574d76dee8",
+    "heikhal": "12847ddde114c988337fac15dd45676035c69cb3",
+    "heil": "a23b62d6f8d1f70a74b105ca8d1cf80b9b120a1c",
+    "hout_hasikra": "0bd2683e2d2dc6429076b5a2ec0116b91c94fa63",
+    "kaleh_orev": "934a6545e128df824b4ef89b0aa0d563df0c0d4f",
+    "kaporet": "0a500d661a6a870058c43d144d67983d59acb028",
+    "keranot": "db27bf7fffa189761ee8dda36a1d629c47c6cd5a",
+    "kevashim_ketanim": "872789b8113e42b1fb6eacc14ee50104467caf06",
+    "kevesh": "20a9911201ee4bf0ad0df89b59c2dd96baca1833",
+    "kiyor": "3fc397e28386b1a35e44fadbd634cc830a95f97c",
+    "kodesh_hakodashim": "e4eb0b120a865eca9b74b5e95d478761dd073154",
+    "kotel": "8d37c0c8c1ffa9de2e4c1cf41c99af3d7e41ef96",
+    "lishkat_beit_shemanya": "f57631d310300ee06f355a62896cf71b7b89c042",
+    "lishkat_haetz": "663aa57a2620977a869cc484bd681f308ed9b95c",
+    "lishkat_haetzim": "b70b190e80fc3fb61c15bad6dec58936f4fb8940",
+    "lishkat_hagazit": "1f8542ccf24c0f7ab79a4d45484a5725bddb6719",
+    "lishkat_hagola": "9abb2cb7f79c3c5280ba77596763240b90831c40",
+    "lishkat_hamedichin": "5156bca0a2b15e14d84b71660d526057a393ed46",
+    "lishkat_hamelach": "061e573019158117975493b8dd310b3c4a3d462b",
+    "lishkat_hametzoraim": "5034e379e2a323d18abdecbcdd42051c3b3f09a3",
+    "lishkat_hanezirim": "ecf74fce5eef88f368a6f5977293a2cd269974cc",
+    "lishkat_haparva": "f1f6c1e57e294ca44e1fc5f703840ee9954aafc5",
+    "lishkat_osei_chavitin": "38a5bf1b0f8a15cfebf9b9cff987df19faff0030",
+    "lishkat_parhedrin": "736ff9c95308112c9c230bef557045fe4e328bca",
+    "lishkat_pinchas": "019281e52a078699b8bccb4c54e6620ecb024186",
+    "maake": "91981208e0e640d0f5c316a501dd7fa9518c6abc",
+    "maarakhot": "f52177d33432dd8171db8e79224036baf7b8718b",
+    "machta": "d9cb5de1298499c5128d5406390a8ddeccc4a9d4",
+    "magrefa": "73aa775a2acf8bf069129921e04c266fc4d34433",
+    "makom_hadeshen": "b84463bee7a549a33163622c9a08ac97007631c0",
+    "mekhonot": "06dac41d41ba6bdffc7edae7bf736243ade31f5f",
+    "melach_kevesh": "959de871d5168e93721f130c7945bee01a9e0cfe",
+    "melach_rosh": "3e2b5f0069f25a2cf3c92a279c631dde3df9e45d",
+    "menora": "105f66b6058b57e5c6710c45123fa6c031af8973",
+    "menora_d_or": "cba72857d4b359fc1a4198cb1888de4ee34f005a",
+    "mesiba": "476a74db3d82759b9403304ff81b9b5415167963",
+    "mesiba_bira": "f1efc864f6480ef056d1cc6e7d599fd170af5867",
+    "mizbeach": "c71024c181ba6d8d3a268b60938567885633daa6",
+    "mizbeach_hazahav": "dcbaa15ab51cfe2d36a2550e8b386f191f48c521",
+    "mukhni": "9c53404468a967254346cac830f3f1eb7c48d714",
+    "mur_har_habayit": "9559ebdfd403fcc8e9296e447eae9f6d7bfd8a0a",
+    "mur_herode": "7fe69357d51c2cb27fe5514979c4d24c5c82bed5",
+    "netilat_yadayim": "c33bdc92fdc14d59f26130ccf4da2137ab10717e",
+    "niche_bilga": "7d4b298e657af806889e9141e6188044b24d2a15",
+    "oulam": "258bd59b8ce28cc9fdeae56594f10b4a9b752409",
+    "parokhet": "95db87520861e4dbc49c8f989cd923b128bc735b",
+    "petah_oulam": "d55ec22cbfb9b4de7ef45d7b61617b2f0c8c1653",
+    "place_kotel": "abbef8179b0db6edd00d1e80bce063367385fd80",
+    "pont_maghrebins": "96a9084e35b2f5b691c54db212e02c8c1ecfa483",
+    "porat_yosef": "bd0264bfa638ccd1938a2b0938ec1d857ca85da2",
+    "porte_est_ezrat_nashim": "792477dc335d6ee44551f89958b2f444c3162dc7",
+    "portes_azara": "b021933b60da9169551bf7ad02250c137975aae4",
+    "portes_heikhal": "6aae94cd266491a3bcc4fec01b3885b0b1f0b57c",
+    "portes_houlda": "ce91b338e0f883002722b11bcdb86f9883fa4490",
+    "portiques": "8bca1235cd2a4e2e3d2d5baa955c5fb4f2b2de03",
+    "quinze_marches": "7aa0f765e22d92c3f8da53e63ca0284f7605d3a0",
+    "revouva": "d6333b39c738f162104b32eeb518e95aa64423b6",
+    "sculptures_murs": "5b338f83929cdb45fe4ba2153b9864da980c65e0",
+    "sefalim": "e6cadeeefab172744adeff456365639e6786627d",
+    "shaar_hamayim": "c3affd3e4fe97fafe3973461fcc3baad0fe5deda",
+    "shaar_hanitzotz": "670f648b5d6678ecb4c021e42954df563ff5b6e2",
+    "shaar_kiponus": "3ccfa5c45f8151849c48bab36e55893f021dfbd0",
+    "shaar_nikanor": "c55f1a4ec4c16a82bfb25ca8404dd09be6a6e6bf",
+    "shaar_shushan": "49218f0016914f0a46e9a4d391da5f40eac2150f",
+    "shaar_tadi": "343b239d6b660985a55d18d313b263ea7b51e0f7",
+    "sharsherot_oulam": "ee89ae47245a00e5c1ce361d830ae25f50c12800",
+    "shit": "6a590847a4192cbd28bc5422f8e9df590476b431",
+    "shofarot": "a91ecf071fbd5e9b95b83187bb12331d5b73a2ae",
+    "shulchan": "3cb7a2bcd1a222fc63389fc999e4b7267e4999c6",
+    "shulchanot_kevesh": "6aff4586c554b02cc9cc3560ab105bd6d4758321",
+    "sol_har_habayit": "ed6dce653bbc98bfacbedb2e66eef974060f11f9",
+    "soreg": "665d92689624e8f7d331d8784b1c181f6c824e6e",
+    "tabaot": "c7a0f17d87c567117ca210b6fe2152015176536b",
+    "tables_oulam": "c02b8539396df062927543b9ef88c4798e16728e",
+    "taim": "efe37013b82ab94dc9bb4d6720f4f5c37385b860",
+    "tapuach": "81c1239a9211df26a3cd76cfc0145747aa77ecee",
+    "tavla_helene": "98502ae17214c7f92e96e2ce05315578d6f53e55",
+    "yakhin_boaz": "8afdd2ec705a8f53868434a68dd74c3c2183a1a9",
+    "yam": "b11326605312da24afbaf15d0ba684b047499822",
+    "yessod": "3b99cffc429d582e7b87ef68b521bf889fdb2d6b"
   }
 }
