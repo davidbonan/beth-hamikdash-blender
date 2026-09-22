@@ -204,7 +204,7 @@ def preparer_cycles():
     prefs.compute_device_type = "METAL"
     prefs.get_devices()
     for appareil in prefs.devices:
-        appareil.use = True
+        appareil.use = appareil.type == "METAL"
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "GPU"
