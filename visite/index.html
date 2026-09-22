@@ -85,7 +85,8 @@
 
   /* ---- cinéma : la scène seule, encadrée par l'accueil ---- */
   html.cinema #accueil, html.cinema #chargement, html.cinema #barre, html.cinema #aide, html.cinema #manche,
-  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #fiche, html.cinema #plan { display: none !important; }
+  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #fiche, html.cinema #plan,
+  html.cinema #parcours { display: none !important; }
   html.cinema canvas { pointer-events: none; }
 
   /* ---- rappel des commandes ---- */
@@ -236,8 +237,9 @@
   :root[lang="he"] .zone, :root[lang="he"] h3 { letter-spacing: 0; }
 
   /* ---- fiche ---- */
+  :root { --fiche-largeur: min(400px, 92vw); }
   #fiche {
-    position: fixed; top: 0; right: 0; bottom: 0; z-index: 25; width: min(400px, 92vw);
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 25; width: var(--fiche-largeur);
     padding: 0 24px 40px; overflow-y: auto; overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch; background: var(--pierre);
     border-left: 1px solid var(--trait); box-shadow: -12px 0 40px rgba(0,0,0,.35);
@@ -439,6 +441,50 @@
     #initiation section p { font-size: 13px; }
   }
 
+  /* ---- parcours guidés ---- */
+  /* La même carte que l'initiation, au même endroit : elle accompagne, elle n'empêche rien. */
+  #parcours { position: fixed; inset: 0; z-index: 18; pointer-events: none; }
+  #parcours .carte {
+    position: absolute; bottom: calc(96px + var(--marge-bas)); inset-inline: 0; margin-inline: auto;
+    width: min(460px, calc(100vw - 32px)); padding: 12px 18px 12px;
+    border: 1px solid rgba(203,192,170,.22); border-radius: 8px;
+    background: rgba(13,12,11,.8); backdrop-filter: blur(4px); box-shadow: 0 12px 32px rgba(0,0,0,.35);
+    color: #e8e0d0; pointer-events: auto; animation: paraitre .45s ease both;
+  }
+  @media (hover: hover) and (pointer: fine) and (min-width: 721px) {
+    #parcours .carte { bottom: calc(12px + var(--marge-bas)); inset-inline: calc(14px + var(--marge-gauche)) auto; margin-inline: 0; }
+  }
+  #parcours .etape { margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .13em; color: #a9a094; }
+  #parcours h2 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  #parcours .texte { margin: 6px 0 0; font-size: 14px; color: #d6cebf; }
+  #parcours .en-marche .texte, #parcours .en-marche h2 { opacity: .55; }
+  #parcours .pied { display: flex; gap: 8px; margin-top: 10px; }
+  #parcours .pied button {
+    font: inherit; font-size: 13px; padding: 6px 14px; color: #c8bfae; background: none;
+    border: 1px solid rgba(203,192,170,.28); border-radius: 4px; cursor: pointer;
+  }
+  #parcours .pied button:hover:not(:disabled) { border-color: var(--or); color: #f0e9da; }
+  #parcours .pied button:disabled { opacity: .35; cursor: default; }
+  #parcours .allure { min-width: 44px; font-variant-numeric: tabular-nums; }
+  #parcours .quitter { margin-inline-start: auto; }
+  #parcours .suivant { color: #f3efe6; background: var(--or); border-color: var(--or); }
+  /* Le tiroir de la fiche monte à 46 % de la hauteur : la carte reste au-dessus de lui. */
+  @media (max-width: 720px) and (min-height: 521px) {
+    body:has(#fiche.ouverte) #parcours .carte { bottom: calc(46vh + 12px); }
+    /* Douze lignes de Yoma 5:1 couvriraient la scène : le texte défile dans la carte. */
+    #parcours .texte { max-height: 18vh; overflow-y: auto; }
+  }
+  @media (max-height: 520px) {
+    #parcours .carte { bottom: calc(12px + var(--marge-bas)); padding: 8px 14px; }
+    #parcours .texte { display: none; }
+  }
+  /* Écran bas, téléphone couché ou fenêtre écrasée : la fiche est un panneau latéral, la carte se range à côté. */
+  @media (max-height: 520px) {
+    body:has(#fiche.ouverte) #parcours .carte {
+      inset-inline: 14px auto; margin-inline: 0; width: min(460px, calc(100vw - var(--fiche-largeur) - 28px));
+    }
+  }
+
   /* ---- menus de la barre ---- */
   /* Au bureau le libellé du menu se lit ; sur un écran étroit il se tronquait en « Un élémen… »,
      et une icône prend sa place, le menu natif invisible par-dessus. */
@@ -565,9 +611,10 @@
      ce qui manque. Le panneau latéral ne coûte que de la largeur, qui abonde.
      Le seuil est répété dans fiche.js : c'est lui qui décide si la poignée se tire. */
   @media (max-width: 720px) and (max-height: 520px) {
+    :root { --fiche-largeur: min(340px, 56vw); }
     #fiche {
       top: 0; right: 0; bottom: 0; left: auto;
-      width: min(340px, 56vw); height: auto; max-height: none;
+      width: var(--fiche-largeur); height: auto; max-height: none;
       padding: 0 max(16px, var(--marge-droite)) calc(24px + var(--marge-bas)) 16px;
       border-top: 0; border-left: 1px solid var(--trait); border-radius: 0;
       box-shadow: -12px 0 40px rgba(0,0,0,.35);
@@ -602,6 +649,9 @@
   <symbol id="icone-porte" viewBox="0 0 24 24">
     <path d="M5 21V10a7 7 0 0 1 14 0v11M3 21h18M12 3.2V21" fill="none" stroke="currentColor" stroke-width="1.7"/>
   </symbol>
+  <symbol id="icone-pas" viewBox="0 0 24 24">
+    <path d="M7.5 3.5c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4H6.1c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM6.2 13h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4ZM16.5 9c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4h-2.8c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM15.2 18.5h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4Z" fill="currentColor"/>
+  </symbol>
   <symbol id="icone-loupe" viewBox="0 0 24 24">
     <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/>
     <path d="m15 15 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -631,6 +681,7 @@
   <label class="menu" title="Aller à…" data-titre="aller"><svg class="icone" aria-hidden="true"><use href="#icone-porte"></use></svg><select id="aller"><option value="" data-texte="aller">Aller à…</option></select></label>
   <label class="menu" title="Un élément…" data-titre="chercher"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select></label>
   <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="vol">Vol libre</button>
+  <label class="menu" title="Suivre un service, station par station" data-titre="parcours_titre"><svg class="icone" aria-hidden="true"><use href="#icone-pas"></use></svg><select id="parcours-choix"><option value="" data-texte="parcours_menu">Parcours…</option></select></label>
   <span id="mode" data-texte="a_pied">à pied</span>
   <span id="position"></span>
   <button id="rejouer" type="button" title="Revoir les premiers pas" aria-label="Revoir les premiers pas"
@@ -719,6 +770,20 @@
     <div class="pied">
       <div class="progres"><i></i></div>
       <button class="passer" type="button" data-texte="initiation_passer">Passer</button>
+    </div>
+  </div>
+</div>
+
+<div id="parcours" hidden>
+  <div class="carte" role="dialog" aria-live="polite" aria-labelledby="parcours-titre">
+    <p class="etape"><span class="nom"></span> · <span class="rang"></span> · <span class="source"></span></p>
+    <h2 id="parcours-titre"></h2>
+    <p class="texte"></p>
+    <div class="pied">
+      <button class="precedent" type="button" data-texte="parcours_precedent">Précédent</button>
+      <button class="allure" type="button" title="Vitesse de la marche" data-titre="parcours_allure">×1</button>
+      <button class="quitter" type="button" data-texte="parcours_quitter">Quitter</button>
+      <button class="suivant" type="button" data-texte="parcours_suivant">Suivant</button>
     </div>
   </div>
 </div>

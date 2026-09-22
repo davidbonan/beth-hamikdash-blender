@@ -1291,7 +1291,7 @@
   "lishkat_hagola": {
     "nom": "Lishkat HaGola",
     "translit": "Lishkat HaGola",
-    "resume": "The chamber of the well. A cistern is dug there, a wheel set over it, and from there water is supplied to the whole Azara. Second of the three chambers of the north, between the Lishkat HaGazit to the east and the Lishkat HaEtz, set back in a second row behind them; the roof of the three is at the same level.",
+    "resume": "The chamber of the well. A cistern is dug there, a wheel set over it, and from there water is supplied to the whole Azara. Second of the three chambers of the north, inside the courtyard against the wall, west of the Lishkat HaGazit and in front of the Lishkat HaEtz; the roof of the three is at the same level.",
     "cotes": [
       "in the north, against the wall, west of the Lishkat HaGazit",
       "a single petach piercing the wall and opening onto the Azara",
@@ -1314,7 +1314,7 @@
         "citation": "שבדרום. נ\"א שבצפון והכי מייתי לה בפ\"ק דיומא דף י\"ט"
       }
     ],
-    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Its opening in the wall is not an eighth gate of the Azara: Middot 1:4 counts only gates. Tour's choice: this single petach, piercing the wall and opening onto the Azara, and the well's curb and wheel."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Also adopted: the arrangement Tosafot Yom Tov (Middot 5:4) draws from “behind the two of them” — HaGazit in front, to the east; HaGola behind it, on the courtyard side; HaEtz behind HaGola, its back to the north. Tour's choice: the chamber inside the courtyard, like the three of the south, its door to the south onto the Azara, and the well's curb and wheel."
   },
   "lishkat_haetz": {
     "nom": "Lishkat HaEtz",
@@ -1357,7 +1357,7 @@
         "citation": "כתב הר\"ב לשכת פרהדרין כו'. הכי מסיק בגמ' פ\"ק דיומא דף י\"ט"
       }
     ],
-    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Tour's choice: the chamber stands in a second row behind the other two, outside the wall, and its door is designed for the tour. Set aside: the identification with the chamber of the Kohen Gadol. Abba Shaul (Middot 5:4) says it was his chamber; Yoma 19a sees in it one of his two chambers, Parhedrin or Avtinas, without deciding; Bartenura (Middot 5:4) and the Rambam (Beit HaBechirah 5:17) identify it with the Lishkat Parhedrin. The tour places the Lishkat Parhedrin in the south, as a separate chamber."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Also adopted: the arrangement Tosafot Yom Tov (Middot 5:4) draws from “behind the two of them” — HaGazit in front, to the east; HaGola behind it, on the courtyard side; HaEtz behind HaGola, its back to the north, hence on the far side of the wall, on the terrace of the Cheil. Tour's choice: its door, onto the Cheil. Set aside: the identification with the chamber of the Kohen Gadol. Abba Shaul (Middot 5:4) says it was his chamber; Yoma 19a sees in it one of his two chambers, Parhedrin or Avtinas, without deciding; Bartenura (Middot 5:4) and the Rambam (Beit HaBechirah 5:17) identify it with the Lishkat Parhedrin. The tour places the Lishkat Parhedrin in the south, as a separate chamber."
   },
   "lishkat_hamelach": {
     "nom": "Lishkat HaMelach",

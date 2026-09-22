@@ -238,7 +238,7 @@
   "cohanim": {
     "he": "בגדי כהונה",
     "translit": "Bigdei kehouna",
-    "resume": "Le cohen hedyot sert en quatre vêtements de lin blanc : la kutonet, les mikhnasayim, la migba'at et l'avnet. La kutonet tombe jusqu'au-dessus du talon et ses manches jusqu'au poignet ; les mikhnasayim couvrent d'au-dessus du nombril jusqu'au genou ; la migba'at est une bande de lin que les fils d'Aharon enroulent « comme un chapeau » ; l'avnet, long de trente-deux amot, s'enroule tour sur tour à hauteur des coudes. Le cohen sert pieds nus : rien ne doit le séparer du dallage. La visite en montre deux au Kiyor — l'un s'y sanctifie, main droite sur le pied droit, main gauche sur le pied gauche, penché —, un qui monte au kevesh et en redescend, et un au pied de l'angle nord-est de l'autel.",
+    "resume": "Le cohen hedyot sert en quatre vêtements de lin blanc : la kutonet, les mikhnasayim, la migba'at et l'avnet. La kutonet tombe jusqu'au-dessus du talon et ses manches jusqu'au poignet ; les mikhnasayim couvrent d'au-dessus du nombril jusqu'au genou ; la migba'at est une bande de lin que les fils d'Aharon enroulent « comme un chapeau » ; l'avnet, long de trente-deux amot, s'enroule tour sur tour à hauteur des coudes. Le cohen sert pieds nus : rien ne doit le séparer du dallage. La visite habille ainsi ses six cohanim : au Kiyor, sur le kevesh, à l'angle de l'autel, sur l'autel et dans le Heikhal — chacun a sa fiche.",
     "cotes": [
       "kutonet : jusqu'au-dessus du talon ; manche jusqu'au poignet, large comme la main",
       "mikhnasayim : d'au-dessus du nombril jusqu'au genou",
@@ -280,25 +280,162 @@
       {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
       {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
     ],
-    "note": "Choix de la visite : la Mishna ne dit pas comment les Léviim étaient vêtus ; le lin vient de la dédicace du Temple de Shlomo (Divrei HaYamim II 5:12). La kippa blanche, la place sur la marche du haut, face au Sanctuaire, le passage laissé libre sur l'axe et le balancement sont aussi des choix. Retenu : l'avis de R. Eliézer ben Yaakov (Middot 2:6) — une marche d'une ama sépare l'Ezrat Israël de l'Ezrat Cohanim, et le Doukhan est posé dessus. Selon le premier avis de la michna, les deux cours ne sont séparées que par une rangée de saillies (rashei pispasin). Non représentés : les enfants Léviim, qui se tenaient en bas selon R. Eliézer ben Yaakov (Arakhin 2:6)."
+    "note": "Choix de la visite : la Mishna ne dit pas comment les Léviim étaient vêtus ; le lin vient de la dédicace du Temple de Shlomo (Divrei HaYamim II 5:12). La kippa blanche, la place sur la marche du haut, face au Sanctuaire, le passage laissé libre sur l'axe et le balancement sont aussi des choix. Retenu : l'avis de R. Eliézer ben Yaakov (Middot 2:6) — une marche d'une ama sépare l'Ezrat Israël de l'Ezrat Cohanim, et le Doukhan est posé dessus. Selon le premier avis de la michna, les deux cours ne sont séparées que par une rangée de saillies (rashei pispasin). Les enfants Léviim, qui se tenaient en bas selon R. Eliézer ben Yaakov (Arakhin 2:6), ont leur fiche au pied du Doukhan."
   },
-
-  "fideles": {
-    "he": "העם בעזרת הנשים",
-    "translit": "HaAm beEzrat HaNashim",
-    "resume": "L'Ezrat Nashim, 135 amot sur 135, est la cour où hommes et femmes se tiennent avant de monter les quinze marches vers la porte de Nikanor. Elle est plus sainte que le Har HaBayit et le 'Heil : le tevoul yom n'y entre pas. On l'entoura plus tard d'une galerie, pour que « les femmes regardent d'en haut et les hommes d'en bas ». La visite y pose quelques fidèles pour donner l'échelle de la cour, des marches et de la porte.",
+  "kiddoush_yadayim": {
+    "he": "קידוש ידיים ורגליים",
+    "translit": "Kiddoush yadayim veraglayim",
+    "resume": "Avant tout service, le cohen sanctifie ses mains et ses pieds à l'eau du Kiyor : la main droite posée sur le pied droit, la main gauche sur le pied gauche, penché, selon le Rambam. La Torah en fait une loi perpétuelle, « pour qu'ils ne meurent pas », et un service accompli sans ce lavage est invalide. C'est le premier geste du tamid du matin : celui qui a gagné le retrait des cendres s'entend dire « garde-toi de toucher l'ustensile avant d'avoir sanctifié tes mains et tes pieds au Kiyor ». La visite pose ce cohen au sud du Kiyor, penché sur ses pieds.",
     "cotes": [
-      "135 × 135 amot",
-      "quatre lishkot de 40 amot aux angles, sans toit",
-      "quinze marches vers l'Ezrat Israël",
-      "interdite au tevoul yom"
+      "mains et pieds ensemble, penché",
+      "main droite sur le pied droit, main gauche sur le pied gauche",
+      "avant tout service : le premier geste du tamid",
+      "le Kiyor entre l'Oulam et l'autel, tiré vers le sud"
     ],
     "sources": [
-      {"oeuvre": "Middot", "ref": "2:5", "citation": "שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן"},
-      {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת נָשִׁים מְקֻדֶּשֶׁת מִמֶּנּוּ, שֶׁאֵין טְבוּל יוֹם נִכְנָס לְשָׁם"}
+      {"oeuvre": "Shemot", "ref": "30:19-21", "citation": "וְרָחֲצוּ אַהֲרֹן וּבָנָיו מִמֶּנּוּ אֶת יְדֵיהֶם וְאֶת רַגְלֵיהֶם… וְרָחֲצוּ יְדֵיהֶם וְרַגְלֵיהֶם וְלֹא יָמֻתוּ"},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "הִזָּהֵר שֶׁמָּא תִגַּע בַּכְּלִי, עַד שֶׁתְּקַדֵּשׁ יָדֶיךָ וְרַגְלֶיךָ מִן הַכִּיּוֹר"},
+      {"oeuvre": "Rambam Bi'at HaMikdash", "ref": "5:16", "citation": "מַנִּיחַ יָדוֹ הַיְמָנִית עַל גַּבֵּי רַגְלוֹ הַיְמָנִית וְיָדוֹ הַשְּׂמָאלִית עַל גַּבֵּי רַגְלוֹ הַשְּׂמָאלִית וְשׁוֹחֶה וּמְקַדֵּשׁ"},
+      {"oeuvre": "Zeva'him", "ref": "2:1", "citation": "כָּל הַזְּבָחִים שֶׁקִּבֵּל דָּמָן… שֶׁלֹּא רְחוּץ יָדַיִם וְרַגְלַיִם… פָּסָל"},
+      {"oeuvre": "Middot", "ref": "3:6", "citation": "הַכִּיּוֹר הָיָה בֵּין הָאוּלָם וְלַמִּזְבֵּחַ, וּמָשׁוּךְ כְּלַפֵּי הַדָּרוֹם"}
     ],
-    "note": "Prise de position du projet : les fidèles ne portent pas de costume d'époque. Ils sont vêtus comme leur communauté s'habille aujourd'hui pour Kippour — costume et chapeau, costume et talith, costume et kippa. C'est un parti pris, pas une reconstitution. La tenue des femmes, robe et foulard, et les gestes des figures sont aussi des choix."
+    "note": "Choix de la visite : la posture suit le Rambam à la lettre ; la Mishna ne la décrit pas. Sa place au sud du Kiyor, face à lui, est aussi un choix."
   },
+
+  "aliyat_hakevesh": {
+    "he": "העלייה בכבש",
+    "translit": "Aliyat hakevesh",
+    "resume": "On ne monte pas à l'autel par des marches — « tu ne monteras pas à mon autel par des degrés » — mais par le kevesh, la rampe de trente-deux amot sur seize adossée au sud de l'autel. Tous ceux qui montent à l'autel montent par la droite, en font le tour et redescendent par la gauche, hors trois services où l'on revient sur ses pas. La visite fait monter ce cohen par le côté est de la rampe et redescendre par l'ouest, en boucle.",
+    "cotes": [
+      "kevesh : 32 amot de long, 16 de large, au sud de l'autel",
+      "montée par la droite, descente par la gauche",
+      "jamais de marches"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "20:23", "citation": "וְלֹא תַעֲלֶה בְמַעֲלֹת עַל מִזְבְּחִי"},
+      {"oeuvre": "Middot", "ref": "3:3", "citation": "וְכֶבֶשׁ הָיָה לִדְרוֹמוֹ שֶׁל מִזְבֵּחַ, שְׁלֹשִׁים וּשְׁתַּיִם עַל רֹחַב שֵׁשׁ עֶשְׂרֵה"},
+      {"oeuvre": "Zeva'him", "ref": "6:3", "citation": "כָּל הָעוֹלִים לַמִּזְבֵּחַ, עוֹלִין דֶּרֶךְ יָמִין, וּמַקִּיפִין וְיוֹרְדִין דֶּרֶךְ שְׂמֹאל"}
+    ],
+    "note": "Choix de la visite : ce cohen monte les mains vides, pour montrer la rampe et son sens ; il ne porte ni membre ni ustensile."
+  },
+
+  "zerika": {
+    "he": "זריקת הדם",
+    "translit": "Zerikat hadam",
+    "resume": "Le sang du tamid, reçu dans le mizrak à l'égorgement, est porté au coin nord-est de l'autel, puis au coin sud-ouest : deux aspersions « qui en font quatre », chacune touchant deux faces de l'autel. Le reste du sang se verse sur le yessod sud. La visite pose ce cohen au coin nord-est, le mizrak à deux mains.",
+    "cotes": [
+      "coin nord-est, puis sud-ouest",
+      "deux aspersions qui en font quatre",
+      "reste du sang sur le yessod sud"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "4:1", "citation": "שָׁחַט הַשּׁוֹחֵט, וְקִבֵּל הַמְקַבֵּל. בָּא לוֹ לְקֶרֶן מִזְרָחִית צְפוֹנִית, וְנוֹתֵן מִזְרָחָה צָפוֹנָה. מַעֲרָבִית דְּרוֹמִית, וְנוֹתֵן מַעֲרָבָה דָרוֹמָה. שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִית"},
+      {"oeuvre": "Zeva'him", "ref": "5:4", "citation": "הָעוֹלָה, קָדְשֵׁי קָדָשִׁים, שְׁחִיטָתָהּ בַּצָּפוֹן… וְדָמָהּ טָעוּן שְׁתֵּי מַתָּנוֹת שֶׁהֵן אַרְבַּע"}
+    ],
+    "note": "Choix de la visite : le cohen tient le mizrak devant lui, entre deux aspersions ; la Mishna donne les coins et l'ordre, pas le geste. La forme du mizrak est aussi un choix."
+  },
+
+  "melihat_haevarim": {
+    "he": "מליחת האברים",
+    "translit": "Meli'hat haevarim",
+    "resume": "« Sur tout ton sacrifice tu offriras du sel. » Les neuf cohanim qui ont reçu les membres du tamid les portent au kevesh, les déposent sur sa moitié basse, du côté ouest, et les salent : c'est là qu'un tas de sel est posé sur la rampe. Les membres attendent ainsi pendant que les cohanim lisent le Shema dans la Lishkat HaGazit ; ils ne monteront sur le feu qu'après l'encens. La visite pose un cohen sur la rampe, une patte avant à la main, qui prend le sel et le répand.",
+    "cotes": [
+      "moitié basse du kevesh, côté ouest",
+      "le sel en trois lieux : la Lishkat HaMela'h, le kevesh, le sommet de l'autel",
+      "membres salés avant le Shema, brûlés après l'encens"
+    ],
+    "sources": [
+      {"oeuvre": "Lévitique", "ref": "2:13", "citation": "עַל כָּל קָרְבָּנְךָ תַּקְרִיב מֶלַח"},
+      {"oeuvre": "Tamid", "ref": "4:3", "citation": "הָלְכוּ וּנְתָנוּם מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ, וּמְלָחוּם. וְיָרְדוּ וּבָאוּ לָהֶם לְלִשְׁכַּת הַגָּזִית, לִקְרוֹת אֶת שְׁמַע"},
+      {"oeuvre": "Mena'hot", "ref": "21b", "citation": "בִּשְׁלֹשָׁה מְקוֹמוֹת הַמֶּלַח נְתוּנָה: בְּלִשְׁכַּת הַמֶּלַח, וְעַל גַּבֵּי הַכֶּבֶשׁ, וּבְרֹאשׁוֹ שֶׁל מִזְבֵּחַ"},
+      {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְכָךְ הָיוּ מוֹשִׁיטִין לוֹ שְׁאָר כָּל הָאֵבָרִין, וְהוּא סוֹמֵךְ עֲלֵיהֶן וְזוֹרְקָן"}
+    ],
+    "note": "Choix de la visite : un seul cohen et une seule patte, pour le geste ; la Mishna en met neuf en rang, chacun avec sa part — le deuxième porte les deux pattes avant."
+  },
+
+  "siddour_hamaarakha": {
+    "he": "סידור המערכה",
+    "translit": "Siddour hama'arakha",
+    "resume": "« Le cohen y fera brûler du bois, matin après matin. » Les cendres retirées, les cohanim montent les bûches sur l'autel pour dresser la grande ma'arakha, à l'est du foyer, sa face tournée vers l'est. Tout bois convient sauf l'olivier et la vigne ; on prenait d'ordinaire des branches de figuier, de noyer et de pin. La visite pose un cohen sur l'autel, une bûche dans les bras, qu'il abaisse vers le tas avant de se redresser.",
+    "cotes": [
+      "la grande ma'arakha à l'est de l'autel, face à l'est",
+      "tout bois sauf l'olivier et la vigne",
+      "figuier, noyer, pin"
+    ],
+    "sources": [
+      {"oeuvre": "Lévitique", "ref": "6:5", "citation": "וְהָאֵשׁ עַל הַמִּזְבֵּחַ תּוּקַד בּוֹ לֹא תִכְבֶּה וּבִעֵר עָלֶיהָ הַכֹּהֵן עֵצִים בַּבֹּקֶר בַּבֹּקֶר"},
+      {"oeuvre": "Tamid", "ref": "2:3", "citation": "הֵחֵלּוּ מַעֲלִין בְּגִזְרִין לְסַדֵּר אֵשׁ הַמַּעֲרָכָה… כָּל הָעֵצִים כְּשֵׁרִין לַמַּעֲרָכָה, חוּץ מִשֶּׁל זַיִת וְשֶׁל גֶּפֶן"},
+      {"oeuvre": "Tamid", "ref": "2:4", "citation": "סִדֵּר הַמַּעֲרָכָה גְדוֹלָה מִזְרָחָה, וַחֲזִיתָהּ מִזְרָחָה"}
+    ],
+    "note": "Choix de la visite : un cohen seul ; la Mishna dit « ils commencèrent à monter les bûches », au pluriel."
+  },
+
+  "hatavat_hanerot": {
+    "he": "הטבת הנרות",
+    "translit": "Hatavat hanerot",
+    "resume": "Celui qui a gagné le nettoyage de la Menora entre dans le Heikhal. S'il trouve les deux lampes de l'est allumées, il nettoie les cinq autres — mèches brûlées et cendres dans le kouz, huile et mèche neuves — et laisse celles-là ; il revient pour les deux dernières après l'encens. Devant la Menora, une pierre à trois marches sur laquelle il se tient ; il pose le kouz sur la deuxième. La visite pose ce cohen sur la marche haute de la pierre, penché sur les lampes ; le kouz attend sur la deuxième marche.",
+    "cotes": [
+      "cinq lampes, puis deux",
+      "le kouz posé sur la deuxième marche de la pierre",
+      "« en arrangeant les lampes » : le matin, avec l'encens"
+    ],
+    "sources": [
+      {"oeuvre": "Shemot", "ref": "30:7", "citation": "בְּהֵיטִיבוֹ אֶת הַנֵּרֹת יַקְטִירֶנָּה"},
+      {"oeuvre": "Tamid", "ref": "3:9", "citation": "מִי שֶׁזָּכָה בְדִשּׁוּן הַמְּנוֹרָה, נִכְנַס וּמָצָא שְׁנֵי נֵרוֹת מִזְרָחִיִּים דּוֹלְקִים, מְדַשֵּׁן אֶת הַשְּׁאָר… וְאֶבֶן הָיְתָה לִפְנֵי הַמְּנוֹרָה וּבָהּ שָׁלשׁ מַעֲלוֹת, שֶׁעָלֶיהָ הַכֹּהֵן עוֹמֵד וּמֵטִיב אֶת הַנֵּרוֹת. וְהִנִּיחַ אֶת הַכּוּז עַל מַעֲלָה שְׁנִיָּה וְיָצָא"},
+      {"oeuvre": "Tamid", "ref": "6:1", "citation": "נָטַל אֶת הַכּוּז מִמַּעֲלָה שְׁנִיָּה, וְהִשְׁתַּחֲוָה וְיָצָא"}
+    ],
+    "note": "Non modélisée : la pierre à trois marches devant la Menora ; le cohen se tient au sol, à l'est de la Menora, et n'atteint pas la lampe. La forme du kouz est un choix."
+  },
+
+  "tzoarei_haleviim": {
+    "he": "צוערי הלויים",
+    "translit": "Tzoarei haleviim",
+    "resume": "Un enfant lévi n'entre dans l'Azara pour le service qu'à l'heure où les Léviim se tiennent au chant ; il ne joue pas, il chante, « pour donner du piquant à la mélodie ». Selon R. Eliézer ben Yaakov, les enfants ne comptent pas dans les douze et ne montent pas sur le Doukhan : ils se tiennent à terre, la tête entre les jambes des Léviim, et on les appelait tzoarei haleviim. La visite en pose deux au pied du Doukhan, dans l'Ezrat Israël, deux amot et demie plus bas que leurs aînés.",
+    "cotes": [
+      "à terre, pas sur le Doukhan",
+      "hors du compte des douze",
+      "la voix seule, sans nevel ni kinor"
+    ],
+    "sources": [
+      {"oeuvre": "Arakhin", "ref": "2:6", "citation": "אֵין קָטָן נִכְנָס לָעֲזָרָה לַעֲבוֹדָה אֶלָּא בְשָׁעָה שֶׁהַלְוִיִּם עוֹמְדִים בַּשִּׁיר… רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, אֵין עוֹלִין לַמִּנְיָן, וְאֵין עוֹמְדִים עַל הַדּוּכָן, אֶלָּא בָאָרֶץ הָיוּ עוֹמְדִין, וְרָאשֵׁיהֶן מִבֵּין רַגְלֵי הַלְוִיִּם, וְצוֹעֲרֵי הַלְוִיִּם הָיוּ נִקְרָאִין"}
+    ],
+    "note": "Retenu : R. Eliézer ben Yaakov, comme pour le Doukhan lui-même. Selon le premier avis de la michna, les enfants se tiennent avec les Léviim. Choix de la visite : deux enfants, de part et d'autre de l'axe, en kutonet de lin comme les chanteurs."
+  },
+
+  "shomer_levi": {
+    "he": "שומר מן הלויים",
+    "translit": "Shomer",
+    "resume": "Les cohanim gardent le Temple en trois endroits, les Léviim en vingt et un : cinq aux cinq portes du Har HaBayit, quatre à ses angles intérieurs, cinq aux portes de l'Azara, quatre à ses angles extérieurs, et trois aux chambres. L'homme du Har HaBayit fait sa ronde, des torches devant lui ; le garde qu'il trouve endormi, il le frappe de son bâton, et il peut brûler son vêtement. La visite pose un Lévi hors de la porte de Nikanor, sur les degrés, tourné vers l'Ezrat Nashim.",
+    "cotes": [
+      "vingt et un postes de Léviim",
+      "cinq aux portes de l'Azara",
+      "la ronde de l'homme du Har HaBayit"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "1:1", "citation": "וְהַלְוִיִּם בְּעֶשְׂרִים וְאֶחָד מָקוֹם. חֲמִשָּׁה, עַל חֲמִשָּׁה שַׁעֲרֵי הַר הַבַּיִת. אַרְבָּעָה, עַל אַרְבַּע פִּנּוֹתָיו מִתּוֹכוֹ. חֲמִשָּׁה, עַל חֲמִשָּׁה שַׁעֲרֵי הָעֲזָרָה. אַרְבָּעָה, עַל אַרְבַּע פִּנּוֹתֶיהָ מִבַּחוּץ"},
+      {"oeuvre": "Middot", "ref": "1:2", "citation": "אִישׁ הַר הַבַּיִת הָיָה מְחַזֵּר עַל כָּל מִשְׁמָר וּמִשְׁמָר, וַאֲבוּקוֹת דּוֹלְקִין לְפָנָיו… נִכָּר שֶׁהוּא יָשֵׁן, חוֹבְטוֹ בְמַקְלוֹ"},
+      {"oeuvre": "Tamid", "ref": "1:1", "citation": "בִּשְׁלשָׁה מְקוֹמוֹת הַכֹּהֲנִים שׁוֹמְרִים בְּבֵית הַמִּקְדָּשׁ. בְּבֵית אַבְטִינָס, בְּבֵית הַנִּיצוֹץ וּבְבֵית הַמּוֹקֵד"}
+    ],
+    "note": "Choix de la visite : la porte de Nikanor pour ce poste, l'un des cinq ; la garde de la Mishna est de nuit, et la visite le montre de jour. Sa kutonet de lin est un choix, comme pour les chanteurs."
+  },
+
+  "anshei_maamad": {
+    "he": "אנשי המעמד",
+    "translit": "Anshei ma'amad",
+    "resume": "« Comment le korban d'un homme peut-il être offert sans qu'il se tienne auprès ? » Les premiers prophètes ont institué vingt-quatre gardes, et pour chaque garde de cohanim un ma'amad à Jérusalem, de cohanim, de Léviim et d'Israélites : les Israélites du ma'amad montent se tenir auprès du tamid, au nom de tout Israël. Leur place est l'Ezrat Israël, la bande de onze amot à l'est de l'Ezrat Cohanim, qu'ils ne franchissent que pour la semikha, la she'hita et la tenoufa. La visite en pose deux, tournés vers l'autel, l'un enveloppé du talith.",
+    "cotes": [
+      "Ezrat Israël : onze amot de large sur les 135 de la cour",
+      "vingt-quatre ma'amadot, un par garde",
+      "l'Ezrat Cohanim ne se franchit que pour semikha, she'hita et tenoufa"
+    ],
+    "sources": [
+      {"oeuvre": "Ta'anit", "ref": "4:2", "citation": "וְכִי הֵיאַךְ קָרְבָּנוֹ שֶׁל אָדָם קָרֵב, וְהוּא אֵינוֹ עוֹמֵד עַל גַּבָּיו… עַל כָּל מִשְׁמָר וּמִשְׁמָר הָיָה מַעֲמָד בִּירוּשָׁלַיִם שֶׁל כֹּהֲנִים, שֶׁל לְוִיִּם, וְשֶׁל יִשְׂרְאֵלִים"},
+      {"oeuvre": "Middot", "ref": "5:1", "citation": "מְקוֹם דְּרִיסַת יִשְׂרָאֵל אַחַת עֶשְׂרֵה אַמָּה, מְקוֹם דְּרִיסַת הַכֹּהֲנִים אַחַת עֶשְׂרֵה אַמָּה"},
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת הַכֹּהֲנִים מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין יִשְׂרָאֵל נִכְנָסִים לְשָׁם אֶלָּא בִשְׁעַת צָרְכֵיהֶם, לִסְמִיכָה לִשְׁחִיטָה וְלִתְנוּפָה"}
+    ],
+    "note": "Prise de position du projet : les fidèles ne portent pas de costume d'époque mais ce que leur communauté porte aujourd'hui pour Kippour — costume et talith, costume et kippa. C'est un parti pris, pas une reconstitution. Les gestes sont aussi des choix."
+  },
+
 
   "kotel": {
     "he": "הכותל המערבי",

@@ -661,7 +661,7 @@
   "lishkat_hagola": {
     "he": "לשכת הגולה",
     "translit": "Lishkat HaGola",
-    "resume": "La chambre du puits. Un bassin y est creusé, une roue posée dessus, et c'est de là qu'on alimente en eau toute l'Azara. Deuxième des trois lishkot du nord, entre la Lishkat HaGazit à l'est et la Lishkat HaEtz, en second rang derrière elles ; le toit des trois est de même niveau.",
+    "resume": "La chambre du puits. Un bassin y est creusé, une roue posée dessus, et c'est de là qu'on alimente en eau toute l'Azara. Deuxième des trois lishkot du nord, dans la cour, contre le mur, à l'ouest de la Lishkat HaGazit et devant la Lishkat HaEtz ; le toit des trois est de même niveau.",
     "cotes": [
       "au nord, contre le mur, à l'ouest de la Lishkat HaGazit",
       "un unique petah qui perce le mur et ouvre sur l'Azara",
@@ -672,7 +672,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:4", "citation": "שבדרום. נ\"א שבצפון והכי מייתי לה בפ\"ק דיומא דף י\"ט"}
     ],
-    "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Son ouverture dans le mur n'est pas une huitième porte de l'Azara : Middot 1:4 ne compte que les portes. Choix de la visite : cet unique petah, qui perce le mur et ouvre sur l'Azara, la margelle et la roue du puits."
+    "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Retenu aussi : la disposition que Tosfot Yom Tov (Middot 5:4) tire de « derrière les deux » — HaGazit devant, à l'est ; HaGola derrière elle, côté cour ; HaEtz derrière HaGola, dos au nord. Choix de la visite : la chambre dans la cour, comme les trois du sud, sa porte au sud sur l'Azara, la margelle et la roue du puits."
   },
 
   "lishkat_haetz": {
@@ -692,7 +692,7 @@
       {"oeuvre": "Bartenura", "ref": "Middot 5:4", "citation": "אוֹתָהּ לִשְׁכַּת הָעֵץ הִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל. וְהִיא לִשְׁכַּת פַּרְהֶדְרִין"},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:4", "citation": "כתב הר\"ב לשכת פרהדרין כו'. הכי מסיק בגמ' פ\"ק דיומא דף י\"ט"}
     ],
-    "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Choix de la visite : la chambre est posée en second rang derrière les deux autres, hors du mur, et sa porte est dessinée pour la visite. Écarté : l'identification à la chambre du Cohen Gadol. Abba Shaul (Middot 5:4) dit que c'était sa chambre ; Yoma 19a y voit l'une de ses deux chambres, Parhedrin ou Avtinas, sans trancher ; Bartenura (Middot 5:4) et le Rambam (Beit HaBe'hira 5:17) l'identifient à la Lishkat Parhedrin. La visite place la Lishkat Parhedrin au sud, comme une chambre distincte."
+    "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Retenu aussi : la disposition que Tosfot Yom Tov (Middot 5:4) tire de « derrière les deux » — HaGazit devant, à l'est ; HaGola derrière elle, côté cour ; HaEtz derrière HaGola, dos au nord, donc de l'autre côté du mur, sur la terrasse du 'Heil. Choix de la visite : sa porte, sur le 'Heil. Écarté : l'identification à la chambre du Cohen Gadol. Abba Shaul (Middot 5:4) dit que c'était sa chambre ; Yoma 19a y voit l'une de ses deux chambres, Parhedrin ou Avtinas, sans trancher ; Bartenura (Middot 5:4) et le Rambam (Beit HaBe'hira 5:17) l'identifient à la Lishkat Parhedrin. La visite place la Lishkat Parhedrin au sud, comme une chambre distincte."
   },
 
   "lishkat_hamelach": {

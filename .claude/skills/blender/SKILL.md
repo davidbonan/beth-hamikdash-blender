@@ -211,15 +211,17 @@ Toute cuisson — ciblée (`--recuire`) ou complète (`--lumiere tout`) — pass
 ## Les figurants
 
 `beit_hamikdash_figures.py` lit le .blend et écrit `visite/figures.glb` et `visite/figures.json`
-(emprises et vues de `cohanim`, `leviim`, `fideles`, que la visite ajoute à `reperes.json`).
+(emprises et vues, une par rôle plus les familles `cohanim` et `leviim`, que la visite ajoute à `reperes.json`).
+Chaque rôle porte le nom de son concept — `kiddoush_yadayim`, `zerika`, `leviim_3`, `anshei_maamad_1` — et
+c'est par ce nom que la visite ouvre sa fiche au clic.
 Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                         # les 22 rôles, une douzaine de minutes
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- cohanim_1 fideles_3   # un essai
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                         # les 23 rôles, un quart d'heure
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- zerika leviim_3      # un essai
 ```
 
-Un essai réécrit `figures.glb` avec ses seuls rôles : relancer les 22 avant de committer.
+Un essai réécrit `figures.glb` avec ses seuls rôles : relancer les 23 avant de committer.
 Rôles, places et gestes se déclarent dans `roles()`.
 
 Corps, peaux, yeux, cheveux, barbes et vêtements viennent de MakeHuman (extension MPFB) : la

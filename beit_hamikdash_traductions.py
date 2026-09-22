@@ -81,6 +81,16 @@ def ecarts_textes(textes, langue):
     return ecarts
 
 
+def ecarts_parcours(langue):
+    ecarts = []
+    for parcours in (lire("parcours.json") or {}).get("parcours", []):
+        if not parcours.get("titre", {}).get(langue):
+            ecarts.append(f"parcours.json {parcours['id']} : « titre » manquant en {langue}")
+        ecarts += [f"parcours.json {parcours['id']}/{s['id']} : « {clef} » manquant en {langue}"
+                   for s in parcours.get("stations", []) for clef in ("titre", "texte") if not s.get(clef, {}).get(langue)]
+    return ecarts
+
+
 def main():
     textes = lire("textes.json")
     if textes is None:
@@ -88,6 +98,7 @@ def main():
     ecarts = []
     for langue in textes:
         ecarts += ecarts_textes(textes, langue)
+        ecarts += ecarts_parcours(langue)
         if langue != "fr":
             ecarts += ecarts_contenus(langue)
     for ecart in ecarts:

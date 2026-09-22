@@ -121,7 +121,13 @@ node "$visite" https://bethhamikdach.com/visite/ [capture.png]
 `--mobile` passe en 390 × 844 tactile. `--planche <dossier>` capture en plus chaque
 entrée et chaque vue de `reperes.json` puis assemble `planche.html` et `planche.jpg` :
 c'est la vérification des cadrages après toute retouche de `beit_hamikdash_visite.py`
-(`--seulement id,id` pour n'en refaire que quelques-unes).
+(`--seulement id,id` pour n'en refaire que quelques-unes). `--parcours <dossier>` suit
+chaque parcours guidé de `parcours.json` (`--seulement tamid` pour un seul) : une capture
+par station dans `<dossier>/<parcours>/`, et chaque marche jouée à la main, au rayon —
+`SOL PERDU` (code 1) quand un point de passage manque un escalier et que l'œil n'arrive
+plus à la hauteur du dallage déclaré — à pas fin (1/30 s) comme à grands pas (0,4 s, l'image
+de 0,1 s à l'allure ×4, `ecartVite`) —, `MUR TRAVERSE` ou `MUR FROLE` quand le pas coupe
+un mur ou passe à moins de 0,3 m de lui, avec le concept touché et le point en amot.
 
 Il répond `scene prete` et la pose de la caméra (code 0), ou `BLOQUE :` précédé de ce
 qui a manqué — 404 d'asset, erreur de module (code 1). Une capture atterrit dans le

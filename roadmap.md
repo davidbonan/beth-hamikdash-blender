@@ -10,15 +10,17 @@ constate, ce qu'on touche, et comment on saura que c'est fait.
 
 ## Majeur
 
-### 3. Parcours narré — `backlog`
+### 3. Parcours narré — `done`
 - **Constat.** Visite libre sans fil : le visiteur atterrit face à la porte est et ne sait ni où aller ni pourquoi. Le mp3 de `audio/` (Ishay Ribo, Seder HaAvoda) n'est utilisé nulle part.
 - **Touche.** Nouveau module `visite/parcours.js` : liste de stations `{ entree, concept, texte }` dans un `parcours.json` traduit comme `textes.json`. Entre deux stations, le pilote automatique existant (`cible` dans `vitesseVoulue`, `visite/visite.js`) marche à pied ; à l'arrivée, `montrer(concept)` ouvre la fiche et un bouton « Suivant » apparaît dans la barre. Premier parcours : le Tamid du matin (Tamid 1–7), du Beit HaMoked au Doukhan, 8 à 10 stations.
 - **Fait quand.** Un visiteur qui ne touche que « Suivant » traverse le Temple dans l'ordre du service et lit une fiche à chaque arrêt.
+- **Fait.** `visite/parcours.js` + `parcours.json`, neuf stations du Beit HaMoked à l'Ezrat Israël, puis le seder ha'avoda de Yom Kippour en douze stations (Lishkat Parhedrin, Sha'ar HaMayim, Beit HaParva, le taureau, le sort, la ma'hta, le Kodesh HaKodashim, la parokhet, l'autel d'or, le bouc émissaire, la lecture dans l'Ezrat Nashim, retour au Beit HaParva) ; menu « Parcours… » dans la barre, allure ×1 / ×2 / ×4 sur la carte. La marche reprend la polyligne du cinéma (points de passage autour de l'autel, sol sondé) plutôt que le pilote automatique, qui ne contourne rien ; « Suivant » pendant la marche saute à l'arrivée. Pas de son.
 
 ### 4. Échelle humaine — `done`
 - **Constat.** `FOULE = False` dans le blockout (README:590) : ni cohanim ni peuple. Rien ne dit que l'Oulam fait 100 amot de haut ou que l'autel dépasse deux hommes.
 - **Touche.** Une poignée de silhouettes statiques exportées avec le glb : deux cohanim au Kiyor, un au kevesh, des Léviim sur le Doukhan, quelques figures dans l'Ezrat Nashim. Concept `figures` dans `concepts.json`, non interrogeable ou avec une fiche « ce que portent les cohanim » (Bigdei Kehouna, sources Shemot 28). Attention à la modélisation, ça ne doit pas juste ressembler à des cubes et ronds empilés mais à des figures réalistes.
 - **Fait quand.** Capture depuis l'Ezrat Israël : une silhouette au pied de l'autel donne l'échelle sans qu'on ait à lire une cote.
+- **Repris.** Plus de passants : chaque figurant fait un geste du tamid à la place que la Mishna lui donne, et porte sa propre fiche (un rôle = un concept). Les fidèles de l'Ezrat Nashim sont devenus deux anshei ma'amad dans l'Ezrat Israël (Ta'anit 4:2).
 
 ## Mineur
 
