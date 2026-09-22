@@ -250,7 +250,7 @@ function vaciller(dt) {
 }
 
 // L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
-const MENORA = { couleur: 0xffb36b, intensite: 150, portee: 18, carte: 512 };
+const MENORA = { couleur: 0xffe1aa, intensite: 150, portee: 18, carte: 512 };
 // Une flamme d'huile d'olive sur mèche de lin : quatre centimètres, le pied bleu, le coeur
 // blanc, le manteau orangé qui s'efface vers la pointe. Additive, sans profondeur écrite.
 const PROFIL_FLAMME = [[0, -0.003], [0.0035, 0.0], [0.0068, 0.007], [0.0075, 0.013],

@@ -5,13 +5,17 @@
  * course, et trois gestes — regarder, interroger, s'y rendre. Rien ici ne connaît la
  * scène ; la marche, ses collisions et le regard restent dans visite.js.
  *
- * Au doigt, la moitié gauche de l'écran est un manche qui naît sous le pouce : un
- * manche posé d'avance oblige à viser un cercle qu'on ne regarde pas. La moitié
- * droite tourne la tête. Un appui bref reste un appui bref des deux côtés, sans quoi
- * la moitié gauche du Temple ne s'interrogerait plus.
+ * Au doigt, le bas gauche de l'écran est un manche qui naît sous le pouce : un
+ * manche posé d'avance oblige à viser un cercle qu'on ne regarde pas. Tout le reste
+ * tourne la tête ; couché, le pouce gauche monte plus haut et le manche avec. Un appui
+ * bref reste un appui bref des deux côtés, sans quoi la moitié gauche du Temple ne
+ * s'interrogerait plus.
  */
-const SENSIBILITE = { mouse: 0.0022, pen: 0.0022, touch: 0.0034 };
+const SENSIBILITE = { mouse: 0.0022, pen: 0.0022 };
+// Au doigt, un glissé d'un bord à l'autre fait demi-tour, que le téléphone soit debout ou couché.
+const sensibilite = (type) => type === "touch" ? Math.PI / innerWidth : SENSIBILITE[type] ?? SENSIBILITE.mouse;
 const ZONE_MANCHE = 0.46;      // fraction gauche de l'écran
+const ZONE_MANCHE_DEBOUT = 0.5; // fraction basse de l'écran, téléphone debout
 const RAYON = 58;              // px : la course du pouce
 const MORT = 0.14;             // en deçà, le pouce n'a pas encore décidé
 const POUSSEE = 1.32;          // pousser au-delà du cercle, c'est courir
@@ -54,14 +58,13 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
   const bouton = cercle.firstElementChild;
   const manche = { long: 0, lat: 0, course: false };
 
+  // Le cercle est là où le pouce s'est posé, même à cheval sur le bord : recentré, il
+  // décalerait le zéro du geste et un pouce qui pousse droit devant partirait de côté.
   function poserManche(x, y) {
-    const marge = RAYON + 14;
-    const cx = borner(x, marge, innerWidth - marge), cy = borner(y, marge, innerHeight - marge);
-    cercle.style.left = `${cx}px`;
-    cercle.style.top = `${cy}px`;
+    cercle.style.left = `${x}px`;
+    cercle.style.top = `${y}px`;
     bouton.style.transform = "translate(-50%, -50%)";
     cercle.classList.add("vu");
-    return { cx, cy };
   }
 
   function bougerManche(dx, dy) {
@@ -123,15 +126,17 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
     interroger(x, y);
   }
 
+  const sousLePouceGauche = (x, y) =>
+    x < innerWidth * ZONE_MANCHE && (innerWidth > innerHeight || y > innerHeight * ZONE_MANCHE_DEBOUT);
+
   toile.addEventListener("pointerdown", (e) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     const g = { role: null, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY,
                 t: performance.now(), parcours: 0 };
-    if (e.pointerType === "touch" && idManche === null && e.clientX < innerWidth * ZONE_MANCHE) {
+    if (e.pointerType === "touch" && idManche === null && sousLePouceGauche(e.clientX, e.clientY)) {
       idManche = e.pointerId;
       g.role = "manche";
-      const { cx, cy } = poserManche(e.clientX, e.clientY);
-      g.x0 = cx; g.y0 = cy;
+      poserManche(e.clientX, e.clientY);
     } else if (idRegard === null) {
       idRegard = e.pointerId;
       g.role = "regard";
@@ -156,7 +161,7 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
     g.x = e.clientX; g.y = e.clientY;
     g.parcours += Math.abs(dx) + Math.abs(dy);
     if (g.role === "regard") {
-      const s = SENSIBILITE[e.pointerType] ?? SENSIBILITE.mouse;
+      const s = sensibilite(e.pointerType);
       regarder(dx * s, dy * s);
     } else {
       bougerManche(e.clientX - g.x0, e.clientY - g.y0);
