@@ -3612,21 +3612,18 @@ PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -12       # nord, ouest ->
 # פָּתוּחַ בַּחוֹל » (Yoma 25a ; Rambam, Beit HaBe'hira 5:17). Elle enjambe
 # le mur, qui s'interrompt sur sa largeur. Ce ne sont pas des portes de plus : Middot 1:4
 # compte sept **שערים**, et Yoma 25a appelle celles-ci des פתחים.
-# La Lishkat HaGola, bâtie derrière le mur, le perce : « וּמִשָּׁם מַסְפִּיקִים מַיִם לְכָל
-# הָעֲזָרָה » (Middot 5:4) — une chambre qui alimente toute la cour s'ouvre sur elle.
 # Les x du groupe du nord (Gazit, Gola, HaEtz) sont un CHOIX : voir plus bas, c'est la
-# seule portée de mur assez longue pour les trois. HaGazit est la plus orientale, les
+# seule portée de mur assez longue pour les deux corps. HaGazit est la plus orientale, les
 # lishkot se comptant d'est en ouest (Tosfot Yom Tov sur Middot 5:3, « מִדְּלֹא תְּנַן הָכָא
 # סְמוּכִין לַמַּעֲרָב… שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה »).
 GAZIT_X0, GAZIT_X1 = -158, -138
 GOLA_X0, GOLA_X1 = -182, -162
 MOKED_X0, MOKED_X1 = PORTE_MOKED - 10, PORTE_MOKED + 10
-PETAH_GOLA = (GOLA_X0 + GOLA_X1) / 2
 # Le Beit HaMoked et la Lishkat HaGazit enjambent le mur : il s'interrompt sur leur
 # largeur, et leurs baies sont dans leurs propres faces. Un mur qui les traverserait en
 # ferait deux culs-de-sac de dix amot.
 TRAVERSEES = {"nord": [(MOKED_X0, MOKED_X1), (GAZIT_X0, GAZIT_X1)], "sud": []}
-OUVERTURES = {"nord": [PORTE_KORBAN, PORTE_NITZOTZ, PETAH_GOLA],
+OUVERTURES = {"nord": [PORTE_KORBAN, PORTE_NITZOTZ],
               "sud": [PORTE_MAYIM, PORTE_BEKHOROT, PORTE_DELEK]}
 for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
     ouvertures = OUVERTURES[nm]
@@ -3643,22 +3640,20 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
         box(f"Azara_porte_{nm}_{p:+.0f}_linteau", p - 5, p + 5, y0, y1,
             Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
         # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
-        # ouverts dès l'aube (Tamid 3:7). Le פתח de HaGola n'en est pas un.
+        # ouverts dès l'aube (Tamid 3:7).
         shaar(f"Azara_porte_{nm}_{p:+.0f}", ("x", *face), p, Z_AZ, SOUS_CORNICHE, T,
-              "20_Azara", metal=None if p == PETAH_GOLA else MAT_OR())
-        if p != PETAH_GOLA:
-            battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
-                     Z_AZ, 20, "20_Azara", MAT_OR())
+              "20_Azara", metal=MAT_OR())
+        battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
+                 Z_AZ, 20, "20_Azara", MAT_OR())
 SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du Beit Avtinas
+SAILLIE_INT = 10      # profondeur des corps bâtis DANS la cour, contre le mur. Au-delà, au sud,
+                      # le débord du socle mordrait sur le pied du kevesh : Rambam, Beit HaBe'hira
+                      # 5:15, « וּבֵין הַכֶּבֶשׁ וּלְכֹתֶל דְּרוֹמִי י"ב אַמָּה וּמֶחֱצָה ».
 AXE_MUR_N = AY1 + T / 2
 NORD_Y1 = AY1 + T + SAILLIE
 NORD_Y0 = 2 * AXE_MUR_N - NORD_Y1     # symétrique du précédent par rapport à l'axe du mur
-# Second rang : la Lishkat HaEtz est « אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), donc en retrait
-# derrière HaGazit et HaGola. C'est la seule chose de tout le pourtour qui sorte des
-# douze amot de saillie, et c'est elle qui fixe désormais où se pose le soreg.
-ETZ_Y0 = NORD_Y1 + ECART_LISHKA
-ETZ_Y1 = ETZ_Y0 + SAILLIE
-POURTOUR_Y1 = ETZ_Y1 + LISHKA_DEBORD   # la face bâtie la plus saillante du complexe
+NORD_INT = (AY1 - SAILLIE_INT, AY1)   # la Lishkat HaGola, dans la cour comme les trois du sud
+POURTOUR_Y1 = NORD_Y1 + LISHKA_DEBORD   # la face bâtie la plus saillante du complexe, corps de porte compris
 # Ezrat Israël → Ezrat Kohanim (Middot 2:6, R. Eliezer ben Yaakov) : « מַעֲלָה גְבוֹהָה אַמָּה
 # וְהַדּוּכָן נָתוּן עָלֶיהָ וּבוֹ שָׁלֹשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה, נִמְצֵאת עֶזְרַת כֹּהֲנִים גְּבוֹהָה
 # מֵעֶזְרַת יִשְׂרָאֵל שְׁתֵּי אַמּוֹת וּמֶחֱצָה ». Une volée qui monte vers l'ouest, sur toute la largeur :
@@ -3807,11 +3802,15 @@ box("Beit_HaMoked_rashei_pispasin", MK_X0 + KITON_L + CLOISON, MK_X1 - KITON_L -
     AXE_MUR_N - 0.1, AXE_MUR_N + 0.1, Z_AZ, Z_AZ + 0.03, "80_Lishkot", MAT_MARBRE())
 # --- Les trois lishkot du nord (Middot 5:3-4 ; Rambam, Beit HaBe'hira 5:17) : HaGazit,
 #     HaGola, HaEtz, « וְגַג שְׁלָשְׁתָּן שָׁוֶה » — un seul niveau de toit pour les trois, à 30
-#     au-dessus de l'Azara. Le groupe demande 44 amot de mur continu, et la portée à
-#     l'ouest de Sha'ar HaNitzotz est la seule qui les offre : à l'est, les escaliers de
+#     au-dessus de l'Azara. Leur disposition est celle que Tosfot Yom Tov (Middot 5:4,
+#     d'après Shiltei HaGiborim) tire de « אֲחוֹרֵי שְׁתֵּיהֶן » : HaGazit à l'est, devant les
+#     deux autres ; HaGola et HaEtz derrière elle, l'une DANS la cour — « שֵׁשׁ לְשָׁכוֹת הָיוּ
+#     בָעֲזָרָה » (5:3) —, l'autre au nord, dos au 'Heil — « לִשְׁכַּת הַגּוֹלָה לְדָרוֹם… וְלִשְׁכַּת הָעֵץ
+#     בְּצָפוֹן… נִמְצָא שֶׁלִּשְׁכַּת הָעֵץ אֲחוֹרֶיהָ לְצָפוֹן ». Le mur nord passe entre les deux, comme
+#     il passe au milieu de HaGazit. Le groupe demande 44 amot de mur continu, et la portée
+#     à l'ouest de Sha'ar HaNitzotz est la seule qui les offre : à l'est, les escaliers de
 #     Sha'ar HaKorban et le Beit HaMoked ne laissent que 37,5. Aucune source ne donne
-#     ces x (CHOIX) ; l'ORDRE, lui, est tenu — d'est en ouest, HaGazit puis HaGola,
-#     HaEtz en second rang.
+#     ces x (CHOIX) ; l'ORDRE, lui, est tenu — d'est en ouest, HaGazit puis HaGola.
 #     OUVERT — le nord des trois suit la girsa de Yoma 19a, celle du Rambam et la
 #     préférence de Tosfot Yom Tov sur Middot 5:3 (« ונראה בעיני שגירסת הספר נשתבשה »),
 #     contre le texte imprimé de Middot 5:4 qui les met au SUD. Mais le même Rambam
@@ -3820,9 +3819,8 @@ box("Beit_HaMoked_rashei_pispasin", MK_X0 + KITON_L + CLOISON, MK_X1 - KITON_L -
 #     DEUX lishkot — ce que Yoma 19a laisse ouvert (« וְלֹא יָדַעְנָא » laquelle est au nord,
 #     laquelle au sud) — et non que Parhedrin = HaEtz.
 # Lishkat HaGazit, même parti que le Beit HaMoked : à cheval, la salle au niveau de la cour,
-# un פתח sur le sacré et un sur le 'hol (Yoma 25a). Celui du 'hol ne peut pas être au nord,
-# où la Lishkat HaEtz, « אֲחוֹרֵי שְׁתֵּיהֶן », est à une ama de son socle : il est à l'est, et
-# ses degrés descendent dans les cinq amot qui la séparent de Sha'ar HaNitzotz. CHOIX,
+# un פתח sur le sacré et un sur le 'hol (Yoma 25a). Celui du 'hol est à l'est, et ses
+# degrés descendent dans les cinq amot qui la séparent de Sha'ar HaNitzotz. CHOIX,
 # comme sa cote.
 PETAH_HOL_GAZIT = (4, 8)
 lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot",
@@ -4072,22 +4070,19 @@ for rang in range(3):
     box(f"{nom}_assise", SANHEDRIN_X - 4, SANHEDRIN_X + 4, y1 - 0.8, y1, Z_AZ + 0.68, Z_AZ + 0.85,
         "80_Lishkot", MAT_MARBRE())
 # Lishkat HaGola : « שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם
-# לְכָל הָעֲזָרָה » (Middot 5:4). Elle alimente la cour, elle s'ouvre donc dessus, et son
-# unique פתח perce le mur nord — pas une porte de plus au compte de Middot 1:4.
-# Elle reste posée sur la terrasse du 'Heil, sans enjamber la limite du sacré : rien ne
-# le dit d'elle, et ce n'est pas nécessaire. Bâtie dans le 'hol mais ouverte au קדש, son
-# intérieur est sanctifié et son toit ne l'est pas (Tosfot Yom Tov sur Middot 5:3,
-# d'après Maaser Sheni 3:8 : « גגותיהן לא נתקדשו כלל, אע"פ שתוכן קדש כשפתוחות לקדש »).
-# Sans conséquence pour un puits ; décisif pour le Beit HaParva, plus bas.
-lishka("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot", [],
-       adossee="S")
-maake("Lishkat_HaGola", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_AZ + 30, "80_Lishkot")
-# Le בּוֹר au milieu du sol que la cour prolonge par le פתח, et le גַּלְגַּל posé dessus :
-# margelle, potence et roue sur le modèle du mukhni du Kiyor, formes CHOIX.
-BOR_X, BOR_Y = PETAH_GOLA, (AY1 + T + NORD_Y1 - LISHKA_PAREMENT) / 2
-dalle_percee("Lishkat_HaGola_sol", GOLA_X0 + LISHKA_PAREMENT, GOLA_X1 - LISHKA_PAREMENT, AY1 + T,
-             NORD_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL(),
-             [(BOR_X - 1.5, BOR_X + 1.5, BOR_Y - 1.5, BOR_Y + 1.5)])
+# לְכָל הָעֲזָרָה » (Middot 5:4). Elle alimente la cour et s'ouvre dessus : DANS l'Azara,
+# contre la face intérieure du mur nord, comme les trois du sud — « שֵׁשׁ לְשָׁכוֹת הָיוּ
+# בָעֲזָרָה » (Middot 5:3), et Tosfot Yom Tov (5:4) la met au sud de HaEtz, côté cour.
+# Porte au sud, sur la cour (PORTE_LISHKA, CHOIX). Derrière le Kodesh HaKodashim, la bande
+# entre le mur et le Bâtiment n'est pas le « nord » de l'abattage, qui s'arrête au mur de
+# l'Oulam (Rambam, Beit HaBe'hira 5:15) : dix amot de profondeur n'y gênent rien.
+lishka("Lishkat_HaGola", GOLA_X0, GOLA_X1, *NORD_INT, Z_AZ, Z_AZ + 30, "80_Lishkot",
+       [Porte("S", *PORTE_LISHKA, Z_AZ)], adossee="N")
+maake("Lishkat_HaGola", GOLA_X0, GOLA_X1, *NORD_INT, Z_AZ + 30, "80_Lishkot")
+# Le בּוֹר au milieu du sol, creusé dans le dallage et le podium (VIDES_SOUS_AZARA), et le
+# גַּלְגַּל posé dessus : margelle, potence et roue sur le modèle du mukhni du Kiyor, formes CHOIX.
+BOR_X, BOR_Y = (GOLA_X0 + GOLA_X1) / 2, (NORD_INT[0] + LISHKA_PAREMENT + NORD_INT[1]) / 2
+BOR = (BOR_X - 1.5, BOR_X + 1.5, BOR_Y - 1.5, BOR_Y + 1.5)
 cyl("Lishkat_HaGola_bor_eau", BOR_X, BOR_Y, Z_EZN, Z_EZN + 2, 1.5, "80_Lishkot", MAT_EAU(), verts=24)
 revolution("Lishkat_HaGola_bor_margelle", BOR_X, BOR_Y, Z_AZ,
            [(2.4, 0.0), (2.4, 1.1), (2.2, 1.3), (1.4, 1.3), (1.2, 1.1), (1.2, -0.3)],
@@ -4114,7 +4109,7 @@ cyl_between("Lishkat_HaGola_galgal_corde", (BOR_X + 0.9, BOR_Y, GALGAL_Z), (BOR_
 revolution("Lishkat_HaGola_dli", BOR_X - 1.7, BOR_Y, Z_AZ + 1.3,
            [(0.0, 0.0), (0.3, 0.0), (0.36, 0.6), (0.32, 0.6), (0.26, 0.05), (0.0, 0.05)],
            "80_Lishkot", MAT_CHENE(), verts=16)
-GL_X0, GL_Y0, GL_Y1 = GOLA_X0 + LISHKA_PAREMENT, AY1 + T, NORD_Y1 - LISHKA_PAREMENT
+GL_X0, GL_Y0, GL_Y1 = GOLA_X0 + LISHKA_PAREMENT, NORD_INT[0] + LISHKA_PAREMENT, NORD_INT[1]
 SHOKET = (GL_X0 + 0.25, GL_X0 + 1.15, GL_Y0 + 1.75, GL_Y1 - 1.75)
 dalle_trouee("Lishkat_HaGola_shoket", GL_X0, GL_X0 + 1.4, GL_Y0 + 1.5, GL_Y1 - 1.5, Z_AZ, Z_AZ + 1.3,
              SHOKET, "80_Lishkot")
@@ -4123,17 +4118,16 @@ for k in range(4):
     revolution(f"Lishkat_HaGola_kad_{k}", GL_X0 + 2.2, GL_Y0 + 2 + 1.6 * k, Z_AZ,
                [(0.0, 0.0), (0.22, 0.0), (0.35, 0.4), (0.3, 0.75), (0.12, 0.95), (0.15, 1.02), (0.0, 1.0)],
                "80_Lishkot", MAT_TERRE_CUITE(), verts=14)
-# Lishkat HaEtz, en second rang : « וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4), sur la
-# largeur des deux autres. Elle ne tient pas dans l'Azara : à son droit, entre le mur nord
-# et le Heikhal, il reste 32,5 amot (70 de corps, Middot 4:7), et cette bande est le
-# « nord » de l'abattage, le Beit HaMitba'haïm à l'est — pas de quoi loger un corps
-# derrière un autre. Elle est donc entière dans le 'hol, ce que la Mishna ne dit pas d'elle
-# (« שֵׁשׁ לְשָׁכוֹת הָיוּ בָעֲזָרָה », Middot 5:3) : c'est le prix du second rang, et il est
-# écrit ici. R. Eliezer ben Yaakov : « שָׁכַחְתִּי מֶה הָיְתָה מְשַׁמֶּשֶׁת » — sans usage connu,
-# pas d'ouverture connue non plus ; CHOIX, une porte sur le 'Heil.
-lishka("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1,
-       Z_EZN, Z_AZ + 30, "80_Lishkot", [Porte("N", *PORTE_LISHKA, Z_EZN)])
-maake("Lishkat_HaEtz", GOLA_X0, GAZIT_X1, ETZ_Y0, ETZ_Y1, Z_AZ + 30, "80_Lishkot")
+# Lishkat HaEtz, « וְהִיא הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן » (Middot 5:4) : derrière HaGola, dos au nord,
+# à l'ouest de HaGazit — la face est à l'est, l'arrière au nord (Tosfot Yom Tov ibid.).
+# Elle est donc de l'autre côté du mur, sur la terrasse du 'Heil, entière dans le 'hol : la
+# Mishna ne le dit pas d'elle (« שֵׁשׁ לְשָׁכוֹת הָיוּ בָעֲזָרָה », 5:3), et l'écart est écrit
+# ici — derrière HaGola, il n'y a que le mur. R. Eliezer ben Yaakov : « שָׁכַחְתִּי מֶה הָיְתָה
+# מְשַׁמֶּשֶׁת » — sans usage connu, pas d'ouverture connue non plus ; CHOIX, une porte sur le
+# 'Heil. Même toit que HaGola et HaGazit, le mur de 25 passant sous les 30 des trois.
+lishka("Lishkat_HaEtz", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1,
+       Z_EZN, Z_AZ + 30, "80_Lishkot", [Porte("N", *PORTE_LISHKA, Z_EZN)], adossee="S")
+maake("Lishkat_HaEtz", GOLA_X0, GOLA_X1, AY1 + T, NORD_Y1, Z_AZ + 30, "80_Lishkot")
 
 # Sha'ar HaNitzotz, la porte nord la plus occidentale — le seul corps de porte que la
 # Mishna décrive en entier : « וּכְמִין אַכְסַדְרָה הָיָה, וַעֲלִיָּה בְנוּיָה עַל גַּבָּיו,
@@ -4406,9 +4400,6 @@ cyl("Lishkat_Osei_Chavitin_yora_mayim", AX1 - 1.3, OC_Y1 - 1.5, Z_EZI + 1.9, Z_E
 #     fixé par ses trois portes, par le kevesh et par la Mer. Melah est séparée des deux
 #     autres par Sha'ar HaBekhorot — rien ne demande que les trois se touchent, sauf
 #     Medi'hin et Parva, que la mesiba relie.
-SAILLIE_INT = 10          # profondeur des corps intérieurs. Au-delà, le débord du socle
-                          # mordrait sur le pied du kevesh : Rambam, Beit HaBe'hira 5:15,
-                          # « וּבֵין הַכֶּבֶשׁ וּלְכֹתֶל דְּרוֹמִי י"ב אַמָּה וּמֶחֱצָה ».
 H_LISHKA_INT = 22         # CHOIX : sous les 25 amot du mur, qui continue de se lire.
 SUD_INT = (AY0, AY0 + SAILLIE_INT)
 MELACH_X, PARVA_X, MEDICHIN_X = (-44, -26), (-92, -74), (-113, -96)
@@ -4516,11 +4507,9 @@ cyl("Mesiba_Parva_corniche", MESIBA_X, MESIBA_Y, Z_TOIT_PARVA - 1, Z_TOIT_PARVA 
 # Soreg (10 tefa'him = 1.67 ama) et 'Heil. Middot 2:3 : « לִפְנִים מִמֶּנּוּ הַחֵיל, עֶשֶׂר
 # אַמּוֹת » — dix amot de dégagement, et les douze marches y sont. Le soreg se pose donc
 # à 10 amot de la face bâtie la plus saillante, corps de porte compris : mesuré depuis
-# le mur, il traversait le Beit HaMoked et le Beit Avtinas. La face la plus saillante
-# est désormais celle de la Lishkat HaEtz, en second rang derrière HaGazit et HaGola —
-# d'où POURTOUR_Y1. Le soreg reste un rectangle : la dissymétrie du bâti ne passe pas
-# dans son tracé, elle se lit dans la largeur du 'Heil. Ses treize פרצות ont été
-# rebouchées (« חָזְרוּ וּגְדָרוּם »), il est donc continu.
+# le mur, il traversait le Beit HaMoked et le Beit Avtinas — d'où POURTOUR_Y1, le même
+# au nord et au sud. Ses treize פרצות ont été rebouchées (« חָזְרוּ וּגְדָרוּם »), il est
+# donc continu.
 HEIL = 10
 SX0, SX1 = AX0 - T - HEIL, EX1 + 5 + HEIL
 SY0, SY1 = -(POURTOUR_Y1 + HEIL), POURTOUR_Y1 + HEIL
@@ -5126,6 +5115,7 @@ VIDES_SOUS_AZARA = [
     (*BAIN, Z_HAR, Z_TEVILA_SOL - 0.5),
     (*SHIT, Z_SHIT_FOND, Z_SHIT_VOUTE),
     (*SHIT_TAVLA, Z_SHIT_VOUTE, Z_AZ),
+    (*BOR, Z_EZN, Z_AZ),
 ]
 massif_evide("Azara_sol", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_AZ - 1, Z_AZ,
              VIDES_SOUS_AZARA, "20_Azara", MAT_SOL())

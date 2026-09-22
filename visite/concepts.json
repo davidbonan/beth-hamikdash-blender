@@ -930,9 +930,57 @@
       "prefixes": []
     },
     {
-      "id": "fideles",
-      "nom": "Fidèles dans l'Ezrat Nashim",
+      "id": "kiddoush_yadayim",
+      "nom": "Kiddoush yadayim veraglayim",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "aliyat_hakevesh",
+      "nom": "La montée du kevesh",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "zerika",
+      "nom": "Zerikat hadam",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "melihat_haevarim",
+      "nom": "Le salage des membres",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "siddour_hamaarakha",
+      "nom": "Siddour hama'arakha",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "hatavat_hanerot",
+      "nom": "Hatavat hanerot",
+      "zone": "heikhal",
+      "prefixes": []
+    },
+    {
+      "id": "tzoarei_haleviim",
+      "nom": "Les enfants des Léviim",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "shomer_levi",
+      "nom": "Un Lévi de garde",
       "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "anshei_maamad",
+      "nom": "Les anshei ma'amad",
+      "zone": "azara",
       "prefixes": []
     }
   ]

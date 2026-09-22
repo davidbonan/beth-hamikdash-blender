@@ -16,7 +16,7 @@ from mathutils.kdtree import KDTree
 RACINE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RACINE))
 import beit_hamikdash_gestes as G  # noqa: E402
-from beit_hamikdash_visite import AMA, DOSSIER, Z_AZ, Z_EZN, comprimer, en_metres  # noqa: E402
+from beit_hamikdash_visite import AMA, DOSSIER, Z_AZ, Z_BAT, comprimer, en_metres  # noqa: E402
 
 from bl_ext.blender_org.mpfb.entities.objectproperties import HumanObjectProperties  # noqa: E402
 from bl_ext.blender_org.mpfb.services.humanservice import HumanService  # noqa: E402
@@ -49,6 +49,7 @@ FOULARD = (0.50, 0.44, 0.36)
 CHENE = (0.28, 0.17, 0.08)
 BOYAU = (0.62, 0.52, 0.36)
 BRONZE = (0.62, 0.40, 0.18)
+CHAIR = (0.55, 0.16, 0.12)
 OR = (1.0, 0.74, 0.30)
 
 
@@ -847,10 +848,31 @@ def tziltzal(mm, repere):
 
 # Au fond pointu (Zeva'him 88a).
 def mizrak(mm, repere):
-    profil = ((0.000, 0.004), (0.02, 0.040), (0.05, 0.080), (0.075, 0.100), (0.082, 0.104), (0.078, 0.094))
-    anneaux = [[repere @ Vector((r * math.cos(a), r * math.sin(a), z)) for a in np.linspace(0, TOUR, 22, endpoint=False)]
+    tourner_profil(mm, repere, ((0.000, 0.004), (0.02, 0.040), (0.05, 0.080), (0.075, 0.100), (0.082, 0.104), (0.078, 0.094)), OR)
+
+
+def tourner_profil(mm, repere, profil, couleur, n=22):
+    anneaux = [[repere @ Vector((r * math.cos(a), r * math.sin(a), z)) for a in np.linspace(0, TOUR, n, endpoint=False)]
                for z, r in profil]
-    mm.nappe(anneaux, OR, "objet")
+    mm.nappe(anneaux, couleur, "objet")
+
+
+def bout_a_bout(mm, repere, chemin, rayons, couleur, n=10):
+    chemin = [Vector((0.0, 0.0, -0.01)) + chemin[0]] + chemin
+    rayons = [0.004] + list(rayons)
+    mm.nappe([[repere @ p for p in a] for a in tube(chemin, rayons, n)], couleur, "objet", pole_fin=repere @ chemin[-1])
+
+
+# Une bûche de la ma'arakha (Tamid 2:3), le long du z du repère.
+def gizra(mm, repere, longueur=0.72, rayon=0.045):
+    chemin = [Vector((0.0, 0.0, z)) for z in np.linspace(-longueur / 2, longueur / 2, 6)]
+    bout_a_bout(mm, repere, chemin, [rayon * (1.0 + 0.08 * math.sin(3.1 * k)) for k in range(6)], CHENE)
+
+
+# Une patte avant du tamid (Tamid 4:3), l'épaule en haut du repère, le sabot en bas.
+def ever(mm, repere):
+    chemin = [Vector((0.0, y, z)) for z, y in ((0.0, 0.0), (0.12, 0.0), (0.24, -0.03), (0.34, -0.03), (0.46, -0.02))]
+    bout_a_bout(mm, repere, chemin, (0.055, 0.050, 0.030, 0.024, 0.022), CHAIR, 12)
 
 
 def _poids_jupe(humain, p):
@@ -1027,8 +1049,11 @@ def cohen(nom, gabarit=Gabarit(), gris=False):
 
 
 # « מְלֻבָּשִׁים בּוּץ » (Divrei HaYamim II 5:12).
-def levi(nom, gabarit=Gabarit(), gris=False):
-    h = Humain(nom, gabarit, **_poils(nom, gris))
+def levi(nom, gabarit=Gabarit(), gris=False, barbe=True):
+    poils = _poils(nom, gris)
+    if not barbe:
+        poils["barbe"] = None
+    h = Humain(nom, gabarit, **poils)
     h.vetir_mpfb(KUTONET)
     h.detendre()
     coiffure = Maillage()
@@ -1114,12 +1139,12 @@ class Terrain:
         return ((z[i, j] * (1 - fu) + z[i + 1, j] * fu) * (1 - fv) + (z[i, j + 1] * (1 - fu) + z[i + 1, j + 1] * fu) * fv)
 
 
-# En amot : aller-retour de `a` à `b`, demi-tours de `rayon` aux deux bouts.
+# En amot : aller-retour de `a` à `b`, demi-tours de `rayon` aux deux bouts ; l'aller se fait à gauche de `a` → `b`, ou à droite avec `sens=-1`.
 class Stade:
-    def __init__(self, a, b, rayon, pas=0.04):
+    def __init__(self, a, b, rayon, pas=0.04, sens=1):
         a, b, r = Vector(a) * AMA, Vector(b) * AMA, rayon * AMA
         d = (b - a).normalized()
-        n = Vector((-d.y, d.x))
+        n = Vector((-d.y, d.x)) * sens
         droit = (b - a).length
         k, m = max(2, int(droit / pas)), max(8, int(math.pi * r / pas))
         points = [a + n * r + d * (droit * i / k) for i in range(k)]
@@ -1240,20 +1265,87 @@ def priere(h, a, horloge, t):
                       G.doigts(a, "l", 0.55), G.doigts(a, "r", 0.55))
 
 
-def parler(h, a, horloge, t):
-    montre = 0.5 + 0.5 * horloge.onde(t, 3.2)
-    main = a.au("spine_03", devant_poitrine(h, 0.20 + 0.14 * montre, 0.38 - 0.10 * montre, -0.14))
-    return G.composer(G.debout(a, horloge, t, 0.7, regard=0.06), G.tete(flexion=0.05 * horloge.onde(t, 1.6)),
-                      G.bras_ballant(a, "l"), G.bras(a, "r", main), G.paume(a, "r", G.HAUT + G.DEVANT),
-                      G.doigts(a, "l"), G.doigts(a, "r", 0.2))
+def mains_jointes(h, a, sous_hanche=0.02):
+    mains = a.au("spine_03", Vector((0.0, -0.16, h.z_hanche - sous_hanche)))
+    return G.composer(G.bras(a, "l", lambda poses: mains(poses) + G.GAUCHE * 0.03),
+                      G.bras(a, "r", lambda poses: mains(poses) - G.GAUCHE * 0.03),
+                      G.doigts(a, "l", 0.6), G.doigts(a, "r", 0.6))
 
 
 def ecouter(h, a, horloge, t):
-    mains = a.au("spine_03", Vector((0.0, -0.16, h.z_hanche - 0.02)))
     return G.composer(G.debout(a, horloge, t, 0.4, regard=0.04), G.tete(flexion=0.06 + 0.04 * horloge.onde(t, 2.4)),
-                      G.bras(a, "l", lambda poses: mains(poses) + G.GAUCHE * 0.03),
-                      G.bras(a, "r", lambda poses: mains(poses) - G.GAUCHE * 0.03),
-                      G.doigts(a, "l", 0.6), G.doigts(a, "r", 0.6))
+                      mains_jointes(h, a))
+
+
+# Un des vingt et un postes des Léviim, aux portes de l'Azara (Middot 1:1) : debout, le regard qui va.
+def garder(h, a, horloge, t):
+    return G.composer(G.debout(a, horloge, t, 0.8, regard=0.45), mains_jointes(h, a, 0.05))
+
+
+# « וְרָאשֵׁיהֶן מִבֵּין רַגְלֵי הַלְוִיִּם » (Arakhin 2:6) : les enfants chantent à terre, sans instrument.
+def chanter(h, a, horloge, t, retard):
+    return G.composer(G.debout(a, horloge, t, retard, regard=0.03), G.balancement(t, BATTEMENT, 0.8, retard),
+                      G.tete(flexion=-0.14), mains_jointes(h, a, -0.04))
+
+
+def repere_gizra(h):
+    return repere_vers(devant_poitrine(h, 0.30, 0.32), G.GAUCHE, G.HAUT)
+
+
+# « הֵחֵלּוּ מַעֲלִין בְּגִזְרִין לְסַדֵּר אֵשׁ הַמַּעֲרָכָה » (Tamid 2:3) : la bûche descend vers la ma'arakha, puis remonte.
+def charger(h, a, horloge, t):
+    u = t / horloge.duree
+    w = G.lisse((u - 0.20) / 0.18) * (1.0 - G.lisse((u - 0.62) / 0.18))
+    buche = a.repere("spine_03", repere_gizra(h))
+    prise = lambda s: (lambda poses: buche(poses) @ Vector((-0.05, 0.0, s * 0.24)))
+    return G.composer(G.debout(a, horloge, t, 0.3, regard=0.03),
+                      G.bassin(Vector((0.0, 0.10 * w, -0.16 * w)), tangage=0.30 * w),
+                      G.buste(flexion=0.62 * w), G.tete(flexion=-0.10 * w),
+                      G.bras(a, "l", prise(1.0)), G.bras(a, "r", prise(-1.0)),
+                      G.paume(a, "l", G.HAUT), G.paume(a, "r", G.HAUT),
+                      G.doigts(a, "l", 0.75, 0.5), G.doigts(a, "r", 0.75, 0.5))
+
+
+PENTE_KEVESH = 9.0 / 30.0
+
+
+def repere_ever(h):
+    return repere_vers(Vector((0.21, -0.20, h.z_hanche + 0.06)), 0.25 * G.DEVANT - G.HAUT, G.GAUCHE)
+
+
+# « הָלְכוּ וּנְתָנוּם מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ, וּמְלָחוּם » (Tamid 4:3) : la droite va au sel, puis sale le membre que tient la gauche.
+def saler(h, a, horloge, t):
+    u = t / horloge.duree
+    au_sel = G.lisse((u - 0.04) / 0.16) * (1.0 - G.lisse((u - 0.36) / 0.12))
+    sur_ever = G.lisse((u - 0.44) / 0.10) * (1.0 - G.lisse((u - 0.86) / 0.10))
+    secousse = 0.02 * math.sin(TOUR * 5.0 * u) * sur_ever
+    membre = a.repere("spine_03", repere_ever(h))
+    sel = a.au("spine_03", Vector((-0.12, -0.50, h.z_hanche - 0.55)))
+    dessus = a.au("spine_03", Vector((0.16, -0.30, h.z_hanche + 0.06)))
+    pendante = a.au("spine_03", a.poignet["r"])
+
+    def droite(poses):
+        return pendante(poses).lerp(sel(poses), au_sel).lerp(dessus(poses) + G.HAUT * secousse, sur_ever)
+
+    penche = 0.55 * au_sel + 0.20 * sur_ever
+    return G.composer(G.pied(a, "l", sol=-PENTE_KEVESH * 0.09), G.pied(a, "r", sol=PENTE_KEVESH * 0.09),
+                      G.respiration(horloge, t),
+                      G.bassin(Vector((0.0, 0.12 * penche, -0.18 * penche)), tangage=0.35 * penche),
+                      G.buste(flexion=0.55 * penche), G.tete(flexion=0.25 * penche - 0.05),
+                      G.bras(a, "l", lambda poses: membre(poses) @ Vector((0.0, 0.0, -0.03))), G.bras(a, "r", droite),
+                      G.paume(a, "l", G.DEVANT - G.GAUCHE), G.paume(a, "r", G.DEVANT * (1.0 - sur_ever) - G.HAUT * sur_ever),
+                      G.doigts(a, "l", 0.8, 0.5), G.doigts(a, "r", 0.35 + 0.3 * au_sel))
+
+
+# « אֶבֶן הָיְתָה לִפְנֵי הַמְּנוֹרָה וּבָהּ שָׁלֹשׁ מַעֲלוֹת שֶׁעָלֶיהָ הַכֹּהֵן עוֹמֵד וּמֵטִיב אֶת הַנֵּרוֹת » (Tamid 3:9) :
+# debout sur la pierre, il se penche sur les lampes ; le kouz attend sur la deuxième marche.
+def hatava(h, a, horloge, t):
+    va = 0.5 + 0.5 * horloge.onde(t, 2.5)
+    lampe = a.au("spine_03", devant_poitrine(h, 0.56 - 0.05 * va, 0.38 - 0.05 * va, -0.10))
+    pendante = a.au("spine_03", a.poignet["l"])
+    return G.composer(G.debout(a, horloge, t, 0.6, regard=0.02), G.buste(flexion=0.16, torsion=0.08), G.tete(flexion=0.12),
+                      G.bras(a, "l", pendante), G.bras(a, "r", lampe),
+                      G.paume(a, "r", G.DEVANT - G.HAUT), G.doigts(a, "l", 0.3), G.doigts(a, "r", 0.3))
 
 
 class Role(NamedTuple):
@@ -1268,6 +1360,7 @@ class Role(NamedTuple):
     foulee: float = 1.35
     vitesse: float = 1.15
     sol_haut: float = Z_AZ
+    famille: str = None
 
 
 LEVIIM_Y = (-23.5, -20.0, -16.5, -13.0, -9.5, -6.0, 6.0, 9.5, 13.0, 16.5, 20.0, 23.5)
@@ -1298,52 +1391,61 @@ def _levi(k, genre):
     else:
         geste = lambda h, a, horloge, t: jouer_kinor(h, a, horloge, t, echelle, retard)
     return Role(nom, "leviim", batir, geste, (-13.15, LEVIIM_Y[k], Z_AZ), 180.0 + 10.0 * (_alea(nom, 3) - 0.5),
-                duree=MESURES * BATTEMENT)
+                duree=MESURES * BATTEMENT, famille="leviim")
 
 
+# À terre, dans l'Ezrat Israël au pied du Doukhan : la tête à hauteur des pieds des Léviim (Arakhin 2:6, R. Eliézer ben Yaakov).
+def _tzoar(k, y):
+    nom = f"tzoarei_haleviim_{k + 1}"
+    gabarit = Gabarit(1.18 + 0.10 * _alea(nom, 1), age=0.12 + 0.05 * _alea(nom, 0), peau="young_caucasian_male")
+    retard = 0.06 * (_alea(nom, 2) - 0.5)
+    return Role(nom, "tzoarei_haleviim", lambda: levi(nom, gabarit, barbe=False),
+                lambda h, a, horloge, t: chanter(h, a, horloge, t, retard),
+                (-10.4, y, Z_AZ), 180.0 + 8.0 * (_alea(nom, 3) - 0.5), duree=MESURES * BATTEMENT)
+
+
+def _cohen(nom, geste, ou, cap, gabarit, tenu=None, gris=False, duree=16.0):
+    def batir():
+        h = cohen(nom, gabarit, gris=gris)
+        if tenu:
+            objet, construire, repere = tenu
+            tenir(h, objet, construire, "spine_03", repere(h))
+        return h
+    return Role(nom, nom, batir, geste, ou, cap, duree=duree, famille="cohanim")
+
+
+# Chaque figure fait un geste du tamid du matin, à l'endroit que la Mishna lui donne ; son nom est son concept.
 def roles():
     return [
-        # Deux cohanim au Kiyor (Middot 3:6) : l'un se sanctifie mains et pieds, l'autre va et vient.
-        Role("cohanim_1", "cohanim", lambda: cohen("cohanim_1", Gabarit(1.74, age=0.55)), lavage,
-             (-59.0, -17.4, Z_AZ), 90.0, duree=12.0),
-        Role("cohanim_2", "cohanim", lambda: cohen("cohanim_2", Gabarit(1.71, age=0.48)),
-             trajet=Stade((-62.0, -20.0), (-62.0, -31.0), 1.8)),
-        # Le kevesh monte du sud vers l'autel (Middot 3:3) : on y monte d'un côté, on en descend de l'autre.
-        Role("cohanim_3", "cohanim", lambda: cohen("cohanim_3", Gabarit(1.77, age=0.62)),
-             trajet=Stade((-38.0, -52.0), (-38.0, -28.0), 2.0), vitesse=1.0, sol_haut=9.0),
-        Role("cohanim_4", "cohanim", lambda: tenir_mizrak(cohen("cohanim_4", Gabarit(1.72, age=0.82,
-                                                                                        peau="old_caucasian_male"),
-                                                                   gris=True)),
-             zerika, (-20.5, 4.6, Z_AZ), 142.0),
+        # Au Kiyor (Middot 3:6) : main droite sur le pied droit, main gauche sur le pied gauche, penché.
+        _cohen("kiddoush_yadayim", lavage, (-59.0, -17.4, Z_AZ), 90.0, Gabarit(1.74, age=0.55), duree=12.0),
+        # Le kevesh au sud de l'autel (Middot 3:3) : on monte par la droite, on descend par la gauche (Zeva'him 6:3).
+        Role("aliyat_hakevesh", "aliyat_hakevesh", lambda: cohen("aliyat_hakevesh", Gabarit(1.77, age=0.62)),
+             trajet=Stade((-38.0, -52.0), (-38.0, -28.0), 2.0, sens=-1), vitesse=1.0, sol_haut=9.0, famille="cohanim"),
+        # Le sang du tamid au coin nord-est (Tamid 4:1).
+        _cohen("zerika", zerika, (-20.5, 4.6, Z_AZ), 142.0, Gabarit(1.72, age=0.82, peau="old_caucasian_male"),
+               tenu=("mizrak", mizrak, repere_mizrak), gris=True),
+        # Les membres salés sur la moitié basse du kevesh, à l'ouest, où le sel est posé (Tamid 4:3).
+        _cohen("melihat_haevarim", saler, (-41.5, -46.5, 3.0), 180.0, Gabarit(1.73, age=0.50),
+               tenu=("ever", ever, repere_ever), duree=6.0),
+        # Le bois monté sur l'autel pour la ma'arakha, dressée à l'est (Tamid 2:3-4).
+        _cohen("siddour_hamaarakha", charger, (-26.0, -9.0, 9.0), 180.0, Gabarit(1.76, age=0.42),
+               tenu=("gizra", gizra, repere_gizra), duree=8.0),
+        # Sur la marche haute de la pierre de la Menora (Tamid 3:9).
+        _cohen("hatavat_hanerot", hatava, (-123.6, -7.5, Z_BAT + 0.9), 180.0, Gabarit(1.70, age=0.58), duree=10.0),
     ] + [_levi(k, genre) for k, genre in enumerate(LEVIIM_INSTRUMENTS)] + [
-        Role("fideles_1", "fideles", lambda: fidele("fideles_1", "costume", Gabarit(1.78, age=0.55), tete="chapeau"),
-             trajet=Stade((24.0, -5.5), (50.0, -5.5), 1.4), vitesse=1.05, sol_haut=Z_EZN),
-        Role("fideles_2", "fideles", lambda: fidele("fideles_2", "costume", Gabarit(1.22, age=0.15,
-                                                                                   peau="young_caucasian_male"),
-                                                    barbe=False),
-             trajet=Stade((24.0, -5.5), (50.0, -5.5), 3.3), foulee=0.95, sol_haut=Z_EZN),
-        Role("fideles_3", "fideles", lambda: fidele("fideles_3", "costume", Gabarit(1.76, age=0.68), tete="talith"),
-             priere, (58.0, -13.0, Z_EZN), 180.0),
-        Role("fideles_4", "fideles", lambda: fidele("fideles_4", "costume", Gabarit(1.73, age=0.45)),
-             parler, (70.0, 14.0, Z_EZN), 301.0),
-        Role("fideles_5", "fideles", lambda: fidele("fideles_5", "costume", Gabarit(1.69, age=0.85,
-                                                                                    peau="old_caucasian_male"),
-                                                    gris=True),
-             ecouter, (71.3, 11.8, Z_EZN), 121.0),
-        Role("fideles_6", "fideles", lambda: fidele("fideles_6", "robe", Gabarit(1.62, genre=0.0, age=0.5,
-                                                                                peau="middleage_caucasian_female"),
-                                                    barbe=False, tete="foulard"),
-             trajet=Stade((80.0, 6.0), (98.0, 6.0), 1.6), vitesse=1.0, foulee=1.2, sol_haut=Z_EZN),
+        _tzoar(0, 3.2), _tzoar(1, -3.2),
+        # Un des cinq postes des Léviim aux portes de l'Azara (Middot 1:1), hors de la porte, sur le palier des quinze marches.
+        Role("shomer_levi", "shomer_levi", lambda: levi("shomer_levi", Gabarit(1.79, age=0.45)), garder,
+             (9.0, 5.5, Z_AZ), 0.0, duree=24.0),
+        # Les anshei ma'amad, debout sur leur korban dans l'Ezrat Israël (Ta'anit 4:2 ; Middot 5:1).
+        Role("anshei_maamad_1", "anshei_maamad",
+             lambda: fidele("anshei_maamad_1", "costume", Gabarit(1.76, age=0.68), tete="talith"), priere,
+             (-5.0, -26.0, Z_AZ), 180.0),
+        Role("anshei_maamad_2", "anshei_maamad",
+             lambda: fidele("anshei_maamad_2", "costume", Gabarit(1.69, age=0.85, peau="old_caucasian_male"), gris=True),
+             ecouter, (-5.5, 24.0, Z_AZ), 186.0),
     ]
-
-
-def tenir_mizrak(h):
-    tenir(h, "mizrak", mizrak, "spine_03", repere_mizrak(h))
-    return h
-
-
-# Le père et le fils bouclent leur tour dans le même temps.
-DUREE_COMMUNE = {"fideles_1": "fideles_2"}
 
 
 def animer_sur_place(h, role, sol):
@@ -1362,12 +1464,12 @@ def animer_sur_place(h, role, sol):
     return [place]
 
 
-def animer_en_marche(h, role, terrain, duree=None):
+def animer_en_marche(h, role, terrain):
     a = G.Acteur(h.squelette, h.sol)
     trajet = role.trajet
     longueur = trajet.longueur
     foulee = longueur / max(1, round(longueur / role.foulee))
-    images = round((duree or longueur / role.vitesse) * IMAGES)
+    images = round(longueur / role.vitesse * IMAGES)
     vitesse = longueur * IMAGES / images
     horloge = G.Horloge(images / IMAGES)
     rec = G.Enregistreur(h.rig, a.sq, h.rig.name)
@@ -1391,7 +1493,7 @@ def animer_en_marche(h, role, terrain, duree=None):
             places.append(place)
     h.rig.matrix_world = places[0]
     rec.ecrire()
-    return places, images
+    return places
 
 
 def emprise(h, places):
@@ -1409,10 +1511,11 @@ def unir(boites):
 
 VUES = [
     # Face au Kiyor, entre la Mer de bronze et l'autel : de plus loin, l'un ou l'autre le cache.
-    dict(id="vue_cohanim", position=(-54.8, -29.2, Z_AZ), cap=105, tangage=-4),
+    dict(id="vue_kiddoush_yadayim", position=(-54.8, -29.2, Z_AZ), cap=105, tangage=-4),
     # Les Léviim font face au Sanctuaire ; neuf amot entre l'autel et le Doukhan ne cadrent pas les douze de face.
     dict(id="vue_leviim", position=(-20.5, -30.0, Z_AZ), cadre=["leviim"]),
-    dict(id="vue_fideles", cadre=["fideles"], cap=180, sol=Z_EZN, recul_max=60.0),
+    # De dos, l'autel devant lui : depuis le seuil de Nikanor, dans l'Ezrat Israël.
+    dict(id="vue_anshei_maamad", position=(-1.5, -26.5, Z_AZ - 2.5), cap=180),
 ]
 
 
@@ -1427,16 +1530,16 @@ def main():
         else:
             sols[role.nom] = _rayon_sol(role.ou[0] * AMA, role.ou[1] * AMA, role.ou[2] * AMA)
 
-    boites, figures, durees = {}, [], {}
+    boites, figures = {}, []
     for role in lot:
         h = role.batir()
         if role.trajet:
-            commune = next((k for k, v in DUREE_COMMUNE.items() if v == role.nom), None)
-            places, images = animer_en_marche(h, role, terrains[role.nom], durees.get(commune))
-            durees[role.nom] = images / IMAGES
+            places = animer_en_marche(h, role, terrains[role.nom])
         else:
             places = animer_sur_place(h, role, sols[role.nom])
-        boites.setdefault(role.concept, []).append(emprise(h, places))
+        # Les cohanim ont aussi leur emprise commune : « Un élément… » y mène. Les Léviim sont déjà un concept.
+        for concept in {role.concept, role.famille} - {None}:
+            boites.setdefault(concept, []).append(emprise(h, places))
         figures.append(h)
         print(f"  {role.nom:12s} {len(places):4d} places")
 

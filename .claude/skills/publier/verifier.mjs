@@ -9,10 +9,11 @@ const drapeau = (nom) => {
 }
 const mobile = options.includes('--mobile') && options.splice(options.indexOf('--mobile'), 1)
 const planche = drapeau('--planche')
+const parcours = drapeau('--parcours')
 const seulement = drapeau('--seulement')?.split(',')
 const [url, capture = 'visite.png'] = options
 if (!url) {
-  console.error('usage: node verifier.mjs <url> [capture.png] [--mobile] [--planche <dossier> [--seulement id,id]]   (playwright-core installé dans le dossier courant)')
+  console.error('usage: node verifier.mjs <url> [capture.png] [--mobile] [--planche <dossier>] [--parcours <dossier>] [--seulement id,id]   (playwright-core installé dans le dossier courant)')
   process.exit(2)
 }
 
@@ -98,6 +99,76 @@ async function tirerPlanche(dossier) {
   console.log('planche', index)
 }
 
+// Les parcours guidés, station par station : une capture à chaque arrêt, et la marche
+// vers la suivante avancée à la main, sans attendre les images. Un pas qui perd le sol
+// — un point de passage à côté d'un escalier — se voit à l'arrivée : l'œil n'est plus à
+// la hauteur du dallage que la station déclare. Un pas qui traverse un mur, ou le frôle
+// à moins d'un tiers de mètre — la caméra coupe à 0,12 m —, se voit pas à pas, au rayon.
+const DEGAGEMENT = 0.3
+async function suivreParcours(dossier) {
+  await page.evaluate(() => window.__figurants)
+  let fautes = 0
+  for (const id of (await page.evaluate(() => window.__parcours.liste())).filter((p) => !seulement || seulement.includes(p))) {
+    mkdirSync(`${dossier}/${id}`, { recursive: true })
+    const n = await page.evaluate((id) => { window.__parcours.ouvrir(id); return window.__parcours.nombre() }, id)
+    console.log('parcours', id, n, 'stations')
+    for (let i = 0; i < n; i++) {
+      await page.evaluate((i) => window.__parcours.aller(i), i)
+      await page.waitForTimeout(500)
+      await page.evaluate((t) => window.__temps(t), 3 + i)
+      await laisserRendre()
+      await capturer(`${dossier}/${id}/station_${i}.png`)
+      const carte = await page.evaluate(() => ({
+        titre: document.querySelector('#parcours h2').textContent, fiche: document.querySelector('#fiche h2')?.textContent,
+        ouverte: document.querySelector('#fiche').classList.contains('ouverte') }))
+      console.log('station', i, JSON.stringify(carte))
+      if (i + 1 === n) break
+      const marche = await page.evaluate((DEGAGEMENT) => {
+        document.querySelector('#parcours .suivant').click()
+        const trajet = window.__parcours.trajet()
+        const autour = []
+        for (let k = 0; k < 16; k++) autour.push([Math.cos(k * Math.PI / 8), 0, Math.sin(k * Math.PI / 8)])
+        let pas = 0, dernier = null, sauts = 0, traverse = null, serre = null
+        while (window.__parcours.trajet() && pas++ < 5000) {
+          trajet.avancer(1 / 30)
+          const { x, y, z } = window.__etat()
+          if (dernier !== null) {
+            if (Math.abs(y - dernier.y) > 0.3) sauts++
+            const segment = [x - dernier.x, y - dernier.y, z - dernier.z]
+            const longueur = Math.hypot(...segment)
+            const mur = longueur > 1e-4 && window.__mur([dernier.x, dernier.y, dernier.z], segment, longueur)
+            if (mur && !traverse) traverse = { concept: mur.concept, amot: [+(x / 0.48).toFixed(1), +(z / 0.48).toFixed(1)] }
+          }
+          for (const direction of autour) {
+            const mur = window.__mur([x, y, z], direction, DEGAGEMENT)
+            if (mur && (!serre || mur.distance < serre.distance)) {
+              serre = { distance: +mur.distance.toFixed(2), concept: mur.concept, amot: [+(x / 0.48).toFixed(1), +(z / 0.48).toFixed(1)] }
+            }
+          }
+          dernier = { x, y, z }
+        }
+        return { pas, sauts, ecart: +window.__parcours.ecartSol().toFixed(2), traverse, serre }
+      }, DEGAGEMENT)
+      // La même marche à grands pas — une image de 0,1 s à l'allure ×4 — : l'escalier doit se gravir quand même.
+      // Le retour à la station passe par le fondu : on lui laisse le temps de poser la caméra.
+      await page.evaluate((i) => window.__parcours.aller(i), i)
+      await page.waitForTimeout(300)
+      marche.ecartVite = await page.evaluate(() => {
+        document.querySelector('#parcours .suivant').click()
+        const trajet = window.__parcours.trajet()
+        let pas = 0
+        while (window.__parcours.trajet() && pas++ < 5000) trajet.avancer(0.4)
+        return +window.__parcours.ecartSol().toFixed(2)
+      })
+      const faute = marche.sauts || Math.abs(marche.ecart) > 0.3 || Math.abs(marche.ecartVite) > 0.3 || marche.traverse || marche.serre
+      fautes += faute ? 1 : 0
+      console.log(`marche ${i} -> ${i + 1}`, JSON.stringify(marche),
+        marche.traverse ? 'MUR TRAVERSE' : marche.serre ? 'MUR FROLE' : faute ? 'SOL PERDU' : 'ok')
+    }
+  }
+  return fautes
+}
+
 let code = 0
 await page.goto(url, { waitUntil: 'load', timeout: 60000 })
 try {
@@ -115,5 +186,6 @@ try {
 await capturer(capture)
 console.log('capture', capture)
 if (planche !== null && code === 0) await tirerPlanche(planche || 'planche')
+if (parcours !== null && code === 0 && await suivreParcours(parcours || 'parcours')) code = 1
 await navigateur.close()
 process.exit(code)

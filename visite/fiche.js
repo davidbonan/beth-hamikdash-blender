@@ -16,7 +16,7 @@ export const nomDeZone = (zone) => libelle("zones", zone) ?? zone;
 const TRAITES = {
   middot: "Middot", tamid: "Tamid", yoma: "Yoma", shekalim: "Shekalim",
   soucca: "Sukkah", souccah: "Sukkah", sukkah: "Sukkah", succa: "Sukkah",
-  kelim: "Kelim", arakhin: "Arakhin", erakhin: "Arakhin",
+  kelim: "Kelim", arakhin: "Arakhin", erakhin: "Arakhin", taanit: "Taanit",
   zevahim: "Zevachim", zevachim: "Zevachim",
   menahot: "Menachot", menachot: "Menachot",
   "baba batra": "Bava Batra", "bava batra": "Bava Batra",

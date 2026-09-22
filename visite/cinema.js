@@ -21,7 +21,7 @@ const FILM = 16 / 9;
 const REPONSE_SOL = 0.22;      // s : une marche de 1/2 ama se glisse, elle ne se saute pas
 const lisse = (u) => u * u * (3 - 2 * u);
 
-function polyligne(points) {
+export function polyligne(points) {
   const longueurs = [0];
   for (let i = 1; i < points.length; i++) longueurs.push(longueurs[i - 1] + points[i].distanceTo(points[i - 1]));
   const total = longueurs[longueurs.length - 1];

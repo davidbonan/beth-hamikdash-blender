@@ -17,6 +17,7 @@ import { initiation } from "./initiation.js";
 import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
 import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
+import { parcours } from "./parcours.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
@@ -103,8 +104,9 @@ installerLangue(textes);
 // Encadrée par l'accueil, la scène marche seule et se tait : ni barre, ni fiche, ni initiation.
 const CINEMA = new URLSearchParams(location.search).has("cinema");
 document.documentElement.classList.toggle("cinema", CINEMA);
-const [reperes, { cadrages: CADRAGES_DU_PLAN }, figurants, parcours] = await Promise.all([
-  json("./reperes.json"), json("./plan.json"), json("./figures.json"), CINEMA ? json("./cinema.json") : null]);
+const [reperes, { cadrages: CADRAGES_DU_PLAN }, figurants, haltesCinema, { parcours: PARCOURS }] = await Promise.all([
+  json("./reperes.json"), json("./plan.json"), json("./figures.json"), CINEMA ? json("./cinema.json") : null,
+  json("./parcours.json")]);
 Object.assign(reperes.emprises, figurants.emprises);
 reperes.vues.push(...figurants.vues);
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
@@ -848,6 +850,12 @@ aller.onchange = () => {
   aller.blur();
 };
 
+const choixParcours = $("#parcours-choix");
+function remplirParcours() {
+  choixParcours.replaceChildren(choixParcours.options[0]);
+  for (const p of PARCOURS) choixParcours.append(new Option(p.titre[langue()] ?? p.titre.fr, p.id));
+}
+
 function remplirChercher() {
   const parZone = [...CONCEPTS.values()].sort((a, b) =>
     nomDeZone(a.zone).localeCompare(nomDeZone(b.zone), langue()) || a.nom.localeCompare(b.nom, langue()));
@@ -963,6 +971,7 @@ async function accorderLangue(code) {
   for (const [id, concept] of traduits) CONCEPTS.set(id, concept);
   remplirAller();
   remplirChercher();
+  remplirParcours();
   rafraichir();
   planMiddot.rafraichir();
 }
@@ -1062,7 +1071,38 @@ function accorderAir() {
   brume.density += (AIR_DEHORS * (1 - oeilAdapte.fermeture) - brume.density) * 0.25;
 }
 
+// Le cinéma comme le parcours prennent la caméra le temps d'un trajet : la boucle la leur prête.
 let film = null;
+
+function preterLaCamera(trajet) {
+  film = trajet;
+  if (trajet) return;
+  piedsY = camera.position.y - OEIL;
+  accorderRegard();
+}
+
+const guides = parcours({
+  parcours: PARCOURS, camera, sol: solEn, oeil: OEIL, ama: AMA,
+  marcher: preterLaCamera,
+  arriver: (station) => { preterLaCamera(null); montrer(station.concept); },
+  poserA: (pieds, cible, concept) => fondu(() => {
+    tenirLaVue(false);
+    poser(pieds);
+    orienterVers(cible);
+    if (concept) montrer(concept);
+  }),
+  fermerFiche: fermer,
+});
+// La carte du parcours prend la place du rappel des commandes, comme l'initiation.
+choixParcours.onchange = () => {
+  const id = choixParcours.value;
+  choixParcours.value = "";
+  choixParcours.blur();
+  if (!id) return;
+  aide.classList.add("parti");
+  guides.ouvrir(id);
+};
+
 renderer.setAnimationLoop(() => {
   const dt = Math.min(horloge.getDelta(), 0.1);
   if (film) {
@@ -1122,7 +1162,7 @@ function commencerInitiation() {
 }
 $("#rejouer").onclick = (e) => { e.currentTarget.blur(); commencerInitiation(); };
 if (CINEMA) {
-  film = cinema({ parcours, camera, sol: solEn, oeil: OEIL, ama: AMA, voile,
+  film = cinema({ parcours: haltesCinema, camera, sol: solEn, oeil: OEIL, ama: AMA, voile,
     signaler: (etat) => parent.postMessage({ type: "cinema", ...etat }, location.origin) });
   film.avancer(0);
   dessiner(0);
@@ -1147,7 +1187,7 @@ window.__etat = () => {
   const e = new THREE.Euler(0, 0, 0, "YXZ").setFromQuaternion(camera.quaternion);
   const d = 180 / Math.PI;
   return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
-           x: +camera.position.x.toFixed(3), z: +camera.position.z.toFixed(3),
+           x: +camera.position.x.toFixed(3), y: +camera.position.y.toFixed(3), z: +camera.position.z.toFixed(3),
            piedsY: +piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
            fov: +camera.fov.toFixed(1), vol, lieu: lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z)) };
 };
@@ -1158,5 +1198,12 @@ window.__ombres = (actives) => {
   dessiner(0);
 };
 window.__figurants = figurantsPrets;
+window.__sol = solEn;
+window.__mur = (origine, direction, portee) => {
+  const rayon = new THREE.Raycaster(new THREE.Vector3(...origine), new THREE.Vector3(...direction).normalize(), 0, portee);
+  const [touche] = rayon.intersectObjects(murs, false);
+  return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
+};
+window.__parcours = guides;
 window.__temps = (t) => { melangeur.setTime(t); dessiner(0); };
 window.__pret = true;

@@ -1,0 +1,1016 @@
+{
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7). En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche qui s'ouvre à l'arrivée. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "parcours": [
+  {
+   "id": "tamid",
+   "titre": {
+    "fr": "Le tamid",
+    "en": "The tamid",
+    "he": "התמיד"
+   },
+   "stations": [
+    {
+     "id": "beit_hamoked",
+     "concept": "beit_hamoked",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "1:1-2"
+     },
+     "point": [
+      -12,
+      -46
+     ],
+     "sol": 0,
+     "cible": [
+      -12,
+      8,
+      -62
+     ],
+     "titre": {
+      "fr": "Au Beit HaMoked, avant l'aube",
+      "en": "In the Beit HaMoked, before dawn",
+      "he": "בבית המוקד, לפני עלות השחר"
+     },
+     "texte": {
+      "fr": "Les anciens de la maison paternelle dorment ici, les clés de l'Azara en main, et les jeunes cohanim à terre autour d'eux. Le préposé frappe à la porte avant l'aube ; celui qui s'est immergé vient tirer au sort le retrait des cendres.",
+      "en": "The elders of the patrilineal family sleep here, the keys of the Azara in their hands, and the young kohanim on the ground around them. The appointed priest knocks at the gate before dawn; whoever has immersed comes to draw lots for the removal of the ashes.",
+      "he": "זקני בית האב ישנים כאן ומפתחות העזרה בידם, ופרחי כהונה איש כסתו בארץ סביבם. הממונה בא ודופק עליהם לפני עלות השחר; מי שטבל בא ומפיס על תרומת הדשן."
+     }
+    },
+    {
+     "id": "kiddoush_yadayim",
+     "concept": "kiddoush_yadayim",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "1:4"
+     },
+     "point": [
+      -54.8,
+      29.2
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -22,
+       -40
+      ],
+      [
+       -55.5,
+       -40
+      ],
+      [
+       -55.5,
+       20
+      ]
+     ],
+     "cible": [
+      -59,
+      3,
+      15.5
+     ],
+     "titre": {
+      "fr": "Le Kiyor : mains et pieds",
+      "en": "The Kiyor: hands and feet",
+      "he": "הכיור: ידיים ורגליים"
+     },
+     "texte": {
+      "fr": "Nul ne touche un ustensile avant d'avoir sanctifié ses mains et ses pieds à l'eau du Kiyor. C'est le premier geste de chaque service, et celui qui a gagné le sort commence par là, à la seule lueur de la ma'arakha.",
+      "en": "No one touches a vessel before sanctifying his hands and feet with the water of the Kiyor. It is the first act of every service, and the one who won the lot begins there, by the light of the ma'arakha alone.",
+      "he": "אין נוגעים בכלי עד שמקדשים ידיים ורגליים מן הכיור. זו הפעולה הראשונה של כל עבודה, ומי שזכה בפיס מתחיל בה, לאור המערכה בלבד."
+     }
+    },
+    {
+     "id": "terumat_hadeshen",
+     "concept": "makom_hadeshen",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "1:4"
+     },
+     "point": [
+      -22,
+      50
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -56,
+       44
+      ],
+      [
+       -47,
+       53.5
+      ],
+      [
+       -29,
+       53.5
+      ],
+      [
+       -24,
+       51
+      ]
+     ],
+     "cible": [
+      -28.5,
+      1,
+      45
+     ],
+     "titre": {
+      "fr": "Terumat hadeshen",
+      "en": "Terumat hadeshen",
+      "he": "תרומת הדשן"
+     },
+     "texte": {
+      "fr": "La pelle d'argent en main, il monte au sommet de l'autel, écarte les braises, ramasse les cendres consumées et redescend. Il se tourne vers le nord et les dépose à dix amot à l'est du kevesh, à trois tefa'him de la rampe : le lieu du deshen.",
+      "en": "Silver pan in hand, he goes up to the top of the altar, pushes the coals aside, scoops up the consumed ashes and comes down. He turns to the north and sets them down ten amot east of the kevesh, three tefachim from the ramp: the place of the deshen.",
+      "he": "מחתת הכסף בידו, הוא עולה לראש המזבח, מפנה את הגחלים הילך והילך, חותה מן המאוכלות הפנימיות ויורד. הופך פניו לצפון ומניחן כעשר אמות ממזרח לכבש, שלושה טפחים מן הכבש: מקום הדשן."
+     }
+    },
+    {
+     "id": "siddour_hamaarakha",
+     "concept": "siddour_hamaarakha",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "2:3-4"
+     },
+     "point": [
+      -25.5,
+      15
+     ],
+     "sol": 9,
+     "via": [
+      [
+       -27,
+       54
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -30,
+       18
+      ]
+     ],
+     "cible": [
+      -31,
+      10.5,
+      9
+     ],
+     "titre": {
+      "fr": "Le bois de la ma'arakha",
+      "en": "The wood of the ma'arakha",
+      "he": "עצי המערכה"
+     },
+     "texte": {
+      "fr": "Les cendres retirées, les cohanim montent les bûches et dressent la grande ma'arakha sur l'autel, côté est, sa face vers l'est ; tout bois convient sauf l'olivier et la vigne. « Le cohen y fera brûler du bois, matin après matin » (Vayikra 6:5).",
+      "en": "The ashes removed, the kohanim carry up the logs and set the great ma'arakha on the altar, on its east side, its face to the east; any wood is fit except olive and vine. “The kohen shall burn wood on it every morning” (Vayikra 6:5).",
+      "he": "משנתרם הדשן מעלים הכהנים גזרים ומסדרים את המערכה הגדולה על המזבח, במזרחו, וחזיתה מזרחה; כל העצים כשרים חוץ משל זית ושל גפן. \"ובער עליה הכהן עצים בבוקר בבוקר\" (ויקרא ו, ה)."
+     }
+    },
+    {
+     "id": "zerika",
+     "concept": "zerika",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "4:1"
+     },
+     "point": [
+      -14,
+      -1
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -30,
+       18
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -24,
+       52
+      ],
+      [
+       -17.5,
+       40
+      ],
+      [
+       -17.5,
+       3
+      ]
+     ],
+     "cible": [
+      -21,
+      3,
+      -5
+     ],
+     "titre": {
+      "fr": "Le sang au coin de l'autel",
+      "en": "The blood at the altar's corner",
+      "he": "הדם על קרן המזבח"
+     },
+     "texte": {
+      "fr": "L'agneau est égorgé au nord de l'autel, sur le deuxième anneau. Le cohen qui a reçu le sang le porte au coin nord-est, puis au coin sud-ouest — deux aspersions qui en font quatre — et verse le reste sur le yessod sud.",
+      "en": "The lamb is slaughtered north of the altar, at the second ring. The kohen who received the blood carries it to the north-east corner, then to the south-west corner — two applications that are four — and pours the rest on the southern yesod.",
+      "he": "הטלה נשחט בצפון המזבח, על טבעת שנייה. הכהן שקיבל את הדם בא לו לקרן מזרחית־צפונית ואחר כך למערבית־דרומית — שתי מתנות שהן ארבע — ושיירי הדם שופך על יסוד דרומי."
+     }
+    },
+    {
+     "id": "melihat_haevarim",
+     "concept": "melihat_haevarim",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "4:3"
+     },
+     "point": [
+      -36,
+      52
+     ],
+     "sol": 1,
+     "via": [
+      [
+       -17.5,
+       3
+      ],
+      [
+       -17.5,
+       40
+      ],
+      [
+       -24,
+       52
+      ],
+      [
+       -30,
+       53.5
+      ]
+     ],
+     "cible": [
+      -42.5,
+      5,
+      46
+     ],
+     "titre": {
+      "fr": "Les membres salés sur le kevesh",
+      "en": "The limbs salted on the kevesh",
+      "he": "האברים נמלחים על הכבש"
+     },
+     "texte": {
+      "fr": "Les neuf cohanim qui ont reçu les membres les déposent sur la moitié basse du kevesh, côté ouest, et les salent. Puis ils descendent à la Lishkat HaGazit lire le Shema ; les membres attendent.",
+      "en": "The nine kohanim who received the limbs lay them on the lower half of the kevesh, on the west side, and salt them. Then they go down to the Lishkat HaGazit to recite the Shema; the limbs wait.",
+      "he": "תשעת הכהנים שזכו באברים נותנים אותם מחצי הכבש ולמטה, במערבו, ומולחים אותם. אחר כך יורדים ללשכת הגזית לקרוא את שמע; האברים ממתינים."
+     }
+    },
+    {
+     "id": "hatavat_hanerot",
+     "concept": "hatavat_hanerot",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "3:9"
+     },
+     "point": [
+      -112,
+      4
+     ],
+     "sol": 6,
+     "via": [
+      [
+       -47,
+       53.5
+      ],
+      [
+       -56,
+       46
+      ],
+      [
+       -56,
+       20
+      ],
+      [
+       -55,
+       2
+      ],
+      [
+       -100,
+       0
+      ]
+     ],
+     "cible": [
+      -122.5,
+      8.8,
+      7.5
+     ],
+     "titre": {
+      "fr": "La Menora, dans le Heikhal",
+      "en": "The Menorah, in the Heikhal",
+      "he": "המנורה, בהיכל"
+     },
+     "texte": {
+      "fr": "Le sang jeté, celui qui a gagné la Menora entre dans le Heikhal (Rambam, Temidin 6:3) : il nettoie cinq lampes, y met huile et mèches neuves, et laisse les deux de l'est ; il reviendra pour elles — avant l'encens selon Tamid 6:1, après selon le Rambam (Temidin 6:4).",
+      "en": "The blood thrown, the one who won the Menorah enters the Heikhal (Rambam, Temidin 6:3): he cleans five lamps, puts in fresh oil and wicks, and leaves the two eastern ones; he will come back for them — before the incense according to Tamid 6:1, after it according to the Rambam (Temidin 6:4).",
+      "he": "משנזרק הדם נכנס להיכל מי שזכה בדישון המנורה (רמב\"ם, תמידין ו, ג): מדשן חמישה נרות, נותן בהם שמן ופתילות חדשות, ומניח את שני המזרחיים; אליהם יחזור — לפני הקטורת לפי תמיד ו, א, ואחריה לפי הרמב\"ם (תמידין ו, ד)."
+     }
+    },
+    {
+     "id": "leviim",
+     "concept": "leviim",
+     "source": {
+      "oeuvre": "Tamid",
+      "ref": "7:3"
+     },
+     "point": [
+      -20.5,
+      30
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -100,
+       0
+      ],
+      [
+       -55,
+       2
+      ],
+      [
+       -56,
+       20
+      ],
+      [
+       -56,
+       46
+      ],
+      [
+       -47,
+       53.5
+      ],
+      [
+       -29,
+       53.5
+      ],
+      [
+       -24,
+       45
+      ]
+     ],
+     "cible": [
+      -13,
+      1.5,
+      0
+     ],
+     "titre": {
+      "fr": "Le chant des Léviim",
+      "en": "The song of the Leviim",
+      "he": "שירת הלויים"
+     },
+     "texte": {
+      "fr": "Les membres montés sur le feu, on apporte le vin de la libation ; le segan agite le linge, Ben Arza frappe le tziltzal et les Léviim entrent dans le chant. À chaque pause, une sonnerie ; à chaque sonnerie, le peuple se prosterne.",
+      "en": "The limbs on the fire, the wine for the libation is brought; the segan waves the cloth, Ben Arza strikes the tziltzal and the Leviim break into song. At every break, a blast of the trumpets; at every blast, the people prostrate themselves.",
+      "he": "משעלו האברים על האש מביאים את יין הנסך; הסגן מניף בסודרין, בן ארזא מקיש בצלצל והלויים מדברים בשיר. הגיעו לפרק — תקעו; ועל כל תקיעה — השתחוויה."
+     }
+    },
+    {
+     "id": "anshei_maamad",
+     "concept": "anshei_maamad",
+     "source": {
+      "oeuvre": "Ta'anit",
+      "ref": "4:2"
+     },
+     "point": [
+      -3,
+      31
+     ],
+     "sol": -2.5,
+     "via": [
+      [
+       -16,
+       32
+      ],
+      [
+       -9,
+       32
+      ]
+     ],
+     "cible": [
+      -6,
+      -0.1,
+      25
+     ],
+     "titre": {
+      "fr": "Israël se tient auprès de son korban",
+      "en": "Israel stands by its offering",
+      "he": "ישראל עומד על גבי קרבנו"
+     },
+     "texte": {
+      "fr": "« Comment le korban d'un homme peut-il être offert sans qu'il se tienne auprès ? » Les Israélites du ma'amad se tiennent dans l'Ezrat Israël, les onze amot à l'est du Doukhan, au nom de tout Israël. C'est l'ordre du tamid pour le service de la maison de notre Dieu.",
+      "en": "“How can a person's offering be sacrificed when he is not standing by it?” The Israelites of the ma'amad stand in the Ezrat Israel, the eleven amot east of the Dukhan, on behalf of all Israel. This is the order of the tamid for the service of the house of our God.",
+      "he": "\"וכי היאך קרבנו של אדם קרב והוא אינו עומד על גביו?\" ישראל שבמעמד עומדים בעזרת ישראל, אחת עשרה האמה שממזרח לדוכן, בשם כל ישראל. זה הוא סדר התמיד לעבודת בית אלוהינו."
+     }
+    }
+   ]
+  },
+  {
+   "id": "yom_kippour",
+   "titre": {
+    "fr": "Yom Kippour",
+    "en": "Yom Kippur",
+    "he": "יום הכיפורים"
+   },
+   "stations": [
+    {
+     "id": "parhedrin",
+     "concept": "lishkat_parhedrin",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "1:1"
+     },
+     "point": [
+      -37,
+      79
+     ],
+     "sol": -10,
+     "via": [],
+     "cible": [
+      -28.3,
+      -7.2,
+      80
+     ],
+     "titre": {
+      "fr": "Lishkat Parhedrin : sept jours à l'écart",
+      "en": "Lishkat Parhedrin: seven days apart",
+      "he": "לשכת פלהדרין: שבעת ימים בפרישה"
+     },
+     "texte": {
+      "fr": "Sept jours avant Yom Kippour, on retire le Cohen Gadol de sa maison pour la Lishkat Parhedrin, et l'on prépare un autre cohen à sa place, au cas où un empêchement le rendrait inapte. C'est d'ici que part le jour.",
+      "en": "Seven days before Yom Kippur the High Priest is taken from his house to the Parhedrin chamber, and another priest is made ready in his stead, lest something disqualify him. The day begins here.",
+      "he": "שבעת ימים קודם יום הכיפורים מפרישים את הכהן הגדול מביתו ללשכת פלהדרין, ומתקינים לו כהן אחר תחתיו שמא יארע בו פסול. מכאן מתחיל היום."
+     }
+    },
+    {
+     "id": "tevila_rishona",
+     "concept": "shaar_hamayim",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "3:3"
+     },
+     "point": [
+      -16,
+      62
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -33.5,
+       87.5
+      ],
+      [
+       -12,
+       87.5
+      ],
+      [
+       -12,
+       74
+      ],
+      [
+       -12,
+       69.5
+      ]
+     ],
+     "cible": [
+      -12,
+      12,
+      78
+     ],
+     "titre": {
+      "fr": "Sha'ar HaMayim : la première tevila",
+      "en": "The Water Gate: the first immersion",
+      "he": "שער המים: הטבילה הראשונה"
+     },
+     "texte": {
+      "fr": "Nul n'entre dans l'Azara pour le service sans s'être immergé. Le Cohen Gadol s'immerge cinq fois ce jour-là et sanctifie dix fois ses mains et ses pieds, toutes dans le sanctuaire, sur le Beit HaParva, sauf celle-ci, la première, dans le profane : au-dessus de la porte des Eaux, à côté de sa lishka (Yoma 31a).",
+      "en": "No one enters the Azara for the service without immersing. The High Priest immerses five times that day and sanctifies his hands and feet ten times, all in the sanctuary, on the Beit HaParva, except this one, the first, in the profane: above the Water Gate, beside his chamber (Yoma 31a).",
+      "he": "אין אדם נכנס לעזרה לעבודה עד שיטבול. חמש טבילות ועשרה קידושין טובל כהן גדול ומקדש בו ביום, וכולן בקודש על בית הפרווה, חוץ מזו, הראשונה, שהייתה בחול: על גבי שער המים, ובצד לשכתו הייתה (יומא לא ע״א)."
+     }
+    },
+    {
+     "id": "tevila_shniya",
+     "concept": "lishkat_haparva",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "3:6"
+     },
+     "point": [
+      -58,
+      52
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -20,
+       53.5
+      ],
+      [
+       -47,
+       53.5
+      ]
+     ],
+     "cible": [
+      -84,
+      12,
+      60
+     ],
+     "titre": {
+      "fr": "Beit HaParva : la deuxième tevila, les habits de lin",
+      "en": "Beit HaParva: the second immersion, the linen garments",
+      "he": "בית הפרווה: הטבילה השנייה, בגדי הלבן"
+     },
+     "texte": {
+      "fr": "Après le tamid du matin, on l'amène au Beit HaParva, dans le sanctuaire. On tend un drap de lin entre lui et le peuple ; il sanctifie mains et pieds, se dévêt, descend, s'immerge, remonte et s'essuie. On lui apporte les habits blancs : il les revêt et sanctifie encore mains et pieds. Le bain est sur le toit de cette lishka (Middot 5:3).",
+      "en": "After the morning tamid he is brought to the Beit HaParva, inside the sanctuary. A linen sheet is spread between him and the people; he sanctifies hands and feet, undresses, goes down, immerses, comes up and dries himself. They bring him the white garments: he puts them on and sanctifies hands and feet again. The bath is on the roof of this chamber (Middot 5:3).",
+      "he": "אחר תמיד של שחר מביאים אותו לבית הפרווה, ובקודש הייתה. פורסים סדין של בוץ בינו לבין העם; מקדש ידיו ורגליו, פושט, יורד וטובל, עולה ומסתפג. מביאים לו בגדי לבן, לובש ומקדש ידיו ורגליו. בית הטבילה על גג הלשכה הזאת (מידות ה, ג)."
+     }
+    },
+    {
+     "id": "viduy_rishon",
+     "concept": "douze_marches_oulam",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "3:8"
+     },
+     "point": [
+      -55.5,
+      -14
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -56,
+       50
+      ],
+      [
+       -56,
+       20
+      ],
+      [
+       -55.5,
+       0
+      ]
+     ],
+     "cible": [
+      -64,
+      1.5,
+      -14
+     ],
+     "titre": {
+      "fr": "Le taureau, entre l'Oulam et l'autel : premier viduy",
+      "en": "The bull, between the Oulam and the altar: first confession",
+      "he": "פרו בין האולם ולמזבח: וידוי ראשון"
+     },
+     "texte": {
+      "fr": "Son taureau se tient entre l'Oulam et l'autel, la tête au sud, la face à l'ouest ; le cohen, à l'est, face à l'ouest, pose ses deux mains sur lui et confesse : « De grâce, HaShem, j'ai fauté, transgressé, péché devant Toi, moi et ma maison… » Et à l'entendre, ils répondent : Baroukh shem kevod malkhouto le'olam va'ed.",
+      "en": "His bull stands between the Oulam and the altar, head to the south, face to the west; the priest, to its east and facing west, lays both hands on it and confesses: “Please, HaShem, I have done wrong, transgressed, sinned before You, I and my house…” And hearing it, they answer: Barukh shem kevod malkhuto le'olam va'ed.",
+      "he": "פרו עומד בין האולם ולמזבח, ראשו לדרום ופניו למערב; הכהן עומד במזרח ופניו למערב, סומך שתי ידיו עליו ומתוודה: ״אנא השם, עוויתי פשעתי חטאתי לפניך אני וביתי…״ והם עונים אחריו: ברוך שם כבוד מלכותו לעולם ועד."
+     }
+    },
+    {
+     "id": "goral",
+     "concept": "tabaot",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "3:9"
+     },
+     "point": [
+      -16,
+      -30
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -55.5,
+       -12
+      ],
+      [
+       -20,
+       -12
+      ]
+     ],
+     "cible": [
+      -16,
+      1,
+      -38
+     ],
+     "titre": {
+      "fr": "Les deux boucs : le tirage au sort",
+      "en": "The two goats: the lots",
+      "he": "שני השעירים: הגורל"
+     },
+     "texte": {
+      "fr": "Il vient à l'est de l'Azara, au nord de l'autel, le segan à sa droite, le chef de la maison paternelle à sa gauche. Là, deux boucs, et une urne avec deux sorts : « pour HaShem », « pour Azazel ». Il les tire, un dans chaque main, et les pose sur les deux boucs (Yoma 4:1) ; celui du Nom sera égorgé ici, aux anneaux ; l'autre partira au désert.",
+      "en": "He comes to the east of the Azara, north of the altar, the deputy at his right, the head of the father’s house at his left. There, two goats, and an urn with two lots: “for HaShem”, “for Azazel”. He draws them, one in each hand, and lays them on the two goats (Yoma 4:1); the one for the Name will be slaughtered here, at the rings; the other will go to the wilderness.",
+      "he": "בא לו למזרח העזרה, לצפון המזבח, הסגן מימינו וראש בית אב משמאלו. שם שני שעירים, וקלפי ובה שני גורלות: ״לשם״, ״לעזאזל״. טורף ומעלה אותם, אחד בכל יד, ונותנם על שני השעירים (יומא ד, א); של שם יישחט כאן, אצל הטבעות; השני יצא למדבר."
+     }
+    },
+    {
+     "id": "machta",
+     "concept": "machta",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "4:3"
+     },
+     "point": [
+      -25.5,
+      15
+     ],
+     "sol": 9,
+     "via": [
+      [
+       -20,
+       -12
+      ],
+      [
+       -55.5,
+       -12
+      ],
+      [
+       -55.5,
+       20
+      ],
+      [
+       -56,
+       46
+      ],
+      [
+       -47,
+       53.5
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -30,
+       18
+      ]
+     ],
+     "cible": [
+      -31,
+      10.5,
+      9
+     ],
+     "titre": {
+      "fr": "Le second viduy, le sang, la ma'hta",
+      "en": "The second confession, the blood, the machta",
+      "he": "וידוי שני, הדם, המחתה"
+     },
+     "texte": {
+      "fr": "Revenu à son taureau, il confesse une seconde fois, pour lui, sa maison et les fils d'Aaron (Yoma 4:2) ; il l'égorge, reçoit le sang dans le mizrak et le donne à celui qui le remue sur la quatrième rangée de dalles du Heikhal, pour qu'il ne fige pas. Puis il prend la ma'hta, monte au sommet de l'autel, écarte les braises de part et d'autre et puise parmi les plus consumées, à l'intérieur ; il descend la poser sur la quatrième rangée de l'Azara.",
+      "en": "Back at his bull, he confesses a second time, for himself, his house and the sons of Aaron (Yoma 4:2); he slaughters it, receives the blood in the mizrak and hands it to the one who stirs it on the fourth row of tiles of the Heikhal, so that it does not congeal. Then he takes the machta, climbs to the top of the altar, pushes the coals aside and scoops from the most consumed ones, inside; he comes down and sets it on the fourth row of the Azara.",
+      "he": "חוזר אצל פרו ומתוודה שנית, עליו ועל ביתו ועל בני אהרן (יומא ד, ב); שוחטו, מקבל את דמו במזרק ונותנו למי שממרס בו על הרובד הרביעי שבהיכל, כדי שלא יקרוש. נוטל מחתה ועולה לראש המזבח, מפנה גחלים אילך ואילך וחותה מן המעוכלות הפנימיות; יורד ומניחה על הרובד הרביעי שבעזרה."
+     }
+    },
+    {
+     "id": "ketoret",
+     "concept": "aron",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "5:1"
+     },
+     "point": [
+      -144.5,
+      0
+     ],
+     "sol": 6,
+     "via": [
+      [
+       -30,
+       18
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -47,
+       53.5
+      ],
+      [
+       -56,
+       46
+      ],
+      [
+       -56,
+       20
+      ],
+      [
+       -55,
+       2
+      ],
+      [
+       -100,
+       0
+      ],
+      [
+       -130,
+       0
+      ],
+      [
+       -136,
+       8
+      ],
+      [
+       -138.5,
+       8
+      ],
+      [
+       -138.5,
+       -8
+      ],
+      [
+       -140.5,
+       -8
+      ],
+      [
+       -140.5,
+       0
+      ]
+     ],
+     "cible": [
+      -149,
+      7.7,
+      0
+     ],
+     "titre": {
+      "fr": "Le Kodesh HaKodashim : l'encens entre les barres",
+      "en": "The Kodesh HaKodashim: the incense between the staves",
+      "he": "קודש הקודשים: הקטורת בין הבדים"
+     },
+     "texte": {
+      "fr": "On lui tend la cuiller et la ma'hta ; il emplit ses deux paumes d'encens et le verse dans la cuiller. La ma'hta dans la droite, la cuiller dans la gauche, il traverse le Heikhal jusqu'aux deux parokhot, l'extérieure ouverte au sud, l'intérieure au nord ; il marche entre elles jusqu'au nord, se tourne vers le sud, longe la parokhet jusqu'à l'Arche, pose la ma'hta entre les deux barres, amoncelle l'encens sur les braises, et toute la maison s'emplit de fumée. Il ressort par où il est entré et dit une courte prière dans le Heikhal, pour ne pas effrayer Israël.",
+      "en": "They hand him the spoon and the machta; he fills both palms with incense and pours it into the spoon. Machta in the right hand, spoon in the left, he walks through the Heikhal to the two parokhot, the outer one hooked open at the south, the inner one at the north; he walks between them to the north, turns south, follows the curtain to the Ark, sets the machta between the two staves, heaps the incense on the coals, and the whole house fills with smoke. He goes out the way he came in and says a short prayer in the Heikhal, so as not to frighten Israel.",
+      "he": "מוציאים לו את הכף ואת המחתה; חופן מלוא חופניו קטורת ונותן לתוך הכף. המחתה בימינו והכף בשמאלו, מהלך בהיכל עד שמגיע לבין שתי הפרוכות, החיצונה פרופה מן הדרום והפנימית מן הצפון; מהלך ביניהן עד שמגיע לצפון, הופך פניו לדרום, מהלך עם הפרוכת עד שמגיע לארון, נותן את המחתה בין שני הבדים, צובר את הקטורת על גבי הגחלים ונתמלא כל הבית כולו עשן. יוצא בדרך בית כניסתו ומתפלל תפילה קצרה בהיכל, שלא להבעית את ישראל."
+     }
+    },
+    {
+     "id": "hazaot",
+     "concept": "parokhet",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "5:4"
+     },
+     "point": [
+      -124,
+      0
+     ],
+     "sol": 6,
+     "via": [
+      [
+       -140.5,
+       -8
+      ],
+      [
+       -138.5,
+       -8
+      ],
+      [
+       -138.5,
+       8
+      ],
+      [
+       -135,
+       8
+      ]
+     ],
+     "cible": [
+      -138,
+      12,
+      0
+     ],
+     "titre": {
+      "fr": "Les aspersions : une en haut, sept en bas",
+      "en": "The sprinklings: one upward, seven downward",
+      "he": "ההזאות: אחת למעלה ושבע למטה"
+     },
+     "texte": {
+      "fr": "Il reprend le sang du taureau, rentre là où il est entré, se tient là où il s'est tenu, et asperge une fois vers le haut, sept fois vers le bas, en comptant : une ; une et une ; une et deux… jusqu'à une et sept (Yoma 5:3). Le bouc pour HaShem égorgé, il rentre de même avec son sang. Puis, d'ici, sur la parokhet face à l'Arche, de l'extérieur : le sang du taureau, une en haut, sept en bas ; celui du bouc, de même ; et il verse l'un dans l'autre.",
+      "en": "He takes back the bull’s blood, enters where he entered, stands where he stood, and sprinkles once upward and seven times downward, counting: one; one and one; one and two… up to one and seven (Yoma 5:3). The goat for HaShem slaughtered, he goes in again with its blood. Then, from here, on the parokhet facing the Ark, from outside: the bull’s blood, one up, seven down; the goat’s, the same; and he pours one into the other.",
+      "he": "נוטל את דם הפר, נכנס למקום שנכנס ועומד במקום שעמד, ומזה ממנו אחת למעלה ושבע למטה, וכך מונה: אחת; אחת ואחת; אחת ושתיים… עד אחת ושבע (יומא ה, ג). נשחט השעיר לשם, נכנס שוב עם דמו. ואחר כך, מכאן, על הפרוכת שכנגד הארון מבחוץ: דם הפר אחת למעלה ושבע למטה; דם השעיר כמו כן; ומערה זה לתוך זה."
+     }
+    },
+    {
+     "id": "mizbeach_hazahav",
+     "concept": "mizbeach_hazahav",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "5:5"
+     },
+     "point": [
+      -114,
+      0
+     ],
+     "sol": 6,
+     "via": [
+      [
+       -121,
+       -3
+      ],
+      [
+       -117,
+       -3
+      ]
+     ],
+     "cible": [
+      -119,
+      8,
+      0
+     ],
+     "titre": {
+      "fr": "Le Mizbea'h HaZahav : les quatre cornes",
+      "en": "The Mizbeach HaZahav: the four horns",
+      "he": "מזבח הזהב: ארבע הקרנות"
+     },
+     "texte": {
+      "fr": "« Il sortira vers l'autel qui est devant HaShem » : c'est l'autel d'or. Il commence à le purifier en descendant, de la corne nord-est à la nord-ouest, la sud-ouest, la sud-est — là où il commence sur l'autel extérieur, il finit sur l'intérieur. Puis sept fois sur l'or nu de l'autel, et le reste du sang au yesod ouest de l'autel extérieur (Yoma 5:6).",
+      "en": "“He shall go out to the altar that is before HaShem”: this is the golden altar. He begins to cleanse it downward, from the north-east horn to the north-west, the south-west, the south-east — where he begins on the outer altar, he finishes on the inner one. Then seven times on the bare gold of the altar, and the rest of the blood on the western yesod of the outer altar (Yoma 5:6).",
+      "he": "״ויצא אל המזבח אשר לפני ה׳״ – זה מזבח הזהב. מתחיל מחטא ויורד, מקרן מזרחית צפונית לצפונית מערבית, מערבית דרומית, דרומית מזרחית – מקום שמתחיל בחטאת על המזבח החיצון, משם גומר על הפנימי. ואחר כך שבע פעמים על טהרו של מזבח, ושיירי הדם על יסוד מערבי של המזבח החיצון (יומא ה, ו)."
+     }
+    },
+    {
+     "id": "sair_hamishtaleach",
+     "concept": "shaar_nikanor",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "6:2"
+     },
+     "point": [
+      -16,
+      0
+     ],
+     "sol": 0,
+     "via": [
+      [
+       -118,
+       -3
+      ],
+      [
+       -100,
+       0
+      ],
+      [
+       -55,
+       2
+      ],
+      [
+       -55.5,
+       -12
+      ],
+      [
+       -20,
+       -12
+      ],
+      [
+       -17,
+       -4
+      ]
+     ],
+     "cible": [
+      4,
+      6,
+      0
+     ],
+     "titre": {
+      "fr": "Le bouc émissaire : le viduy et le départ",
+      "en": "The scapegoat: the confession and the sending",
+      "he": "השעיר המשתלח: הווידוי והשילוח"
+     },
+     "texte": {
+      "fr": "Il vient au bouc émissaire, pose ses deux mains sur lui et confesse pour tout Israël. Quand les cohanim et le peuple debout dans l'Azara entendent le Nom explicite sortir de sa bouche, ils s'agenouillent, se prosternent, tombent sur la face : Baroukh shem kevod malkhouto le'olam va'ed. Puis il le remet à celui qui le conduit (Yoma 6:3) ; on lui a fait un pont, à cause des Babyloniens qui lui tiraient les poils (Yoma 6:4).",
+      "en": "He comes to the scapegoat, lays both hands on it and confesses for all Israel. When the priests and the people standing in the Azara hear the explicit Name come from his mouth, they kneel, prostrate themselves and fall on their faces: Barukh shem kevod malkhuto le’olam va’ed. Then he hands it to the one who leads it (Yoma 6:3); a ramp was made for it, because of the Babylonians who pulled its hair (Yoma 6:4).",
+      "he": "בא לו אצל שעיר המשתלח, סומך שתי ידיו עליו ומתוודה על כל ישראל. וכשהכהנים והעם העומדים בעזרה שומעים את השם המפורש יוצא מפי כהן גדול, כורעים ומשתחווים ונופלים על פניהם: ברוך שם כבוד מלכותו לעולם ועד. מוסרו למי שמוליכו (יומא ו, ג); וכבש עשו לו מפני הבבליים שהיו מתלשים בשערו (יומא ו, ד)."
+     }
+    },
+    {
+     "id": "keriat_hatorah",
+     "concept": "ezrat_nashim",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "7:1"
+     },
+     "point": [
+      26,
+      0
+     ],
+     "sol": -10,
+     "via": [
+      [
+       -12.5,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       20,
+       0
+      ]
+     ],
+     "cible": [
+      66,
+      -6,
+      0
+     ],
+     "titre": {
+      "fr": "Ezrat Nashim : la lecture de la Torah",
+      "en": "Ezrat Nashim: the reading of the Torah",
+      "he": "עזרת נשים: קריאת התורה"
+     },
+     "texte": {
+      "fr": "Le Cohen Gadol vient lire, en habits de lin s'il le veut, ou dans une tunique blanche à lui. Le 'hazan de la synagogue prend le sefer Torah et le donne au chef de la synagogue, qui le donne au segan, qui le donne au Cohen Gadol ; debout, il reçoit et lit A'harei mot et Akh be'assor, roule le rouleau, le serre contre lui — « il est écrit ici plus que ce que j'ai lu devant vous » —, dit par cœur Ouve'assor des Nombres, et bénit huit bénédictions. Il lit dans l'Ezrat Nashim (Yoma 69b ; Rambam, Avodat Yom HaKippourim 3:10).",
+      "en": "The High Priest comes to read, in the linen garments if he wishes, or in a white robe of his own. The synagogue attendant takes the Torah scroll and gives it to the head of the synagogue, who gives it to the deputy, who gives it to the High Priest; standing, he receives it and reads Acharei mot and Akh be’asor, rolls the scroll, holds it to his chest — “more than what I have read before you is written here” —, says Uve’asor from Numbers by heart, and blesses eight blessings. He reads in the Ezrat Nashim (Yoma 69b; Rambam, Avodat Yom HaKippurim 3:10).",
+      "he": "בא לו כהן גדול לקרות, בבגדי בוץ אם רצה, או באצטלית לבן משלו. חזן הכנסת נוטל ספר תורה ונותנו לראש הכנסת, וראש הכנסת נותנו לסגן, והסגן נותנו לכהן גדול; עומד ומקבל וקורא אחרי מות ואך בעשור, גולל את הספר ומניחו בחיקו – ״יותר ממה שקראתי לפניכם כתוב כאן״ – קורא על פה ובעשור שבחומש הפקודים, ומברך שמונה ברכות. קורא בעזרת נשים (יומא סט ע״ב; רמב״ם, עבודת יום הכיפורים ג, י)."
+     }
+    },
+    {
+     "id": "tevilot_acharonot",
+     "concept": "lishkat_haparva",
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "7:4"
+     },
+     "point": [
+      -58,
+      52
+     ],
+     "sol": 0,
+     "via": [
+      [
+       20,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       -6,
+       0
+      ],
+      [
+       -12.5,
+       0
+      ],
+      [
+       -16,
+       -4
+      ],
+      [
+       -20,
+       -12
+      ],
+      [
+       -55.5,
+       -12
+      ],
+      [
+       -55.5,
+       20
+      ]
+     ],
+     "cible": [
+      -84,
+      12,
+      60
+     ],
+     "titre": {
+      "fr": "Beit HaParva : les dernières tevilot",
+      "en": "Beit HaParva: the last immersions",
+      "he": "בית הפרווה: הטבילות האחרונות"
+     },
+     "texte": {
+      "fr": "Retour au Beit HaParva. Habits d'or pour son bélier et le bélier du peuple (Yoma 7:3) ; habits blancs pour aller retirer la cuiller et la ma'hta du Kodesh HaKodashim ; habits d'or pour l'encens du soir et l'entretien des lampes — une tevila et deux kiddoushim à chaque changement, cinq tevilot en tout. Puis ses propres habits : on l'accompagne jusqu'à sa maison, et il fait fête à ses proches d'être sorti en paix du sanctuaire.",
+      "en": "Back to the Beit HaParva. Golden garments for his ram and the people’s ram (Yoma 7:3); white garments to bring the spoon and the machta out of the Kodesh HaKodashim; golden garments for the evening incense and the tending of the lamps — an immersion and two sanctifications at each change, five immersions in all. Then his own clothes: they escort him to his house, and he makes a feast for his friends for having come out of the sanctuary in peace.",
+      "he": "חזרה לבית הפרווה. בגדי זהב לאילו ולאיל העם (יומא ז, ג); בגדי לבן להוציא את הכף ואת המחתה מקודש הקודשים; בגדי זהב לקטורת של בין הערביים ולהטבת הנרות – טבילה ושני קידושים בכל חילוף, חמש טבילות בסך הכול. ואחר כך בגדי עצמו: מלווים אותו עד ביתו, ויום טוב היה עושה לאוהביו בשעה שיצא בשלום מן הקודש."
+     }
+    }
+   ]
+  }
+ ]
+}

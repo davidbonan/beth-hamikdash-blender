@@ -61,7 +61,14 @@
       "est": "E",
       "ouest": "O",
       "initiation_fin_vol": "Vous savez voler",
-      "initiation_fin_vol_texte": "« À pied », en haut de l'écran, vous repose au sol."
+      "initiation_fin_vol_texte": "« À pied », en haut de l'écran, vous repose au sol.",
+      "parcours_menu": "Parcours…",
+      "parcours_titre": "Suivre un service, station par station",
+      "parcours_allure": "Vitesse de la marche : au pas, ×2, ×4",
+      "parcours_suivant": "Suivant",
+      "parcours_terminer": "Terminer",
+      "parcours_precedent": "Précédent",
+      "parcours_quitter": "Quitter"
     },
     "zones": {
       "har_habayit": "Har HaBayit",
@@ -137,7 +144,14 @@
       "est": "מז",
       "ouest": "מע",
       "initiation_fin_vol": "עכשיו אתם יודעים לטוס",
-      "initiation_fin_vol_texte": "\"הליכה\" בראש המסך תחזיר אתכם לקרקע."
+      "initiation_fin_vol_texte": "\"הליכה\" בראש המסך תחזיר אתכם לקרקע.",
+      "parcours_menu": "סיורים…",
+      "parcours_titre": "מעקב אחר עבודה, תחנה אחר תחנה",
+      "parcours_allure": "מהירות ההליכה: רגילה, ×2, ×4",
+      "parcours_suivant": "הבא",
+      "parcours_terminer": "סיום",
+      "parcours_precedent": "הקודם",
+      "parcours_quitter": "יציאה"
     },
     "zones": {
       "har_habayit": "הר הבית",
@@ -232,7 +246,8 @@
       "Zeva'him": "זבחים",
       "Shemot Rabba": "שמות רבה",
       "Shir HaShirim Rabba": "שיר השירים רבה",
-      "Teshouvot HaRadbaz II": "שו\"ת הרדב\"ז ח\"ב"
+      "Teshouvot HaRadbaz II": "שו\"ת הרדב\"ז ח\"ב",
+      "Ta'anit": "תענית"
     }
   },
   "en": {
@@ -297,7 +312,14 @@
       "est": "E",
       "ouest": "W",
       "initiation_fin_vol": "You can fly",
-      "initiation_fin_vol_texte": "“Walk”, at the top of the screen, sets you back on the ground."
+      "initiation_fin_vol_texte": "“Walk”, at the top of the screen, sets you back on the ground.",
+      "parcours_menu": "Tours…",
+      "parcours_titre": "Follow a service, station by station",
+      "parcours_allure": "Walking speed: normal, ×2, ×4",
+      "parcours_suivant": "Next",
+      "parcours_terminer": "Finish",
+      "parcours_precedent": "Back",
+      "parcours_quitter": "Leave"
     },
     "zones": {
       "har_habayit": "Har HaBayit",
@@ -392,7 +414,8 @@
       "Zeva'him": "Zevachim",
       "Shemot Rabba": "Shemot Rabbah",
       "Shir HaShirim Rabba": "Shir HaShirim Rabbah",
-      "Teshouvot HaRadbaz II": "Responsa of the Radbaz, vol. II"
+      "Teshouvot HaRadbaz II": "Responsa of the Radbaz, vol. II",
+      "Ta'anit": "Ta'anit"
     }
   }
 }
