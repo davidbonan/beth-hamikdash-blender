@@ -1607,9 +1607,10 @@ def _sens_direct(paroi):
     return 1 if aire.dot(normale) > 0 else -1
 
 
-def _bande_saillante(nom, paroi, motif, cadre, saillie, col):
+def _bande_saillante(nom, paroi, motif, cadre, saillie, col, allonge=1.0):
     """Une bande d'or qui sort de `saillie`, dont le dessus reparcourt la tuile de `motif`
     le long de son plus grand côté, et ses flancs jusqu'au pied assis dans le placage.
+    `allonge` : longueur d'une tuile posée, en part de la largeur de la bande.
 
     Une figure isolée vaut une plaque ; un cordon qui court sur quarante amot en vaudrait
     des centaines. La bande n'en fait qu'UNE, et son dessus est un ruban de quadrilatères
@@ -1628,7 +1629,7 @@ def _bande_saillante(nom, paroi, motif, cadre, saillie, col):
     sens = _sens_direct(paroi)
     horizontal = abs(u1 - u0) >= abs(z1 - z0)
     (l0, l1), (c0, c1) = ((u0, u1), (z0, z1)) if horizontal else ((z0, z1), (u0, u1))
-    n = max(1, round(abs(l1 - l0) / abs(c1 - c0)))
+    n = max(1, round(abs(l1 - l0) / (abs(c1 - c0) * allonge)))
     pas = (l1 - l0) / n
     verts, faces, uv = [], [], []
     coins_motif = [(mu0, mz0), (mu1, mz0), (mu1, mz0 + etendue), (mu0, mz0 + etendue)]
@@ -1675,8 +1676,8 @@ def _bande_saillante(nom, paroi, motif, cadre, saillie, col):
 #     lit par ses UV : `beit_hamikdash_gravures.py` écrit la carte et les silhouettes,
 #     tracées sur la carte même. Des plaques empilées, aussi bien découpées fussent-elles,
 #     se lisaient en emporte-pièce : seul le chanfrein prenait la lumière.
-# Le bandeau porte maintenant un cordon ET les fleurs enfilées dessus (`bandeau_guirlande`) :
-# à 0,55 ama les deux se disputaient la même ligne et le cordon sortait en filet sale.
+# Le bandeau porte un cordon ET les rosettes enfilées dessus (`bandeau_guirlande`) : à
+# 0,55 ama les deux se disputaient la même ligne et le cordon sortait en filet sale.
 BANDEAU_KIR = 0.8         # hauteur d'un bandeau, en amot
 # Sur la pierre — jambages, frise de la gezuztra — la figure est TAILLÉE, rien n'en sort :
 # son modelé bombe au fond de la taille, et c'est le flanc tourné vers elle qui en trace
@@ -1693,10 +1694,10 @@ SAILLIE_KIR = 0.10
 ASSISE_KIR = 0.02
 # Le pas d'un keruv à la palmette voisine, en amot : 8 pas sur les 40 amot du Heikhal —
 # sept figures par rang, un pas de marge pour les montants —, et le Kodesh HaKodashim prend
-# le même, pour que ses keruvim aient la taille de ceux du Heikhal. Le pas règle la taille
-# des figures, qui se touchent à la pointe des ailes : 8,1 amot, dans deux registres de
-# 9,3 utiles. À un seul registre, le Kodesh HaKodashim ne tenait plus qu'un keruv par paroi,
-# sans la timora que Ye'hezkel 41:18 met entre deux.
+# le même, pour que ses keruvim aient la taille de ceux du Heikhal. Les figures font la
+# hauteur du registre, 9,4 amot, et leurs silhouettes s'emboîtent à ce pas à 5 cm près
+# (`emboitement`). À un seul registre, le Kodesh HaKodashim ne tenait plus qu'un keruv par
+# paroi, sans la timora que Ye'hezkel 41:18 met entre deux.
 PAS_KIR = 40 / 8
 PAS_FLEURON = 3.7         # pas d'un fleuron dans un bandeau, en amot
 GRAVURES_JSON = pathlib.Path(__file__).resolve().parent / "visite" / "matieres" / "gravures.json"
@@ -1773,6 +1774,28 @@ def _relief_saillant(nom, paroi, motif, u, z0, h, col):
     return _saillie_profil(nom, paroi, contour, SAILLIE_KIR, col, matiere_gravee(MAT_OR_PLAQUE()), uv)
 
 
+def _etendue_a(silhouette, z):
+    """Les abscisses extrêmes où la ligne de hauteur `z` coupe la silhouette."""
+    coupes = [ua + (ub - ua) * (z - za) / (zb - za)
+              for (ua, za), (ub, zb) in zip(silhouette, silhouette[1:] + silhouette[:1])
+              if za != zb and min(za, zb) <= z <= max(za, zb)]
+    return (min(coupes), max(coupes)) if coupes else None
+
+
+def emboitement(motif_a, motif_b):
+    """Le pas, en part de la hauteur commune, sous lequel deux figures voisines se
+    mordent, lu hauteur par hauteur des deux côtés. Les boîtes des silhouettes ne
+    s'emboîtent pas là où les ailes et les palmes, elles, s'emboîtent : les ailes du
+    keruv sont larges en haut, la palmette au milieu."""
+    a, b = GRAVURES[motif_a]["silhouette"], GRAVURES[motif_b]["silhouette"]
+    pire = 0.0
+    for k in range(1001):
+        ea, eb = _etendue_a(a, k / 1000), _etendue_a(b, k / 1000)
+        if ea and eb:
+            pire = max(pire, ea[1] - eb[0], eb[1] - ea[0])
+    return pire
+
+
 def largeur_gravure(motif):
     """Largeur de la figure, en part de sa hauteur, lue sur sa silhouette dans l'atlas."""
     us = [du for du, _ in GRAVURES[motif]["silhouette"]]
@@ -1819,15 +1842,6 @@ def fleur_de_guirlande(nom, paroi, u, z, r, col):
     return o
 
 
-def bouton_de_guirlande(nom, paroi, u, z0, h, col):
-    """« פְּקָעִים » (Melakhim I 6:18) : le bouton fermé, « כְּמִין כַּפְתּוֹרִים » (Rashi),
-    « בִּיצִים שֶׁשְּׁנֵי רָאשֵׁיהֶם חַדִּים » (Ralbag), qui le rattache aux גְּבִיעִים כַּפְתֹּרִים
-    וּפְרָחִים de la Menora. Debout sur le cordon, pied en `z0`, haut de `h`."""
-    o = _relief_saillant(nom, paroi, "bouton", u, z0, h, col)
-    o["sans_biseau"] = True
-    return o
-
-
 # Les deux traits d'un bandeau, en amot au-dessus de son bas : entre le bord et ce que
 # le bandeau porte, qui en laisse de quoi ne pas le toucher — deux tailles qui se
 # touchent ne font plus qu'un trou.
@@ -1850,42 +1864,55 @@ def bandeau_fleurons(nom, paroi, u0, u1, z, col, mat=None):
                     BANDEAU_KIR * 0.42, col, mat)
 
 
-CORDON_BANDEAU = 0.34     # part du bandeau prise par le cordon, traits déduits
-# Les deux plaques se chevauchent sans clignoter parce que leurs dessus sont à deux
-# saillies ; posées bord à bord elles se lisaient en rang de fleurs À CÔTÉ du cordon.
-ENFILAGE = 0.16           # part de la fleur qui descend DANS le cordon
-PAS_FLEUR = 1.45          # pas d'une fleur à la suivante dans un bandeau, en amot
+# La guirlande de l'image validée : un gros cordon qui tient presque toute la hauteur du
+# bandeau entre deux filets plats, et des rosettes enfilées au milieu du cordon. En amot
+# au-dessus du bas du bandeau. Un cordon d'un tiers de bandeau, des fleurs debout dessus et
+# des filets d'un centimètre se lisaient en rang d'objets posés, non en corde.
+FILET_GUIRLANDE = 0.07
+CORDON_GUIRLANDE = (0.13, BANDEAU_KIR - 0.13)
+RAYON_ROSETTE = 0.36
+# Une torsion par diamètre de corde, la tuile de `corde` en portant deux : sur une tuile
+# carrée les mèches tombaient au demi-diamètre et le cordon sortait en hachures.
+ALLONGE_CORDE = 2.0
+# Une rosette sous chaque figure et une à chaque point où deux figures se touchent : c'est
+# le pas des figures qui règle celui des fleurs, et le cordon se lit avec la file.
+PAS_ROSETTE = PAS_KIR / 2
 
 
-def bandeau_guirlande(nom, paroi, u0, u1, z, col):
+def rosettes_regulieres(u0, u1):
+    """Les rosettes d'un bandeau qui ne porte pas de file de figures : au pas le plus
+    proche de PAS_ROSETTE, centrées."""
+    n = max(1, round(abs(u1 - u0) / PAS_ROSETTE))
+    pas = (u1 - u0) / n
+    return [u0 + pas * (i + 0.5) for i in range(n)]
+
+
+def bandeau_guirlande(nom, paroi, u0, u1, z, col, rosettes=None):
     """« פְּטוּרֵי צִצִּים » tel que le Targum le lit : « אָטוּנִין שׁוֹשַׁנִין », des cordes de
     fleurs, et Rashi le décompose sur 6:18 — « פְּטוּרֵי לְשׁוֹן חֲבָלִים … צִצִּים לְשׁוֹן
     פְּרָחִים », « צוּרַת שַׁלְשְׁלָאוֹת ». Le bandeau est donc un CORDON qui court, et des fleurs
-    enfilées dessus ; et puisque Melakhim I 6:18 met les פְּקָעִים — les boutons — au même
-    rang que les צִצִּים, ce qui s'enfile alterne le bouton et la corolle ouverte.
+    enfilées dessus, en `rosettes` (abscisses) ou au pas régulier.
 
-    Ce que le bandeau portait avant — deux traits et une corolle tous les 3,7 amot —
-    laissait les figures flotter sur l'or nu : c'est le cordon, et lui seul, qui les tient.
-    Tout y sort de l'or, comme les figures qu'il sépare.
+    C'est le cordon, et lui seul, qui tient les figures : elles posent le pied sur le
+    filet du haut et touchent de la tête celui du bandeau suivant (`figure_du_registre`).
     """
-    (_, bas), (haut, _) = TRAITS_BANDEAU
-    cordon = bas + (haut - bas) * CORDON_BANDEAU
-    for bord, (zb, zh) in enumerate(TRAITS_BANDEAU):
+    for bord, (zb, zh) in enumerate(((0.0, FILET_GUIRLANDE),
+                                      (BANDEAU_KIR - FILET_GUIRLANDE, BANDEAU_KIR))):
         _saillie_profil(f"{nom}_trait_{bord}", paroi,
                         [(u0, z + zb), (u1, z + zb), (u1, z + zh), (u0, z + zh)],
                         SAILLIE_KIR * 0.4, col)
-    _bande_saillante(f"{nom}_cordon", paroi, "corde", ((u0, z + bas), (u1, z + cordon)),
-                     SAILLIE_KIR * 0.7, col)
-    n = max(2, round(abs(u1 - u0) / PAS_FLEUR))
-    pas = (u1 - u0) / n
-    fleur = (haut - cordon) * 0.94
-    pied = z + cordon - fleur * ENFILAGE
-    for i in range(n):
-        u = u0 + pas * (i + 0.5)
-        if i % 2 == 0:
-            fleur_de_guirlande(f"{nom}_fleur_{i:02d}", paroi, u, pied + fleur / 2, fleur / 2, col)
-        else:
-            bouton_de_guirlande(f"{nom}_fleur_{i:02d}", paroi, u, pied, fleur, col)
+    bas, haut = CORDON_GUIRLANDE
+    _bande_saillante(f"{nom}_cordon", paroi, "corde", ((u0, z + bas), (u1, z + haut)),
+                     SAILLIE_KIR * 0.7, col, ALLONGE_CORDE)
+    for i, u in enumerate(rosettes_regulieres(u0, u1) if rosettes is None else rosettes):
+        fleur_de_guirlande(f"{nom}_fleur_{i:02d}", paroi, u, z + BANDEAU_KIR / 2, RAYON_ROSETTE, col)
+
+
+def figure_du_registre(z, registre):
+    """Pied et hauteur d'une figure du registre qui commence en `z` : de la moitié du filet
+    du bandeau d'en bas à la moitié du filet de celui d'en haut. Une figure qui flotte
+    entre deux bandeaux se lit posée au hasard sur l'or ; c'est le contact qui fait scène."""
+    return z + BANDEAU_KIR - FILET_GUIRLANDE / 2, registre - BANDEAU_KIR + FILET_GUIRLANDE
 
 
 REGISTRES_VANTAIL = 3     # figures empilées sur un vantail : « תמרה בין כרוב לכרוב »
@@ -1903,13 +1930,14 @@ def vantail_sculpte(nom, paroi, u0, u1, z0, z1, col):
     portent ce que portent les murs.
     """
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_VANTAIL
-    h = registre - BANDEAU_KIR
+    _, h = figure_du_registre(z0, registre)
     assert h * largeur_gravure("keruv") <= abs(u1 - u0), f"keruv de {h:.2f} amot sur un vantail de {abs(u1 - u0):.2f}"
     for r in range(REGISTRES_VANTAIL + 1):
-        bandeau_guirlande(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col)
+        bandeau_guirlande(f"{nom}_{r}", paroi, u0, u1, z0 + r * registre, col, [(u0 + u1) / 2])
     for r in range(REGISTRES_VANTAIL):
         motif = keruv if r % 2 == 0 else palmette
-        motif(f"{nom}_{r}", paroi, (u0 + u1) / 2, z0 + r * registre + BANDEAU_KIR, h, col)
+        pied, _ = figure_du_registre(z0 + r * registre, registre)
+        motif(f"{nom}_{r}", paroi, (u0 + u1) / 2, pied, h, col)
 
 
 def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32, capots=True):
@@ -6256,10 +6284,9 @@ box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim",
 #     flottant à mi-hauteur ne sont dans aucune source.
 CHAMP_KIR = (1.0, 22.0)   # bas et haut du champ sculpté, en amot au-dessus de Z_BAT
 CHAMP_HAUT = (22.0, 38.0)  # du haut du champ au bas de la corniche : ce qui restait nu
-# Deux registres de keruvim monumentaux : leur taille est celle qui fait se toucher la
-# pointe d'aile d'un keruv et la palme de la palmette voisine, au pas PAS_KIR. Keruv et
-# palmette sont posés à la MÊME hauteur, et c'est cette hauteur commune qui tient le
-# champ. Aucune source ne donne le nombre de registres.
+# Deux registres de keruvim monumentaux, qui vont chacun d'un bandeau à l'autre. Keruv et
+# palmette ont la MÊME hauteur, et c'est cette hauteur commune qui tient le champ. Aucune
+# source ne donne le nombre de registres.
 REGISTRES_KIR = 2         # registres de figures, séparés par des guirlandes
 
 
@@ -6288,12 +6315,13 @@ def champ_sculpte(nom, paroi, u0, u1, col):
     montants tressés. Une file commence et finit par un keruv, « וְתִמֹרָה בֵּין כְּרוּב
     לִכְרוּב » (Ye'hezkel 41:18), et se centre sur la paroi.
 
-    Les deux figures ont la MÊME hauteur et se touchent au pas : c'est ce qui tient le
-    champ."""
+    Les deux figures ont la MÊME hauteur, posent sur le bandeau d'en bas et touchent celui
+    d'en haut : c'est ce qui tient le champ."""
     z0, z1 = Z_BAT + CHAMP_KIR[0], Z_BAT + CHAMP_KIR[1]
     registre = (z1 - z0 - BANDEAU_KIR) / REGISTRES_KIR
-    h = PAS_KIR / ((largeur_gravure("keruv") + largeur_gravure("palmette")) / 2)
-    assert h <= registre - BANDEAU_KIR, f"keruv de {h:.2f} amot dans un registre de {registre - BANDEAU_KIR:.2f}"
+    _, h = figure_du_registre(z0, registre)
+    assert h * emboitement("keruv", "palmette") < PAS_KIR, \
+        f"keruv de {h:.2f} amot : il mord sur la palmette voisine au pas de {PAS_KIR:.2f}"
     # La file se centre sur la paroi, n impair pour qu'elle commence et finisse par un
     # keruv ; n + 1 pas doivent y tenir, et ce qui reste à chaque angle porte le montant.
     n = 2 * int((round(abs(u1 - u0) / PAS_KIR, 6) - 2) // 2) + 1
@@ -6301,10 +6329,12 @@ def champ_sculpte(nom, paroi, u0, u1, col):
     premier = (u0 + u1) / 2 - pas * (n - 1) / 2
     marge = (abs(u1 - u0) - (n - 1) * PAS_KIR - h * largeur_gravure("keruv")) / 2
     ua, ub = _montants(f"Kir_{nom}", paroi, u0, u1, z0, z1, marge, col)
+    rosettes = [premier + pas / 2 * k for k in range(-2, 2 * n + 1)]
+    rosettes = [u for u in rosettes if min(ua, ub) + RAYON_ROSETTE < u < max(ua, ub) - RAYON_ROSETTE]
     for r in range(REGISTRES_KIR + 1):
-        bandeau_guirlande(f"Kir_{nom}_{r}", paroi, ua, ub, z0 + r * registre, col)
+        bandeau_guirlande(f"Kir_{nom}_{r}", paroi, ua, ub, z0 + r * registre, col, rosettes)
     for r in range(REGISTRES_KIR):
-        pied = z0 + r * registre + (registre + BANDEAU_KIR - h) / 2
+        pied, _ = figure_du_registre(z0 + r * registre, registre)
         for i in range(n):
             u = premier + pas * i
             if i % 2 == 0:

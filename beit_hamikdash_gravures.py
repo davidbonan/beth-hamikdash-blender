@@ -477,11 +477,29 @@ def _planche(motif):
     return planche
 
 
+# Les motifs dont la tuile se tire du milieu d'une planche de trois : une mèche du cordon
+# qui passe le bord y était coupée, son bombé et le fondu retombaient au bord de la tuile,
+# et chaque raccord de deux tuiles montrait une marche. Au milieu de trois tuiles, le bord
+# voit ses voisines comme n'importe quel point du cordon.
+PERIODIQUES = {"corde"}
+
+
+def _planche_periodique(motif):
+    u0, z0, u1, z1 = motif.cadre
+    planche = Planche((2 * u0 - u1, z0, 2 * u1 - u0, z1), 3 * TUILE_PX)
+    motif.guide(planche)
+    return planche
+
+
 def relief_dessine(nom):
     """(relief, masque) d'un motif dessiné : sa planche EST sa tuile. Ni recadrage sur la
     figure ni bombé depuis le bord — les deux supposent une figure isolée au milieu de sa
     tuile, quand un cordon touche ses deux bords et doit y retrouver son voisin."""
-    relief, masque = _planche(MOTIFS[nom]).relief(FONDU)
+    if nom in PERIODIQUES:
+        relief, masque = _planche_periodique(MOTIFS[nom]).relief(FONDU)
+        relief, masque = relief[:, TUILE_PX:2 * TUILE_PX], masque[:, TUILE_PX:2 * TUILE_PX]
+    else:
+        relief, masque = _planche(MOTIFS[nom]).relief(FONDU)
     return (relief / (relief.max() or 1.0)).astype(np.float32), masque > 0.5
 
 

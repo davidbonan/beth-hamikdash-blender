@@ -2,7 +2,9 @@
 import contextlib
 import datetime
 import fcntl
+import functools
 import hashlib
+import json
 import os
 import pathlib
 import subprocess
@@ -23,6 +25,10 @@ PORTEE_IMPACT = 4.0
 # et traînait pourtant ses 447 s de cuisson. La carte sort en PNG 8 bits : un échelon y vaut
 # 1/255, soit 0,4 %. Sous le centième d'une borne HAUTE, aucun texel ne peut bouger. Cf. `impact`.
 SEUIL_IMPACT = 0.01
+# Le facteur de forme ignore ce qui s'interpose : le sol du Har HaBayit, 3,8 m sous le dallage du
+# Heikhal, en prenait 100 % à travers le podium. Un voisin doit donc VOIR la retouche : un rayon au
+# moins, entre ÉCHANTILLONS points de chacun, qui ne bute sur aucun autre concept.
+ECHANTILLONS = 400
 FACES_DE_BOITE = ((0, 1, 3, 2), (4, 6, 7, 5), (0, 4, 5, 1), (2, 3, 7, 6), (0, 2, 6, 4), (1, 5, 7, 3))
 
 
@@ -42,14 +48,66 @@ def signature_image(image):
     return _HACHES_IMAGE[cle]
 
 
-def signature_matiere(mat):
+# L'atlas des gravures se hache tuile par tuile, et un concept n'en signe que celles que ses
+# UV visent : haché entier, retoucher le cordon du Heikhal faisait recuire toutes les portes
+# à timora, jusqu'au Har HaBayit.
+FICHE_GRAVURES = VISITE / "matieres" / "gravures.json"
+_TUILES_HACHEES = {}
+
+
+@functools.cache
+def _tuiles_de_l_atlas():
+    fiche = json.loads(FICHE_GRAVURES.read_text(encoding="utf-8"))
+    return f"gravures_{fiche['pixels']}.webp", sorted({tuple(m["tuile"]) for m in fiche["motifs"].values()})
+
+
+def tuiles_visees(obj, index_matiere, tuiles):
+    """Les tuiles de l'atlas où tombe le centre UV d'au moins une face de la matière `index_matiere`."""
+    maillage = obj.data
+    couche = maillage.uv_layers.get("UVMap")
+    if couche is None:
+        return []
+    uv = np.empty(len(maillage.loops) * 2, dtype=np.float32)
+    couche.data.foreach_get("uv", uv)
+    debuts, nombres, matieres = (np.empty(len(maillage.polygons), dtype=np.int32) for _ in range(3))
+    maillage.polygons.foreach_get("loop_start", debuts)
+    maillage.polygons.foreach_get("loop_total", nombres)
+    maillage.polygons.foreach_get("material_index", matieres)
+    faces = matieres == index_matiere
+    if not faces.any():
+        return []
+    centres = np.add.reduceat(uv.reshape(-1, 2), debuts)[faces] / nombres[faces, None]
+    return [(ou, ov, taille) for ou, ov, taille in tuiles
+            if ((centres >= (ou, ov)) & (centres < (ou + taille, ov + taille))).all(axis=1).any()]
+
+
+def signature_tuiles(image, tuiles):
+    """Le contenu des seules `tuiles` de l'image, par tuile."""
+    cle = signature_image(image)
+    if cle not in _TUILES_HACHEES:
+        largeur, hauteur = image.size
+        pixels = np.empty(largeur * hauteur * 4, dtype=np.float32)
+        image.pixels.foreach_get(pixels)
+        pixels = pixels.reshape(hauteur, largeur, 4)
+        _TUILES_HACHEES[cle] = {
+            (ou, ov, taille): hashlib.sha1(pixels[round(ov * hauteur):round((ov + taille) * hauteur),
+                                                  round(ou * largeur):round((ou + taille) * largeur)].tobytes()).hexdigest()
+            for ou, ov, taille in _tuiles_de_l_atlas()[1]}
+    return ",".join(_TUILES_HACHEES[cle][tuile] for tuile in tuiles)
+
+
+def signature_matiere(mat, obj, index_matiere):
     if mat is None or mat.node_tree is None:
         return repr(mat and (mat.name, tuple(mat.diffuse_color)))
+    atlas, tuiles = _tuiles_de_l_atlas()
     parties = [mat.name]
     for noeud in sorted(mat.node_tree.nodes, key=lambda n: n.name):
         parties.append(noeud.bl_idname)
-        if getattr(noeud, "image", None) is not None:
-            parties.append(signature_image(noeud.image))
+        image = getattr(noeud, "image", None)
+        if image is not None and pathlib.Path(image.filepath).name == atlas:
+            parties.append(signature_tuiles(image, tuiles_visees(obj, index_matiere, tuiles)))
+        elif image is not None:
+            parties.append(signature_image(image))
         for entree in noeud.inputs:
             if entree.is_linked or not hasattr(entree, "default_value"):
                 continue
@@ -72,8 +130,8 @@ def empreinte(obj, taille, reglages):
         valeurs = np.empty(len(collection) * (3 if attribut == "co" else 1), dtype=type_)
         collection.foreach_get(attribut, valeurs)
         empreinte_.update(valeurs.tobytes())
-    for fente in obj.material_slots:
-        empreinte_.update(signature_matiere(fente.material).encode())
+    for index, fente in enumerate(obj.material_slots):
+        empreinte_.update(signature_matiere(fente.material, obj, index).encode())
     return empreinte_.hexdigest()
 
 
@@ -90,7 +148,10 @@ class Geometrie:
         matrice = np.array(obj.matrix_world)
         self.sommets = co.reshape(-1, 3) @ matrice[:3, :3].T + matrice[:3, 3]
         obj.data.calc_loop_triangles()
-        self.arbre = BVHTree.FromPolygons(self.sommets.tolist(), [tuple(t.vertices) for t in obj.data.loop_triangles])
+        self.triangles = np.empty(len(obj.data.loop_triangles) * 3, dtype=np.int64)
+        obj.data.loop_triangles.foreach_get("vertices", self.triangles)
+        self.triangles = self.triangles.reshape(-1, 3)
+        self.arbre = BVHTree.FromPolygons(self.sommets.tolist(), self.triangles.tolist())
 
     def boite(self):
         return Vector(self.sommets.min(axis=0)), Vector(self.sommets.max(axis=0))
@@ -100,6 +161,46 @@ class Geometrie:
             return True
         coins = [Vector((x, y, z)) for x in (bas.x, haut.x) for y in (bas.y, haut.y) for z in (bas.z, haut.z)]
         return bool(self.arbre.overlap(BVHTree.FromPolygons(coins, FACES_DE_BOITE)))
+
+    def points_dans(self, bas, haut):
+        """Jusqu'à ECHANTILLONS points de la surface dans la boîte, répartis sur toute la liste : les
+        sommets, les centres de triangles, et une grille de la boîte ramenée à la face la plus proche —
+        un dallage de cent mètres n'a ni sommet ni centre dans quatre mètres autour d'un mur."""
+        bas, haut = np.maximum(np.array(bas), self.sommets.min(axis=0)), np.minimum(np.array(haut), self.sommets.max(axis=0))
+        if np.any(bas > haut):
+            return np.empty((0, 3))
+        grille = np.stack(np.meshgrid(*(np.linspace(b, h, 7) for b, h in zip(bas, haut))), -1).reshape(-1, 3)
+        projetes = [tuple(trouve[0]) for trouve in map(self.arbre.find_nearest, map(Vector, grille)) if trouve[0] is not None]
+        points = np.concatenate([self.sommets, self.sommets[self.triangles].mean(axis=1), np.array(projetes).reshape(-1, 3)])
+        points = points[np.all((points >= bas - 1e-4) & (points <= haut + 1e-4), axis=1)]
+        return points[np.linspace(0, len(points) - 1, min(len(points), ECHANTILLONS)).astype(int)] if len(points) else points
+
+
+class Obstacles:
+    """Tous les concepts dans un seul arbre, chaque triangle rattaché au sien."""
+
+    def __init__(self, geometries):
+        idents = sorted(geometries)
+        decalages = np.cumsum([0] + [len(geometries[i].sommets) for i in idents])
+        self.proprietaires = np.concatenate([np.full(len(geometries[i].triangles), k) for k, i in enumerate(idents)])
+        self.idents = idents
+        self.arbre = BVHTree.FromPolygons(
+            np.concatenate([geometries[i].sommets for i in idents]).tolist(),
+            np.concatenate([geometries[i].triangles + d for i, d in zip(idents, decalages)]).tolist())
+
+    def voit(self, depuis, vers, cible):
+        """Un point de `depuis` voit-il un point de `vers` sans buter sur autre chose que `cible` ?"""
+        for p in map(Vector, depuis):
+            for q in map(Vector, vers):
+                rayon = q - p
+                longueur = rayon.length
+                if longueur < 0.02:
+                    return True
+                rayon /= longueur
+                _, _, index, distance = self.arbre.ray_cast(p + rayon * 0.01, rayon, longueur - 0.02)
+                if index is None or self.idents[self.proprietaires[index]] == cible:
+                    return True
+        return False
 
 
 def impact(boite, geometrie):
@@ -153,22 +254,40 @@ class Recuisson:
                   for bas, haut in ([Geometrie(fusionnes[source]).boite()] if source in fusionnes else [])
                   + ([boite_blender(emprises[source])] if source in emprises else [])]
         raisons = {ident: raison for ident, raison in sources.items() if ident in self.cuits}
-        negliges = {}
+        geometries = {ident: Geometrie(obj) for ident, obj in fusionnes.items()}
+        obstacles = None
+        negliges, caches = {}, {}
         for ident in sorted(self.cuits - set(raisons)):
-            geometrie = Geometrie(fusionnes[ident])
-            parts = [(impact(boite, geometrie), source) for source, boite in boites
-                     if geometrie.touche(boite[0] - marge, boite[1] + marge)]
+            geometrie = geometries[ident]
+            parts = sorted(((impact(boite, geometrie), source, boite) for source, boite in boites
+                            if geometrie.touche(boite[0] - marge, boite[1] + marge)), key=lambda p: p[0], reverse=True)
             if not parts:
                 continue
-            part, source = max(parts)
-            if part >= SEUIL_IMPACT:
-                raisons[ident] = f"voisin de {source} ({part * 100:.0f} %)"
-            else:
-                negliges[ident] = (part, source)
+            if parts[0][0] < SEUIL_IMPACT:
+                negliges[ident] = parts[0][:2]
+                continue
+            for part, source, (bas, haut) in parts:
+                if part < SEUIL_IMPACT:
+                    break
+                voisin = geometrie.points_dans(bas - marge, haut + marge)
+                visee = geometries[source].points_dans(*geometries[source].boite()) if source in geometries else []
+                # Une source disparue, ou rien à viser de part ou d'autre : la borne vaut telle quelle.
+                if not len(voisin) or not len(visee):
+                    raisons[ident] = f"voisin de {source} ({part * 100:.0f} %)"
+                    break
+                obstacles = obstacles or Obstacles(geometries)
+                if obstacles.voit(voisin, visee, source):
+                    raisons[ident] = f"voisin de {source} ({part * 100:.0f} %)"
+                    break
+                caches.setdefault(ident, set()).add(source)
         if negliges:
             print(f"\n  voisins écartés, rebond sous {SEUIL_IMPACT * 100:.0f} % : "
                   + ", ".join(f"{ident} ({part * 100:.1f} % de {source})"
                               for ident, (part, source) in sorted(negliges.items())))
+        caches = {ident: sources_ for ident, sources_ in caches.items() if ident not in raisons}
+        if caches:
+            print("\n  voisins écartés, rien ne passe de la retouche jusqu'à eux : "
+                  + ", ".join(f"{ident} (de {', '.join(sorted(s))})" for ident, s in sorted(caches.items())))
         hors_cuisson = sorted(set(sources) - self.cuits)
         if hors_cuisson:
             print(f"\n  modifiés sans carte à eux, recuits par leurs voisins : {', '.join(hors_cuisson)}")
