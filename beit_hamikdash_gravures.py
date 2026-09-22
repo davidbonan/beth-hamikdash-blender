@@ -5,11 +5,13 @@
     /Applications/Blender.app/Contents/MacOS/Blender -b -P beit_hamikdash_gravures.py -- --tailler timora   # une tuile
 
 « כְּרוּבִים וְתִמֹרֹת וּפְטוּרֵי צִצִּים » (Melakhim I 6:29), « וְצִפָּה זָהָב מְיֻשָּׁר עַל־הַמְּחֻקֶּה »
-(6:35) : la figure est CREUSÉE, et l'or épouse le creusé. Un bas-relief se lit à son
-modelé — les volumes qui bombent, les plans qui s'étagent, les sillons qui séparent une
-penne de la suivante — et non à sa découpe : une plaque plate au contour parfait reste
-un emporte-pièce. Le blockout ne taille donc qu'UN fond par figure, à sa
-silhouette ; tout le modelé est ici, dans une carte que ce fond lit par ses UV.
+(6:35) : l'or épouse la taille, « שׁוֹקֵעַ בִּמְקוֹם שִׁקּוּעוֹ, וּבוֹלֵט בִּמְקוֹם בְּלִיטָתוֹ »
+(Rashi). Sur les parois et les vantaux du Bayit la figure SORT de l'or ; sur un jambage
+de pierre elle y est creusée. Un bas-relief se lit à son modelé — les volumes qui
+bombent, les plans qui s'étagent, les sillons qui séparent une penne de la suivante —
+et non à sa découpe : une plaque plate au contour parfait reste un emporte-pièce. Le
+blockout ne pose donc qu'UNE plaque par figure, à sa silhouette ; tout le modelé est
+ici, dans une carte que cette plaque lit par ses UV.
 
 Le modelé lui-même n'est plus dessiné ici. Des contours lissés et des dômes, si juste
 soit le motif, sortent en clip-art : chaque partie bombe de la même parabole, chaque
@@ -20,7 +22,9 @@ ossuaires, portes de 'Houlda, frises hérodiennes — ; les tuiles taillées, da
 `gravures/`, sont la SOURCE : versionnées, parce qu'un modèle ne rend jamais deux fois
 la même image. `--guides` redessine les guides dans `gravures/guides/`, `--tailler`
 en fait tailler un — avec l'esquisse validée du motif, s'il en a une —, et sans argument
-l'atlas se compose des tuiles.
+l'atlas se compose des tuiles. Le keruv et la palmette des parois n'ont plus de guide :
+leur esquisse, découpée dans l'image d'inspiration validée (`gravures/esquisses/`), porte
+déjà la composition, et un guide de dômes la contredisait.
 
 Une tuile taillée est un rendu ombré, pas une hauteur : la luminance en donne les
 creux et les arêtes (les sillons sont sombres, les crêtes claires), et c'est la
@@ -53,13 +57,9 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from beit_hamikdash_carte import (RACINE, SORTIE, Planche, bombe, cadrer, distance, ecrire,  # noqa: E402
                                   figure, flouter, lire, silhouette)
-from beit_hamikdash_contours import (AILES_DRESSEES, AILES_HAUTES, CROISURE, DATTE, EPIS,  # noqa: E402
-                                     GAINE_KERUV, JAMBE, LARGEUR_JAMBE, MAINS, PALMES,
-                                     REDUCTION_DRESSE, REDUCTION_HAUTE, SABOT, TRONC, aile,
-                                     bezier, bouton, chevrons, corolle, ellipse, epi, folioles,
-                                     guilloche, largeurs_palme, lisser, meches_de_criniere,
-                                     palme, plumage, poser_lame, reduire, ruban, symetrique,
-                                     tete_keruv, torsade)
+from beit_hamikdash_contours import (bezier, bouton, corolle, ellipse, folioles,  # noqa: E402
+                                     guilloche, largeurs_palme, lisser, ruban, symetrique,
+                                     torsade)
 
 TUILE_PX = 1024
 # Trois tuiles de côté : les quatre figures du champ ne suffisaient plus à le tenir, et
@@ -71,18 +71,17 @@ ATLAS_PX = GRILLE * TUILE_PX
 NOM = f"gravures_{ATLAS_PX}"
 TUILES = RACINE / "gravures"
 GUIDES = TUILES / "guides"
-# L'esquisse validée d'un motif, quand il en a une : montrée au modèle avec le guide, elle
-# donne la manière — le dessin des plumes, les proportions — que le guide ne porte pas.
-# Celle des keruvim est le keruv TISSÉ de la parokhet : c'est son dessin, et non une frise
-# d'ailes tendues, qui donne la manière retenue. (Le tissage, lui, a pour esquisse le keruv
-# taillé du vantail : les deux figures se tiennent l'une l'autre, chacune par un fichier.)
-ESQUISSES = {"keruv": RACINE / "tissages" / "keruv.png",
-             "keruv_dresse": RACINE / "tissages" / "keruv.png"}
-ESQUISSE = "The second image is the approved design of this figure, woven in wool: carve " \
-           "THAT drawing in stone — the same crossed feather sheath, the same slender " \
-           "proportions, the same restraint. Ignore its colours, its green background and " \
-           "its woven texture; ignore its hands, and ignore the way its head is drawn. The " \
-           "first image gives the composition and framing to keep."
+# Les esquisses validées d'un motif et la consigne qui les présente au modèle. La tête du
+# keruv a son esquisse à part : à l'échelle de la frise, le lion ne se lisait jamais.
+# `gravures/keruv_dresse.png` n'est plus dans l'atlas mais reste l'esquisse de la parokhet.
+ESQUISSE = "The first image is the approved design of this figure, carved in gold on a wall " \
+           "between neighbours that the frame cuts. Carve THAT figure, alone and whole: its " \
+           "outline, its proportions, its pose, every row of its carving. Leave out the " \
+           "neighbouring figures cut by the frame edges, the wall behind it and its gold colour."
+ESQUISSES = {"keruv": ((TUILES / "esquisses" / "keruv.png", TUILES / "esquisses" / "tete_keruv.png"),
+                       ESQUISSE + " The second image is the approved design of its head alone: "
+                       "carve the head exactly like it, at the small size the first image gives."),
+             "palmette": ((TUILES / "esquisses" / "palmette.png",), ESQUISSE)}
 # Le relief d'une tuile taillée : la silhouette bombe sur RONDEUR (en part de la hauteur)
 # depuis son bord, et la luminance, floutée de GRAIN pour ôter le grain du modèle, y
 # ajoute le modelé pour PART_MODELE du tout. Un fond plus noir que SEUIL_FOND est le mur.
@@ -101,61 +100,8 @@ FONDU = 0.005            # en part de la hauteur : 2 cm sur un keruv de paroi
 # 0,014 la moitié des palmes est ressortie en lame lisse.
 # Un motif DESSINÉ (`corde`, `tresse`) a pour silhouette le carré de son cadre : c'est
 # le fond de la taille, et deux tuiles voisines doivent s'aboucher au pixel.
-TOLERANCE = {"keruv": 0.005, "keruv_dresse": 0.005, "timora": 0.010, "fleuron": 0.02,
-             "bouton": 0.02, "dekel": 0.010, "corde": 0.05, "tresse": 0.05,
-             "panneau": 0.05}
-
-
-# --- Le keruv : la 'haya de Ye'hezkel, quatre ailes, une jambe, une tête à deux faces. ---
-
-# La gaine des ailes croisées, la jambe, la tête et les pennes sont dans
-# beit_hamikdash_contours.py : le guide du keruv tissé du rideau est bâti sur le même corps.
-
-# Les niveaux, en unités libres : ce qui est devant est plus haut. L'atlas les ramène
-# tous ensemble à [0, 1], et la visite les lit à la même échelle sur tous les motifs.
-NIVEAU_AILE, NIVEAU_JAMBE, NIVEAU_GAINE, NIVEAU_TETE = 0.0, 0.30, 0.35, 0.65
-NIVEAU_MAIN = 0.58        # les mains PAR-DESSUS la gaine : elles en sortent
-
-
-def ailes_hautes(planche, attache, angle, taille, k=1.0):
-    """Les deux ailes levées, taillées penne par penne : la lame de l'aile, puis ses rangs
-    de plumes posés dessus en tuiles, des rémiges aux petites couvertures."""
-    (u, z) = attache
-    for sens in (-1, 1):
-        def poser_aile(contour):
-            return reduire(poser_lame(contour, sens * u, z, angle, taille, sens), k)
-        planche.bomber(poser_aile(aile(8)), NIVEAU_AILE, 1.0, 0.05 * k)
-        for contour, rang in plumage():
-            planche.bomber(poser_aile(contour), NIVEAU_AILE + 0.04 + 0.05 * rang, 0.55, 0.018 * k)
-
-
-def corps_de_keruv(planche, k=1.0):
-    planche.bomber(reduire(ellipse(*SABOT), k), NIVEAU_JAMBE + 0.1, 0.8, 0.02 * k)
-    planche.bomber(reduire(ruban(JAMBE, LARGEUR_JAMBE), k), NIVEAU_JAMBE, 0.8, 0.02 * k)
-    planche.bomber(reduire(lisser(GAINE_KERUV), k), NIVEAU_GAINE, 1.0, 0.08 * k)
-    planche.graver(reduire(CROISURE, k), 0.014 * k, 0.5)
-    # Les rangs de plumes de la gaine, en chevrons qui descendent vers la jambe.
-    for z in (0.74, 0.64, 0.54, 0.44, 0.34, 0.26):
-        planche.graver(reduire([(-0.12, z + 0.03), (0.0, z - 0.02), (0.12, z + 0.03)], k), 0.008 * k, 0.3)
-    # « וִידֵי אָדָם מִתַּחַת כַּנְפֵיהֶם » (Ye'hezkel 1:8) : les mains rendues à la paroi. Le
-    # keruv TISSÉ de la parokhet, dont celui-ci est repris, ne les avait jamais perdues ;
-    # et à 4,2 amot dans un registre plein, c'est la seule forme qui rompe la gaine de
-    # plumes — sans elles la figure entière se lit en un seul massif de pennes.
-    for main in MAINS:
-        planche.bomber(reduire(ellipse(*main), k), NIVEAU_MAIN, 0.9, 0.012 * k)
-    planche.bomber(reduire(tete_keruv(), k), NIVEAU_TETE, 1.2, 0.022 * k)
-    for meche in meches_de_criniere():
-        planche.graver(reduire(meche, k), 0.010 * k, 0.35)
-
-
-def keruv(planche):
-    ailes_hautes(planche, *AILES_HAUTES, REDUCTION_HAUTE)
-    corps_de_keruv(planche, REDUCTION_HAUTE)
-
-
-def keruv_dresse(planche):
-    ailes_hautes(planche, *AILES_DRESSEES, REDUCTION_DRESSE)
-    corps_de_keruv(planche, REDUCTION_DRESSE)
+TOLERANCE = {"keruv": 0.005, "palmette": 0.005, "timora": 0.010, "fleuron": 0.02,
+             "bouton": 0.02, "corde": 0.05, "tresse": 0.05, "panneau": 0.05}
 
 
 # --- La timora : une palmette, sept palmes en éventail sur une base en cloche. ----------
@@ -205,38 +151,6 @@ def timora(planche):
     planche.bomber(BASE, NIVEAU_BASE, 1.0, 0.03)
     for bractee in _collier():
         planche.bomber(bractee, NIVEAU_COLLIER, 0.7, 0.022)
-
-
-# --- Le dattier des PAROIS : « צוּרַת דִּקְלִין » (Targum Yonatan sur Melakhim I 6:29). -------
-
-# Sur les parois, le Targum ne dit pas « chapiteau » mais des PALMIERS, et Rashi le cite
-# lui-même — « כִּי בְּמַשְׁכְּנָא דִשְׁלֹמֹה הֵן מְתֻרְגָּמוֹת צוּרַת דִּיקְלִין ». Le כּוֹתֶרֶת de Rashi
-# (« דּוֹמֶה לְדֶקֶל ») est dit sur Ye'hezkel 40:16, qui parle des JAMBAGES de portes : `timora`
-# le garde pour eux. La palmette sur les parois laissait 40 % de la hauteur du registre en
-# or nu au-dessus de chaque figure — c'est ce vide, autant que la composition, qui faisait
-# le champ fade.
-# C'est le dattier que la parokhet TISSE déjà (beit_hamikdash_parokhet.py), comme le keruv
-# des parois est celui du rideau : fût droit à cicatrices, sept palmes, deux régimes — les
-# monnaies de Bar Kokhba, et non la palmette assyrienne.
-NIVEAU_FUT, NIVEAU_REGIME = 0.34, 0.30
-
-
-def dekel(planche):
-    planche.bomber(TRONC, NIVEAU_FUT, 0.52, 0.035)
-    for chevron in chevrons():
-        planche.graver(chevron, 0.011, 0.34)
-    for inclinaison, longueur, retombee in PALMES[::-1]:
-        for sens in ((1,) if inclinaison == 0 else (-1, 1)):
-            axe, largeurs = palme(sens * inclinaison, longueur, retombee)
-            planche.bomber(folioles(axe, largeurs), NIVEAU_PALME, 1.0, 0.035)
-            planche.graver(axe[3:-9], 0.005, 0.3)
-    # Les régimes PAR-DESSUS les palmes : ils pendent de la couronne, devant le fût.
-    for sens in (-1, 1):
-        for ecart, longueur in EPIS:
-            fil, dattes = epi(ecart, longueur)
-            planche.bomber(ruban([(sens * u, z) for u, z in fil], 0.011), NIVEAU_REGIME, 0.45, 0.006)
-            for u, z in dattes:
-                planche.bomber(ellipse(sens * u, z, *DATTE), NIVEAU_REGIME, 0.75, 0.011)
 
 
 # --- Le fleuron : la rosette à six pétales, celle des ossuaires de Jérusalem. -----------
@@ -430,33 +344,30 @@ TAILLE = "Re-sculpt this {sujet} as a genuine hand-carved stone bas-relief in th
          "marks, slightly worn. Pure grayscale on a flat pure black background, " \
          "orthographic front view, no colour, no text."
 KERUV = ("an awe-inspiring heavenly being of Ezekiel's vision, NOT a human in clothes and NOT "
-         "a Christian angel: no tunic, no garment, no belt, no visible torso. The body is a "
-         "tall sheath of feathers made by two lower wings wrapped down and crossed in front "
-         "from the shoulders to the shins. Just below the shoulders TWO small human HANDS "
-         "come out from under the wings, one on each side, laid flat against the feather "
-         "sheath, palm outwards, fingers together and pointing down — hands ONLY, no arms, "
-         "no wrists, no shoulders, nothing else of a human body anywhere. Below the sheath "
-         "ONE single straight rigid leg without knee, ending in ONE calf's hoof, CLOVEN — "
-         "split down the middle into two blunt toes like an ox's foot, never a ball and "
-         "never a human foot. THE WINGS ARE THE GLORY OF THE FIGURE and must be "
-         "magnificent: each wing is built of individual feathers — three graded rows of small "
-         "rounded coverts overlapping like roof tiles at the root, then a row of longer "
-         "secondaries, then long slender primaries carved one by one to the tip, each with "
-         "its own outline and central shaft, five graded rows at least. EVERY feather ends in "
-         "a POINT, and the tips stay slightly apart, so the edge of the wing is a row of "
-         "sharp points and not a smooth border. {ailes} THE HEAD IS THE HARD PART, read it "
-         "twice: there is ONE SINGLE HEAD, one skull only, and it carries TWO FACES looking "
-         "in opposite directions, a man's profile on the left and a young lion's profile on "
-         "the right, sharing the same cranium back to back, like a janiform head on a coin. "
-         "It must NOT be two heads side by side, NOT two necks, NOT two separate skulls "
-         "touching, NOT one head behind the other. Both faces are BLANK featureless "
-         "silhouettes — no eye, no eyebrow, no nostril, no mouth, nothing carved inside the "
-         "profile, only the outline of brow, nose and chin. The LEFT profile is a man's: "
-         "straight nose, smooth skull, no beard, no wig. The RIGHT profile must be "
-         "unmistakably a YOUNG LION: bulging forehead, short square muzzle jutting forward, "
-         "deep heavy jaw, a small round ear set high, and a short mane carved in separate "
-         "locks running around the back of the skull down to the neck. Majestic, hieratic, "
-         "severe; no halo, no crown, no beard, no palm trees, a single figure alone.")
+         "a Christian angel: no tunic, no garment, no belt, no visible torso. THE WINGS ARE THE "
+         "GLORY OF THE FIGURE: two immense upper wings rise from the shoulders far above the "
+         "head, tall and sweeping, their tips curving slightly outward; each is built of many "
+         "graded rows of feathers carved one by one — small rounded coverts overlapping like "
+         "roof tiles at the root, then medium feathers, then long pointed flight feathers, five "
+         "tiers at least, every feather with its own outline and shaft. Two lower wings wrap "
+         "down and cross in front of the body like a cloak of feathers, from the shoulders to "
+         "the shins. Two small human HANDS come out from under the wings, hands only. Below "
+         "the cloak ONE single straight rigid leg without knee, ending in ONE calf's hoof, "
+         "CLOVEN — split down the middle into two blunt toes like an ox's foot, never a ball, "
+         "never a paw, never a human foot. The HEAD is SMALL, about a seventh of the height of "
+         "the figure, on a slender neck between the raised wings: ONE skull carrying TWO "
+         "faces back to back, a young LION's profile facing left — muzzle, strong jaw, a mane "
+         "in overlapping rows of thick locks — and a HUMAN profile facing right that is one "
+         "smooth blank contour, no eye, no mouth, no hair. Majestic and hieratic; no halo, no "
+         "crown, no beard, a single figure alone.")
+PALMETTE = ("a stylized palm, NOT a realistic tree and NOT a feather plume: a tall slender "
+            "central spine rising from a bell-shaped base girdled by two carved rings and a "
+            "collar of short sheathing bracts, and from it a great symmetrical fan of many "
+            "long palm fronds in superimposed tiers, the outer fronds arching outward and "
+            "curling downward at their tips near the base. Every frond is carved with its "
+            "midrib and dense fine leaflets like a feather. Sumptuous and rhythmic, as rich as "
+            "the wings of the cherubim beside it; no dates, no trunk, no Greek anthemion, no "
+            "volutes.")
 class Taille(typing.NamedTuple):
     """Ce qu'on demande au modèle pour un motif : son sujet, et son iconographie mot à
     mot — c'est elle que le guide ne porte qu'à moitié."""
@@ -468,25 +379,17 @@ class Motif(typing.NamedTuple):
     """Un motif de l'atlas : ce qui le dessine, le cadre réel qu'il couvre, sa case dans
     la grille, et la taille qu'un modèle en fait. `taille` vide = motif DESSINÉ, dont la
     planche est la tuile : sa manière est géométrique, il n'y a rien à apprendre d'un
-    modèle, et lui seul est sûr de se répéter sans couture."""
-    guide: typing.Callable
+    modèle, et lui seul est sûr de se répéter sans couture. `guide` vide = motif taillé
+    d'après sa seule esquisse (ESQUISSES), qui en porte la composition."""
+    guide: typing.Callable | None
     cadre: tuple
     case: tuple
     taille: Taille = None
 
 
 MOTIFS = {
-    "keruv": Motif(keruv, CADRE_DEBOUT, (0, 1), Taille(
-        "four-winged cherub",
-        KERUV.format(ailes="Its two upper wings are very large, rising from the "
-                           "shoulders and opening a little outwards, their tips well "
-                           "above the head."))),
-    "keruv_dresse": Motif(keruv_dresse, CADRE_DEBOUT, (1, 0), Taille(
-        "four-winged cherub",
-        KERUV.format(ailes="Its two upper wings rise straight up from the "
-                           "shoulders, tall and narrow like two flames, their "
-                           "tips high above the head, the flight feathers long, "
-                           "straight and parallel."))),
+    "keruv": Motif(None, CADRE_DEBOUT, (0, 1), Taille("four-winged cherub", KERUV)),
+    "palmette": Motif(None, CADRE_DEBOUT, (2, 2), Taille("stylized palm", PALMETTE)),
     "timora": Motif(timora, CADRE_DEBOUT, (1, 1), Taille(
         "palmette of palm fronds",
         "a fan of exactly seven palm fronds springing from a small bell-shaped base, "
@@ -517,24 +420,6 @@ MOTIFS = {
         "TO A POINT, widest below its middle, seated in a short calyx of three sepals "
         "that wrap its foot. Three shallow ribs run up the bud from the calyx to the "
         "point. It is shut: no petal is open, nothing flares out at the top.")),
-    "dekel": Motif(dekel, CADRE_DEBOUT, (2, 2), Taille(
-        "date palm tree",
-        "a single upright date palm seen flat from the front, as on the Bar Kokhba coins: "
-        "a straight slender trunk rising the lower half of the frame, its whole length "
-        "covered in the CHEVRON leaf-scars of cut-off fronds, stacked one above the other "
-        "like a braid, never smooth and never a ring-banded column. "
-        "From its top springs a crown of exactly seven fronds — the middle one upright, "
-        "the three pairs on either side bending outward and drooping more and more, the "
-        "lowest pair falling back below the horizontal. "
-        "IMPORTANT: every frond is deeply CUT INTO SEPARATE POINTED LEAFLETS along both "
-        "sides of a grooved midrib, like a feather or a comb, never a smooth leaf and "
-        "never a stiff Greek anthemion; the leaflets are narrow, straight and angled "
-        "towards the tip. "
-        "READ THIS TWICE, it is the part that gets dropped: TWO clusters of dates hang "
-        "from the crown, one on each side of the trunk, each a few slack strands weighed "
-        "down with small oval fruit, hanging DOWN in front of the trunk and clearly "
-        "separate from the fronds — not a bunch of grapes, not a pinecone. "
-        "No capital, no collar of bracts, no volutes: this is a tree, not an ornament.")),
     "corde": Motif(corde, (0.0, 0.0, 1.0, 1.0), (2, 1)),
     "tresse": Motif(tresse, (0.0, 0.0, 1.0, 1.0), (0, 2)),
     "panneau": Motif(panneau, (0.0, 0.0, 1.0, 1.0), (1, 2)),
@@ -569,15 +454,16 @@ def guider(nom):
 
 
 def tailler(nom):
-    """Fait tailler le guide de `nom` par gpt-image-2 et pose la tuile dans `gravures/`."""
+    """Fait tailler `nom` par gpt-image-2 — d'après son guide, ou sa seule esquisse s'il n'en
+    a pas — et pose la tuile dans `gravures/`."""
     sys.path.insert(0, str(RACINE / ".claude" / "skills" / "fal-video"))
     import fal_commun  # noqa: E402
-    sujet, iconographie = MOTIFS[nom].taille
+    motif = MOTIFS[nom]
     cle = fal_commun.cle_api()
-    esquisse = ESQUISSES.get(nom)
-    images = [GUIDES / f"{nom}.png"] + ([esquisse] if esquisse else [])
-    prompt = TAILLE.format(sujet=sujet, iconographie=iconographie)
-    corps = {"prompt": prompt + (" " + ESQUISSE if len(images) > 1 else ""),
+    esquisses, consigne = ESQUISSES.get(nom, ((), ""))
+    images = ([GUIDES / f"{nom}.png"] if motif.guide else []) + list(esquisses)
+    prompt = TAILLE.format(sujet=motif.taille.sujet, iconographie=motif.taille.iconographie)
+    corps = {"prompt": f"{prompt} {consigne}".strip(),
              "image_urls": [fal_commun.televerse(str(image), cle) for image in images],
              "image_size": "square_hd", "quality": "high", "output_format": "png"}
     reponse = fal_commun.genere("openai/gpt-image-2/edit", corps, cle)
@@ -642,7 +528,7 @@ def graver():
 
 ARGUMENTS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 if ARGUMENTS[:1] == ["--guides"]:
-    for nom in ARGUMENTS[1:] or MOTIFS:
+    for nom in ARGUMENTS[1:] or [n for n, m in MOTIFS.items() if m.guide]:
         guider(nom)
 elif ARGUMENTS[:1] == ["--tailler"]:
     for nom in ARGUMENTS[1:] or [n for n, m in MOTIFS.items() if m.taille]:

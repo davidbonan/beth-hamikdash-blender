@@ -38,7 +38,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `shor.blend` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
-| `beit_hamikdash_gravures.py` | les figures gravées des parois (keruv, timora, fleuron) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour tailler chaque figure dans sa paroi | `visite/matieres/gravures_3072.webp`, `gravures.json` |
+| `beit_hamikdash_gravures.py` | les figures des parois (keruv, palmette, timora, fleuron, bouton) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour poser chaque figure sur sa paroi | `visite/matieres/gravures_3072.webp`, `gravures.json` |
 | `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
@@ -136,11 +136,11 @@ $BLENDER -b -P beit_hamikdash_parokhet.py
 Et pour les figures gravées des parois du Bayit — keruvim, timorot, fleurons, sur les murs
 d'or, les vantaux du Heikhal et les jambages des portes des cours — `beit_hamikdash_gravures.py`
 (~5 s) compose l'atlas de modelé `visite/matieres/gravures_3072.webp` **et** `gravures.json`,
-la silhouette de chaque figure tracée sur la carte même, à partir des quatre tuiles taillées
-de `gravures/` (keruv aux ailes tendues des murs, keruv dressé des vantaux, timora, fleuron : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
+la silhouette de chaque figure tracée sur la carte même, à partir des tuiles taillées
+de `gravures/` (keruv et palmette des murs et des vantaux, timora des jambages, fleuron, bouton : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
 versionnés parce qu'un modèle ne rend jamais deux fois la même image — la luminance donne le
-modelé, la distance au bord le volume). Le blockout **lit ce JSON** pour tailler chaque
-figure à sa silhouette, un fond dont les UV visent la tuile ; sans lui il s'arrête net.
+modelé, la distance au bord le volume). Le blockout **lit ce JSON** pour poser chaque
+figure à sa silhouette — en saillie sur l'or du Bayit, taillée dans la pierre des jambages —, une face dont les UV visent la tuile ; sans lui il s'arrête net.
 La rasterisation commune aux deux cartes est `beit_hamikdash_carte.py`.
 
 ```bash
@@ -151,7 +151,8 @@ $BLENDER -b -P beit_hamikdash_gravures.py -- --tailler timora    # fait retaille
 
 Le guide d'un motif est son dessin procédural — composition, iconographie, cadrage —
 ombré ; c'est lui que le modèle retaille, avec l'esquisse validée du motif quand
-`gravures/esquisses/` en a une. Changer un motif, c'est corriger son guide ou
+`gravures/esquisses/` en a une. Le keruv et la palmette n'ont pas de guide : leur esquisse seule
+en porte la composition (`ESQUISSES`). Changer un motif, c'est corriger son guide ou
 son prompt (`MOTIFS`), retailler, regarder la tuile, puis recomposer l'atlas et reconstruire.
 
 `FOULE = True` en tête du blockout ajoute les figures de Yom Kippour : le peuple dans
