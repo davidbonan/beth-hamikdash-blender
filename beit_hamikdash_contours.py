@@ -161,10 +161,6 @@ TETE_KERUV = [
     (-1.36, -0.24), (-1.22, -0.14), (-1.44, -0.02), (-1.20, 0.18), (-1.30, 0.36),
     (-1.06, 0.62), (-0.54, 0.92)]
 TETE = (0.0, 0.905, 0.145)   # u, z, taille
-# Les mèches de la crinière, dans le repère de la tête : le contour seul ne suffit pas à
-# nommer le lion, ce sont elles qui le font lire.
-CRINIERE = (((0.30, 0.86), (0.62, 1.02)), ((0.72, 0.74), (1.00, 0.94)),
-            ((0.98, 0.54), (1.28, 0.70)), ((1.06, 0.26), (1.34, 0.36)))
 
 
 def tete_keruv():
@@ -173,62 +169,12 @@ def tete_keruv():
     return lisser(poser(TETE_KERUV, *TETE), passes=1)
 
 
-def meches_de_criniere():
-    """Les mèches de la crinière, posées comme la tête : des traits à graver."""
-    return [[(TETE[0] + u * TETE[2], TETE[1] + z * TETE[2]) for u, z in meche]
-            for meche in CRINIERE]
-
-
-# L'aile penne par penne : cinq rangs, des rémiges aux petites couvertures, dans le repère
-# de la lame (p le long de la nervure, q en travers, positif vers le bord d'attaque) :
-# (nombre, p de la première, p de la dernière, q du talon, longueur, avance de la pointe,
-# demi-largeur). C'est l'étagement des rangs et la pointe de chaque penne qui font l'aile ;
-# une lame rainurée n'en est que l'ombre, et des pennes en travers de la nervure la
-# peignent en arête de poisson — elles se couchent vers la pointe.
-RANGS_PENNES = ((9, 0.16, 0.92, -0.06, 0.30, 0.30, 0.052),
-                (9, 0.13, 0.86, -0.02, 0.23, 0.24, 0.046),
-                (8, 0.10, 0.76, 0.03, 0.16, 0.18, 0.040),
-                (7, 0.08, 0.62, 0.07, 0.11, 0.13, 0.034),
-                (6, 0.06, 0.50, 0.10, 0.08, 0.09, 0.029))
-
-
-def penne(talon, pointe, demi):
-    """Une penne lancéolée, du talon à la pointe : ventrue au tiers, effilée au bout."""
-    (p0, q0), (p1, q1) = talon, pointe
-    dp, dq = p1 - p0, q1 - q0
-    n = math.hypot(dp, dq) or 1.0
-    nu, nq = -dq / n, dp / n
-    profil = ((0.10, 0.55), (0.34, 1.00), (0.66, 0.92), (0.88, 0.52))
-    cote = [(p0 + dp * t + nu * demi * w, q0 + dq * t + nq * demi * w) for t, w in profil]
-    revers = [(p0 + dp * t - nu * demi * w, q0 + dq * t - nq * demi * w)
-              for t, w in reversed(profil)]
-    return lisser([talon] + cote + [pointe] + revers, passes=1)
-
-
-def plumage():
-    """Les pennes d'une aile, dans le repère de la lame : (contour, rang), du rang le plus
-    bas — les rémiges — au plus haut. Les rémiges s'allongent vers la pointe de l'aile,
-    les couvertures gardent leur taille."""
-    plumes = []
-    for rang, (nombre, debut, fin, q, longueur, avance, demi) in enumerate(RANGS_PENNES):
-        for n in range(nombre):
-            t = n / (nombre - 1)
-            part = 0.55 + 0.45 * t if rang < 2 else 1.0
-            p = debut + (fin - debut) * t
-            plumes.append((penne((p, q), (p + avance, q - longueur * part), demi), rang))
-    return plumes
-
-
-# Les ailes hautes, (u, z) de l'attache, inclinaison sur la verticale, taille. Aux parois
-# comme sur un vantail elles se lèvent au-dessus de la tête — à peine ouvertes aux parois,
-# droites sur un vantail et sur le rideau. Tendues à l'horizontale, elles sortaient en aile
-# d'Isis quel que soit le dessin des plumes ; la jonction des pointes d'un keruv à l'autre
-# au-dessus de la timora (« חֹבְרֹת אִישׁ אֶל אָחִיו », Ye'hezkel 1:9) est abandonnée avec elles.
-AILES_HAUTES = ((0.130, 0.745), 26, 0.52)
+# Les ailes du keruv tissé, (u, z) de l'attache, inclinaison sur la verticale, taille :
+# droites, au-dessus de la tête. Tendues à l'horizontale, elles sortaient en aile d'Isis
+# quel que soit le dessin des plumes.
 AILES_DRESSEES = ((0.09, 0.78), 12, 0.42)
 # Les ailes levées montent au-dessus de la tête, jusqu'à 1,25 : le keruv est dessiné
 # réduit d'autant, pour que la pointe de ses ailes tienne à 1.
-REDUCTION_HAUTE = 0.78
 REDUCTION_DRESSE = 0.80
 
 
