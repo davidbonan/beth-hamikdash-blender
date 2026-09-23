@@ -454,7 +454,12 @@
   @media (hover: hover) and (pointer: fine) and (min-width: 721px) {
     #parcours .carte { bottom: calc(12px + var(--marge-bas)); inset-inline: calc(14px + var(--marge-gauche)) auto; margin-inline: 0; }
   }
-  #parcours .etape { margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .13em; color: #a9a094; }
+  #parcours .etape {
+    display: flex; align-items: baseline; margin: 0 0 4px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .13em; color: #a9a094; cursor: pointer;
+  }
+  #parcours .etape .rang::before, #parcours .etape .source::before { content: "·"; margin-inline: .5em; }
+  #parcours .etape::after { content: "⌄"; margin-inline-start: auto; padding-inline-start: 12px; font-size: 15px; line-height: 0; }
   #parcours h2 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
   #parcours .texte { margin: 6px 0 0; font-size: 14px; color: #d6cebf; }
   #parcours .en-marche .texte, #parcours .en-marche h2 { opacity: .55; }
@@ -474,7 +479,32 @@
   #parcours .allure { min-width: 44px; font-variant-numeric: tabular-nums; }
   #parcours .quitter { margin-inline-start: auto; }
   #parcours .suivant { color: #f3efe6; background: var(--or); border-color: var(--or); }
+  #parcours .pied i { display: none; font-style: normal; }
+  /* En SVG, pas en ‹ › : dans la carte repliée Chrome reflétait le glyphe hébreu à contresens. parcours.js choisit le tracé. */
+  #parcours .pied svg { width: 10px; height: 14px; vertical-align: -2px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  /* Le rappel des commandes dort sous la carte : il n'a rien à dire pendant qu'on est guidé. */
+  body:has(#parcours:not([hidden])) #aide { display: none; }
+  /* Repliée, la carte tient sur une ligne : ‹ rang titre ×1 ✕ ›, le titre la redéplie. */
+  #parcours .carte.repliee { display: flex; align-items: center; gap: 6px; padding: 6px 8px; }
+  #parcours .repliee .pied { display: contents; }
+  #parcours .repliee :is(.nom, .source, .texte, .fiche, .pied span), #parcours .repliee .etape::after { display: none; }
+  #parcours .repliee .pied i { display: inline-block; }
+  #parcours .repliee .pied button { padding: 6px 12px; }
+  #parcours .repliee .precedent { order: -1; }
+  #parcours .repliee .etape { margin: 0; letter-spacing: .05em; }
+  #parcours .repliee .rang::before { content: none; }
+  #parcours .repliee h2 {
+    flex: 1; min-width: 0; font-size: 15px; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #parcours .repliee .quitter { margin-inline-start: 0; }
   /* Le tiroir de la fiche monte à 46 % de la hauteur : la carte reste au-dessus de lui. */
+  @media (max-width: 720px) {
+    #parcours .carte { bottom: calc(16px + var(--marge-bas)); }
+    #parcours .pied i { display: inline-block; }
+    #parcours .pied span { display: none; }
+    #parcours .pied button { padding: 6px 14px; font-size: 15px; }
+  }
   @media (max-width: 720px) and (min-height: 521px) {
     body:has(#fiche.ouverte) #parcours .carte { bottom: calc(46vh + 12px); }
     /* Douze lignes de Yoma 5:1 couvriraient la scène : le texte défile dans la carte. */
@@ -782,15 +812,15 @@
 
 <div id="parcours" hidden>
   <div class="carte" role="dialog" aria-live="polite" aria-labelledby="parcours-titre">
-    <p class="etape"><span class="nom"></span> · <span class="rang"></span> · <span class="source"></span></p>
+    <p class="etape" title="Replier ou déplier la carte" data-titre="parcours_replier"><span class="nom"></span><span class="rang"></span><span class="source"></span></p>
     <h2 id="parcours-titre"></h2>
     <p class="texte"></p>
     <button class="fiche" type="button" data-texte="parcours_fiche">Lire la fiche</button>
     <div class="pied">
-      <button class="precedent" type="button" data-texte="parcours_precedent">Précédent</button>
+      <button class="precedent" type="button" title="Précédent" data-titre="parcours_precedent"><i><svg viewBox="0 0 12 16" aria-hidden="true"><path/></svg></i><span data-texte="parcours_precedent">Précédent</span></button>
       <button class="allure" type="button" title="Vitesse de la marche" data-titre="parcours_allure">×1</button>
-      <button class="quitter" type="button" data-texte="parcours_quitter">Quitter</button>
-      <button class="suivant" type="button" data-texte="parcours_suivant">Suivant</button>
+      <button class="quitter" type="button" title="Quitter" data-titre="parcours_quitter"><i>✕</i><span data-texte="parcours_quitter">Quitter</span></button>
+      <button class="suivant" type="button" title="Suivant" data-titre="parcours_suivant"><i><svg viewBox="0 0 12 16" aria-hidden="true"><path/></svg></i><span data-texte="parcours_suivant">Suivant</span></button>
     </div>
   </div>
 </div>
