@@ -3222,7 +3222,7 @@ box("EzratNashim_mur_sud", EX0, EX1 + 5, -72.5, -67.5, Z_EZN, Z_EZN + H_MUR_EN, 
 box("EzratNashim_mur_est_S", EX1, EX1 + 5, -72.5, -5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
 box("EzratNashim_mur_est_N", EX1, EX1 + 5, 5, 72.5, Z_EZN, Z_EZN + H_MUR_EN, "10_EzratNashim")
 box("EzratNashim_porte_est_linteau", EX1, EX1 + 5, -5, 5, Z_EZN + 20, Z_EZN + H_MUR_EN, "10_EzratNashim")
-# Quatre chambres d'angle 40 × 40, sans toit (murs de 2 amot) — « ולא היו מקורות »
+# Quatre chambres d'angle 40 × 40, sans toit (murs de MUR_LISHKA_EN amot, CHOIX) — « ולא היו מקורות »
 # (Middot 2:5, qui les rattache aux « חצרות קטורות » d'Ezekiel 46:21-22). Affectations
 # par angle : Middot 2:5. CHOIX : la Mishna ne décrit aucune porte, seulement des
 # usages qui la supposent (les nazirs y cuisent, les metzoraim s'y immergent) ;
@@ -3238,47 +3238,41 @@ box("EzratNashim_porte_est_linteau", EX1, EX1 + 5, -5, 5, Z_EZN + 20, Z_EZN + H_
 # donner, c'est le couronnement de leurs murs : les quatre crêtes s'arrêtaient net et
 # se lisaient en boîtes découpées, ce que le reste de l'enceinte ne fait nulle part.
 H_LISHKA_EN = 15
+MUR_LISHKA_EN = 3
 SOUS_CORNICHE_LISHKA_EN = Z_EZN + H_LISHKA_EN + min(zb for zb, _, _ in CORNICHE)
 # Le cadre d'une porte de chambre porte ses deux timorot à l'échelle de son jambage
 # (TIMORA_SUR_CADRE) : à 1,5 ama de cadre elles ne se voyaient pas de la cour.
 CADRE_LISHKA_EN = 2.5
-ATTIQUE = ((0.00, 1.20, 0.0), (1.20, 1.45, 0.2))
-H_DE_ATTIQUE = 2.1
+CRETE_LISHKA_EN = Z_EZN + H_LISHKA_EN + max(zh for _, zh, _ in CORNICHE)
 PAREMENT_LIBRE_LISHKA_EN = (Z_EZN + max(zh for _, zh, _ in SOCLE), SOUS_CORNICHE_LISHKA_EN - PILASTRE_CHAPITEAU)
 Z_BANDEAU_LISHKA_EN = (sum(PAREMENT_LIBRE_LISHKA_EN) - max(zh for _, zh, _ in BANDEAU)) / 2
 for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 - 40, 27.5, "S"),
                          ("Metzoraim_NO", EX0, 27.5, "S"), ("Shemanya_SO", EX0, -67.5, "N")):
     xb, yb = xa + 40, ya + 40
     parois = {"S": ("x", ya, -1), "N": ("x", yb, 1), "O": ("y", xa, -1), "E": ("y", xb, 1)}
-    for a, b, c, d, side in ((xa, xb, ya, ya + 2, "S"), (xa, xb, yb - 2, yb, "N"),
-                             (xa, xa + 2, ya, yb, "O"), (xb - 2, xb, ya, yb, "E")):
+    e = MUR_LISHKA_EN
+    for a, b, c, d, side in ((xa, xb, ya, ya + e, "S"), (xa, xb, yb - e, yb, "N"),
+                             (xa, xa + e, ya, yb, "O"), (xb - e, xb, ya, yb, "E")):
         nom = f"Lishkat_{nm}_{side}"
         if side == cour:
             mur_perce(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim",
                       [((a + b) / 2, 6)], 12)
             # Un פתח de chambre n'est pas un שער : Middot 2:3 ne le change pas en or, et
             # il ne reçoit qu'un cadre de pierre.
-            shaar(f"{nom}_cadre", parois[side], (a + b) / 2, Z_EZN, SOUS_CORNICHE_LISHKA_EN, 2,
+            shaar(f"{nom}_cadre", parois[side], (a + b) / 2, Z_EZN, SOUS_CORNICHE_LISHKA_EN, e,
                   "10_EzratNashim", MAT_PIERRE(), largeur=6, hauteur=12, cadre=CADRE_LISHKA_EN)
         else:
             box(nom, a, b, c, d, Z_EZN, Z_EZN + H_LISHKA_EN, "10_EzratNashim")
-    ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, 2,
+    ceinture(f"Lishkat_{nm}_couronnement", xa, xb, ya, yb, e,
              Z_EZN + H_LISHKA_EN, CORNICHE, "10_EzratNashim",
              filet=MAT_OR() if FILET_OR else None)
     milieu = (xa + xb) / 2 if cour in "SN" else (ya + yb) / 2
-    ceinture(f"Lishkat_{nm}_socle", xa, xb, ya, yb, 2, Z_EZN, SOCLE, "10_EzratNashim",
+    ceinture(f"Lishkat_{nm}_socle", xa, xb, ya, yb, e, Z_EZN, SOCLE, "10_EzratNashim",
              baies={cour: [(milieu - 3, milieu + 3)]})
     # Le bandeau partage le parement libre en deux panneaux égaux. Calé sur la gezuztra, il
     # tombait aux deux tiers d'un mur de quinze amot et se collait aux chapiteaux.
-    ceinture(f"Lishkat_{nm}_bandeau", xa, xb, ya, yb, 2, Z_BANDEAU_LISHKA_EN, BANDEAU, "10_EzratNashim",
+    ceinture(f"Lishkat_{nm}_bandeau", xa, xb, ya, yb, e, Z_BANDEAU_LISHKA_EN, BANDEAU, "10_EzratNashim",
              saillie=SAILLIE_BANDEAU, baies={cour: [(milieu - 3, milieu + 3)]})
-    # Attique sur la crête, et un dé à chaque angle : une chambre sans toit n'a rien pour
-    # arrêter sa silhouette. CHOIX — pas de merlons, qui feraient d'une cour sacrée un rempart.
-    crete = Z_EZN + H_LISHKA_EN + max(zh for _, zh, _ in CORNICHE)
-    ceinture(f"Lishkat_{nm}_attique", xa, xb, ya, yb, 2, crete, ATTIQUE, "10_EzratNashim", saillie=1.0)
-    for coin, (cx, cy) in enumerate(((xa, ya), (xb - 2, ya), (xa, yb - 2), (xb - 2, yb - 2))):
-        box(f"Lishkat_{nm}_attique_de_{coin}", cx - 0.3, cx + 2.3, cy - 0.3, cy + 2.3,
-            crete, crete + H_DE_ATTIQUE, "10_EzratNashim")
     # Pilastres aux deux bouts des deux faces tournées vers la cour, et au milieu de celle
     # qui n'a pas de porte.
     axe_cour = "O" if xa > EX0 else "E"
@@ -3296,7 +3290,7 @@ for nm, xa, ya, cour in (("Nezirim_SE", EX1 - 40, -67.5, "N"), ("Etzim_NE", EX1 
 # NORD-EST, Lishkat HaEtzim : « הַכֹּהֲנִים בַּעֲלֵי מוּמִין מַתְלִיעִין הָעֵצִים, וְכָל עֵץ שֶׁנִּמְצָא
 # בּוֹ תּוֹלַעַת פָּסוּל מֵעַל גַּבֵּי הַמִּזְבֵּחַ ». Le bois trié est celui de la ma'arakha —
 # figuier, noyer et עֵץ שָׁמֶן (Tamid 2:3) —, d'où MAT_BOIS_MAARAKHA et pas le chêne clair.
-for _s, _x in enumerate((106.0, 118.0, 130.0)):
+for _s, _x in enumerate((105.5, 116.0, 126.5)):
     for _l in range(5):
         _z = Z_EZN + 0.3 + _l * 0.62
         for _k in range(5):
@@ -3311,7 +3305,7 @@ for _s, _x in enumerate((106.0, 118.0, 130.0)):
 # Le tri lui-même : le vrac qui arrive près de la porte, les billots des cohanim qui l'examinent
 # — hors de l'Azara, rien n'interdit de s'asseoir —, et le bois véreux écarté à part. CHOIX :
 # places, nombres, et que le rebut attende là.
-for _tas, (_cx, _cy, _n) in (("vrac", (112.0, 42.0, 14)), ("pasoul", (132.0, 36.0, 8))):
+for _tas, (_cx, _cy, _n) in (("vrac", (112.0, 42.0, 14)), ("pasoul", (130.0, 38.0, 8))):
     for _k in range(_n):
         _cle = f"Lishkat_Etzim_NE_{_tas}_{_k}"
         _a, _r = math.tau * alea(_cle), 2.5 * alea(_cle, 1)
@@ -3378,9 +3372,9 @@ JARRE = [(0.0, 0.0), (0.35, 0.06), (0.78, 0.7), (0.86, 1.3), (0.58, 2.0),
          (0.34, 2.2), (0.44, 2.35), (0.36, 2.42), (0.0, 2.36)]
 PORTE_SHEMANYA_X, PANSE_JARRE = EX0 + 20, max(r for r, _ in JARRE)
 for _r, (_y, _n, _devant_porte) in enumerate(((-62.0, 10, False), (-59.4, 10, False),
-                                              (-33.4, 9, True), (-30.8, 9, True))):
+                                              (-35.6, 9, True), (-33.0, 9, True))):
     for _k in range(_n):
-        _x = 10.5 + _k * 3.5
+        _x = PORTE_SHEMANYA_X + (_k - (_n - 1) / 2) * 3.2
         if _devant_porte and abs(_x - PORTE_SHEMANYA_X) < 3 + PANSE_JARRE:
             continue
         revolution(f"Lishkat_Shemanya_SO_jarre_{_r}{_k}", _x, _y, Z_EZN,
@@ -3389,89 +3383,165 @@ for _r, (_y, _n, _devant_porte) in enumerate(((-62.0, 10, False), (-59.4, 10, Fa
 # וּרְבִיעִית הַהִין, לֹג, וַחֲצִי לֹג, וּרְבִיעִית לֹג » (Mena'hot 9:2). Le hin vaut douze log ; les sept
 # mesures ont donc le rayon de la racine cubique de leur contenance. Qu'elles soient rangées ici,
 # leur bronze et la taille du hin : CHOIX — la Michna dit seulement qu'elles étaient au Mikdash.
-box("Lishkat_Shemanya_SO_table", 7.5, 9.3, -50.5, -42.5, Z_EZN, Z_EZN + 1.5, "10_EzratNashim")
+box("Lishkat_Shemanya_SO_table", 9.7, 11.5, -50.5, -42.5, Z_EZN, Z_EZN + 1.5, "10_EzratNashim")
 for _k, _log in enumerate((12, 6, 4, 3, 1, 0.5, 0.25)):
     _r = 0.22 * (_log / 12) ** (1 / 3)
-    revolution(f"Lishkat_Shemanya_SO_mida_{_k}", 8.4, -49.8 + 1.1 * _k, Z_EZN + 1.5,
+    revolution(f"Lishkat_Shemanya_SO_mida_{_k}", 10.6, -49.8 + 1.1 * _k, Z_EZN + 1.5,
                [(0.0, 0.0), (_r, 0.0), (_r, 1.3 * _r), (0.88 * _r, 1.3 * _r), (0.88 * _r, 0.05), (0.0, 0.05)],
                "10_EzratNashim", MAT_BRONZE(), verts=16)
-# Gezuztra : galerie des femmes le long des murs nord et sud (Middot 2:5 ; Soukka 51b),
-# entre les chambres d'angle — elle traversait leurs murs. Colonnes, architrave, corniche
-# et balustrade sont des CHOIX (Rambam, Beit HaBe'hira 1:11) ; la frise de fleurons
-# reprend les « פְּטוּרֵי צִצִּים » du Bayit (Melakhim I 6:29), en pierre.
-GEZ_X0, GEZ_X1 = EX0 + 40, EX1 - 40
-Z_GEZ = Z_EZN + 10            # sous-face de la dalle
+# Gezuztra : « וַחֲלָקָה הָיְתָה בָּרִאשׁוֹנָה, וְהִקִּיפוּהָ כְצוֹצְרָה » (Middot 2:5) — « הִקִּיפוּ סָבִיב
+# לְעֶזְרַת נָשִׁים » (Bartenura ad loc.) : elle fait le tour de la cour. Aucune source n'en donne la
+# hauteur : CHOIX, à la crête des chambres d'angle, dont elle longe les murs côté cour sans les
+# couvrir — « וְלֹא הָיוּ מְקוֹרוֹת ». Au droit d'une chambre, le mur et son couronnement la
+# portent, et elle déborde de 1,5 dont 0,84 sur la corniche ; entre les chambres, des colonnes.
+# Ouverte à l'ouest, où monte Nikanor, et coupée à l'est, où la porte monte plus haut qu'elle.
+# Aucune source ne dit par où l'on y montait : pas d'escalier.
+# Avis écarté, Rashi sur Soucca 51b : « נָתְנוּ זִיזִין בַּכְּתָלִים בּוֹלְטִין מִן הַכּוֹתֶל סָבִיב סָבִיב
+# וְכָל שָׁנָה מְסַדְּרִין שָׁם גְּזוּזְטְרָאוֹת לְוָוחִין » — des corbeaux à demeure, un plancher de bois
+# posé chaque année.
+# Colonnes, architrave, corniche et balustrade sont des CHOIX (Rambam, Beit HaBe'hira 1:11) ; la
+# frise de fleurons reprend les « פְּטוּרֵי צִצִּים » du Bayit (Melakhim I 6:29), en pierre.
+Z_GEZ = CRETE_LISHKA_EN       # sous-face de la dalle
 Z_ARCHITRAVE = Z_GEZ - 1.4
-COLONNES_GEZ = 8
-X_COLONNES_GEZ = [GEZ_X0 + 4 + k * (GEZ_X1 - GEZ_X0 - 8) / (COLONNES_GEZ - 1)
-                  for k in range(COLONNES_GEZ)]
 SOUS_CORNICHE_EN = Z_EZN + H_MUR_EN + min(zb for zb, _, _ in CORNICHE)
-for nm, ya, yb, devant in (("nord", 64, 67.5, 64), ("sud", -67.5, -64, -64)):
-    sens = 1 if devant > 0 else -1
-    box(f"Gezuztra_{nm}", GEZ_X0, GEZ_X1, ya, yb, Z_GEZ, Z_GEZ + 1, "10_EzratNashim")
-    y_colonnes = devant + sens * 0.9
-    for i, x in enumerate(X_COLONNES_GEZ):
-        colonne_cannelee(f"Gezuztra_{nm}_colonne_{i:02d}", x, y_colonnes, Z_EZN, Z_ARCHITRAVE, 0.6,
+Y_BOUT_GEZ = 5 + ENCADREMENT_SHAAR
+# Moitié nord. Les dalles se partagent les angles sans se recouvrir ; chaque rive est une
+# polyligne qui laisse la dalle à sa gauche. La moitié sud est le miroir.
+NU_LISHKA_EN = 40 - MUR_LISHKA_EN         # nu intérieur d'une chambre d'angle, depuis l'angle
+Y_NU_LISHKA_EN = 27.5 + MUR_LISHKA_EN
+GEZ_DALLES = ((EX0, EX0 + 41.5, 26, Y_NU_LISHKA_EN), (EX0 + NU_LISHKA_EN, EX0 + 41.5, Y_NU_LISHKA_EN, 67.5),
+              (EX0 + 41.5, EX1 - 41.5, 64, 67.5), (EX1 - 41.5, EX1 - NU_LISHKA_EN, Y_NU_LISHKA_EN, 67.5),
+              (EX1 - 41.5, EX1, 26, Y_NU_LISHKA_EN), (EX1 - 3.5, EX1, Y_BOUT_GEZ, 26))
+GEZ_RIVE_COUR = ((EX0, 26), (EX0 + 41.5, 26), (EX0 + 41.5, 64), (EX1 - 41.5, 64), (EX1 - 41.5, 26),
+                 (EX1 - 3.5, 26), (EX1 - 3.5, Y_BOUT_GEZ), (EX1, Y_BOUT_GEZ))
+# Le dos des bandes qui longent une chambre donne sur son vide : une balustrade là aussi,
+# sans cymaise ni larmier — le couronnement de la chambre en tient lieu. CHOIX.
+GEZ_RIVES_CHAMBRE = (((EX0 + NU_LISHKA_EN, 67.5), (EX0 + NU_LISHKA_EN, Y_NU_LISHKA_EN), (EX0, Y_NU_LISHKA_EN)),
+                     ((EX1, Y_NU_LISHKA_EN), (EX1 - NU_LISHKA_EN, Y_NU_LISHKA_EN), (EX1 - NU_LISHKA_EN, 67.5)))
+R_COLONNE_GEZ = 0.7           # un dixième de sa hauteur
+X_COLONNES_GEZ = [EX0 + 45.5 + k * (EX1 - EX0 - 91) / 7 for k in range(8)]
+# Le long du mur est, une colonne entre deux shofarot sur deux : au droit d'un shofar, elle le heurtait.
+Y_COLONNES_GEZ_EST = (11.2, 18.0, 24.8)
+X_COLONNES_GEZ_EST = EX1 - 3.5 + 0.9
+
+
+def _onglets(trace, d):
+    """Les sommets de `trace` décalés de `d` vers sa gauche, en onglet."""
+    gauches = []
+    for (xa, ya), (xb, yb) in zip(trace, trace[1:]):
+        longueur = math.hypot(xb - xa, yb - ya)
+        gauches.append((-(yb - ya) / longueur, (xb - xa) / longueur))
+    points = []
+    for k, (x, y) in enumerate(trace):
+        na, nb = gauches[max(k - 1, 0)], gauches[min(k, len(gauches) - 1)]
+        s = d / (1 + na[0] * nb[0] + na[1] * nb[1])
+        points.append((x + s * (na[0] + nb[0]), y + s * (na[1] + nb[1])))
+    return points
+
+
+def bande_le_long(nom, trace, d0, d1, z0, z1, col, mat=None):
+    """Bande entre les décalages `d0` < `d1` de `trace`, un quadrilatère par segment : les
+    onglets s'aboutent sans se recouvrir, et aucun n-gone n'est concave."""
+    a, b = _onglets(trace, d0), _onglets(trace, d1)
+    for k in range(len(trace) - 1):
+        prism(f"{nom}_{k}", [a[k], a[k + 1], b[k + 1], b[k]], z0, z1, col, mat)
+
+
+def balustrade(nom, trace, z, col, colonnes=()):
+    """Plinthe, balustres, main courante sur la dalle dont `z` est le dessus, et un dé aux
+    bouts, à chaque sommet et au droit de chaque colonne."""
+    bande_le_long(f"{nom}_plinthe", trace, 0.0, 0.6, z, z + 0.25, col)
+    bande_le_long(f"{nom}_main_courante", trace, -0.05, 0.65, z + 1.75, z + 2.0, col)
+    axe_des = _onglets(trace, 0.3)
+    des = axe_des[1:-1]
+    for (x, y), (xa, ya), (xb, yb) in ((axe_des[0], trace[0], trace[1]), (axe_des[-1], trace[-1], trace[-2])):
+        longueur = math.hypot(xb - xa, yb - ya)
+        des.append((x + 0.4 * (xb - xa) / longueur, y + 0.4 * (yb - ya) / longueur))
+    for k, ((xa, ya), (xb, yb)) in enumerate(zip(trace, trace[1:])):
+        longueur = math.hypot(xb - xa, yb - ya)
+        ux, uy = (xb - xa) / longueur, (yb - ya) / longueur
+        abscisses = [(xc - xa) * ux + (yc - ya) * uy for xc, yc in colonnes
+                     if abs((xc - xa) * uy - (yc - ya) * ux) < 2 and 0 < (xc - xa) * ux + (yc - ya) * uy < longueur]
+        des += [(xa + s * ux - 0.3 * uy, ya + s * uy + 0.3 * ux) for s in abscisses]
+        arrets = [0.0, longueur] + abscisses
+        for i, s in enumerate(plage(0.9, longueur - 0.9, 0.7)):
+            if min(abs(s - a) for a in arrets) < 0.7:
+                continue
+            revolution(f"{nom}_balustre_{k}_{i:03d}", xa + s * ux - 0.3 * uy, ya + s * uy + 0.3 * ux,
+                       z + 0.25, BALUSTRE, col, verts=10)
+    for i, (x, y) in enumerate(des):
+        box(f"{nom}_de_{i:02d}", x - 0.4, x + 0.4, y - 0.4, y + 0.4, z, z + 2.1, col)
+
+
+def entablement(nom, trace, col):
+    """Architrave à deux fasces, la haute au nu de la dalle, et sa frise, sous `trace`, un
+    segment droit de la rive côté cour."""
+    bande_le_long(f"{nom}_architrave_basse", trace, 0.2, 1.6, Z_ARCHITRAVE, Z_ARCHITRAVE + 0.7, col)
+    bande_le_long(f"{nom}_architrave_haute", trace, 0.0, 1.8, Z_ARCHITRAVE + 0.7, Z_GEZ, col)
+    (xa, ya), (xb, yb) = trace
+    paroi, u0, u1 = ((("x", ya, 1 if xa > xb else -1), *sorted((xa, xb))) if ya == yb else
+                     (("y", xa, 1 if yb > ya else -1), *sorted((ya, yb))))
+    bandeau_fleurons(f"{nom}_frise", paroi, u0 + 1, u1 - 1, Z_ARCHITRAVE + 0.775, col, MAT_PIERRE())
+
+
+def miroir(trace, sens):
+    """La rive de la moitié sud : les points en miroir, dans l'ordre inverse pour garder
+    la dalle à gauche."""
+    return list(trace) if sens > 0 else [(x, -y) for x, y in reversed(trace)]
+
+
+for nm, sens in (("nord", 1), ("sud", -1)):
+    for k, (xa, xb, ya, yb) in enumerate(GEZ_DALLES):
+        box(f"Gezuztra_{nm}_dalle_{k}", xa, xb, *sorted((sens * ya, sens * yb)), Z_GEZ, Z_GEZ + 1,
+            "10_EzratNashim")
+    colonnes = ([(x, sens * 64.9) for x in X_COLONNES_GEZ] +
+                [(X_COLONNES_GEZ_EST, sens * y) for y in Y_COLONNES_GEZ_EST])
+    for i, (x, y) in enumerate(colonnes):
+        colonne_cannelee(f"Gezuztra_{nm}_colonne_{i:02d}", x, y, Z_EZN, Z_ARCHITRAVE, R_COLONNE_GEZ,
                          "10_EzratNashim")
-    # Architrave à deux fasces, la haute au nu de la dalle, et sa frise.
-    box(f"Gezuztra_{nm}_architrave_basse", GEZ_X0, GEZ_X1, devant + sens * 0.2, devant + sens * 1.6,
-        Z_ARCHITRAVE, Z_ARCHITRAVE + 0.7, "10_EzratNashim")
-    box(f"Gezuztra_{nm}_architrave_haute", GEZ_X0, GEZ_X1, devant, devant + sens * 1.8,
-        Z_ARCHITRAVE + 0.7, Z_GEZ, "10_EzratNashim")
-    bandeau_fleurons(f"Gezuztra_{nm}_frise", ("x", devant, -sens), GEZ_X0 + 1, GEZ_X1 - 1,
-                     Z_ARCHITRAVE + 0.775, "10_EzratNashim", MAT_PIERRE())
-    # Corniche au nu de la dalle : cymaise puis larmier, sous la balustrade.
-    box(f"Gezuztra_{nm}_cymaise", GEZ_X0, GEZ_X1, devant - sens * 0.3, devant,
-        Z_GEZ, Z_GEZ + 0.35, "10_EzratNashim")
-    box(f"Gezuztra_{nm}_larmier", GEZ_X0, GEZ_X1, devant - sens * 0.6, devant,
-        Z_GEZ + 0.35, Z_GEZ + 0.9, "10_EzratNashim")
-    # Balustrade : plinthe, balustres, main courante, et un dé au droit de chaque colonne.
-    y_balustres = devant + sens * 0.3
-    box(f"Gezuztra_{nm}_balustrade_plinthe", GEZ_X0, GEZ_X1, devant, devant + sens * 0.6,
-        Z_GEZ + 1, Z_GEZ + 1.25, "10_EzratNashim")
-    box(f"Gezuztra_{nm}_balustrade_main_courante", GEZ_X0, GEZ_X1, devant - sens * 0.05,
-        devant + sens * 0.65, Z_GEZ + 2.75, Z_GEZ + 3.0, "10_EzratNashim")
-    for i, x in enumerate(X_COLONNES_GEZ):
-        box(f"Gezuztra_{nm}_balustrade_de_{i:02d}", x - 0.4, x + 0.4, devant - sens * 0.1,
-            devant + sens * 0.7, Z_GEZ + 1, Z_GEZ + 3.1, "10_EzratNashim")
-    for i, x in enumerate(plage(GEZ_X0 + 1.3, GEZ_X1 - 1.3, 0.7)):
-        if min(abs(x - xc) for xc in X_COLONNES_GEZ) < 0.7:
-            continue
-        revolution(f"Gezuztra_{nm}_balustre_{i:03d}", x, y_balustres, Z_GEZ + 1.25, BALUSTRE,
-                   "10_EzratNashim", verts=10)
+    rive = miroir(GEZ_RIVE_COUR, sens)
+    # Corniche au nu de la dalle, côté cour : cymaise puis larmier, sous la balustrade. Pas sur
+    # le bout qui regarde la porte est : elle y entrait dans le liseré du cadre.
+    face_cour = miroir(GEZ_RIVE_COUR[:-1], sens)
+    bande_le_long(f"Gezuztra_{nm}_cymaise", face_cour, -0.3, 0.0, Z_GEZ, Z_GEZ + 0.35, "10_EzratNashim")
+    bande_le_long(f"Gezuztra_{nm}_larmier", face_cour, -0.6, 0.0, Z_GEZ + 0.35, Z_GEZ + 0.9, "10_EzratNashim")
+    balustrade(f"Gezuztra_{nm}_balustrade", rive, Z_GEZ + 1, "10_EzratNashim", colonnes)
+    for k, trace in enumerate(GEZ_RIVES_CHAMBRE):
+        balustrade(f"Gezuztra_{nm}_balustrade_dos_{k}", miroir(trace, sens), Z_GEZ + 1, "10_EzratNashim")
+    # L'entablement ne court qu'où des colonnes portent la dalle : le long du mur nord ou sud,
+    # et le long du mur est.
+    entablement(f"Gezuztra_{nm}", miroir(GEZ_RIVE_COUR[2:4], sens), "10_EzratNashim")
+    entablement(f"Gezuztra_{nm}_est", miroir(GEZ_RIVE_COUR[5:7], sens), "10_EzratNashim")
     # Au droit de chaque colonne, un pilastre sur le mur du fond, sous la galerie et au-dessus.
-    fond = ("x", 67.5 * sens, -sens)
-    for i, x in enumerate(X_COLONNES_GEZ):
-        pilastre(f"EzratNashim_pilastre_{nm}_bas_{i:02d}", fond, x, Z_EZN, Z_ARCHITRAVE,
-                 "10_EzratNashim", largeur=2.0, saillie=0.7)
-        pilastre(f"EzratNashim_pilastre_{nm}_haut_{i:02d}", fond, x, Z_GEZ + 1, SOUS_CORNICHE_EN,
-                 "10_EzratNashim", largeur=2.0, saillie=0.7)
+    for mur, fond, positions in (("", ("x", 67.5 * sens, -sens), X_COLONNES_GEZ),
+                                 ("_est", ("y", EX1, -1), [sens * y for y in Y_COLONNES_GEZ_EST])):
+        for i, u in enumerate(positions):
+            pilastre(f"EzratNashim_pilastre_{nm}{mur}_bas_{i:02d}", fond, u, Z_EZN, Z_ARCHITRAVE,
+                     "10_EzratNashim", largeur=2.0, saillie=0.7)
+            pilastre(f"EzratNashim_pilastre_{nm}{mur}_haut_{i:02d}", fond, u, Z_GEZ + 1, SOUS_CORNICHE_EN,
+                     "10_EzratNashim", largeur=2.0, saillie=0.7)
 # Couronnement des murs de l'Ezrat Nashim, et les battants d'or de sa porte est :
 # « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעֲרֵי נִיקָנוֹר » (Middot 2:3).
-# Socle, bandeau et couronnement se posent aux mêmes bouts, avec les mêmes mitres, et
-# tombent ici tous les dix amot : le pied à Z_EZN, la crête vingt amot plus haut, et
-# entre les deux le plancher de la gezuztra (Middot 2:5), qui est de plain-pied avec le
-# dallage de l'Azara. Le bandeau n'est donc pas un ornement posé à mi-hauteur : c'est le
-# niveau de la galerie, lu du dehors. Seule la porte est interrompt les deux moulures
-# basses.
+# Socle, bandeau et couronnement se posent aux mêmes bouts, avec les mêmes mitres : le pied à
+# Z_EZN, la crête vingt-cinq amot plus haut, et entre les deux le plancher de la gezuztra
+# (Middot 2:5). Le bandeau n'est donc pas un ornement posé à mi-hauteur : c'est le niveau de
+# la galerie, lu du dehors. Il ne sort que sur la face extérieure : dedans, la galerie le
+# dit elle-même, et il entrerait dans sa dalle. Seule la porte est interrompt les deux
+# moulures basses.
 OR_CORNICHE = MAT_OR() if FILET_OR else None
-for _ouvrage, _profil, _z, _s in (("socle", SOCLE, Z_EZN, SAILLIE_MOULURE),
-                                  ("bandeau", BANDEAU, Z_AZ, SAILLIE_BANDEAU),
-                                  ("couronnement", CORNICHE, Z_EZN + H_MUR_EN, SAILLIE_MOULURE)):
+for _ouvrage, _profil, _z, _s, _dehors in (("socle", SOCLE, Z_EZN, SAILLIE_MOULURE, False),
+                                           ("bandeau", BANDEAU, Z_GEZ, SAILLIE_BANDEAU, True),
+                                           ("couronnement", CORNICHE, Z_EZN + H_MUR_EN, SAILLIE_MOULURE, False)):
     _baie = () if _ouvrage == "couronnement" else [(-5, 5)]
     _filet = OR_CORNICHE if _ouvrage == "couronnement" else None
     moulure(f"EzratNashim_{_ouvrage}_nord", EX0, EX1, 67.5, 72.5, _z, _profil, "10_EzratNashim",
-            saillie=_s, mitres=("deborde", "bute"), filet=_filet)
+            saillie=_s, mitres=("deborde", "bute"), filet=_filet, cotes=(not _dehors, True))
     moulure(f"EzratNashim_{_ouvrage}_sud", EX0, EX1, -72.5, -67.5, _z, _profil, "10_EzratNashim",
-            saillie=_s, mitres=("deborde", "bute"), filet=_filet)
+            saillie=_s, mitres=("deborde", "bute"), filet=_filet, cotes=(True, not _dehors))
     moulure(f"EzratNashim_{_ouvrage}_est", EX1, EX1 + 5, -72.5, 72.5, _z, _profil, "10_EzratNashim",
-            saillie=_s, mitres=("deborde", "deborde"), reserve=_baie, filet=_filet)
+            saillie=_s, mitres=("deborde", "deborde"), reserve=_baie, filet=_filet,
+            cotes=(not _dehors, True))
 battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashim", MAT_OR())
-# Pilastres du mur est côté cour, entre les chambres d'angle et le cadre de la porte, au pas
-# de ceux de la gezuztra.
-ordre_de_pilastres("EzratNashim_pilastre_est", ("y", EX1, -1), (-24, 24), (Z_EZN, SOUS_CORNICHE_EN),
-                   "10_EzratNashim", pas=6.7, largeur=2.0, saillie=0.7,
-                   reserve=[(-5 - ENCADREMENT_SHAAR, 5 + ENCADREMENT_SHAAR)])
 # « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב » (Middot 2:3) : la michna dit le
 # ŠAʿAR, pas ses vantaux — et elle dit deux michnayot plus haut que chaque שער avait sa
 # שְׁקוֹפָה. L'or déborde donc des battants sur les jambages et sur elle. ARBITRAGE : lire
@@ -3536,6 +3606,85 @@ for i in range(15):
     poly = [(EX0 + r * math.cos(t), r * math.sin(t))
             for t in [-math.pi / 2 + math.pi * k / 24 for k in range(0, 25)]]
     prism(f"Marche_Nikanor_{i:02d}", poly, Z_EZN, Z_EZN + 0.5 * (i + 1), "10_EzratNashim")
+# Deux tribunaux de vingt-trois : « שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת,
+# וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית » (Sanhedrin 11:2). Chacun au seuil
+# d'une porte, comme les juges du Tanakh (« וּבֹעַז עָלָה הַשַּׁעַר וַיֵּשֶׁב שָׁם », Ruth 4:1), et chacun
+# au-dedans : « מבפנים לשער מזרח של חומת הר הבית », « מבפנים לשער מזרח של עזרת
+# נשים » (Tiferet Israël, Yakhin sur Sanhedrin 11:9-10). Le premier sous le portique, derrière la
+# porte de Shushan (Hagahot Ya'avetz sur Sanhedrin 88b) ; « אחד בהר הבית » (Tossefta Sanhedrin
+# 7:1) le dit aussi. Avis écartés : Rashi (Sanhedrin 86b), qui met les deux dans l'Ezrat Nashim, le
+# second devant l'Ezrat Israël ; la Tossefta, qui met le second « בחיל », dix amot déjà prises
+# par les douze marches, et ne leur donne que trois juges.
+# « וְהַגָּדוֹל בְּחָכְמָה שֶׁבְּכֻלָּן רֹאשׁ עֲלֵיהֶן וְהַשְּׁאָר יוֹשְׁבִין בְּעִגּוּל כְּמוֹ חֲצִי גֹּרֶן כְּדֵי שֶׁיְּהֵא הָרֹאשׁ
+# רוֹאֶה אֶת כֻּלָּן » (Rambam, Sanhedrin 1:3) : deux gradins en demi-cercle, le chef au milieu de
+# l'arc, et deux greffiers debout aux pointes (Sanhedrin 4:3). Devant eux, « שָׁלֹשׁ שׁוּרוֹת שֶׁל
+# תַּלְמִידֵי חֲכָמִים… שׁוּרָה רִאשׁוֹנָה קְרוֹבָה לַסַּנְהֶדְרִין וְשׁוּרָה שְׁנִיָּה לְמַטָּה הֵימֶנָּה » (ibid. 1:7),
+# « לְמַטָּה » lu « plus loin ». Vingt-trois par rang n'y tiennent pas : la scène montre la
+# disposition, pas le nombre. Côtés, cotes et sièges : CHOIX.
+BEIT_DIN_R = (2.2, 3.2, 4.2)          # bords des deux gradins
+BEIT_DIN_H = (0.9, 1.5)               # dessus de chaque gradin
+BEIT_DIN_DOSSIER = (0.5, 2.3, 3.2)    # épaisseur ; hauteur derrière les juges, derrière le chef
+BEIT_DIN_CHEF = math.pi / 12          # demi-ouverture du siège du chef
+BEIT_DIN_TRONCONS = 11                # de chaque côté du chef
+BANCS_BEIT_DIN = (2.0, 3.5, 5.0)      # distance du centre de l'arc au bord de chaque banc
+BANC_BEIT_DIN = (9.0, 0.7, 0.9)       # longueur, profondeur, hauteur
+
+
+def beit_din_katan(nom, centre, ouverture, col):
+    """Un tribunal de vingt-trois, l'arc centré en `centre` (x, y, sol) et ouvert vers
+    l'angle `ouverture` : les juges sur le demi-cercle d'en face, les élèves devant eux."""
+    cx, cy, z = centre
+
+    def au(r, a):
+        return cx + r * math.cos(a), cy + r * math.sin(a)
+
+    def secteur(suffixe, r0, r1, a0, a1, h, mat):
+        prism(f"{nom}_{suffixe}", [au(r0, a0), au(r1, a0), au(r1, a1), au(r0, a1)], z, z + h, col, mat)
+
+    def rectangle(suffixe, x, y, a, demi_long, demi_large, z0, z1, mat):
+        ux, uy, nx, ny = math.cos(a), math.sin(a), -math.sin(a), math.cos(a)
+        prism(f"{nom}_{suffixe}", [(x + su * demi_long * ux + sn * demi_large * nx,
+                                    y + su * demi_long * uy + sn * demi_large * ny)
+                                   for su, sn in ((-1, -1), (1, -1), (1, 1), (-1, 1))], z0, z1, col, mat)
+
+    fond = ouverture + math.pi
+    pas = (math.pi / 2 - BEIT_DIN_CHEF) / BEIT_DIN_TRONCONS
+    for cote, depart in (("g", ouverture + math.pi / 2), ("d", fond + BEIT_DIN_CHEF)):
+        for k in range(BEIT_DIN_TRONCONS):
+            a0, a1 = depart + k * pas, depart + (k + 1) * pas
+            for rang, h in enumerate(BEIT_DIN_H):
+                secteur(f"gradin_{rang}_{cote}{k:02d}", BEIT_DIN_R[rang], BEIT_DIN_R[rang + 1], a0, a1, h,
+                        MAT_PIERRE())
+            secteur(f"dossier_{cote}{k:02d}", BEIT_DIN_R[-1], BEIT_DIN_R[-1] + BEIT_DIN_DOSSIER[0], a0, a1,
+                    BEIT_DIN_DOSSIER[1], MAT_PIERRE())
+    # Le chef : un siège plus profond, un marchepied, un dossier plus haut. Ni trône ni or.
+    for k, (a0, a1) in enumerate(((fond - BEIT_DIN_CHEF, fond), (fond, fond + BEIT_DIN_CHEF))):
+        secteur(f"chef_siege_{k}", BEIT_DIN_R[0], BEIT_DIN_R[-1], a0, a1, BEIT_DIN_H[-1], MAT_PIERRE())
+        secteur(f"chef_marchepied_{k}", BEIT_DIN_R[0] - 0.5, BEIT_DIN_R[0], a0, a1, BEIT_DIN_H[-1] / 3, MAT_PIERRE())
+        secteur(f"chef_dossier_{k}", BEIT_DIN_R[-1], BEIT_DIN_R[-1] + BEIT_DIN_DOSSIER[0], a0, a1,
+                BEIT_DIN_DOSSIER[2], MAT_PIERRE())
+    # « וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל » (Sanhedrin 4:3).
+    for cote, s in (("g", 1), ("d", -1)):
+        x, y = au(BEIT_DIN_R[1], ouverture + s * math.pi / 2)
+        x, y = x + math.cos(ouverture), y + math.sin(ouverture)
+        cyl(f"{nom}_sofer_{cote}_pied", x, y, z, z + 2.0, 0.1, col, MAT_CEDRE(), verts=8)
+        rectangle(f"sofer_{cote}_pupitre", x, y, ouverture, 0.3, 0.45, z + 2.0, z + 2.1, MAT_CEDRE())
+    longueur, profondeur, h = BANC_BEIT_DIN
+    for rang, d in enumerate(BANCS_BEIT_DIN):
+        x, y = au(d + profondeur / 2, ouverture)
+        rectangle(f"banc_{rang}_siege", x, y, ouverture, profondeur / 2, longueur / 2, z + h - 0.1, z + h,
+                  MAT_CEDRE())
+        for i, t in enumerate((-0.45, 0.0, 0.45)):
+            rectangle(f"banc_{rang}_pied_{i}", x - t * longueur * math.sin(ouverture),
+                      y + t * longueur * math.cos(ouverture), ouverture, profondeur / 2 - 0.05, 0.1,
+                      z, z + h - 0.1, MAT_CEDRE())
+
+
+# Au sud de chaque porte. Au Har HaBayit, entre le mur et le premier rang de colonnes, ouvert
+# sur le passage de la porte ; dans l'Ezrat Nashim, dos à la colonnade de la galerie, un
+# passage laissé devant les shofarot, ouvert vers Nikanor : CHOIX.
+beit_din_katan("Beit_Din_Har_HaBayit", (HX1 - MUR_HAR - 5, -16, Z_HAR), math.pi / 2, "00_HarHabayit")
+beit_din_katan("Beit_Din_HaAzara", (129, -17, Z_EZN), math.pi, "10_EzratNashim")
 
 # ----------------------------------------------------------------------------
 # 20 — AZARA (187 × 135), Middot 5:1–2
@@ -3561,13 +3710,36 @@ box("EzratIsrael_sol", X_DOUKHAN, AX1, AY0, AY1, Z_EZI - 1, Z_EZI, "20_Azara", M
 # déjà juste ; les deux autres montaient au ras de leur sol.
 # Le dallage de l'Azara, les deux podiums et le sol de l'Ezrat Nashim sont posés plus bas,
 # « SOUS L'AZARA », une fois connus les vides qu'y creusent la mesiba et le shit.
-box("Podium_ezrat_israel", X_DOUKHAN, AX1, AY0 - T, AY1 + T, Z_EZN, Z_EZI - 1, "00_HarHabayit")
+# Chambres sous l'Ezrat Israël : « וּלְשָׁכוֹת הָיוּ תַחַת עֶזְרַת יִשְׂרָאֵל, וּפְתוּחוֹת לְעֶזְרַת הַנָּשִׁים,
+# שֶׁשָּׁם הַלְוִיִּם נוֹתְנִים כִּנּוֹרוֹת וּנְבָלִים וּמְצִלְתַּיִם וְכָל כְּלֵי שִׁיר » (Middot 2:6). Avec elles,
+# les deux de Shekalim 5:6, que nul ne situe — « צְרִיכָה עִיּוּן בְּאֵיזֶה מָקוֹם הָיְתָה עוֹמֶדֶת » (Raavad,
+# dans Melekhet Shelomoh sur Tamid 3:5) : CHOIX, sur « אולי גם הן נפתחו לעזרת נשים » (Mishnat
+# Eretz Israël). Les Léviim de part et d'autre des marches, où ils montent avec leurs
+# instruments ; HaKelim au nord, 'Hashaïm au sud, au-delà : CHOIX.
+# Sous l'Ezrat Israël seulement — « מְקוֹם דְּרִיסַת יִשְׂרָאֵל אַחַת עֶשְׂרֵה אַמָּה » (Middot 5:1) ; le
+# Doukhan et ses marches commencent à l'ouest —, du sol de l'Ezrat Nashim au dallage d'au-dessus.
+# Chacune a ses murs d'une demi-ama : taillée dans le podium, elle n'aurait pour parois que
+# ses blocs, et la visite ne saurait pas qu'on y est entré.
+# Portes 3 × 6 : la cote de Middot 2:3 n'est pas pour elles (voir PORTE_LISHKA) ; CHOIX.
+X_EZI = AX1 - 11
+MUR_LISHKA_EZI = 0.5
+H_PORTE_EZI = 6
+# Un cadre de porte prend `cadre` + 0,9 de chaque côté : à CADRE_LISHKA_EN, celui des Léviim
+# entrait dans la plus basse marche et chevauchait celui de HaKelim.
+CADRE_LISHKA_EZI = 0.6
+# Nom, emprise en y murs compris, centre de la porte.
+LISHKOT_EZI = (("Leviim_N", 13.5, 20.5, 16.5), ("HaKelim", 20.5, 32.5, 23.0),
+               ("Leviim_S", -20.5, -13.5, -16.5), ("Chashaim", -32.5, -20.5, -23.0))
+massif_evide("Podium_ezrat_israel", X_DOUKHAN, AX1, AY0 - T, AY1 + T, Z_EZN, Z_EZI - 1,
+             [(X_EZI, AX1, y0, y1, Z_EZN, Z_EZI - 1) for _, y0, y1, _ in LISHKOT_EZI], "00_HarHabayit")
 # Le seuil de Nikanor : le sol de l'Ezrat Israël continue dans l'épaisseur du mur, sinon la
 # baie ouvre sur le vide entre ses deux vantaux.
 box("Nikanor_seuil", AX1, AX1 + T, -5, 5, Z_EZN, Z_EZI, "20_Azara", MAT_SOL())
-# Mur est avec la porte de Nikanor (10 × 20) au centre
-box("Azara_mur_est_S", AX1, AX1 + T, AY0 - T, -5, Z_EZN, Z_AZ + H_MUR, "20_Azara")
-box("Azara_mur_est_N", AX1, AX1 + T, 5, AY1 + T, Z_EZN, Z_AZ + H_MUR, "20_Azara")
+# Mur est avec la porte de Nikanor (10 × 20) au centre, et au pied les portes des chambres
+# sous l'Ezrat Israël.
+for _nom, _y0, _y1 in (("Azara_mur_est_S", AY0 - T, -5), ("Azara_mur_est_N", 5, AY1 + T)):
+    mur_perce(_nom, AX1, AX1 + T, _y0, _y1, Z_EZN, Z_AZ + H_MUR, "20_Azara",
+              [(porte, 3) for _, _, _, porte in LISHKOT_EZI if _y0 < porte < _y1], H_PORTE_EZI)
 box("Nikanor_linteau", AX1, AX1 + T, -5, 5, Z_EZI + 20, Z_AZ + H_MUR, "20_Azara")
 # Battants rabattus dans l'embrasure, comme ceux du Heikhal : les portes de l'Azara
 # sont ouvertes dès l'aube (Tamid 3:7 ; Yoma 3:1-2), et à Kippour pendant l'avoda.
@@ -3593,6 +3765,105 @@ H_PISHPESH = 8
 for cote, y0, y1 in PISHPESHIM:
     box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + H_PISHPESH, "20_Azara", MAT_NEHOSHET())
     box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + H_PISHPESH, Z_EZI + H_PISHPESH + 0.4, "20_Azara", MAT_NEHOSHET())
+# Les chambres sous l'Ezrat Israël : leurs murs, et un cadre de pierre sur chaque porte,
+# comme aux chambres d'angle — un פתח de chambre n'est pas un שער.
+for _nom, _y0, _y1, _porte in LISHKOT_EZI:
+    massif_evide(f"Lishkat_{_nom}_murs", X_EZI, AX1, _y0, _y1, Z_EZN, Z_EZI - 1,
+                 [(X_EZI + MUR_LISHKA_EZI, AX1, _y0 + MUR_LISHKA_EZI, _y1 - MUR_LISHKA_EZI, Z_EZN, Z_EZI - 1)],
+                 "10_EzratNashim")
+    shaar(f"Lishkat_{_nom}_cadre", ("y", AX1 + T, 1), _porte, Z_EZN, Z_EZI, T, "10_EzratNashim", MAT_PIERRE(),
+          largeur=3, hauteur=H_PORTE_EZI, cadre=CADRE_LISHKA_EZI)
+
+
+def instrument_range(nom, genre, x, y, z0, le_long, col):
+    """Instrument de Lévi rangé, et non tenu comme dans `instrument_de_levi` : kinor ou nevel
+    debout, son cadre parallèle à la paroi qui court le long de l'axe `le_long` ; tziltzal
+    couché, ses deux disques l'un sur l'autre."""
+    if genre == "tziltzal":
+        for k in range(2):
+            cyl(f"{nom}_{k}", x, y, z0 + 0.05 * k, z0 + 0.05 * k + 0.04, 0.28, col, MAT_BRONZE(), verts=12)
+        return
+    bois = MAT_CHENE()
+
+    def piece(suffixe, a0, a1, b0, b1, zb, zh):
+        bornes = (x + a0, x + a1, y + b0, y + b1) if le_long == "x" else (x + b0, x + b1, y + a0, y + a1)
+        box(f"{nom}_{suffixe}", *bornes, zb, zh, col, bois)
+
+    large, haut = (0.30, 1.10) if genre == "kinor" else (0.42, 1.70)
+    if genre == "kinor":
+        piece("caisse", -large, large, -0.06, 0.06, z0, z0 + 0.30)
+    else:
+        cone(f"{nom}_caisse", x, y, z0, z0 + 0.70, 0.36, 0.26, col, bois, verts=10)   # tient dans l'étagère
+    for s in (-1, 1):
+        a = s * (large - 0.04)
+        cyl(f"{nom}_bras{s:+d}", x + (a if le_long == "x" else 0), y + (0 if le_long == "x" else a),
+            z0 + (0.30 if genre == "kinor" else 0.70), z0 + haut, 0.04, col, bois, verts=6)
+    piece("joug", -large - 0.01, large + 0.01, -0.04, 0.04, z0 + haut - 0.08, z0 + haut)
+
+
+# Lishkot HaLéviim : « שֶׁשָּׁם הַלְוִיִּם נוֹתְנִים כִּנּוֹרוֹת וּנְבָלִים וּמְצִלְתַּיִם » (Middot 2:6). Des
+# rayonnages de cèdre le long des deux grands murs — les nevalim en bas, les kinorot au-dessus,
+# les metziltayim en haut — et trois kinorot aux crochets du fond. Pas de 'hatzotzrot : la michna
+# ne les nomme pas, et les cohanim en sonnent (« וּבְנֵי אַהֲרֹן הַכֹּהֲנִים יִתְקְעוּ בַּחֲצֹצְרוֹת », Bamidbar
+# 10:8) ; Soucca 5:4 en met pourtant aux Léviim à Sim'hat Beit HaSho'éva. Tout : CHOIX.
+PLANCHES_LEVIIM = (-9.7, -7.7, -6.0, -4.6)      # dessous de chaque planche
+MONTANTS_LEVIIM = [X_EZI + 0.7 + k * 2.5 for k in range(5)]
+for _nom, _s in (("Leviim_N", 1), ("Leviim_S", -1)):
+    for _mur, _nu in (("a", 14.0), ("b", 20.0)):
+        _dedans = 1 if _mur == "a" else -1       # sens de la paroi vers la chambre
+        _y0, _y1 = sorted((_s * _nu, _s * (_nu + _dedans * 0.8)))
+        _y = (_y0 + _y1) / 2
+        for k, x in enumerate(MONTANTS_LEVIIM):
+            box(f"Lishkat_{_nom}_etagere_{_mur}_montant_{k}", x, x + 0.12, _y0, _y1, Z_EZN, PLANCHES_LEVIIM[-1] + 0.1,
+                "10_EzratNashim", MAT_CEDRE())
+        for k, (xa, xb) in enumerate(zip(MONTANTS_LEVIIM, MONTANTS_LEVIIM[1:])):
+            for j, z in enumerate(PLANCHES_LEVIIM):
+                box(f"Lishkat_{_nom}_etagere_{_mur}_planche_{k}{j}", xa + 0.12, xb, _y0, _y1, z, z + 0.1,
+                    "10_EzratNashim", MAT_CEDRE())
+            xc = (xa + 0.12 + xb) / 2
+            instrument_range(f"Lishkat_{_nom}_{_mur}_nevel_{k}", "nevel", xc, _y, PLANCHES_LEVIIM[0] + 0.1,
+                             "x", "10_EzratNashim")
+            for i, u in enumerate((-0.55, 0.55)):
+                instrument_range(f"Lishkat_{_nom}_{_mur}_kinor_{k}{i}", "kinor", xc + u, _y,
+                                 PLANCHES_LEVIIM[1] + 0.1, "x", "10_EzratNashim")
+            for i, u in enumerate((-0.7, 0.0, 0.7)):
+                instrument_range(f"Lishkat_{_nom}_{_mur}_tziltzal_{k}{i}", "tziltzal", xc + u, _y,
+                                 PLANCHES_LEVIIM[2] + 0.1, "x", "10_EzratNashim")
+    for i, y in enumerate((15.6, 17.0, 18.4)):
+        crochet(f"Lishkat_{_nom}_crochet_{i}", X_EZI + MUR_LISHKA_EZI, _s * y, -6.3, 1, "10_EzratNashim")
+        instrument_range(f"Lishkat_{_nom}_fond_kinor_{i}", "kinor", X_EZI + MUR_LISHKA_EZI + 0.2, _s * y, -7.4,
+                         "y", "10_EzratNashim")
+# Lishkat HaKelim : « כָּל מִי שֶׁהוּא מִתְנַדֵּב כְּלִי, זוֹרְקוֹ לְתוֹכָהּ. וְאַחַת לִשְׁלשִׁים יוֹם, גִּזְבָּרִין
+# פּוֹתְחִין אוֹתָהּ » (Shekalim 5:6). Fermée : deux vantaux de bronze sous une traverse, et
+# au-dessus une baie où l'on jette le don ; dedans, ce qui y est tombé. Tout : CHOIX.
+_porte = next(p for n, _, _, p in LISHKOT_EZI if n == "HaKelim")
+box("Lishkat_HaKelim_traverse", AX1, AX1 + T, _porte - 1.5, _porte + 1.5, Z_EZN + 4.5, Z_EZN + 5,
+    "10_EzratNashim")
+for _cote, (_ya, _yb) in (("S", (_porte - 1.5, _porte - 0.01)), ("N", (_porte + 0.01, _porte + 1.5))):
+    box(f"Lishkat_HaKelim_vantail_{_cote}", AX1 + T / 2 - 0.15, AX1 + T / 2 + 0.15, _ya, _yb,
+        Z_EZN, Z_EZN + 4.5, "10_EzratNashim", MAT_BRONZE())
+_metaux = (MAT_ARGENT, MAT_OR, MAT_BRONZE, MAT_BRONZE)
+for k in range(18):
+    _n = f"Lishkat_HaKelim_keli_{k:02d}"
+    x, y = AX1 - 0.5 - 2.2 * alea(_n, 0), _porte - 1.3 + 2.6 * alea(_n, 1)
+    z, r, mat = Z_EZN + 0.3 * alea(_n, 2), 0.15 + 0.2 * alea(_n, 3), _metaux[k % 4]()
+    forme = k % 3
+    if forme == 0:      # plat
+        cyl(_n, x, y, z, z + 0.04, r + 0.1, "10_EzratNashim", mat, verts=16)
+    elif forme == 1:    # coupe
+        cone(_n, x, y, z, z + 0.25, 0.5 * r, r, "10_EzratNashim", mat, verts=16)
+    else:               # cruche
+        revolution(_n, x, y, z, [(0.0, 0.0), (0.6 * r, 0.0), (r, 0.3), (0.5 * r, 0.75), (0.6 * r, 0.9),
+                                 (0.5 * r, 0.9), (0.0, 0.85)], "10_EzratNashim", mat, verts=16)
+# Lishkat 'Hashaïm : « יִרְאֵי חֵטְא נוֹתְנִים לְתוֹכָהּ בַּחֲשַׁאי, וַעֲנִיִּים בְּנֵי טוֹבִים מִתְפַּרְנְסִים מִתוֹכָהּ
+# בַּחֲשַׁאי » (Shekalim 5:6). Ouverte, un coffre au milieu, où l'on dépose et d'où l'on prend. CHOIX.
+_y = next(p for n, _, _, p in LISHKOT_EZI if n == "Chashaim") - 3.5
+box("Lishkat_Chashaim_coffre", -6.5, -4.5, _y - 0.6, _y + 0.6, Z_EZN, Z_EZN + 1.1, "10_EzratNashim", MAT_CEDRE())
+box("Lishkat_Chashaim_coffre_couvercle", -6.55, -4.45, _y - 0.65, _y + 0.65, Z_EZN + 1.1, Z_EZN + 1.3,
+    "10_EzratNashim", MAT_CEDRE())
+for k, x in enumerate((-6.0, -5.0)):
+    box(f"Lishkat_Chashaim_coffre_bande_{k}", x - 0.08, x + 0.08, _y - 0.67, _y + 0.67, Z_EZN, Z_EZN + 1.32,
+        "10_EzratNashim", MAT_BRONZE())
 # Mur ouest
 box("Azara_mur_ouest", AX0 - T, AX0, AY0 - T, AY1 + T, Z_AZ, Z_AZ + H_MUR, "20_Azara")
 # Murs nord et sud avec trois portes chacun (10 × 20). Positions : CHOIX (Middot 1:4)
@@ -4595,7 +4866,8 @@ for _nm, _y0, _y1, _cotes, _corps in (("nord", AY1, AY1 + T, (True, False), CORP
 # se lisent en gros œuvre ; le bandeau y porte, comme dans l'Ezrat Nashim, le niveau du
 # dallage de l'Azara qui est derrière.
 moulure("Azara_socle_est_bas", AX1, AX1 + T, AY0 - T, AY1 + T, Z_EZN, SOCLE, "20_Azara",
-        mitres=("deborde", "deborde"), cotes=(False, True), reserve=[(-5, 5)])
+        mitres=("deborde", "deborde"), cotes=(False, True),
+        reserve=[(-5, 5)] + [(p - 2 - CADRE_LISHKA_EZI, p + 2 + CADRE_LISHKA_EZI) for _, _, _, p in LISHKOT_EZI])
 moulure("Azara_bandeau_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, BANDEAU, "20_Azara",
         saillie=SAILLIE_BANDEAU, mitres=("deborde", "deborde"), cotes=(False, True),
         reserve=[(-5, 5)])
@@ -4612,11 +4884,6 @@ ordre_de_pilastres("Azara_pilastre_ouest", ("y", AX0, 1), (AY0, AY1), (Z_AZ, SOU
 NIKANOR_CADRE = (-5 - ENCADREMENT_SHAAR, 5 + ENCADREMENT_SHAAR)
 ordre_de_pilastres("Azara_pilastre_est", ("y", AX1, -1), (AY0, AY1), (Z_EZI, SOUS_CORNICHE),
                    "20_Azara", reserve=[NIKANOR_CADRE] + [(y0 - 0.3, y1 + 0.3) for _, y0, y1 in PISHPESHIM])
-# Et sur sa face est, qui est le mur ouest de l'Ezrat Nashim : entre les chambres d'angle,
-# de part et d'autre des quinze marches de Nikanor.
-MARCHES_NIKANOR = (-13.5, 13.5)
-ordre_de_pilastres("EzratNashim_pilastre_ouest", ("y", AX1 + T, 1), (-24, 24), (Z_EZN, SOUS_CORNICHE),
-                   "20_Azara", pas=6.7, largeur=2.0, saillie=0.7, reserve=[NIKANOR_CADRE, MARCHES_NIKANOR])
 
 # ----------------------------------------------------------------------------
 # 30 — MIZBEA'H (Middot 3:1) + rampe + Kiyor + Beit HaMitba'haïm
@@ -5247,6 +5514,7 @@ ROVAD_X_E = BX_E                          # les bandeaux se posent sur le nu du 
 rovadim("Ulam_facade", ROVAD_X_E, (1, 0), -50, 50, Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE(),
         reserve=[(-10, 10, Z_BAT, Z_BAT + 40),        # la baie de 20 × 40
                  (-16, 16, Z_BAT + 40, Z_BAT + 52)])  # et la pile d'amaltraot
+Y_PISHPESH_HALIFOT = (42, 45)          # |y| de la baie, dans la face ouest de chaque débord
 # Les faces nord et sud portent les mêmes bandeaux, et s'arrêtent au mur du Heikhal :
 # le Kessef Mishneh (sur 4:9) écarte les rovadim du corps du bâtiment,
 # « וְלֹא שֶׁיְּהֵא מֻקָּף רְבָדִים כְּמוֹ שֶׁל אוּלָם ».
@@ -5255,13 +5523,23 @@ for cote, y, sens in (("N", 50, 1), ("S", -50, -1)):
             Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
     # « סָבִיב לְכָתְלֵי הָאוּלָם » : la face ouest des débords aussi, du corps du bâtiment à l'angle.
     rovadim(f"Ulam_flanc_retour_{cote}", BX_E - 16, (-1, 0), *sorted((sens * 35, y + sens * ROVAD_SAILLIE)),
-            Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
+            Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE(),
+            reserve=[(*sorted(sens * y for y in Y_PISHPESH_HALIFOT), Z_BAT, Z_BAT + H_PISHPESH)])
 
 # Beit HaHalifot : « הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן… וְהוּא הָיָה נִקְרָא בֵּית
 # הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים » (Middot 4:7) — « שֶׁכֹּתֶל הָאוּלָם עָבְיוֹ חָמֵשׁ אַמָּה,
-# וְהָאוּלָם עֶשֶׂר אַמּוֹת לַצָּפוֹן » (Bartenura ad loc.) : l'Oulam lui-même, ouvert, 90 entre ses murs.
-# Le mur qui le ferme à l'ouest n'est dans aucune source : 5 amot pris dans les 16, CHOIX,
-# pour garder le corps à 70.
+# וְהָאוּלָם עֶשֶׂר אַמּוֹת לַצָּפוֹן » (Bartenura ad loc.). Une chambre fermée de chaque côté —
+# « הָיָה חֶדֶר מִכָּאן וּמִכָּאן » (Tiferet Israël, Yakhin sur Middot 4:7, 71) —, et à chacune deux
+# portes : « א' לָאוּלָם, וְא' בַּזָּוִית… בְּזָוִית צְפוֹנִית מַעֲרָבִית… דְּרוֹמִית מַעֲרָבִית. וְכָל א' מִב' אֵלּוּ
+# הַפְּתָחִים הָיָה גָּבוֹהַּ ח' אַמּוֹת » (ibid., 72) ; « שְׁנֵי פִּשְׁפָּשִׁין הָיוּ בְּבֵית הַחֲלִיפוֹת, וְגוֹבְהָן
+# שְׁמֹנָה » (Zeva'him 55b), « וּפְתוּחִין לַמַּעֲרָב » (Rashi ad loc., citant la Tossefta).
+# Avis écartés : l'Oulam lui-même, ouvert sur ses débords (Tosfot Yom Tov) ; les niches dans le
+# mur ouest, du dehors — « וּבַכּוֹתֶל הַמַּעֲרָבִי… הָיוּ חַלּוֹנוֹת לִגְנוֹז סַכִּינִין מִבַּחוּץ » (Rashi sur
+# Zeva'him 55b).
+# Le mur qui ferme la chambre à l'ouest n'est dans aucune source : 5 amot pris dans les 16,
+# CHOIX, pour garder le corps à 70. Largeur des deux portes (celle des pishpeshim de Nikanor),
+# cloison d'une ama, vantail rabattu du pishpesh, et les degrés qui descendent à l'Azara, six
+# amot plus bas (« כָּל הַמַּעֲלוֹת… רוּם מַעֲלָה חֲצִי אַמָּה, וְשִׁלְחָהּ חֲצִי אַמָּה », Middot 2:3) : CHOIX.
 # Une niche par michmar : « חַלּוֹנוֹת הָיוּ בְּלִשְׁכַּת הַחֲלִיפוֹת שֶׁשָּׁם גּוֹנְזִין אֶת סַכִּינֵיהֶם » (Bartenura
 # sur Soucca 5:8), « לכל משמר ומשמר היה שם ארגז מיוחד בכותל » (Tiferet Israël sur Middot 4:7).
 # Celle de Bilga est murée, « וְחַלּוֹנָהּ סְתוּמָה » (Soucca 5:8 ; Soucca 56b). Taille, place et
@@ -5307,8 +5585,17 @@ for cote, sens, premier in (("N", 1, 1), ("S", -1, 13)):
               math.radians(-14), nu + sens * 0.4, "40_Ulam")
     massif_evide(f"Ulam_halifot_mur_{cote}", BX_E - 16, BX_E - 5, *sorted((sens * 45, sens * 50)),
                  Z_BAT, Z_TOIT, niches, "40_Ulam", MAT_MARBRE_HERODE())
-    box(f"Ulam_halifot_fond_{cote}", BX_E - 16, BX_E - 11, *sorted((sens * 35, sens * 45)),
-        Z_BAT, Z_TOIT, "40_Ulam", MAT_MARBRE_HERODE())
+    pishpesh = sorted(sens * y for y in Y_PISHPESH_HALIFOT)
+    massif_evide(f"Ulam_halifot_fond_{cote}", BX_E - 16, BX_E - 11, *sorted((sens * 35, sens * 45)),
+                 Z_BAT, Z_TOIT, [(BX_E - 16, BX_E - 11, *pishpesh, Z_BAT, Z_BAT + H_PISHPESH)],
+                 "40_Ulam", MAT_MARBRE_HERODE())
+    box(f"Ulam_halifot_pishpesh_{cote}_vantail", BX_E - 11, BX_E - 10.8, *sorted((sens * 39, sens * 42)),
+        Z_BAT, Z_BAT + H_PISHPESH, "40_Ulam", MAT_BRONZE())
+    escalier(f"Ulam_halifot_degres_{cote}", BX_E - 22, BX_E - 16, *pishpesh, Z_AZ, Z_BAT, "-x",
+             "40_Ulam", MAT_MARBRE_HERODE())
+    paroi_percee(f"Ulam_halifot_cloison_{cote}", BX_E - 11, BX_E - 5, *sorted((sens * 35, sens * 36)),
+                 Z_BAT, Z_BAT + 40, "40_Ulam", MAT_MARBRE_HERODE(),
+                 [(BX_E - 9.5, BX_E - 6.5, Z_BAT, Z_BAT + H_PISHPESH)])
     couches_middot(f"Ulam_halifot_plancher_{cote}", BX_E - 11, BX_E - 5, *sorted((sens * 35, sens * 45)),
                    Z_BAT + 40, "40_Ulam")
     box(f"Ulam_halifot_masse_{cote}", BX_E - 11, BX_E - 5, *sorted((sens * 35, sens * 45)),

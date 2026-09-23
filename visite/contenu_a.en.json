@@ -219,7 +219,12 @@
   "gezuztra": {
     "nom": "Gezuztra (the Gallery)",
     "translit": "Gezuztra",
-    "resume": "A gallery, or balcony, ran along the walls of the Ezrat Nashim. It was added for Simchat Beit HaShoeva: the women looked on from above and the men from below, “so that they would not mingle”.",
+    "resume": "A gallery ran all around the Ezrat Nashim. It was added for Simchat Beit HaShoeva: the women looked on from above and the men from below, “so that they would not mingle”.",
+    "cotes": [
+      "all around the court, open to the west toward Nikanor, cut at the eastern gate",
+      "at the crest of the corner chambers, 15.6 amot above the court",
+      "3.5 amot wide"
+    ],
     "sources": [
       {
         "oeuvre": "Middot",
@@ -235,9 +240,19 @@
         "oeuvre": "Soucca",
         "ref": "51b",
         "citation": "חֲלָקָה הָיְתָה בָּרִאשׁוֹנָה. וְהִקִּיפוּהָ גְּזוּזְטְרָא, וְהִתְקִינוּ שֶׁיְּהוּ נָשִׁים יוֹשְׁבוֹת מִלְמַעְלָה וַאֲנָשִׁים מִלְּמַטָּה"
+      },
+      {
+        "oeuvre": "Bartenura sur Middot",
+        "ref": "2:5",
+        "citation": "כְּמוֹ גְּזוּזְטְרָא הִקִּיפוּ סָבִיב לְעֶזְרַת נָשִׁים"
+      },
+      {
+        "oeuvre": "Rashi sur Soucca",
+        "ref": "51b",
+        "citation": "נתנו זיזין בכתלים בולטין מן הכותל סביב סביב וכל שנה מסדרין שם גזוזטראות לווחין"
       }
     ],
-    "note": "Tour's choice: the gallery is shown empty outside the festival; no source says what became of it the rest of the year."
+    "note": "No source gives its height: the tour sets it at the crest of the corner chambers, running along their walls on the court side without covering them — they remain roofless (Middot 2:5). Columns, balustrade and frieze are choices. No source says how one went up to it: the tour shows no stair. Set aside: Rashi (Sukkah 51b), for whom corbels stayed in the walls and a floor of planks was laid on them every year. Tour's choice: the gallery is shown empty outside the festival; no source says what became of it the rest of the year."
   },
   "lishkat_haetzim": {
     "nom": "Lishkat HaEtzim",
@@ -327,7 +342,7 @@
   },
   "quinze_marches": {
     "nom": "The Fifteen Steps",
-    "resume": "Fifteen semicircular steps rise from the Ezrat Nashim to the Ezrat Israel. They correspond to the fifteen Shir HaMaalot of Psalms, and the Leviim stand on them with their instruments to sing during Simchat Beit HaShoeva. Beneath the Ezrat Israel, opening onto the Ezrat Nashim, are the chambers where they stored their instruments.",
+    "resume": "Fifteen semicircular steps rise from the Ezrat Nashim to the Ezrat Israel. They correspond to the fifteen Shir HaMaalot of Psalms, and the Leviim stand on them with their instruments to sing during Simchat Beit HaShoeva. Beneath the Ezrat Israel, opening onto the Ezrat Nashim, are the chambers where they stored their instruments, the Lishkot HaLeviim, one on each side of the steps.",
     "cotes": [
       "15 semicircular steps"
     ],
@@ -355,6 +370,229 @@
     ],
     "translit": "Chamesh esreh maalot",
     "note": "The sources set the fifteen steps against the fifteen Shir HaMaalot; they do not say that these psalms were the ones sung there. Sukkah 5:4 calls the gate at the top of the steps Sha'ar HaElyon; the Rambam (Beit HaBechirah 5:5) identifies it with the Gate of Nikanor."
+  },
+  "lishkot_haleviim": {
+    "nom": "Lishkot HaLeviim",
+    "translit": "Lishkot HaLeviim",
+    "resume": "Beneath the Ezrat Yisrael, chambers opened onto the Ezrat Nashim: the Levites kept their kinorot, their nevalim, their metziltayim and all the instruments of song there. They lie at the foot of the fifteen steps, on which the Levites stood with their instruments to sing.",
+    "cotes": [
+      "beneath the Ezrat Yisrael, opening onto the Ezrat Nashim",
+      "two chambers, one on each side of the fifteen steps",
+      "doors of 3 × 6 amot"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "2:6",
+        "citation": "וּלְשָׁכוֹת הָיוּ תַחַת עֶזְרַת יִשְׂרָאֵל, וּפְתוּחוֹת לְעֶזְרַת הַנָּשִׁים, שֶׁשָּׁם הַלְוִיִּם נוֹתְנִים כִּנּוֹרוֹת וּנְבָלִים וּמְצִלְתַּיִם וְכָל כְּלֵי שִׁיר"
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "כְּנֶגֶד חֲמִשָּׁה עָשָׂר שִׁיר הַמַּעֲלוֹת שֶׁבַּתְּהִלִּים, שֶׁעֲלֵיהֶן לְוִיִּם עוֹמְדִין בִּכְלֵי שִׁיר וְאוֹמְרִים שִׁירָה"
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "10:8",
+        "citation": "וּבְנֵי אַהֲרֹן הַכֹּהֲנִים יִתְקְעוּ בַּחֲצֹצְרוֹת"
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "וְהַלְוִיִּם בְּכִנּוֹרוֹת וּבִנְבָלִים וּבִמְצִלְתַּיִם וּבַחֲצוֹצְרוֹת"
+      }
+    ],
+    "note": "What the Mishnah says: chambers beneath the Ezrat Yisrael, opening onto the Ezrat Nashim, where the Levites put down their instruments; neither how many nor where. Tour's choice: two chambers, one on each side of the steps, with doors of 3 × 6 amot — the size in Middot 2:3, twenty by ten, is that of the gates of the Azara, and these chambers are only six and a half amot high —, the cedar shelves, the hooks and where each instrument sits. No chatzotzrot: the mishnah does not name them among what is put down there, and the kohanim blow them (Numbers 10:8). At Simchat Beit HaShoevah, however, the Levites play them on the fifteen steps (Sukkah 5:4). Modeled: two chambers of 10.5 × 6 amot under the paving of the Ezrat Yisrael."
+  },
+  "lishkat_hakelim": {
+    "nom": "Lishkat HaKelim",
+    "translit": "Lishkat HaKelim",
+    "resume": "Whoever wished to donate a vessel to the Temple threw it into this chamber. Once every thirty days the treasurers opened it: whatever could serve the upkeep of the Temple was kept, the rest was sold, and the money went to the chamber of the Temple's upkeep.",
+    "cotes": [
+      "beneath the Ezrat Yisrael, to the north, beyond the Levites",
+      "door shut, an opening above it to throw in the gifts"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shekalim",
+        "ref": "5:6",
+        "citation": "לִשְׁכַּת הַכֵּלִים, כָּל מִי שֶׁהוּא מִתְנַדֵּב כֶּלִי, זוֹרְקוֹ לְתוֹכָהּ. וְאַחַת לִשְׁלשִׁים יוֹם, גִּזְבָּרִין פּוֹתְחִין אוֹתָהּ. וְכָל כְּלִי שֶׁמּוֹצְאִין בּוֹ צֹרֶךְ לְבֶדֶק הַבַּיִת, מַנִּיחִין אוֹתוֹ. וְהַשְּׁאָר נִמְכָּרִין בִּדְמֵיהֶן וְנוֹפְלִין לְלִשְׁכַּת בֶּדֶק הַבַּיִת"
+      },
+      {
+        "oeuvre": "Rambam Arakhin",
+        "ref": "2:12",
+        "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים. וְאַחַת לִשְׁכַּת הַכֵּלִים"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Tamid 3:5",
+        "citation": "צריכה עיון באיזה מקום היתה עומדת"
+      },
+      {
+        "oeuvre": "Mishnat Eretz Israël",
+        "ref": "Préface à Tamid et Middot 7:79",
+        "citation": "כך לשכת הכלים ולשכת חשאין ; אולי גם הן נפתחו לעזרת נשים"
+      }
+    ],
+    "note": "No source places this chamber or the Chamber of Secret Gifts: the Raavad wonders at it, quoted by Melekhet Shlomo (Tamid 3:5), and Mishnat Eretz Yisrael suggests that they too opened onto the Ezrat Nashim. The tour places them beneath the Ezrat Yisrael, with the Levites' chambers: a choice. Also a choice: the shut bronze door, the opening for throwing in the gift, the heap of vessels. One does not enter: it was opened only once a month."
+  },
+  "lishkat_chashaim": {
+    "nom": "Lishkat Chasha'im",
+    "translit": "Lishkat Chasha'im",
+    "resume": "The chamber of discreet gifts. Those who feared sin put money in it in secret, and poor people of good family drew their living from it, in secret too. The Rambam gives it as the example of the gift where the giver does not know to whom he gives, nor the poor man from whom he receives.",
+    "cotes": [
+      "beneath the Ezrat Yisrael, to the south, beyond the Levites",
+      "open door, a chest in the middle"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shekalim",
+        "ref": "5:6",
+        "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים, וְאַחַת לִשְׁכַּת הַכֵּלִים, לִשְׁכַּת חֲשָׁאִים יִרְאֵי חֵטְא נוֹתְנִים לְתוֹכָה בַּחֲשַׁאי, וַעֲנִיִּים בְּנֵי טוֹבִים מִתְפַּרְנְסִים מִתוֹכָהּ בַּחֲשַׁאי"
+      },
+      {
+        "oeuvre": "Rambam Arakhin",
+        "ref": "2:12",
+        "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים. וְאַחַת לִשְׁכַּת הַכֵּלִים"
+      },
+      {
+        "oeuvre": "Rambam Matnot Aniyim",
+        "ref": "10:8",
+        "citation": "הַנּוֹתֵן צְדָקָה לָעֲנִיִּים וְלֹא יָדַע לְמִי נָתַן וְלֹא יָדַע הֶעָנִי מִמִּי לָקַח… כְּגוֹן לִשְׁכַּת חֲשָׁאִים שֶׁהָיְתָה בַּמִּקְדָּשׁ"
+      },
+      {
+        "oeuvre": "Sifrei Devarim",
+        "ref": "117:7",
+        "citation": "מִכָּן אָמְרוּ: לִשְׁכַּת חֲשָׁאִים הָיְתָה בִּירוּשָׁלִַם"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Tamid 3:5",
+        "citation": "צריכה עיון באיזה מקום היתה עומדת"
+      },
+      {
+        "oeuvre": "Mishnat Eretz Israël",
+        "ref": "Préface à Tamid et Middot 7:79",
+        "citation": "כך לשכת הכלים ולשכת חשאין ; אולי גם הן נפתחו לעזרת נשים"
+      }
+    ],
+    "note": "No source places this chamber: the Raavad wonders at it for its neighbor (Melekhet Shlomo on Tamid 3:5), and Mishnat Eretz Yisrael suggests that both opened onto the Ezrat Nashim. The tour places it beneath the Ezrat Yisrael: a choice, as is the cedar chest bound in bronze. Variant: the Sifrei (Devarim 117), quoting the Mishnah, reads “in Jerusalem” instead of “in the Mikdash”; it places nothing in the Temple."
+  },
+  "beit_din_har_habayit": {
+    "nom": "Court at the gate of the Har HaBayit",
+    "translit": "Beit din she'al petach Har HaBayit",
+    "resume": "The first of Jerusalem's three courts, a court of twenty-three. A sage whose teaching was disputed in his town came here first; if the judges had a tradition, they said it, otherwise one went up to the court at the gate of the Azara, then to the Great Sanhedrin in the Lishkat HaGazit. Tiferet Yisrael places it just inside the eastern gate of the Har HaBayit, the one topped by the image of Shushan HaBirah: it sits under the portico, beside the passage of the gate. The judges sit in a half-circle, the wisest in the middle so that he sees them all; two scribes stand before them, and three rows of students sit facing them.",
+    "cotes": [
+      "23 judges in a half-circle, the wisest in the middle",
+      "two scribes standing",
+      "three rows of students, the first the closest"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "11:2",
+        "citation": "שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת, וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית"
+      },
+      {
+        "oeuvre": "Tiferet Israël",
+        "ref": "Sanhedrin 11:9",
+        "citation": "אחד יושב על פתח הר הבית מבפנים לשער מזרח של חומת הר הבית"
+      },
+      {
+        "oeuvre": "Hagahot Ya'avetz sur Sanhedrin",
+        "ref": "88b",
+        "citation": "סתמו הוא שער המזרחי שעליו שושן הבירה צורה"
+      },
+      {
+        "oeuvre": "Tosefta Sanhedrin",
+        "ref": "7:1",
+        "citation": "ושני בתי דינין של ג' היו בירושלים אחד בהר הבית ואחד בחיל"
+      },
+      {
+        "oeuvre": "Pesachim",
+        "ref": "13b",
+        "citation": "הר הבית סטיו כפול היה… סטיו לפנים מסטיו"
+      },
+      {
+        "oeuvre": "Rambam Sanhedrin",
+        "ref": "1:3",
+        "citation": "וְהַגָּדוֹל בְּחָכְמָה שֶׁבְּכֻלָּן רֹאשׁ עֲלֵיהֶן וְהַשְּׁאָר יוֹשְׁבִין בְּעִגּוּל כְּמוֹ חֲצִי גֹּרֶן כְּדֵי שֶׁיְּהֵא הָרֹאשׁ רוֹאֶה אֶת כֻּלָּן"
+      },
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "4:3",
+        "citation": "וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Sanhedrin 4:3",
+        "citation": "סנהדרין. אף של כ\"ג. רש\"י"
+      },
+      {
+        "oeuvre": "Rambam Sanhedrin",
+        "ref": "1:7",
+        "citation": "כָּל סַנְהֶדְרִי קְטַנָּה מוֹשִׁיבִין לִפְנֵיהֶן שָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים בְּכָל שׁוּרָה וְשׁוּרָה עֶשְׂרִים וּשְׁלֹשָׁה אִישׁ. שׁוּרָה רִאשׁוֹנָה קְרוֹבָה לַסַּנְהֶדְרִין"
+      },
+      {
+        "oeuvre": "Rashi sur Sanhedrin",
+        "ref": "86b",
+        "citation": "אחד יושב על פתח הר הבית - הוא שער המזרחי שלפנים מן החיל לפני עזרת נשים"
+      }
+    ],
+    "note": "What the texts say: three courts (Sanhedrin 11:2), two of them of twenty-three; Tiferet Yisrael puts this one “inside the eastern gate of the wall of the Har HaBayit”, and Haggahot Ya'avetz names that gate: the one bearing Shushan HaBirah. The Tosefta (Sanhedrin 7:1) says only “one on the Har HaBayit”. The half-circle, the scribes and the students hold for a court of twenty-three as for the great one (Tosafot Yom Tov on Sanhedrin 4:3, citing Rashi). Tour's choice: the south side of the gate, under the double portico (Pesachim 13b), between the wall and the first row of columns; the two tiers and the seats. The Rambam counts twenty-three students per row (Sanhedrin 1:7): the scene shows the three rows, not every student, and reads « לְמַטָּה הֵימֶנָּה » as “further away”. Set aside: Rashi (Sanhedrin 86b) and Bartenura, who put it at the eastern gate of the Ezrat Nashim; the Tosefta, which gives it only three judges."
+  },
+  "beit_din_haazara": {
+    "nom": "Court at the gate of the Azara",
+    "translit": "Beit din she'al petach HaAzara",
+    "resume": "The second of Jerusalem's three courts, a court of twenty-three. One went up to it when the court at the gate of the Har HaBayit had no tradition on the question; if it had none either, one went to the Great Sanhedrin in the Lishkat HaGazit. Tiferet Yisrael places it just inside the eastern gate of the Ezrat Nashim: the judges sit with their backs to the colonnade of the gallery, facing the Nikanor gate.",
+    "cotes": [
+      "23 judges in a half-circle, the wisest in the middle",
+      "two scribes standing",
+      "three rows of students, the first the closest"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "11:2",
+        "citation": "שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת, וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית"
+      },
+      {
+        "oeuvre": "Tiferet Israël",
+        "ref": "Sanhedrin 11:10",
+        "citation": "ואחד יושב על פתח העזרה מבפנים לשער מזרח של עזרת נשים"
+      },
+      {
+        "oeuvre": "Rambam Sanhedrin",
+        "ref": "1:3",
+        "citation": "וְהַגָּדוֹל בְּחָכְמָה שֶׁבְּכֻלָּן רֹאשׁ עֲלֵיהֶן וְהַשְּׁאָר יוֹשְׁבִין בְּעִגּוּל כְּמוֹ חֲצִי גֹּרֶן כְּדֵי שֶׁיְּהֵא הָרֹאשׁ רוֹאֶה אֶת כֻּלָּן"
+      },
+      {
+        "oeuvre": "Sanhedrin",
+        "ref": "4:3",
+        "citation": "וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Sanhedrin 4:3",
+        "citation": "סנהדרין. אף של כ\"ג. רש\"י"
+      },
+      {
+        "oeuvre": "Rambam Sanhedrin",
+        "ref": "1:7",
+        "citation": "כָּל סַנְהֶדְרִי קְטַנָּה מוֹשִׁיבִין לִפְנֵיהֶן שָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים בְּכָל שׁוּרָה וְשׁוּרָה עֶשְׂרִים וּשְׁלֹשָׁה אִישׁ. שׁוּרָה רִאשׁוֹנָה קְרוֹבָה לַסַּנְהֶדְרִין"
+      },
+      {
+        "oeuvre": "Rashi sur Sanhedrin",
+        "ref": "86b",
+        "citation": "ואחד יושב למעלה הימנו - כשעברו עזרת נשים ובאין לפני עזרת ישראל"
+      },
+      {
+        "oeuvre": "Tosefta Sanhedrin",
+        "ref": "7:1",
+        "citation": "ושני בתי דינין של ג' היו בירושלים אחד בהר הבית ואחד בחיל"
+      }
+    ],
+    "note": "What the texts say: three courts (Sanhedrin 11:2), two of them of twenty-three; Tiferet Yisrael puts this one “inside the eastern gate of the Ezrat Nashim”. The half-circle, the scribes and the students hold for a court of twenty-three as for the great one (Tosafot Yom Tov on Sanhedrin 4:3, citing Rashi). Tour's choice: the south side of the gate, backed onto the colonnade of the gallery, with a passage left in front of the shofarot; the two tiers and the seats. The Rambam counts twenty-three students per row (Sanhedrin 1:7): the scene shows the three rows, not every student. Set aside: Rashi (Sanhedrin 86b), who puts it at the end of the Ezrat Nashim, before the Ezrat Yisrael; the Tosefta (Sanhedrin 7:1), which puts it “in the Cheil”, whose ten amot the twelve steps already take, and gives it only three judges."
   },
   "shaar_nikanor": {
     "nom": "Gate of Nikanor",
@@ -1190,7 +1428,7 @@
   "lishkat_hagazit": {
     "nom": "Lishkat HaGazit",
     "translit": "Lishkat HaGazit",
-    "resume": "Seat of the Sanhedrin, and place where the lots for the Kohanim were drawn. It straddles the north wall of the Azara, half within the sacred area, half outside it: the wall breaks off across its width, and the boundary is marked on the floor. Two openings, one onto the Azara in the south, the other onto the chol in the east, at the top of twenty steps coming up from the terrace of the Cheil. The Gemara calls them petachim, not sha'arim — they are not gates of the Azara. Its walls are of hewn stone broken by courses of cedar; in the chol half, where the court sits, the floor is of cedar and the far wall is lined with carved cedar panels. In the sacred half, the Kohanim stand in a circle for the drawing of lots, and they come there to read the Shema. The Sanhedrin sits in the chol half, since no one sits in the Azara except the kings of the house of David. It sits in a semicircle, so that the judges see one another: the Nasi in the middle, the Av Beit Din at his right, two scribes standing before them — three according to R. Yehuda —, and three rows of students seated facing the judges. It sits there from the morning Tamid until the evening one; on Shabbat and festivals, it sits on the Cheil. There it judges the Kohanim: one found unfit dresses in black and leaves, one found fit dresses in white and goes in to serve with his brothers.",
+    "resume": "Seat of the Sanhedrin, and place where the lots for the Kohanim were drawn. It straddles the north wall of the Azara, half within the sacred area, half outside it: the wall breaks off across its width, and the boundary is marked on the floor. Two openings, one onto the Azara in the south, the other onto the chol in the east, at the top of twenty steps coming up from the terrace of the Cheil. The Gemara calls them petachim, not sha'arim — they are not gates of the Azara. Its walls are of hewn stone broken by courses of cedar; in the chol half, where the court sits, the floor is of cedar and the far wall is lined with carved cedar panels. In the sacred half, the Kohanim stand in a circle for the drawing of lots, and they come there to read the Shema. The Sanhedrin sits in the chol half, since no one sits in the Azara except the kings of the house of David. It sits in a semicircle, so that the judges see one another: the Nasi in the middle, the Av Beit Din at his right, two scribes standing before them — three according to R. Yehuda —, and three rows of students seated facing the judges. It sits there from the morning Tamid until the evening one; on Shabbat and festivals, it sits on the Cheil. There it judges the Kohanim: one found unfit dresses in black and leaves, one found fit dresses in white and goes in to serve with his brothers. Two courts of twenty-three sit below, at the eastern gates of the Har HaBayit and of the Ezrat Nashim: one goes up from one to the other, then here (Sanhedrin 11:2).",
     "cotes": [
       "straddling the north wall",
       "half in the sacred area, half outside it, the boundary marked on the floor",

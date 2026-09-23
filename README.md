@@ -364,10 +364,11 @@ avec sa raison. Ce qu'il dit aujourd'hui :
   mesiba jusqu'au bain — à une exception près : **le sommet de l'autel**, que le quart
   d'ama d'air entre la tête du kevesh et l'autel coupait de tout. C'est la règle de
   marche qui a plié, pas le modèle : voir la fente ci-dessus.
-- **Trois lieux se refusent par choix du modèle**, pas par accident : la gezuztra de
+- **Quatre lieux se refusent par choix du modèle**, pas par accident : la gezuztra de
   l'Ezrat Nashim, dont aucun escalier n'est bâti ; le Beit HaKisse du bain, dont la
   porte est fermée — c'est ainsi qu'on savait la place prise (*Tamid* 1:1) ; le toit du
-  Beit HaParva, dont la mesiba est une tour pleine.
+  Beit HaParva, dont la mesiba est une tour pleine ; la Lishkat HaKelim, que les
+  trésoriers n'ouvrent qu'une fois par trente jours (*Shekalim* 5:6).
 - **Le Soreg n'a aucune ouverture** : ses poteaux se suivent tous les 3 amot sur les
   quatre côtés, y compris sur l'axe est.
 
@@ -1009,6 +1010,27 @@ et places restent des CHOIX, la présence de chaque objet ne l'est pas (fiche §
   La scène suit *Middot*.
 - **Non fait** : la cuisson de la lumière et l'export de la visite, à relancer (`--lumiere` sur
   les concepts touchés) ; `temple.glb` et `visite/lumiere/` ne montrent pas encore ces meubles.
+
+### La galerie, les chambres sous l'Ezrat Israël, les petits tribunaux (23/09)
+
+- **La gezuztra fait le tour.** « הִקִּיפוּ סָבִיב לְעֶזְרַת נָשִׁים » (Bartenura sur *Middot* 2:5) : elle
+  ne courait qu'au nord et au sud, entre les chambres d'angle, dix amot au-dessus de la cour.
+  Elle monte à leur crête et passe sur leurs murs côté cour, sans les couvrir (« וְלֹא הָיוּ
+  מְקוֹרוֹת ») ; colonnes le long des murs nord, sud et est, balustrade des deux côtés où elle
+  longe une chambre. Ouverte à l'ouest, coupée à la porte est. Les attiques des chambres
+  tombent : la galerie tient leur silhouette. Le bandeau des murs monte avec elle, dehors
+  seulement. Toujours aucun escalier : aucune source n'en donne.
+- **Quatre chambres sous l'Ezrat Israël** (*Middot* 2:6 ; *Shekalim* 5:6) : deux des Léviim
+  de part et d'autre des marches, avec leurs instruments ; Lishkat HaKelim au nord, fermée ;
+  Lishkat 'Hashaïm au sud, et son coffre. Ranger là celles de *Shekalim* est un CHOIX : personne
+  ne les situe (fiche §4).
+- **Beit HaHalifot fermé** (Tiferet Israël sur *Middot* 4:7 ; *Zeva'him* 55b) : une cloison, une
+  porte sur l'Oulam, un pishpesh à l'angle ouest et ses douze degrés vers l'Azara. Les niches
+  restent où elles étaient.
+- **Deux tribunaux de vingt-trois**, chacun au-dedans d'une porte est (*Sanhedrin* 11:2 ; Tiferet
+  Israël) : l'un sous le portique, derrière Sha'ar Shushan, l'autre dans l'Ezrat Nashim, dos à la
+  galerie. En demi-cercle, le chef au milieu, deux greffiers, trois bancs d'élèves — la
+  disposition, pas le nombre. Code propre : rien n'est pris à la Lishkat HaGazit, qui reste à reprendre.
 
 ## Licence
 
