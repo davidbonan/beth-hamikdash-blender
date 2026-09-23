@@ -28,6 +28,9 @@ const TOURNER_DEPART = 3;      // m : le temps de quitter des yeux ce qu'on rega
 const TOURNER_ARRIVEE = 8;     // m : le temps de se tourner vers ce que la station montre
 const ALLURES = [1, 2, 4];     // la marche au pas, ou le temps qui s'accélère
 const MEMOIRE_ALLURE = "visite.parcours.allure";
+// Sur un téléphone la carte couvre la moitié basse de la scène : pendant la marche elle se replie d'elle-même.
+const ECRAN_ETROIT = matchMedia("(max-width: 720px), (max-height: 520px)");
+const CHEVRON_GAUCHE = "M8.5 2 2.5 8l6 6", CHEVRON_DROIT = "M3.5 2l6 6-6 6", COCHE = "M1 8.5l3.5 4L11 3";
 const lisse = (u) => u * u * (3 - 2 * u);
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
@@ -38,6 +41,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   const titre = carte.querySelector("h2"), texte = carte.querySelector(".texte");
   const precedent = carte.querySelector(".precedent"), suivant = carte.querySelector(".suivant");
   const allure = carte.querySelector(".allure"), fiche = carte.querySelector(".fiche");
+  const motSuivant = suivant.querySelector("span"), traceSuivant = suivant.querySelector("path"), tracePrecedent = precedent.querySelector("path");
 
   const enM = ([x, z]) => new THREE.Vector3(x * ama, 0, z * ama);
   const cibleEnM = ([x, y, z]) => new THREE.Vector3(x * ama, y * ama, z * ama);
@@ -48,6 +52,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   let courante = -1, origine = -1;
   let trajet = null;
   let facteur = ALLURES.includes(+lireRetenu(MEMOIRE_ALLURE)) ? +lireRetenu(MEMOIRE_ALLURE) : 1;
+  let repliee = false, deplieeEnMarche = false;
   const ouvert = () => !racine.hidden;
   const derniere = () => courante === stations.length - 1;
 
@@ -59,10 +64,24 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     titre.textContent = traduit(station.titre);
     texte.textContent = traduit(station.texte);
     precedent.disabled = courante === 0;
-    ecrire(suivant, derniere() ? "parcours_terminer" : "parcours_suivant");
+    const clefSuivant = derniere() ? "parcours_terminer" : "parcours_suivant";
+    ecrire(motSuivant, clefSuivant);
+    suivant.dataset.titre = clefSuivant;
+    suivant.title = motSuivant.textContent;
+    const [arriere, avant] = document.documentElement.dir === "rtl" ? [CHEVRON_DROIT, CHEVRON_GAUCHE] : [CHEVRON_GAUCHE, CHEVRON_DROIT];
+    tracePrecedent.setAttribute("d", arriere);
+    traceSuivant.setAttribute("d", derniere() ? COCHE : avant);
     allure.textContent = `×${facteur}`;
     fiche.disabled = trajet !== null || !station.concept;
     carte.classList.toggle("en-marche", trajet !== null);
+    carte.classList.toggle("repliee", estRepliee());
+  }
+
+  // Replier la carte à la main tient jusqu'à ce qu'on la redéplie ; la déplier pendant une marche ne vaut que pour elle.
+  const estRepliee = () => repliee || (trajet !== null && !deplieeEnMarche && ECRAN_ETROIT.matches);
+  function basculerCarte() {
+    if (estRepliee()) { repliee = false; deplieeEnMarche = true; } else repliee = true;
+    carte.classList.toggle("repliee", estRepliee());
   }
 
   // Aller en avant suit les points de passage de la station visée ; revenir les
@@ -122,6 +141,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     };
     origine = courante;
     courante = i;
+    deplieeEnMarche = false;
     fermerFiche();
     afficher();
     marcher(trajet);
@@ -184,6 +204,8 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   };
   allure.onclick = (e) => { e.currentTarget.blur(); accelerer(); };
   fiche.onclick = (e) => { e.currentTarget.blur(); ouvrirFiche(stations[courante].concept); };
+  carte.querySelector(".etape").onclick = basculerCarte;
+  titre.onclick = () => { if (estRepliee()) basculerCarte(); };
   carte.querySelector(".quitter").onclick = (e) => { e.currentTarget.blur(); fermer(); };
   suivreLangue(() => { if (ouvert()) afficher(); });
 
