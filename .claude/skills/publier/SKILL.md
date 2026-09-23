@@ -32,7 +32,7 @@ montre est toujours le HEAD de `main`, jamais l'arbre de travail.
 
 ## Ce que `construire_site.sh` filtre, et pourquoi pas de `<base>`
 
-Le script rsync `index.html`, les `.js`, les `.json`, `temple.glb`, `figures.glb`,
+Le script rsync `index.html`, les `.js`, les `.json`, `temple.glb`, `figures.glb`, `figures_shoeva.glb`,
 `apercu.jpg`, `mini_*.png`, `matieres/*.webp`, `plans/*.webp` et `occlusion/*.webp` vers `dist/visite/`, en
 `--delete`. Le reste de `visite/` (scans, profils de navigateur) ne part pas.
 
@@ -104,7 +104,7 @@ un asset manquant. Deux niveaux.
 
 ```bash
 curl -sIL https://bethhamikdach.com/visite | grep -i "^HTTP\|^location"
-for f in visite.js temple.glb figures.glb figures.json concepts.json reperes.json textes.json; do
+for f in visite.js temple.glb figures.glb figures_shoeva.glb figures.json concepts.json reperes.json textes.json; do
   curl -s -o /dev/null -w "$f %{http_code}\n" "https://bethhamikdach.com/visite/$f"
 done
 ```

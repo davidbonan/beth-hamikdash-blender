@@ -982,6 +982,30 @@
       "nom": "Les anshei ma'amad",
       "zone": "azara",
       "prefixes": []
+    },
+    {
+      "id": "leviim_hamaalot",
+      "nom": "Les Léviim sur les quinze marches",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "tokei_hatzotzrot",
+      "nom": "Les deux cohanim aux trompettes",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "hassidim_veanshei_maase",
+      "nom": "Les 'hassidim et les hommes d'action",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "shemone_avoukot",
+      "nom": "Les huit torches",
+      "zone": "ezrat_nashim",
+      "prefixes": []
     }
   ]
 }

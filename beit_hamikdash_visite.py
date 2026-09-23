@@ -57,7 +57,7 @@ COLLECTIONS = ("00_HarHabayit", "10_EzratNashim", "20_Azara", "30_Mizbeach", "40
 LARGEUR_CHANFREIN = 0.03 * AMA
 
 # En amot. `cadre` : concepts à montrer entiers ; sans `position`, le navigateur recule le long du `cap` (0 = est, 90 = nord).
-Z_HAR, Z_EZN, Z_AZ, Z_BAT = -16.0, -10.0, 0.0, 6.0
+Z_HAR, Z_EZN, Z_EZI, Z_AZ, Z_BAT = -16.0, -10.0, -2.5, 0.0, 6.0
 Z_PLACE_KOTEL = -51.58
 
 REPERES = [
