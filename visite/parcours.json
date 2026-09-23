@@ -1,5 +1,5 @@
 {
- "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7). En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7) et la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4). `moment` : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim le temps du parcours ; sans lui, le jour. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
  "parcours": [
   {
    "id": "tamid",
@@ -1008,6 +1008,247 @@
       "fr": "Retour au Beit HaParva. Habits d'or pour son bélier et le bélier du peuple (Yoma 7:3) ; habits blancs pour aller retirer la cuiller et la ma'hta du Kodesh HaKodashim ; habits d'or pour l'encens du soir et l'entretien des lampes — une tevila et deux kiddoushim à chaque changement, cinq tevilot en tout. Puis ses propres habits : on l'accompagne jusqu'à sa maison, et il fait fête à ses proches d'être sorti en paix du sanctuaire.",
       "en": "Back to the Beit HaParva. Golden garments for his ram and the people’s ram (Yoma 7:3); white garments to bring the spoon and the machta out of the Kodesh HaKodashim; golden garments for the evening incense and the tending of the lamps — an immersion and two sanctifications at each change, five immersions in all. Then his own clothes: they escort him to his house, and he makes a feast for his friends for having come out of the sanctuary in peace.",
       "he": "חזרה לבית הפרווה. בגדי זהב לאילו ולאיל העם (יומא ז, ג); בגדי לבן להוציא את הכף ואת המחתה מקודש הקודשים; בגדי זהב לקטורת של בין הערביים ולהטבת הנרות – טבילה ושני קידושים בכל חילוף, חמש טבילות בסך הכול. ואחר כך בגדי עצמו: מלווים אותו עד ביתו, ויום טוב היה עושה לאוהביו בשעה שיצא בשלום מן הקודש."
+     }
+    }
+   ]
+  },
+  {
+   "id": "simhat_beit_hashoeva",
+   "titre": {
+    "fr": "Sim'hat Beit HaSho'éva",
+    "en": "Simchat Beit HaSho’eva",
+    "he": "שמחת בית השואבה"
+   },
+   "moment": "nuit",
+   "stations": [
+    {
+     "id": "motzaei_yom_tov",
+     "concept": "ezrat_nashim",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:1-2"
+     },
+     "point": [
+      128,
+      0
+     ],
+     "sol": -10,
+     "cible": [
+      20,
+      8,
+      0
+     ],
+     "titre": {
+      "fr": "L'Ezrat Nashim, au soir du premier jour",
+      "en": "The Ezrat Nashim, on the first festival night",
+      "he": "עזרת נשים, במוצאי יום טוב הראשון"
+     },
+     "texte": {
+      "fr": "Au soir du premier jour de fête, on descend à l'Ezrat Nashim pour y faire un grand aménagement. C'est la fête du puisage de l'eau : sa flûte joue cinq ou six jours, et ne repousse ni le Shabbat ni le jour de fête. « Qui n'a pas vu la joie de Beit HaSho'éva n'a jamais vu de joie. »",
+      "en": "At the close of the first festival day, they go down to the Ezrat Nashim and make a great arrangement there. This is the feast of the water-drawing: its flute plays five or six days, and overrides neither Shabbat nor the festival day. “Whoever has not seen the joy of Beit HaSho’eva has never seen joy in his life.”",
+      "he": "במוצאי יום טוב הראשון של חג יורדים לעזרת נשים ומתקנים שם תיקון גדול. זהו החליל של בית השואבה, חמישה וששה ימים, ואינו דוחה לא את השבת ולא את יום טוב. ״כל מי שלא ראה שמחת בית השואבה – לא ראה שמחה מימיו.״"
+     }
+    },
+    {
+     "id": "gezuztra",
+     "concept": "gezuztra",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "51b"
+     },
+     "point": [
+      72,
+      -45
+     ],
+     "sol": -10,
+     "via": [
+      [
+       90,
+       -10
+      ]
+     ],
+     "cible": [
+      72,
+      2,
+      -65
+     ],
+     "titre": {
+      "fr": "La gezuztra, galerie des femmes",
+      "en": "The gezuztra, the women's gallery",
+      "he": "הגזוזטרא"
+     },
+     "texte": {
+      "fr": "Le grand aménagement, c'est cette galerie. La cour était lisse autrefois ; on l'a entourée d'une gezuztra, et l'on a établi que les femmes s'assoient en haut et les hommes en bas.",
+      "en": "This is the great arrangement: the court was bare at first; they surrounded it with a gallery, the gezuztra, and ordained that the women sit above and the men below.",
+      "he": "זהו התיקון הגדול: חלקה הייתה בראשונה, והקיפוה גזוזטרא, והתקינו שיהו נשים יושבות מלמעלה ואנשים מלמטה."
+     }
+    },
+    {
+     "id": "menorot",
+     "concept": "candelabres_shoeva",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:2"
+     },
+     "point": [
+      62,
+      -8
+     ],
+     "sol": -10,
+     "cible": [
+      110,
+      18,
+      -20
+     ],
+     "titre": {
+      "fr": "Les menorot d'or",
+      "en": "The golden menorot",
+      "he": "מנורות של זהב"
+     },
+     "texte": {
+      "fr": "Des menorot d'or, hautes de cinquante amot (Soucca 52b), quatre coupes d'or à leur sommet et quatre échelles à chacune. Quatre jeunes des fleurs de la kehouna y montent, des jarres d'huile en main — cent vingt log, trente chacun — et versent dans chaque coupe. Leur nombre n'est pas donné : quatre est un choix du modèle.",
+      "en": "Golden menorot stood there, fifty amot high (Sukkah 52b), four golden bowls at their tops and four ladders to each. Four youths of the priestly novices climb them, jugs of oil in hand — a hundred and twenty log, thirty each — and pour into every bowl. Their number is not given: four is the model's choice.",
+      "he": "מנורות של זהב היו שם, גובהן חמישים אמה (סוכה נב ע״ב), וארבעה ספלים של זהב בראשיהן וארבעה סולמות לכל אחת ואחת. ארבעה ילדים מפרחי כהונה עולים בהם, ובידיהם כדים של שמן – מאה ועשרים לוג, שלושים לכל אחד – ומטילים לכל ספל וספל. מספרן אינו מפורש: ארבע הן בחירת הדגם."
+     }
+    },
+    {
+     "id": "petilot",
+     "concept": "candelabres_shoeva",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:3"
+     },
+     "point": [
+      60,
+      30
+     ],
+     "sol": -10,
+     "cible": [
+      35,
+      30,
+      0
+     ],
+     "titre": {
+      "fr": "Les mèches",
+      "en": "The wicks",
+      "he": "הפתילות"
+     },
+     "texte": {
+      "fr": "Les mèches sont arrachées aux caleçons et aux ceintures usés des cohanim, et c'est avec elles qu'on allume. Il n'y avait pas de cour à Jérusalem qui ne soit éclairée de la lumière de Beit HaSho'éva.",
+      "en": "From the worn-out breeches and belts of the priests they tore wicks, and with them they lit. There was no courtyard in Jerusalem that was not lit by the light of Beit HaSho’eva.",
+      "he": "מבלאי מכנסי כהנים ומהמייניהם היו מפקיעים, ובהם היו מדליקים. ולא הייתה חצר בירושלים שאינה מאירה מאור בית השואבה."
+     }
+    },
+    {
+     "id": "avoukot",
+     "concept": "hassidim_veanshei_maase",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:4"
+     },
+     "point": [
+      93,
+      6
+     ],
+     "sol": -10,
+     "cible": [
+      77,
+      -5,
+      -15
+     ],
+     "titre": {
+      "fr": "Les torches des 'hassidim",
+      "en": "The torches of the pious",
+      "he": "אבוקות של אור"
+     },
+     "texte": {
+      "fr": "Les 'hassidim et les hommes d'action dansent devant l'assemblée, des torches allumées à la main, et disent devant elle des chants et des louanges. Au milieu de la ronde, un homme lance huit torches et les rattrape sans qu'elles se touchent, comme on le disait de Rabban Shimon ben Gamliel (Soucca 53a).",
+      "en": "The pious and the men of deeds dance before the people with flaming torches in their hands, and recite before them songs and praises. In the middle of the ring, a man throws eight torches and catches them without their touching, as was said of Rabban Shimon ben Gamliel (Sukkah 53a).",
+      "he": "חסידים ואנשי מעשה מרקדים לפני העם באבוקות של אור שבידיהם, ואומרים לפניהם דברי שירות ותשבחות. באמצע המחול איש זורק שמונה אבוקות ומקבלן, ואין נוגעות זו בזו, כמו שאמרו על רבן שמעון בן גמליאל (סוכה נג.)."
+     }
+    },
+    {
+     "id": "leviim_maalot",
+     "concept": "leviim_hamaalot",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:4"
+     },
+     "point": [
+      30,
+      0
+     ],
+     "sol": -10,
+     "cible": [
+      10,
+      -6,
+      0
+     ],
+     "titre": {
+      "fr": "Les Léviim sur les quinze marches",
+      "en": "The Levites on the fifteen steps",
+      "he": "הלויים על חמש עשרה מעלות"
+     },
+     "texte": {
+      "fr": "Les Léviim, avec kinorot, nevalim, cymbales, trompettes et instruments sans nombre, se tiennent sur les quinze marches qui descendent de l'Ezrat Israël à l'Ezrat Nashim — quinze, comme les quinze Chants des degrés des Psaumes.",
+      "en": "The Levites, with lyres, harps, cymbals, trumpets and instruments without number, stand on the fifteen steps that go down from the Ezrat Israel to the Ezrat Nashim — corresponding to the fifteen Songs of Ascents in Psalms.",
+      "he": "והלויים בכינורות ובנבלים ובמצלתיים ובחצוצרות ובכלי שיר בלא מספר, על חמש עשרה מעלות היורדות מעזרת ישראל לעזרת נשים – כנגד חמישה עשר שיר המעלות שבתהלים."
+     }
+    },
+    {
+     "id": "kara_hagever",
+     "concept": "tokei_hatzotzrot",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:4"
+     },
+     "point": [
+      10.5,
+      0
+     ],
+     "sol": -2.5,
+     "cible": [
+      2,
+      0.5,
+      0
+     ],
+     "titre": {
+      "fr": "Au chant du coq, les trompettes",
+      "en": "At cockcrow, the trumpets",
+      "he": "קרא הגבר"
+     },
+     "texte": {
+      "fr": "Deux cohanim se tiennent à la porte haute qui descend de l'Ezrat Israël à l'Ezrat Nashim, deux trompettes en main. Au chant du coq, ils sonnent teki'a, terou'a, teki'a. À la dixième marche, ils sonnent encore ; arrivés à la cour, encore. Et ils vont en sonnant jusqu'à la porte qui sort à l'est.",
+      "en": "Two priests stand at the upper gate that goes down from the Ezrat Israel to the Ezrat Nashim, two trumpets in their hands. When the rooster calls, they sound teki’a, teru’a, teki’a. Reaching the tenth step, they sound again; reaching the court, again. And they go on sounding until the gate that leads out to the east.",
+      "he": "שני כהנים עומדים בשער העליון היורד מעזרת ישראל לעזרת נשים, ושתי חצוצרות בידיהם. קרא הגבר – תקעו והריעו ותקעו. הגיעו למעלה עשירית – תקעו והריעו ותקעו. הגיעו לעזרה – תקעו והריעו ותקעו. והולכים ותוקעים עד השער היוצא מזרח."
+     }
+    },
+    {
+     "id": "shaar_hamizrach",
+     "concept": "porte_est_ezrat_nashim",
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "5:4"
+     },
+     "point": [
+      134,
+      0
+     ],
+     "sol": -10,
+     "cible": [
+      0,
+      20,
+      0
+     ],
+     "titre": {
+      "fr": "À la porte est, face à l'ouest",
+      "en": "At the east gate, facing west",
+      "he": "בשער המזרח, פנים למערב"
+     },
+     "texte": {
+      "fr": "Arrivés à la porte qui sort à l'est, ils se tournent vers l'ouest et disent : « Nos pères, qui étaient en ce lieu, le dos au Heikhal de HaShem et la face à l'est, se prosternaient vers l'est, vers le soleil — et nous, vers HaShem sont nos yeux. » Rabbi Yehouda : ils le redisaient, « Nous sommes à HaShem, et vers HaShem sont nos yeux ».",
+      "en": "Reaching the gate that leads out to the east, they turn their faces to the west and say: “Our fathers who were in this place had their backs to the Heikhal of HaShem and their faces eastward, and bowed eastward to the sun — but as for us, our eyes are to HaShem.” Rabbi Yehuda says: they would repeat, “We are HaShem’s, and to HaShem are our eyes.”",
+      "he": "הגיעו לשער היוצא ממזרח, הפכו פניהם למערב ואמרו: ״אבותינו שהיו במקום הזה אחוריהם אל היכל ה׳ ופניהם קדמה, והמה משתחווים קדמה לשמש – ואנו ליה עינינו.״ רבי יהודה אומר: היו שונים ואומרים ״אנו ליה, וליה עינינו״."
      }
     }
    ]

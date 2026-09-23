@@ -579,5 +579,106 @@
       "dix étages, coupoles de béton préfabriqué (archives Moshe Safdie, université McGill)"
     ],
     "note": "Choix de la visite : ses dix étages sont comptés depuis son pied, à trois mètres vingt ; ses baies et le pas de ses coupoles sont une trame, pas un relevé."
+  },
+  "leviim_hamaalot": {
+    "he": "לויים על חמש עשרה מעלות",
+    "translit": "Leviim al 'hamesh esreh maalot",
+    "resume": "À Sim'hat Beit HaSho'éva, les Léviim se tiennent sur les quinze marches qui descendent de l'Ezrat Israël à l'Ezrat Nashim, avec kinorot, nevalim, cymbales, trompettes et instruments sans nombre, et disent le chant. Quinze marches, comme les quinze Chants des degrés des Psaumes. Le reste de l'année, le chant du korban se dit sur le Doukhan, près de l'autel. La visite en pose quinze, un par marche, tournés vers l'Ezrat Nashim.",
+    "cotes": [
+      "quinze marches, de l'Ezrat Israël à l'Ezrat Nashim",
+      "instruments « sans nombre »",
+      "un Lévi par marche"
+    ],
+    "note": "Choix de la visite : un Lévi par marche, leur instrument et leur orientation. La Mishna ne donne ni leur nombre ni leur place. La kutonet de lin est reprise des chanteurs du Doukhan.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "וְהַלְוִיִּם בְּכִנּוֹרוֹת וּבִנְבָלִים וּבִמְצִלְתַּיִם וּבַחֲצוֹצְרוֹת וּבִכְלֵי שִׁיר בְּלֹא מִסְפָּר, עַל חֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת הַיּוֹרְדוֹת מֵעֶזְרַת יִשְׂרָאֵל לְעֶזְרַת נָשִׁים"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:5",
+        "citation": "וַחֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת עוֹלוֹת מִתּוֹכָהּ לְעֶזְרַת יִשְׂרָאֵל, כְּנֶגֶד חֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת שֶׁבַּתְּהִלִּים"
+      }
+    ]
+  },
+  "tokei_hatzotzrot": {
+    "he": "שני כהנים בחצוצרות",
+    "translit": "Shnei kohanim ba'hatzotzrot",
+    "resume": "Deux cohanim se tiennent à la porte haute qui descend de l'Ezrat Israël à l'Ezrat Nashim, deux trompettes en main. Au chant du coq, ils sonnent teki'a, terou'a, teki'a : c'est le signal pour aller puiser l'eau de la libation au Shilo'ah. Ils sonnent encore à la dixième marche, encore en arrivant au sol de la cour, puis vont en sonnant jusqu'à la porte qui sort à l'est. Là, ils se tournent vers l'ouest : « et nous, vers HaShem sont nos yeux ». La visite les montre à la porte, avant la descente.",
+    "cotes": [
+      "deux cohanim, deux trompettes",
+      "teki'a, terou'a, teki'a",
+      "de la porte haute à la porte est"
+    ],
+    "note": "Choix de la visite : la porte haute est Sha'ar Nikanor, seule porte entre les deux cours. Les trompettes du tamid sont d'argent (Tamid 7:3) ; la visite leur donne ce métal ici aussi, et leur longueur est un choix. La descente en sonnant n'est pas montrée.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "וְעָמְדוּ שְׁנֵי כֹהֲנִים בַּשַּׁעַר הָעֶלְיוֹן שֶׁיּוֹרֵד מֵעֶזְרַת יִשְׂרָאֵל לְעֶזְרַת נָשִׁים, וּשְׁתֵּי חֲצוֹצְרוֹת בִּידֵיהֶן. קָרָא הַגֶּבֶר, תָּקְעוּ וְהֵרִיעוּ וְתָקָעוּ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "7:3",
+        "citation": "שְׁנֵי כֹהֲנִים עוֹמְדִים עַל שֻׁלְחַן הַחֲלָבִים וּשְׁתֵּי חֲצוֹצְרוֹת שֶׁל כֶּסֶף בְּיָדָם"
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "10:2",
+        "citation": "עֲשֵׂה לְךָ שְׁתֵּי חֲצוֹצְרֹת כֶּסֶף מִקְשָׁה תַּעֲשֶׂה אֹתָם"
+      }
+    ]
+  },
+  "hassidim_veanshei_maase": {
+    "he": "חסידים ואנשי מעשה",
+    "translit": "'Hassidim ve-anshei ma'asse",
+    "resume": "Les 'hassidim et les hommes d'action dansent devant l'assemblée, des torches allumées à la main, et disent devant elle des chants et des louanges. La guemara rapporte leurs mots : « Heureuse notre jeunesse, qui n'a pas fait honte à notre vieillesse. » Le Bartenura précise qu'ils jonglaient, avec quatre torches ou avec huit, en lançant l'une et en rattrapant l'autre. La visite en fait une ronde de huit danseurs, autour de l'homme aux huit torches.",
+    "cotes": [
+      "des torches à la main",
+      "des chants et des louanges",
+      "une ronde de huit"
+    ],
+    "note": "Choix de la visite : la ronde, le nombre de danseurs, leur pas et leur place dans la cour. Comme les autres fidèles de la visite, ils portent ce que leur communauté porte aujourd'hui les jours de fête. C'est un parti pris, pas une reconstitution.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "חֲסִידִים וְאַנְשֵׁי מַעֲשֶׂה הָיוּ מְרַקְּדִים לִפְנֵיהֶם בַּאֲבוּקוֹת שֶׁל אוֹר שֶׁבִּידֵיהֶן, וְאוֹמְרִים לִפְנֵיהֶן דִּבְרֵי שִׁירוֹת וְתִשְׁבָּחוֹת"
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "53a",
+        "citation": "יֵשׁ מֵהֶן אוֹמְרִים: אַשְׁרֵי יַלְדוּתֵנוּ שֶׁלֹּא בִּיְּשָׁה אֶת זִקְנוּתֵנוּ, אֵלּוּ חֲסִידִים וְאַנְשֵׁי מַעֲשֶׂה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Soucca 5:4",
+        "citation": "בְּאַרְבַּע אֲבוּקוֹת אוֹ בִּשְׁמֹנֶה, זוֹרֵק זוֹ וּמְקַבֵּל אֶת זוֹ"
+      }
+    ]
+  },
+  "shemone_avoukot": {
+    "he": "שמונה אבוקות",
+    "translit": "Shmoneh avoukot",
+    "resume": "On disait de Rabban Shimon ben Gamliel qu'à Sim'hat Beit HaSho'éva, il prenait huit torches allumées. Il en lançait une, en rattrapait une, et elles ne se touchaient pas. La visite montre le geste sans prétendre montrer l'homme : huit torches, quatre par main, relancées chacune par la main qui l'a reçue.",
+    "cotes": [
+      "huit torches",
+      "« elles ne se touchaient pas »"
+    ],
+    "note": "Choix de la visite : la figure est anonyme. Le jeu est en fontaine, chaque main avec ses quatre torches, sans croisement. C'est une façon de rendre possible ce que le récit décrit. La cadence et la hauteur des lancers sont aussi des choix.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "53a",
+        "citation": "הָיָה נוֹטֵל שְׁמֹנֶה אֲבוּקוֹת שֶׁל אוֹר, וְזוֹרֵק אַחַת וְנוֹטֵל אַחַת וְאֵין נוֹגְעוֹת זוֹ בָּזוֹ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Soucca 5:4",
+        "citation": "בְּאַרְבַּע אֲבוּקוֹת אוֹ בִּשְׁמֹנֶה, זוֹרֵק זוֹ וּמְקַבֵּל אֶת זוֹ"
+      }
+    ]
   }
 }

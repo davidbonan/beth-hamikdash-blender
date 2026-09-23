@@ -112,6 +112,9 @@ async function suivreParcours(dossier) {
     mkdirSync(`${dossier}/${id}`, { recursive: true })
     const n = await page.evaluate((id) => { window.__parcours.ouvrir(id); return window.__parcours.nombre() }, id)
     console.log('parcours', id, n, 'stations')
+    // Un parcours de nuit charge sa troupe et passe par le noir : on l'attend avant la première image.
+    await page.evaluate(() => window.__figurants)
+    await page.waitForFunction(() => !document.querySelector('.noir'))
     for (let i = 0; i < n; i++) {
       await page.evaluate((i) => window.__parcours.aller(i), i)
       await page.waitForTimeout(500)

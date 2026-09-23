@@ -1,15 +1,17 @@
 /**
  * Les parcours guidés : la visite marche seule d'une station à la suivante, dans
  * l'ordre d'un service — le tamid du matin (Tamid 1–7), le seder ha'avoda de Yom
- * Kippour (Yoma 1–7) —, et dit à chaque arrêt ce qu'on y voit ; la fiche du concept
- * attend derrière le lien « Lire la fiche » de la carte, elle ne couvre pas le texte de l'étape.
+ * Kippour (Yoma 1–7), la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4) —, et dit à
+ * chaque arrêt ce qu'on y voit ; la fiche du concept attend derrière le lien « Lire la
+ * fiche » de la carte, elle ne couvre pas le texte de l'étape.
  *
  * Les parcours sont `parcours.json`, en amot comme `cinema.json` : pour chaque station,
  * où l'on se tient, ce qu'on regarde, les points de passage qui contournent l'autel,
  * et le concept à lire. La marche est celle du cinéma — polyligne, sol sondé à chaque
  * image — mais elle s'arrête : « Suivant » repart, « Précédent » rebrousse, et un clic
  * pendant la marche saute à l'arrivée. Rien ici ne connaît la scène : visite.js prête
- * la caméra le temps du trajet, et pose ou oriente le visiteur quand on le lui demande.
+ * la caméra le temps du trajet, pose ou oriente le visiteur quand on le lui demande, et
+ * passe au `moment` que le parcours déclare — le jour, s'il n'en dit rien.
  */
 import * as THREE from "three";
 import { polyligne } from "./cinema.js";
@@ -29,7 +31,7 @@ const MEMOIRE_ALLURE = "visite.parcours.allure";
 const lisse = (u) => u * u * (3 - 2 * u);
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
-export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, ouvrirFiche, fermerFiche }) {
+export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, ouvrirFiche, fermerFiche }) {
   const racine = document.querySelector("#parcours");
   const carte = racine.querySelector(".carte");
   const nom = carte.querySelector(".nom"), rang = carte.querySelector(".rang"), source = carte.querySelector(".source");
@@ -154,6 +156,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     guide = liste.find((p) => p.id === id) ?? liste[0];
     stations = guide.stations;
     racine.hidden = false;
+    changerDeMoment(guide.moment ?? "jour");
     sauter(0);
   }
 
@@ -161,6 +164,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     if (trajet) marcher(null);
     trajet = null;
     racine.hidden = true;
+    changerDeMoment("jour");
   }
 
   function accelerer() {

@@ -554,7 +554,8 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(pieceEnfumee);
 
   function rendre() {
-    for (const o of horsGeo) o.visible = false;
+    const caches = horsGeo.filter((o) => o.visible);
+    for (const o of caches) o.visible = false;
     scene.overrideMaterial = GEOMETRIE;
     renderer.getClearColor(teinteFond);
     const alphaFond = renderer.getClearAlpha();
@@ -566,7 +567,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     renderer.render(scene, camera);
     scene.overrideMaterial = null;
     renderer.setClearColor(teinteFond, alphaFond);
-    for (const o of horsGeo) o.visible = true;
+    for (const o of caches) o.visible = true;
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;

@@ -8,7 +8,7 @@ import { cartesLumiere, cartesOcclusion } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
-import { SOLEIL, brumer, domeVu, environnement } from "./ciel.js";
+import { SOLEIL, brumer, domeVu, environnement, peindreDome, teinterAir } from "./ciel.js";
 import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
@@ -18,6 +18,7 @@ import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
 import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
+import { TEMPS_FLAMME, flamme } from "./flamme.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
@@ -104,11 +105,20 @@ installerLangue(textes);
 // Encadrée par l'accueil, la scène marche seule et se tait : ni barre, ni fiche, ni initiation.
 const CINEMA = new URLSearchParams(location.search).has("cinema");
 document.documentElement.classList.toggle("cinema", CINEMA);
-const [reperes, { cadrages: CADRAGES_DU_PLAN }, figurants, haltesCinema, { parcours: PARCOURS }] = await Promise.all([
-  json("./reperes.json"), json("./plan.json"), json("./figures.json"), CINEMA ? json("./cinema.json") : null,
-  json("./parcours.json")]);
-Object.assign(reperes.emprises, figurants.emprises);
-reperes.vues.push(...figurants.vues);
+// La troupe de chaque moment : celle du jour descend avec la visite, celle de la nuit à la première nuit.
+// Chemins écrits en entier : empreintes.py ne signe que ceux qu'il lit.
+const TROUPES = {
+  jour: { glb: "./figures.glb", json: "./figures.json" },
+  nuit: { glb: "./figures_shoeva.glb", json: "./figures_shoeva.json" },
+};
+const [reperes, { cadrages: CADRAGES_DU_PLAN }, haltesCinema, { parcours: PARCOURS }, ...distributions] =
+  await Promise.all([json("./reperes.json"), json("./plan.json"), CINEMA ? json("./cinema.json") : null,
+    json("./parcours.json"), ...Object.values(TROUPES).map((t) => json(t.json))]);
+const figurants = Object.fromEntries(Object.keys(TROUPES).map((quand, i) => [quand, distributions[i]]));
+for (const { emprises, vues } of distributions) {
+  Object.assign(reperes.emprises, emprises);
+  reperes.vues.push(...vues);
+}
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
   [id, new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max))]));
 
@@ -152,22 +162,30 @@ const scene = new THREE.Scene();
 const brume = brumer(scene);
 const AIR_DEHORS = brume.density;
 
+// La lumière de chaque moment qu'un parcours demande. La nuit est celle de Sim'hat Beit HaSho'éva
+// (Soucca 5:2) : le 16 Tishri, la lune pleine se lève à l'est, là où la visite pose son soleil du matin.
+// La lumière cuite est celle du ciel de jour : la nuit n'en garde que ce que la lune en laisse.
+const ECLAIRAGES = {
+  jour: { astre: { couleur: 0xffd6a0, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false },
+  nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true },
+};
+
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
 // calcaire y perdait sa teinte et le modelé avec, et les murs rendaient un aplat gris.
 // Le rapport compte plus que les niveaux — même arbitrage que le ciel du blockout.
 // Elle descend une seconde fois, avec `ambiance` dans ciel.js : ce que ce réglage-ci
 // corrigeait pour les parements, il restait à le corriger pour tout ce qui est à plat.
-const cielAmbiant = new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, 0.16);
+const cielAmbiant = new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, ECLAIRAGES.jour.ciel);
 scene.add(cielAmbiant);
 // Matin, à l'est : l'axe de l'avoda, et la lumière qui rase la façade. Plus bas sur
 // l'horizon, le soleil traverse plus d'atmosphère : il perd de la force et gagne de
 // l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
-const soleil = new THREE.DirectionalLight(0xffd6a0, 4.9);
+const soleil = new THREE.DirectionalLight(ECLAIRAGES.jour.astre.couleur, ECLAIRAGES.jour.astre.intensite);
 reglerOmbres(soleil);
 epargnerOmbres();
 scene.add(soleil, soleil.target);
-const appoint = new THREE.DirectionalLight(0xb9c6d4, 0.12);  // rebond du ciel à l'ouest
+const appoint = new THREE.DirectionalLight(0xb9c6d4, ECLAIRAGES.jour.appoint);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
@@ -243,6 +261,11 @@ function vaciller(dt) {
   vacillement += dt;
   const t = vacillement;
   TEMPS_FLAMME.value = t;
+  const eclat = ECLAIRAGES[moment].shoeva ? SHOEVA.intensite : 0;
+  shoeva?.lampes.forEach((l, i) => {
+    l.intensity = eclat * (0.93 + 0.04 * Math.sin(t * 7.3 + i) + 0.03 * Math.sin(t * 17.9 + i * 2.1));
+  });
+  if (shoeva?.lueur) shoeva.lueur.intensity = eclat ? LUEUR.intensite * (0.9 + 0.1 * Math.sin(t * 11.3)) : 0;
   if (lumiereMenora) {
     lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
   }
@@ -253,60 +276,120 @@ function vaciller(dt) {
 
 // L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
 const MENORA = { couleur: 0xffe1aa, intensite: 150, portee: 18, carte: 512 };
-// Une flamme d'huile d'olive sur mèche de lin : quatre centimètres, le pied bleu, le coeur
-// blanc, le manteau orangé qui s'efface vers la pointe. Additive, sans profondeur écrite.
-const PROFIL_FLAMME = [[0, -0.003], [0.0035, 0.0], [0.0068, 0.007], [0.0075, 0.013],
-                       [0.0062, 0.022], [0.0034, 0.032], [0.0008, 0.04], [0, 0.043]]
-  .map(([r, y]) => new THREE.Vector2(r, y));
-const HAUTEUR_FLAMME = 0.043;
-const TEMPS_FLAMME = { value: 0 };
 let lumiereMenora = null;
-
-function materiauFlamme(phase) {
-  return new THREE.ShaderMaterial({
-    uniforms: { uTemps: TEMPS_FLAMME, uPhase: { value: phase } },
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    vertexShader: /* glsl */`
-      uniform float uTemps; uniform float uPhase;
-      varying float vHauteur; varying vec3 vN; varying vec3 vVue;
-      void main(){
-        vec3 p = position;
-        vHauteur = clamp(p.y / ${HAUTEUR_FLAMME}, 0.0, 1.0);
-        float h2 = vHauteur * vHauteur;
-        p.y *= 1.0 + 0.10 * sin(uTemps * 8.3 + uPhase) + 0.05 * sin(uTemps * 19.0 + uPhase * 2.1);
-        p.x += (0.6 * sin(uTemps * 6.1 + uPhase) + 0.4 * sin(uTemps * 14.3 + uPhase * 1.7)) * 0.0022 * h2;
-        p.z += (0.6 * cos(uTemps * 5.3 + uPhase * 0.7) + 0.4 * sin(uTemps * 11.9 + uPhase)) * 0.0018 * h2;
-        vec4 mv = modelViewMatrix * vec4(p, 1.0);
-        vN = normalMatrix * normal; vVue = -mv.xyz;
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: /* glsl */`
-      varying float vHauteur; varying vec3 vN; varying vec3 vVue;
-      void main(){
-        float face = abs(dot(normalize(vN), normalize(vVue)));
-        vec3 coeur = vec3(3.4, 2.7, 1.5), manteau = vec3(2.0, 0.75, 0.18), pied = vec3(0.12, 0.22, 0.85);
-        vec3 c = mix(manteau, coeur, smoothstep(0.45, 0.95, face) * (1.0 - smoothstep(0.35, 0.85, vHauteur)));
-        c = mix(pied, c, smoothstep(0.02, 0.22, vHauteur));
-        float voile = smoothstep(0.05, 0.6, face) * (1.0 - 0.7 * smoothstep(0.6, 1.0, vHauteur));
-        gl_FragColor = vec4(c * voile, 1.0);
-      }`,
-  });
-}
 
 function allumerMenora(flammes) {
   if (!flammes?.length) return;
-  const forme = new THREE.LatheGeometry(PROFIL_FLAMME, 16);
   const centre = new THREE.Vector3();
   flammes.forEach((p, i) => {
-    const flamme = new THREE.Mesh(forme, materiauFlamme(i * 2.39));
-    flamme.position.set(...p);
-    scene.add(flamme);
-    horsGeometrie.push(flamme);
-    centre.add(flamme.position);
+    const meche = flamme(i * 2.39);
+    meche.position.set(...p);
+    scene.add(meche);
+    horsGeometrie.push(meche);
+    centre.add(meche.position);
   });
   // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
   const point = centre.divideScalar(flammes.length).add(new THREE.Vector3(0, 0.35, 0));
   lumiereMenora = poserLampe(MENORA, point, PROFIL.menora.ombre);
+}
+
+// Les mâts d'or de l'Ezrat Nashim, qui ne brûlent que la nuit de Sim'hat Beit HaSho'éva (Soucca 5:2).
+const SHOEVA = { couleur: 0xffc58a, intensite: 600, portee: 200, carte: 1024 };
+const HAUTEUR_FLAMME_SHOEVA = 1.2;
+// Les torches de la ronde, en une lueur sans ombre : une lampe par torche, c'est un nuanceur par torche.
+const LUEUR = { couleur: 0xffa860, intensite: 40, portee: 16, hauteur: 1.5 };   // m : des mèches de caleçons et de ceintures de cohanim (Soucca 5:3)
+let moment = "jour";
+let shoeva = null;
+let lumiereCuiteDuCiel = null;
+const reflets = { jour: scene.environment };
+
+// Le Heikhal et le Kodesh HaKodashim ont leur lumière cuite à leurs propres lampes, que la nuit n'éteint pas.
+function eclaireParSesLampes(maillage) {
+  if (sousSonde.has(maillage)) return true;
+  const centre = maillage.geometry.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(maillage.matrixWorld);
+  return EMPRISES.get("kodesh_hakodashim").containsPoint(centre);
+}
+
+// De proche en proche : deux points à moins de `pas` l'un de l'autre sont du même groupe.
+function centresDesGroupes(points, pas) {
+  let groupes = [];
+  for (const p of points) {
+    const voisins = groupes.filter((g) => g.some((q) => q.distanceTo(p) < pas));
+    groupes = [...groupes.filter((g) => !voisins.includes(g)), [p, ...voisins.flat()]];
+  }
+  return groupes.map((g) => g.reduce((somme, p) => somme.add(p), new THREE.Vector3()).divideScalar(g.length));
+}
+
+// Le bord des coupes est le plus haut du mât : ses sommets, groupés, donnent le centre de chacune.
+function coupesDeLaShoeva(candelabres) {
+  const sommets = [];
+  for (const o of candelabres) {
+    const position = o.geometry.attributes.position;
+    for (let i = 0; i < position.count; i++) {
+      sommets.push(new THREE.Vector3().fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld));
+    }
+  }
+  const haut = sommets.reduce((max, p) => Math.max(max, p.y), -Infinity);
+  return centresDesGroupes(sommets.filter((p) => p.y > haut - 0.02), 0.25);
+}
+
+// Une lampe par mât, au milieu de ses quatre coupes : seize lampes à carte d'ombre, c'est seize cubes à rendre.
+function poserShoeva() {
+  const candelabres = [];
+  gltf.scene.traverse((o) => { if (o.isMesh && o.userData.concept === "candelabres_shoeva") candelabres.push(o); });
+  const coupes = coupesDeLaShoeva(candelabres);
+  const flammes = coupes.map((coupe, i) => {
+    const meche = flamme(i * 2.39, HAUTEUR_FLAMME_SHOEVA);
+    meche.position.copy(coupe).y -= 0.1;
+    scene.add(meche);
+    horsGeometrie.push(meche);
+    return meche;
+  });
+  const lampes = centresDesGroupes(coupes, 2).map((mat) =>
+    poserLampe(SHOEVA, mat.add(new THREE.Vector3(0, HAUTEUR_FLAMME_SHOEVA / 2, 0)), PROFIL.menora.ombre));
+  return { candelabres, flammes, lampes, lueur: eclairerLaRonde(EMPRISES.get("hassidim_veanshei_maase")) };
+}
+
+function eclairerLaRonde(ronde) {
+  if (!ronde) return null;
+  const lueur = new THREE.PointLight(LUEUR.couleur, 0, LUEUR.portee, 2);
+  ronde.getCenter(lueur.position).y += LUEUR.hauteur;
+  scene.add(lueur);
+  return lueur;
+}
+
+// L'intensité de jour de chaque lumière cuite au ciel seul, celle que le moment module.
+function lumieresCuitesAuCiel() {
+  const intensites = new Map();
+  gltf.scene.traverse((o) => {
+    if (o.isMesh && o.material.lightMap && !eclaireParSesLampes(o)) intensites.set(o.material, o.material.lightMapIntensity);
+  });
+  return intensites;
+}
+
+// Les mâts ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
+async function passerAu(voulu) {
+  if (voulu === moment) return;
+  moment = voulu;
+  montrerTroupes();
+  const eclairage = ECLAIRAGES[voulu];
+  soleil.color.set(eclairage.astre.couleur);
+  soleil.intensity = eclairage.astre.intensite;
+  soleil.shadow.needsUpdate = true;
+  appoint.intensity = eclairage.appoint;
+  cielAmbiant.intensity = eclairage.ciel;
+  peindreDome(ciel, voulu);
+  teinterAir(brume, voulu);
+  scene.environment = reflets[voulu] ??= environnement(renderer, voulu);
+  lumiereCuiteDuCiel ??= lumieresCuitesAuCiel();
+  for (const [materiau, intensite] of lumiereCuiteDuCiel) materiau.lightMapIntensity = intensite * eclairage.cuite;
+  const premiere = shoeva === null && eclairage.shoeva;
+  if (premiere) shoeva = poserShoeva();
+  if (shoeva === null) return;
+  for (const f of shoeva.flammes) f.visible = eclairage.shoeva;
+  // Les coupes sont sous la lampe de leur mât : leur ombre posait quatre disques noirs sur les murs.
+  for (const o of shoeva.candelabres) o.castShadow = !eclairage.shoeva;
+  if (premiere) await rendu.compiler();
 }
 
 // Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
@@ -453,10 +536,13 @@ if (!brut) {
 }
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
-let melangeur = null;
+const troupes = {};
+const chargements = {};
 const MARGE_GESTE = 0.35;
-const EMPRISES_FIGURANTS = Object.keys(figurants.emprises).map((id) => EMPRISES.get(id));
+const EMPRISES_FIGURANTS = Object.fromEntries(Object.entries(figurants).map(([quand, { emprises }]) =>
+  [quand, Object.keys(emprises).map((id) => EMPRISES.get(id))]));
 const PRISE = new THREE.MeshBasicMaterial();
+const HAUTEUR_FLAMME_TORCHE = 0.3;
 
 // Le clic vise une boîte portée par le figurant : un rayon sur un corps animé transforme chaque sommet en JavaScript.
 function prendreEnMain(figurant) {
@@ -466,6 +552,7 @@ function prendreEnMain(figurant) {
     o.material.side = ETOFFES.has(o.material.name) ? THREE.DoubleSide : THREE.FrontSide;
     o.castShadow = PROFIL.figurants.ombre;
     o.receiveShadow = true;
+    if (!o.isSkinnedMesh) return;
     o.computeBoundingSphere();
     o.boundingSphere.radius += MARGE_GESTE;
     o.computeBoundingBox();
@@ -479,19 +566,60 @@ function prendreEnMain(figurant) {
   return prise;
 }
 
+// La tête d'étoupe est au bout du manche, sur l'axe y du maillage : la flamme s'y pose, droite, quoi que fasse la torche.
+function allumerTorches(troupe) {
+  const torches = [];
+  troupe.traverse((o) => { if (o.isMesh && /_avouka(_\d+)?$/.test(o.name)) torches.push(o); });
+  return torches.map((torche, i) => {
+    torche.geometry.computeBoundingBox();
+    const meche = flamme(i * 1.93, HAUTEUR_FLAMME_TORCHE);
+    scene.add(meche);
+    horsGeometrie.push(meche);
+    return { torche, meche, bout: new THREE.Vector3(0, torche.geometry.boundingBox.max.y - 0.06, 0) };
+  });
+}
+
+function suivreTorches(troupe) {
+  if (!troupe.torches.length) return;
+  troupe.scene.updateMatrixWorld();
+  for (const { torche, meche, bout } of troupe.torches) meche.position.copy(bout).applyMatrix4(torche.matrixWorld);
+}
+
+// La troupe d'un autre moment se cache, et ses prises sortent de ce que le doigt vise.
+function montrerTroupes() {
+  for (const [quand, troupe] of Object.entries(troupes)) {
+    const presente = quand === moment;
+    troupe.scene.visible = presente;
+    for (const { meche } of troupe.torches) meche.visible = presente;
+    for (const prise of troupe.prises) {
+      const rang = obstacles.indexOf(prise);
+      if (presente && rang < 0) obstacles.push(prise);
+      if (!presente && rang >= 0) obstacles.splice(rang, 1);
+    }
+  }
+}
+
 // Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
-async function poserFigurants({ scene: troupe, animations }) {
-  melangeur = new THREE.AnimationMixer(troupe);
+async function poserFigurants(quand, { scene: troupe, animations }) {
+  const melangeur = new THREE.AnimationMixer(troupe);
   for (const clip of animations) melangeur.clipAction(clip).play();
   melangeur.update(0);
   troupe.updateMatrixWorld(true);
   const prises = troupe.children.map(prendreEnMain);
+  const torches = allumerTorches(troupe);
   await rendu.compiler(troupe);
   scene.add(troupe);
   troupe.updateMatrixWorld(true);
-  obstacles.push(...prises);
+  troupes[quand] = { scene: troupe, melangeur, prises, torches };
+  suivreTorches(troupes[quand]);
+  montrerTroupes();
 }
-const figurantsPrets = chargeur.loadAsync("./figures.glb").then(poserFigurants);
+
+function chargerTroupe(quand) {
+  chargements[quand] ??= chargeur.loadAsync(TROUPES[quand].glb).then((g) => poserFigurants(quand, g));
+  return chargements[quand];
+}
+chargerTroupe("jour");
 
 // Jérusalem autour du Temple descend en dernier : on s'y pose aussi, et on s'y cogne.
 async function poserPays({ scene: pays }) {
@@ -830,9 +958,15 @@ afficherMode();
 const voile = $("#voile");
 // Une téléportation qui coupe net laisse le visiteur sans savoir d'où il vient. Le
 // délai est celui de la transition du voile, à l'aller seulement : on repart de noir.
+// Deux fondus qui se chevauchent — une station et le moment de son parcours — ne lèvent le voile qu'au dernier.
+let fondus = 0;
 function fondu(action) {
+  fondus++;
   voile.classList.add("noir");
-  setTimeout(() => { action(); voile.classList.remove("noir"); }, 170);
+  setTimeout(async () => {
+    await action();
+    if (--fondus === 0) voile.classList.remove("noir");
+  }, 170);
 }
 
 const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
@@ -1004,8 +1138,8 @@ const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
 const PAS_OMBRE = PROFIL.ombres.portee / 10;
 
 // Une carte figée garderait l'ombre des figurants à leur pose de départ.
-const figurantsDansLOmbre = () => PROFIL.figurants.ombre && melangeur !== null
-  && EMPRISES_FIGURANTS.some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
+const figurantsDansLOmbre = () => PROFIL.figurants.ombre && moment in troupes
+  && EMPRISES_FIGURANTS[moment].some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
 
 function suivreSoleil() {
   if (figurantsDansLOmbre()) soleil.shadow.needsUpdate = true;
@@ -1020,7 +1154,11 @@ function suivreSoleil() {
 function dessiner(dt) {
   for (const u of horloges) u.value += dt;
   vaciller(dt);
-  melangeur?.update(dt);
+  const troupe = troupes[moment];
+  if (troupe) {
+    troupe.melangeur.update(dt);
+    suivreTorches(troupe);
+  }
   suivreSoleil();
   ciel.position.copy(camera.position);
   rendu.rendre();
@@ -1090,6 +1228,11 @@ const guides = parcours({
     poser(pieds);
     orienterVers(cible);
   }),
+  changerDeMoment: (voulu) => {
+    if (voulu === moment) return;
+    chargerTroupe(voulu);
+    fondu(() => passerAu(voulu));
+  },
   ouvrirFiche: montrer,
   fermerFiche: fermer,
 });
@@ -1197,7 +1340,7 @@ window.__ombres = (actives) => {
   scene.traverse((o) => { if (o.isMesh) o.material.needsUpdate = true; });
   dessiner(0);
 };
-window.__figurants = figurantsPrets;
+Object.defineProperty(window, "__figurants", { get: () => Promise.all(Object.values(chargements)) });
 window.__sol = solEn;
 window.__mur = (origine, direction, portee) => {
   const rayon = new THREE.Raycaster(new THREE.Vector3(...origine), new THREE.Vector3(...direction).normalize(), 0, portee);
@@ -1205,5 +1348,5 @@ window.__mur = (origine, direction, portee) => {
   return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
 };
 window.__parcours = guides;
-window.__temps = (t) => { melangeur.setTime(t); dessiner(0); };
+window.__temps = (t) => { troupes[moment]?.melangeur.setTime(t); dessiner(0); };
 window.__pret = true;

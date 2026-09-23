@@ -224,6 +224,16 @@ Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
 Un essai réécrit `figures.glb` avec ses seuls rôles : relancer les 23 avant de committer.
 Rôles, places et gestes se déclarent dans `roles()`.
 
+La nuit de Sim'hat Beit HaSho'éva a sa propre troupe, que la visite ne charge qu'à la première nuit :
+les Léviim des quinze marches, les deux cohanim aux trompettes, la ronde des danseurs et l'homme aux
+huit torches (`roles_shoeva()`, 26 rôles). Elle écrit `visite/figures_shoeva.glb` et `.json`. Torches et
+trompettes ne sont pas liées à la peau : `Accessoire` les anime objet par objet, et la visite allume la
+tête de chaque `*_avouka`.
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- --troupe figures_shoeva
+```
+
 Corps, peaux, yeux, cheveux, barbes et vêtements viennent de MakeHuman (extension MPFB) : la
 kutonet est la robe de moine `donitz_monk_robe` (CC0) sans pèlerine ni cordon, la robe et le
 voile de la fidèle `punkduck_medieval_dress` et `elvs_charity_veil1` (CC BY), teints par

@@ -54,8 +54,9 @@ export const SOLEIL = new THREE.Vector3(150, 58, 55).normalize();
 const AIR = { densite: 4e-3, epaisseur: 110, effacement: [3800, 5600], pres: 150, lointain: 0.05,
               froid: [0.90, 0.94, 1.06], chaud: [1.20, 1.08, 0.92] };
 
+const HALO_DU_SOLEIL = [1.00, 0.84, 0.58];
 const VU = { haut: 0x4d7fb8, bas: 0xd8dcd4, sol: 0xa89c86, ambiance: 1.0,
-             soleil: 2.2, etendue: 7e-5, horizon: 6.0 };
+             soleil: 2.2, etendue: 7e-5, horizon: 6.0, halo: HALO_DU_SOLEIL, etoiles: 0 };
 // Le dôme ÉCLAIRANT tient trois réglages que la scène ne sait pas calculer seule.
 //
 // `ambiance` pèse sur le dégradé et jamais sur le disque : c'est le rapport du soleil à
@@ -77,16 +78,24 @@ const VU = { haut: 0x4d7fb8, bas: 0xd8dcd4, sol: 0xa89c86, ambiance: 1.0,
 // Il a porté 0xc9b795 quand la cour était ocre, puis 0xc4bcae le temps qu'elle soit
 // grise ; le rovad est revenu dans le meleke des murs (MAT_SOL), son rebond avec.
 const ECLAIRANT = { haut: 0xb2aa9c, bas: 0xe0d9c9, sol: 0xcdc0a8, ambiance: 0.45,
-                    soleil: 3.5, etendue: 1.6e-3, horizon: 26.0 };
+                    soleil: 3.5, etendue: 1.6e-3, horizon: 26.0, halo: HALO_DU_SOLEIL, etoiles: 0 };
+
+// La nuit après le premier jour de Souccot (Soucca 5:2) : le 16 Tishri, la lune est pleine et
+// se lève à l'est au coucher du soleil. Elle prend donc la place du soleil du matin, disque compris.
+const VU_NUIT = { haut: 0x0a1222, bas: 0x1a2436, sol: 0x121212, ambiance: 1.0,
+                  soleil: 1.4, etendue: 7e-5, horizon: 6.0, halo: [0.05, 0.06, 0.08], etoiles: 0.8 };
+const ECLAIRANT_NUIT = { haut: 0x1e2636, bas: 0x262e3c, sol: 0x2a2620, ambiance: 0.45,
+                         soleil: 0.25, etendue: 1.6e-3, horizon: 26.0, halo: [0.02, 0.02, 0.03], etoiles: 0 };
+const CIELS = { jour: { vu: VU, eclairant: ECLAIRANT }, nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT } };
 
 // Le dégradé des deux dômes, et le ciel que l'air ajoute à ce qu'il éloigne.
 const DEGRADE = /* glsl */`
-  vec3 degradeCiel(float h, float s, vec3 haut, vec3 bas, vec3 sol, float ambiance, float horizon){
+  vec3 degradeCiel(float h, float s, vec3 haut, vec3 bas, vec3 sol, float ambiance, float horizon, vec3 halo){
     vec3 c = ambiance * (h > 0.0 ? mix(bas, haut, pow(h, 0.55))
                                  : mix(bas, sol, min(-h * horizon, 1.0)));
     // Trois portées : la moitié du ciel se réchauffe vers le soleil, le halo se
     // resserre autour, le disque tient dans son étendue.
-    return c + vec3(1.00, 0.84, 0.58) * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
+    return c + halo * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
   }`;
 
 function dome(rayon, teintes) {
@@ -101,22 +110,29 @@ function dome(rayon, teintes) {
                   ambiance: { value: teintes.ambiance },
                   soleil: { value: teintes.soleil },
                   etendue: { value: teintes.etendue },
-                  horizon: { value: teintes.horizon } },
+                  horizon: { value: teintes.horizon },
+                  halo: { value: new THREE.Vector3(...teintes.halo) },
+                  etoiles: { value: teintes.etoiles } },
       vertexShader: /* glsl */`
         varying vec3 vD;
         void main(){ vD = position;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
       fragmentShader: /* glsl */`
         uniform vec3 hautCiel, basCiel, solCiel, dirSoleil;
-        uniform float ambiance, soleil, etendue, horizon;
+        uniform vec3 halo;
+        uniform float ambiance, soleil, etendue, horizon, etoiles;
         varying vec3 vD;
         ${DEGRADE}
         void main(){
           vec3 d = normalize(vD);
           float s = max(dot(d, dirSoleil), 0.0);
-          vec3 c = degradeCiel(d.y, s, hautCiel, basCiel, solCiel, ambiance, horizon);
+          vec3 c = degradeCiel(d.y, s, hautCiel, basCiel, solCiel, ambiance, horizon, halo);
           c += vec3(1.00, 0.95, 0.86) * soleil
              * smoothstep(1.0 - etendue, 1.0 - 0.3 * etendue, s);
+          vec3 q = d * 420.0;
+          float tirage = fract(sin(dot(floor(q), vec3(127.1, 311.7, 74.7))) * 43758.5453);
+          float etoile = max(tirage - 0.996, 0.0) * 250.0 * smoothstep(0.35, 0.0, length(fract(q) - 0.5));
+          c += etoiles * etoile * smoothstep(0.0, 0.2, d.y) * vec3(0.85, 0.92, 1.0);
           gl_FragColor = vec4(c, 1.0);
         }`,
     }));
@@ -128,11 +144,25 @@ export function domeVu(rayon) {
   return m;
 }
 
-export function environnement(renderer) {
+export function environnement(renderer, moment = "jour") {
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, ECLAIRANT)), 0.04, 0.1, 200);
+  const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, CIELS[moment].eclairant)), 0.04, 0.1, 200);
   pmrem.dispose();
   return cible.texture;
+}
+
+export function peindreDome(domeVu, moment) {
+  const teintes = CIELS[moment].vu;
+  const { uniforms } = domeVu.material;
+  for (const cle of ["haut", "bas", "sol"]) uniforms[`${cle}Ciel`].value.set(teintes[cle]);
+  for (const cle of ["ambiance", "soleil", "etendue", "horizon", "etoiles"]) uniforms[cle].value = teintes[cle];
+  uniforms.halo.value.set(...teintes.halo);
+}
+
+// Le voile est tiré du ciel de jour ; la couleur de la brume le ramène à celui du moment.
+export function teinterAir(brume, moment) {
+  const jour = new THREE.Color(VU.bas), voulu = new THREE.Color(CIELS[moment].vu.bas);
+  brume.color.setRGB(voulu.r / jour.r, voulu.g / jour.g, voulu.b / jour.b);
 }
 
 const litteral = (c) => `vec3(${c.map((x) => x.toFixed(4)).join(", ")})`;
@@ -148,6 +178,7 @@ export function brumer(scene) {
     fog_pars_fragment: /* glsl */`
       #ifdef USE_FOG
         uniform float fogDensity;
+        uniform vec3 fogColor;
         varying vec3 vRayonAir;
         ${DEGRADE}
         vec3 voiler(vec3 couleur, vec3 rayon){
@@ -161,8 +192,8 @@ export function brumer(scene) {
           float transmis = exp(-epaisseur)
             * (1.0 - smoothstep(${AIR.effacement[0].toFixed(1)}, ${AIR.effacement[1].toFixed(1)}, longueur));
           float versSoleil = dot(d, ${litteral(SOLEIL.toArray())});
-          vec3 ciel = degradeCiel(d.y, max(versSoleil, 0.0), ${teinte(VU.haut)}, ${teinte(VU.bas)},
-                                 ${teinte(VU.sol)}, ${VU.ambiance.toFixed(3)}, ${VU.horizon.toFixed(3)});
+          vec3 ciel = fogColor * degradeCiel(d.y, max(versSoleil, 0.0), ${teinte(VU.haut)}, ${teinte(VU.bas)},
+                                 ${teinte(VU.sol)}, ${VU.ambiance.toFixed(3)}, ${VU.horizon.toFixed(3)}, ${litteral(VU.halo)});
           float cote = versSoleil * 0.5 + 0.5;
           vec3 air = mix(${litteral(AIR.froid)}, ${litteral(AIR.chaud)}, cote * cote);
           return mix(ciel * mix(vec3(1.0), air, transmis), couleur, transmis);
@@ -170,6 +201,6 @@ export function brumer(scene) {
       #endif`,
     fog_fragment: "#ifdef USE_FOG\ngl_FragColor.rgb = voiler(gl_FragColor.rgb, vRayonAir);\n#endif",
   });
-  scene.fog = new THREE.FogExp2(VU.bas, AIR.densite);
+  scene.fog = new THREE.FogExp2(0xffffff, AIR.densite);
   return scene.fog;
 }

@@ -106,16 +106,18 @@ def lire(valeur, poses):
     return valeur(poses) if callable(valeur) else valeur
 
 
-def rouler(m, actuelle, voulue, part=1.0):
-    axe = m.col[1].to_3d().normalized()
+def angle_autour(axe, actuelle, voulue):
     a = actuelle - axe * actuelle.dot(axe)
     b = voulue - axe * voulue.dot(axe)
     if a.length < 1e-5 or b.length < 1e-5:
-        return m
+        return 0.0
     angle = a.normalized().angle(b.normalized())
-    if a.cross(b).dot(axe) < 0.0:
-        angle = -angle
-    return tourner(m, axe, angle * part)
+    return -angle if a.cross(b).dot(axe) < 0.0 else angle
+
+
+def rouler(m, actuelle, voulue, part=1.0):
+    axe = m.col[1].to_3d().normalized()
+    return tourner(m, axe, angle_autour(axe, actuelle, voulue) * part)
 
 
 # Viser seul laisse la torsion de l'os au hasard : `charniere`, normale du plan de flexion au repos, la fixe.
@@ -158,6 +160,11 @@ def composer(*groupes):
 LATERAL = Vector((0.0, 1.0, 0.0))
 DOIGTS = ("index", "middle", "ring", "pinky")
 APPUI = 0.62
+# Part de la flexion d'un doigt à chaque phalange, et d'un doigt à l'autre : la main détendue plie plus vers l'auriculaire.
+PHALANGES = (0.8, 1.15, 0.75)
+CASCADE = {"index": 0.85, "middle": 1.0, "ring": 1.1, "pinky": 1.2}
+POUCE = (0.55, 0.55, 0.65)
+DEMI_DOIGT = 0.010
 
 
 class Acteur:
@@ -180,6 +187,17 @@ class Acteur:
                 normale = -normale
             self.paume[c] = normale
             self.jointure[c] = long_doigt
+        # L'axe de flexion de chaque phalange, dans son propre plan : un axe commun à la main vrillait les doigts écartés.
+        # Le pouce, hors du plan de la paume, plie autour du x de ses os (vérifié au rendu, des deux côtés).
+        self.flechir = {}
+        for c in "lr":
+            for k in (1, 2, 3):
+                self.flechir[f"thumb_{k:02d}_{c}"] = Vector((1.0, 0.0, 0.0))
+                for doigt in DOIGTS:
+                    nom = f"{doigt}_{k:02d}_{c}"
+                    long_ = sq.repos[nom].col[1].to_3d().normalized()
+                    self.flechir[nom] = sq.repos[nom].to_3x3().inverted() @ long_.cross(self.paume[c]).normalized()
+        self.prises = {}
 
     def au(self, os_, point):
         inverse = self.sq.repos[os_].inverted()
@@ -233,10 +251,13 @@ def pied(acteur, cote, decalage=Vector(), tangage=0.0, pivot="talon", sol=0.0):
     return regles
 
 
-def bras(acteur, cote, cible, pole=None):
+def pole_du_bras(acteur, cote):
     s = 1.0 if cote == "l" else -1.0
-    pole = pole or (lambda poses: acteur.dans("spine_03", poses, Vector((0.3 * s, 1.0, -0.3))))
-    return chaine(acteur.sq, f"upperarm_{cote}", f"lowerarm_{cote}", cible, pole, COUDE)
+    return lambda poses: acteur.dans("spine_03", poses, Vector((0.3 * s, 1.0, -0.3)))
+
+
+def bras(acteur, cote, cible, pole=None):
+    return chaine(acteur.sq, f"upperarm_{cote}", f"lowerarm_{cote}", cible, pole or pole_du_bras(acteur, cote), COUDE)
 
 
 def bras_ballant(acteur, cote, avance=0.0, ecart=0.0, hauteur=0.0):
@@ -252,19 +273,155 @@ def paume(acteur, cote, direction):
     return {f"hand_{cote}": regle}
 
 
-def doigts(acteur, cote, flexion=0.35, pouce=0.15):
-    regles = {}
-    for doigt in DOIGTS + ("thumb",):
-        for k in (1, 2, 3):
-            nom = f"{doigt}_{k:02d}_{cote}"
-            angle = (pouce if doigt == "thumb" else flexion) * (0.7 if k == 1 else 1.0)
+def _plier(acteur, nom, angle):
+    axe = acteur.flechir[nom]
+    return lambda m, poses: tourner(m, (m.to_3x3() @ axe).normalized(), angle)
 
-            def regle(m, poses, angle=angle):
-                d = acteur.dans(f"hand_{cote}", poses, acteur.jointure[cote])
-                n = acteur.dans(f"hand_{cote}", poses, acteur.paume[cote])
-                return tourner(m, d.cross(n).normalized(), angle)
-            regles[nom] = regle
+
+def _main(acteur, cote, angles, pouce):
+    regles = {}
+    for doigt, triple in angles.items():
+        for k, angle in zip((1, 2, 3), triple):
+            regles[f"{doigt}_{k:02d}_{cote}"] = _plier(acteur, f"{doigt}_{k:02d}_{cote}", angle)
+    for k, part in zip((1, 2, 3), POUCE):
+        regles[f"thumb_{k:02d}_{cote}"] = _plier(acteur, f"thumb_{k:02d}_{cote}", pouce * part)
     return regles
+
+
+def doigts(acteur, cote, flexion=0.35, pouce=0.15):
+    return _main(acteur, cote, {d: [flexion * CASCADE[d] * p for p in PHALANGES] for d in DOIGTS}, pouce)
+
+
+def _centre_du_cercle(a, b, c):
+    ab, ac = b - a, c - a
+    n = ab.cross(ac)
+    return a + (ab.length_squared * ac.cross(n) + ac.length_squared * n.cross(ab)) / (2.0 * n.length_squared)
+
+
+POUCE_TENANT = 0.9
+# rad, au-delà du repos : jointure, phalange moyenne, phalangette.
+FLEXION_MAX = (1.55, 1.85, 1.30)
+
+
+# Chaque phalange est une corde du cercle que le doigt fait autour d'un manche de `rayon` : l'angle d'une
+# articulation est la demi-somme des arcs de ses deux phalanges, moins le pli du repos. Le manche passe par
+# le centre de ces cercles, de l'auriculaire vers l'index.
+def prise(acteur, cote, rayon):
+    cle = (cote, round(rayon, 4))
+    if cle in acteur.prises:
+        return acteur.prises[cle]
+    sq = acteur.sq
+    r = rayon + DEMI_DOIGT
+    angles, centres = {}, {}
+    for doigt in DOIGTS:
+        noms = [f"{doigt}_{k:02d}_{cote}" for k in (1, 2, 3)]
+        jointures = [sq.tete(n) for n in noms] + [sq.queue(noms[2])]
+        pans = [q - p for p, q in zip(jointures, jointures[1:])]
+        arcs = [2.0 * math.asin(min(1.0, v.length / (2.0 * r))) for v in pans]
+        voulus = (arcs[0] / 2.0 + 0.2, (arcs[0] + arcs[1]) / 2.0 - pans[0].angle(pans[1]),
+                  (arcs[1] + arcs[2]) / 2.0 - pans[1].angle(pans[2]))
+        angles[doigt] = [min(max(v, 0.0), m) for v, m in zip(voulus, FLEXION_MAX)]
+        poses, _ = sq.resoudre({n: _plier(acteur, n, v) for n, v in zip(noms, angles[doigt])})
+        centres[doigt] = _centre_du_cercle(*(poses[n].translation for n in noms))
+    axe = (centres["index"] - centres["pinky"]).normalized()
+    centre = sum(centres.values(), Vector()) / len(centres)
+    acteur.prises[cle] = (angles, centre, axe)
+    return acteur.prises[cle]
+
+
+# La main fermée sur un manche de `rayon` ; `manche(poses)` rend son axe, du petit doigt vers le pouce, en repère d'armature.
+def poigne(acteur, cote, rayon):
+    flexions, _, _ = prise(acteur, cote, rayon)
+    return _main(acteur, cote, flexions, POUCE_TENANT)
+
+
+DEVIATION_CUBITALE = math.radians(30.0)
+DEVIATION_RADIALE = math.radians(20.0)
+PRONATION_DANS_L_AVANT_BRAS = 0.5
+MARGE_DU_POIGNET = math.radians(5.0)
+
+
+# Angles permis entre le manche, côté pouce, et l'avant-bras : le poignet dévie de 30° vers l'auriculaire et de 20°
+# vers le pouce ; un manche mince se tient du bout des doigts, dans tous les sens.
+def bornes_du_manche(acteur, cote, rayon):
+    _, _, axe = prise(acteur, cote, rayon)
+    repos = axe.angle(acteur.sq.repos[f"lowerarm_{cote}"].col[1].to_3d())
+    doigts = math.pi * lisse((0.015 - rayon) / 0.008)
+    return max(repos - DEVIATION_CUBITALE - doigts, 0.0), min(repos + DEVIATION_RADIALE + doigts, math.pi)
+
+
+def borner_au_poignet(avant_bras, voulu, bornes, neutre):
+    angle = voulu.angle(avant_bras)
+    borne = min(max(angle, bornes[0]), bornes[1])
+    if borne == angle:
+        return voulu
+    travers = voulu - avant_bras * voulu.dot(avant_bras)
+    if travers.length < 1e-5:
+        travers = neutre - avant_bras * neutre.dot(avant_bras)
+    return avant_bras * math.cos(borne) + travers.normalized() * math.sin(borne)
+
+
+# Le coude se place pour que l'avant-bras croise le manche sous un angle que le poignet tient, au plus près de `pole`.
+def coude_pour_manche(acteur, cote, rayon, cible, direction, pole=None):
+    pole = pole or pole_du_bras(acteur, cote)
+    l1, l2 = acteur.sq.longueur[f"upperarm_{cote}"], acteur.sq.longueur[f"lowerarm_{cote}"]
+    ouvert, ferme = bornes_du_manche(acteur, cote, rayon)
+    cos_min = math.cos(min(ferme - MARGE_DU_POIGNET, math.pi))
+    cos_max = math.cos(max(ouvert + MARGE_DU_POIGNET, 0.0))
+    epaule = acteur.au("spine_03", acteur.epaule[cote])
+
+    def regle(poses):
+        voulu = lire(pole, poses)
+        vers_main = lire(cible, poses) - epaule(poses)
+        u = vers_main.normalized()
+        d = lire(direction, poses).normalized()
+        distance = min(max(vers_main.length, abs(l1 - l2) + 1e-4), (l1 + l2) * 0.9995)
+        a = (l1 * l1 + distance * distance - l2 * l2) / (2.0 * distance)
+        h = math.sqrt(max(l1 * l1 - a * a, 0.0))
+        travers = d - u * d.dot(u)
+        pres = voulu - u * voulu.dot(u)
+        if h < 1e-4 or travers.length < 1e-4 or pres.length < 1e-6:
+            return voulu
+        e1 = travers.normalized()
+        e2 = u.cross(e1)
+        long_ = (distance - a) * u.dot(d)
+        bas = (long_ - cos_max * l2) / (h * travers.length)
+        haut = (long_ - cos_min * l2) / (h * travers.length)
+        pres.normalize()
+        alpha = min(max(min(max(pres.dot(e1), bas), haut), -1.0), 1.0)
+        beta = math.copysign(math.sqrt(1.0 - alpha * alpha), pres.dot(e2) or 1.0)
+        return e1 * alpha + e2 * beta
+    return regle
+
+
+# Le poing tourne jusqu'à ce que le manche tenu pointe vers `direction`, pour la part `part` du chemin : la pronation
+# se partage entre l'avant-bras et le poignet, qui n'y ajoute qu'une déviation bornée.
+def aligner_prise(acteur, cote, rayon, direction, part=1.0):
+    _, _, axe = prise(acteur, cote, rayon)
+    main, coude = f"hand_{cote}", f"lowerarm_{cote}"
+    locale = acteur.sq.repos[main].to_3x3().inverted() @ axe
+    relatif = acteur.sq.relatif[main]
+
+    def manche_neutre(m):
+        return (m.to_3x3() @ locale).normalized()
+
+    def pronation(m, poses):
+        return rouler(m, manche_neutre(m @ relatif), lire(direction, poses), PRONATION_DANS_L_AVANT_BRAS * part)
+
+    bornes = bornes_du_manche(acteur, cote, rayon)
+
+    def regle(m, poses):
+        avant_bras = poses[coude].col[1].to_3d().normalized()
+        voulu = borner_au_poignet(avant_bras, lire(direction, poses).normalized(), bornes, manche_neutre(m))
+        m = tourner(m, avant_bras, angle_autour(avant_bras, manche_neutre(m), voulu) * part)
+        q = Quaternion().slerp(manche_neutre(m).rotation_difference(voulu), part)
+        return orienter(m, q)
+    return {coude: pronation, main: regle}
+
+
+def manche(acteur, cote, rayon, poses):
+    _, centre, axe = prise(acteur, cote, rayon)
+    return acteur.au(f"hand_{cote}", centre)(poses), acteur.dans(f"hand_{cote}", poses, axe).normalized()
 
 
 def respiration(horloge, t, ampleur=0.012, periode=4.2, phase=0.0):
@@ -280,8 +437,8 @@ def balancement(t, battement, ampleur=1.0, retard=0.0):
                     tete(inclinaison=0.045 * ampleur * math.sin(math.pi * b - 0.4), flexion=0.05 * ampleur * creux))
 
 
-# `phase` couvre deux pas ; `sol(cote, decalage)` relève un pied posé plus haut.
-def marche(acteur, phase, foulee, sol=None, levee=0.075):
+# `phase` couvre deux pas ; `sol(cote, decalage)` relève un pied posé plus haut. Les bras restent à qui les appelle.
+def jambes(acteur, phase, foulee, sol=None, levee=0.075):
     regles = []
     for cote, decal in (("l", 0.0), ("r", 0.5)):
         p = (phase + decal) % 1.0
@@ -307,11 +464,15 @@ def marche(acteur, phase, foulee, sol=None, levee=0.075):
     regles.append(bassin(Vector((0.017 * math.cos(TOUR * (phase - 0.3)), 0.0,
                                  -0.024 * (0.5 + 0.5 * math.cos(2.0 * TOUR * phase)))), lacet=-0.07 * c, roulis=0.03 * c))
     regles.append(buste(flexion=0.04, torsion=0.10 * c))
-    regles.append(bras_ballant(acteur, "l", avance=-0.15 * c, ecart=0.025))
-    regles.append(bras_ballant(acteur, "r", avance=0.15 * c, ecart=0.025))
-    regles.append(doigts(acteur, "l"))
-    regles.append(doigts(acteur, "r"))
     return composer(*regles)
+
+
+def marche(acteur, phase, foulee, sol=None, levee=0.075):
+    c = math.cos(TOUR * phase)
+    return composer(jambes(acteur, phase, foulee, sol, levee),
+                    bras_ballant(acteur, "l", avance=-0.15 * c, ecart=0.025),
+                    bras_ballant(acteur, "r", avance=0.15 * c, ecart=0.025),
+                    doigts(acteur, "l"), doigts(acteur, "r"))
 
 
 def debout(acteur, horloge, t, graine=0.0, regard=0.10):
@@ -358,6 +519,19 @@ class Enregistreur:
             rig.rotation_mode = "QUATERNION"
             self._courbes(sac, "", "Objet", positions, rotations, trames)
         return action
+
+    # Un objet tenu sans peau, torche ou trompette : sa matrice dans le repère de l'armature, image par image.
+    @staticmethod
+    def objet(objet, matrices):
+        action = bpy.data.actions.new(objet.name)
+        objet.animation_data_create()
+        objet.animation_data.action = action
+        objet.animation_data.action_slot = action.slots.new(id_type="OBJECT", name=objet.name)
+        sac = anim_utils.action_ensure_channelbag_for_slot(action, objet.animation_data.action_slot)
+        objet.rotation_mode = "QUATERNION"
+        objet.matrix_basis = matrices[0]
+        Enregistreur._courbes(sac, "", "Objet", [m.translation.copy() for m in matrices],
+                              [m.to_quaternion() for m in matrices], list(range(len(matrices))))
 
     @staticmethod
     def _courbes(sac, chemin, groupe, positions, rotations, trames):

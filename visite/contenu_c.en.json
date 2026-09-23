@@ -578,5 +578,106 @@
       "ten storeys, precast concrete domes (Moshe Safdie archive, McGill University)"
     ],
     "note": "Choice of the tour: its ten storeys are counted from its foot, at three metres twenty; its openings and the spacing of its domes are a pattern, not a survey."
+  },
+  "leviim_hamaalot": {
+    "nom": "The Leviim on the fifteen steps",
+    "translit": "Leviim al 'hamesh esreh maalot",
+    "resume": "At Simchat Beit HaSho'eva, the Leviim stand on the fifteen steps that lead down from the Ezrat Israel to the Ezrat Nashim, with kinorot, nevalim, cymbals, trumpets and countless instruments, and sing. Fifteen steps, like the fifteen Songs of Ascents in Psalms. The rest of the year, the song of the korban is sung on the Dukhan, near the altar. The tour places fifteen of them, one per step, facing the Ezrat Nashim.",
+    "cotes": [
+      "fifteen steps, from the Ezrat Israel to the Ezrat Nashim",
+      "instruments “without number”",
+      "one Levite per step"
+    ],
+    "note": "Tour's choice: one Levite per step, their instruments and the way they face. The Mishna gives neither their number nor their place. The linen kutonet is taken from the singers of the Dukhan.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "וְהַלְוִיִּם בְּכִנּוֹרוֹת וּבִנְבָלִים וּבִמְצִלְתַּיִם וּבַחֲצוֹצְרוֹת וּבִכְלֵי שִׁיר בְּלֹא מִסְפָּר, עַל חֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת הַיּוֹרְדוֹת מֵעֶזְרַת יִשְׂרָאֵל לְעֶזְרַת נָשִׁים"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "2:5",
+        "citation": "וַחֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת עוֹלוֹת מִתּוֹכָהּ לְעֶזְרַת יִשְׂרָאֵל, כְּנֶגֶד חֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת שֶׁבַּתְּהִלִּים"
+      }
+    ]
+  },
+  "tokei_hatzotzrot": {
+    "nom": "The two kohanim with trumpets",
+    "translit": "Shnei kohanim ba'hatzotzrot",
+    "resume": "Two kohanim stand at the upper gate that leads down from the Ezrat Israel to the Ezrat Nashim, two trumpets in hand. At cockcrow they sound teki'a, teru'a, teki'a: the signal to go and draw the water of the libation from the Shiloach. They sound again at the tenth step, again on reaching the floor of the court, then go on sounding as far as the gate that leads out to the east. There they turn to the west: “and as for us, our eyes are to HaShem”. The tour shows them at the gate, before they go down.",
+    "cotes": [
+      "two kohanim, two trumpets",
+      "teki'a, teru'a, teki'a",
+      "from the upper gate to the east gate"
+    ],
+    "note": "Tour's choice: the upper gate is Sha'ar Nikanor, the only gate between the two courts. The trumpets of the tamid are silver (Tamid 7:3); the tour gives them that metal here as well, and their length is a choice. The descent while sounding is not shown.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "וְעָמְדוּ שְׁנֵי כֹהֲנִים בַּשַּׁעַר הָעֶלְיוֹן שֶׁיּוֹרֵד מֵעֶזְרַת יִשְׂרָאֵל לְעֶזְרַת נָשִׁים, וּשְׁתֵּי חֲצוֹצְרוֹת בִּידֵיהֶן. קָרָא הַגֶּבֶר, תָּקְעוּ וְהֵרִיעוּ וְתָקָעוּ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "7:3",
+        "citation": "שְׁנֵי כֹהֲנִים עוֹמְדִים עַל שֻׁלְחַן הַחֲלָבִים וּשְׁתֵּי חֲצוֹצְרוֹת שֶׁל כֶּסֶף בְּיָדָם"
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "10:2",
+        "citation": "עֲשֵׂה לְךָ שְׁתֵּי חֲצוֹצְרֹת כֶּסֶף מִקְשָׁה תַּעֲשֶׂה אֹתָם"
+      }
+    ]
+  },
+  "hassidim_veanshei_maase": {
+    "nom": "The pious and the men of deeds",
+    "translit": "'Hassidim ve-anshei ma'asse",
+    "resume": "The pious and the men of deeds dance before the assembly with burning torches in their hands, and recite songs and praises before it. The Gemara records their words: “Happy is our youth, which has not shamed our old age.” The Bartenura adds that they juggled, with four torches or with eight, throwing one and catching the other. The tour makes them a ring of eight dancers, around the man with eight torches.",
+    "cotes": [
+      "torches in hand",
+      "songs and praises",
+      "a ring of eight"
+    ],
+    "note": "Tour's choice: the ring, the number of dancers, their step and their place in the court. Like the tour's other worshippers, they wear what their community wears on festivals today. This is a deliberate choice, not a reconstruction.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:4",
+        "citation": "חֲסִידִים וְאַנְשֵׁי מַעֲשֶׂה הָיוּ מְרַקְּדִים לִפְנֵיהֶם בַּאֲבוּקוֹת שֶׁל אוֹר שֶׁבִּידֵיהֶן, וְאוֹמְרִים לִפְנֵיהֶן דִּבְרֵי שִׁירוֹת וְתִשְׁבָּחוֹת"
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "53a",
+        "citation": "יֵשׁ מֵהֶן אוֹמְרִים: אַשְׁרֵי יַלְדוּתֵנוּ שֶׁלֹּא בִּיְּשָׁה אֶת זִקְנוּתֵנוּ, אֵלּוּ חֲסִידִים וְאַנְשֵׁי מַעֲשֶׂה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Soucca 5:4",
+        "citation": "בְּאַרְבַּע אֲבוּקוֹת אוֹ בִּשְׁמֹנֶה, זוֹרֵק זוֹ וּמְקַבֵּל אֶת זוֹ"
+      }
+    ]
+  },
+  "shemone_avoukot": {
+    "nom": "The eight torches",
+    "translit": "Shmoneh avoukot",
+    "resume": "It was said of Rabban Shimon ben Gamliel that at Simchat Beit HaSho'eva he would take eight burning torches. He threw one, caught one, and they never touched. The tour shows the act without claiming to show the man: eight torches, four in each hand, each thrown again by the hand that caught it.",
+    "cotes": [
+      "eight torches",
+      "“they did not touch one another”"
+    ],
+    "note": "Tour's choice: the figure is anonymous. The pattern is a fountain, each hand with its own four torches, never crossing. It is one way to make what the account describes possible. The rhythm and height of the throws are also choices.",
+    "sources": [
+      {
+        "oeuvre": "Soucca",
+        "ref": "53a",
+        "citation": "הָיָה נוֹטֵל שְׁמֹנֶה אֲבוּקוֹת שֶׁל אוֹר, וְזוֹרֵק אַחַת וְנוֹטֵל אַחַת וְאֵין נוֹגְעוֹת זוֹ בָּזוֹ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Soucca 5:4",
+        "citation": "בְּאַרְבַּע אֲבוּקוֹת אוֹ בִּשְׁמֹנֶה, זוֹרֵק זוֹ וּמְקַבֵּל אֶת זוֹ"
+      }
+    ]
   }
 }
