@@ -1084,13 +1084,13 @@ function preterLaCamera(trajet) {
 const guides = parcours({
   parcours: PARCOURS, camera, sol: solEn, oeil: OEIL, ama: AMA,
   marcher: preterLaCamera,
-  arriver: (station) => { preterLaCamera(null); montrer(station.concept); },
-  poserA: (pieds, cible, concept) => fondu(() => {
+  arriver: () => preterLaCamera(null),
+  poserA: (pieds, cible) => fondu(() => {
     tenirLaVue(false);
     poser(pieds);
     orienterVers(cible);
-    if (concept) montrer(concept);
   }),
+  ouvrirFiche: montrer,
   fermerFiche: fermer,
 });
 // La carte du parcours prend la place du rappel des commandes, comme l'initiation.

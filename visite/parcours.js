@@ -1,7 +1,8 @@
 /**
  * Les parcours guidés : la visite marche seule d'une station à la suivante, dans
  * l'ordre d'un service — le tamid du matin (Tamid 1–7), le seder ha'avoda de Yom
- * Kippour (Yoma 1–7) —, et ouvre à chaque arrêt la fiche de ce qu'on y voit.
+ * Kippour (Yoma 1–7) —, et dit à chaque arrêt ce qu'on y voit ; la fiche du concept
+ * attend derrière le lien « Lire la fiche » de la carte, elle ne couvre pas le texte de l'étape.
  *
  * Les parcours sont `parcours.json`, en amot comme `cinema.json` : pour chaque station,
  * où l'on se tient, ce qu'on regarde, les points de passage qui contournent l'autel,
@@ -28,13 +29,13 @@ const MEMOIRE_ALLURE = "visite.parcours.allure";
 const lisse = (u) => u * u * (3 - 2 * u);
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
-export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, fermerFiche }) {
+export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, ouvrirFiche, fermerFiche }) {
   const racine = document.querySelector("#parcours");
   const carte = racine.querySelector(".carte");
   const nom = carte.querySelector(".nom"), rang = carte.querySelector(".rang"), source = carte.querySelector(".source");
   const titre = carte.querySelector("h2"), texte = carte.querySelector(".texte");
   const precedent = carte.querySelector(".precedent"), suivant = carte.querySelector(".suivant");
-  const allure = carte.querySelector(".allure");
+  const allure = carte.querySelector(".allure"), fiche = carte.querySelector(".fiche");
 
   const enM = ([x, z]) => new THREE.Vector3(x * ama, 0, z * ama);
   const cibleEnM = ([x, y, z]) => new THREE.Vector3(x * ama, y * ama, z * ama);
@@ -58,6 +59,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     precedent.disabled = courante === 0;
     ecrire(suivant, derniere() ? "parcours_terminer" : "parcours_suivant");
     allure.textContent = `×${facteur}`;
+    fiche.disabled = trajet !== null || !station.concept;
     carte.classList.toggle("en-marche", trajet !== null);
   }
 
@@ -126,7 +128,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   function finir(i) {
     trajet = null;
     courante = i;
-    arriver(stations[i]);
+    arriver();
     afficher();
   }
 
@@ -134,7 +136,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   // un mur : on le repose d'abord là où le parcours l'a laissé.
   function aller(i) {
     if (camera.position.distanceTo(new THREE.Vector3(...piedsDe(stations[courante]))) > ECART_DEPART) {
-      poserA(piedsDe(stations[courante]), cibleEnM(stations[courante].cible), null);
+      poserA(piedsDe(stations[courante]), cibleEnM(stations[courante].cible));
     }
     partirVers(i);
   }
@@ -143,7 +145,8 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     if (trajet) marcher(null);
     trajet = null;
     courante = i;
-    poserA(piedsDe(stations[i]), cibleEnM(stations[i].cible), stations[i].concept);
+    fermerFiche();
+    poserA(piedsDe(stations[i]), cibleEnM(stations[i].cible));
     afficher();
   }
 
@@ -176,6 +179,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     if (trajet) sauter(courante); else if (derniere()) fermer(); else aller(courante + 1);
   };
   allure.onclick = (e) => { e.currentTarget.blur(); accelerer(); };
+  fiche.onclick = (e) => { e.currentTarget.blur(); ouvrirFiche(stations[courante].concept); };
   carte.querySelector(".quitter").onclick = (e) => { e.currentTarget.blur(); fermer(); };
   suivreLangue(() => { if (ouvert()) afficher(); });
 

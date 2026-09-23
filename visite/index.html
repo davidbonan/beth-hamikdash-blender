@@ -458,6 +458,12 @@
   #parcours h2 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
   #parcours .texte { margin: 6px 0 0; font-size: 14px; color: #d6cebf; }
   #parcours .en-marche .texte, #parcours .en-marche h2 { opacity: .55; }
+  /* La fiche du concept se lit sur demande, un lien sous le texte : elle ne couvre pas l'étape. */
+  #parcours .fiche {
+    margin-top: 8px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px;
+    color: var(--or); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+  }
+  #parcours .fiche:disabled { opacity: .35; cursor: default; }
   #parcours .pied { display: flex; gap: 8px; margin-top: 10px; }
   #parcours .pied button {
     font: inherit; font-size: 13px; padding: 6px 14px; color: #c8bfae; background: none;
@@ -779,6 +785,7 @@
     <p class="etape"><span class="nom"></span> · <span class="rang"></span> · <span class="source"></span></p>
     <h2 id="parcours-titre"></h2>
     <p class="texte"></p>
+    <button class="fiche" type="button" data-texte="parcours_fiche">Lire la fiche</button>
     <div class="pied">
       <button class="precedent" type="button" data-texte="parcours_precedent">Précédent</button>
       <button class="allure" type="button" title="Vitesse de la marche" data-titre="parcours_allure">×1</button>
@@ -803,4 +810,4 @@
 } }
 </script>
 <script type="module" src="./visite.js"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "5fc9072e758d4623b321af15c740227c"}'></script>
+<script src="/audience.js" defer></script>

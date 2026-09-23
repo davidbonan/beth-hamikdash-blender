@@ -1,5 +1,5 @@
 {
- "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7). En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche qui s'ouvre à l'arrivée. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7). En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
  "parcours": [
   {
    "id": "tamid",
