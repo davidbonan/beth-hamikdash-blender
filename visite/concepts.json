@@ -20,7 +20,8 @@
       "prefixes": [
         "HarHabayit_sol",
         "Podium_har",
-        "Podium_azara"
+        "Podium_azara",
+        "Podium_ezrat"
       ],
       "lieu": true
     },
@@ -199,6 +200,48 @@
         "Marche_Nikanor"
       ],
       "lieu": true
+    },
+    {
+      "id": "lishkot_haleviim",
+      "nom": "Lishkot HaLéviim",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Leviim"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "lishkat_hakelim",
+      "nom": "Lishkat HaKelim",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_HaKelim"
+      ]
+    },
+    {
+      "id": "lishkat_chashaim",
+      "nom": "Lishkat 'Hashaïm",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Chashaim"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "beit_din_har_habayit",
+      "nom": "Beit din de la porte du Har HaBayit",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Beit_Din_Har_HaBayit"
+      ]
+    },
+    {
+      "id": "beit_din_haazara",
+      "nom": "Beit din de la porte de l'Azara",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Beit_Din_HaAzara"
+      ]
     },
     {
       "id": "shaar_nikanor",
@@ -855,7 +898,8 @@
       "zone": "oulam",
       "prefixes": [
         "Ulam_halifot"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "niche_bilga",

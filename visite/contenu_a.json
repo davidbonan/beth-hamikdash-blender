@@ -114,14 +114,20 @@
   "gezuztra": {
     "he": "גזוזטרא",
     "translit": "Gezuztra",
-    "resume": "Une galerie, ou balcon, courait le long des murs de l'Ezrat Nashim. Elle fut ajoutée pour Sim'hat Beit HaShoeva : les femmes regardaient d'en haut et les hommes d'en bas, « afin qu'ils ne soient pas mêlés ».",
-    "cotes": [],
+    "resume": "Une galerie faisait le tour de l'Ezrat Nashim. Elle fut ajoutée pour Sim'hat Beit HaShoeva : les femmes regardaient d'en haut et les hommes d'en bas, « afin qu'ils ne soient pas mêlés ».",
+    "cotes": [
+      "tout autour de la cour, ouverte à l'ouest vers Nikanor, coupée à la porte est",
+      "à la crête des chambres d'angle, 15,6 amot au-dessus de la cour",
+      "large de 3,5 amot"
+    ],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:5", "citation": "וַחֲלָקָה הָיְתָה בָּרִאשׁוֹנָה, וְהִקִּיפוּהָ כְצוֹצְרָה, שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן, כְּדֵי שֶׁלֹּא יְהוּ מְעֹרָבִין"},
       {"oeuvre": "Soucca", "ref": "5:2", "citation": "יָרְדוּ לְעֶזְרַת נָשִׁים, וּמְתַקְּנִין שָׁם תִּקּוּן גָּדוֹל"},
-      {"oeuvre": "Soucca", "ref": "51b", "citation": "חֲלָקָה הָיְתָה בָּרִאשׁוֹנָה. וְהִקִּיפוּהָ גְּזוּזְטְרָא, וְהִתְקִינוּ שֶׁיְּהוּ נָשִׁים יוֹשְׁבוֹת מִלְמַעְלָה וַאֲנָשִׁים מִלְּמַטָּה"}
+      {"oeuvre": "Soucca", "ref": "51b", "citation": "חֲלָקָה הָיְתָה בָּרִאשׁוֹנָה. וְהִקִּיפוּהָ גְּזוּזְטְרָא, וְהִתְקִינוּ שֶׁיְּהוּ נָשִׁים יוֹשְׁבוֹת מִלְמַעְלָה וַאֲנָשִׁים מִלְּמַטָּה"},
+      {"oeuvre": "Bartenura sur Middot", "ref": "2:5", "citation": "כְּמוֹ גְּזוּזְטְרָא הִקִּיפוּ סָבִיב לְעֶזְרַת נָשִׁים"},
+      {"oeuvre": "Rashi sur Soucca", "ref": "51b", "citation": "נתנו זיזין בכתלים בולטין מן הכותל סביב סביב וכל שנה מסדרין שם גזוזטראות לווחין"}
     ],
-    "note": "Choix de la visite : la galerie est montrée vide hors de la fête ; aucune source ne dit ce qu'elle devenait le reste de l'année."
+    "note": "Aucune source n'en donne la hauteur : la visite la pose à la crête des chambres d'angle, dont elle longe les murs côté cour sans les couvrir — elles restent sans toit (Middot 2:5). Colonnes, balustrade et frise sont des choix. Aucune source ne dit par où l'on y montait : la visite ne montre pas d'escalier. Écarté : Rashi (Soucca 51b), pour qui des corbeaux restaient dans les murs et un plancher de planches y était posé chaque année. Choix de la visite : la galerie est montrée vide hors de la fête ; aucune source ne dit ce qu'elle devenait le reste de l'année."
   },
 
   "lishkat_haetzim": {
@@ -185,7 +191,7 @@
   "quinze_marches": {
     "he": "חמש עשרה מעלות",
     "translit": "'Hamesh esreh maalot",
-    "resume": "Quinze marches semi-circulaires montent de l'Ezrat Nashim à l'Ezrat Israël. Elles répondent aux quinze Shir HaMaalot des Psaumes, et les Léviim s'y tiennent avec leurs instruments pour dire le chant lors de Sim'hat Beit HaShoeva. Sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, se trouvent les chambres où ils rangeaient leurs instruments.",
+    "resume": "Quinze marches semi-circulaires montent de l'Ezrat Nashim à l'Ezrat Israël. Elles répondent aux quinze Shir HaMaalot des Psaumes, et les Léviim s'y tiennent avec leurs instruments pour dire le chant lors de Sim'hat Beit HaShoeva. Sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, se trouvent les chambres où ils rangeaient leurs instruments, les Lishkot HaLéviim, une de chaque côté des marches.",
     "cotes": ["15 marches semi-circulaires"],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:5", "citation": "comme la moitié d'une aire ronde"},
@@ -194,6 +200,105 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:5", "citation": "וְשַׁעַר זֶה הוּא הַנִּקְרָא שַׁעַר הָעֶלְיוֹן וְהוּא שַׁעַר נִיקָנוֹר"}
     ],
     "note": "Les sources mettent les quinze marches en regard des quinze Shir HaMaalot ; elles ne disent pas que ce sont ces psaumes qu'on y chantait. Soucca 5:4 appelle Sha'ar HaElyon la porte du haut des marches ; le Rambam (Beit HaBe'hira 5:5) l'identifie à la porte de Nikanor."
+  },
+
+  "lishkot_haleviim": {
+    "he": "לשכות הלויים",
+    "translit": "Lishkot HaLéviim",
+    "resume": "Sous l'Ezrat Israël, des chambres s'ouvraient sur l'Ezrat Nashim : les Léviim y rangeaient leurs kinorot, leurs nevalim, leurs metziltayim et tous les instruments du chant. Elles sont au pied des quinze marches, sur lesquelles les Léviim se tenaient avec leurs instruments pour dire le chant.",
+    "cotes": [
+      "sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim",
+      "deux chambres, de part et d'autre des quinze marches",
+      "portes de 3 × 6 amot"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "2:6", "citation": "וּלְשָׁכוֹת הָיוּ תַחַת עֶזְרַת יִשְׂרָאֵל, וּפְתוּחוֹת לְעֶזְרַת הַנָּשִׁים, שֶׁשָּׁם הַלְוִיִּם נוֹתְנִים כִּנּוֹרוֹת וּנְבָלִים וּמְצִלְתַּיִם וְכָל כְּלֵי שִׁיר"},
+      {"oeuvre": "Soucca", "ref": "5:4", "citation": "כְּנֶגֶד חֲמִשָּׁה עָשָׂר שִׁיר הַמַּעֲלוֹת שֶׁבַּתְּהִלִּים, שֶׁעֲלֵיהֶן לְוִיִּם עוֹמְדִין בִּכְלֵי שִׁיר וְאוֹמְרִים שִׁירָה"},
+      {"oeuvre": "Nombres", "ref": "10:8", "citation": "וּבְנֵי אַהֲרֹן הַכֹּהֲנִים יִתְקְעוּ בַּחֲצֹצְרוֹת"}
+    ],
+    "note": "Ce que dit la michna : des chambres sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, où les Léviim déposent leurs instruments ; ni leur nombre ni leur place. Choix de la visite : deux chambres, une de chaque côté des marches, avec des portes de 3 × 6 amot — la cote de Middot 2:3, vingt sur dix, est celle des portes de l'Azara, et ces chambres n'ont que six amot et demie de haut —, les rayonnages de cèdre, les crochets et la place de chaque instrument. Pas de 'hatzotzrot : ce sont les cohanim qui en sonnent (Nombres 10:8). Modélisé : deux chambres de 10,5 × 6 amot sous le dallage de l'Ezrat Israël."
+  },
+
+  "lishkat_hakelim": {
+    "he": "לשכת הכלים",
+    "translit": "Lishkat HaKelim",
+    "resume": "Qui voulait offrir un ustensile au Temple le jetait dans cette chambre. Une fois tous les trente jours, les trésoriers l'ouvraient : ce qui pouvait servir à l'entretien du Temple était gardé, le reste vendu, et l'argent versé à la chambre de l'entretien du Temple.",
+    "cotes": [
+      "sous l'Ezrat Israël, au nord, au-delà des Léviim",
+      "porte fermée, une baie au-dessus pour y jeter les dons"
+    ],
+    "sources": [
+      {"oeuvre": "Shekalim", "ref": "5:6", "citation": "לִשְׁכַּת הַכֵּלִים, כָּל מִי שֶׁהוּא מִתְנַדֵּב כֶּלִי, זוֹרְקוֹ לְתוֹכָהּ. וְאַחַת לִשְׁלשִׁים יוֹם, גִּזְבָּרִין פּוֹתְחִין אוֹתָהּ. וְכָל כְּלִי שֶׁמּוֹצְאִין בּוֹ צֹרֶךְ לְבֶדֶק הַבַּיִת, מַנִּיחִין אוֹתוֹ. וְהַשְּׁאָר נִמְכָּרִין בִּדְמֵיהֶן וְנוֹפְלִין לְלִשְׁכַּת בֶּדֶק הַבַּיִת"},
+      {"oeuvre": "Rambam Arakhin", "ref": "2:12", "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים. וְאַחַת לִשְׁכַּת הַכֵּלִים"},
+      {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 3:5", "citation": "צריכה עיון באיזה מקום היתה עומדת"},
+      {"oeuvre": "Mishnat Eretz Israël", "ref": "Préface à Tamid et Middot 7:79", "citation": "כך לשכת הכלים ולשכת חשאין ; אולי גם הן נפתחו לעזרת נשים"}
+    ],
+    "note": "Aucune source ne situe cette chambre ni celle des 'Hashaïm : le Raavad s'en étonne, rapporté par Melekhet Shelomoh (Tamid 3:5), et Mishnat Eretz Israël propose qu'elles s'ouvraient elles aussi sur l'Ezrat Nashim. La visite les range sous l'Ezrat Israël, avec celles des Léviim : un choix. Choix aussi : la porte de bronze fermée, la baie par où l'on jette le don, le tas d'ustensiles. On n'y entre pas : elle ne s'ouvre qu'une fois par mois."
+  },
+
+  "lishkat_chashaim": {
+    "he": "לשכת חשאים",
+    "translit": "Lishkat 'Hashaïm",
+    "resume": "La chambre des dons discrets. Ceux qui craignaient la faute y déposaient en secret, et des pauvres de bonne famille y trouvaient leur subsistance, en secret aussi. Le Rambam la donne en exemple du don où le donneur ne sait pas à qui il donne, ni le pauvre de qui il reçoit.",
+    "cotes": [
+      "sous l'Ezrat Israël, au sud, au-delà des Léviim",
+      "porte ouverte, un coffre au milieu"
+    ],
+    "sources": [
+      {"oeuvre": "Shekalim", "ref": "5:6", "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים, וְאַחַת לִשְׁכַּת הַכֵּלִים, לִשְׁכַּת חֲשָׁאִים יִרְאֵי חֵטְא נוֹתְנִים לְתוֹכָה בַּחֲשַׁאי, וַעֲנִיִּים בְּנֵי טוֹבִים מִתְפַּרְנְסִים מִתוֹכָהּ בַּחֲשַׁאי"},
+      {"oeuvre": "Rambam Arakhin", "ref": "2:12", "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים. וְאַחַת לִשְׁכַּת הַכֵּלִים"},
+      {"oeuvre": "Rambam Matnot Aniyim", "ref": "10:8", "citation": "הַנּוֹתֵן צְדָקָה לָעֲנִיִּים וְלֹא יָדַע לְמִי נָתַן וְלֹא יָדַע הֶעָנִי מִמִּי לָקַח… כְּגוֹן לִשְׁכַּת חֲשָׁאִים שֶׁהָיְתָה בַּמִּקְדָּשׁ"},
+      {"oeuvre": "Sifrei Devarim", "ref": "117:7", "citation": "מִכָּן אָמְרוּ: לִשְׁכַּת חֲשָׁאִים הָיְתָה בִּירוּשָׁלִַם"},
+      {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 3:5", "citation": "צריכה עיון באיזה מקום היתה עומדת"},
+      {"oeuvre": "Mishnat Eretz Israël", "ref": "Préface à Tamid et Middot 7:79", "citation": "כך לשכת הכלים ולשכת חשאין ; אולי גם הן נפתחו לעזרת נשים"}
+    ],
+    "note": "Aucune source ne situe cette chambre : le Raavad s'en étonne pour sa voisine (Melekhet Shelomoh sur Tamid 3:5), et Mishnat Eretz Israël propose qu'elles s'ouvraient toutes deux sur l'Ezrat Nashim. La visite la range sous l'Ezrat Israël : un choix, comme le coffre de cèdre cerclé de bronze. Variante : le Sifrei (Devarim 117), citant la michna, lit « à Jérusalem » au lieu de « dans le Mikdash » ; il ne situe rien dans le Temple."
+  },
+
+  "beit_din_har_habayit": {
+    "he": "בית דין שעל פתח הר הבית",
+    "translit": "Beit din shé'al peta'h Har HaBayit",
+    "resume": "Le premier des trois tribunaux de Jérusalem, un tribunal de vingt-trois. Un sage dont l'enseignement était contesté dans sa ville venait d'abord ici ; si les juges avaient une tradition, ils la disaient, sinon on montait au tribunal de la porte de l'Azara, puis au grand Sanhédrin de la Lishkat HaGazit. Le Tiferet Israël le place juste à l'intérieur de la porte est du Har HaBayit, celle que surmonte l'image de Shushan HaBira : il siège sous le portique, au bord du passage de la porte. Les juges siègent en demi-cercle, le plus sage au milieu pour qu'il les voie tous ; deux greffiers se tiennent debout devant eux, et trois rangs d'élèves sont assis en face.",
+    "cotes": [
+      "23 juges en demi-cercle, le plus sage au milieu",
+      "deux greffiers debout",
+      "trois rangs d'élèves, le premier le plus près"
+    ],
+    "sources": [
+      {"oeuvre": "Sanhedrin", "ref": "11:2", "citation": "שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת, וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית"},
+      {"oeuvre": "Tiferet Israël", "ref": "Sanhedrin 11:9", "citation": "אחד יושב על פתח הר הבית מבפנים לשער מזרח של חומת הר הבית"},
+      {"oeuvre": "Hagahot Ya'avetz sur Sanhedrin", "ref": "88b", "citation": "סתמו הוא שער המזרחי שעליו שושן הבירה צורה"},
+      {"oeuvre": "Tosefta Sanhedrin", "ref": "7:1", "citation": "ושני בתי דינין של ג' היו בירושלים אחד בהר הבית ואחד בחיל"},
+      {"oeuvre": "Pesachim", "ref": "13b", "citation": "הר הבית סטיו כפול היה… סטיו לפנים מסטיו"},
+      {"oeuvre": "Rambam Sanhedrin", "ref": "1:3", "citation": "וְהַגָּדוֹל בְּחָכְמָה שֶׁבְּכֻלָּן רֹאשׁ עֲלֵיהֶן וְהַשְּׁאָר יוֹשְׁבִין בְּעִגּוּל כְּמוֹ חֲצִי גֹּרֶן כְּדֵי שֶׁיְּהֵא הָרֹאשׁ רוֹאֶה אֶת כֻּלָּן"},
+      {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Sanhedrin 4:3", "citation": "סנהדרין. אף של כ\"ג. רש\"י"},
+      {"oeuvre": "Rambam Sanhedrin", "ref": "1:7", "citation": "כָּל סַנְהֶדְרִי קְטַנָּה מוֹשִׁיבִין לִפְנֵיהֶן שָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים בְּכָל שׁוּרָה וְשׁוּרָה עֶשְׂרִים וּשְׁלֹשָׁה אִישׁ. שׁוּרָה רִאשׁוֹנָה קְרוֹבָה לַסַּנְהֶדְרִין"},
+      {"oeuvre": "Rashi sur Sanhedrin", "ref": "86b", "citation": "אחד יושב על פתח הר הבית - הוא שער המזרחי שלפנים מן החיל לפני עזרת נשים"}
+    ],
+    "note": "Ce que disent les textes : trois tribunaux (Sanhedrin 11:2), dont deux de vingt-trois ; le Tiferet Israël met celui-ci « à l'intérieur de la porte est de la muraille du Har HaBayit », et Hagahot Ya'avetz nomme cette porte : celle de Shushan HaBira. La Tossefta (Sanhedrin 7:1) dit seulement « l'un au Har HaBayit ». Le demi-cercle, les greffiers et les élèves valent pour un tribunal de vingt-trois comme pour le grand (Tosfot Yom Tov sur Sanhedrin 4:3, au nom de Rashi). Choix de la visite : le côté sud de la porte, sous le double portique (Pesa'him 13b), entre le mur et le premier rang de colonnes ; les deux gradins et les sièges. Le Rambam compte vingt-trois élèves par rang (Sanhedrin 1:7) : la scène montre les trois rangs, pas tous les élèves, et lit « לְמַטָּה הֵימֶנָּה » comme « plus loin ». Écartés : Rashi (Sanhedrin 86b) et Bartenura, qui le mettent à la porte est de l'Ezrat Nashim ; la Tossefta, qui ne lui donne que trois juges."
+  },
+
+  "beit_din_haazara": {
+    "he": "בית דין שעל פתח העזרה",
+    "translit": "Beit din shé'al peta'h HaAzara",
+    "resume": "Le deuxième des trois tribunaux de Jérusalem, un tribunal de vingt-trois. On y montait quand le tribunal de la porte du Har HaBayit n'avait pas de tradition sur la question ; s'il n'en avait pas non plus, on allait au grand Sanhédrin de la Lishkat HaGazit. Le Tiferet Israël le place juste à l'intérieur de la porte est de l'Ezrat Nashim : les juges y siègent dos à la colonnade de la galerie, face à la porte de Nikanor.",
+    "cotes": [
+      "23 juges en demi-cercle, le plus sage au milieu",
+      "deux greffiers debout",
+      "trois rangs d'élèves, le premier le plus près"
+    ],
+    "sources": [
+      {"oeuvre": "Sanhedrin", "ref": "11:2", "citation": "שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת, וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית"},
+      {"oeuvre": "Tiferet Israël", "ref": "Sanhedrin 11:10", "citation": "ואחד יושב על פתח העזרה מבפנים לשער מזרח של עזרת נשים"},
+      {"oeuvre": "Rambam Sanhedrin", "ref": "1:3", "citation": "וְהַגָּדוֹל בְּחָכְמָה שֶׁבְּכֻלָּן רֹאשׁ עֲלֵיהֶן וְהַשְּׁאָר יוֹשְׁבִין בְּעִגּוּל כְּמוֹ חֲצִי גֹּרֶן כְּדֵי שֶׁיְּהֵא הָרֹאשׁ רוֹאֶה אֶת כֻּלָּן"},
+      {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Sanhedrin 4:3", "citation": "סנהדרין. אף של כ\"ג. רש\"י"},
+      {"oeuvre": "Rambam Sanhedrin", "ref": "1:7", "citation": "כָּל סַנְהֶדְרִי קְטַנָּה מוֹשִׁיבִין לִפְנֵיהֶן שָׁלֹשׁ שׁוּרוֹת שֶׁל תַּלְמִידֵי חֲכָמִים בְּכָל שׁוּרָה וְשׁוּרָה עֶשְׂרִים וּשְׁלֹשָׁה אִישׁ. שׁוּרָה רִאשׁוֹנָה קְרוֹבָה לַסַּנְהֶדְרִין"},
+      {"oeuvre": "Rashi sur Sanhedrin", "ref": "86b", "citation": "ואחד יושב למעלה הימנו - כשעברו עזרת נשים ובאין לפני עזרת ישראל"},
+      {"oeuvre": "Tosefta Sanhedrin", "ref": "7:1", "citation": "ושני בתי דינין של ג' היו בירושלים אחד בהר הבית ואחד בחיל"}
+    ],
+    "note": "Ce que disent les textes : trois tribunaux (Sanhedrin 11:2), dont deux de vingt-trois ; le Tiferet Israël met celui-ci « à l'intérieur de la porte est de l'Ezrat Nashim ». Le demi-cercle, les greffiers et les élèves valent pour un tribunal de vingt-trois comme pour le grand (Tosfot Yom Tov sur Sanhedrin 4:3, au nom de Rashi). Choix de la visite : le côté sud de la porte, dos à la colonnade de la galerie, un passage laissé devant les shofarot ; les deux gradins et les sièges. Le Rambam compte vingt-trois élèves par rang (Sanhedrin 1:7) : la scène montre les trois rangs, pas tous les élèves. Écartés : Rashi (Sanhedrin 86b), qui le met au bout de l'Ezrat Nashim, devant l'Ezrat Israël ; la Tossefta (Sanhedrin 7:1), qui le met « dans le 'Heil », où les douze marches prennent déjà les dix amot, et ne lui donne que trois juges."
   },
 
   "shaar_nikanor": {
@@ -627,7 +732,7 @@
   "lishkat_hagazit": {
     "he": "לשכת הגזית",
     "translit": "Lishkat HaGazit",
-    "resume": "Siège du Sanhédrin, et lieu du tirage au sort des Cohanim. Elle est à cheval sur le mur nord de l'Azara, moitié dans le sacré, moitié hors : le mur s'interrompt sur sa largeur, et la limite est tracée au sol. Deux ouvertures, l'une sur l'Azara au sud, l'autre sur le hol à l'est, en haut de vingt degrés venant de la terrasse du 'Heil. La guemara les appelle petahim, et non she'arim — ce ne sont pas des portes de l'Azara. Ses murs sont de pierre taillée coupée de rangs de cèdre ; dans la moitié de hol, où siège le tribunal, le sol est de cèdre et le mur du fond est revêtu de panneaux de cèdre sculptés. Dans la moitié sacrée, les Cohanim se tiennent en cercle pour le tirage au sort, et ils y viennent lire le Shema. Le Sanhédrin siège dans la moitié de hol, car nul ne s'assied dans l'Azara, sauf les rois de la maison de David. Il siège en demi-cercle, pour que les juges se voient : le Nasi au milieu, l'Av Beit Din à sa droite, deux greffiers debout devant eux — trois selon R. Yehouda —, et trois rangs d'élèves assis face aux juges. Il siège là du Tamid du matin à celui du soir ; le Shabbat et les jours de fête, il siège sur le 'Heil. Il y juge les Cohanim : celui qu'on trouve inapte s'habille de noir et s'en va, celui qu'on trouve apte s'habille de blanc et entre servir avec ses frères.",
+    "resume": "Siège du Sanhédrin, et lieu du tirage au sort des Cohanim. Elle est à cheval sur le mur nord de l'Azara, moitié dans le sacré, moitié hors : le mur s'interrompt sur sa largeur, et la limite est tracée au sol. Deux ouvertures, l'une sur l'Azara au sud, l'autre sur le hol à l'est, en haut de vingt degrés venant de la terrasse du 'Heil. La guemara les appelle petahim, et non she'arim — ce ne sont pas des portes de l'Azara. Ses murs sont de pierre taillée coupée de rangs de cèdre ; dans la moitié de hol, où siège le tribunal, le sol est de cèdre et le mur du fond est revêtu de panneaux de cèdre sculptés. Dans la moitié sacrée, les Cohanim se tiennent en cercle pour le tirage au sort, et ils y viennent lire le Shema. Le Sanhédrin siège dans la moitié de hol, car nul ne s'assied dans l'Azara, sauf les rois de la maison de David. Il siège en demi-cercle, pour que les juges se voient : le Nasi au milieu, l'Av Beit Din à sa droite, deux greffiers debout devant eux — trois selon R. Yehouda —, et trois rangs d'élèves assis face aux juges. Il siège là du Tamid du matin à celui du soir ; le Shabbat et les jours de fête, il siège sur le 'Heil. Il y juge les Cohanim : celui qu'on trouve inapte s'habille de noir et s'en va, celui qu'on trouve apte s'habille de blanc et entre servir avec ses frères. Deux tribunaux de vingt-trois siègent plus bas, aux portes est du Har HaBayit et de l'Ezrat Nashim : on monte de l'un à l'autre, puis ici (Sanhedrin 11:2).",
     "cotes": [
       "à cheval sur le mur nord",
       "moitié dans le sacré, moitié hors, la limite tracée au sol",

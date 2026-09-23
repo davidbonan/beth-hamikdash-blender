@@ -197,10 +197,11 @@
   "beit_hahalifot": {
     "nom": "Beit HaHalifot (the knife chambers)",
     "translit": "Beit HaHalifot",
-    "resume": "The Ulam extends fifteen amot north and south beyond the body of the building, and these two extensions were called Beit HaHalifot, “because the knives were stored there”: Bartenura explains that large knives were called ‘halafim. Each of the twenty-four mishmarot — the teams of Kohanim who each came up to serve for a week (Rambam, Klei HaMikdash 4:3) — had its own niche in the wall for its knives. Sacrifices are slaughtered, a priori, with a knife from the vessels of the service (Rambam, Ma'aseh HaKorbanot 4:7), and those vessels are made of metal (Klei HaMikdash 1:13); when the neck is cut in a single stroke, the blade must reach past the animal's neck (Chullin 31a). Only one niche was walled up: Bilga's.",
+    "resume": "The Ulam extends fifteen amot north and south beyond the body of the building, and these two extensions were called Beit HaHalifot, “because the knives were stored there”: Bartenura explains that large knives were called ‘halafim. Each projection is a closed room with two doors eight amot high: one onto the Ulam, the other, a wicket, in its western corner. Each of the twenty-four mishmarot — the teams of Kohanim who each came up to serve for a week (Rambam, Klei HaMikdash 4:3) — had its own niche in the wall for its knives. Sacrifices are slaughtered, a priori, with a knife from the vessels of the service (Rambam, Ma'aseh HaKorbanot 4:7), and those vessels are made of metal (Klei HaMikdash 1:13); when the neck is cut in a single stroke, the blade must reach past the animal's neck (Chullin 31a). Only one niche was walled up: Bilga's.",
     "cotes": [
       "15-amot extension: a 5-amot wall and 10 of space",
-      "24 niches, one per mishmar"
+      "24 niches, one per mishmar",
+      "two doors of 8 amot: onto the Ulam, and a wicket at the western corner"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "4:7", "citation": "הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן, וַחֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַדָּרוֹם, וְהוּא הָיָה נִקְרָא בֵּית הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים"},
@@ -210,9 +211,13 @@
       {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "4:3", "citation": "וְעוֹלִין לִירוּשָׁלַיִם לַעֲבוֹדָה מִשְׁמָר לְכָל שַׁבָּת"},
-      {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"}
+      {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "שהיה האולם יתר לכאן ולכאן, היה חדר מכאן ומכאן, ונקראו בית חליפות"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "ולכל א' מב' בתי החליפות שבאולם היו ב' פתחים, א' לאולם, וא' בזוית… וכל א' מב' אלו הפתחים היה גבוה ח' אמות"},
+      {"oeuvre": "Zeva'him", "ref": "55b", "citation": "שְׁנֵי פִּשְׁפָּשִׁין הָיוּ בְּבֵית הַחֲלִיפוֹת, וְגוֹבְהָן שְׁמֹנָה; כְּדֵי לְהַכְשִׁיר אֶת הָעֲזָרָה כּוּלָּהּ לַאֲכִילַת קׇדְשֵׁי קָדָשִׁים, וְלִשְׁחִיטַת קָדָשִׁים קַלִּים"},
+      {"oeuvre": "Rashi sur Zeva'him", "ref": "55b", "citation": "שני פשפשין היו בבית החליפות ופתוחין למערב"}
     ],
-    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam (Beit HaBechirah 4:5) counts the Ulam wall and its ten amot within the hundred-amot width, as if they ran along the whole building; the Raavad disputes it (“שלא היה שם כותל לאולם כלל”). The tour follows Middot 4:7 and Bartenura: the fifteen amot project only at the Ulam."
+    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam (Beit HaBechirah 4:5) counts the Ulam wall and its ten amot within the hundred-amot width, as if they ran along the whole building; the Raavad disputes it (“שלא היה שם כותל לאולם כלל”). The tour follows Middot 4:7 and Bartenura: the fifteen amot project only at the Ulam. The tour follows Tiferet Yisrael (Yachin on Middot 4:7): each projection is a closed room, with its door onto the Ulam and its wicket in the western corner, eight amot high (Zevachim 55b), opening to the west (Rashi, citing the Tosefta). Set aside: Tosafot Yom Tov, for whom the projection is the Ulam itself, open; Rashi (Zevachim 55b), who puts the niches in the western wall, on the outside, and gives the name Beit HaChalifot to the court opposite. Width of the doors, partition, door leaf and the steps down to the Azara: choices."
   },
 
   "niche_bilga": {

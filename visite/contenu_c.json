@@ -199,10 +199,11 @@
   "beit_hahalifot": {
     "he": "בית החליפות",
     "translit": "Beit HaHalifot",
-    "resume": "L'Oulam déborde de quinze amot au nord et au sud du corps du bâtiment, et ces deux débords s'appelaient Beit HaHalifot, « parce qu'on y rangeait les couteaux » : Bartenura explique que les grands couteaux se disaient ‘halafim. Chacune des vingt-quatre michmarot — les équipes de cohanim qui montaient servir chacune une semaine (Rambam, Klei HaMikdash 4:3) — y avait sa niche dans le mur pour ses propres couteaux. On égorge les sacrifices, a priori, avec un couteau des ustensiles du service (Rambam, Ma'asse HaKorbanot 4:7), et ces ustensiles se font en métal (Klei HaMikdash 1:13) ; quand on tranche le cou d'un seul coup, la lame doit dépasser le cou de la bête (Houlin 31a). Une seule niche était murée : celle de Bilga.",
+    "resume": "L'Oulam déborde de quinze amot au nord et au sud du corps du bâtiment, et ces deux débords s'appelaient Beit HaHalifot, « parce qu'on y rangeait les couteaux » : Bartenura explique que les grands couteaux se disaient ‘halafim. Chaque débord est une chambre fermée, avec deux portes hautes de huit amot : l'une sur l'Oulam, l'autre, un guichet, dans son angle ouest. Chacune des vingt-quatre michmarot — les équipes de cohanim qui montaient servir chacune une semaine (Rambam, Klei HaMikdash 4:3) — y avait sa niche dans le mur pour ses propres couteaux. On égorge les sacrifices, a priori, avec un couteau des ustensiles du service (Rambam, Ma'asse HaKorbanot 4:7), et ces ustensiles se font en métal (Klei HaMikdash 1:13) ; quand on tranche le cou d'un seul coup, la lame doit dépasser le cou de la bête (Houlin 31a). Une seule niche était murée : celle de Bilga.",
     "cotes": [
       "débord de 15 amot : mur de 5 et 10 d'espace",
-      "24 niches, une par michmar"
+      "24 niches, une par michmar",
+      "deux portes de 8 amot : sur l'Oulam, et un guichet à l'angle ouest"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "4:7", "citation": "הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן, וַחֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַדָּרוֹם, וְהוּא הָיָה נִקְרָא בֵּית הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים"},
@@ -212,9 +213,13 @@
       {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "4:3", "citation": "וְעוֹלִין לִירוּשָׁלַיִם לַעֲבוֹדָה מִשְׁמָר לְכָל שַׁבָּת"},
-      {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"}
+      {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "שהיה האולם יתר לכאן ולכאן, היה חדר מכאן ומכאן, ונקראו בית חליפות"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "ולכל א' מב' בתי החליפות שבאולם היו ב' פתחים, א' לאולם, וא' בזוית… וכל א' מב' אלו הפתחים היה גבוה ח' אמות"},
+      {"oeuvre": "Zeva'him", "ref": "55b", "citation": "שְׁנֵי פִּשְׁפָּשִׁין הָיוּ בְּבֵית הַחֲלִיפוֹת, וְגוֹבְהָן שְׁמֹנָה; כְּדֵי לְהַכְשִׁיר אֶת הָעֲזָרָה כּוּלָּהּ לַאֲכִילַת קׇדְשֵׁי קָדָשִׁים, וְלִשְׁחִיטַת קָדָשִׁים קַלִּים"},
+      {"oeuvre": "Rashi sur Zeva'him", "ref": "55b", "citation": "שני פשפשין היו בבית החליפות ופתוחין למערב"}
     ],
-    "note": "Choix de la visite : aucune source ne dit où passe le mur ouest du Beit HaHalifot — la visite le prend dans les 16 amot pour garder le corps du bâtiment à 70. La taille des niches, leur place dans le mur latéral, leur ordre (celui des michmarot de Divrei HaYamim I 24) sont des choix, comme la forme des couteaux, leur fer, leur manche de bronze et leur nombre, deux par niche. Le Rambam (Beit HaBe'hira 4:5) compte le mur de l'Oulam et ses dix amot dans la largeur de cent amot, comme s'ils longeaient tout le bâtiment ; le Raavad le conteste (« שלא היה שם כותל לאולם כלל »). La visite suit Middot 4:7 et Bartenura : les quinze amot ne débordent qu'à l'Oulam."
+    "note": "Choix de la visite : aucune source ne dit où passe le mur ouest du Beit HaHalifot — la visite le prend dans les 16 amot pour garder le corps du bâtiment à 70. La taille des niches, leur place dans le mur latéral, leur ordre (celui des michmarot de Divrei HaYamim I 24) sont des choix, comme la forme des couteaux, leur fer, leur manche de bronze et leur nombre, deux par niche. Le Rambam (Beit HaBe'hira 4:5) compte le mur de l'Oulam et ses dix amot dans la largeur de cent amot, comme s'ils longeaient tout le bâtiment ; le Raavad le conteste (« שלא היה שם כותל לאולם כלל »). La visite suit Middot 4:7 et Bartenura : les quinze amot ne débordent qu'à l'Oulam. La visite suit Tiferet Israël (Yakhin sur Middot 4:7) : chaque débord est une chambre fermée, avec sa porte sur l'Oulam et son guichet dans l'angle ouest, hauts de huit amot (Zeva'him 55b), qui ouvrent vers l'ouest (Rashi, citant la Tossefta). Écartés : Tosfot Yom Tov, pour qui le débord est l'Oulam lui-même, ouvert ; Rashi (Zeva'him 55b), qui met les niches dans le mur ouest, côté extérieur, et donne le nom de Beit HaHalifot à la cour d'en face. Largeur des portes, cloison, vantail et degrés qui descendent à l'Azara : des choix."
   },
 
   "niche_bilga": {
