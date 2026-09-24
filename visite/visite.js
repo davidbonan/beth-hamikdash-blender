@@ -8,9 +8,11 @@ import { cartesLumiere, cartesOcclusion } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
+import { niveauxDeDetail } from "./detail.js";
 import { SOLEIL, brumer, domeVu, environnement, peindreDome, teinterAir } from "./ciel.js";
 import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
+import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
 import { initiation } from "./initiation.js";
@@ -396,6 +398,14 @@ async function passerAu(voulu) {
 // tout entière. Les flammes de la Menora non plus : elles ne sont pas une surface à ombrer.
 const horsGeometrie = [ciel];
 const rendu = chaine(renderer, scene, camera, horsGeometrie);
+const detail = niveauxDeDetail(scene, camera);
+// Le film veut chaque image au plein détail, sans qu'un allègement arrivé en cours de prise ne la change.
+function alleger(racine) {
+  if (CINEMA) return;
+  const maillages = [];
+  racine.traverse((o) => { if (o.isMesh) maillages.push(o); });
+  detail.confier(maillages);
+}
 
 // La résolution suit ce que la machine tient. Baisser la définition d'un tiers coûte
 // une image plus douce ; la garder coûte le mouvement, qui est ce qu'on est venu voir.
@@ -611,6 +621,7 @@ async function poserFigurants(quand, { scene: troupe, animations }) {
   scene.add(troupe);
   troupe.updateMatrixWorld(true);
   troupes[quand] = { scene: troupe, melangeur, prises, torches };
+  alleger(troupe);
   suivreTorches(troupes[quand]);
   montrerTroupes();
 }
@@ -639,6 +650,7 @@ async function poserPays({ scene: pays }) {
   obstacles.push(...maisons);
   murs.push(...maisons);
   scene.add(pays);
+  alleger(pays);
 }
 chargeur.loadAsync("./pays.glb").then(poserPays);
 
@@ -1161,33 +1173,22 @@ function dessiner(dt) {
   }
   suivreSoleil();
   ciel.position.copy(camera.position);
+  detail.choisir(HAUTEUR_IMAGE.value);
   rendu.rendre();
 }
 
-// La définition ne se règle pas sur une image mais sur une moyenne, et les deux seuils
-// laissent un écart entre eux : accolés, l'échelle descendrait puis remonterait sans
-// fin, ce qui se voit bien plus qu'une image un peu douce.
-//
-// Le seuil de remontée se lit contre la SYNCHRONISATION VERTICALE, pas contre un idéal :
-// sur un écran à 60 Hz une image ne peut pas durer moins de 16,7 ms, quelle que soit
-// l'avance du GPU. Un seuil sous cette barre — 12 ms — ne pouvait donc jamais être
-// atteint : l'échelle descendait et ne remontait plus jamais, et c'est là qu'un
-// téléphone gagnait son flou définitif.
 const aide = $("#aide");
-let moyenne = 16, attente = 0, entame = false;
+let entame = false;
 // Mesuré autour de la marche seule : un saut du menu n'est pas un pas.
 const avantLePas = new THREE.Vector3();
 // À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
+const regulateur = regulerEchelle(PROFIL.echelleMin);
 function ajusterEchelle(dt) {
-  moyenne += (dt * 1000 - moyenne) * 0.05;
-  if (++attente < 120) return;
-  const precedente = echelle;
-  if (moyenne > 26) echelle = Math.max(PROFIL.echelleMin, echelle - 0.15);
-  else if (moyenne < 18) echelle = Math.min(1, echelle + 0.1);
-  if (echelle === precedente) return;
-  attente = 0;
+  const voulue = regulateur.suivre(dt, performance.now() / 1000);
+  if (voulue === null) return;
+  echelle = voulue;
   dimensionner();
 }
 
@@ -1297,6 +1298,7 @@ renderer.setAnimationLoop(() => {
 });
 
 $("#chargement").classList.add("parti");
+alleger(gltf.scene);
 
 // Au premier passage l'initiation remplace le rappel des commandes ; le « ? » la rejoue.
 function commencerInitiation() {

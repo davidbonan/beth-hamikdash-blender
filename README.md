@@ -88,6 +88,8 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/plan.json`, `visite/plans/` | Le Temple vu du dessus, une image par cadrage — Har HaBayit, Ezrat Nashim, Azara, Heikhal en coupe, souterrains — et l'emprise en mètres de chacune. Artefacts — `beit_hamikdash_plan.py` les rend depuis le .blend. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
+| `visite/detail.js`, `visite/simplification.js` | Les niveaux de détail : chaque maillage découpé en tuiles, chaque tuile allégée en niveaux (meshoptimizer, dans deux Workers, après l'ouverture), et rendue au plus léger dont l'écart tient sous un pixel. Les maillages d'origine restent, cachés, pour les rayons. |
+| `visite/echelle.js` | La définition qui suit ce que la machine tient : trois paliers, et une remontée ratée qui attend deux fois plus longtemps avant de se retenter — sans quoi l'échelle battait entre deux paliers toutes les trois secondes. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
 | `visite/nappes.js` | Les cinq jeux de scans, chargés en 1024 sur toutes les machines. |
 | `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `beit_hamikdash_nappes.py`, `beit_hamikdash_parokhet.py` et `beit_hamikdash_gravures.py` les refabriquent. |
