@@ -25,12 +25,12 @@ export const PROFIL = leger
   ? { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.75], echelleDepart: 1, grainLeger: true, preProfondeur: false,
       textures: { decor: 1024, figurants: 512 },
       ombres: { taille: 1024, portee: 26, penombre: false }, occlusion: 6,
-      halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, menora: { ombre: false }, figurants: { ombre: false },
+      halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, sanctuaire: { ombre: true, carte: 256 }, feux: { ombre: false, carte: 256 }, figurants: { ombre: false },
       fumee: { pas: 16, octaves: 2 } }
   : { dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7], echelleDepart: 1, grainLeger: false, preProfondeur: true,
       textures: { decor: Infinity, figurants: Infinity },
       ombres: { taille: 2048, portee: 40, penombre: true }, occlusion: 12,
-      halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, menora: { ombre: true }, figurants: { ombre: true },
+      halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { ombre: true },
       fumee: { pas: 48, octaves: 3 } };
 
 // La mémoire GPU est ce qui fait perdre son contexte WebGL à un iPhone : au-delà de `cote`, une texture pèse sans rien montrer de plus sur un petit écran.

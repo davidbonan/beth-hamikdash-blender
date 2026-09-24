@@ -304,13 +304,14 @@ const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteu
 let feuDeLAutel = null;
 
 // La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
-function poserLampe(reglage, position, ombre) {
+function poserLampe(reglage, position, ombrage) {
+  const carte = Math.min(reglage.carte, ombrage.carte);
   const lumiere = new THREE.PointLight(reglage.couleur, reglage.intensite, reglage.portee, 2);
   lumiere.position.copy(position);
-  lumiere.castShadow = ombre;
+  lumiere.castShadow = ombrage.ombre;
   lumiere.shadow.autoUpdate = false;
   lumiere.shadow.needsUpdate = true;
-  lumiere.shadow.mapSize.set(reglage.carte, reglage.carte);
+  lumiere.shadow.mapSize.set(carte, carte);
   lumiere.shadow.camera.near = 0.05;
   lumiere.shadow.camera.far = reglage.portee;
   lumiere.shadow.bias = -0.002;
@@ -325,8 +326,8 @@ function poserLampe(reglage, position, ombre) {
 
 function eclairerKodeshHakodashim(arche, braises) {
   if (!arche?.length || !braises?.length) return;
-  const lumiereArche = poserLampe(ARCHE, new THREE.Vector3(...arche[0]), PROFIL.menora.ombre);
-  braise = poserLampe(BRAISE, new THREE.Vector3(...braises[0]), PROFIL.menora.ombre);
+  const lumiereArche = poserLampe(ARCHE, new THREE.Vector3(...arche[0]), PROFIL.sanctuaire);
+  braise = poserLampe(BRAISE, new THREE.Vector3(...braises[0]), PROFIL.sanctuaire);
   // La pièce n'a aucune ouverture, mais le ciel y entrait quand même — par l'ambiance, par
   // le rebond, par l'or qui le réfléchit. La pénombre est dans la pièce, pas dans le
   // temps : elle se lit sur la position de chaque point, et la fumée y prend la lumière
@@ -371,7 +372,7 @@ function allumerMenora(flammes) {
   });
   // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
   const point = centre.divideScalar(flammes.length).add(new THREE.Vector3(0, 0.35, 0));
-  lumiereMenora = poserLampe(MENORA, point, PROFIL.menora.ombre);
+  lumiereMenora = poserLampe(MENORA, point, PROFIL.sanctuaire);
 }
 
 // Les mâts d'or de l'Ezrat Nashim, qui ne brûlent que la nuit de Sim'hat Beit HaSho'éva (Soucca 5:2).
@@ -427,7 +428,7 @@ function poserShoeva() {
     return meche;
   });
   const lampes = centresDesGroupes(coupes, 2).map((mat) =>
-    poserLampe(SHOEVA, mat.add(new THREE.Vector3(0, HAUTEUR_FLAMME_SHOEVA / 2, 0)), PROFIL.menora.ombre));
+    poserLampe(SHOEVA, mat.add(new THREE.Vector3(0, HAUTEUR_FLAMME_SHOEVA / 2, 0)), PROFIL.feux));
   return { candelabres, flammes, lampes, lueur: eclairerLaRonde(EMPRISES.get("hassidim_veanshei_maase")) };
 }
 
@@ -451,7 +452,7 @@ function lumieresCuitesAuCiel() {
 function allumerLeFeu() {
   const dessus = EMPRISES.get("maarakhot");
   const foyer = dessus.getCenter(new THREE.Vector3()).setY(dessus.max.y + FEU.hauteur);
-  return poserLampe(FEU, foyer, PROFIL.menora.ombre);
+  return poserLampe(FEU, foyer, PROFIL.feux);
 }
 
 // Les mâts et le feu ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
