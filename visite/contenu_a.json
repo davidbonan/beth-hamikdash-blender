@@ -83,7 +83,7 @@
   "ezrat_nashim": {
     "he": "עזרת נשים",
     "translit": "Ezrat Nashim",
-    "resume": "La Cour des Femmes est la grande cour par laquelle on entre dans l'enceinte du Temple, à l'est de l'Azara. Elle mesure 135 amot de côté et quatre chambres sans toit en occupent les angles.",
+    "resume": "La Cour des Femmes est la grande cour à l'est de l'Azara. Elle mesure 135 amot de côté et quatre chambres sans toit en occupent les angles.",
     "cotes": [
       "135 × 135 amot (≈ 65 × 65 m)",
       "à ciel ouvert (choix de la visite)",
@@ -93,7 +93,7 @@
       {"oeuvre": "Middot", "ref": "2:5", "citation": ""},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:7", "citation": "וְלִפְנֵי הָעֲזָרָה בַּמִּזְרָח הָיְתָה עֶזְרַת הַנָּשִׁים"}
     ],
-    "note": "Choix de la visite : la cour est montrée à ciel ouvert, et la foule s'y masse. Middot 2:5 ne dit sans toit que les quatre chambres d'angle, « וְלֹא הָיוּ מְקוֹרוֹת »."
+    "note": "Choix de la visite : la cour est montrée à ciel ouvert. Middot 2:5 ne dit sans toit que les quatre chambres d'angle, « וְלֹא הָיוּ מְקוֹרוֹת »."
   },
 
   "porte_est_ezrat_nashim": {
@@ -127,7 +127,7 @@
       {"oeuvre": "Bartenura sur Middot", "ref": "2:5", "citation": "כְּמוֹ גְּזוּזְטְרָא הִקִּיפוּ סָבִיב לְעֶזְרַת נָשִׁים"},
       {"oeuvre": "Rashi sur Soucca", "ref": "51b", "citation": "נתנו זיזין בכתלים בולטין מן הכותל סביב סביב וכל שנה מסדרין שם גזוזטראות לווחין"}
     ],
-    "note": "Aucune source n'en donne la hauteur : la visite la pose à la crête des chambres d'angle, dont elle longe les murs côté cour sans les couvrir — elles restent sans toit (Middot 2:5). Colonnes, balustrade et frise sont des choix. Aucune source ne dit par où l'on y montait : la visite ne montre pas d'escalier. Écarté : Rashi (Soucca 51b), pour qui des corbeaux restaient dans les murs et un plancher de planches y était posé chaque année. Choix de la visite : la galerie est montrée vide hors de la fête ; aucune source ne dit ce qu'elle devenait le reste de l'année."
+    "note": "Aucune source n'en donne la hauteur : la visite la pose à la crête des chambres d'angle, dont elle longe les murs côté cour sans les couvrir — elles restent sans toit (Middot 2:5). Colonnes, balustrade et frise sont des choix. Aucune source ne dit par où l'on y montait : la visite ne montre pas d'escalier. Écarté : Rashi (Soucca 51b), pour qui des corbeaux restaient dans les murs et un plancher de planches y était posé chaque année. Choix de la visite : la galerie est montrée vide, même la nuit de Sim'hat Beit HaShoeva ; aucune source ne dit ce qu'elle devenait le reste de l'année."
   },
 
   "lishkat_haetzim": {
@@ -1023,7 +1023,7 @@
       {"oeuvre": "Bartenura", "ref": "Middot 5:4", "citation": "אוֹתָהּ לִשְׁכַּת הָעֵץ הִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל. וְהִיא לִשְׁכַּת פַּרְהֶדְרִין"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "וְלִשְׁכַּת הָעֵץ הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן וְהִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל וְהִיא הַנִּקְרֵאת לִשְׁכַּת פַּרְהֶדְרִין"}
     ],
-    "note": "Question ouverte : Yoma 19a donne au Cohen Gadol deux chambres, Parhedrin et Avtinas, l'une au nord et l'autre au sud, « et nous ne savons pas » laquelle est où ; la guemara juge plus plausible Parhedrin au sud, puis repousse l'argument. Seul le Talmud de Jérusalem (Yoma 1:5) met la chambre d'Avtinas « au-dessus de Sha'ar HaMayim, et voisine de sa chambre » : la visite y adosse la Lishkat Parhedrin, et met ainsi les deux chambres au sud, ce que Yoma 19a exclut. Écarté : Bartenura (Middot 5:4) et le Rambam (Beit HaBe'hira 5:17) identifient la Lishkat Parhedrin à la Lishkat HaEtz, au nord, dont Abba Shaul dit qu'elle était la chambre du Cohen Gadol (Middot 5:4). Choix de la visite : sa place à l'ouest de la porte."
+    "note": "Question ouverte : Yoma 19a donne au Cohen Gadol deux chambres, Parhedrin et Avtinas, l'une au nord et l'autre au sud, « et nous ne savons pas » laquelle est où ; la guemara juge plus plausible Parhedrin au sud, puis repousse l'argument. Seul le Talmud de Jérusalem (Yoma 1:5) met la chambre d'Avtinas « au-dessus de Sha'ar HaMayim, et voisine de sa chambre » : la visite y adosse la Lishkat Parhedrin, et met ainsi les deux chambres au sud, ce que Yoma 19a exclut. Écarté : Bartenura (Middot 5:4) et le Rambam (Beit HaBe'hira 5:17) identifient la Lishkat Parhedrin à la Lishkat HaEtz — au nord selon le Rambam, au sud selon le texte de la Mishna que commente Bartenura —, dont Abba Shaul dit qu'elle était la chambre du Cohen Gadol (Middot 5:4). Choix de la visite : sa place à l'ouest de la porte."
   },
 
   "lishkat_osei_chavitin": {

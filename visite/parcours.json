@@ -1,8 +1,9 @@
 {
- "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7) et la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4). `moment` : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim le temps du parcours ; sans lui, le jour. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7) et la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
  "parcours": [
   {
    "id": "tamid",
+   "troupe": "figures_tamid",
    "titre": {
     "fr": "Le tamid",
     "en": "The tamid",
@@ -11,6 +12,7 @@
    "stations": [
     {
      "id": "beit_hamoked",
+     "moment": "avant_l_aube",
      "concept": "beit_hamoked",
      "source": {
       "oeuvre": "Tamid",
@@ -32,13 +34,14 @@
       "he": "בבית המוקד, לפני עלות השחר"
      },
      "texte": {
-      "fr": "Les anciens de la maison paternelle dorment ici, les clés de l'Azara en main, et les jeunes cohanim à terre autour d'eux. Le préposé frappe à la porte avant l'aube ; celui qui s'est immergé vient tirer au sort le retrait des cendres.",
-      "en": "The elders of the patrilineal family sleep here, the keys of the Azara in their hands, and the young kohanim on the ground around them. The appointed priest knocks at the gate before dawn; whoever has immersed comes to draw lots for the removal of the ashes.",
-      "he": "זקני בית האב ישנים כאן ומפתחות העזרה בידם, ופרחי כהונה איש כסתו בארץ סביבם. הממונה בא ודופק עליהם לפני עלות השחר; מי שטבל בא ומפיס על תרומת הדשן."
+      "fr": "Les anciens de la maison paternelle dorment ici, les clés de l'Azara en main, et les jeunes cohanim à terre, chacun sur sa couche. Le préposé frappe à la porte avant l'aube ; celui qui s'est immergé vient tirer au sort le retrait des cendres.",
+      "en": "The elders of the patrilineal family sleep here, the keys of the Azara in their hands, and the young kohanim on the ground, each on his bedding. The appointed priest knocks at the gate before dawn; whoever has immersed comes to draw lots for the removal of the ashes.",
+      "he": "זקני בית האב ישנים כאן ומפתחות העזרה בידם, ופרחי כהונה איש כסתו בארץ. הממונה בא ודופק עליהם לפני עלות השחר; מי שטבל בא ומפיס על תרומת הדשן."
      }
     },
     {
      "id": "kiddoush_yadayim",
+     "moment": "avant_l_aube",
      "concept": "kiddoush_yadayim",
      "source": {
       "oeuvre": "Tamid",
@@ -74,13 +77,14 @@
       "he": "הכיור: ידיים ורגליים"
      },
      "texte": {
-      "fr": "Nul ne touche un ustensile avant d'avoir sanctifié ses mains et ses pieds à l'eau du Kiyor. C'est le premier geste de chaque service, et celui qui a gagné le sort commence par là, à la seule lueur de la ma'arakha.",
-      "en": "No one touches a vessel before sanctifying his hands and feet with the water of the Kiyor. It is the first act of every service, and the one who won the lot begins there, by the light of the ma'arakha alone.",
-      "he": "אין נוגעים בכלי עד שמקדשים ידיים ורגליים מן הכיור. זו הפעולה הראשונה של כל עבודה, ומי שזכה בפיס מתחיל בה, לאור המערכה בלבד."
+      "fr": "Nul ne touche un ustensile avant d'avoir sanctifié ses mains et ses pieds à l'eau du Kiyor. C'est le premier geste du jour : celui qui a gagné le sort commence par là, à la seule lueur de la ma'arakha.",
+      "en": "No one touches a vessel before sanctifying his hands and feet with the water of the Kiyor. It is the first act of the day: the one who won the lot begins there, by the light of the ma'arakha alone.",
+      "he": "אין נוגעים בכלי עד שמקדשים ידיים ורגליים מן הכיור. זו הפעולה הראשונה של היום: מי שזכה בפיס מתחיל בה, לאור המערכה בלבד."
      }
     },
     {
      "id": "terumat_hadeshen",
+     "moment": "avant_l_aube",
      "concept": "makom_hadeshen",
      "source": {
       "oeuvre": "Tamid",
@@ -120,13 +124,14 @@
       "he": "תרומת הדשן"
      },
      "texte": {
-      "fr": "La pelle d'argent en main, il monte au sommet de l'autel, écarte les braises, ramasse les cendres consumées et redescend. Il se tourne vers le nord et les dépose à dix amot à l'est du kevesh, à trois tefa'him de la rampe : le lieu du deshen.",
-      "en": "Silver pan in hand, he goes up to the top of the altar, pushes the coals aside, scoops up the consumed ashes and comes down. He turns to the north and sets them down ten amot east of the kevesh, three tefachim from the ramp: the place of the deshen.",
-      "he": "מחתת הכסף בידו, הוא עולה לראש המזבח, מפנה את הגחלים הילך והילך, חותה מן המאוכלות הפנימיות ויורד. הופך פניו לצפון ומניחן כעשר אמות ממזרח לכבש, שלושה טפחים מן הכבש: מקום הדשן."
+      "fr": "La pelle d'argent en main, il monte au sommet de l'autel, écarte les braises, ramasse les cendres consumées et redescend. Arrivé au dallage, il se tourne vers le nord, longe le côté est du kevesh sur une dizaine d'amot et les entasse à trois tefa'him de la rampe : le lieu du deshen.",
+      "en": "Silver pan in hand, he goes up to the top of the altar, pushes the coals aside, scoops up the consumed ashes and comes down. Reaching the floor, he turns to the north, walks about ten amot along the east side of the kevesh and heaps them three tefachim from the ramp: the place of the deshen.",
+      "he": "מחתת הכסף בידו, הוא עולה לראש המזבח, מפנה את הגחלים הילך והילך, חותה מן המאוכלות הפנימיות ויורד. הגיע לרצפה, הופך פניו לצפון, מהלך למזרחו של כבש כעשר אמות וצוברן על הרצפה רחוק מן הכבש שלושה טפחים: מקום הדשן."
      }
     },
     {
      "id": "siddour_hamaarakha",
+     "moment": "avant_l_aube",
      "concept": "siddour_hamaarakha",
      "source": {
       "oeuvre": "Tamid",
@@ -166,13 +171,14 @@
       "he": "עצי המערכה"
      },
      "texte": {
-      "fr": "Les cendres retirées, les cohanim montent les bûches et dressent la grande ma'arakha sur l'autel, côté est, sa face vers l'est ; tout bois convient sauf l'olivier et la vigne. « Le cohen y fera brûler du bois, matin après matin » (Vayikra 6:5).",
-      "en": "The ashes removed, the kohanim carry up the logs and set the great ma'arakha on the altar, on its east side, its face to the east; any wood is fit except olive and vine. “The kohen shall burn wood on it every morning” (Vayikra 6:5).",
-      "he": "משנתרם הדשן מעלים הכהנים גזרים ומסדרים את המערכה הגדולה על המזבח, במזרחו, וחזיתה מזרחה; כל העצים כשרים חוץ משל זית ושל גפן. \"ובער עליה הכהן עצים בבוקר בבוקר\" (ויקרא ו, ה)."
+      "fr": "Les cendres retirées, les cohanim montent les bûches, et celui qui a retiré les cendres dresse la grande ma'arakha sur l'autel, côté est, sa face vers l'est (Rambam, Temidin 4:5) ; tout bois convient sauf l'olivier et la vigne. « Le cohen y fera brûler du bois, matin après matin » (Vayikra 6:5).",
+      "en": "The ashes removed, the kohanim carry up the logs, and the one who removed the ashes sets the great ma'arakha on the altar, on its east side, its face to the east (Rambam, Temidin 4:5); any wood is fit except olive and vine. “The kohen shall burn wood on it every morning” (Vayikra 6:5).",
+      "he": "משנתרם הדשן מעלים הכהנים גזרים, והתורם מסדר את המערכה הגדולה על המזבח, במזרחו, וחזיתה מזרחה (רמב\"ם, תמידין ד, ה); כל העצים כשרים חוץ משל זית ושל גפן. \"ובער עליה הכהן עצים בבוקר בבוקר\" (ויקרא ו, ה)."
      }
     },
     {
      "id": "zerika",
+     "moment": "aube",
      "concept": "zerika",
      "source": {
       "oeuvre": "Tamid",
@@ -220,13 +226,14 @@
       "he": "הדם על קרן המזבח"
      },
      "texte": {
-      "fr": "L'agneau est égorgé au nord de l'autel, sur le deuxième anneau. Le cohen qui a reçu le sang le porte au coin nord-est, puis au coin sud-ouest — deux aspersions qui en font quatre — et verse le reste sur le yessod sud.",
-      "en": "The lamb is slaughtered north of the altar, at the second ring. The kohen who received the blood carries it to the north-east corner, then to the south-west corner — two applications that are four — and pours the rest on the southern yesod.",
-      "he": "הטלה נשחט בצפון המזבח, על טבעת שנייה. הכהן שקיבל את הדם בא לו לקרן מזרחית־צפונית ואחר כך למערבית־דרומית — שתי מתנות שהן ארבע — ושיירי הדם שופך על יסוד דרומי."
+      "fr": "L'agneau du matin est égorgé au nord de l'autel, à hauteur de son coin nord-ouest, sur le deuxième anneau. Le cohen qui a reçu le sang le porte au coin nord-est, puis au coin sud-ouest — deux aspersions qui en font quatre — et verse le reste sur le yessod sud.",
+      "en": "The morning lamb is slaughtered north of the altar, by its north-west corner, at the second ring. The kohen who received the blood carries it to the north-east corner, then to the south-west corner — two applications that are four — and pours the rest on the southern yesod.",
+      "he": "הטלה של שחר נשחט על קרן צפונית מערבית, על טבעת שנייה. הכהן שקיבל את הדם בא לו לקרן מזרחית־צפונית ואחר כך למערבית־דרומית — שתי מתנות שהן ארבע — ושיירי הדם שופך על יסוד דרומי."
      }
     },
     {
      "id": "melihat_haevarim",
+     "moment": "aube",
      "concept": "melihat_haevarim",
      "source": {
       "oeuvre": "Tamid",
@@ -276,7 +283,7 @@
      "concept": "hatavat_hanerot",
      "source": {
       "oeuvre": "Tamid",
-      "ref": "3:9"
+      "ref": "6:1"
      },
      "point": [
       -112,
@@ -316,9 +323,9 @@
       "he": "המנורה, בהיכל"
      },
      "texte": {
-      "fr": "Le sang jeté, celui qui a gagné la Menora entre dans le Heikhal (Rambam, Temidin 6:3) : il nettoie cinq lampes, y met huile et mèches neuves, et laisse les deux de l'est ; il reviendra pour elles — avant l'encens selon Tamid 6:1, après selon le Rambam (Temidin 6:4).",
-      "en": "The blood thrown, the one who won the Menorah enters the Heikhal (Rambam, Temidin 6:3): he cleans five lamps, puts in fresh oil and wicks, and leaves the two eastern ones; he will come back for them — before the incense according to Tamid 6:1, after it according to the Rambam (Temidin 6:4).",
-      "he": "משנזרק הדם נכנס להיכל מי שזכה בדישון המנורה (רמב\"ם, תמידין ו, ג): מדשן חמישה נרות, נותן בהם שמן ופתילות חדשות, ומניח את שני המזרחיים; אליהם יחזור — לפני הקטורת לפי תמיד ו, א, ואחריה לפי הרמב\"ם (תמידין ו, ד)."
+      "fr": "Revenus de la Lishkat HaGazit, les cohanim montent les marches de l'Oulam, et celui qui a gagné la Menora rentre dans le Heikhal. Il y a déjà nettoyé cinq lampes — avant le sang du tamid selon Abayé (Yoma 33a), après selon le Rambam (Temidin 6:3) — et laissé brûler les deux de l'est. Il revient à elles : avant l'encens selon Tamid 6:1, qui laisse brûler l'occidentale, après selon le Rambam (Temidin 6:4).",
+      "en": "Back from the Lishkat HaGazit, the kohanim go up the steps of the Ulam, and the one who won the Menorah goes back into the Heikhal. He has already cleaned five lamps — before the blood of the tamid according to Abaye (Yoma 33a), after it according to the Rambam (Temidin 6:3) — and left the two eastern ones burning. He comes back to them: before the incense according to Tamid 6:1, which leaves the western one burning, after it according to the Rambam (Temidin 6:4).",
+      "he": "חזרו מלשכת הגזית, התחילו עולים במעלות האולם, ומי שזכה בדישון המנורה נכנס שוב להיכל. כבר דישן חמישה נרות — קודם לדם התמיד לפי אביי (יומא לג, א), ואחריו לפי הרמב\"ם (תמידין ו, ג) — והניח את שני המזרחיים דולקים. אליהם הוא חוזר: לפני הקטורת לפי תמיד ו, א, המניח את המערבי דולק, ואחריה לפי הרמב\"ם (תמידין ו, ד)."
      }
     },
     {
@@ -412,15 +419,16 @@
       "he": "ישראל עומד על גבי קרבנו"
      },
      "texte": {
-      "fr": "« Comment le korban d'un homme peut-il être offert sans qu'il se tienne auprès ? » Les Israélites du ma'amad se tiennent dans l'Ezrat Israël, les onze amot à l'est du Doukhan, au nom de tout Israël. C'est l'ordre du tamid pour le service de la maison de notre Dieu.",
-      "en": "“How can a person's offering be sacrificed when he is not standing by it?” The Israelites of the ma'amad stand in the Ezrat Israel, the eleven amot east of the Dukhan, on behalf of all Israel. This is the order of the tamid for the service of the house of our God.",
-      "he": "\"וכי היאך קרבנו של אדם קרב והוא אינו עומד על גביו?\" ישראל שבמעמד עומדים בעזרת ישראל, אחת עשרה האמה שממזרח לדוכן, בשם כל ישראל. זה הוא סדר התמיד לעבודת בית אלוהינו."
+      "fr": "« Comment le korban d'un homme peut-il être offert sans qu'il se tienne auprès ? » Ceux du ma'amad qui sont à Jérusalem ou près d'elle se tiennent dans l'Ezrat Israël, les onze amot à l'est du Doukhan, au nom de tout Israël. « C'est l'ordre du tamid pour le service de la maison de notre Dieu » (Tamid 7:3).",
+      "en": "“How can a person's offering be sacrificed when he is not standing by it?” Those of the ma'amad in or near Jerusalem stand in the Ezrat Israel, the eleven amot east of the Dukhan, on behalf of all Israel. “This is the order of the tamid for the service of the house of our God” (Tamid 7:3).",
+      "he": "\"וכי היאך קרבנו של אדם קרב והוא אינו עומד על גביו?\" אנשי המעמד שבירושלים או קרוב לה עומדים בעזרת ישראל, אחת עשרה האמה שממזרח לדוכן, בשם כל ישראל. \"זה הוא סדר התמיד לעבודת בית אלהינו\" (תמיד ז, ג)."
      }
     }
    ]
   },
   {
    "id": "yom_kippour",
+   "troupe": "figures_kippour",
    "titre": {
     "fr": "Yom Kippour",
     "en": "Yom Kippur",
@@ -458,6 +466,7 @@
     },
     {
      "id": "tevila_rishona",
+     "moment": "aube",
      "concept": "shaar_hamayim",
      "source": {
       "oeuvre": "Yoma",
@@ -615,9 +624,9 @@
       "he": "שני השעירים: הגורל"
      },
      "texte": {
-      "fr": "Il vient à l'est de l'Azara, au nord de l'autel, le segan à sa droite, le chef de la maison paternelle à sa gauche. Là, deux boucs, et une urne avec deux sorts : « pour HaShem », « pour Azazel ». Il les tire, un dans chaque main, et les pose sur les deux boucs (Yoma 4:1) ; celui du Nom sera égorgé ici, aux anneaux ; l'autre partira au désert.",
-      "en": "He comes to the east of the Azara, north of the altar, the deputy at his right, the head of the father’s house at his left. There, two goats, and an urn with two lots: “for HaShem”, “for Azazel”. He draws them, one in each hand, and lays them on the two goats (Yoma 4:1); the one for the Name will be slaughtered here, at the rings; the other will go to the wilderness.",
-      "he": "בא לו למזרח העזרה, לצפון המזבח, הסגן מימינו וראש בית אב משמאלו. שם שני שעירים, וקלפי ובה שני גורלות: ״לשם״, ״לעזאזל״. טורף ומעלה אותם, אחד בכל יד, ונותנם על שני השעירים (יומא ד, א); של שם יישחט כאן, אצל הטבעות; השני יצא למדבר."
+      "fr": "Il vient à l'est de l'Azara, au nord de l'autel, le segan à sa droite, le chef de la maison paternelle à sa gauche. Là, deux boucs, et une urne avec deux sorts : « pour HaShem », « pour Azazel ». Il les tire, un dans chaque main, et les pose sur les deux boucs (Yoma 4:1) ; celui du Nom sera égorgé au nord de l'autel (Zeva'him 5:2) ; l'autre partira au désert.",
+      "en": "He comes to the east of the Azara, north of the altar, the deputy at his right, the head of the father’s house at his left. There, two goats, and an urn with two lots: “for HaShem”, “for Azazel”. He draws them, one in each hand, and lays them on the two goats (Yoma 4:1); the one for the Name will be slaughtered north of the altar (Zevachim 5:2); the other will go to the wilderness.",
+      "he": "בא לו למזרח העזרה, לצפון המזבח, הסגן מימינו וראש בית אב משמאלו. שם שני שעירים, וקלפי ובה שני גורלות: ״לשם״, ״לעזאזל״. טורף ומעלה אותם, אחד בכל יד, ונותנם על שני השעירים (יומא ד, א); של שם יישחט בצפון (זבחים ה, ב); השני יצא למדבר."
      }
     },
     {
@@ -854,14 +863,14 @@
     },
     {
      "id": "sair_hamishtaleach",
-     "concept": "shaar_nikanor",
+     "concept": "sair_hamishtaleach",
      "source": {
       "oeuvre": "Yoma",
       "ref": "6:2"
      },
      "point": [
-      -16,
-      0
+      -14.5,
+      -4
      ],
      "sol": 0,
      "via": [
@@ -886,14 +895,14 @@
        -12
       ],
       [
-       -17,
-       -4
+       -21,
+       -6
       ]
      ],
      "cible": [
-      4,
-      6,
-      0
+      -17.3,
+      2.5,
+      -10.2
      ],
      "titre": {
       "fr": "Le bouc émissaire : le viduy et le départ",
@@ -901,8 +910,8 @@
       "he": "השעיר המשתלח: הווידוי והשילוח"
      },
      "texte": {
-      "fr": "Il vient au bouc émissaire, pose ses deux mains sur lui et confesse pour tout Israël. Quand les cohanim et le peuple debout dans l'Azara entendent le Nom explicite sortir de sa bouche, ils s'agenouillent, se prosternent, tombent sur la face : Baroukh shem kevod malkhouto le'olam va'ed. Puis il le remet à celui qui le conduit (Yoma 6:3) ; on lui a fait un pont, à cause des Babyloniens qui lui tiraient les poils (Yoma 6:4).",
-      "en": "He comes to the scapegoat, lays both hands on it and confesses for all Israel. When the priests and the people standing in the Azara hear the explicit Name come from his mouth, they kneel, prostrate themselves and fall on their faces: Barukh shem kevod malkhuto le’olam va’ed. Then he hands it to the one who leads it (Yoma 6:3); a ramp was made for it, because of the Babylonians who pulled its hair (Yoma 6:4).",
+      "fr": "Il vient au bouc émissaire, pose ses deux mains sur lui et confesse pour tout Israël. Quand les cohanim et le peuple debout dans l'Azara entendent le Nom explicite sortir de sa bouche, ils s'agenouillent, se prosternent, tombent sur la face : Baroukh shem kevod malkhouto le'olam va'ed. Puis il le remet à celui qui le conduit (Yoma 6:3) ; on lui avait fait une chaussée surélevée, à cause des Babyloniens qui lui tiraient les poils (Yoma 6:4).",
+      "en": "He comes to the scapegoat, lays both hands on it and confesses for all Israel. When the priests and the people standing in the Azara hear the explicit Name come from his mouth, they kneel, prostrate themselves and fall on their faces: Barukh shem kevod malkhuto le’olam va’ed. Then he hands it to the one who leads it (Yoma 6:3); a raised causeway had been made for it, because of the Babylonians who pulled its hair (Yoma 6:4).",
       "he": "בא לו אצל שעיר המשתלח, סומך שתי ידיו עליו ומתוודה על כל ישראל. וכשהכהנים והעם העומדים בעזרה שומעים את השם המפורש יוצא מפי כהן גדול, כורעים ומשתחווים ונופלים על פניהם: ברוך שם כבוד מלכותו לעולם ועד. מוסרו למי שמוליכו (יומא ו, ג); וכבש עשו לו מפני הבבליים שהיו מתלשים בשערו (יומא ו, ד)."
      }
     },
@@ -1014,6 +1023,7 @@
   },
   {
    "id": "simhat_beit_hashoeva",
+   "troupe": "figures_shoeva",
    "titre": {
     "fr": "Sim'hat Beit HaSho'éva",
     "en": "Simchat Beit HaSho’eva",
@@ -1040,7 +1050,7 @@
      ],
      "titre": {
       "fr": "L'Ezrat Nashim, au soir du premier jour",
-      "en": "The Ezrat Nashim, on the first festival night",
+      "en": "The Ezrat Nashim, at the close of the first festival day",
       "he": "עזרת נשים, במוצאי יום טוב הראשון"
      },
      "texte": {
@@ -1106,9 +1116,9 @@
       "he": "מנורות של זהב"
      },
      "texte": {
-      "fr": "Des menorot d'or, hautes de cinquante amot (Soucca 52b), quatre coupes d'or à leur sommet et quatre échelles à chacune. Quatre jeunes des fleurs de la kehouna y montent, des jarres d'huile en main — cent vingt log, trente chacun — et versent dans chaque coupe. Leur nombre n'est pas donné : quatre est un choix du modèle.",
-      "en": "Golden menorot stood there, fifty amot high (Sukkah 52b), four golden bowls at their tops and four ladders to each. Four youths of the priestly novices climb them, jugs of oil in hand — a hundred and twenty log, thirty each — and pour into every bowl. Their number is not given: four is the model's choice.",
-      "he": "מנורות של זהב היו שם, גובהן חמישים אמה (סוכה נב ע״ב), וארבעה ספלים של זהב בראשיהן וארבעה סולמות לכל אחת ואחת. ארבעה ילדים מפרחי כהונה עולים בהם, ובידיהם כדים של שמן – מאה ועשרים לוג, שלושים לכל אחד – ומטילים לכל ספל וספל. מספרן אינו מפורש: ארבע הן בחירת הדגם."
+      "fr": "Des menorot d'or, hautes de cinquante amot (Soucca 52b), quatre coupes d'or à leur sommet et quatre échelles à chacune. Quatre jeunes des fleurs de la kehouna y montent, des jarres d'huile en main — cent vingt log, trente chacun (Soucca 52b) — et versent dans chaque coupe. Leur nombre n'est pas donné : quatre est un choix du modèle.",
+      "en": "Golden menorot stood there, fifty amot high (Sukkah 52b), four golden bowls at their tops and four ladders to each. Four youths of the priestly novices climb them, jugs of oil in hand — a hundred and twenty log, thirty each (Sukkah 52b) — and pour into every bowl. Their number is not given: four is the model's choice.",
+      "he": "מנורות של זהב היו שם, גובהן חמישים אמה (סוכה נב ע״ב), וארבעה ספלים של זהב בראשיהן וארבעה סולמות לכל אחת ואחת. ארבעה ילדים מפרחי כהונה עולים בהם, ובידיהם כדים של שמן – מאה ועשרים לוג, שלושים לכל אחד (סוכה נב ע״ב) – ומטילים לכל ספל וספל. מספרן אינו מפורש: ארבע הן בחירת הדגם."
      }
     },
     {
@@ -1197,6 +1207,7 @@
     },
     {
      "id": "kara_hagever",
+     "moment": "fin_de_nuit",
      "concept": "tokei_hatzotzrot",
      "source": {
       "oeuvre": "Soucca",
@@ -1213,18 +1224,19 @@
       0
      ],
      "titre": {
-      "fr": "Au chant du coq, les trompettes",
-      "en": "At cockcrow, the trumpets",
+      "fr": "Kara hagever : les trompettes",
+      "en": "Kara hagever: the trumpets",
       "he": "קרא הגבר"
      },
      "texte": {
-      "fr": "Deux cohanim se tiennent à la porte haute qui descend de l'Ezrat Israël à l'Ezrat Nashim, deux trompettes en main. Au chant du coq, ils sonnent teki'a, terou'a, teki'a. À la dixième marche, ils sonnent encore ; arrivés à la cour, encore. Et ils vont en sonnant jusqu'à la porte qui sort à l'est.",
-      "en": "Two priests stand at the upper gate that goes down from the Ezrat Israel to the Ezrat Nashim, two trumpets in their hands. When the rooster calls, they sound teki’a, teru’a, teki’a. Reaching the tenth step, they sound again; reaching the court, again. And they go on sounding until the gate that leads out to the east.",
+      "fr": "Deux cohanim se tiennent à la porte haute qui descend de l'Ezrat Israël à l'Ezrat Nashim, deux trompettes en main. Quand le gever appelle — le coq selon Rabbi Sheila, le crieur du Temple selon Rav (Yoma 20b) —, ils sonnent teki'a, terou'a, teki'a. À la dixième marche, ils sonnent encore ; arrivés à la cour, encore. Et ils vont en sonnant jusqu'à la porte qui sort à l'est.",
+      "en": "Two priests stand at the upper gate that goes down from the Ezrat Israel to the Ezrat Nashim, two trumpets in their hands. When the gever calls — the rooster according to Rabbi Sheila, the Temple crier according to Rav (Yoma 20b) — they sound teki’a, teru’a, teki’a. Reaching the tenth step, they sound again; reaching the court, again. And they go on sounding until the gate that leads out to the east.",
       "he": "שני כהנים עומדים בשער העליון היורד מעזרת ישראל לעזרת נשים, ושתי חצוצרות בידיהם. קרא הגבר – תקעו והריעו ותקעו. הגיעו למעלה עשירית – תקעו והריעו ותקעו. הגיעו לעזרה – תקעו והריעו ותקעו. והולכים ותוקעים עד השער היוצא מזרח."
      }
     },
     {
      "id": "shaar_hamizrach",
+     "moment": "fin_de_nuit",
      "concept": "porte_est_ezrat_nashim",
      "source": {
       "oeuvre": "Soucca",

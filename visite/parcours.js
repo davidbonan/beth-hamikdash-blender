@@ -11,7 +11,9 @@
  * image — mais elle s'arrête : « Suivant » repart, « Précédent » rebrousse, et un clic
  * pendant la marche saute à l'arrivée. Rien ici ne connaît la scène : visite.js prête
  * la caméra le temps du trajet, pose ou oriente le visiteur quand on le lui demande, et
- * passe au `moment` que le parcours déclare — le jour, s'il n'en dit rien.
+ * passe au `moment` que la station, sinon le parcours, déclare — le jour, s'ils n'en
+ * disent rien — et à la `troupe` du parcours, les figurants de son service ; en sortant,
+ * à ceux de la visite libre.
  */
 import * as THREE from "three";
 import { polyligne } from "./cinema.js";
@@ -34,7 +36,7 @@ const CHEVRON_GAUCHE = "M8.5 2 2.5 8l6 6", CHEVRON_DROIT = "M3.5 2l6 6-6 6", COC
 const lisse = (u) => u * u * (3 - 2 * u);
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
-export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, ouvrirFiche, fermerFiche }) {
+export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, changerDeTroupe, ouvrirFiche, fermerFiche }) {
   const racine = document.querySelector("#parcours");
   const carte = racine.querySelector(".carte");
   const nom = carte.querySelector(".nom"), rang = carte.querySelector(".rang"), source = carte.querySelector(".source");
@@ -47,6 +49,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   const cibleEnM = ([x, y, z]) => new THREE.Vector3(x * ama, y * ama, z * ama);
   const piedsDe = (station) => [station.point[0] * ama, station.sol * ama, station.point[1] * ama];
   const traduit = (champ) => champ[langue()] ?? champ.fr;
+  const momentDe = (station) => station.moment ?? guide.moment ?? "jour";
 
   let guide = null, stations = [];
   let courante = -1, origine = -1;
@@ -142,6 +145,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     origine = courante;
     courante = i;
     deplieeEnMarche = false;
+    changerDeMoment(momentDe(station));
     fermerFiche();
     afficher();
     marcher(trajet);
@@ -168,6 +172,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     trajet = null;
     courante = i;
     fermerFiche();
+    changerDeMoment(momentDe(stations[i]));
     poserA(piedsDe(stations[i]), cibleEnM(stations[i].cible));
     afficher();
   }
@@ -176,7 +181,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     guide = liste.find((p) => p.id === id) ?? liste[0];
     stations = guide.stations;
     racine.hidden = false;
-    changerDeMoment(guide.moment ?? "jour");
+    changerDeTroupe(guide.troupe);
     sauter(0);
   }
 
@@ -185,6 +190,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     trajet = null;
     racine.hidden = true;
     changerDeMoment("jour");
+    changerDeTroupe();
   }
 
   function accelerer() {

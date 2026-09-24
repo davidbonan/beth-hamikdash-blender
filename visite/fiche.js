@@ -40,6 +40,7 @@ const OUVRAGES = {
   yirmeyahou: "Jeremiah", jeremie: "Jeremiah",
   yehezkel: "Ezekiel",
   "rambam temidin": "Mishneh Torah, Daily Offerings and Additional Offerings",
+  "rambam tefila": "Mishneh Torah, Prayer and the Priestly Blessing",
   "rashi exode": "Rashi on Exodus", "rashi shemot": "Rashi on Exodus",
   "rashi sur yoma": "Rashi on Yoma",
   "rashi sur pesachim": "Rashi on Pesachim",

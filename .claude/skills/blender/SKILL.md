@@ -34,7 +34,8 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
 | `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
 | `beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
-| `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés (gestes : `beit_hamikdash_gestes.py`) | `visite/figures.glb`, `visite/figures.json` |
+| `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés, une troupe par parcours (gestes : `beit_hamikdash_gestes.py`) | `visite/figures*.glb`, `visite/figures*.json` |
+| `beit_hamikdash_seir.py` | le bouc émissaire de Kippour, champ de distance polygonisé comme le bœuf (outillage commun : `beit_hamikdash_champ.py`), que les figures posent à côté du Cohen Gadol | `seir.blend` |
 | `beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `shor.blend` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
 | `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
@@ -210,29 +211,32 @@ Toute cuisson — ciblée (`--recuire`) ou complète (`--lumiere tout`) — pass
 
 ## Les figurants
 
-`beit_hamikdash_figures.py` lit le .blend et écrit `visite/figures.glb` et `visite/figures.json`
+`beit_hamikdash_figures.py` lit le .blend et écrit une **troupe** : `visite/<troupe>.glb` et `visite/<troupe>.json`
 (emprises et vues, une par rôle plus les familles `cohanim` et `leviim`, que la visite ajoute à `reperes.json`).
-Chaque rôle porte le nom de son concept — `kiddoush_yadayim`, `zerika`, `leviim_3`, `anshei_maamad_1` — et
-c'est par ce nom que la visite ouvre sa fiche au clic.
-Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
+Chaque rôle porte le nom de son concept — `zerika`, `leviim_3`, `anshei_maamad_1` — et c'est par ce nom que la visite
+ouvre sa fiche au clic. Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
+
+Quatre troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours la sienne (`troupe` dans `parcours.json`),
+à la première demande :
+
+| Troupe | Rôles | Qui |
+|---|---|---|
+| `figures` | `roles_de_la_visite()`, 5 | la zerika, deux Léviim, un anshei ma'amad, le Lévi de garde à Nikanor |
+| `figures_tamid` | `roles_du_tamid()`, 22 | les gestes du tamid du matin, douze Léviim, deux enfants, deux anshei ma'amad |
+| `figures_kippour` | `roles_kippour()`, 13 | le Cohen Gadol en lin sur le bouc émissaire (`seir.blend`), cinq cohanim et sept Israélites prosternés |
+| `figures_shoeva` | `roles_shoeva()`, 26 | la nuit de l'Ezrat Nashim : Léviim des quinze marches, trompettes, ronde aux torches |
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                         # les 23 rôles, un quart d'heure
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- zerika leviim_3      # un essai
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                            # la visite libre
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- --troupe figures_tamid  # un quart d'heure
+/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- --troupe figures_kippour zerika   # un essai
 ```
 
-Un essai réécrit `figures.glb` avec ses seuls rôles : relancer les 23 avant de committer.
-Rôles, places et gestes se déclarent dans `roles()`.
+Un essai réécrit le .glb de sa troupe avec ses seuls rôles : relancer la troupe entière avant de committer.
+Le bouc se regénère à part (`$BLENDER -b -P beit_hamikdash_seir.py`, quelques secondes), avant la troupe de Kippour.
 
-La nuit de Sim'hat Beit HaSho'éva a sa propre troupe, que la visite ne charge qu'à la première nuit :
-les Léviim des quinze marches, les deux cohanim aux trompettes, la ronde des danseurs et l'homme aux
-huit torches (`roles_shoeva()`, 26 rôles). Elle écrit `visite/figures_shoeva.glb` et `.json`. Torches et
-trompettes ne sont pas liées à la peau : `Accessoire` les anime objet par objet, et la visite allume la
+Torches et trompettes ne sont pas liées à la peau : `Accessoire` les anime objet par objet, et la visite allume la
 tête de chaque `*_avouka`.
-
-```sh
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- --troupe figures_shoeva
-```
 
 Corps, peaux, yeux, cheveux, barbes et vêtements viennent de MakeHuman (extension MPFB) : la
 kutonet est la robe de moine `donitz_monk_robe` (CC0) sans pèlerine ni cordon, la robe et le

@@ -163,7 +163,7 @@
   "ezrat_nashim": {
     "nom": "Ezrat Nashim",
     "translit": "Ezrat Nashim",
-    "resume": "The Court of the Women is the large court through which one enters the Temple enclosure, east of the Azara. It measures 135 amot on each side, and four roofless chambers occupy its corners.",
+    "resume": "The Court of the Women is the large court east of the Azara. It measures 135 amot on each side, and four roofless chambers occupy its corners.",
     "cotes": [
       "135 × 135 amot (≈ 65 × 65 m)",
       "open to the sky (tour's choice)",
@@ -181,7 +181,7 @@
         "citation": "וְלִפְנֵי הָעֲזָרָה בַּמִּזְרָח הָיְתָה עֶזְרַת הַנָּשִׁים"
       }
     ],
-    "note": "Tour's choice: the court is shown open to the sky, with the crowd gathered in it. Middot 2:5 says only of the four corner chambers that they are roofless, « וְלֹא הָיוּ מְקוֹרוֹת »."
+    "note": "Tour's choice: the court is shown open to the sky. Middot 2:5 says only of the four corner chambers that they are roofless, « וְלֹא הָיוּ מְקוֹרוֹת »."
   },
   "porte_est_ezrat_nashim": {
     "nom": "Eastern Gate of the Ezrat Nashim",
@@ -252,7 +252,7 @@
         "citation": "נתנו זיזין בכתלים בולטין מן הכותל סביב סביב וכל שנה מסדרין שם גזוזטראות לווחין"
       }
     ],
-    "note": "No source gives its height: the tour sets it at the crest of the corner chambers, running along their walls on the court side without covering them — they remain roofless (Middot 2:5). Columns, balustrade and frieze are choices. No source says how one went up to it: the tour shows no stair. Set aside: Rashi (Sukkah 51b), for whom corbels stayed in the walls and a floor of planks was laid on them every year. Tour's choice: the gallery is shown empty outside the festival; no source says what became of it the rest of the year."
+    "note": "No source gives its height: the tour sets it at the crest of the corner chambers, running along their walls on the court side without covering them — they remain roofless (Middot 2:5). Columns, balustrade and frieze are choices. No source says how one went up to it: the tour shows no stair. Set aside: Rashi (Sukkah 51b), for whom corbels stayed in the walls and a floor of planks was laid on them every year. Tour's choice: the gallery is shown empty, even on the night of Simchat Beit HaShoeva; no source says what became of it the rest of the year."
   },
   "lishkat_haetzim": {
     "nom": "Lishkat HaEtzim",
@@ -2099,7 +2099,7 @@
         "citation": "וְלִשְׁכַּת הָעֵץ הָיְתָה אֲחוֹרֵי שְׁתֵּיהֶן וְהִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל וְהִיא הַנִּקְרֵאת לִשְׁכַּת פַּרְהֶדְרִין"
       }
     ],
-    "note": "Open question: Yoma 19a gives the Kohen Gadol two chambers, Parhedrin and Avtinas, one in the north and one in the south, “and we do not know” which is where; the Gemara finds Parhedrin in the south more plausible, then rejects the argument. Only the Jerusalem Talmud (Yoma 1:5) puts the Avtinas chamber “above Sha'ar HaMayim, and next to his chamber”: the tour sets the Lishkat Parhedrin against it, and so puts both chambers in the south, which Yoma 19a rules out. Set aside: Bartenura (Middot 5:4) and the Rambam (Beit HaBechirah 5:17) identify the Lishkat Parhedrin with the Lishkat HaEtz, in the north, which Abba Shaul says was the chamber of the Kohen Gadol (Middot 5:4). Tour's choice: its place west of the gate."
+    "note": "Open question: Yoma 19a gives the Kohen Gadol two chambers, Parhedrin and Avtinas, one in the north and one in the south, “and we do not know” which is where; the Gemara finds Parhedrin in the south more plausible, then rejects the argument. Only the Jerusalem Talmud (Yoma 1:5) puts the Avtinas chamber “above Sha'ar HaMayim, and next to his chamber”: the tour sets the Lishkat Parhedrin against it, and so puts both chambers in the south, which Yoma 19a rules out. Set aside: Bartenura (Middot 5:4) and the Rambam (Beit HaBechirah 5:17) identify the Lishkat Parhedrin with the Lishkat HaEtz — in the north according to the Rambam, in the south in the text of the Mishna that Bartenura comments on — which Abba Shaul says was the chamber of the Kohen Gadol (Middot 5:4). Tour's choice: its place west of the gate."
   },
   "lishkat_osei_chavitin": {
     "nom": "Lishkat Osei Chavitin",
