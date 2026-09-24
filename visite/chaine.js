@@ -370,7 +370,7 @@ const ETALONNAGE = {
 // Chaque case de la grille en moyenne 8 × 8 ; la grille est relue toutes les
 // quelques images, l'adaptation mettant de toute façon plus d'une seconde à suivre.
 const GRILLE = 16;
-const RELUE_TOUTES = 6;
+const RELUE_TOUTES = 20;
 const PHOTOMETRIE = new THREE.ShaderMaterial({
   uniforms: { tDiffuse: { value: null } },
   vertexShader: OCCLUSION.vertexShader,
@@ -477,9 +477,9 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const teinteFond = new THREE.Color();
   const composeur = new EffectComposer(renderer,
     new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
-  composeur.addPass(new Profondeur(scene, camera));
+  if (PROFIL.preProfondeur) composeur.addPass(new Profondeur(scene, camera));
   const passeScene = new RenderPass(scene, camera);
-  passeScene.clear = false;
+  passeScene.clear = !PROFIL.preProfondeur;
   composeur.addPass(passeScene);
   const passeAO = new ShaderPass(OCCLUSION);
   passeAO.renderToScreen = false;
