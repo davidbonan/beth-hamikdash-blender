@@ -539,8 +539,9 @@ class Enregistreur:
         for k, q in enumerate(rotations[1:], 1):
             if q.dot(rotations[k - 1]) < 0.0:
                 rotations[k] = -q
-        immobile = all((p - positions[0]).length < 1e-5 for p in positions)
-        canaux = [] if immobile and chemin else [("location", i, [p[i] for p in positions]) for i in range(3)]
+        # Un os posé loin de son repos y reste : seul celui qui n'en bouge jamais se passe de courbe.
+        au_repos = all(p.length < 1e-5 for p in positions)
+        canaux = [] if au_repos and chemin else [("location", i, [p[i] for p in positions]) for i in range(3)]
         canaux += [("rotation_quaternion", i, [q[i] for q in rotations]) for i in range(4)]
         for propriete, indice, valeurs in canaux:
             courbe = sac.fcurves.new(prefixe + propriete, index=indice, group_name=groupe)

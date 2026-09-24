@@ -110,7 +110,7 @@
   "candelabres_shoeva": {
     "he": "מנורות של זהב",
     "translit": "Menorot shel zahav (Simhat Beit HaShoeva)",
-    "resume": "Les grands candélabres d'or dressés dans l'Ezrat Nashim pour Simhat Beit HaShoeva. Chacun porte quatre coupes d'or (sefalim) à son sommet et quatre échelles par lesquelles on monte y verser l'huile. Ils dominent toute l'enceinte.",
+    "resume": "Les grands candélabres d'or dressés dans l'Ezrat Nashim pour Simhat Beit HaShoeva. Chacun porte quatre coupes d'or (sefalim) à son sommet et quatre échelles par lesquelles on monte y verser l'huile. Ils s'élèvent bien au-dessus des murs de l'Ezrat Nashim.",
     "cotes": [
       "cinquante amot de haut",
       "quatre coupes (sefalim) d'or au sommet de chacun",
@@ -121,7 +121,7 @@
       {"oeuvre": "Soucca", "ref": "5:2-3", "citation": "מְנוֹרוֹת שֶׁל זָהָב הָיוּ שָׁם, וְאַרְבָּעָה סְפָלִים שֶׁל זָהָב בְּרָאשֵׁיהֶן, וְאַרְבָּעָה סֻלָּמוֹת לְכָל אֶחָד וְאֶחָד"},
       {"oeuvre": "Soucca", "ref": "52b", "citation": ""}
     ],
-    "note": "Choix de la visite : la Mishna parle de « candélabres » sans en donner le nombre ; la visite en dresse quatre. Ils appartiennent à la fête de Soucot : la visite les laisse dressés le jour de Kippour qu'elle représente."
+    "note": "Choix de la visite : la Mishna parle de « candélabres » sans en donner le nombre ; la visite en dresse quatre. Ils appartiennent à la fête de Soucot : la visite les laisse dressés toute l'année, éteints, et ne les allume que la nuit de Sim'hat Beit HaShoeva."
   },
 
   "shofarot": {
@@ -243,7 +243,7 @@
   "cohanim": {
     "he": "בגדי כהונה",
     "translit": "Bigdei kehouna",
-    "resume": "Le cohen hedyot sert en quatre vêtements de lin blanc : la kutonet, les mikhnasayim, la migba'at et l'avnet. La kutonet tombe jusqu'au-dessus du talon et ses manches jusqu'au poignet ; les mikhnasayim couvrent d'au-dessus du nombril jusqu'au genou ; la migba'at est une bande de lin que les fils d'Aharon enroulent « comme un chapeau » ; l'avnet, long de trente-deux amot, s'enroule tour sur tour à hauteur des coudes. Le cohen sert pieds nus : rien ne doit le séparer du dallage. La visite habille ainsi ses six cohanim : au Kiyor, sur le kevesh, à l'angle de l'autel, sur l'autel et dans le Heikhal — chacun a sa fiche.",
+    "resume": "Le cohen hedyot sert en quatre vêtements de lin blanc : la kutonet, les mikhnasayim, la migba'at et l'avnet. La kutonet tombe jusqu'au-dessus du talon et ses manches jusqu'au poignet ; les mikhnasayim couvrent d'au-dessus du nombril jusqu'au genou ; la migba'at est une bande de lin que les fils d'Aharon enroulent « comme un chapeau » ; l'avnet, long de trente-deux amot, s'enroule tour sur tour à hauteur des coudes. Le cohen sert pieds nus : rien ne doit le séparer du dallage. Le parcours du tamid habille ainsi ses six cohanim : au Kiyor, sur le kevesh, à l'angle de l'autel, sur l'autel et dans le Heikhal — chacun a sa fiche.",
     "cotes": [
       "kutonet : jusqu'au-dessus du talon ; manche jusqu'au poignet, large comme la main",
       "mikhnasayim : d'au-dessus du nombril jusqu'au genou",
@@ -270,7 +270,7 @@
   "leviim": {
     "he": "לויים על הדוכן",
     "translit": "Leviim al haDoukhan",
-    "resume": "Les Léviim chantent debout sur le Doukhan, chacun avec son instrument ; selon R. Eliézer ben Yaakov (Middot 2:6), le Doukhan est posé sur la marche qui sépare l'Ezrat Israël de l'Ezrat Cohanim. On n'en compte jamais moins de douze : au moins neuf kinorot, deux nevalim et un seul tziltzal. Aux jours de Shlomo, le Tanakh montre les chanteurs « vêtus de lin ». La visite en pose douze, tournés vers le Sanctuaire, de part et d'autre de l'axe qu'on suit en montant de la porte de Nikanor. Au tamid, Ben Arza frappe le tziltzal et les Léviim entrent dans le chant : dans la visite, le tziltzal bat la mesure.",
+    "resume": "Les Léviim chantent debout sur le Doukhan, chacun avec son instrument ; selon R. Eliézer ben Yaakov (Middot 2:6), le Doukhan est posé sur la marche qui sépare l'Ezrat Israël de l'Ezrat Cohanim. On n'en compte jamais moins de douze : au moins neuf kinorot, deux nevalim et un seul tziltzal. Aux jours de Shlomo, le Tanakh montre les chanteurs « vêtus de lin ». Le parcours du tamid en pose douze, tournés vers le Sanctuaire, de part et d'autre de l'axe qu'on suit en montant de la porte de Nikanor ; la visite libre n'en garde que deux, un kinor et le tziltzal, un de chaque côté. Au tamid, Ben Arza frappe le tziltzal et les Léviim entrent dans le chant : dans la visite libre comme dans le parcours du tamid, le tziltzal bat la mesure.",
     "cotes": [
       "douze Léviim, jamais moins",
       "neuf kinorot, deux nevalim, un tziltzal",
@@ -285,12 +285,12 @@
       {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
       {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
     ],
-    "note": "Choix de la visite : la Mishna ne dit pas comment les Léviim étaient vêtus ; le lin vient de la dédicace du Temple de Shlomo (Divrei HaYamim II 5:12). La kippa blanche, la place sur la marche du haut, face au Sanctuaire, le passage laissé libre sur l'axe et le balancement sont aussi des choix. Retenu : l'avis de R. Eliézer ben Yaakov (Middot 2:6) — une marche d'une ama sépare l'Ezrat Israël de l'Ezrat Cohanim, et le Doukhan est posé dessus. Selon le premier avis de la michna, les deux cours ne sont séparées que par une rangée de saillies (rashei pispasin). Les enfants Léviim, qui se tenaient en bas selon R. Eliézer ben Yaakov (Arakhin 2:6), ont leur fiche au pied du Doukhan."
+    "note": "Choix de la visite : la Mishna ne dit pas comment les Léviim étaient vêtus ; le lin vient de la dédicace du Temple de Shlomo (Divrei HaYamim II 5:12). La kippa blanche, la place sur la marche du haut, face au Sanctuaire, le passage laissé libre sur l'axe et le balancement sont aussi des choix. Retenu : l'avis de R. Eliézer ben Yaakov (Middot 2:6) — une marche d'une ama sépare l'Ezrat Israël de l'Ezrat Cohanim, et le Doukhan est posé dessus. Selon le premier avis de la michna, les deux cours ne sont séparées que par une rangée de saillies (rashei pispasin). Les enfants Léviim, qui se tenaient en bas selon R. Eliézer ben Yaakov (Arakhin 2:6), ont leur fiche au pied du Doukhan dans le parcours du tamid."
   },
   "kiddoush_yadayim": {
     "he": "קידוש ידיים ורגליים",
     "translit": "Kiddoush yadayim veraglayim",
-    "resume": "Avant tout service, le cohen sanctifie ses mains et ses pieds à l'eau du Kiyor : la main droite posée sur le pied droit, la main gauche sur le pied gauche, penché, selon le Rambam. La Torah en fait une loi perpétuelle, « pour qu'ils ne meurent pas », et un service accompli sans ce lavage est invalide. C'est le premier geste du tamid du matin : celui qui a gagné le retrait des cendres s'entend dire « garde-toi de toucher l'ustensile avant d'avoir sanctifié tes mains et tes pieds au Kiyor ». La visite pose ce cohen au sud du Kiyor, penché sur ses pieds.",
+    "resume": "Avant tout service, le cohen sanctifie ses mains et ses pieds à l'eau du Kiyor : la main droite posée sur le pied droit, la main gauche sur le pied gauche, penché, selon le Rambam. La Torah en fait une loi perpétuelle, « pour qu'ils ne meurent pas », et un service accompli sans ce lavage est invalide. C'est le premier geste du tamid du matin : celui qui a gagné le retrait des cendres s'entend dire « garde-toi de toucher l'ustensile avant d'avoir sanctifié tes mains et tes pieds au Kiyor ». Le parcours du tamid pose ce cohen au sud du Kiyor, penché sur ses pieds.",
     "cotes": [
       "mains et pieds ensemble, penché",
       "main droite sur le pied droit, main gauche sur le pied gauche",
@@ -310,7 +310,7 @@
   "aliyat_hakevesh": {
     "he": "העלייה בכבש",
     "translit": "Aliyat hakevesh",
-    "resume": "On ne monte pas à l'autel par des marches — « tu ne monteras pas à mon autel par des degrés » — mais par le kevesh, la rampe de trente-deux amot sur seize adossée au sud de l'autel. Tous ceux qui montent à l'autel montent par la droite, en font le tour et redescendent par la gauche, hors trois services où l'on revient sur ses pas. La visite fait monter ce cohen par le côté est de la rampe et redescendre par l'ouest, en boucle.",
+    "resume": "On ne monte pas à l'autel par des marches — « tu ne monteras pas à mon autel par des degrés » — mais par le kevesh, la rampe de trente-deux amot sur seize adossée au sud de l'autel. Tous ceux qui montent à l'autel montent par la droite, en font le tour et redescendent par la gauche, hors trois services où l'on revient sur ses pas. Le parcours du tamid fait monter ce cohen par le côté est de la rampe et redescendre par l'ouest, en boucle.",
     "cotes": [
       "kevesh : 32 amot de long, 16 de large, au sud de l'autel",
       "montée par la droite, descente par la gauche",
@@ -327,7 +327,7 @@
   "zerika": {
     "he": "זריקת הדם",
     "translit": "Zerikat hadam",
-    "resume": "Le sang du tamid, reçu dans le mizrak à l'égorgement, est porté au coin nord-est de l'autel, puis au coin sud-ouest : deux aspersions « qui en font quatre », chacune touchant deux faces de l'autel. Le reste du sang se verse sur le yessod sud. La visite pose ce cohen au coin nord-est, le mizrak à deux mains.",
+    "resume": "Le sang du tamid, reçu dans le mizrak à l'égorgement, est porté au coin nord-est de l'autel, puis au coin sud-ouest : deux aspersions « qui en font quatre », chacune touchant deux faces de l'autel. Le reste du sang se verse sur le yessod sud. La visite libre et le parcours du tamid posent ce cohen au coin nord-est, le mizrak à deux mains.",
     "cotes": [
       "coin nord-est, puis sud-ouest",
       "deux aspersions qui en font quatre",
@@ -343,7 +343,7 @@
   "melihat_haevarim": {
     "he": "מליחת האברים",
     "translit": "Meli'hat haevarim",
-    "resume": "« Sur tout ton sacrifice tu offriras du sel. » Les neuf cohanim qui ont reçu les membres du tamid les portent au kevesh, les déposent sur sa moitié basse, du côté ouest, et les salent : c'est là qu'un tas de sel est posé sur la rampe. Les membres attendent ainsi pendant que les cohanim lisent le Shema dans la Lishkat HaGazit ; ils ne monteront sur le feu qu'après l'encens. La visite pose un cohen sur la rampe, une patte avant à la main, qui prend le sel et le répand.",
+    "resume": "« Sur tout ton sacrifice tu offriras du sel. » Les neuf cohanim qui ont reçu les membres du tamid les portent au kevesh, les déposent sur sa moitié basse, du côté ouest, et les salent : c'est là qu'un tas de sel est posé sur la rampe. Les membres attendent ainsi pendant que les cohanim lisent le Shema dans la Lishkat HaGazit ; ils ne monteront sur le feu qu'après l'encens. Le parcours du tamid pose un cohen sur la rampe, une patte avant à la main, qui prend le sel et le répand.",
     "cotes": [
       "moitié basse du kevesh, côté ouest",
       "le sel en trois lieux : la Lishkat HaMela'h, le kevesh, le sommet de l'autel",
@@ -361,9 +361,9 @@
   "siddour_hamaarakha": {
     "he": "סידור המערכה",
     "translit": "Siddour hama'arakha",
-    "resume": "« Le cohen y fera brûler du bois, matin après matin. » Les cendres retirées, les cohanim montent les bûches sur l'autel pour dresser la grande ma'arakha, à l'est du foyer, sa face tournée vers l'est. Tout bois convient sauf l'olivier et la vigne ; on prenait d'ordinaire des branches de figuier, de noyer et de pin. La visite pose un cohen sur l'autel, une bûche dans les bras, qu'il abaisse vers le tas avant de se redresser.",
+    "resume": "« Le cohen y fera brûler du bois, matin après matin. » Les cendres retirées, les cohanim montent les bûches sur l'autel pour dresser la grande ma'arakha, à l'est du foyer, sa face tournée vers l'est. Tout bois convient sauf l'olivier et la vigne ; on prenait d'ordinaire des branches de figuier, de noyer et de pin. Le parcours du tamid pose un cohen sur l'autel, une bûche dans les bras, qu'il abaisse vers le tas avant de se redresser.",
     "cotes": [
-      "la grande ma'arakha à l'est de l'autel, face à l'est",
+      "la grande ma'arakha sur le côté est du sommet de l'autel, face à l'est",
       "tout bois sauf l'olivier et la vigne",
       "figuier, noyer, pin"
     ],
@@ -378,7 +378,7 @@
   "hatavat_hanerot": {
     "he": "הטבת הנרות",
     "translit": "Hatavat hanerot",
-    "resume": "Celui qui a gagné le nettoyage de la Menora entre dans le Heikhal. S'il trouve les deux lampes de l'est allumées, il nettoie les cinq autres — mèches brûlées et cendres dans le kouz, huile et mèche neuves — et laisse celles-là ; il revient pour les deux dernières après l'encens. Devant la Menora, une pierre à trois marches sur laquelle il se tient ; il pose le kouz sur la deuxième. La visite pose ce cohen sur la marche haute de la pierre, penché sur les lampes ; le kouz attend sur la deuxième marche.",
+    "resume": "Celui qui a gagné le nettoyage de la Menora entre dans le Heikhal. S'il trouve les deux lampes de l'est allumées, il nettoie les cinq autres — mèches brûlées et cendres dans le kouz, huile et mèche neuves — et laisse celles-là ; il revient ensuite aux deux lampes de l'est : selon Tamid 6:1, avant l'encens, il nettoie l'orientale et laisse l'occidentale allumée ; selon le Rambam (Temidin 6:4), après l'encens, il arrange les deux. Devant la Menora, une pierre à trois marches sur laquelle il se tient ; il pose le kouz sur la deuxième. Le parcours du tamid pose ce cohen sur la marche haute de la pierre, face aux lampes ; le kouz attend sur la deuxième marche.",
     "cotes": [
       "cinq lampes, puis deux",
       "le kouz posé sur la deuxième marche de la pierre",
@@ -387,15 +387,16 @@
     "sources": [
       {"oeuvre": "Shemot", "ref": "30:7", "citation": "בְּהֵיטִיבוֹ אֶת הַנֵּרֹת יַקְטִירֶנָּה"},
       {"oeuvre": "Tamid", "ref": "3:9", "citation": "מִי שֶׁזָּכָה בְדִשּׁוּן הַמְּנוֹרָה, נִכְנַס וּמָצָא שְׁנֵי נֵרוֹת מִזְרָחִיִּים דּוֹלְקִים, מְדַשֵּׁן אֶת הַשְּׁאָר… וְאֶבֶן הָיְתָה לִפְנֵי הַמְּנוֹרָה וּבָהּ שָׁלשׁ מַעֲלוֹת, שֶׁעָלֶיהָ הַכֹּהֵן עוֹמֵד וּמֵטִיב אֶת הַנֵּרוֹת. וְהִנִּיחַ אֶת הַכּוּז עַל מַעֲלָה שְׁנִיָּה וְיָצָא"},
-      {"oeuvre": "Tamid", "ref": "6:1", "citation": "נָטַל אֶת הַכּוּז מִמַּעֲלָה שְׁנִיָּה, וְהִשְׁתַּחֲוָה וְיָצָא"}
+      {"oeuvre": "Tamid", "ref": "6:1", "citation": "נָטַל אֶת הַכּוּז מִמַּעֲלָה שְׁנִיָּה, וְהִשְׁתַּחֲוָה וְיָצָא"},
+      {"oeuvre": "Rambam Temidin", "ref": "6:4", "citation": "וְאַחַר כָּךְ מְפִיסִין פַּיִס שְׁלִישִׁי וּרְבִיעִי וְזוֹכֶה בַּקְּטֹרֶת מִי שֶׁזָּכָה וְנִכְנַס וּמַקְטִיר. וְאַחַר כָּךְ נִכְנַס זֶה שֶׁזָּכָה בְּדִשּׁוּן הַמְּנוֹרָה וּמֵטִיב שְׁתֵּי הַנֵּרוֹת"}
     ],
-    "note": "Non modélisée : la pierre à trois marches devant la Menora ; le cohen se tient au sol, à l'est de la Menora, et n'atteint pas la lampe. La forme du kouz est un choix."
+    "note": "La forme du kouz est un choix."
   },
 
   "tzoarei_haleviim": {
     "he": "צוערי הלויים",
     "translit": "Tzoarei haleviim",
-    "resume": "Un enfant lévi n'entre dans l'Azara pour le service qu'à l'heure où les Léviim se tiennent au chant ; il ne joue pas, il chante, « pour donner du piquant à la mélodie ». Selon R. Eliézer ben Yaakov, les enfants ne comptent pas dans les douze et ne montent pas sur le Doukhan : ils se tiennent à terre, la tête entre les jambes des Léviim, et on les appelait tzoarei haleviim. La visite en pose deux au pied du Doukhan, dans l'Ezrat Israël, deux amot et demie plus bas que leurs aînés.",
+    "resume": "Un enfant lévi n'entre dans l'Azara pour le service qu'à l'heure où les Léviim se tiennent au chant ; il ne joue pas, il chante, « pour donner du piquant à la mélodie ». Selon R. Eliézer ben Yaakov, les enfants ne comptent pas dans les douze et ne montent pas sur le Doukhan : ils se tiennent à terre, la tête entre les jambes des Léviim, et on les appelait tzoarei haleviim. Le parcours du tamid en pose deux au pied du Doukhan, dans l'Ezrat Israël, deux amot et demie plus bas que leurs aînés.",
     "cotes": [
       "à terre, pas sur le Doukhan",
       "hors du compte des douze",
@@ -410,7 +411,7 @@
   "shomer_levi": {
     "he": "שומר מן הלויים",
     "translit": "Shomer",
-    "resume": "Les cohanim gardent le Temple en trois endroits, les Léviim en vingt et un : cinq aux cinq portes du Har HaBayit, quatre à ses angles intérieurs, cinq aux portes de l'Azara, quatre à ses angles extérieurs, et trois aux chambres. L'homme du Har HaBayit fait sa ronde, des torches devant lui ; le garde qu'il trouve endormi, il le frappe de son bâton, et il peut brûler son vêtement. La visite pose un Lévi hors de la porte de Nikanor, sur les degrés, tourné vers l'Ezrat Nashim.",
+    "resume": "Les cohanim gardent le Temple en trois endroits, les Léviim en vingt et un : cinq aux cinq portes du Har HaBayit, quatre à ses angles intérieurs, cinq aux portes de l'Azara, quatre à ses angles extérieurs, et trois aux chambres. L'homme du Har HaBayit fait sa ronde, des torches devant lui ; le garde qu'il trouve endormi, il le frappe de son bâton, et il peut brûler son vêtement. La visite libre pose un Lévi hors de la porte de Nikanor, sur les degrés, tourné vers l'Ezrat Nashim.",
     "cotes": [
       "vingt et un postes de Léviim",
       "cinq aux portes de l'Azara",
@@ -427,7 +428,7 @@
   "anshei_maamad": {
     "he": "אנשי המעמד",
     "translit": "Anshei ma'amad",
-    "resume": "« Comment le korban d'un homme peut-il être offert sans qu'il se tienne auprès ? » Les premiers prophètes ont institué vingt-quatre gardes, et pour chaque garde de cohanim un ma'amad à Jérusalem, de cohanim, de Léviim et d'Israélites : les Israélites du ma'amad montent se tenir auprès du tamid, au nom de tout Israël. Leur place est l'Ezrat Israël, la bande de onze amot à l'est de l'Ezrat Cohanim, qu'ils ne franchissent que pour la semikha, la she'hita et la tenoufa. La visite en pose deux, tournés vers l'autel, l'un enveloppé du talith.",
+    "resume": "« Comment le korban d'un homme peut-il être offert sans qu'il se tienne auprès ? » Les premiers prophètes ont institué vingt-quatre gardes, et pour chaque garde de cohanim un ma'amad à Jérusalem, de cohanim, de Léviim et d'Israélites : ceux du ma'amad qui sont à Jérusalem ou près d'elle se tiennent auprès du tamid, au nom de tout Israël ; les autres se rassemblent dans leurs villes. Leur place est l'Ezrat Israël, la bande de onze amot à l'est de l'Ezrat Cohanim, qu'ils ne franchissent que pour la semikha, la she'hita et la tenoufa. Le parcours du tamid en pose deux, tournés vers le Sanctuaire, l'un enveloppé du talith ; la visite libre, un seul, enveloppé du talith.",
     "cotes": [
       "Ezrat Israël : onze amot de large sur les 135 de la cour",
       "vingt-quatre ma'amadot, un par garde",
@@ -588,13 +589,13 @@
   "leviim_hamaalot": {
     "he": "לויים על חמש עשרה מעלות",
     "translit": "Leviim al 'hamesh esreh maalot",
-    "resume": "À Sim'hat Beit HaSho'éva, les Léviim se tiennent sur les quinze marches qui descendent de l'Ezrat Israël à l'Ezrat Nashim, avec kinorot, nevalim, cymbales, trompettes et instruments sans nombre, et disent le chant. Quinze marches, comme les quinze Chants des degrés des Psaumes. Le reste de l'année, le chant du korban se dit sur le Doukhan, près de l'autel. La visite en pose quinze, un par marche, tournés vers l'Ezrat Nashim.",
+    "resume": "À Sim'hat Beit HaSho'éva, les Léviim se tiennent sur les quinze marches qui descendent de l'Ezrat Israël à l'Ezrat Nashim, avec kinorot, nevalim, cymbales, trompettes et instruments sans nombre, et disent le chant. Quinze marches, comme les quinze Chants des degrés des Psaumes. Le reste de l'année, le chant du korban se dit sur le Doukhan, près de l'autel. La nuit de Souccot, la visite en pose quinze, un par marche, tournés vers l'Ezrat Nashim.",
     "cotes": [
       "quinze marches, de l'Ezrat Israël à l'Ezrat Nashim",
       "instruments « sans nombre »",
       "un Lévi par marche"
     ],
-    "note": "Choix de la visite : un Lévi par marche, leur instrument et leur orientation. La Mishna ne donne ni leur nombre ni leur place. La kutonet de lin est reprise des chanteurs du Doukhan.",
+    "note": "Choix de la visite : un Lévi par marche, leur instrument et leur orientation. La Mishna ne donne ni leur nombre ni leur place sur les marches. La kutonet de lin est reprise des chanteurs du Doukhan.",
     "sources": [
       {
         "oeuvre": "Soucca",
@@ -611,7 +612,7 @@
   "tokei_hatzotzrot": {
     "he": "שני כהנים בחצוצרות",
     "translit": "Shnei kohanim ba'hatzotzrot",
-    "resume": "Deux cohanim se tiennent à la porte haute qui descend de l'Ezrat Israël à l'Ezrat Nashim, deux trompettes en main. Au chant du coq, ils sonnent teki'a, terou'a, teki'a : c'est le signal pour aller puiser l'eau de la libation au Shilo'ah. Ils sonnent encore à la dixième marche, encore en arrivant au sol de la cour, puis vont en sonnant jusqu'à la porte qui sort à l'est. Là, ils se tournent vers l'ouest : « et nous, vers HaShem sont nos yeux ». La visite les montre à la porte, avant la descente.",
+    "resume": "Deux cohanim se tiennent à la porte haute qui descend de l'Ezrat Israël à l'Ezrat Nashim, deux trompettes en main. Quand le gever appelle — le coq selon Rabbi Sheila, le crieur du Temple selon Rav (Yoma 20b) —, ils sonnent teki'a, terou'a, teki'a : c'est le signal pour aller puiser l'eau de la libation au Shilo'ah. Ils sonnent encore à la dixième marche, encore en arrivant au sol de la cour, puis vont en sonnant jusqu'à la porte qui sort à l'est. Là, ils se tournent vers l'ouest : « et nous, vers HaShem sont nos yeux ». La nuit de Souccot, la visite les montre à la porte, avant la descente.",
     "cotes": [
       "deux cohanim, deux trompettes",
       "teki'a, terou'a, teki'a",
@@ -639,7 +640,7 @@
   "hassidim_veanshei_maase": {
     "he": "חסידים ואנשי מעשה",
     "translit": "'Hassidim ve-anshei ma'asse",
-    "resume": "Les 'hassidim et les hommes d'action dansent devant l'assemblée, des torches allumées à la main, et disent devant elle des chants et des louanges. La guemara rapporte leurs mots : « Heureuse notre jeunesse, qui n'a pas fait honte à notre vieillesse. » Le Bartenura précise qu'ils jonglaient, avec quatre torches ou avec huit, en lançant l'une et en rattrapant l'autre. La visite en fait une ronde de huit danseurs, autour de l'homme aux huit torches.",
+    "resume": "Les 'hassidim et les hommes d'action dansent devant l'assemblée, des torches allumées à la main, et disent devant elle des chants et des louanges. La guemara rapporte leurs mots : « Heureuse notre jeunesse, qui n'a pas fait honte à notre vieillesse. » Le Bartenura précise qu'ils jonglaient, avec quatre torches ou avec huit, en lançant l'une et en rattrapant l'autre. La nuit de Souccot, la visite en fait une ronde de huit danseurs, autour de l'homme aux huit torches.",
     "cotes": [
       "des torches à la main",
       "des chants et des louanges",
@@ -667,7 +668,7 @@
   "shemone_avoukot": {
     "he": "שמונה אבוקות",
     "translit": "Shmoneh avoukot",
-    "resume": "On disait de Rabban Shimon ben Gamliel qu'à Sim'hat Beit HaSho'éva, il prenait huit torches allumées. Il en lançait une, en rattrapait une, et elles ne se touchaient pas. La visite montre le geste sans prétendre montrer l'homme : huit torches, quatre par main, relancées chacune par la main qui l'a reçue.",
+    "resume": "On disait de Rabban Shimon ben Gamliel qu'à Sim'hat Beit HaSho'éva, il prenait huit torches allumées. Il en lançait une, en rattrapait une, et elles ne se touchaient pas. La nuit de Souccot, la visite montre le geste sans prétendre montrer l'homme : huit torches, quatre par main, relancées chacune par la main qui l'a reçue.",
     "cotes": [
       "huit torches",
       "« elles ne se touchaient pas »"
@@ -685,5 +686,86 @@
         "citation": "בְּאַרְבַּע אֲבוּקוֹת אוֹ בִּשְׁמֹנֶה, זוֹרֵק זוֹ וּמְקַבֵּל אֶת זוֹ"
       }
     ]
+  },
+  "sair_hamishtaleach": {
+    "he": "וידוי על השעיר המשתלח",
+    "translit": "Viduy 'al ha-sa'ir ha-mishtalea'h",
+    "resume": "Le Cohen Gadol, dans ses quatre habits de lin blanc, vient au bouc qui sera envoyé à Azazel. On lui a noué sur la tête une langue d'écarlate et on l'a placé face à la porte par où il partira. Le Cohen Gadol pose sur lui ses deux mains et confesse les fautes de tout Israël, en prononçant le Nom tel qu'il s'écrit. Puis il le remet à celui qui le conduit au désert. Le parcours de Yom Kippour le montre les deux paumes sur le front du bouc, au nord-est de l'autel.",
+    "cotes": [
+      "quatre habits de lin blanc",
+      "les deux mains sur le bouc",
+      "le Nom prononcé trois fois"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "6:2",
+        "citation": "בָּא לוֹ אֵצֶל שָׂעִיר הַמִּשְׁתַּלֵּחַ וְסוֹמֵךְ שְׁתֵּי יָדָיו עָלָיו וּמִתְוַדֶּה"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "4:2",
+        "citation": "קָשַׁר לָשׁוֹן שֶׁל זְהוֹרִית בְּרֹאשׁ שָׂעִיר הַמִּשְׁתַּלֵּחַ וְהֶעֱמִידוֹ כְנֶגֶד בֵּית שִׁלּוּחוֹ"
+      },
+      {
+        "oeuvre": "Rambam Klei HaMikdash",
+        "ref": "8:3",
+        "citation": "בִּגְדֵי לָבָן הֵם אַרְבָּעָה כֵּלִים שֶׁמְּשַׁמֵּשׁ בָּהֶן כֹּהֵן גָּדוֹל בְּיוֹם הַכִּפּוּרִים. כֻּתֹּנֶת. וּמִכְנָסָיִם. וְאַבְנֵט. וּמִצְנֶפֶת. וְאַרְבָּעָתָן לְבָנִים… וּמִן הַפִּשְׁתָּן לְבַדּוֹ הֵם"
+      },
+      {
+        "oeuvre": "Rambam Klei HaMikdash",
+        "ref": "8:2",
+        "citation": "כֹּהֵן גָּדוֹל צוֹנֵף בָּהּ כְּמִי שֶׁלּוֹפֵף עַל הַשֶּׁבֶר"
+      },
+      {
+        "oeuvre": "Rambam Ma'asse HaKorbanot",
+        "ref": "3:14",
+        "citation": "וְהַסּוֹמֵךְ עוֹמֵד בַּמִּזְרָח וּפָנָיו לַמַּעֲרָב וּמַנִּיחַ שְׁתֵּי יָדָיו בֵּין שְׁתֵּי קַרְנָיו"
+      },
+      {
+        "oeuvre": "Rambam Avodat Yom HaKippurim",
+        "ref": "2:6",
+        "citation": "וּמַזְכִּיר אֶת הַשֵּׁם בְּכָל וִדּוּי מֵהֶן שָׁלֹשׁ פְּעָמִים… וּבְכֻלָּם הוּא מַזְכִּיר כִּכְתָבוֹ שֶׁהוּא הַשֵּׁם הַמְפֹרָשׁ"
+      }
+    ],
+    "note": "Choix de la visite : la Mishna dit vers où le bouc est tourné, pas où se tient le Cohen Gadol. La visite le met contre le flanc du bouc, tourné comme lui, les mains entre les cornes. La place au nord-est de l'autel, la race du bouc et la façon de nouer la langue d'écarlate sont aussi des choix. La mitznefet est la même bande de lin que la migba'at des cohanim, enroulée à plat."
+  },
+  "korim_oumishtahavim": {
+    "he": "כורעים ומשתחווים",
+    "translit": "Kor'im ou-mishta'havim",
+    "resume": "Quand les cohanim et le peuple debout dans l'Azara entendaient le Nom sortir de la bouche du Cohen Gadol, ils s'agenouillaient, se prosternaient et tombaient sur leur face. Ils disaient : « Béni soit le nom de la gloire de Sa royauté, pour toujours. » Le Rambam compte dix fois le Nom ce jour-là : trois à chacun des trois viduy, et une au tirage au sort. La prosternation complète, bras et jambes étendus, face contre terre, n'est permise sur la pierre qu'au Temple. Le parcours de Yom Kippour montre les cohanim dans l'Ezrat Cohanim et les Israélites dans l'Ezrat Israël, étendus, la tête vers le Heikhal.",
+    "cotes": [
+      "à genoux, prosternés, face contre terre",
+      "bras et jambes étendus",
+      "dix fois le Nom ce jour-là"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "6:2",
+        "citation": "וְהַכֹּהֲנִים וְהָעָם הָעוֹמְדִים בָּעֲזָרָה, כְּשֶׁהָיוּ שׁוֹמְעִים שֵׁם הַמְפֹרָשׁ שֶׁהוּא יוֹצֵא מִפִּי כֹהֵן גָּדוֹל, הָיוּ כּוֹרְעִים וּמִשְׁתַּחֲוִים וְנוֹפְלִים עַל פְּנֵיהֶם, וְאוֹמְרִים, בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ לְעוֹלָם וָעֶד"
+      },
+      {
+        "oeuvre": "Rambam Avodat Yom HaKippurim",
+        "ref": "2:6",
+        "citation": "וּמַזְכִּיר אֶת הַשֵּׁם בְּכָל וִדּוּי מֵהֶן שָׁלֹשׁ פְּעָמִים… נִמְצָא מַזְכִּיר אֶת הַשֵּׁם בַּיּוֹם זֶה עֶשֶׂר פְּעָמִים"
+      },
+      {
+        "oeuvre": "Rambam Avodat Yom HaKippurim",
+        "ref": "2:7",
+        "citation": "כָּל הַכֹּהֲנִים וְהָעָם הָעוֹמְדִים בָּעֲזָרָה כְּשֶׁהֵם שׁוֹמְעִים אֶת הַשֵּׁם הַמְפֹרָשׁ יוֹצֵא מִפִּי כֹּהֵן גָּדוֹל… הָיוּ כּוֹרְעִים וּמִשְׁתַּחֲוִים וְנוֹפְלִים עַל פְּנֵיהֶם"
+      },
+      {
+        "oeuvre": "Rambam Tefila",
+        "ref": "5:13",
+        "citation": "הִשְׁתַּחֲוָיָה זֶה פִּשּׁוּט יָדַיִם וְרַגְלַיִם עַד שֶׁנִּמְצָא מֻטָּל עַל פָּנָיו אַרְצָה"
+      },
+      {
+        "oeuvre": "Rambam Tefila",
+        "ref": "5:14",
+        "citation": "וְאָסוּר לַעֲשׂוֹת הִשְׁתַּחֲוָיָה עַל הָאֲבָנִים אֶלָּא בַּמִּקְדָּשׁ"
+      }
+    ],
+    "note": "Choix de la visite : la Mishna donne les trois gestes, pas la pose finale. La visite les fige étendus, selon la définition du Rambam. Le nombre de prosternés et leurs places sont aussi des choix. Les Israélites portent ce que leur communauté porte aujourd'hui à Kippour, et vont pieds nus, comme tous les fidèles de la visite."
   }
 }

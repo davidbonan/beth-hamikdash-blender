@@ -8,7 +8,7 @@ import { cartesLumiere, cartesOcclusion } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
-import { SOLEIL, brumer, domeVu, environnement, peindreDome, teinterAir } from "./ciel.js";
+import { astreDu, brumer, domeVu, environnement, peindreDome, teinterAir } from "./ciel.js";
 import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { commandes } from "./pilotage.js";
@@ -105,22 +105,30 @@ installerLangue(textes);
 // Encadrée par l'accueil, la scène marche seule et se tait : ni barre, ni fiche, ni initiation.
 const CINEMA = new URLSearchParams(location.search).has("cinema");
 document.documentElement.classList.toggle("cinema", CINEMA);
-// La troupe de chaque moment : celle du jour descend avec la visite, celle de la nuit à la première nuit.
+// Une troupe pour la visite libre, une par parcours : chacune descend la première fois qu'on la demande.
 // Chemins écrits en entier : empreintes.py ne signe que ceux qu'il lit.
 const TROUPES = {
-  jour: { glb: "./figures.glb", json: "./figures.json" },
-  nuit: { glb: "./figures_shoeva.glb", json: "./figures_shoeva.json" },
+  figures: { glb: "./figures.glb", json: "./figures.json" },
+  figures_tamid: { glb: "./figures_tamid.glb", json: "./figures_tamid.json" },
+  figures_kippour: { glb: "./figures_kippour.glb", json: "./figures_kippour.json" },
+  figures_shoeva: { glb: "./figures_shoeva.glb", json: "./figures_shoeva.json" },
 };
+const TROUPE_LIBRE = "figures";
 const [reperes, { cadrages: CADRAGES_DU_PLAN }, haltesCinema, { parcours: PARCOURS }, ...distributions] =
   await Promise.all([json("./reperes.json"), json("./plan.json"), CINEMA ? json("./cinema.json") : null,
     json("./parcours.json"), ...Object.values(TROUPES).map((t) => json(t.json))]);
-const figurants = Object.fromEntries(Object.keys(TROUPES).map((quand, i) => [quand, distributions[i]]));
+const figurants = Object.fromEntries(Object.keys(TROUPES).map((nom, i) => [nom, distributions[i]]));
+// Un concept joué par plusieurs troupes — les Léviim, douze au tamid, deux en visite libre — prend la boîte de toutes.
+const unirBoites = (a, b) => (a ? {
+  min: a.min.map((v, k) => Math.min(v, b.min[k])),
+  max: a.max.map((v, k) => Math.max(v, b.max[k])),
+} : b);
 for (const { emprises, vues } of distributions) {
-  Object.assign(reperes.emprises, emprises);
-  reperes.vues.push(...vues);
+  for (const [id, boite] of Object.entries(emprises)) reperes.emprises[id] = unirBoites(reperes.emprises[id], boite);
+  reperes.vues.push(...vues.filter((vue) => !reperes.vues.some((v) => v.id === vue.id)));
 }
-const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) =>
-  [id, new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max))]));
+const enBoite = (b) => new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max));
+const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) => [id, enBoite(b)]));
 
 const traductions = new Map();
 function contenusTraduits(code) {
@@ -165,9 +173,15 @@ const AIR_DEHORS = brume.density;
 // La lumière de chaque moment qu'un parcours demande. La nuit est celle de Sim'hat Beit HaSho'éva
 // (Soucca 5:2) : le 16 Tishri, la lune pleine se lève à l'est, là où la visite pose son soleil du matin.
 // La lumière cuite est celle du ciel de jour : la nuit n'en garde que ce que la lune en laisse.
+// Au chant du coq, la même lune, couchante à l'ouest (ciel.js).
+// Avant l'aube, sans lune, et à l'aube, sans soleil, l'astre n'est plus que la lueur de l'est.
+// `feu` : le feu de l'autel, qui brûle toute la nuit (Vayikra 6:2) et que le jour noie.
 const ECLAIRAGES = {
-  jour: { astre: { couleur: 0xffd6a0, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false },
-  nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true },
+  jour: { astre: { couleur: 0xffd6a0, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false },
+  nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true },
+  fin_de_nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true },
+  avant_l_aube: { astre: { couleur: 0xa9bde0, intensite: 0 }, appoint: 0, ciel: 0.05, cuite: 0.12, shoeva: false, feu: true },
+  aube: { astre: { couleur: 0xb4c0d8, intensite: 0.6 }, appoint: 0.03, ciel: 0.05, cuite: 0.25, shoeva: false, feu: true },
 };
 
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
@@ -224,6 +238,9 @@ const ARCHE = { couleur: 0xffeed2, intensite: 9, portee: 6, carte: 512 };
 const BRAISE = { couleur: 0xff7a2a, intensite: 6, portee: 8, carte: 512 };
 let braise = null;
 let vacillement = 0;
+// Le feu de l'autel, une lampe au-dessus des ma'arakhot : de nuit, la seule lumière de l'Azara (Tamid 1:4).
+const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteur: 3.0 };
+let feuDeLAutel = null;
 
 // La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
 function poserLampe(reglage, position, ombre) {
@@ -269,6 +286,9 @@ function vaciller(dt) {
   if (lumiereMenora) {
     lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
   }
+  if (feuDeLAutel) {
+    feuDeLAutel.intensity = ECLAIRAGES[moment].feu ? FEU.intensite * (0.9 + 0.06 * Math.sin(t * 2.3) + 0.04 * Math.sin(t * 6.1 + 1.3)) : 0;
+  }
   if (!braise) return;
   const souffle = 0.86 + 0.09 * Math.sin(t * 1.7) + 0.05 * Math.sin(t * 4.3 + 1.0) + 0.04 * (Math.random() - 0.5);
   braise.intensity = BRAISE.intensite * souffle;
@@ -299,6 +319,7 @@ const HAUTEUR_FLAMME_SHOEVA = 1.2;
 // Les torches de la ronde, en une lueur sans ombre : une lampe par torche, c'est un nuanceur par torche.
 const LUEUR = { couleur: 0xffa860, intensite: 40, portee: 16, hauteur: 1.5 };   // m : des mèches de caleçons et de ceintures de cohanim (Soucca 5:3)
 let moment = "jour";
+let directionDeLAstre = astreDu(moment);
 let shoeva = null;
 let lumiereCuiteDuCiel = null;
 const reflets = { jour: scene.environment };
@@ -367,15 +388,21 @@ function lumieresCuitesAuCiel() {
   return intensites;
 }
 
-// Les mâts ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
+function allumerLeFeu() {
+  const dessus = EMPRISES.get("maarakhot");
+  const foyer = dessus.getCenter(new THREE.Vector3()).setY(dessus.max.y + FEU.hauteur);
+  return poserLampe(FEU, foyer, PROFIL.menora.ombre);
+}
+
+// Les mâts et le feu ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
 async function passerAu(voulu) {
   if (voulu === moment) return;
   moment = voulu;
-  montrerTroupes();
   const eclairage = ECLAIRAGES[voulu];
   soleil.color.set(eclairage.astre.couleur);
   soleil.intensity = eclairage.astre.intensite;
-  soleil.shadow.needsUpdate = true;
+  directionDeLAstre = astreDu(voulu);
+  ANCRE_OMBRE.set(Infinity, Infinity, Infinity);
   appoint.intensity = eclairage.appoint;
   cielAmbiant.intensity = eclairage.ciel;
   peindreDome(ciel, voulu);
@@ -383,13 +410,16 @@ async function passerAu(voulu) {
   scene.environment = reflets[voulu] ??= environnement(renderer, voulu);
   lumiereCuiteDuCiel ??= lumieresCuitesAuCiel();
   for (const [materiau, intensite] of lumiereCuiteDuCiel) materiau.lightMapIntensity = intensite * eclairage.cuite;
+  const feuAllume = feuDeLAutel === null && eclairage.feu;
+  if (feuAllume) feuDeLAutel = allumerLeFeu();
   const premiere = shoeva === null && eclairage.shoeva;
   if (premiere) shoeva = poserShoeva();
-  if (shoeva === null) return;
-  for (const f of shoeva.flammes) f.visible = eclairage.shoeva;
-  // Les coupes sont sous la lampe de leur mât : leur ombre posait quatre disques noirs sur les murs.
-  for (const o of shoeva.candelabres) o.castShadow = !eclairage.shoeva;
-  if (premiere) await rendu.compiler();
+  if (shoeva !== null) {
+    for (const f of shoeva.flammes) f.visible = eclairage.shoeva;
+    // Les coupes sont sous la lampe de leur mât : leur ombre posait quatre disques noirs sur les murs.
+    for (const o of shoeva.candelabres) o.castShadow = !eclairage.shoeva;
+  }
+  if (premiere || feuAllume) await rendu.compiler();
 }
 
 // Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
@@ -539,8 +569,10 @@ if (!brut) {
 const troupes = {};
 const chargements = {};
 const MARGE_GESTE = 0.35;
-const EMPRISES_FIGURANTS = Object.fromEntries(Object.entries(figurants).map(([quand, { emprises }]) =>
-  [quand, Object.keys(emprises).map((id) => EMPRISES.get(id))]));
+const EMPRISES_FIGURANTS = Object.fromEntries(Object.entries(figurants).map(([nom, { emprises }]) =>
+  [nom, Object.values(emprises).map(enBoite)]));
+// La voulue change à la demande, la présente sous le voile du fondu qui suit.
+let troupeVoulue = TROUPE_LIBRE, troupePresente = TROUPE_LIBRE;
 const PRISE = new THREE.MeshBasicMaterial();
 const HAUTEUR_FLAMME_TORCHE = 0.3;
 
@@ -585,10 +617,10 @@ function suivreTorches(troupe) {
   for (const { torche, meche, bout } of troupe.torches) meche.position.copy(bout).applyMatrix4(torche.matrixWorld);
 }
 
-// La troupe d'un autre moment se cache, et ses prises sortent de ce que le doigt vise.
+// Les autres troupes se cachent, et leurs prises sortent de ce que le doigt vise.
 function montrerTroupes() {
-  for (const [quand, troupe] of Object.entries(troupes)) {
-    const presente = quand === moment;
+  for (const [nom, troupe] of Object.entries(troupes)) {
+    const presente = nom === troupePresente;
     troupe.scene.visible = presente;
     for (const { meche } of troupe.torches) meche.visible = presente;
     for (const prise of troupe.prises) {
@@ -600,7 +632,7 @@ function montrerTroupes() {
 }
 
 // Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
-async function poserFigurants(quand, { scene: troupe, animations }) {
+async function poserFigurants(nom, { scene: troupe, animations }) {
   const melangeur = new THREE.AnimationMixer(troupe);
   for (const clip of animations) melangeur.clipAction(clip).play();
   melangeur.update(0);
@@ -610,16 +642,21 @@ async function poserFigurants(quand, { scene: troupe, animations }) {
   await rendu.compiler(troupe);
   scene.add(troupe);
   troupe.updateMatrixWorld(true);
-  troupes[quand] = { scene: troupe, melangeur, prises, torches };
-  suivreTorches(troupes[quand]);
+  troupes[nom] = { scene: troupe, melangeur, prises, torches };
+  suivreTorches(troupes[nom]);
   montrerTroupes();
 }
 
-function chargerTroupe(quand) {
-  chargements[quand] ??= chargeur.loadAsync(TROUPES[quand].glb).then((g) => poserFigurants(quand, g));
-  return chargements[quand];
+function chargerTroupe(nom) {
+  chargements[nom] ??= chargeur.loadAsync(TROUPES[nom].glb).then((g) => poserFigurants(nom, g));
+  return chargements[nom];
 }
-chargerTroupe("jour");
+chargerTroupe(TROUPE_LIBRE);
+
+function presenterTroupe(voulue) {
+  troupePresente = voulue;
+  montrerTroupes();
+}
 
 // Jérusalem autour du Temple descend en dernier : on s'y pose aussi, et on s'y cogne.
 async function poserPays({ scene: pays }) {
@@ -1138,15 +1175,15 @@ const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
 const PAS_OMBRE = PROFIL.ombres.portee / 10;
 
 // Une carte figée garderait l'ombre des figurants à leur pose de départ.
-const figurantsDansLOmbre = () => PROFIL.figurants.ombre && moment in troupes
-  && EMPRISES_FIGURANTS[moment].some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
+const figurantsDansLOmbre = () => PROFIL.figurants.ombre && troupePresente in troupes
+  && EMPRISES_FIGURANTS[troupePresente].some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
 
 function suivreSoleil() {
   if (figurantsDansLOmbre()) soleil.shadow.needsUpdate = true;
   if (camera.position.distanceToSquared(ANCRE_OMBRE) < PAS_OMBRE * PAS_OMBRE) return;
   ANCRE_OMBRE.copy(camera.position);
   soleil.target.position.copy(camera.position);
-  soleil.position.copy(camera.position).addScaledVector(SOLEIL, RECUL_SOLEIL);
+  soleil.position.copy(camera.position).addScaledVector(directionDeLAstre, RECUL_SOLEIL);
   soleil.target.updateMatrixWorld();
   soleil.shadow.needsUpdate = true;
 }
@@ -1154,7 +1191,7 @@ function suivreSoleil() {
 function dessiner(dt) {
   for (const u of horloges) u.value += dt;
   vaciller(dt);
-  const troupe = troupes[moment];
+  const troupe = troupes[troupePresente];
   if (troupe) {
     troupe.melangeur.update(dt);
     suivreTorches(troupe);
@@ -1230,8 +1267,13 @@ const guides = parcours({
   }),
   changerDeMoment: (voulu) => {
     if (voulu === moment) return;
-    chargerTroupe(voulu);
     fondu(() => passerAu(voulu));
+  },
+  changerDeTroupe: (voulue = TROUPE_LIBRE) => {
+    if (voulue === troupeVoulue) return;
+    troupeVoulue = voulue;
+    chargerTroupe(voulue);
+    fondu(() => presenterTroupe(voulue));
   },
   ouvrirFiche: montrer,
   fermerFiche: fermer,
@@ -1348,5 +1390,5 @@ window.__mur = (origine, direction, portee) => {
   return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
 };
 window.__parcours = guides;
-window.__temps = (t) => { troupes[moment]?.melangeur.setTime(t); dessiner(0); };
+window.__temps = (t) => { troupes[troupePresente]?.melangeur.setTime(t); dessiner(0); };
 window.__pret = true;

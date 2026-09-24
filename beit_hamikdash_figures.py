@@ -158,6 +158,14 @@ def metal():
     return _matiere("Figure_Metal", 0.32, 1.0)
 
 
+def poil():
+    return _matiere("Figure_Poil", 0.9)
+
+
+def corne():
+    return _matiere("Figure_Corne", 0.45)
+
+
 _teintes = {}
 
 
@@ -202,6 +210,12 @@ def teinter_objet(objet, facteur, cote=1024):
             if noeud.bl_idname == "ShaderNodeTexImage" and noeud.image and "normal" not in noeud.image.name \
                     and not noeud.image.name.endswith(("_hn.png", "_s.png")):
                 noeud.image = teinter(noeud.image, facteur, cote)
+
+
+# Un maillage sans couleur de sommets en reçoit une seule : la matière des figures la lit.
+def teinter_maillage(me, couleur):
+    couleurs = me.color_attributes.new("Color", "BYTE_COLOR", "CORNER")
+    couleurs.data.foreach_set("color", [*couleur, 1.0] * len(me.loops))
 
 
 # `pieces` : rangs, de la plus grande à la plus petite, des parties du maillage gardées ; `epaules` : « manches » ou tout
@@ -646,19 +660,27 @@ def tube(chemin, rayons, n):
 
 
 # Avnet de trois doigts, tour sur tour (Klei HaMikdash 8:19), brodé (8:1), aux coudes (Rashi Shemot 28:7) ; rayures : CHOIX.
-AVNET = ((0.000, LIN), (0.010, TEKHELET), (0.022, ARGAMAN), (0.034, SHANI), (0.046, TEKHELET), (0.056, LIN), (0.064, LIN))
+class Teintes(NamedTuple):
+    bandes: tuple
+    raies: tuple
 
 
-def avnet(mm, ceinture, surface):
+AVNET_BRODE = Teintes(((0.000, LIN), (0.010, TEKHELET), (0.022, ARGAMAN), (0.034, SHANI), (0.046, TEKHELET), (0.056, LIN),
+                       (0.064, LIN)), (TEKHELET, ARGAMAN, SHANI))
+# « וְאַרְבַּעְתָּן לְבָנִים … וּמִן הַפִּשְׁתָּן לְבַדּוֹ הֵם » (Rambam Klei HaMikdash 8:3) : à Kippour, l'avnet est de lin seul.
+AVNET_DE_LIN = Teintes(tuple((dz, LIN) for dz, _ in AVNET_BRODE.bandes), (LIN,) * 3)
+
+
+def avnet(mm, ceinture, surface, teintes=AVNET_BRODE):
     z0 = ceinture.z - 0.032
     th = _angles()
     anneaux, couleurs = [], []
-    for dz, couleur in AVNET:
-        epaisseur = 0.003 if dz in (0.0, AVNET[-1][0]) else 0.010
+    for dz, couleur in teintes.bandes:
+        epaisseur = 0.003 if dz in (0.0, teintes.bandes[-1][0]) else 0.010
         anneaux.append([ceinture.point(t, z0 + dz, epaisseur) for t in th])
         couleurs.append(couleur)
     mm.nappe(anneaux, lambda i, j: couleurs[i + 1], "buste")
-    raies = (TEKHELET, ARGAMAN, SHANI)
+    raies = teintes.raies
     for depart, longueur in ((0.42, 0.52), (0.52, 0.44)):
         travers = Vector((math.cos(depart), math.sin(depart), 0.0))
         rangs = []
@@ -730,6 +752,11 @@ def migbaat(mm, humain, tours=5.0, par_tour=40, largeur=0.048, epaisseur=0.009, 
         sections.append([centre + dehors * a + haut * b for a, b in profil])
     mm.nappe(sections, LIN, "head")
     coiffe(mm, h, [(-0.035, 0.010, 0.80), (-0.015, 0.010, 0.62), (0.0, 0.008, 0.42), (0.008, 0.004, 0.2)], LIN, "head")
+
+
+# « כֹּהֵן גָּדוֹל צוֹנֵף בָּהּ כְּמִי שֶׁלּוֹפֵף עַל הַשֶּׁבֶר » (Rambam Klei HaMikdash 8:2) : la même bande, enroulée à plat.
+def mitznefet(mm, humain):
+    migbaat(mm, humain, tours=6.0, montee=0.010)
 
 
 HAUT_Z = Vector((0.0, 0.0, 1.0))
@@ -1196,7 +1223,6 @@ def _poils(nom, gris):
 KUTONET = Habit("donitz_monk_robe", "Figure_Kutonet", LIN, pieces=(0, 2, 3), longue=True, epaules="haut")
 ROBE = Habit("punkduck_medieval_dress", "Figure_Robe", LAINE_BLEUE, longue=True)
 COSTUME = Habit("male_elegantsuit01", epaules="manches")
-CHAUSSURES = Habit("shoes03")
 
 
 # Les faces de la robe sont larges : coupées au plan d'abord, sinon celles qui l'enjambent dressent des ailerons.
@@ -1294,20 +1320,38 @@ def empiecement(humain, robe, ecart=0.008, rangs=12, n=56):
     bpy.data.meshes.remove(entiere.data)
 
 
-# Lin (Rambam Klei HaMikdash 8:1), pieds nus (Zeva'him 24a).
+class Habits(NamedTuple):
+    avnet: Teintes
+    coiffe: object
+
+
+BIGDEI_KEHOUNA = Habits(AVNET_BRODE, migbaat)
+BIGDEI_LAVAN = Habits(AVNET_DE_LIN, mitznefet)
+
+
 def cohen(nom, gabarit=Gabarit(), gris=False):
-    h = Humain(nom, gabarit, **_poils(nom, gris))
+    return vetir_de_lin(Humain(nom, gabarit, **_poils(nom, gris)), BIGDEI_KEHOUNA)
+
+
+# Les quatre habits blancs du Cohen Gadol à Kippour (Vayikra 16:4 ; Rambam Klei HaMikdash 8:3).
+def cohen_gadol(nom, gabarit=Gabarit()):
+    return vetir_de_lin(Humain(nom, gabarit, **_poils(nom, True)), BIGDEI_LAVAN)
+
+
+# Lin (Rambam Klei HaMikdash 8:1), pieds nus (Zeva'him 24a).
+def vetir_de_lin(h, habits):
+    nom = h.nom
     robe = h.vetir_mpfb(KUTONET)
     h.detendre()
     empiecement(h, robe)
     ceinture = Ceinture(h, h.squelette.tete("lowerarm_l").z)
     ceinture.serrer(h, robe)
     ceint = Maillage()
-    avnet(ceint, ceinture, surface_de(h, [robe]))
+    avnet(ceint, ceinture, surface_de(h, [robe]), habits.avnet)
     lier(h, ceint, f"{nom}_avnet", lin())
     coiffure = Maillage()
-    migbaat(coiffure, h)
-    lier(h, coiffure, f"{nom}_migbaat", lin(), "head")
+    habits.coiffe(coiffure, h)
+    lier(h, coiffure, f"{nom}_{habits.coiffe.__name__}", lin(), "head")
     appliquer_visibilite(h, h.visible & ~h.efface)
     return h
 
@@ -1328,13 +1372,13 @@ def levi(nom, gabarit=Gabarit(), gris=False, barbe=True):
     return h
 
 
+# Pieds nus : « לֹא יִכָּנֵס לְהַר הַבַּיִת בְּמַקְלוֹ וּבְמִנְעָלוֹ » (Berakhot 9:5).
 def fidele(nom, tenue, gabarit=Gabarit(), gris=False, barbe=True, tete="kippa"):
     poils = _poils(nom, gris)
     if not barbe:
         poils["barbe"] = None
     h = Humain(nom, gabarit, **poils)
     h.vetir_mpfb({"costume": COSTUME, "robe": ROBE}[tenue])
-    h.vetir_mpfb(CHAUSSURES)
     h.detendre()
     if tete == "chapeau":
         coiffure = Maillage()
@@ -1996,8 +2040,14 @@ def _cohen(nom, geste, ou, cap, gabarit, tenu=None, gris=False, duree=16.0):
     return Role(nom, nom, batir, geste, ou, cap, duree=duree, famille="cohanim")
 
 
+# Un des cinq postes des Léviim aux portes de l'Azara (Middot 1:1), hors de la porte, sur le palier des quinze marches.
+def _shomer_levi():
+    return Role("shomer_levi", "shomer_levi", lambda: levi("shomer_levi", Gabarit(1.79, age=0.45)), garder,
+                (9.0, 5.5, Z_AZ), 0.0, duree=24.0)
+
+
 # Chaque figure fait un geste du tamid du matin, à l'endroit que la Mishna lui donne ; son nom est son concept.
-def roles():
+def roles_du_tamid():
     return [
         # Au Kiyor (Middot 3:6) : main droite sur le pied droit, main gauche sur le pied gauche, penché.
         _cohen("kiddoush_yadayim", lavage, (-59.0, -17.4, Z_AZ), 90.0, Gabarit(1.74, age=0.55), duree=12.0),
@@ -2017,9 +2067,6 @@ def roles():
         _cohen("hatavat_hanerot", hatava, (-123.6, -7.5, Z_BAT + 0.9), 180.0, Gabarit(1.70, age=0.58), duree=10.0),
     ] + [_levi(k, genre) for k, genre in enumerate(LEVIIM_INSTRUMENTS)] + [
         _tzoar(0, 3.2), _tzoar(1, -3.2),
-        # Un des cinq postes des Léviim aux portes de l'Azara (Middot 1:1), hors de la porte, sur le palier des quinze marches.
-        Role("shomer_levi", "shomer_levi", lambda: levi("shomer_levi", Gabarit(1.79, age=0.45)), garder,
-             (9.0, 5.5, Z_AZ), 0.0, duree=24.0),
         # Les anshei ma'amad, debout sur leur korban dans l'Ezrat Israël (Ta'anit 4:2 ; Middot 5:1).
         Role("anshei_maamad_1", "anshei_maamad",
              lambda: fidele("anshei_maamad_1", "costume", Gabarit(1.76, age=0.68), tete="talith"), priere,
@@ -2082,6 +2129,153 @@ def roles_shoeva():
              lambda: fidele("shemone_avoukot", "costume", Gabarit(1.73, age=0.55), tete="kippa"),
              jongler, (*RONDE, Z_EZN), 0.0, duree=64 * JET, accessoires=tuple(torche_jonglee(j) for j in range(8))),
     ]
+
+
+SEIR_BLEND = RACINE / "seir.blend"
+POIL_NOIR = (0.028, 0.025, 0.023)
+CORNE = (0.32, 0.28, 0.23)
+# Entre les deux cornes, dans le repère du bouc (`beit_hamikdash_seir.py`) : là où se posent les mains.
+FRONT_DU_SEIR = Vector((0.955, 0.0, 0.965))
+
+
+# « קָשַׁר לָשׁוֹן שֶׁל זְהוֹרִית בְּרֹאשׁ שָׂעִיר הַמִּשְׁתַּלֵּחַ » (Yoma 4:2) : nouée au pied des cornes, un bout qui pend ; la forme est un CHOIX.
+def lashon_zehorit(mm, repere):
+    centre = FRONT_DU_SEIR + Vector((0.0, 0.0, -0.012))
+    boucle = [centre + Vector((0.032 * math.cos(a), 0.046 * math.sin(a), 0.006 * math.sin(2.0 * a)))
+              for a in np.linspace(0.0, TOUR, 19)]
+    pan = [centre + Vector((0.004 * k, 0.046 + 0.010 * k, -0.034 * k)) for k in range(6)]
+    for chemin in (boucle, pan):
+        mm.nappe([[repere @ p for p in a] for a in tube_simple(chemin, 0.005, 6)], SHANI, "objet")
+
+
+# La tête vers l'homme, la croupe qui s'en écarte : parallèle à lui, son flanc passait dans la kutonet.
+BIAIS_DU_SEIR = math.radians(20.0)
+
+
+# Le bouc suit son homme : posé dans le repère de l'armature, `front` au point voulu, tourné vers où l'homme regarde.
+def amener_le_seir(h, front):
+    repere = (Matrix.Translation(front) @ Matrix.Rotation(-math.pi / 2.0 + BIAIS_DU_SEIR, 4, "Z")
+              @ Matrix.Translation(-FRONT_DU_SEIR))
+    with bpy.data.libraries.load(str(SEIR_BLEND)) as (_, charge):
+        charge.meshes = ["Seir", "Seir_cornes"]
+    for me, matiere, couleur in zip(charge.meshes, (poil(), corne()), (POIL_NOIR, CORNE)):
+        teinter_maillage(me, couleur)
+        me.materials.append(matiere)
+        objet = bpy.data.objects.new(f"{h.nom}_{me.name.lower()}", me)
+        for c in h.rig.users_collection:
+            c.objects.link(objet)
+        objet.parent = h.rig
+        objet.matrix_basis = repere
+    ruban = Maillage()
+    lashon_zehorit(ruban, repere)
+    _objet(h, ruban, f"{h.nom}_lashon_zehorit", laine())
+
+
+# « וְסוֹמֵךְ שְׁתֵּי יָדָיו עָלָיו וּמִתְוַדֶּה » (Yoma 6:2), « בֵּין שְׁתֵּי קַרְנָיו » (Rambam Ma'asse HaKorbanot 3:14) :
+# les deux paumes sur le front du bouc, le buste penché qui suit la confession.
+def semikha(front):
+    def geste(h, a, horloge, t):
+        souffle = 0.5 + 0.5 * horloge.onde(t, 5.5)
+        poignets = front + Vector((0.02, 0.06, 0.06))
+        return G.composer(G.pied(a, "l"), G.pied(a, "r"), G.respiration(horloge, t),
+                          G.bassin(Vector((0.0, 0.06, -0.03)), tangage=0.12),
+                          G.buste(flexion=0.34 + 0.06 * souffle, torsion=-0.18), G.tete(flexion=0.24 + 0.08 * souffle),
+                          G.bras(a, "l", poignets + G.GAUCHE * 0.04), G.bras(a, "r", poignets - G.GAUCHE * 0.04),
+                          G.paume(a, "l", -G.HAUT), G.paume(a, "r", -G.HAUT),
+                          G.doigts(a, "l", 0.12, 0.1), G.doigts(a, "r", 0.12, 0.1))
+    return geste
+
+
+# « הִשְׁתַּחֲוָיָה זֶה פִּשּׁוּט יָדַיִם וְרַגְלַיִם עַד שֶׁנִּמְצָא מֻטָּל עַל פָּנָיו אַרְצָה » (Rambam Tefila 5:13) :
+# le bassin bascule d'un quart de tour et le corps entier le suit, étendu, les bras allongés devant la tête.
+HAUTEUR_DU_BASSIN_COUCHE = 0.13
+
+
+def prosternation(h, a, horloge, t):
+    pivot = a.bassin
+    couche = Matrix.Rotation(math.pi / 2.0, 3, G.GAUCHE)
+    descente = Vector((0.0, 0.0, a.sol + HAUTEUR_DU_BASSIN_COUCHE - pivot.z))
+    loin = Vector((0.0, 0.0, -1.0))
+
+    def pointe(cote):
+        return {f"foot_{cote}": lambda m, poses: G.viser(m, m.translation + couche @ (loin + G.LATERAL * 0.3)),
+                f"ball_{cote}": lambda m, poses: G.viser(m, m.translation + couche @ loin)}
+
+    def main_devant(s):
+        return a.au("spine_03", Vector((s * 0.17, -0.10, h.z_tete + 0.32)))
+
+    return G.composer(G.bassin(descente, tangage=math.pi / 2.0), G.respiration(horloge, t, ampleur=0.008),
+                      G.buste(flexion=-0.06), G.tete(flexion=-0.10),
+                      pointe("l"), pointe("r"),
+                      G.bras(a, "l", main_devant(1.0)), G.bras(a, "r", main_devant(-1.0)),
+                      G.paume(a, "l", lambda poses: a.dans("spine_03", poses, G.DEVANT)),
+                      G.paume(a, "r", lambda poses: a.dans("spine_03", poses, G.DEVANT)),
+                      G.doigts(a, "l", 0.08, 0.1), G.doigts(a, "r", 0.08, 0.1))
+
+
+# Au nord-est de l'autel, où les boucs ont été tirés au sort (Yoma 3:9), tourné vers la porte de son départ (Yoma 4:2).
+SEIR_OU = (-17.5, 10.6, Z_AZ)
+
+
+# À sa droite, la tête devant lui : il se tient le long du bouc, tourné comme lui (CHOIX).
+def front_du_seir(h):
+    return Vector((-0.38, -0.50, h.sol + FRONT_DU_SEIR.z))
+
+
+def _cohen_gadol():
+    nom = "sair_hamishtaleach"
+
+    def batir():
+        h = cohen_gadol(nom, Gabarit(1.78, age=0.62))
+        amener_le_seir(h, front_du_seir(h))
+        return h
+    return Role(nom, nom, batir, lambda h, a, horloge, t: semikha(front_du_seir(h))(h, a, horloge, t), SEIR_OU, 0.0,
+                famille="cohanim")
+
+
+# Les cohanim dans l'Ezrat Cohanim, les Israélites dans l'Ezrat Israël (Middot 5:1), tous la tête vers le Heikhal.
+# Couché, un homme tient 3,5 amot devant ses pieds et 2 derrière : ni sur le yessod, ni sous les lishkot qui flanquent Nikanor.
+PROSTERNES_COHANIM = ((-17.5, 26.0), (-17.0, 18.5), (-17.8, -3.0), (-17.2, -14.0), (-17.6, -27.0))
+PROSTERNES_ISRAEL = ((-4.5, -41.0), (-5.2, -33.5), (-4.2, -26.5), (-4.8, 24.5), (-4.0, 31.0), (-5.0, 37.5), (-4.4, 44.0))
+
+
+def _gabarit_de_prosterne(nom):
+    age = 0.35 + 0.55 * _alea(nom, 0)
+    return Gabarit(1.66 + 0.16 * _alea(nom, 1), age=age, poids=0.4 + 0.3 * _alea(nom, 2),
+                   peau="old_caucasian_male" if age > 0.8 else "middleage_caucasian_male")
+
+
+def _prosterne(nom, batir, ou, famille=None):
+    cap = 180.0 + 6.0 * (_alea(nom, 3) - 0.5)
+    return Role(nom, "korim_oumishtahavim", batir, prosternation, (*ou, Z_AZ), cap, famille=famille)
+
+
+def _cohen_prosterne(k):
+    nom = f"korim_oumishtahavim_{k + 1}"
+    gabarit = _gabarit_de_prosterne(nom)
+    return _prosterne(nom, lambda: cohen(nom, gabarit, gris=gabarit.age > 0.7), PROSTERNES_COHANIM[k], "cohanim")
+
+
+def _israel_prosterne(k):
+    nom = f"korim_oumishtahavim_{len(PROSTERNES_COHANIM) + k + 1}"
+    gabarit = _gabarit_de_prosterne(nom)
+    tete = "talith" if k % 2 == 0 else "kippa"
+    return _prosterne(nom, lambda: fidele(nom, "costume", gabarit, gris=gabarit.age > 0.7, tete=tete),
+                      PROSTERNES_ISRAEL[k])
+
+
+# Yom Kippour, au troisième viduy : le Nom sort de la bouche du Cohen Gadol, et l'Azara tombe sur sa face (Yoma 6:2).
+def roles_kippour():
+    return [_cohen_gadol()] + [_cohen_prosterne(k) for k in range(len(PROSTERNES_COHANIM))] + [
+        _israel_prosterne(k) for k in range(len(PROSTERNES_ISRAEL))]
+
+
+# La visite libre : un lieu, un geste — la zerika à l'autel, deux Léviim qui jouent, un Israélite, la garde de Nikanor.
+FIGURES_DE_LA_VISITE = ("zerika", "leviim_6", "leviim_7", "anshei_maamad_1")
+
+
+def roles_de_la_visite():
+    return [r for r in roles_du_tamid() if r.nom in FIGURES_DE_LA_VISITE] + [_shomer_levi()]
 
 
 def animer_sur_place(h, role, sol):
@@ -2181,9 +2375,26 @@ def animer_en_danse(h, role, terrain):
     return places
 
 
+# Mesurée sur la pose de la première image, avec ce que la figure porte : couché, un corps sort de sa boîte debout.
+def points_poses(h):
+    bpy.context.scene.frame_set(0)
+    graphe = bpy.context.evaluated_depsgraph_get()
+    points = []
+    for objet in (o for o in h.rig.children if o.type == "MESH"):
+        evalue = objet.evaluated_get(graphe)
+        me = evalue.to_mesh()
+        co = np.empty(len(me.vertices) * 3)
+        me.vertices.foreach_get("co", co)
+        evalue.to_mesh_clear()
+        passage = np.array(objet.matrix_local)
+        co = co.reshape(-1, 3) @ passage[:3, :3].T + passage[:3, 3]
+        points.append(co)
+    return np.vstack(points)
+
+
 def emprise(h, places):
-    visibles = h.co[h.visible]
-    bas, haut = visibles.min(axis=0) - 0.15, visibles.max(axis=0) + 0.15
+    poses = points_poses(h)
+    bas, haut = poses.min(axis=0) - 0.15, poses.max(axis=0) + 0.15
     coins = [Vector((x, y, z)) for x in (bas[0], haut[0]) for y in (bas[1], haut[1]) for z in (bas[2], haut[2])]
     points = [place @ c for place in places for c in coins]
     return ([min(p.x for p in points), min(p.z for p in points), -max(p.y for p in points)],
@@ -2209,7 +2420,8 @@ class Troupe(NamedTuple):
     vues: list
 
 
-TROUPES = {"figures": Troupe(roles, VUES), "figures_shoeva": Troupe(roles_shoeva, [])}
+TROUPES = {"figures": Troupe(roles_de_la_visite, VUES), "figures_tamid": Troupe(roles_du_tamid, VUES),
+           "figures_kippour": Troupe(roles_kippour, []), "figures_shoeva": Troupe(roles_shoeva, [])}
 
 
 def main():
@@ -2265,7 +2477,7 @@ def main():
     emprises = {concept: unir(liste) for concept, liste in boites.items()}
     (DOSSIER / f"{nom_troupe}.json").write_text(json.dumps({
         "emprises": emprises,
-        "vues": [en_metres(v, emprises) for v in troupe.vues if set(v.get("cadre", ())) <= emprises.keys()],
+        "vues": [en_metres(v, emprises) for v in troupe.vues if v["id"].removeprefix("vue_") in emprises],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n{len(figures)} figures · {glb.name} {glb.stat().st_size / 1e6:.1f} Mo")
 

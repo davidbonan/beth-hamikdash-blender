@@ -1050,6 +1050,18 @@
       "nom": "Les huit torches",
       "zone": "ezrat_nashim",
       "prefixes": []
+    },
+    {
+      "id": "sair_hamishtaleach",
+      "nom": "Le viduy sur le bouc émissaire",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "korim_oumishtahavim",
+      "nom": "Les prosternés de Kippour",
+      "zone": "azara",
+      "prefixes": []
     }
   ]
 }

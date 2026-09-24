@@ -86,7 +86,22 @@ const VU_NUIT = { haut: 0x0a1222, bas: 0x1a2436, sol: 0x121212, ambiance: 1.0,
                   soleil: 1.4, etendue: 7e-5, horizon: 6.0, halo: [0.05, 0.06, 0.08], etoiles: 0.8 };
 const ECLAIRANT_NUIT = { haut: 0x1e2636, bas: 0x262e3c, sol: 0x2a2620, ambiance: 0.45,
                          soleil: 0.25, etendue: 1.6e-3, horizon: 26.0, halo: [0.02, 0.02, 0.03], etoiles: 0 };
-const CIELS = { jour: { vu: VU, eclairant: ECLAIRANT }, nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT } };
+// Avant l'aube d'un jour quelconque : sans lune, la phase n'en étant pas connue.
+const VU_AVANT_L_AUBE = { haut: 0x04070e, bas: 0x0a101c, sol: 0x0a0a0a, ambiance: 1.0,
+                          soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0, 0, 0], etoiles: 1.0 };
+const ECLAIRANT_AVANT_L_AUBE = { haut: 0x0e121a, bas: 0x12161e, sol: 0x14120e, ambiance: 0.45,
+                                 soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0, 0, 0], etoiles: 0 };
+// « הֵאִיר פְּנֵי כָל הַמִּזְרָח » (Tamid 3:2) : l'est s'éclaire, le soleil n'est pas levé.
+const VU_AUBE = { haut: 0x1c2a44, bas: 0x6e7688, sol: 0x2a2826, ambiance: 1.0,
+                  soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0.55, 0.36, 0.20], etoiles: 0.15 };
+const ECLAIRANT_AUBE = { haut: 0x3a4152, bas: 0x565c68, sol: 0x4a463e, ambiance: 0.45,
+                         soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0.30, 0.20, 0.12], etoiles: 0 };
+// Au chant du coq du 16 Tishri (Soucca 5:4), la même lune pleine se couche à l'ouest.
+const LUNE_COUCHANTE = new THREE.Vector3(-150, 35, -20).normalize();
+const CIELS = { jour: { vu: VU, eclairant: ECLAIRANT }, nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT },
+                fin_de_nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, astre: LUNE_COUCHANTE },
+                avant_l_aube: { vu: VU_AVANT_L_AUBE, eclairant: ECLAIRANT_AVANT_L_AUBE },
+                aube: { vu: VU_AUBE, eclairant: ECLAIRANT_AUBE } };
 
 // Le dégradé des deux dômes, et le ciel que l'air ajoute à ce qu'il éloigne.
 const DEGRADE = /* glsl */`
@@ -98,7 +113,9 @@ const DEGRADE = /* glsl */`
     return c + halo * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
   }`;
 
-function dome(rayon, teintes) {
+export const astreDu = (moment) => CIELS[moment].astre ?? SOLEIL;
+
+function dome(rayon, teintes, astre = SOLEIL) {
   return new THREE.Mesh(
     new THREE.SphereGeometry(rayon, 64, 32),
     new THREE.ShaderMaterial({
@@ -106,7 +123,7 @@ function dome(rayon, teintes) {
       uniforms: { hautCiel: { value: new THREE.Color(teintes.haut) },
                   basCiel: { value: new THREE.Color(teintes.bas) },
                   solCiel: { value: new THREE.Color(teintes.sol) },
-                  dirSoleil: { value: SOLEIL },
+                  dirSoleil: { value: astre },
                   ambiance: { value: teintes.ambiance },
                   soleil: { value: teintes.soleil },
                   etendue: { value: teintes.etendue },
@@ -146,7 +163,7 @@ export function domeVu(rayon) {
 
 export function environnement(renderer, moment = "jour") {
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, CIELS[moment].eclairant)), 0.04, 0.1, 200);
+  const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, CIELS[moment].eclairant, astreDu(moment))), 0.04, 0.1, 200);
   pmrem.dispose();
   return cible.texture;
 }
@@ -157,6 +174,7 @@ export function peindreDome(domeVu, moment) {
   for (const cle of ["haut", "bas", "sol"]) uniforms[`${cle}Ciel`].value.set(teintes[cle]);
   for (const cle of ["ambiance", "soleil", "etendue", "horizon", "etoiles"]) uniforms[cle].value = teintes[cle];
   uniforms.halo.value.set(...teintes.halo);
+  uniforms.dirSoleil.value = astreDu(moment);
 }
 
 // Le voile est tiré du ciel de jour ; la couleur de la brume le ramène à celui du moment.
