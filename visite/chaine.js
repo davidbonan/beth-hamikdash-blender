@@ -421,6 +421,11 @@ class Photometre extends Pass {
     this.lecture = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
   }
 
+  oublierTampons() {
+    this.tampon = null;
+    this.lecture = null;
+  }
+
   relever(gl) {
     if (gl.clientWaitSync(this.lecture, 0, 0) === gl.TIMEOUT_EXPIRED) return;
     gl.deleteSync(this.lecture);
@@ -495,6 +500,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   // Avant le halo : c'est la lumière de la scène qu'on mesure, pas son débordement.
   const photometre = new Photometre();
   composeur.addPass(photometre);
+  renderer.domElement.addEventListener("webglcontextrestored", () => photometre.oublierTampons());
 
   // Le halo passe AVANT la sortie, donc avant le tonemapping : la cible du composeur
   // est en demi-flottant et garde le linéaire, et c'est là seulement que le soleil sur

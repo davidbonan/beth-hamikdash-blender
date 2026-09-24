@@ -5,17 +5,29 @@ import { PROFIL, plafonner } from "./qualite.js";
 const chargeur = new THREE.ImageBitmapLoader()
   .setOptions({ imageOrientation: "none", premultiplyAlpha: "none", colorSpaceConversion: "none" });
 
+const envoyees = [];
+
+async function charger(texture, carte) {
+  texture.image = await chargeur.loadAsync(carte);
+  await plafonner(texture, PROFIL.textures.decor);
+  texture.needsUpdate = true;
+}
+
 async function texture({ carte, canal }, format, colorSpace) {
-  const image = await chargeur.loadAsync(carte);
-  const texture = new THREE.Texture(image);
+  const texture = new THREE.Texture();
   texture.format = format;
   texture.flipY = false;
   texture.channel = canal;
   texture.colorSpace = colorSpace;
-  await plafonner(texture, PROFIL.textures.decor);
+  await charger(texture, carte);
   texture.onUpdate = () => texture.image.close();
-  texture.needsUpdate = true;
+  envoyees.push({ texture, carte });
   return texture;
+}
+
+// Une image relâchée ne se renvoie pas : un contexte rendu par le navigateur recevait des cartes noires.
+export function rechargerCartes() {
+  return Promise.all(envoyees.map(({ texture, carte }) => charger(texture, carte)));
 }
 
 // aoMap ne lit que le rouge : un seul canal, et l'image relâchée une fois envoyée au GPU.
