@@ -11,7 +11,7 @@ import { chaine } from "./chaine.js";
 import { niveauxDeDetail } from "./detail.js";
 import { astreDu, brumer, domeVu, environnement, peindreDome, teinterAir } from "./ciel.js";
 import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
-import { PROFIL } from "./qualite.js";
+import { PROFIL, plafonner } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
@@ -78,11 +78,37 @@ const etat = $("#etat"), jauge = $("#jauge i");
 // Une erreur de chargement laissait l'écran figé sur son dernier état sans rien dire :
 // le voile ne se lève qu'en fin de module, et un module qui jette ne lève rien.
 const echouer = (quoi) => {
+  if (contexte?.isContextLost()) return perdreContexte();
   etat.textContent = `${texte("echec")} ${quoi}`;
   etat.style.color = "#e0836a";
 };
 addEventListener("error", (e) => echouer(e.message || e.error));
 addEventListener("unhandledrejection", (e) => echouer(e.reason?.message || e.reason));
+
+// Un iPhone à court de mémoire retire son contexte à la page : plus rien ne se dessine, et la compilation en cours
+// jetait « shaderSource … must be an instance of WebGLShader ». Une première fois la page se recharge d'elle-même ;
+// une rechute aussitôt après ne boucle pas, elle le dit et attend qu'on touche l'écran.
+let contexte = null;
+const PERTE = "visite-contexte-perdu";
+const RECHUTE_MS = 120000;
+function lireStockage(cle) {
+  try { return sessionStorage.getItem(cle); } catch { return null; }
+}
+function ecrireStockage(cle, valeur) {
+  try { sessionStorage.setItem(cle, valeur); } catch { /* navigation privée : la page rechargera, sans garde-fou */ }
+}
+let contexteEnPerte = false;
+function perdreContexte() {
+  if (contexteEnPerte) return;
+  contexteEnPerte = true;
+  const rechute = Date.now() - Number(lireStockage(PERTE) ?? 0) < RECHUTE_MS;
+  ecrireStockage(PERTE, String(Date.now()));
+  if (!rechute) return location.reload();
+  document.documentElement.classList.add("perdu");
+  ecrire(etat, "contexte_perdu");
+  etat.style.color = "";
+  $("#chargement").onclick = () => location.reload();
+}
 
 // Le cachet que le build appose sur ./visite.js voyage jusqu'ici : les données qu'on
 // demande par un nom construit le portent comme celles qu'il a pu réécrire.
@@ -167,6 +193,8 @@ renderer.shadowMap.enabled = true;
 // par une pénombre variable. Il reste le réglage du profil léger, qui garde celle-ci.
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
+contexte = renderer.getContext();
+renderer.domElement.addEventListener("webglcontextlost", perdreContexte);
 
 const scene = new THREE.Scene();
 const brume = brumer(scene);
@@ -213,7 +241,8 @@ const RECUL_SOLEIL = 200;
 const ciel = domeVu(5700);
 scene.add(ciel);
 // L'or est métallique : sans environnement à réfléchir, il rend noir.
-scene.environment = environnement(renderer);
+const reflets = { jour: environnement(renderer) };
+scene.environment = reflets.jour.texture;
 
 // Le champ est fixé à l'HORIZONTALE, pas à la verticale. Un champ vertical constant
 // vaut 94° de large en 16/9 et 31° sur un téléphone tenu debout : on y visiterait le
@@ -324,7 +353,6 @@ let moment = "jour";
 let directionDeLAstre = astreDu(moment);
 let shoeva = null;
 let lumiereCuiteDuCiel = null;
-const reflets = { jour: scene.environment };
 
 // Le Heikhal et le Kodesh HaKodashim ont leur lumière cuite à leurs propres lampes, que la nuit n'éteint pas.
 function eclaireParSesLampes(maillage) {
@@ -399,6 +427,7 @@ function allumerLeFeu() {
 // Les mâts et le feu ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
 async function passerAu(voulu) {
   if (voulu === moment) return;
+  const quitte = moment;
   moment = voulu;
   const eclairage = ECLAIRAGES[voulu];
   soleil.color.set(eclairage.astre.couleur);
@@ -409,7 +438,13 @@ async function passerAu(voulu) {
   cielAmbiant.intensity = eclairage.ciel;
   peindreDome(ciel, voulu);
   teinterAir(brume, voulu);
-  scene.environment = reflets[voulu] ??= environnement(renderer, voulu);
+  reflets[voulu] ??= environnement(renderer, voulu);
+  scene.environment = reflets[voulu].texture;
+  // Le ciel de jour revient à la fin de chaque parcours ; celui d'un autre moment se refait en un fondu s'il revient.
+  if (quitte !== "jour") {
+    reflets[quitte].dispose();
+    delete reflets[quitte];
+  }
   lumiereCuiteDuCiel ??= lumieresCuitesAuCiel();
   for (const [materiau, intensite] of lumiereCuiteDuCiel) materiau.lightMapIntensity = intensite * eclairage.cuite;
   const feuAllume = feuDeLAutel === null && eclairage.feu;
@@ -641,8 +676,30 @@ function montrerTroupes() {
   }
 }
 
+// Un figurant se lit sur quelques centaines de pixels au plus : le profil léger ramène ses textures à cette mesure.
+async function plafonnerTextures(racine) {
+  const textures = new Set();
+  racine.traverse((o) => {
+    if (o.isMesh) for (const valeur of Object.values(o.material)) if (valeur?.isTexture) textures.add(valeur);
+  });
+  await Promise.all([...textures].map((t) => plafonner(t, PROFIL.textures.figurants)));
+}
+
+function rendreLaMemoire(maillages) {
+  const materiaux = new Set(maillages.map((m) => m.material));
+  for (const maillage of maillages) {
+    maillage.geometry.dispose();
+    maillage.skeleton?.dispose();
+  }
+  for (const materiau of materiaux) {
+    for (const valeur of Object.values(materiau)) if (valeur?.isTexture) valeur.dispose();
+    materiau.dispose();
+  }
+}
+
 // Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
-async function poserFigurants(nom, { scene: troupe, animations }) {
+async function poserFigurants({ scene: troupe, animations }) {
+  await plafonnerTextures(troupe);
   const melangeur = new THREE.AnimationMixer(troupe);
   for (const clip of animations) melangeur.clipAction(clip).play();
   melangeur.update(0);
@@ -650,23 +707,58 @@ async function poserFigurants(nom, { scene: troupe, animations }) {
   const prises = troupe.children.map(prendreEnMain);
   const torches = allumerTorches(troupe);
   await rendu.compiler(troupe);
-  scene.add(troupe);
-  troupe.updateMatrixWorld(true);
-  troupes[nom] = { scene: troupe, melangeur, prises, torches };
-  alleger(troupe);
-  suivreTorches(troupes[nom]);
-  montrerTroupes();
+  return { scene: troupe, melangeur, prises, torches };
 }
 
+// Une troupe renvoyée pendant sa descente est libérée à l'arrivée, sans entrer en scène.
 function chargerTroupe(nom) {
-  chargements[nom] ??= chargeur.loadAsync(TROUPES[nom].glb).then((g) => poserFigurants(nom, g));
-  return chargements[nom];
+  if (chargements[nom]) return chargements[nom];
+  const chargement = chargeur.loadAsync(TROUPES[nom].glb).then(poserFigurants).then((troupe) => {
+    if (chargements[nom] !== chargement) return libererTroupe(troupe);
+    scene.add(troupe.scene);
+    troupe.scene.updateMatrixWorld(true);
+    troupes[nom] = troupe;
+    alleger(troupe.scene);
+    suivreTorches(troupe);
+    montrerTroupes();
+  });
+  chargements[nom] = chargement;
+  return chargement;
 }
 chargerTroupe(TROUPE_LIBRE);
+
+// Chaque troupe de parcours pèse des dizaines de textures : gardées toutes, les trois parcours menaient la mémoire GPU de 0,7 à 1,2 Go.
+function libererTroupe({ scene: troupe, melangeur, prises, torches }) {
+  scene.remove(troupe);
+  for (const { meche } of torches) {
+    scene.remove(meche);
+    horsGeometrie.splice(horsGeometrie.indexOf(meche), 1);
+    meche.material.dispose();
+  }
+  for (const prise of prises) {
+    const rang = obstacles.indexOf(prise);
+    if (rang >= 0) obstacles.splice(rang, 1);
+    prise.geometry.dispose();
+  }
+  melangeur.stopAllAction();
+  melangeur.uncacheRoot(troupe);
+  const maillages = [];
+  troupe.traverse((o) => { if (o.isMesh && o.material !== PRISE) maillages.push(o); });
+  detail.oublier(maillages);
+  rendreLaMemoire(maillages);
+}
+
+function renvoyerTroupe(nom) {
+  const troupe = troupes[nom];
+  delete chargements[nom];
+  delete troupes[nom];
+  if (troupe) libererTroupe(troupe);
+}
 
 function presenterTroupe(voulue) {
   troupePresente = voulue;
   montrerTroupes();
+  for (const nom of Object.keys(chargements)) if (nom !== voulue && nom !== TROUPE_LIBRE) renvoyerTroupe(nom);
 }
 
 // Jérusalem autour du Temple descend en dernier : on s'y pose aussi, et on s'y cogne.
@@ -1376,7 +1468,9 @@ window.__etat = () => {
   return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
            x: +camera.position.x.toFixed(3), y: +camera.position.y.toFixed(3), z: +camera.position.z.toFixed(3),
            piedsY: +piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
-           fov: +camera.fov.toFixed(1), vol, lieu: lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z)) };
+           fov: +camera.fov.toFixed(1), vol, lieu: lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z)),
+           exposition: +renderer.toneMappingExposure.toFixed(3), fermeture: +oeilAdapte.fermeture.toFixed(2),
+           luminance: rendu.luminance && +rendu.luminance.toFixed(4) };
 };
 window.__ombres = (actives) => {
   renderer.shadowMap.enabled = actives;
@@ -1385,6 +1479,7 @@ window.__ombres = (actives) => {
   dessiner(0);
 };
 Object.defineProperty(window, "__figurants", { get: () => Promise.all(Object.values(chargements)) });
+window.__moteur = { renderer, scene };
 window.__sol = solEn;
 window.__mur = (origine, direction, portee) => {
   const rayon = new THREE.Raycaster(new THREE.Vector3(...origine), new THREE.Vector3(...direction).normalize(), 0, portee);

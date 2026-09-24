@@ -49,6 +49,29 @@ function sphere(positions, indices) {
   return { centre, rayon };
 }
 
+// La tuile n'emporte que ses sommets : meshoptimizer dimensionne chaque appel sur le tableau reçu, et le tas
+// WebAssembly de l'ouvrier gardait la taille du plus gros maillage entier — 300 Mo dans Safari d'iPhone.
+function compacter(plage, { positions, normales, verrous }, local) {
+  const globaux = [];
+  const indices = new Uint32Array(plage.length);
+  for (let i = 0; i < plage.length; i++) {
+    const s = plage[i];
+    if (local[s] < 0) local[s] = globaux.push(s) - 1;
+    indices[i] = local[s];
+  }
+  const extraire = (source, taille, Type) => {
+    const sortie = new Type(globaux.length * taille);
+    globaux.forEach((s, i) => { for (let c = 0; c < taille; c++) sortie[i * taille + c] = source[s * taille + c]; });
+    return sortie;
+  };
+  for (const s of globaux) local[s] = -1;
+  return {
+    indices, globaux: Uint32Array.from(globaux),
+    maillage: { positions: extraire(positions, 3, Float32Array), normales: extraire(normales, 3, Float32Array),
+                verrous: extraire(verrous, 1, Uint8Array) },
+  };
+}
+
 // Bord verrouillé : la tuile voisine, à un autre niveau, le partage sommet pour sommet, sans fente.
 function niveaux(tuile, { positions, normales, verrous }, metre) {
   const poids = Array(3).fill(POIDS_NORMALE * metre);
@@ -75,9 +98,13 @@ onmessage = async ({ data: { positions, normales, uvs, index, tuiles, metre } })
     verrous: coutures(sommets, uvs.map(lire)),
   };
   const index32 = Uint32Array.from(index);
+  const local = new Int32Array(sommets.length / 3).fill(-1);
   const calculees = tuiles.map(({ debut, nombre }) => {
     const plage = index32.subarray(debut * 3, (debut + nombre) * 3);
-    return { ...sphere(sommets, plage), debut, nombre, niveaux: niveaux(plage, maillage, metre) };
+    const tuile = compacter(plage, maillage, local);
+    const suite = niveaux(tuile.indices, tuile.maillage, metre)
+      .map(({ indices, ecart }) => ({ indices: indices.map((s) => tuile.globaux[s]), ecart }));
+    return { ...sphere(sommets, plage), debut, nombre, niveaux: suite };
   });
   const total = calculees.reduce((n, t) => n + t.niveaux.reduce((m, v) => m + v.indices.length, 0), 0);
   const allege = sommets.length / 3 > 0xffff ? new Uint32Array(total) : new Uint16Array(total);

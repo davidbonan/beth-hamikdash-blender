@@ -88,9 +88,9 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/plan.js` | Le plan : minicarte qui suit le visiteur sur l'image de sa zone, plan entier dont chaque lieu et chaque entrée se touchent pour s'y rendre. |
 | `visite/plan.json`, `visite/plans/` | Le Temple vu du dessus, une image par cadrage — Har HaBayit, Ezrat Nashim, Azara, Heikhal en coupe, souterrains — et l'emprise en mètres de chacune. Artefacts — `beit_hamikdash_plan.py` les rend depuis le .blend. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
-| `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. |
-| `visite/detail.js`, `visite/simplification.js` | Les niveaux de détail : chaque maillage découpé en tuiles, chaque tuile allégée en niveaux (meshoptimizer, dans deux Workers, après l'ouverture), et rendue au plus léger dont l'écart tient sous un pixel. Les maillages d'origine restent, cachés, pour les rayons. |
-| `visite/echelle.js` | La définition qui suit ce que la machine tient : trois paliers, et une remontée ratée qui attend deux fois plus longtemps avant de se retenter — sans quoi l'échelle battait entre deux paliers toutes les trois secondes. |
+| `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. Au profil léger, les cartes de lumière cuite et l'atlas des gravures sont ramenés à 1024, les textures des figurants à 512 : un iPhone perd son contexte WebGL passé quelques centaines de mégaoctets. |
+| `visite/detail.js`, `visite/simplification.js` | Les niveaux de détail : chaque maillage découpé en tuiles, chaque tuile allégée en niveaux (meshoptimizer, dans deux Workers, après l'ouverture, sur ses seuls sommets), et rendue au plus léger dont l'écart tient sous un pixel. Les Workers sont congédiés une fois la file vide : un tas WebAssembly ne rend jamais sa mémoire, et gardés ils pesaient 400 Mo sur iPhone. Les maillages d'origine restent, cachés, pour les rayons. |
+| `visite/echelle.js` | La définition qui suit ce que la machine tient : trois paliers, jugés sur la médiane des 120 dernières images — une image figée par un chargement ne fait plus perdre un palier —, et une remontée ratée qui attend deux fois plus longtemps avant de se retenter — sans quoi l'échelle battait entre deux paliers toutes les trois secondes. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
 | `visite/nappes.js` | Les cinq jeux de scans, chargés en 1024 sur toutes les machines. |
 | `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `beit_hamikdash_nappes.py`, `beit_hamikdash_parokhet.py` et `beit_hamikdash_gravures.py` les refabriquent. |
@@ -134,7 +134,12 @@ porte un repère par lishka, posé là où Blender projette la chambre dans le c
 Le mode `?cinema` (`visite/cinema.js`, parcours dans
 `visite/cinema.json`) fait marcher la scène seule ; l'accueil ne s'en sert plus.
 `?qualite=basse` force le profil léger depuis un bureau — c'est ainsi qu'on vérifie le
-rendu du téléphone sans téléphone sous la main ; `?qualite=haute` fait l'inverse.
+rendu du téléphone sans téléphone sous la main ; `?qualite=haute` fait l'inverse. Pour
+Safari d'iPhone lui-même, le skill `mobile` (`.claude/skills/mobile/`) ouvre la visite dans
+le simulateur iOS avec une sonde qui rapporte erreurs, pertes de contexte, rythme, mémoire
+GPU et empreinte des processus WebKit, et la pilote depuis le terminal.
+Un iPhone à court de mémoire retire son contexte WebGL : la visite se recharge alors
+d'elle-même une fois, et dit ce qui se passe si ça recommence dans les deux minutes.
 
 **Au doigt.** Le pouce gauche pose un manche là où il touche et marche à la course du
 pouce ; pousser au-delà du cercle, c'est courir. Le pouce droit tourne la tête. Un

@@ -1,5 +1,6 @@
 // Cartes de beit_hamikdash_occlusion.py : l'occlusion en aoMap n'assombrit que la lumière sans direction ; la lumière cuite la remplace.
 import * as THREE from "three";
+import { PROFIL, plafonner } from "./qualite.js";
 
 const chargeur = new THREE.ImageBitmapLoader()
   .setOptions({ imageOrientation: "none", premultiplyAlpha: "none", colorSpaceConversion: "none" });
@@ -11,7 +12,8 @@ async function texture({ carte, canal }, format, colorSpace) {
   texture.flipY = false;
   texture.channel = canal;
   texture.colorSpace = colorSpace;
-  texture.onUpdate = () => image.close();
+  await plafonner(texture, PROFIL.textures.decor);
+  texture.onUpdate = () => texture.image.close();
   texture.needsUpdate = true;
   return texture;
 }

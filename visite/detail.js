@@ -62,8 +62,9 @@ export function niveauxDeDetail(scene, camera) {
   // Les tuiles ne bougent pas : leur matrice est posée une fois, et three ne la recalcule plus à chaque image.
   groupe.updateMatrixWorld = () => {};
   scene.add(groupe);
-  const tuiles = [];
+  let tuiles = [];
   const file = [];
+  const oublies = new WeakSet();
   let ouvriers = null;
 
   // La tuile lit sur son maillage ce que la visite y règle : sa matière, et ses ombres la nuit.
@@ -83,6 +84,7 @@ export function niveauxDeDetail(scene, camera) {
   }
 
   function installer(maillage, { allege, tuiles: calculees }) {
+    if (oublies.has(maillage)) return;
     const source = maillage.geometry;
     const index = new THREE.BufferAttribute(allege, 1);
     const echelle = maillage.matrixWorld.getMaxScaleOnAxis();
@@ -99,14 +101,26 @@ export function niveauxDeDetail(scene, camera) {
     maillage.visible = false;
   }
 
+  // Le tas WebAssembly d'un ouvrier ne rend jamais ce qu'il a pris : ouvriers gardés, la page pesait 400 Mo de plus dans Safari d'iPhone.
   function envoyer() {
-    if (file.length === 0) return;
+    if (file.length === 0) {
+      if (ouvriers?.every((o) => !o.maillage)) congedier();
+      return;
+    }
     ouvriers ??= Array.from({ length: OUVRIERS }, demarrer);
     for (const ouvrier of ouvriers) {
       if (ouvrier.maillage || file.length === 0) continue;
       ouvrier.maillage = file.shift();
-      ouvrier.calcul.postMessage(demande(ouvrier.maillage));
+      const message = demande(ouvrier.maillage);
+      // Transférés et non recopiés : la copie de chaque maillage lourd ajoutait 140 Mo au pic du chargement.
+      const tableaux = [message.positions, message.normales, ...message.uvs].filter(Boolean).map((a) => a.tableau.buffer);
+      ouvrier.calcul.postMessage(message, [...tableaux, message.index.buffer]);
     }
+  }
+
+  function congedier() {
+    for (const ouvrier of ouvriers) ouvrier.calcul.terminate();
+    ouvriers = null;
   }
 
   function demarrer() {
@@ -126,6 +140,18 @@ export function niveauxDeDetail(scene, camera) {
       file.push(...maillages.filter((m) => m.visible && m.geometry.index));
       file.sort((a, b) => b.geometry.index.count - a.geometry.index.count);
       envoyer();
+    },
+    // Les tuiles d'un maillage qui quitte la scène la quittent avec lui ; celui encore en calcul ne sera pas installé.
+    oublier(maillages) {
+      const partants = new Set(maillages);
+      for (const m of maillages) oublies.add(m);
+      file.splice(0, file.length, ...file.filter((m) => !partants.has(m)));
+      for (const t of tuiles.filter((t) => partants.has(t.source))) {
+        groupe.remove(t.maille);
+        t.pleine.dispose();
+        t.allegee.dispose();
+      }
+      tuiles = tuiles.filter((t) => !partants.has(t.source));
     },
     choisir(hauteurImage) {
       const focale = hauteurImage / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
