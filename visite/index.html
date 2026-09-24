@@ -68,6 +68,10 @@
   @keyframes approche { from { transform: scale(1); } to { transform: scale(1.06); } }
   @media (prefers-reduced-motion: reduce) { #chargement::before { animation: none; } }
   #chargement.parti { opacity: 0; pointer-events: none; }
+  /* Sans contexte, la scène ne reviendra pas : le voile reste, quoi que le chargement fasse ensuite. */
+  html.perdu #chargement { opacity: 1; pointer-events: auto; cursor: pointer; }
+  html.perdu #jauge, html.perdu #restant { visibility: hidden; }
+  html.perdu #etat { max-width: min(34ch, calc(100vw - 48px)); margin: 0 auto; line-height: 1.5; }
   #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
   #chargement p { margin: 0; color: #d6cebf; font-size: 13px; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
   #restant { min-height: 1.4em; font-variant-numeric: tabular-nums; }

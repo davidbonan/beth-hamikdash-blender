@@ -14,6 +14,7 @@
  * reste de la chrominance. La normale est en convention OpenGL, vert vers le haut.
  */
 import * as THREE from "three";
+import { PROFIL, plafonner } from "./qualite.js";
 
 // La moyenne LINÉAIRE de la nappe, et sa rugosité moyenne. La photo est appliquée en
 // RAPPORT à elles, jamais en remplacement : Blender garde le dernier mot sur la teinte
@@ -66,6 +67,7 @@ export async function nappes() {
   // (matieres.js) : changer l'une sans l'autre aplatit ou exagère tout le modelé.
   const gravures = regler(await chargeur.loadAsync("matieres/gravures_3072.webp"), THREE.NoColorSpace);
   gravures.wrapS = gravures.wrapT = THREE.ClampToEdgeWrapping;
+  await plafonner(gravures, PROFIL.textures.decor);
   jeux.set("gravures", { motif: gravures });
   return jeux;
 }

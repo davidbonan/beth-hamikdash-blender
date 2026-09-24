@@ -165,7 +165,7 @@ export function environnement(renderer, moment = "jour") {
   const pmrem = new THREE.PMREMGenerator(renderer);
   const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, CIELS[moment].eclairant, astreDu(moment))), 0.04, 0.1, 200);
   pmrem.dispose();
-  return cible.texture;
+  return cible;
 }
 
 export function peindreDome(domeVu, moment) {
