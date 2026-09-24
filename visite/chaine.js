@@ -57,6 +57,8 @@ const PORTEE_FIN = [12.0, 26.0];
 // Au-delà, la distance stockée en demi-flottant devient plus grossière que le rayon
 // et l'occlusion se met à clignoter sur les lointains.
 const PORTEE = [45.0, 120.0];
+// Au-delà de la portée et d'un rayon, rien n'occlut plus rien : la passe de géométrie s'arrête là, et ne trace plus le pays.
+const FOND_GEOMETRIE = PORTEE[1] + RAYON + 1;
 
 const GEOMETRIE = new THREE.ShaderMaterial({
   vertexShader: /* glsl */`
@@ -556,10 +558,22 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uArche.value.copy(arche);
   }
 
+  const coin = new THREE.Vector3();
+  function fondDeLaPiece() {
+    let fond = 0;
+    for (let i = 0; i < 8; i++) {
+      coin.set(i & 1 ? pieceEnfumee.max.x : pieceEnfumee.min.x, i & 2 ? pieceEnfumee.max.y : pieceEnfumee.min.y,
+               i & 4 ? pieceEnfumee.max.z : pieceEnfumee.min.z);
+      fond = Math.max(fond, coin.distanceTo(camera.position));
+    }
+    return fond;
+  }
+
   const pieceEnfumeeVue = () => pieceEnfumee !== null && champ.setFromProjectionMatrix(
     vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(pieceEnfumee);
 
   function rendre() {
+    voile.enabled = pieceEnfumeeVue();
     const caches = horsGeo.filter((o) => o.visible);
     for (const o of caches) o.visible = false;
     scene.overrideMaterial = GEOMETRIE;
@@ -570,7 +584,13 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     renderer.setClearColor(0x000000, 0);
     renderer.setRenderTarget(cibleGeo);
     renderer.clear();
+    const fond = camera.far;
+    // La fumée y lit ce qui coupe ses rayons : sans le fond de sa pièce, elle se voyait à travers les murs.
+    camera.far = voile.enabled ? Math.max(FOND_GEOMETRIE, fondDeLaPiece()) : FOND_GEOMETRIE;
+    camera.updateProjectionMatrix();
     renderer.render(scene, camera);
+    camera.far = fond;
+    camera.updateProjectionMatrix();
     scene.overrideMaterial = null;
     renderer.setClearColor(teinteFond, alphaFond);
     for (const o of caches) o.visible = true;
@@ -579,7 +599,6 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
     passeAO.render(renderer, cibleAO, null, 0, false);
-    voile.enabled = pieceEnfumeeVue();
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
