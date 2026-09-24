@@ -505,7 +505,7 @@ function alleger(racine) {
 // La résolution suit ce que la machine tient. Baisser la définition d'un tiers coûte
 // une image plus douce ; la garder coûte le mouvement, qui est ce qu'on est venu voir.
 const DPR = Math.min(devicePixelRatio, PROFIL.dprMax);
-let echelle = 1;
+let echelle = PROFIL.echelleDepart;
 
 function dimensionner() {
   camera.aspect = innerWidth / innerHeight;
@@ -515,7 +515,7 @@ function dimensionner() {
   camera.updateProjectionMatrix();
   // Taille d'abord : sans largeur CSS, la toile vaut 300 px × DPR et élargit la page sur mobile.
   renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(DPR * echelle);
+  renderer.setPixelRatio(DPR * Math.min(echelle, 1));
   const definition = Math.min(DPR, PROFIL.definitionMax) * echelle;
   HAUTEUR_IMAGE.value = Math.round(innerHeight * definition);
   rendu.redimensionner(innerWidth, innerHeight, definition);
@@ -1343,7 +1343,7 @@ const avantLePas = new THREE.Vector3();
 // À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
-const regulateur = regulerEchelle(PROFIL.echelleMin);
+const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart);
 function ajusterEchelle(dt) {
   const voulue = regulateur.suivre(dt, performance.now() / 1000);
   if (voulue === null) return;
