@@ -65,7 +65,12 @@
     if (gl.__sonde) return;
     gl.__sonde = true;
     toile.addEventListener("webglcontextlost", () => { perdu = true; noter("contexte_perdu", { ...memoire() }); vider(); });
-    toile.addEventListener("webglcontextrestored", () => { perdu = false; noter("contexte_rendu", {}); });
+    toile.addEventListener("webglcontextrestored", () => {
+      perdu = false;
+      tailles.clear();
+      for (const famille in octets) octets[famille] = 0;
+      noter("contexte_rendu", {});
+    });
     const liee = (cible) => gl.getParameter({ [gl.TEXTURE_2D]: gl.TEXTURE_BINDING_2D, [gl.TEXTURE_CUBE_MAP]: gl.TEXTURE_BINDING_CUBE_MAP,
       [gl.TEXTURE_3D]: gl.TEXTURE_BINDING_3D, [gl.TEXTURE_2D_ARRAY]: gl.TEXTURE_BINDING_2D_ARRAY }[cible] ?? gl.TEXTURE_BINDING_2D);
     const envelopper = (nom, avant) => {
@@ -138,7 +143,10 @@
       return +((performance.now() - t0) / n).toFixed(2);
     };
     // Ce qu'un iPhone à court de mémoire fait subir à la page, à la demande.
-    window.__perdreContexte = () => gl.getExtension("WEBGL_lose_context").loseContext();
+    // iOS rend parfois le contexte qu'il a retiré : ce que la page devient alors se vérifie ici.
+    const perte = gl.getExtension("WEBGL_lose_context");
+    window.__perdreContexte = () => perte.loseContext();
+    window.__restituerContexte = () => perte.restoreContext();
     noter("contexte", { version: gl.getParameter(gl.VERSION), rendu: gl.getParameter(gl.RENDERER),
                         maxTexture: gl.getParameter(gl.MAX_TEXTURE_SIZE), samples: gl.getParameter(gl.MAX_SAMPLES),
                         floatColor: !!gl.getExtension("EXT_color_buffer_float"), halfColor: !!gl.getExtension("EXT_color_buffer_half_float"),

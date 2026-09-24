@@ -138,8 +138,12 @@ rendu du téléphone sans téléphone sous la main ; `?qualite=haute` fait l'inv
 Safari d'iPhone lui-même, le skill `mobile` (`.claude/skills/mobile/`) ouvre la visite dans
 le simulateur iOS avec une sonde qui rapporte erreurs, pertes de contexte, rythme, mémoire
 GPU et empreinte des processus WebKit, et la pilote depuis le terminal.
-Un iPhone à court de mémoire retire son contexte WebGL : la visite se recharge alors
-d'elle-même une fois, et dit ce qui se passe si ça recommence dans les deux minutes.
+Un iPhone à court de mémoire retire son contexte WebGL. Quand le navigateur le rend, la
+visite reprend sur place : cartes de lumière rechargées (elles sont relâchées une fois
+envoyées, et revenaient noires — les ombres de l'Ezrat Nashim tournaient au noir d'un
+coup), environnements et ombres refaits. Perdu pendant le chargement, ou pas rendu en
+cinq secondes, elle se recharge d'elle-même une fois, et dit ce qui se passe si ça
+recommence dans les deux minutes.
 
 **Au doigt.** Le pouce gauche pose un manche là où il touche et marche à la course du
 pouce ; pousser au-delà du cercle, c'est courir. Le pouce droit tourne la tête. Un

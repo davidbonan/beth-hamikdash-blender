@@ -4,7 +4,7 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import { habiller, assombrir, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
-import { cartesLumiere, cartesOcclusion } from "./occlusion.js";
+import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
@@ -78,7 +78,7 @@ const etat = $("#etat"), jauge = $("#jauge i");
 // Une erreur de chargement laissait l'écran figé sur son dernier état sans rien dire :
 // le voile ne se lève qu'en fin de module, et un module qui jette ne lève rien.
 const echouer = (quoi) => {
-  if (contexte?.isContextLost()) return perdreContexte();
+  if (contexte?.isContextLost()) return quandContextePerdu();
   etat.textContent = `${texte("echec")} ${quoi}`;
   etat.style.color = "#e0836a";
 };
@@ -86,11 +86,17 @@ addEventListener("error", (e) => echouer(e.message || e.error));
 addEventListener("unhandledrejection", (e) => echouer(e.reason?.message || e.reason));
 
 // Un iPhone à court de mémoire retire son contexte à la page : plus rien ne se dessine, et la compilation en cours
-// jetait « shaderSource … must be an instance of WebGLShader ». Une première fois la page se recharge d'elle-même ;
-// une rechute aussitôt après ne boucle pas, elle le dit et attend qu'on touche l'écran.
+// jetait « shaderSource … must be an instance of WebGLShader ». Visite lancée, on attend que le navigateur le rende
+// et on renvoie ce que three ne sait pas refaire seul (reprendre) ; pendant le chargement, ou s'il ne revient pas,
+// la page se recharge d'elle-même. Une rechute aussitôt après ne boucle pas : elle le dit et attend qu'on touche l'écran.
 let contexte = null;
+let visiteLancee = false;
+let derniereReprise = -Infinity;
+let enReprise = false;
+let contexteAbandonne = false;
 const PERTE = "visite-contexte-perdu";
 const RECHUTE_MS = 120000;
+const ATTENTE_RESTITUTION_MS = 5000;
 function lireStockage(cle) {
   try { return sessionStorage.getItem(cle); } catch { return null; }
 }
@@ -98,9 +104,32 @@ function ecrireStockage(cle, valeur) {
   try { sessionStorage.setItem(cle, valeur); } catch { /* navigation privée : la page rechargera, sans garde-fou */ }
 }
 let contexteEnPerte = false;
-function perdreContexte() {
+function quandContextePerdu() {
   if (contexteEnPerte) return;
   contexteEnPerte = true;
+  if (!visiteLancee || Date.now() - derniereReprise < RECHUTE_MS) return abandonnerContexte();
+  attendreRestitution();
+}
+function attendreRestitution() {
+  setTimeout(() => {
+    if (!contexte.isContextLost()) return;
+    if (document.hidden) return document.addEventListener("visibilitychange", attendreRestitution, { once: true });
+    abandonnerContexte();
+  }, ATTENTE_RESTITUTION_MS);
+}
+async function quandContexteRendu() {
+  if (!contexteEnPerte || contexteAbandonne) return;
+  contexteEnPerte = false;
+  derniereReprise = Date.now();
+  enReprise = true;
+  try {
+    await reprendre();
+  } finally {
+    enReprise = false;
+  }
+}
+function abandonnerContexte() {
+  contexteAbandonne = true;
   const rechute = Date.now() - Number(lireStockage(PERTE) ?? 0) < RECHUTE_MS;
   ecrireStockage(PERTE, String(Date.now()));
   if (!rechute) return location.reload();
@@ -194,7 +223,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 contexte = renderer.getContext();
-renderer.domElement.addEventListener("webglcontextlost", perdreContexte);
+renderer.domElement.addEventListener("webglcontextlost", quandContextePerdu);
+renderer.domElement.addEventListener("webglcontextrestored", quandContexteRendu);
 
 const scene = new THREE.Scene();
 const brume = brumer(scene);
@@ -1382,6 +1412,7 @@ choixParcours.onchange = () => {
 };
 
 renderer.setAnimationLoop(() => {
+  if (enReprise) return;
   const dt = Math.min(horloge.getDelta(), 0.1);
   if (film) {
     film.avancer(dt);
@@ -1432,7 +1463,19 @@ renderer.setAnimationLoop(() => {
 });
 
 $("#chargement").classList.add("parti");
+visiteLancee = true;
 alleger(gltf.scene);
+
+// Three renvoie seul géométries et images ; les cartes relâchées, les environnements et les ombres figées sont à refaire.
+async function reprendre() {
+  for (const m of Object.keys(reflets)) {
+    reflets[m].dispose();
+    reflets[m] = environnement(renderer, m);
+  }
+  scene.environment = reflets[moment].texture;
+  scene.traverse((o) => { if (o.isLight && o.shadow) o.shadow.needsUpdate = true; });
+  await rechargerCartes();
+}
 
 // Au premier passage l'initiation remplace le rappel des commandes ; le « ? » la rejoue.
 function commencerInitiation() {
