@@ -83,9 +83,12 @@
      noir bref rend le saut lisible au lieu de le subir. */
   #voile {
     position: fixed; inset: 0; z-index: 30; background: #0d0c0b;
+    display: grid; place-content: center;
     opacity: 0; pointer-events: none; transition: opacity .34s ease;
   }
   #voile.noir { opacity: 1; transition-duration: .16s; }
+  #voile p { margin: 0; color: #d6cebf; font-size: 13px; visibility: hidden; }
+  #voile.attente p { visibility: visible; }
 
   /* ---- cinéma : la scène seule, encadrée par l'accueil ---- */
   html.cinema #accueil, html.cinema #chargement, html.cinema #barre, html.cinema #aide, html.cinema #manche,
@@ -833,7 +836,7 @@
   </div>
 </div>
 
-<div id="voile"></div>
+<div id="voile"><p data-texte="preparation">préparation…</p></div>
 
 <aside id="fiche">
   <div id="poignee"><button id="fermer" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button></div>

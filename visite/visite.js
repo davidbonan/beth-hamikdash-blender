@@ -456,8 +456,19 @@ function allumerLeFeu() {
 }
 
 // Les mâts et le feu ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
+// Posées avant que « préparation… » soit peint, la boucle compilerait leurs nuanceurs dans son image, figée, sans l'avoir montré.
 async function passerAu(voulu) {
   if (voulu === moment) return;
+  const eclairage = ECLAIRAGES[voulu];
+  const lampesAPoser = (feuDeLAutel === null && eclairage.feu) || (shoeva === null && eclairage.shoeva);
+  if (!lampesAPoser) return eclairerAu(voulu);
+  await annoncerAttente(async () => {
+    eclairerAu(voulu);
+    await rendu.compiler();
+  });
+}
+
+function eclairerAu(voulu) {
   const quitte = moment;
   moment = voulu;
   const eclairage = ECLAIRAGES[voulu];
@@ -478,16 +489,13 @@ async function passerAu(voulu) {
   }
   lumiereCuiteDuCiel ??= lumieresCuitesAuCiel();
   for (const [materiau, intensite] of lumiereCuiteDuCiel) materiau.lightMapIntensity = intensite * eclairage.cuite;
-  const feuAllume = feuDeLAutel === null && eclairage.feu;
-  if (feuAllume) feuDeLAutel = allumerLeFeu();
-  const premiere = shoeva === null && eclairage.shoeva;
-  if (premiere) shoeva = poserShoeva();
+  if (feuDeLAutel === null && eclairage.feu) feuDeLAutel = allumerLeFeu();
+  if (shoeva === null && eclairage.shoeva) shoeva = poserShoeva();
   if (shoeva !== null) {
     for (const f of shoeva.flammes) f.visible = eclairage.shoeva;
     // Les coupes sont sous la lampe de leur mât : leur ombre posait quatre disques noirs sur les murs.
     for (const o of shoeva.candelabres) o.castShadow = !eclairage.shoeva;
   }
-  if (premiere || feuAllume) await rendu.compiler();
 }
 
 // Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
@@ -536,6 +544,11 @@ const rendreLaMain = () => new Promise((reprise) => {
   canal.port1.onmessage = () => reprise();
   canal.port2.postMessage(null);
 });
+// Sans cette image, « préparation… » ne s'affichait jamais ; un onglet caché n'en donne aucune, d'où le délai.
+const laisserPeindre = () => new Promise((suite) => {
+  requestAnimationFrame(() => setTimeout(suite));
+  setTimeout(suite, 200);
+});
 async function construireArbres(maillages) {
   let debut = performance.now();
   for (const maillage of maillages) {
@@ -562,11 +575,7 @@ const [gltf, jeux, occlusions, lumieres] = await Promise.all([
   cartesLumiere(reperes.lumiere),
 ]);
 ecrire(etat, "preparation");
-// Sans cette image, « préparation… » ne s'affichait jamais ; un onglet caché n'en donne aucune, d'où le délai.
-await new Promise((suite) => {
-  requestAnimationFrame(() => setTimeout(suite));
-  setTimeout(suite, 200);
-});
+await laisserPeindre();
 scene.add(gltf.scene);
 // Three ne calcule les matrices monde qu'au premier rendu, et un rayon ne les calcule
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
@@ -1139,6 +1148,14 @@ function fondu(action) {
     await action();
     if (--fondus === 0) voile.classList.remove("noir");
   }, 170);
+}
+
+// Chaque lampe de nuit recompile tous les nuanceurs de la scène : Safari s'y fige jusqu'à neuf secondes, le voile dit qu'il prépare.
+async function annoncerAttente(travail) {
+  voile.classList.add("attente");
+  await laisserPeindre();
+  await travail();
+  voile.classList.remove("attente");
 }
 
 const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
