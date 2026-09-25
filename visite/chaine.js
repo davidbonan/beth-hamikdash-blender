@@ -476,6 +476,16 @@ class Profondeur extends Pass {
  * `horsGeo` : ce qui ne doit pas entrer dans la passe de géométrie. Le dôme de ciel
  * en fait partie — il enveloppe la scène, et il occluerait tout.
  */
+// La matière que three prête à un maillage pour la carte d'ombre du soleil (WebGLShadowMap.getDepthMaterial) : face retournée, cartes recopiées.
+const FACE_OMBRE = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
+const RECOPIEES = ["map", "alphaMap", "alphaTest", "displacementMap", "displacementScale", "displacementBias"];
+function ombrePortee({ castShadow, material }) {
+  if (!castShadow) return null;
+  const ombre = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: material.shadowSide ?? FACE_OMBRE[material.side] });
+  for (const cle of RECOPIEES) ombre[cle] = material[cle] ?? ombre[cle];
+  return ombre;
+}
+
 export function chaine(renderer, scene, camera, horsGeo = []) {
   const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
   const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
@@ -484,7 +494,8 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const teinteFond = new THREE.Color();
   const composeur = new EffectComposer(renderer,
     new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
-  if (PROFIL.preProfondeur) composeur.addPass(new Profondeur(scene, camera));
+  const profondeur = PROFIL.preProfondeur && new Profondeur(scene, camera);
+  if (profondeur) composeur.addPass(profondeur);
   const passeScene = new RenderPass(scene, camera);
   passeScene.clear = !PROFIL.preProfondeur;
   composeur.addPass(passeScene);
@@ -608,11 +619,33 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   }
 
   // Compilés hors cible, les nuanceurs prendraient le tonemapping de l'écran : la scène se rend dans le composeur, sans lui.
+  // compileAsync ne voit que la matière de chaque objet : celles des passes de géométrie et de profondeur se compilaient à leur première image, figée.
   function compiler(objets = scene) {
     renderer.setRenderTarget(composeur.readBuffer);
-    const prets = renderer.compileAsync(objets, camera, scene);
+    const prets = [renderer.compileAsync(objets, camera, scene)];
+    for (const materiau of [GEOMETRIE, profondeur?.materiau].filter(Boolean)) prets.push(compilerSous(objets, () => materiau));
+    prets.push(compilerOmbres(objets));
     renderer.setRenderTarget(null);
-    return prets;
+    return Promise.all(prets);
+  }
+
+  // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.
+  function compilerSous(objets, habit) {
+    const doubles = new THREE.Group();
+    objets.traverse((o) => {
+      const materiau = o.isMesh && habit(o);
+      if (materiau) doubles.add(Object.assign(o.clone(false), { material: materiau }));
+    });
+    return renderer.compileAsync(doubles, camera, scene);
+  }
+
+  // La carte d'ombre se trace sans scène, donc sans brume, et three compte la brume dans la clé de chaque nuanceur.
+  function compilerOmbres(objets) {
+    const brume = scene.fog;
+    scene.fog = null;
+    const pret = compilerSous(objets, ombrePortee);
+    scene.fog = brume;
+    return pret;
   }
 
   return { rendre, redimensionner, enfumer, compiler, get luminance() { return photometre.luminance; } };

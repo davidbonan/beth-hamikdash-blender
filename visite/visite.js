@@ -302,6 +302,7 @@ let vacillement = 0;
 // Le feu de l'autel, une lampe au-dessus des ma'arakhot : de nuit, la seule lumière de l'Azara (Tamid 1:4).
 const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteur: 3.0 };
 let feuDeLAutel = null;
+let lampesPosees = 0;
 
 // La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
 function poserLampe(reglage, position, ombrage) {
@@ -465,6 +466,8 @@ async function passerAu(voulu) {
   await annoncerAttente(async () => {
     eclairerAu(voulu);
     await rendu.compiler();
+    // La première image de nuit trace les cartes d'ombre des lampes : sous le voile, et non au premier pas.
+    await laisserPeindre();
   });
 }
 
@@ -489,8 +492,14 @@ function eclairerAu(voulu) {
   }
   lumiereCuiteDuCiel ??= lumieresCuitesAuCiel();
   for (const [materiau, intensite] of lumiereCuiteDuCiel) materiau.lightMapIntensity = intensite * eclairage.cuite;
-  if (feuDeLAutel === null && eclairage.feu) feuDeLAutel = allumerLeFeu();
-  if (shoeva === null && eclairage.shoeva) shoeva = poserShoeva();
+  if (feuDeLAutel === null && eclairage.feu) {
+    feuDeLAutel = allumerLeFeu();
+    lampesPosees++;
+  }
+  if (shoeva === null && eclairage.shoeva) {
+    shoeva = poserShoeva();
+    lampesPosees++;
+  }
   if (shoeva !== null) {
     for (const f of shoeva.flammes) f.visible = eclairage.shoeva;
     // Les coupes sont sous la lampe de leur mât : leur ombre posait quatre disques noirs sur les murs.
@@ -716,13 +725,20 @@ function montrerTroupes() {
   }
 }
 
-// Un figurant se lit sur quelques centaines de pixels au plus : le profil léger ramène ses textures à cette mesure.
-async function plafonnerTextures(racine) {
+function texturesDe(racine) {
   const textures = new Set();
   racine.traverse((o) => {
     if (o.isMesh) for (const valeur of Object.values(o.material)) if (valeur?.isTexture) textures.add(valeur);
   });
-  await Promise.all([...textures].map((t) => plafonner(t, PROFIL.textures.figurants)));
+  return [...textures];
+}
+
+// Envoyées d'un bloc à la première image de la troupe, ses textures figeaient la marche : une par image, avant qu'elle n'entre.
+async function envoyerTextures(textures) {
+  for (const texture of textures) {
+    renderer.initTexture(texture);
+    await laisserPeindre();
+  }
 }
 
 function rendreLaMemoire(maillages) {
@@ -739,15 +755,27 @@ function rendreLaMemoire(maillages) {
 
 // Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
 async function poserFigurants({ scene: troupe, animations }) {
-  await plafonnerTextures(troupe);
+  const textures = texturesDe(troupe);
+  // Un figurant se lit sur quelques centaines de pixels au plus : le profil léger ramène ses textures à cette mesure.
+  await Promise.all(textures.map((t) => plafonner(t, PROFIL.textures.figurants)));
   const melangeur = new THREE.AnimationMixer(troupe);
   for (const clip of animations) melangeur.clipAction(clip).play();
   melangeur.update(0);
   troupe.updateMatrixWorld(true);
   const prises = troupe.children.map(prendreEnMain);
   const torches = allumerTorches(troupe);
-  await rendu.compiler(troupe);
+  await envoyerTextures(textures);
+  await compilerSousLesLampes(troupe);
   return { scene: troupe, melangeur, prises, torches };
+}
+
+// Une lampe posée pendant la compilation change la clé de chaque nuanceur : on recompile jusqu'à ce que l'éclairage n'ait plus bougé.
+async function compilerSousLesLampes(objet) {
+  let lampes;
+  do {
+    lampes = lampesPosees;
+    await rendu.compiler(objet);
+  } while (lampes !== lampesPosees);
 }
 
 // Une troupe renvoyée pendant sa descente est libérée à l'arrivée, sans entrer en scène.
