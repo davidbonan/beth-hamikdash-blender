@@ -1,5 +1,5 @@
 import { nomDeZone } from "./fiche.js";
-import { libelle } from "./langue.js";
+import { langue, libelle, texte } from "./langue.js";
 
 const SVG = "http://www.w3.org/2000/svg";
 const TAILLE_ETIQUETTE = 13;   // px
@@ -8,6 +8,8 @@ const LONGUEUR_VISITEUR = 18;  // px, la flèche du plan entier
 const HAUTEUR_ETAGE = 10;      // mètres : un lieu qui commence plus haut est à l'étage
 const PART_MINI = 0.5;         // du plus petit côté de la zone, ce que la minicarte montre autour du visiteur
 const FENETRE_MINI_MIN = 28;   // mètres
+const PART_ECHELLE = 0.4;      // de la largeur de la minicarte, ce que sa barre d'échelle couvre au plus
+const LONGUEURS_ECHELLE = [100, 50, 25, 20, 10, 5]; // amot
 const FLECHE = "M 1 0 L -0.6 0.65 L -0.3 0 L -0.6 -0.65 Z";
 
 const noeud = (nom, attributs = {}) => {
@@ -27,14 +29,16 @@ const contient = (cadrage, x, z) =>
 
 export const lieuxSouterrains = (cadrages) => new Set(cadrages.filter((c) => c.coupe < 0).flatMap((c) => c.lieux));
 
-export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, allerEntree }) {
-  const bouton = document.querySelector("#minicarte");
+export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerLieu, allerEntree }) {
+  const bouton = document.querySelector("#minicarte .disque");
+  const echelleMini = document.querySelector("#minicarte .echelle");
   const fenetre = document.querySelector("#plan");
   const mini = bouton.querySelector("svg");
   const entier = fenetre.querySelector("svg");
   const choix = fenetre.querySelector(".cadrages");
   let ici = cadrages[0];
   let pose = null;
+  let coteMini = null;
 
   const souterrains = lieuxSouterrains(cadrages);
   // Du plus petit au plus grand : le premier cadrage de plein air qui contient le visiteur est le plus détaillé.
@@ -154,6 +158,15 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, 
     etiqueter();
   }
 
+  // La plus longue barre ronde en amot qui tienne, dite aussi en mètres : la carte est à l'échelle du Temple.
+  function graduer() {
+    const amot = LONGUEURS_ECHELLE.find((l) => l * ama <= PART_ECHELLE * coteMini) ?? LONGUEURS_ECHELLE.at(-1);
+    const metres = new Intl.NumberFormat(langue(), { maximumFractionDigits: 1 }).format(amot * ama);
+    echelleMini.querySelector("i").style.width = `${(100 * amot * ama / coteMini).toFixed(2)}%`;
+    echelleMini.querySelector(".amot").textContent = `${amot} ${texte("amot")}`;
+    echelleMini.querySelector(".metres").textContent = `${metres} ${texte("metres")}`;
+  }
+
   const ouvert = () => !fenetre.hidden;
 
   function ouvrir() {
@@ -169,6 +182,7 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, 
   function rafraichir() {
     for (const b of choix.children) b.textContent = nomDeZone(b.dataset.cadrage);
     nommer();
+    if (coteMini) graduer();
     if (ouvert()) etiqueter();
   }
 
@@ -180,6 +194,10 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, allerLieu, 
     ici = zone;
     const cote = Math.max(FENETRE_MINI_MIN, PART_MINI * Math.min(largeurDe(zone), hauteurDe(zone)));
     mini.setAttribute("viewBox", `${pose.x - cote / 2} ${pose.z - cote / 2} ${cote} ${cote}`);
+    if (cote !== coteMini) {
+      coteMini = cote;
+      graduer();
+    }
     poser(mini, cote / 15);
     const echelle = ouvert() && echelleDuPlan();
     if (echelle) poser(entier, LONGUEUR_VISITEUR / echelle);

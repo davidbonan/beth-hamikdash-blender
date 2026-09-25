@@ -1344,7 +1344,7 @@ const LIEUX = fiche.concepts.filter((c) => c.lieu && EMPRISES.has(c.id)).map((c)
 const lieuEn = (point) => LIEUX.find((id) => EMPRISES.get(id).containsPoint(point)) ?? null;
 
 const planMiddot = plan({
-  cadrages: CADRAGES_DU_PLAN, emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS,
+  cadrages: CADRAGES_DU_PLAN, emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS, ama: AMA,
   entrees: reperes.entrees.map((e) => ({ ...e, position: piedsDe(e) })),
   allerLieu: (id) => fondu(() => allerElement(id)),
   allerEntree: (id) => fondu(() => allerVers(id)),

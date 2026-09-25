@@ -541,11 +541,14 @@
   /* ---- plan ---- */
   #minicarte {
     position: fixed; top: calc(58px + var(--marge-haut)); inset-inline-end: calc(12px + var(--marge-droite));
-    z-index: 16; width: 132px; height: 132px; padding: 0; overflow: hidden; cursor: pointer;
+    z-index: 16; width: 132px;
+  }
+  #minicarte .disque {
+    position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; overflow: hidden; cursor: pointer;
     border: 1px solid rgba(203,192,170,.35); border-radius: 50%;
     background: rgba(13,12,11,.55); backdrop-filter: blur(3px);
   }
-  #minicarte:hover { border-color: var(--or); }
+  #minicarte .disque:hover { border-color: var(--or); }
   #minicarte svg { display: block; width: 100%; height: 100%; }
   #minicarte :is(.entrees, .etiquettes) { display: none; }
   /* Le plan ne tourne pas avec le visiteur : nord en haut, est à droite, quelle que soit la langue. */
@@ -558,6 +561,18 @@
   #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%); }
   #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%); }
   #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%); }
+  /* La barre a la longueur qu'elle dit, sur le disque juste au-dessus : la carte est à l'échelle du Temple. */
+  #minicarte .echelle {
+    display: flex; flex-direction: column; align-items: center; gap: 3px; margin: 6px 0 0; padding: 5px 0 4px;
+    pointer-events: none; font-size: 11px; line-height: 1.2; color: #f3efe6; font-variant-numeric: tabular-nums;
+    border: 1px solid rgba(203,192,170,.35); border-radius: 6px;
+    background: rgba(13,12,11,.55); backdrop-filter: blur(3px);
+  }
+  #minicarte .echelle i { display: block; height: 5px; border: 1.5px solid #f3efe6; border-top: 0; }
+  #minicarte .echelle p { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 5px; margin: 0; }
+  #minicarte .echelle span { white-space: nowrap; }
+  #minicarte .echelle .amot { font-weight: 600; }
+  #minicarte .echelle .metres { color: #cbc0aa; }
   #plan {
     position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
     padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))
@@ -618,7 +633,7 @@
     /* Le menu natif, invisible, couvre l'icône et rien de plus : sa largeur minimale volerait sinon les touches voisines. */
     #barre .menu select { position: absolute; inset: 0; width: 100%; min-width: 0; height: 100%; opacity: 0; }
     #mode { display: none; }
-    #minicarte { width: 92px; height: 92px; top: calc(62px + var(--marge-haut)); }
+    #minicarte { width: 92px; top: calc(62px + var(--marge-haut)); }
   }
 
   /* ---- petit écran : la fiche devient un tiroir ---- */
@@ -737,7 +752,10 @@
 
 <div id="survol"></div>
 
-<button id="minicarte" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg><span class="rose" aria-hidden="true"><span class="nord" data-texte="nord">N</span><span class="sud" data-texte="sud">S</span><span class="est" data-texte="est">E</span><span class="ouest" data-texte="ouest">O</span></span></button>
+<div id="minicarte">
+<button class="disque" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg><span class="rose" aria-hidden="true"><span class="nord" data-texte="nord">N</span><span class="sud" data-texte="sud">S</span><span class="est" data-texte="est">E</span><span class="ouest" data-texte="ouest">O</span></span></button>
+<div class="echelle"><i></i><p><span class="amot"></span><span class="metres"></span></p></div>
+</div>
 
 <div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>
   <div class="tete">
