@@ -9,11 +9,13 @@
  * où l'on se tient, ce qu'on regarde, les points de passage qui contournent l'autel,
  * et le concept à lire. La marche est celle du cinéma — polyligne, sol sondé à chaque
  * image — mais elle s'arrête : « Suivant » repart, « Précédent » rebrousse, et un clic
- * pendant la marche saute à l'arrivée. Rien ici ne connaît la scène : visite.js prête
- * la caméra le temps du trajet, pose ou oriente le visiteur quand on le lui demande, et
- * passe au `moment` que la station, sinon le parcours, déclare — le jour, s'ils n'en
- * disent rien — et à la `troupe` du parcours, les figurants de son service ; en sortant,
- * à ceux de la visite libre.
+ * pendant la marche saute à l'arrivée. Une station `fondu` — un toit, une terrasse
+ * qu'aucun escalier du blockout ne dessert — se rejoint et se quitte sous le voile.
+ * Rien ici ne connaît la scène : visite.js prête la caméra le temps du trajet, pose ou
+ * oriente le visiteur quand on le lui demande, et passe au `moment` que la station,
+ * sinon le parcours, déclare — le jour, s'ils n'en disent rien — et à la `troupe` du
+ * parcours, les figurants de son service, dont chaque station appelle les siens ; en
+ * sortant, à ceux de la visite libre.
  */
 import * as THREE from "three";
 import { polyligne } from "./cinema.js";
@@ -36,7 +38,8 @@ const CHEVRON_GAUCHE = "M8.5 2 2.5 8l6 6", CHEVRON_DROIT = "M3.5 2l6 6-6 6", COC
 const lisse = (u) => u * u * (3 - 2 * u);
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
-export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, changerDeTroupe, ouvrirFiche, fermerFiche }) {
+export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, changerDeTroupe,
+  appelerFigurants, relayerFigurants, ouvrirFiche, fermerFiche }) {
   const racine = document.querySelector("#parcours");
   const carte = racine.querySelector(".carte");
   const nom = carte.querySelector(".nom"), rang = carte.querySelector(".rang"), source = carte.querySelector(".source");
@@ -146,6 +149,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     courante = i;
     deplieeEnMarche = false;
     changerDeMoment(momentDe(station));
+    relayerFigurants(station.figurants);
     fermerFiche();
     afficher();
     marcher(trajet);
@@ -158,9 +162,12 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     afficher();
   }
 
+  const aPied = (i) => !stations[i].fondu && !stations[courante].fondu;
+
   // Loin de sa station — le visiteur a marché de lui-même —, la ligne droite traverserait
   // un mur : on le repose d'abord là où le parcours l'a laissé.
   function aller(i) {
+    if (!aPied(i)) return sauter(i);
     if (camera.position.distanceTo(new THREE.Vector3(...piedsDe(stations[courante]))) > ECART_DEPART) {
       poserA(piedsDe(stations[courante]), cibleEnM(stations[courante].cible));
     }
@@ -173,6 +180,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     courante = i;
     fermerFiche();
     changerDeMoment(momentDe(stations[i]));
+    appelerFigurants(stations[i].figurants);
     poserA(piedsDe(stations[i]), cibleEnM(stations[i].cible));
     afficher();
   }
@@ -191,6 +199,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     racine.hidden = true;
     changerDeMoment("jour");
     changerDeTroupe();
+    appelerFigurants();
   }
 
   function accelerer() {
@@ -220,6 +229,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   const ecartSol = () => camera.position.y - oeil - stations[courante].sol * ama;
   return {
     ouvrir, fermer, aller: sauter, ouvert, liste: () => liste.map((p) => p.id),
+    stations: (id) => liste.find((p) => p.id === id).stations,
     station: () => courante, nombre: () => stations.length, trajet: () => trajet, ecartSol,
   };
 }

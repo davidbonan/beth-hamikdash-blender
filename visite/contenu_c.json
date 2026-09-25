@@ -767,5 +767,96 @@
       }
     ],
     "note": "Choix de la visite : la Mishna donne les trois gestes, pas la pose finale. La visite les fige étendus, selon la définition du Rambam. Le nombre de prosternés et leurs places sont aussi des choix. Les Israélites portent ce que leur communauté porte aujourd'hui à Kippour, et vont pieds nus, comme tous les fidèles de la visite."
+  },
+  "bigdei_zahav": {
+    "he": "בגדי זהב",
+    "translit": "Bigdei zahav",
+    "resume": "Les huit habits du Cohen Gadol : les quatre de tout cohen — kutonet, mikhnasayim, avnet, coiffe — et le me'il de tekhelet bordé de grenades et de clochettes, l'éphod d'or et de laines tissées avec son 'heshev, le 'hoshen aux douze pierres, le tsits d'or sur le front. À Kippour, il les porte pour le service de chaque jour : le tamid du matin après la première tevila, ses béliers et le soir après la troisième et la cinquième. Le parcours le montre ainsi à la Lishkat Parhedrin, sur le Sha'ar HaMayim et au Beit HaParva, et nulle part ailleurs en même temps.",
+    "cotes": [
+      "huit habits",
+      "cinq tevilot, dix kiddoushim",
+      "douze pierres sur le 'hoshen"
+    ],
+    "sources": [
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:2", "citation": "בִּגְדֵי זָהָב הֵן בִּגְדֵי כֹּהֵן גָּדוֹל וְהֵם שְׁמֹנָה כֵּלִים. הָאַרְבָּעָה שֶׁל כָּל כֹּהֵן. וּמְעִיל וְאֵפוֹד וְחשֶׁן וְצִיץ"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:11", "citation": "לֹבְשָׁם בְּיוֹם עֲבוֹדָתוֹ וַאֲפִלּוּ שֶׁלֹּא בִּשְׁעַת עֲבוֹדָה חוּץ מִן הָאַבְנֵט"},
+      {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם. פָּשַׁט, יָרַד וְטָבַל, עָלָה וְנִסְתַּפֵּג. הֵבִיאוּ לוֹ בִגְדֵי זָהָב, וְלָבַשׁ וְקִדֵּשׁ יָדָיו וְרַגְלָיו"},
+      {"oeuvre": "Rambam Avodat Yom HaKippurim", "ref": "2:2", "citation": "וְחָמֵשׁ טְבִילוֹת וַעֲשָׂרָה קִדּוּשִׁין טוֹבֵל כֹּהֵן גָּדוֹל וּמְקַדֵּשׁ בּוֹ בַּיּוֹם"}
+    ],
+    "note": "Choix de la visite : aux sept jours de la Lishkat Parhedrin, rien ne dit quel habit il porte ; la visite l'y montre en habits d'or, qu'il peut porter un jour de service même hors du service. Les couleurs des douze pierres, la coupe de l'éphod et le siège sont des choix. L'avnet, noué sous le me'il, n'est pas montré."
+  },
+  "bigdei_lavan": {
+    "he": "בגדי לבן",
+    "translit": "Bigdei lavan",
+    "resume": "Quatre habits de lin blanc, du fil doublé six fois : kutonet, mikhnasayim, avnet, mitznefet. Le Cohen Gadol ne les porte qu'à Kippour, pour le service propre au jour. Après la deuxième tevila, il les revêt pour son taureau, le tirage au sort, l'encens et le sang portés dans le Kodesh HaKodashim, puis le bouc émissaire ; il peut aussi y lire la Torah. Le parcours le montre à chaque étape à sa place, une seule fois à la fois.",
+    "cotes": [
+      "quatre habits de lin",
+      "fil doublé six fois",
+      "le service propre au jour"
+    ],
+    "sources": [
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:3", "citation": "בִּגְדֵי לָבָן הֵם אַרְבָּעָה כֵּלִים שֶׁמְּשַׁמֵּשׁ בָּהֶן כֹּהֵן גָּדוֹל בְּיוֹם הַכִּפּוּרִים. כֻּתֹּנֶת. וּמִכְנָסָיִם. וְאַבְנֵט. וּמִצְנֶפֶת"},
+      {"oeuvre": "Rambam Avodat Yom HaKippurim", "ref": "2:2", "citation": "וּפוֹשֵׁט בִּגְדֵי הַזָּהָב וְטוֹבֵל וְעוֹלֶה וּמִסְתַּפֵּג וְלוֹבֵשׁ בִּגְדֵי לָבָן. וּמְקַדֵּשׁ יָדָיו וְרַגְלָיו וְעוֹבֵד עֲבוֹדַת הַיּוֹם"},
+      {"oeuvre": "Yoma", "ref": "7:1", "citation": "אִם רָצָה לִקְרוֹת בְּבִגְדֵי בוּץ, קוֹרֵא. וְאִם לֹא, קוֹרֵא בְאִצְטְלִית לָבָן מִשֶּׁלּוֹ"}
+    ],
+    "note": "Choix de la visite : pour la lecture de la Torah, la visite le laisse en lin plutôt que dans sa tunique blanche. Aucune figure n'entre au Kodesh HaKodashim : la ma'hta posée entre les barres y suffit. Les gestes et les places exactes à chaque étape sont des choix, sur les indications de la Mishna."
+  },
+  "zekenim": {
+    "he": "זקני בית דין",
+    "translit": "Ziknei beit din",
+    "resume": "Sept jours avant Kippour, on confie le Cohen Gadol à des anciens du Beit Din. Ils lui lisent l'ordre du jour et lui disent : « Mon maître le Cohen Gadol, lis toi-même, peut-être as-tu oublié, ou jamais appris. » La veille au soir, ils le remettent aux anciens de la kehouna et lui font jurer de ne rien changer à ce qu'on lui a dit ; il se détourne et pleure, et eux pleurent aussi.",
+    "cotes": [
+      "sept jours de lecture",
+      "« lis toi-même »",
+      "le serment de la veille"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "1:3", "citation": "מָסְרוּ לוֹ זְקֵנִים מִזִּקְנֵי בֵית דִּין, וְקוֹרִין לְפָנָיו בְּסֵדֶר הַיּוֹם, וְאוֹמְרִים לוֹ, אִישִׁי כֹהֵן גָּדוֹל, קְרָא אַתָּה בְּפִיךָ"},
+      {"oeuvre": "Yoma", "ref": "1:5", "citation": "הוּא פוֹרֵשׁ וּבוֹכֶה, וְהֵן פּוֹרְשִׁין וּבוֹכִין"}
+    ],
+    "note": "Choix de la visite : ce qu'ils lisent, et comment, la Mishna ne le dit pas ; la visite en montre deux sur un banc de la lishka, l'un avec un rouleau ouvert. Ils portent ce que les Israélites de la visite portent."
+  },
+  "sadin_shel_butz": {
+    "he": "סדין של בוץ",
+    "translit": "Sadin shel boutz",
+    "resume": "À chaque tevila, on tend un drap de lin fin entre le Cohen Gadol et le peuple. Derrière lui, il se dévêt, descend s'immerger, remonte, s'essuie, revêt les habits qu'on lui apporte et sanctifie mains et pieds. La première fois au-dessus du Sha'ar HaMayim, les autres sur le toit du Beit HaParva.",
+    "cotes": [
+      "à chaque tevila",
+      "entre lui et le peuple",
+      "lin fin"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם. פָּשַׁט, יָרַד וְטָבַל, עָלָה וְנִסְתַּפֵּג. הֵבִיאוּ לוֹ בִגְדֵי זָהָב, וְלָבַשׁ וְקִדֵּשׁ יָדָיו וְרַגְלָיו"}
+    ],
+    "note": "Choix de la visite : qui le tient, et à quelle hauteur, la Mishna ne le dit pas. La visite le fait tendre par deux cohanim à hauteur d'épaule : la tête du Cohen Gadol, coiffée de l'habit du moment, passe au-dessus."
+  },
+  "goral": {
+    "he": "הסגן וראש בית אב",
+    "translit": "HaSegan ve-rosh beit av",
+    "resume": "Au tirage au sort, à l'est de l'Azara, au nord de l'autel, le segan se tient à la droite du Cohen Gadol, le chef de la maison paternelle à sa gauche. Il secoue l'urne et en tire les deux sorts, un dans chaque main. Si celui du Nom monte dans sa droite, le segan lui dit : « Mon maître le Cohen Gadol, lève ta droite » ; dans la gauche, c'est le chef de maison qui le lui dit.",
+    "cotes": [
+      "le segan à droite",
+      "le chef de maison à gauche",
+      "« lève ta droite »"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "4:1", "citation": "טָרַף בַּקַּלְפִּי וְהֶעֱלָה שְׁנֵי גוֹרָלוֹת… הַסְּגָן בִּימִינוֹ וְרֹאשׁ בֵּית אָב מִשְּׂמֹאלוֹ"},
+      {"oeuvre": "Rambam Avodat Yom HaKippurim", "ref": "3:2", "citation": "הֵיכָן מַגְרִיל. בְּמִזְרַח הָעֲזָרָה בִּצְפוֹן הַמִּזְבֵּחַ… וּשְׁנֵי הַשְּׂעִירִים לְפָנָיו אֶחָד לִימִינוֹ וְאֶחָד לִשְׂמֹאלוֹ"}
+    ],
+    "note": "Choix de la visite : l'âge, les gestes et l'écart entre eux. La kalpi est posée sur un socle, et le sort du Nom monte dans la droite : deux choix aussi."
+  },
+  "keriat_hatorah": {
+    "he": "חזן הכנסת, ראש הכנסת והסגן",
+    "translit": "'Hazan ha-knesset, rosh ha-knesset ve-ha-segan",
+    "resume": "Pour la lecture du Cohen Gadol, le rouleau passe de main en main par ordre d'honneur : le 'hazan de la synagogue le prend et le donne au chef de la synagogue, qui le donne au segan, qui le donne au Cohen Gadol. Debout, il le reçoit et lit. Les trois restent près de lui pendant la lecture.",
+    "cotes": [
+      "le 'hazan",
+      "le chef de la synagogue",
+      "le segan"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "7:1", "citation": "חַזַּן הַכְּנֶסֶת נוֹטֵל סֵפֶר תּוֹרָה וְנוֹתְנוֹ לְרֹאשׁ הַכְּנֶסֶת, וְרֹאשׁ הַכְּנֶסֶת נוֹתְנוֹ לַסְּגָן, וְהַסְּגָן נוֹתְנוֹ לְכֹהֵן גָּדוֹל, וְכֹהֵן גָּדוֹל עוֹמֵד וּמְקַבֵּל וְקוֹרֵא"}
+    ],
+    "note": "Choix de la visite : leur place pendant la lecture, leur âge et leur habit. Le segan est vêtu en cohen ; le 'hazan et le chef de la synagogue comme les Israélites de la visite."
   }
 }

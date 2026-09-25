@@ -223,7 +223,7 @@ Quatre troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours l
 |---|---|---|
 | `figures` | `roles_de_la_visite()`, 5 | la zerika, deux Léviim, un anshei ma'amad, le Lévi de garde à Nikanor |
 | `figures_tamid` | `roles_du_tamid()`, 22 | les gestes du tamid du matin, douze Léviim, deux enfants, deux anshei ma'amad |
-| `figures_kippour` | `roles_kippour()`, 13 | le Cohen Gadol en lin sur le bouc émissaire (`seir.blend`), cinq cohanim et sept Israélites prosternés |
+| `figures_kippour` | `roles_kippour()`, 34 | le Cohen Gadol une fois par étape du seder ha'avoda — habits d'or (`bigdei_zahav_*`) ou de lin (`bigdei_lavan_*`), taureau (`shor.blend`), boucs (`seir.blend`), kalpi, ma'hta, mizrak, sefer —, les anciens, les tenants du drap, le segan et le chef de maison, ceux qui passent le rouleau, cinq cohanim et sept Israélites prosternés |
 | `figures_shoeva` | `roles_shoeva()`, 26 | la nuit de l'Ezrat Nashim : Léviim des quinze marches, trompettes, ronde aux torches |
 
 ```sh
@@ -233,6 +233,10 @@ Quatre troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours l
 ```
 
 Un essai réécrit le .glb de sa troupe avec ses seuls rôles : relancer la troupe entière avant de committer.
+
+Une troupe peut jouer plusieurs fois le même homme : chaque étape d'un parcours dit ses `figurants` (`parcours.json`,
+noms de rôles ou de concepts) et la visite ne montre qu'eux — le Cohen Gadol de Kippour a onze rôles, jamais deux à
+la fois. `le_cohen_gadol(nom)` leur donne une seule stature, un seul teint (`Humain(…, qui=)`) et une seule peau.
 Le bouc se regénère à part (`$BLENDER -b -P beit_hamikdash_seir.py`, quelques secondes), avant la troupe de Kippour.
 
 Torches et trompettes ne sont pas liées à la peau : `Accessoire` les anime objet par objet, et la visite allume la
