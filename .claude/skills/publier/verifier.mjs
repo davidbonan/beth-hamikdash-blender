@@ -111,6 +111,7 @@ async function suivreParcours(dossier) {
   for (const id of (await page.evaluate(() => window.__parcours.liste())).filter((p) => !seulement || seulement.includes(p))) {
     mkdirSync(`${dossier}/${id}`, { recursive: true })
     const n = await page.evaluate((id) => { window.__parcours.ouvrir(id); return window.__parcours.nombre() }, id)
+    const stations = await page.evaluate((id) => window.__parcours.stations(id), id)
     console.log('parcours', id, n, 'stations')
     // Chaque parcours charge sa troupe et passe par le noir : on l'attend avant la première image.
     // Sous SwiftShader, compiler une troupe neuve dépasse les trente secondes par défaut.
@@ -124,9 +125,24 @@ async function suivreParcours(dossier) {
       await capturer(`${dossier}/${id}/station_${i}.png`)
       const carte = await page.evaluate(() => ({
         titre: document.querySelector('#parcours h2').textContent, fiche: document.querySelector('#fiche h2')?.textContent,
-        ouverte: document.querySelector('#fiche').classList.contains('ouverte') }))
-      console.log('station', i, JSON.stringify(carte))
+        ouverte: document.querySelector('#fiche').classList.contains('ouverte'), figurants: window.__figurantsVus() }))
+      const absents = (stations[i].figurants ?? []).filter((nom) => !carte.figurants.some((vu) => vu === nom || vu.replace(/_\d+$/, '') === nom))
+      fautes += absents.length ? 1 : 0
+      console.log('station', i, JSON.stringify(carte), absents.length ? `FIGURANT ABSENT ${absents}` : '')
       if (i + 1 === n) break
+      const fondu = await page.evaluate(() => {
+        document.querySelector('#parcours .suivant').click()
+        return window.__parcours.trajet() === null
+      })
+      if (fondu) {
+        await page.waitForTimeout(500)
+        const ecart = await page.evaluate(() => +window.__parcours.ecartSol().toFixed(2))
+        fautes += Math.abs(ecart) > 0.3 ? 1 : 0
+        console.log(`fondu ${i} -> ${i + 1}`, JSON.stringify({ ecart }), Math.abs(ecart) > 0.3 ? 'SOL PERDU' : 'ok')
+        continue
+      }
+      await page.evaluate((i) => window.__parcours.aller(i), i)
+      await page.waitForTimeout(300)
       const marche = await page.evaluate((DEGAGEMENT) => {
         document.querySelector('#parcours .suivant').click()
         const trajet = window.__parcours.trajet()

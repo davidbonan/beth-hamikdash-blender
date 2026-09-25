@@ -1062,6 +1062,42 @@
       "nom": "Les prosternés de Kippour",
       "zone": "azara",
       "prefixes": []
+    },
+    {
+      "id": "bigdei_zahav",
+      "nom": "Le Cohen Gadol en habits d'or",
+      "zone": "lishkot",
+      "prefixes": []
+    },
+    {
+      "id": "bigdei_lavan",
+      "nom": "Le Cohen Gadol en habits blancs",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "zekenim",
+      "nom": "Les anciens du Beit Din",
+      "zone": "lishkot",
+      "prefixes": []
+    },
+    {
+      "id": "sadin_shel_butz",
+      "nom": "Le drap de byssus",
+      "zone": "lishkot",
+      "prefixes": []
+    },
+    {
+      "id": "goral",
+      "nom": "Le segan et le chef de maison au tirage",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "keriat_hatorah",
+      "nom": "Ceux qui lui passent le rouleau",
+      "zone": "ezrat_nashim",
+      "prefixes": []
     }
   ]
 }

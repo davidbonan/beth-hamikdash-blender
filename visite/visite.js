@@ -667,6 +667,8 @@ const EMPRISES_FIGURANTS = Object.fromEntries(Object.entries(figurants).map(([no
   [nom, Object.values(emprises).map(enBoite)]));
 // La voulue change à la demande, la présente sous le voile du fondu qui suit.
 let troupeVoulue = TROUPE_LIBRE, troupePresente = TROUPE_LIBRE;
+// Les figurants que l'étape d'un parcours appelle, par nom ou par concept ; null : toute la troupe.
+let appeles = null;
 const PRISE = new THREE.MeshBasicMaterial();
 const HAUTEUR_FLAMME_TORCHE = 0.3;
 
@@ -692,13 +694,21 @@ function prendreEnMain(figurant) {
   return prise;
 }
 
+// Où le figurant peut paraître : sa prise, et tout le trajet de son concept s'il marche ou danse.
+function etendueDe(figurant, prise, emprises, animations) {
+  const etendue = new THREE.Box3().setFromObject(prise);
+  const bouge = animations.some((clip) => clip.tracks.some((piste) => piste.name === `${figurant.name}.position`));
+  const trajet = bouge && emprises[conceptDe(figurant)];
+  return trajet ? etendue.union(enBoite(trajet)) : etendue;
+}
+
 // La tête d'étoupe est au bout du manche, sur l'axe y du maillage : la flamme s'y pose, droite, quoi que fasse la torche.
-function allumerTorches(troupe) {
+function allumerTorches(figurant, rang) {
   const torches = [];
-  troupe.traverse((o) => { if (o.isMesh && /_avouka(_\d+)?$/.test(o.name)) torches.push(o); });
+  figurant.traverse((o) => { if (o.isMesh && /_avouka(_\d+)?$/.test(o.name)) torches.push(o); });
   return torches.map((torche, i) => {
     torche.geometry.computeBoundingBox();
-    const meche = flamme(i * 1.93, HAUTEUR_FLAMME_TORCHE);
+    const meche = flamme((rang + i) * 1.93, HAUTEUR_FLAMME_TORCHE);
     scene.add(meche);
     horsGeometrie.push(meche);
     return { torche, meche, bout: new THREE.Vector3(0, torche.geometry.boundingBox.max.y - 0.06, 0) };
@@ -711,17 +721,35 @@ function suivreTorches(troupe) {
   for (const { torche, meche, bout } of troupe.torches) meche.position.copy(bout).applyMatrix4(torche.matrixWorld);
 }
 
-// Les autres troupes se cachent, et leurs prises sortent de ce que le doigt vise.
+const estAppele = (figurant) => appeles === null || appeles.has(figurant.name) || appeles.has(conceptDe(figurant));
+
+// Caché, un figurant sort de ce que le doigt vise, et ses torches s'éteignent.
+function montrerFigurant({ figurant, prise, torches }, visible) {
+  figurant.visible = visible;
+  for (const { meche } of torches) meche.visible = visible;
+  const rang = obstacles.indexOf(prise);
+  if (visible && rang < 0) obstacles.push(prise);
+  if (!visible && rang >= 0) obstacles.splice(rang, 1);
+}
+
+// Les autres troupes se cachent ; de la présente, les figurants que l'étape appelle.
 function montrerTroupes() {
   for (const [nom, troupe] of Object.entries(troupes)) {
     const presente = nom === troupePresente;
     troupe.scene.visible = presente;
-    for (const { meche } of troupe.torches) meche.visible = presente;
-    for (const prise of troupe.prises) {
-      const rang = obstacles.indexOf(prise);
-      if (presente && rang < 0) obstacles.push(prise);
-      if (!presente && rang >= 0) obstacles.splice(rang, 1);
-    }
+    for (const membre of troupe.membres) montrerFigurant(membre, presente && estAppele(membre.figurant));
+  }
+}
+
+// En marche, un figurant ne paraît ni ne disparaît sous les yeux : il attend d'être hors du cadre.
+const cadre = new THREE.Frustum(), projection = new THREE.Matrix4();
+function relayerHorsDuCadre() {
+  const troupe = troupes[troupePresente];
+  if (!troupe) return;
+  cadre.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+  for (const membre of troupe.membres) {
+    const voulu = estAppele(membre.figurant);
+    if (membre.figurant.visible !== voulu && !cadre.intersectsBox(membre.etendue)) montrerFigurant(membre, voulu);
   }
 }
 
@@ -754,7 +782,7 @@ function rendreLaMemoire(maillages) {
 }
 
 // Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
-async function poserFigurants({ scene: troupe, animations }) {
+async function poserFigurants({ scene: troupe, animations }, emprises) {
   const textures = texturesDe(troupe);
   // Un figurant se lit sur quelques centaines de pixels au plus : le profil léger ramène ses textures à cette mesure.
   await Promise.all(textures.map((t) => plafonner(t, PROFIL.textures.figurants)));
@@ -762,11 +790,17 @@ async function poserFigurants({ scene: troupe, animations }) {
   for (const clip of animations) melangeur.clipAction(clip).play();
   melangeur.update(0);
   troupe.updateMatrixWorld(true);
-  const prises = troupe.children.map(prendreEnMain);
-  const torches = allumerTorches(troupe);
+  let rang = 0;
+  const membres = troupe.children.map((figurant) => {
+    const prise = prendreEnMain(figurant);
+    prise.updateMatrixWorld();
+    const torches = allumerTorches(figurant, rang);
+    rang += torches.length;
+    return { figurant, prise, torches, etendue: etendueDe(figurant, prise, emprises, animations) };
+  });
   await envoyerTextures(textures);
   await compilerSousLesLampes(troupe);
-  return { scene: troupe, melangeur, prises, torches };
+  return { scene: troupe, melangeur, membres, torches: membres.flatMap((m) => m.torches) };
 }
 
 // Une lampe posée pendant la compilation change la clé de chaque nuanceur : on recompile jusqu'à ce que l'éclairage n'ait plus bougé.
@@ -781,7 +815,7 @@ async function compilerSousLesLampes(objet) {
 // Une troupe renvoyée pendant sa descente est libérée à l'arrivée, sans entrer en scène.
 function chargerTroupe(nom) {
   if (chargements[nom]) return chargements[nom];
-  const chargement = chargeur.loadAsync(TROUPES[nom].glb).then(poserFigurants).then((troupe) => {
+  const chargement = chargeur.loadAsync(TROUPES[nom].glb).then((glb) => poserFigurants(glb, figurants[nom].emprises)).then((troupe) => {
     if (chargements[nom] !== chargement) return libererTroupe(troupe);
     scene.add(troupe.scene);
     troupe.scene.updateMatrixWorld(true);
@@ -796,14 +830,14 @@ function chargerTroupe(nom) {
 chargerTroupe(TROUPE_LIBRE);
 
 // Chaque troupe de parcours pèse des dizaines de textures : gardées toutes, les trois parcours menaient la mémoire GPU de 0,7 à 1,2 Go.
-function libererTroupe({ scene: troupe, melangeur, prises, torches }) {
+function libererTroupe({ scene: troupe, melangeur, membres, torches }) {
   scene.remove(troupe);
   for (const { meche } of torches) {
     scene.remove(meche);
     horsGeometrie.splice(horsGeometrie.indexOf(meche), 1);
     meche.material.dispose();
   }
-  for (const prise of prises) {
+  for (const { prise } of membres) {
     const rang = obstacles.indexOf(prise);
     if (rang >= 0) obstacles.splice(rang, 1);
     prise.geometry.dispose();
@@ -1428,7 +1462,11 @@ function preterLaCamera(trajet) {
 const guides = parcours({
   parcours: PARCOURS, camera, sol: solEn, oeil: OEIL, ama: AMA,
   marcher: preterLaCamera,
-  arriver: () => preterLaCamera(null),
+  // Qui n'a pas quitté le cadre de toute la marche change à l'arrivée.
+  arriver: () => {
+    preterLaCamera(null);
+    montrerTroupes();
+  },
   poserA: (pieds, cible) => fondu(() => {
     tenirLaVue(false);
     poser(pieds);
@@ -1444,6 +1482,11 @@ const guides = parcours({
     chargerTroupe(voulue);
     fondu(() => presenterTroupe(voulue));
   },
+  appelerFigurants: (noms) => fondu(() => {
+    appeles = noms ? new Set(noms) : null;
+    montrerTroupes();
+  }),
+  relayerFigurants: (noms) => { appeles = noms ? new Set(noms) : null; },
   ouvrirFiche: montrer,
   fermerFiche: fermer,
 });
@@ -1467,6 +1510,7 @@ renderer.setAnimationLoop(() => {
       lieuPresent = lieuOccupe();
       accorderLampe(lieuPresent);
       accorderAir();
+      relayerHorsDuCadre();
     }
     accorderExposition(dt);
     ajusterEchelle(dt);
@@ -1576,5 +1620,6 @@ window.__mur = (origine, direction, portee) => {
   return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
 };
 window.__parcours = guides;
+window.__figurantsVus = () => troupes[troupePresente]?.membres.filter((m) => m.figurant.visible).map((m) => m.figurant.name) ?? [];
 window.__temps = (t) => { troupes[troupePresente]?.melangeur.setTime(t); dessiner(0); };
 window.__pret = true;

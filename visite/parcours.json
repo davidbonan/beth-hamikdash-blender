@@ -1,5 +1,5 @@
 {
- "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7) et la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7) et la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. `figurants`, d'une station : ceux de la troupe qu'elle montre, par nom (`sair_hamishtaleach`) ou par concept (`leviim` pour les douze) ; `[]` n'en montre aucun, sans lui toute la troupe. En marche, un figurant change hors du cadre, sinon à l'arrivée. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `fondu` une station qu'aucun chemin à pied ne rejoint — un toit —, où l'on arrive et d'où l'on part sous le voile, sans `via`, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
  "parcours": [
   {
    "id": "tamid",
@@ -14,6 +14,7 @@
      "id": "beit_hamoked",
      "moment": "avant_l_aube",
      "concept": "beit_hamoked",
+     "figurants": [],
      "source": {
       "oeuvre": "Tamid",
       "ref": "1:1-2"
@@ -43,6 +44,9 @@
      "id": "kiddoush_yadayim",
      "moment": "avant_l_aube",
      "concept": "kiddoush_yadayim",
+     "figurants": [
+      "kiddoush_yadayim"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "1:4"
@@ -86,6 +90,9 @@
      "id": "terumat_hadeshen",
      "moment": "avant_l_aube",
      "concept": "makom_hadeshen",
+     "figurants": [
+      "aliyat_hakevesh"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "1:4"
@@ -133,6 +140,9 @@
      "id": "siddour_hamaarakha",
      "moment": "avant_l_aube",
      "concept": "siddour_hamaarakha",
+     "figurants": [
+      "siddour_hamaarakha"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "2:3-4"
@@ -180,6 +190,9 @@
      "id": "zerika",
      "moment": "aube",
      "concept": "zerika",
+     "figurants": [
+      "zerika"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "4:1"
@@ -235,6 +248,9 @@
      "id": "melihat_haevarim",
      "moment": "aube",
      "concept": "melihat_haevarim",
+     "figurants": [
+      "melihat_haevarim"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "4:3"
@@ -281,6 +297,9 @@
     {
      "id": "hatavat_hanerot",
      "concept": "hatavat_hanerot",
+     "figurants": [
+      "hatavat_hanerot"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "6:1"
@@ -331,6 +350,11 @@
     {
      "id": "leviim",
      "concept": "leviim",
+     "figurants": [
+      "leviim",
+      "tzoarei_haleviim",
+      "anshei_maamad"
+     ],
      "source": {
       "oeuvre": "Tamid",
       "ref": "7:3"
@@ -389,6 +413,11 @@
     {
      "id": "anshei_maamad",
      "concept": "anshei_maamad",
+     "figurants": [
+      "leviim",
+      "tzoarei_haleviim",
+      "anshei_maamad"
+     ],
      "source": {
       "oeuvre": "Ta'anit",
       "ref": "4:2"
@@ -438,6 +467,10 @@
     {
      "id": "parhedrin",
      "concept": "lishkat_parhedrin",
+     "figurants": [
+      "bigdei_zahav_1",
+      "zekenim"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "1:1"
@@ -449,9 +482,9 @@
      "sol": -10,
      "via": [],
      "cible": [
-      -28.3,
-      -7.2,
-      80
+      -32.5,
+      -7.8,
+      75
      ],
      "titre": {
       "fr": "Lishkat Parhedrin : sept jours à l'écart",
@@ -468,38 +501,26 @@
      "id": "tevila_rishona",
      "moment": "aube",
      "concept": "shaar_hamayim",
+     "figurants": [
+      "bigdei_zahav_2",
+      "sadin_shel_butz_1",
+      "sadin_shel_butz_2"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "3:3"
      },
      "point": [
-      -16,
-      62
+      -19,
+      82.8
      ],
-     "sol": 0,
-     "via": [
-      [
-       -33.5,
-       87.5
-      ],
-      [
-       -12,
-       87.5
-      ],
-      [
-       -12,
-       74
-      ],
-      [
-       -12,
-       69.5
-      ]
-     ],
+     "sol": 26,
      "cible": [
-      -12,
-      12,
-      78
+      -19,
+      28.6,
+      76.8
      ],
+     "fondu": true,
      "titre": {
       "fr": "Sha'ar HaMayim : la première tevila",
       "en": "The Water Gate: the first immersion",
@@ -514,30 +535,26 @@
     {
      "id": "tevila_shniya",
      "concept": "lishkat_haparva",
+     "figurants": [
+      "bigdei_lavan_1",
+      "sadin_shel_butz_3",
+      "sadin_shel_butz_4"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "3:6"
      },
      "point": [
-      -58,
-      52
+      -88.8,
+      62.5
      ],
-     "sol": 0,
-     "via": [
-      [
-       -20,
-       53.5
-      ],
-      [
-       -47,
-       53.5
-      ]
-     ],
+     "sol": 22,
      "cible": [
-      -84,
-      12,
-      60
+      -77.8,
+      24.8,
+      62.5
      ],
+     "fondu": true,
      "titre": {
       "fr": "Beit HaParva : la deuxième tevila, les habits de lin",
       "en": "Beit HaParva: the second immersion, the linen garments",
@@ -552,6 +569,9 @@
     {
      "id": "viduy_rishon",
      "concept": "douze_marches_oulam",
+     "figurants": [
+      "bigdei_lavan_2"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "3:8"
@@ -561,20 +581,6 @@
       -14
      ],
      "sol": 0,
-     "via": [
-      [
-       -56,
-       50
-      ],
-      [
-       -56,
-       20
-      ],
-      [
-       -55.5,
-       0
-      ]
-     ],
      "cible": [
       -64,
       1.5,
@@ -594,6 +600,10 @@
     {
      "id": "goral",
      "concept": "tabaot",
+     "figurants": [
+      "bigdei_lavan_3",
+      "goral"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "3:9"
@@ -632,6 +642,9 @@
     {
      "id": "machta",
      "concept": "machta",
+     "figurants": [
+      "bigdei_lavan_4"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "4:3"
@@ -694,6 +707,7 @@
     {
      "id": "ketoret",
      "concept": "aron",
+     "figurants": [],
      "source": {
       "oeuvre": "Yoma",
       "ref": "5:1"
@@ -780,6 +794,9 @@
     {
      "id": "hazaot",
      "concept": "parokhet",
+     "figurants": [
+      "bigdei_lavan_5"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "5:4"
@@ -826,6 +843,9 @@
     {
      "id": "mizbeach_hazahav",
      "concept": "mizbeach_hazahav",
+     "figurants": [
+      "bigdei_lavan_6"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "5:5"
@@ -864,6 +884,10 @@
     {
      "id": "sair_hamishtaleach",
      "concept": "sair_hamishtaleach",
+     "figurants": [
+      "sair_hamishtaleach",
+      "korim_oumishtahavim"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "6:2"
@@ -918,6 +942,10 @@
     {
      "id": "keriat_hatorah",
      "concept": "ezrat_nashim",
+     "figurants": [
+      "bigdei_lavan_7",
+      "keriat_hatorah"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "7:1"
@@ -960,54 +988,26 @@
     {
      "id": "tevilot_acharonot",
      "concept": "lishkat_haparva",
+     "figurants": [
+      "bigdei_zahav_3",
+      "sadin_shel_butz_3",
+      "sadin_shel_butz_4"
+     ],
      "source": {
       "oeuvre": "Yoma",
       "ref": "7:4"
      },
      "point": [
-      -58,
-      52
+      -88.8,
+      62.5
      ],
-     "sol": 0,
-     "via": [
-      [
-       20,
-       0
-      ],
-      [
-       3,
-       0
-      ],
-      [
-       -6,
-       0
-      ],
-      [
-       -12.5,
-       0
-      ],
-      [
-       -16,
-       -4
-      ],
-      [
-       -20,
-       -12
-      ],
-      [
-       -55.5,
-       -12
-      ],
-      [
-       -55.5,
-       20
-      ]
-     ],
+     "sol": 22,
      "cible": [
-      -84,
-      12,
-      60
+      -77.8,
+      24.8,
+      62.5
      ],
+     "fondu": true,
      "titre": {
       "fr": "Beit HaParva : les dernières tevilot",
       "en": "Beit HaParva: the last immersions",
@@ -1034,6 +1034,11 @@
     {
      "id": "motzaei_yom_tov",
      "concept": "ezrat_nashim",
+     "figurants": [
+      "leviim_hamaalot",
+      "hassidim_veanshei_maase",
+      "shemone_avoukot"
+     ],
      "source": {
       "oeuvre": "Soucca",
       "ref": "5:1-2"
@@ -1062,6 +1067,11 @@
     {
      "id": "gezuztra",
      "concept": "gezuztra",
+     "figurants": [
+      "leviim_hamaalot",
+      "hassidim_veanshei_maase",
+      "shemone_avoukot"
+     ],
      "source": {
       "oeuvre": "Soucca",
       "ref": "51b"
@@ -1096,6 +1106,11 @@
     {
      "id": "menorot",
      "concept": "candelabres_shoeva",
+     "figurants": [
+      "leviim_hamaalot",
+      "hassidim_veanshei_maase",
+      "shemone_avoukot"
+     ],
      "source": {
       "oeuvre": "Soucca",
       "ref": "5:2"
@@ -1124,6 +1139,11 @@
     {
      "id": "petilot",
      "concept": "candelabres_shoeva",
+     "figurants": [
+      "leviim_hamaalot",
+      "hassidim_veanshei_maase",
+      "shemone_avoukot"
+     ],
      "source": {
       "oeuvre": "Soucca",
       "ref": "5:3"
@@ -1152,6 +1172,11 @@
     {
      "id": "avoukot",
      "concept": "hassidim_veanshei_maase",
+     "figurants": [
+      "leviim_hamaalot",
+      "hassidim_veanshei_maase",
+      "shemone_avoukot"
+     ],
      "source": {
       "oeuvre": "Soucca",
       "ref": "5:4"
@@ -1180,6 +1205,11 @@
     {
      "id": "leviim_maalot",
      "concept": "leviim_hamaalot",
+     "figurants": [
+      "leviim_hamaalot",
+      "hassidim_veanshei_maase",
+      "shemone_avoukot"
+     ],
      "source": {
       "oeuvre": "Soucca",
       "ref": "5:4"
