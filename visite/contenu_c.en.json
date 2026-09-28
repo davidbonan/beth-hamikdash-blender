@@ -1198,7 +1198,7 @@
   "parashat_hamelekh": {
     "nom": "What the king reads",
     "translit": "Parashat ha-melekh",
-    "resume": "The king reads sitting — and if he reads standing, it is praiseworthy. He opens, looks and blesses like any reader in the synagogue; he reads from “These are the words” to the end of the Shema, skips to “And if you listen”, then to “You shall surely tithe”, and from there reads in order to the end of the blessings and curses, stopping at “besides the covenant made with them at Chorev”. He rolls the scroll, blesses after it, and adds seven blessings; reading and blessings in the holy tongue, even if foreigners are present.",
+    "resume": "The king reads sitting — and if he reads standing, it is praiseworthy. He opens, looks and blesses like any reader in the synagogue; he reads from “These are the words” to the end of the Shema, skips to “And if you listen”, then to “You shall surely tithe”, and from there reads in order to the end of the blessings and curses, stopping at “besides the covenant made with them at Chorev”. He rolls the scroll, blesses after it, and adds seven blessings; reading and blessings in the holy tongue, even if speakers of other tongues are present.",
     "cotes": [
       "from “These are the words” to the end of the curses",
       "sitting, or standing",
@@ -1211,7 +1211,7 @@
       {"oeuvre": "Rambam Melakhim", "ref": "2:1", "citation": "וְאֵין מִשְׁתַּמְּשִׁין בְּשַׁרְבִיטוֹ. וְלֹא בְּכִתְרוֹ"},
       {"oeuvre": "Esther", "ref": "8:15", "citation": "בִּלְבוּשׁ מַלְכוּת תְּכֵלֶת וָחוּר וַעֲטֶרֶת זָהָב גְּדוֹלָה וְתַכְרִיךְ בּוּץ וְאַרְגָּמָן"}
     ],
-    "note": "Tour's choice: the king's crown, a gold circlet with six points; his robe of argaman, the colour of Esther's “royal garment”; his seat; his features."
+    "note": "Tour's choice: the king's crown, a gold circlet with six points; his robe of argaman, like the mantle of fine linen and argaman in which Mordecai leaves the king (Esther 8:15); his seat; his features."
   },
 
   "agrippas": {

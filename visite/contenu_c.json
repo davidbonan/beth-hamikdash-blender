@@ -1199,7 +1199,7 @@
   "parashat_hamelekh": {
     "he": "פרשת המלך",
     "translit": "Parashat ha-melekh",
-    "resume": "Le roi lit assis — et s'il lit debout, c'est louable. Il ouvre, regarde et bénit comme tout lecteur à la synagogue ; il lit depuis « Voici les paroles » jusqu'à la fin du Shema', saute à « Et si vous écoutez », puis à « Tu prélèveras la dîme », et de là lit à la suite jusqu'à la fin des bénédictions et des malédictions, et s'arrête à « en dehors de l'alliance conclue avec eux au 'Horev ». Il roule le rouleau, bénit après lui, et ajoute sept bénédictions ; lecture et bénédictions en langue sainte, même si des étrangers sont là.",
+    "resume": "Le roi lit assis — et s'il lit debout, c'est louable. Il ouvre, regarde et bénit comme tout lecteur à la synagogue ; il lit depuis « Voici les paroles » jusqu'à la fin du Shema', saute à « Et si vous écoutez », puis à « Tu prélèveras la dîme », et de là lit à la suite jusqu'à la fin des bénédictions et des malédictions, et s'arrête à « en dehors de l'alliance conclue avec eux au 'Horev ». Il roule le rouleau, bénit après lui, et ajoute sept bénédictions ; lecture et bénédictions en langue sainte, même devant des gens d'une autre langue.",
     "cotes": [
       "de « Voici les paroles » à la fin des malédictions",
       "assis, ou debout",
@@ -1212,7 +1212,7 @@
       {"oeuvre": "Rambam Melakhim", "ref": "2:1", "citation": "וְאֵין מִשְׁתַּמְּשִׁין בְּשַׁרְבִיטוֹ. וְלֹא בְּכִתְרוֹ"},
       {"oeuvre": "Esther", "ref": "8:15", "citation": "בִּלְבוּשׁ מַלְכוּת תְּכֵלֶת וָחוּר וַעֲטֶרֶת זָהָב גְּדוֹלָה וְתַכְרִיךְ בּוּץ וְאַרְגָּמָן"}
     ],
-    "note": "Choix de la visite : la couronne du roi, un cercle d'or à six fleurons ; sa robe d'argaman, couleur du « vêtement royal » d'Esther ; son siège ; ses traits."
+    "note": "Choix de la visite : la couronne du roi, un cercle d'or à six fleurons ; sa robe d'argaman, comme le manteau de byssus et d'argaman dans lequel Mordekhaï sort de chez le roi (Esther 8:15) ; son siège ; ses traits."
   },
 
   "agrippas": {

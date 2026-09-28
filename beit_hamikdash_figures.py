@@ -3942,7 +3942,7 @@ def atara(h, fleurons=6, n=48):
     lier(h, mm, f"{h.nom}_atara", metal(), "head")
 
 
-# L'argaman du « לְבוּשׁ מַלְכוּת » (Esther 8:15), sur la robe longue : CHOIX.
+# L'argaman du « תַכְרִיךְ בּוּץ וְאַרְגָּמָן » de Mordekhaï (Esther 8:15), sur la robe longue : CHOIX.
 ROBE_ROYALE = Habit("punkduck_medieval_dress", "Figure_Robe_Royale", ARGAMAN, longue=True)
 
 
