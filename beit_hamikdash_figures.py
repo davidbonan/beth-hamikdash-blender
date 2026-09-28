@@ -2798,6 +2798,24 @@ def _parhedrin(nom, ou, cap):
     return Role(nom, "bigdei_zahav", batir, geste, ou, cap, famille="cohanim")
 
 
+# « הוּא פוֹרֵשׁ וּבוֹכֶה, וְהֵן פּוֹרְשִׁין וּבוֹכִין » (Yoma 1:5) : chacun détourné, la tête basse, la droite sur les yeux.
+def pleurer(h, a, horloge, t):
+    sanglot = 0.5 + 0.5 * horloge.onde(t, 3.4)
+    yeux = a.au("spine_03", Vector((0.0, -0.21, h.z_epaule + 0.18)))
+    return G.composer(G.debout(a, horloge, t, 0.5, regard=0.0), G.buste(flexion=0.10 + 0.04 * sanglot),
+                      G.tete(flexion=0.30 + 0.06 * sanglot), G.bras(a, "r", yeux, coude_ouvert(a, "r")),
+                      G.paume(a, "r", lambda poses: a.dans("spine_03", poses, -G.DEVANT + G.HAUT * 0.3)),
+                      G.doigts(a, "r", 0.20, 0.1), G.doigts(a, "l", 0.35, 0.15))
+
+
+# Les anciens de la kehouna qui le reçoivent au Beit Avtinas (Yoma 1:5), hors service : vêtus comme ceux du Beit Din.
+def _zaken_kehuna(k, ou, cap):
+    nom = f"zikenei_kehuna_{k + 1}"
+    gabarit = Gabarit(1.70 + 0.06 * _alea(nom, 1), age=0.86 + 0.08 * _alea(nom, 0), poids=0.45, peau="old_caucasian_male")
+    return Role(nom, "zikenei_kehuna", lambda: fidele(nom, "costume", gabarit, gris=True, tete="talith"), pleurer,
+                ou, cap, famille="cohanim")
+
+
 # « פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם » (Yoma 3:4, 3:6) : deux cohanim le tendent par ses coins hauts, face à face.
 # Qui le tient, et à hauteur d'épaule — la tête du Cohen Gadol passe au-dessus — : CHOIX.
 COIN_DU_DRAP = Vector((0.0, -0.24, 1.50))
@@ -3075,6 +3093,21 @@ def _keriat_hatorah(nom, ou):
                 ou, 180.0, famille="cohanim")
 
 
+# En habits d'or, il fait lui-même le tamid : « קְרָצוֹ … וְקִבֵּל אֶת הַדָּם וּזְרָקוֹ » (Yoma 3:4), au coin nord-est (Tamid 4:1) ;
+# le soir, la ketoret et les nerot (Yoma 7:4), sur la pierre de la Menora (Tamid 3:9). Places et caps du tamid.
+def _zerika_du_cohen_gadol(nom):
+    def batir():
+        h = cohen_gadol_en_or(nom)
+        tenir(h, "mizrak", mizrak, "spine_03", repere_mizrak(h))
+        return h
+    return Role(nom, "bigdei_zahav", batir, zerika, (-20.5, 4.6, Z_AZ), 142.0, famille="cohanim")
+
+
+def _nerot_du_cohen_gadol(nom):
+    return Role(nom, "bigdei_zahav", lambda: cohen_gadol_en_or(nom), hatava, (-123.6, -7.5, Z_BAT + 0.9), 180.0,
+                duree=10.0, famille="cohanim")
+
+
 def _aupres_du_sefer(k, ou, cap):
     nom = f"keriat_hatorah_{k + 1}"
     gabarit = Gabarit(1.70 + 0.08 * _alea(nom, 1), age=0.50 + 0.4 * _alea(nom, 0))
@@ -3098,8 +3131,13 @@ def roles_kippour():
     return [
         _parhedrin("bigdei_zahav_1", (-31.0, -76.3, Z_EZN), 90.0),
         _zaken(0, (-34.3, -73.9, Z_EZN), True), _zaken(1, (-31.9, -73.9, Z_EZN), False),
+        # Au Beit Avtinas, lui à la fenêtre sur l'Azara, eux entre le mortier et la porte est.
+        Role("bigdei_zahav_4", "bigdei_zahav", lambda: cohen_gadol_en_or("bigdei_zahav_4"), pleurer,
+             (-11.2, -74.8, SUR_SHAAR_HAMAYIM), 100.0, famille="cohanim"),
+        _zaken_kehuna(0, (-9.3, -77.2, SUR_SHAAR_HAMAYIM), 160.0), _zaken_kehuna(1, (-9.0, -79.2, SUR_SHAAR_HAMAYIM), 120.0),
         _derriere_le_drap("bigdei_zahav_2", cohen_gadol_en_or, "bigdei_zahav", (-19.0, -76.8, SUR_SHAAR_HAMAYIM), -90.0),
         *_tenants(1, (-20.4, -75.0), (-17.7, -75.0), SUR_SHAAR_HAMAYIM),
+        _zerika_du_cohen_gadol("bigdei_zahav_5"),
         _derriere_le_drap("bigdei_lavan_1", cohen_gadol, "bigdei_lavan", PRES_DU_MIKVE, 180.0),
         *_tenants(3, (-76.3, -64.6), (-76.3, -60.4), TOIT_DE_LA_PARVA),
         _viduy_rishon("bigdei_lavan_2", (-61.0, 15.2, Z_AZ)),
@@ -3112,6 +3150,7 @@ def roles_kippour():
         _keriat_hatorah("bigdei_lavan_7", (37.0, 0.0, Z_EZN)),
         _aupres_du_sefer(0, (37.4, 1.9, Z_EZN), 200.0), _aupres_du_sefer(1, (38.6, -1.9, Z_EZN), 160.0),
         _aupres_du_sefer(2, (40.0, -3.3, Z_EZN), 160.0),
+        _nerot_du_cohen_gadol("bigdei_zahav_6"),
         _derriere_le_drap("bigdei_zahav_3", cohen_gadol_en_or, "bigdei_zahav", PRES_DU_MIKVE, 180.0),
     ] + [_cohen_prosterne(k) for k in range(len(PROSTERNES_COHANIM))] + [
         _israel_prosterne(k) for k in range(len(PROSTERNES_ISRAEL))]

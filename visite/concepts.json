@@ -1082,6 +1082,12 @@
       "prefixes": []
     },
     {
+      "id": "zikenei_kehuna",
+      "nom": "Les anciens de la kehouna",
+      "zone": "lishkot",
+      "prefixes": []
+    },
+    {
       "id": "sadin_shel_butz",
       "nom": "Le drap de byssus",
       "zone": "lishkot",

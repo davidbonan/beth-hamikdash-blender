@@ -498,6 +498,72 @@
      }
     },
     {
+     "id": "hashbaa",
+     "concept": "beit_avtinas",
+     "figurants": [
+      "bigdei_zahav_4",
+      "zikenei_kehuna"
+     ],
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "1:5"
+     },
+     "point": [
+      -15,
+      74.4
+     ],
+     "sol": 26,
+     "cible": [
+      -10.6,
+      28.6,
+      75.8
+     ],
+     "fondu": true,
+     "titre": {
+      "fr": "Beit Avtinas : le serment",
+      "en": "Beit Avtinas: the oath",
+      "he": "בית אבטינס: השבועה"
+     },
+     "texte": {
+      "fr": "Les anciens du Beit Din le remettent aux anciens de la kehouna, qui le font monter à l'étage du Beit Avtinas, où l'on pile l'encens. Ils l'adjurent : « Mon maître le Cohen Gadol, nous sommes les envoyés du Beit Din, et toi, notre envoyé et l'envoyé du Beit Din. Nous t'adjurons par Celui qui a fait résider Son Nom dans cette maison de ne rien changer à tout ce que nous t'avons dit. » Il se détourne et pleure, et eux se détournent et pleurent (Yoma 1:5).",
+      "en": "The elders of the Beit Din hand him over to the elders of the priesthood, who take him up to the upper room of the Beit Avtinas, where the incense is ground. They adjure him: “My master the Kohen Gadol, we are the messengers of the Beit Din, and you are our messenger and the messenger of the Beit Din. We adjure you by Him who made His Name dwell in this house that you change nothing of all we have told you.” He turns aside and weeps, and they turn aside and weep (Yoma 1:5).",
+      "he": "מסרוהו זקני בית דין לזקני כהונה, והעלוהו לעליית בית אבטינס, מקום שבו שוחקים את הקטורת. והשביעוהו: ״אישי כהן גדול, אנו שלוחי בית דין, ואתה שלוחנו ושליח בית דין. משביעין אנו עליך במי ששיכן שמו בבית הזה, שלא תשנה דבר מכל מה שאמרנו לך.״ הוא פורש ובוכה, והן פורשין ובוכין (יומא א, ה)."
+     }
+    },
+    {
+     "id": "leil_kippour",
+     "moment": "aube",
+     "concept": "lishkat_parhedrin",
+     "figurants": [
+      "bigdei_zahav_1",
+      "zekenim"
+     ],
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "1:6-7"
+     },
+     "point": [
+      -26.5,
+      80
+     ],
+     "sol": -10,
+     "cible": [
+      -34,
+      -7.5,
+      75.5
+     ],
+     "titre": {
+      "fr": "Lishkat Parhedrin : la nuit sans sommeil",
+      "en": "Lishkat Parhedrin: the sleepless night",
+      "he": "לשכת פלהדרין: הלילה בלי שינה"
+     },
+     "texte": {
+      "fr": "Toute la nuit, on le tient éveillé. S'il est savant, il explique ; sinon, des disciples des sages expliquent devant lui. S'il a l'habitude de lire, il lit ; sinon, on lit devant lui — Iyov, Ezra, Divrei HaYamim ; Zekharya ben Kevoutal dit : « Bien des fois j'ai lu devant lui Daniel » (Yoma 1:6). S'il veut s'assoupir, les jeunes cohanim claquent du doigt du milieu devant lui : « Mon maître le Cohen Gadol, lève-toi et rafraîchis-toi une fois sur le dallage », jusqu'à l'heure de la she'hita (Yoma 1:7). Où, la Mishna ne le dit pas : la visite le garde dans sa lishka.",
+      "en": "All night long he is kept awake. If he is a scholar, he expounds; if not, disciples of the sages expound before him. If he is used to reading, he reads; if not, they read before him — Job, Ezra, Chronicles; Zekharya ben Kevutal says: “Many times I read Daniel before him” (Yoma 1:6). If he starts to doze, the young priests snap their middle finger before him: “My master the Kohen Gadol, get up and cool yourself once on the floor,” until the time of the slaughter (Yoma 1:7). Where, the Mishna does not say: the tour keeps him in his chamber.",
+      "he": "כל הלילה מעסיקים אותו שלא יישן. אם היה חכם, דורש; ואם לאו, תלמידי חכמים דורשין לפניו. ואם רגיל לקרות, קורא; ואם לאו, קורין לפניו – באיוב ובעזרא ובדברי הימים; זכריה בן קבוטל אומר: ״פעמים הרבה קריתי לפניו בדניאל״ (יומא א, ו). ביקש להתנמנם, פרחי כהונה מכין לפניו באצבע צרדה ואומרים לו: ״אישי כהן גדול, עמוד והפג אחת על הרצפה״, עד שיגיע זמן השחיטה (יומא א, ז). היכן – המשנה אינה אומרת; הסיור משאירו בלשכתו."
+     }
+    },
+    {
      "id": "tevila_rishona",
      "moment": "aube",
      "concept": "shaar_hamayim",
@@ -530,6 +596,38 @@
       "fr": "Nul n'entre dans l'Azara pour le service sans s'être immergé. Le Cohen Gadol s'immerge cinq fois ce jour-là et sanctifie dix fois ses mains et ses pieds, toutes dans le sanctuaire, sur le Beit HaParva, sauf celle-ci, la première, dans le profane : au-dessus de la porte des Eaux, à côté de sa lishka (Yoma 31a).",
       "en": "No one enters the Azara for the service without immersing. The High Priest immerses five times that day and sanctifies his hands and feet ten times, all in the sanctuary, on the Beit HaParva, except this one, the first, in the profane: above the Water Gate, beside his chamber (Yoma 31a).",
       "he": "אין אדם נכנס לעזרה לעבודה עד שיטבול. חמש טבילות ועשרה קידושין טובל כהן גדול ומקדש בו ביום, וכולן בקודש על בית הפרווה, חוץ מזו, הראשונה, שהייתה בחול: על גבי שער המים, ובצד לשכתו הייתה (יומא לא ע״א)."
+     }
+    },
+    {
+     "id": "tamid_kohen_gadol",
+     "moment": "aube",
+     "concept": "zerika",
+     "figurants": [
+      "bigdei_zahav_5"
+     ],
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "3:1-4"
+     },
+     "point": [
+      -19,
+      -13
+     ],
+     "sol": 0,
+     "cible": [
+      -20.5,
+      3,
+      -4.6
+     ],
+     "titre": {
+      "fr": "Le tamid du matin, de la main du Cohen Gadol",
+      "en": "The morning tamid, by the Kohen Gadol’s hand",
+      "he": "תמיד של שחר בידי הכהן הגדול"
+     },
+     "texte": {
+      "fr": "« Sortez et voyez si l'heure de la she'hita est venue. » Le guetteur répond : « Barkai ! » — l'est s'éclaire jusqu'à 'Hevron (Yoma 3:1). Ce jour-là, tout le service est du Cohen Gadol, jusqu'à l'encens de chaque jour et aux lampes (Rambam, Avodat Yom HaKippourim 1:2). En habits d'or, il entaille le tamid, un autre achève la she'hita ; il reçoit le sang et le jette sur l'autel, puis entre faire la ketoret du matin et l'entretien des lampes, et offre la tête, les membres, les 'havitin et le vin (Yoma 3:4). Les sept agneaux du moussaf montent avec ce tamid, selon R. Akiva (Yoma 7:3), dont la halakha suit l'avis (Bartenura).",
+      "en": "“Go out and see whether the time for slaughter has come.” The watcher answers: “Barkai!” — the east is lit as far as Hebron (Yoma 3:1). On this day the whole service is the Kohen Gadol’s, down to the daily incense and the lamps (Rambam, Avodat Yom HaKippurim 1:2). In the golden garments he cuts the tamid, another completes the slaughter; he receives the blood and casts it on the altar, then goes in for the morning incense and the tending of the lamps, and offers the head, the limbs, the griddle-cakes and the wine (Yoma 3:4). The seven lambs of the musaf are offered with this tamid, according to R. Akiva (Yoma 7:3), whose view the halakha follows (Bartenura).",
+      "he": "״צאו וראו אם הגיע זמן השחיטה.״ הרואה אומר: ״ברקאי!״ – האיר פני כל המזרח עד שבחברון (יומא ג, א). ביום זה כל העבודה בכהן גדול, אף הקטרת הקטורת של כל יום והטבת הנרות (רמב״ם, עבודת יום הכיפורים א, ב). בבגדי זהב קרצו, ומירק אחר שחיטה על ידו; קיבל את הדם וזרקו, נכנס להקטיר קטורת של שחר ולהטיב את הנרות, ולהקריב את הראש ואת האברים ואת החביתין ואת היין (יומא ג, ד). שבעת הכבשים של מוסף קרבים עם תמיד זה, כדברי רבי עקיבא (יומא ז, ג), והלכה כמותו (ברטנורא)."
      }
     },
     {
@@ -940,6 +1038,53 @@
      }
     },
     {
+     "id": "shilouah",
+     "concept": "shaar_shushan",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "6:4-8"
+     },
+     "point": [
+      198,
+      0
+     ],
+     "sol": -16,
+     "via": [
+      [
+       -12.5,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       20,
+       0
+      ],
+      [
+       140,
+       0
+      ]
+     ],
+     "cible": [
+      230,
+      -10,
+      0
+     ],
+     "titre": {
+      "fr": "Sha'ar Shushan : le bouc vers le désert",
+      "en": "Sha'ar Shushan: the goat to the wilderness",
+      "he": "שער שושן: השעיר למדבר"
+     },
+     "texte": {
+      "fr": "On lui avait fait une chaussée, à cause des Babyloniens qui lui tiraient les poils : « Prends et va, prends et va ! » Des notables de Jérusalem accompagnent celui qui le mène jusqu'à la première des dix soukkot qui jalonnent les douze mil jusqu'au rocher (Yoma 6:4). Là-bas, il partage le fil d'écarlate, en noue une moitié au rocher, l'autre entre les cornes, et le pousse en arrière (6:6). Au Temple, on sait qu'il est au désert aux soudarin agités de relais en relais ; selon R. Yishmael, le fil d'écarlate noué à la porte du Heikhal blanchissait : « Si vos fautes sont comme l'écarlate, elles blanchiront comme la neige » (Yoma 6:8). Par quelle porte il sortait, la Mishna ne le dit pas : la visite le fait partir par celle de l'est.",
+      "en": "A causeway had been made for it, because of the Babylonians who pulled its hair: “Take and go, take and go!” Notables of Jerusalem escort the man leading it as far as the first of the ten booths that mark the twelve mil to the cliff (Yoma 6:4). There he divides the crimson thread, ties half to the rock and half between the horns, and pushes it backward (6:6). In the Temple they know it has reached the wilderness by the scarves waved from post to post; according to R. Yishmael, the crimson thread tied at the door of the Heikhal turned white: “Though your sins be like scarlet, they shall be white as snow” (Yoma 6:8). Which gate it left by, the Mishna does not say: the tour sends it out by the eastern one.",
+      "he": "וכבש עשו לו מפני הבבליים, שהיו מתלשים בשערו ואומרים לו: ״טול וצא, טול וצא!״ מיקירי ירושלים היו מלווים את המשלח עד סוכה הראשונה, מעשר סוכות שמירושלים ועד הצוק, שנים עשר מיל (יומא ו, ד). שם חולק לשון של זהורית, חציו קושר בסלע וחציו בין שתי קרניו, ודוחפו לאחוריו (ו, ו). במקדש יודעים שהגיע השעיר למדבר בסודרין שמניפים מדרכייה לדרכייה; רבי ישמעאל אומר: לשון של זהורית היה קשור על פתחו של היכל, וכשהגיע השעיר למדבר היה הלשון מלבין, שנאמר ״אם יהיו חטאיכם כשנים כשלג ילבינו״ (יומא ו, ח). באיזה שער יצא, המשנה אינה אומרת; הסיור מוציאו בשער המזרח."
+     }
+    },
+    {
      "id": "keriat_hatorah",
      "concept": "ezrat_nashim",
      "figurants": [
@@ -957,15 +1102,7 @@
      "sol": -10,
      "via": [
       [
-       -12.5,
-       0
-      ],
-      [
-       3,
-       0
-      ],
-      [
-       20,
+       140,
        0
       ]
      ],
@@ -995,7 +1132,7 @@
      ],
      "source": {
       "oeuvre": "Yoma",
-      "ref": "7:4"
+      "ref": "7:3-4"
      },
      "point": [
       -88.8,
@@ -1014,9 +1151,40 @@
       "he": "בית הפרווה: הטבילות האחרונות"
      },
      "texte": {
-      "fr": "Retour au Beit HaParva. Habits d'or pour son bélier et le bélier du peuple (Yoma 7:3) ; habits blancs pour aller retirer la cuiller et la ma'hta du Kodesh HaKodashim ; habits d'or pour l'encens du soir et l'entretien des lampes — une tevila et deux kiddoushim à chaque changement, cinq tevilot en tout. Puis ses propres habits : on l'accompagne jusqu'à sa maison, et il fait fête à ses proches d'être sorti en paix du sanctuaire.",
-      "en": "Back to the Beit HaParva. Golden garments for his ram and the people’s ram (Yoma 7:3); white garments to bring the spoon and the machta out of the Kodesh HaKodashim; golden garments for the evening incense and the tending of the lamps — an immersion and two sanctifications at each change, five immersions in all. Then his own clothes: they escort him to his house, and he makes a feast for his friends for having come out of the sanctuary in peace.",
-      "he": "חזרה לבית הפרווה. בגדי זהב לאילו ולאיל העם (יומא ז, ג); בגדי לבן להוציא את הכף ואת המחתה מקודש הקודשים; בגדי זהב לקטורת של בין הערביים ולהטבת הנרות – טבילה ושני קידושים בכל חילוף, חמש טבילות בסך הכול. ואחר כך בגדי עצמו: מלווים אותו עד ביתו, ויום טוב היה עושה לאוהביו בשעה שיצא בשלום מן הקודש."
+      "fr": "Retour au Beit HaParva, trois fois encore. Habits d'or pour son bélier et le bélier du peuple (Yoma 7:3) ; habits blancs pour retirer la cuiller et la ma'hta du Kodesh HaKodashim ; habits d'or pour l'encens du soir et les lampes (7:4). À chaque changement, une tevila et deux kiddoushim : cinq tevilot et dix kiddoushim dans la journée (Yoma 3:3).",
+      "en": "Back to the Beit HaParva, three more times. Golden garments for his ram and the people’s ram (Yoma 7:3); white garments to bring the spoon and the machta out of the Kodesh HaKodashim; golden garments for the evening incense and the lamps (7:4). At each change, one immersion and two sanctifications: five immersions and ten sanctifications in the day (Yoma 3:3).",
+      "he": "חזרה לבית הפרווה, עוד שלוש פעמים. בגדי זהב לאילו ולאיל העם (יומא ז, ג); בגדי לבן להוציא את הכף ואת המחתה מקודש הקודשים; בגדי זהב לקטורת של בין הערביים ולהטבת הנרות (ז, ד). בכל חילוף טבילה ושני קידושים: חמש טבילות ועשרה קידושים ביום (יומא ג, ג)."
+     }
+    },
+    {
+     "id": "heikhal_baerev",
+     "concept": "menora",
+     "figurants": [
+      "bigdei_zahav_6"
+     ],
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "7:4"
+     },
+     "point": [
+      -112,
+      4
+     ],
+     "sol": 6,
+     "cible": [
+      -122.5,
+      8.8,
+      7.5
+     ],
+     "titre": {
+      "fr": "Le Heikhal au soir : la ma'hta, l'encens, les lampes",
+      "en": "The Heikhal at evening: the machta, the incense, the lamps",
+      "he": "ההיכל בערב: המחתה, הקטורת והנרות"
+     },
+     "texte": {
+      "fr": "En habits blancs, il entre une quatrième fois au Kodesh HaKodashim, pour en ressortir la cuiller et la ma'hta. Puis, en habits d'or, il revient ici brûler l'encens du soir et entretenir les lampes de la Menora. Il sanctifie mains et pieds, se dévêt ; on lui apporte ses propres habits. On l'accompagne jusqu'à sa maison, et il fait fête à ceux qui l'aiment d'être sorti en paix du sanctuaire (Yoma 7:4).",
+      "en": "In the white garments he enters the Kodesh HaKodashim a fourth time, to bring out the spoon and the machta. Then, in the golden garments, he comes back here to burn the evening incense and tend the lamps of the Menorah. He sanctifies hands and feet and undresses; they bring him his own clothes. They escort him to his house, and he makes a feast for those who love him, for having come out of the sanctuary in peace (Yoma 7:4).",
+      "he": "בבגדי לבן נכנס פעם רביעית לקודש הקודשים להוציא את הכף ואת המחתה. ואחר כך, בבגדי זהב, חוזר לכאן להקטיר קטורת של בין הערביים ולהיטיב את נרות המנורה. מקדש ידיו ורגליו ופושט; מביאים לו בגדי עצמו ולובש. ומלווים אותו עד ביתו, ויום טוב היה עושה לאוהביו בשעה שיצא בשלום מן הקודש (יומא ז, ד)."
      }
     }
    ]
