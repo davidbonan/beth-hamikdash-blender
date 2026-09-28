@@ -1098,6 +1098,168 @@
       "nom": "Ceux qui lui passent le rouleau",
       "zone": "ezrat_nashim",
       "prefixes": []
+    },
+    {
+      "id": "kat_shniya",
+      "nom": "Le deuxième groupe",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "bazikhin",
+      "nom": "Les rangées de bazikhin",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "shechitat_hapessah",
+      "nom": "La she'hita et la zerika du pessa'h",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "hallel_bepessah",
+      "nom": "Le Hallel et les trompettes",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "tolin_umafshitin",
+      "nom": "Suspendre et dépouiller",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "magis",
+      "nom": "Le cohen au magis",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "yoshvim_bacheil",
+      "nom": "Le deuxième groupe, assis dans le 'Heil",
+      "zone": "har_habayit",
+      "prefixes": []
+    },
+    {
+      "id": "maalei_bikkourim",
+      "nom": "Ceux qui montent les bikkourim",
+      "zone": "har_habayit",
+      "prefixes": []
+    },
+    {
+      "id": "shir_habikkourim",
+      "nom": "Le chant des Léviim",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "mikra_bikkourim",
+      "nom": "La lecture des bikkourim",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "tenoufat_bikkourim",
+      "nom": "La tenoufa des bikkourim",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "salei_bikkourim",
+      "nom": "Les corbeilles au pied de l'autel",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "esser_kedushot",
+      "nom": "Les dix degrés de sainteté",
+      "zone": "har_habayit",
+      "prefixes": []
+    },
+    {
+      "id": "nissoukh_hamayim",
+      "nom": "La libation de l'eau",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "tekiot_shaar_hamayim",
+      "nom": "Les trompettes de Sha'ar HaMayim",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "aravot",
+      "nom": "Les aravot autour de l'autel",
+      "zone": "mizbeach",
+      "prefixes": []
+    },
+    {
+      "id": "hakafot_hamizbeach",
+      "nom": "Le tour de l'autel",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "hakhel",
+      "nom": "Hakhel",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "bimat_hamelekh",
+      "nom": "La bima de bois",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "haavarat_hasefer",
+      "nom": "Le rouleau de main en main",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "parashat_hamelekh",
+      "nom": "Ce que lit le roi",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "agrippas",
+      "nom": "Le roi Agrippas",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "kahal",
+      "nom": "Les hommes, les femmes et les enfants",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "nazir",
+      "nom": "Le nazir",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "metzora",
+      "nom": "Le metzora",
+      "zone": "ezrat_nashim",
+      "prefixes": []
+    },
+    {
+      "id": "taharat_hametzora",
+      "nom": "Le metzora à Sha'ar Nikanor",
+      "zone": "azara",
+      "prefixes": []
+    },
+    {
+      "id": "log_hashemen",
+      "nom": "Le log d'huile du metzora",
+      "zone": "azara",
+      "prefixes": []
     }
   ]
 }

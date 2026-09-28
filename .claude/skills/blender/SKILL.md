@@ -216,7 +216,7 @@ Toute cuisson — ciblée (`--recuire`) ou complète (`--lumiere tout`) — pass
 Chaque rôle porte le nom de son concept — `zerika`, `leviim_3`, `anshei_maamad_1` — et c'est par ce nom que la visite
 ouvre sa fiche au clic. Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
 
-Quatre troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours la sienne (`troupe` dans `parcours.json`),
+Neuf troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours la sienne (`troupe` dans `parcours.json`),
 à la première demande :
 
 | Troupe | Rôles | Qui |
@@ -225,6 +225,11 @@ Quatre troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours l
 | `figures_tamid` | `roles_du_tamid()`, 22 | les gestes du tamid du matin, douze Léviim, deux enfants, deux anshei ma'amad |
 | `figures_kippour` | `roles_kippour()`, 34 | le Cohen Gadol une fois par étape du seder ha'avoda — habits d'or (`bigdei_zahav_*`) ou de lin (`bigdei_lavan_*`), taureau (`shor.blend`), boucs (`seir.blend`), kalpi, ma'hta, mizrak, sefer —, les anciens, les tenants du drap, le segan et le chef de maison, ceux qui passent le rouleau, cinq cohanim et sept Israélites prosternés |
 | `figures_shoeva` | `roles_shoeva()`, 26 | la nuit de l'Ezrat Nashim : Léviim des quinze marches, trompettes, ronde aux torches |
+| `figures_pessah` | `roles_pessah()`, 37 | le korban Pessa'h : le deuxième groupe et ses agneaux, les rangées de bazikhin d'or et d'argent, la she'hita et le sang de main en main, le Hallel des Léviim, les crochets et la baguette, le magis, le troisième groupe assis sur le 'Heil |
+| `figures_bikkourim` | `roles_bikkourim()`, 26 | les porteurs et le taureau aux cornes dorées, les Léviim d'« Aromimkha », la lecture et la tenoufa, les corbeilles et les tourterelles |
+| `figures_souccot` | `roles_souccot()`, 13 | Souccot au matin : la tzelo'hit à Sha'ar HaMayim, la libation de l'eau, les aravot sur le yessod, le tour de l'autel |
+| `figures_hakhel` | `roles_hakhel()`, 29 | Hakhel : le roi sur la bima de bois (`sol_porte`), assis ou debout, Agrippas, le rouleau de main en main, les hommes et les enfants autour, les femmes à la gezuztra |
+| `figures_nazir` | `roles_nazir()`, 6 | le nazir au foyer de sa lishka, le metzora au mikve puis sur le seuil de Nikanor, le sang à l'oreille, les sept aspersions d'huile |
 
 ```sh
 /Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                            # la visite libre

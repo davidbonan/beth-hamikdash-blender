@@ -104,7 +104,7 @@ un asset manquant. Deux niveaux.
 
 ```bash
 curl -sIL https://bethhamikdach.com/visite | grep -i "^HTTP\|^location"
-for f in visite.js temple.glb figures.glb figures_tamid.glb figures_kippour.glb figures_shoeva.glb figures.json concepts.json reperes.json textes.json; do
+for f in visite.js temple.glb figures.glb figures_tamid.glb figures_kippour.glb figures_shoeva.glb figures_pessah.glb figures_bikkourim.glb figures_souccot.glb figures_hakhel.glb figures_nazir.glb figures.json concepts.json reperes.json textes.json; do
   curl -s -o /dev/null -w "$f %{http_code}\n" "https://bethhamikdach.com/visite/$f"
 done
 ```

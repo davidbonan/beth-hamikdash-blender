@@ -365,7 +365,7 @@ class Humain:
         yeux = _asset(self.corps, "Eyes", "eyes/low-poly/low-poly.mhclo")
         teinter_objet(yeux, (1.0, 1.0, 1.0), 256)
         self.accessoires = [yeux]
-        poils = [("Eyebrows", f"eyebrows/eyebrow{sourcils:03d}/eyebrow{sourcils:03d}.mhclo"),
+        poils = [("Eyebrows", sourcils and f"eyebrows/eyebrow{sourcils:03d}/eyebrow{sourcils:03d}.mhclo"),
                  ("Hair", cheveux and f"hair/{cheveux}/{cheveux}.mhclo")]
         poils += [("Clothes", f"clothes/{b}/{b}.mhclo") for b in barbe or ()]
         self.cheveux = None
@@ -1926,15 +1926,21 @@ def repere_mizrak(h):
     return repere_vers(devant_poitrine(h, 0.30, 0.34), G.HAUT, G.GAUCHE)
 
 
-def zerika(h, a, horloge, t):
-    coupe = a.repere("spine_03", repere_mizrak(h))
-    incline = 0.5 - 0.5 * horloge.onde(t, 8.0, 0.25)
-    return G.composer(G.debout(a, horloge, t, 0.2, regard=0.05), G.buste(flexion=0.18 * incline),
-                      G.tete(flexion=0.20 * incline),
-                      G.bras(a, "l", lambda poses: coupe(poses) @ Vector((0.11, 0.0, 0.03))),
-                      G.bras(a, "r", lambda poses: coupe(poses) @ Vector((-0.11, 0.0, 0.03))),
-                      G.paume(a, "l", lambda poses: G.HAUT - G.GAUCHE), G.paume(a, "r", lambda poses: G.HAUT + G.GAUCHE),
-                      G.doigts(a, "l", 0.25), G.doigts(a, "r", 0.25))
+# La coupe tenue à deux mains, à `ecart` de son axe, que le buste penche en avant et relève.
+def incliner_la_coupe(ecart):
+    def geste(h, a, horloge, t):
+        coupe = a.repere("spine_03", repere_mizrak(h))
+        incline = 0.5 - 0.5 * horloge.onde(t, 8.0, 0.25)
+        return G.composer(G.debout(a, horloge, t, 0.2, regard=0.05), G.buste(flexion=0.18 * incline),
+                          G.tete(flexion=0.20 * incline),
+                          G.bras(a, "l", lambda poses: coupe(poses) @ Vector((ecart, 0.0, 0.03))),
+                          G.bras(a, "r", lambda poses: coupe(poses) @ Vector((-ecart, 0.0, 0.03))),
+                          G.paume(a, "l", lambda poses: G.HAUT - G.GAUCHE), G.paume(a, "r", lambda poses: G.HAUT + G.GAUCHE),
+                          G.doigts(a, "l", 0.25), G.doigts(a, "r", 0.25))
+    return geste
+
+
+zerika = incliner_la_coupe(0.11)
 
 
 # Calé contre le ventre, la tête penchée en avant : tenu à bout de bras, il tendait les bras comme deux perches.
@@ -2389,6 +2395,8 @@ class Role(NamedTuple):
     sol_haut: float = Z_AZ
     famille: str = None
     accessoires: tuple = ()
+    # Debout sur ce qu'elle porte elle-même (une bima, ses marches) : `ou` donne son sol, qu'aucun rayon ne trouverait.
+    sol_porte: bool = False
 
 
 LEVIIM_Y = (-23.5, -20.0, -16.5, -13.0, -9.5, -6.0, 6.0, 9.5, 13.0, 16.5, 20.0, 23.5)
@@ -2866,6 +2874,7 @@ def amener_le_par(h, front, cap):
     objet.parent = h.rig
     objet.matrix_basis = (Matrix.Translation((front.x, front.y, h.sol)) @ Matrix.Rotation(math.radians(cap), 4, "Z")
                           @ Matrix.Translation((-NUQUE_DU_PAR.x, -NUQUE_DU_PAR.y, 0.0)))
+    return objet
 
 
 # « פָּרוֹ הָיָה עוֹמֵד בֵּין הָאוּלָם וְלַמִּזְבֵּחַ, רֹאשׁוֹ לַדָּרוֹם … וְכֹהֵן עוֹמֵד בַּמִּזְרָח וּפָנָיו לַמַּעֲרָב, וְסוֹמֵךְ שְׁתֵּי
@@ -3108,6 +3117,1153 @@ def roles_kippour():
         _israel_prosterne(k) for k in range(len(PROSTERNES_ISRAEL))]
 
 
+# Le korban Pessa'h (Pesa'him 5:5–10) : une étape, ses figurants.
+SEH_BLEND = RACINE / "seh.blend"
+LAINE_DU_SEH = (0.66, 0.60, 0.50)
+
+
+# Un agneau (`beit_hamikdash_seh.py`) posé à `repere` dans le repère de l'armature ; `etire` : les membres dans l'axe.
+def poser_seh(h, nom, repere, etire=False):
+    with bpy.data.libraries.load(str(SEH_BLEND)) as (_, charge):
+        charge.meshes = ["Seh_etire" if etire else "Seh"]
+    me = charge.meshes[0]
+    teinter_maillage(me, LAINE_DU_SEH)
+    me.materials.append(poil())
+    objet = bpy.data.objects.new(nom, me)
+    for c in h.rig.users_collection:
+        c.objects.link(objet)
+    objet.parent = h.rig
+    objet.matrix_basis = repere
+
+
+# Debout, les pieds sur le sol : `pied` sous le garrot, le museau tourné de `cap` degrés depuis la gauche de l'homme.
+GARROT_DU_SEH = 0.64
+
+
+def seh_debout(pied, cap):
+    return Matrix.Translation(pied) @ Matrix.Rotation(math.radians(cap), 4, "Z") @ Matrix.Translation((-GARROT_DU_SEH, 0.0, 0.0))
+
+
+# Couché sur le flanc, les pattes vers l'arrière de l'homme si `cap` = 0 : la gorge à `gorge`, à une demi-épaisseur du sol.
+GORGE_DU_SEH = Vector((0.80, 0.0, 0.55))
+DEMI_EPAISSEUR_DU_SEH = 0.16
+
+
+def seh_couche(gorge, cap):
+    return (Matrix.Translation(gorge) @ Matrix.Rotation(math.radians(cap), 4, "Z") @ Matrix.Rotation(math.pi / 2.0, 4, "X")
+            @ Matrix.Translation(-GORGE_DU_SEH))
+
+
+# Pendu par les jarrets, la tête en bas : les sabots arrière à `crochet`, le ventre vers le devant de l'homme si `cap` = 90.
+JARRETS_DU_SEH = Vector((-0.26, 0.0, 0.38))
+VENTRE_DU_PENDU = 0.13
+
+
+def seh_pendu(crochet, cap):
+    return (Matrix.Translation(crochet) @ Matrix.Rotation(math.radians(cap), 4, "Z") @ Matrix.Rotation(math.pi / 2.0, 4, "Y")
+            @ Matrix.Translation(-JARRETS_DU_SEH))
+
+
+# « וְלֹא הָיוּ לַבָּזִיכִין שׁוּלַיִם » (Pesa'him 5:5) : « רְחָבִים הָיוּ מִלְמַעְלָה וְתַחְתֵּיהֶם חַדִּים » (Bartenoura) ; profil et taille : CHOIX.
+def bazikh(couleur):
+    profil = ((0.000, 0.002), (0.030, 0.030), (0.060, 0.062), (0.085, 0.086), (0.100, 0.096), (0.106, 0.094))
+    return lambda mm, repere: tourner_profil(mm, repere, profil, couleur)
+
+
+# « נְתָנוֹ בְמָגִיס » (Pesa'him 5:10) : un plat creux ; forme et métal : CHOIX.
+RAYON_DU_MAGIS = 0.175
+
+
+def magis(mm, repere):
+    tourner_profil(mm, repere, ((0.000, 0.010), (0.010, 0.090), (0.030, 0.150), (0.045, RAYON_DU_MAGIS),
+                                (0.048, RAYON_DU_MAGIS - 0.003)), ARGENT)
+
+
+# Le couteau de la she'hita, la lame sortant du poing côté petit doigt ; tout : CHOIX.
+RAYON_DU_MANCHE_DE_SAKIN = 0.012
+
+
+def sakin(mm, repere):
+    manche = [Vector((0.0, 0.0, z)) for z in np.linspace(-0.05, 0.06, 4)]
+    mm.nappe([[repere @ p for p in a] for a in tube_simple(manche, RAYON_DU_MANCHE_DE_SAKIN)], CHENE, "objet")
+    pave(mm, repere @ Vector((0.0, 0.0, -0.17)), repere.to_3x3() @ Vector((0.0, 1.0, 0.0)),
+         repere.to_3x3() @ Vector((0.0, 0.0, 1.0)), (0.028, 0.23), 0.003, ARGENT, "objet")
+
+
+# « מַקְלוֹת דַּקִּים חֲלָקִים » (Pesa'him 5:9) : le long du z du repère, centrée ; longueur et section : CHOIX.
+def makel(mm, repere, longueur=1.90):
+    chemin = [Vector((0.0, 0.0, z)) for z in np.linspace(-longueur / 2, longueur / 2, 5)]
+    mm.nappe([[repere @ p for p in a] for a in tube_simple(chemin, 0.014)], CHENE, "objet")
+
+
+def tenir_la_coupe(ecart):
+    def geste(h, a, horloge, t):
+        coupe = a.repere("spine_03", repere_mizrak(h))
+        return G.composer(G.debout(a, horloge, t, 0.3, regard=0.10), G.tete(flexion=0.12),
+                          G.bras(a, "l", lambda poses: coupe(poses) @ Vector((ecart, 0.0, 0.02))),
+                          G.bras(a, "r", lambda poses: coupe(poses) @ Vector((-ecart, 0.0, 0.02))),
+                          G.paume(a, "l", lambda poses: G.HAUT - G.GAUCHE),
+                          G.paume(a, "r", lambda poses: G.HAUT + G.GAUCHE), G.doigts(a, "l", 0.25), G.doigts(a, "r", 0.25))
+    return geste
+
+
+# « שָׁחַט יִשְׂרָאֵל וְקִבֵּל הַכֹּהֵן » (Pesa'him 5:6) : penché sur l'agneau, le bazikh tenu sous la gorge — « שֶׁמָּא יַנִּיחוּם ».
+def recevoir_le_sang(coupe):
+    def geste(h, a, horloge, t):
+        return G.composer(G.pied(a, "l", G.GAUCHE * 0.08), G.pied(a, "r", -G.GAUCHE * 0.08), G.respiration(horloge, t),
+                          G.bassin(Vector((0.0, 0.16, -0.32)), tangage=0.42), G.buste(flexion=0.62), G.tete(flexion=0.30),
+                          G.bras(a, "l", coupe + G.GAUCHE * 0.09), G.bras(a, "r", coupe - G.GAUCHE * 0.09),
+                          G.paume(a, "l", -G.GAUCHE), G.paume(a, "r", G.GAUCHE), G.doigts(a, "l", 0.3), G.doigts(a, "r", 0.3))
+    return geste
+
+
+# Penché, la gauche sur la tête de l'agneau, la droite mène le couteau à la gorge.
+def shechita(gorge):
+    def geste(h, a, horloge, t):
+        va = horloge.onde(t, 1.4)
+        return G.composer(G.pied(a, "l", G.GAUCHE * 0.10), G.pied(a, "r", -G.GAUCHE * 0.10), G.respiration(horloge, t),
+                          G.bassin(Vector((0.0, 0.16, -0.30)), tangage=0.40), G.buste(flexion=0.58), G.tete(flexion=0.35),
+                          G.bras(a, "l", gorge + Vector((0.16, 0.05, 0.10))),
+                          G.bras(a, "r", gorge + Vector((-0.10, 0.04 * va, 0.08))),
+                          G.paume(a, "l", -G.HAUT), G.paume(a, "r", -G.GAUCHE), G.doigts(a, "l", 0.35),
+                          G.poigne(a, "r", RAYON_DU_MANCHE_DE_SAKIN))
+    return geste
+
+
+# « תּוֹלִין וּמַפְשִׁיטִין » (Pesa'him 5:9) : les mains au ventre de la bête pendue, qui tirent la peau tour à tour ;
+# `main_libre`, s'il y en a une, fait autre chose.
+def depouiller(ventre, main_libre=None):
+    def geste(h, a, horloge, t):
+        l, r = horloge.onde(t, 2.2), horloge.onde(t, 2.2, 0.5)
+        regles = [G.debout(a, horloge, t, 0.2, regard=0.0), G.buste(flexion=0.14), G.tete(flexion=0.20),
+                  G.bras(a, "l", ventre + Vector((0.07, 0.03 * l, -0.05 + 0.06 * l))),
+                  G.paume(a, "l", G.DEVANT - G.GAUCHE), G.doigts(a, "l", 0.55)]
+        if main_libre is None:
+            regles += [G.bras(a, "r", ventre + Vector((-0.07, 0.03 * r, 0.02 + 0.06 * r))),
+                       G.paume(a, "r", G.DEVANT + G.GAUCHE), G.doigts(a, "r", 0.55)]
+        else:
+            regles += main_libre(a)
+        return G.composer(*regles)
+    return geste
+
+
+# La main sur la baguette, devant l'épaule `cote` qui la porte.
+def main_sur_la_baguette(cote):
+    def regles(a):
+        s = 1.0 if cote == "l" else -1.0
+        return [G.bras(a, cote, a.epaule[cote] + Vector((s * 0.02, -0.12, 0.10))), G.paume(a, cote, -G.HAUT),
+                G.doigts(a, cote, 0.8, 0.5)]
+    return regles
+
+
+def porter_la_baguette(cote):
+    autre = "r" if cote == "l" else "l"
+
+    def geste(h, a, horloge, t):
+        return G.composer(G.debout(a, horloge, t, 0.6, regard=0.03), G.tete(flexion=0.10), *main_sur_la_baguette(cote)(a),
+                          G.bras_ballant(a, autre), G.doigts(a, autre, 0.35, 0.15))
+    return geste
+
+
+# « כַּת רִאשׁוֹנָה יָצְתָה וְיָשְׁבָה לָהּ בְּהַר הַבַּיִת, שְׁנִיָּה בַחֵיל » (Pesa'him 5:10) : sur la dernière marche du 'Heil.
+MARCHE_DU_HEIL = 0.5 * AMA
+
+
+def assis_sur_la_marche(h, a, horloge, t):
+    corps = G.composer(assis(a, horloge, t, MARCHE_DU_HEIL, _alea(h.nom, 4)), G.buste(flexion=0.08))
+    return G.composer(corps, G.tete(flexion=0.06 + 0.04 * horloge.onde(t, 6.7)), mains_aux_genoux(a, corps))
+
+
+def _israelite(nom, geste, ou, cap, concept, tete=None, apres=None):
+    age = 0.30 + 0.60 * _alea(nom, 0)
+    gabarit = Gabarit(1.64 + 0.18 * _alea(nom, 1), age=age, poids=0.35 + 0.35 * _alea(nom, 2),
+                      peau="old_caucasian_male" if age > 0.8 else "middleage_caucasian_male")
+    tete = tete or ("talith" if _alea(nom, 3) < 0.25 else "chapeau" if _alea(nom, 3) > 0.8 else "kippa")
+
+    def batir():
+        h = fidele(nom, "costume", gabarit, gris=age > 0.7, tete=tete)
+        return apres(h) if apres else h
+    return Role(nom, concept, batir, geste, ou, cap)
+
+
+# Le deuxième groupe attend dans l'Ezrat Nashim, chacun près de son agneau : l'attente et la place, CHOIX.
+def _kat_shniya(k, ou, cap):
+    nom = f"kat_shniya_{k + 1}"
+
+    def avec_son_seh(h):
+        poser_seh(h, f"{nom}_seh", seh_debout(Vector((0.40, -0.10, h.sol)), -90.0 + 20.0 * _alea(nom, 5)))
+        return h
+    return _israelite(nom, ecouter, ou, cap, "kat_shniya", apres=avec_son_seh)
+
+
+def _un_cohen(nom, ages=(0.35, 0.45)):
+    age = ages[0] + ages[1] * _alea(nom, 0)
+    return cohen(nom, Gabarit(1.66 + 0.14 * _alea(nom, 1), age=age), gris=age > 0.72)
+
+
+def _cohen_au_bazikh(nom, concept, ou, cap, metal, geste):
+    def batir():
+        h = _un_cohen(nom)
+        tenir(h, "bazikh", bazikh(metal), "spine_03", repere_mizrak(h))
+        return h
+    return Role(nom, concept, batir, geste, ou, cap, famille="cohanim")
+
+
+# Deux rangées face à face, du lieu de la she'hita au nord de l'autel : l'une d'argent à l'ouest, l'autre d'or. Leur place
+# dans l'Azara — le pessa'h s'égorge « בְּכָל מָקוֹם בָּעֲזָרָה » (Zeva'him 5:8) — et leur nombre : CHOIX.
+RANGEES = ((ARGENT, -33.0, 0.0), (OR, -29.0, 180.0))
+RANG_Y = (23.0, 19.0, 15.0, 11.0)
+
+
+def _rangees():
+    return [_cohen_au_bazikh(f"bazikhin_{r * len(RANG_Y) + k + 1}", "bazikhin", (x, y, Z_AZ), cap, couleur, tenir_la_coupe(0.09))
+            for r, (couleur, x, cap) in enumerate(RANGEES) for k, y in enumerate(RANG_Y)]
+
+
+# « כֹּהֵן הַקָּרוֹב אֵצֶל הַמִּזְבֵּחַ זוֹרְקוֹ זְרִיקָה אַחַת כְּנֶגֶד הַיְסוֹד » (Pesa'him 5:6) : au bout des rangées, face au yessod nord.
+ZOREK_OU = (-31.0, 8.6, Z_AZ)
+GORGE_OU = (-31.0, 27.1, Z_AZ)
+SHOCHET_OU, SHOCHET_CAP = (-30.4, 28.4, Z_AZ), -120.0
+MEKABEL_OU, MEKABEL_CAP = (-31.7, 26.1, Z_AZ), 60.0
+
+
+def _shechitat_hapessah():
+    shochet = "shechitat_hapessah_1"
+
+    def gorge_de(ou, cap, sol):
+        return vers_la_figure(ou, cap, GORGE_OU, sol) + Vector((0.0, 0.0, DEMI_EPAISSEUR_DU_SEH))
+
+    def avec_le_seh(h):
+        poser_seh(h, f"{shochet}_seh", seh_couche(gorge_de(SHOCHET_OU, SHOCHET_CAP, h.sol), 20.0))
+        return h
+
+    mekabel = "shechitat_hapessah_2"
+
+    def mekabel_batir():
+        h = _un_cohen(mekabel)
+        mm = Maillage()
+        bazikh(OR)(mm, Matrix.Translation(gorge_de(MEKABEL_OU, MEKABEL_CAP, h.sol) + Vector((0.0, 0.08, 0.03))))
+        porter(h, mm, f"{mekabel}_bazikh")
+        return h
+
+    def mekabel_geste(h, a, horloge, t):
+        return recevoir_le_sang(gorge_de(MEKABEL_OU, MEKABEL_CAP, a.sol) + Vector((0.0, 0.08, 0.06)))(h, a, horloge, t)
+
+    return [_israelite(shochet, lambda h, a, horloge, t: shechita(gorge_de(SHOCHET_OU, SHOCHET_CAP, a.sol))(h, a, horloge, t),
+                       SHOCHET_OU, SHOCHET_CAP, "shechitat_hapessah", tete="kippa", apres=avec_le_seh)._replace(
+                accessoires=(Accessoire("sakin", sakin, dans_la_poigne("r", RAYON_DU_MANCHE_DE_SAKIN)),)),
+            Role(mekabel, "shechitat_hapessah", mekabel_batir, mekabel_geste, MEKABEL_OU, MEKABEL_CAP, famille="cohanim"),
+            _cohen_au_bazikh("shechitat_hapessah_3", "shechitat_hapessah", ZOREK_OU, -90.0, OR, zerika)]
+
+
+def _tokea(nom, concept, ou, cap):
+    def batir():
+        h = cohen(nom, Gabarit(1.72 + 0.06 * _alea(nom, 1), age=0.45 + 0.3 * _alea(nom, 0)))
+        h.bouche = bouche(h)
+        return h
+    return Role(nom, concept, batir, tekia, ou, cap, duree=TEKIA, famille="cohanim",
+                accessoires=(Accessoire("hatzotzra", hatzotzra, trompette_tenue),))
+
+
+# « עַל כָּל קְרִיאָה וּקְרִיאָה תּוֹקְעִין שָׁלֹשׁ תְּקִיעוֹת » (Rambam Korban Pessa'h 1:12) ; leur place, au pied du Doukhan : CHOIX.
+def _hallel():
+    return [_levi(k, genre) for k, genre in enumerate(LEVIIM_INSTRUMENTS)] + [
+        _tokea("hallel_bepessah_1", "hallel_bepessah", (-16.0, 3.5, Z_AZ), 180.0),
+        _tokea("hallel_bepessah_2", "hallel_bepessah", (-16.0, -3.5, Z_AZ), 180.0)]
+
+
+# Au crochet est d'un pilier du Beit HaMitba'hayim (Middot 3:5), un agneau qu'on dépouille ; plus à l'ouest, deux hommes
+# portent la baguette, la bête pendue entre eux, et l'un dépouille (Pesa'him 5:9). Qui, et où : CHOIX.
+CROCHET = (-38.8, 52.85, 3.35)
+TOLE_OU = (-38.8, 51.6, Z_AZ)
+BAGUETTE_Y = 47.5
+BAGUETTE_A, BAGUETTE_B = (-45.6, BAGUETTE_Y, Z_AZ), (-42.4, BAGUETTE_Y, Z_AZ)
+SUR_L_EPAULE = Vector((-0.18, 0.0, 0.07))
+
+
+def _tolin_umafshitin():
+    def crochet(sol):
+        return vers_la_figure(TOLE_OU, 90.0, CROCHET, sol)
+
+    def au_crochet(h):
+        poser_seh(h, "tolin_umafshitin_1_seh", seh_pendu(crochet(h.sol), 90.0), etire=True)
+        return h
+
+    def tole(h, a, horloge, t):
+        ventre = crochet(a.sol) + Vector((0.0, VENTRE_DU_PENDU + 0.02, -0.40))
+        return depouiller(ventre)(h, a, horloge, t)
+
+    # Sur l'épaule droite du premier, la gauche du second : du même côté, face à face.
+    def milieu(h):
+        m = vers_la_figure(BAGUETTE_A, 0.0, ((BAGUETTE_A[0] + BAGUETTE_B[0]) / 2, BAGUETTE_Y, 0.0), 0.0)
+        return Vector((SUR_L_EPAULE.x, m.y, h.z_epaule + SUR_L_EPAULE.z))
+
+    def baguette_et_seh(h):
+        mm = Maillage()
+        makel(mm, repere_vers(milieu(h), G.DEVANT, G.GAUCHE))
+        porter(h, mm, "tolin_umafshitin_2_makel")
+        poser_seh(h, "tolin_umafshitin_2_seh", seh_pendu(milieu(h) - Vector((0.0, 0.0, 0.02)), 90.0), etire=True)
+        return h
+
+    def tole_sous_la_baguette(h, a, horloge, t):
+        ventre = milieu(h) + Vector((0.0, VENTRE_DU_PENDU + 0.02, -0.42))
+        return depouiller(ventre, main_sur_la_baguette("r"))(h, a, horloge, t)
+
+    return [_israelite("tolin_umafshitin_1", tole, TOLE_OU, 90.0, "tolin_umafshitin", apres=au_crochet),
+            _israelite("tolin_umafshitin_2", tole_sous_la_baguette, BAGUETTE_A, 0.0, "tolin_umafshitin",
+                       apres=baguette_et_seh),
+            _israelite("tolin_umafshitin_3", porter_la_baguette("l"), BAGUETTE_B, 180.0, "tolin_umafshitin")]
+
+
+# « וְהִקְטִירָן עַל גַּבֵּי הַמִּזְבֵּחַ » : un cohen au bord de la ma'arakha, le magis devant lui, qu'il penche vers le feu (CHOIX).
+def _magis():
+    nom = "magis"
+
+    def batir():
+        h = _un_cohen(nom, (0.45, 0.30))
+        tenir(h, "magis", magis, "spine_03", repere_mizrak(h))
+        return h
+    return Role(nom, nom, batir, incliner_la_coupe(RAYON_DU_MAGIS - 0.01), (-32.0, -15.2, 9.0), 90.0, famille="cohanim")
+
+
+# Le deuxième groupe sur la dernière marche du 'Heil, chacun son pessa'h près de lui, dans sa peau (Pesa'him 65b).
+YOSHVIM_Y = (8.0, 11.5, 15.5, 19.0)
+
+
+def _yoshev(k):
+    nom = f"yoshvim_bacheil_{k + 1}"
+
+    def avec_son_pessah(h):
+        poser_seh(h, f"{nom}_seh", seh_couche(Vector((0.55, 0.10, h.sol + DEMI_EPAISSEUR_DU_SEH)), 180.0), etire=True)
+        return h
+    return _israelite(nom, assis_sur_la_marche, (151.8, YOSHVIM_Y[k], Z_EZN - 6.0), 8.0 * (_alea(nom, 6) - 0.5),
+                      "yoshvim_bacheil", apres=avec_son_pessah)
+
+
+def roles_pessah():
+    return [_kat_shniya(0, (22.0, 6.5, Z_EZN), 180.0), _kat_shniya(1, (24.5, 9.0, Z_EZN), 185.0),
+            _kat_shniya(2, (21.5, -7.0, Z_EZN), 175.0), _kat_shniya(3, (25.0, -5.5, Z_EZN), 180.0),
+            *_rangees(), *_shechitat_hapessah(), *_hallel(), *_tolin_umafshitin(), _magis(),
+            *[_yoshev(k) for k in range(len(YOSHVIM_Y))]]
+
+
+# Les bikkourim (Bikkourim 3:2–8) : une étape, ses figurants.
+# « בְּסַלֵּי נְצָרִים שֶׁל עֲרָבָה קְלוּפָה » (Bikkourim 3:8), « קֻפּוֹת מְצֻפּוֹת כֶּסֶף וְזָהָב » (Bartenoura) ; forme et taille : CHOIX.
+OSIER = (0.72, 0.62, 0.42)
+PROFIL_DU_SAL = ((0.000, 0.002), (0.004, 0.105), (0.030, 0.125), (0.180, 0.155), (0.195, 0.160), (0.200, 0.155))
+HAUT_DU_SAL, BORD_DU_SAL = 0.195, 0.160
+
+
+def sal(couleur):
+    return lambda mm, repere: tourner_profil(mm, repere, PROFIL_DU_SAL, couleur)
+
+
+# « שְׂעוֹרִים מִלְּמַטָּה … וּתְאֵנִים לְמַעְלָה מִן הַכְּלִי » (Rambam Bikkourim 3:7) : des figues au-dessus, quelques grenades au
+# bord. Leur nombre et leur teinte : CHOIX.
+FIGUE, FIGUE_VERTE, ROUGE_GRENADE = (0.28, 0.16, 0.24), (0.42, 0.46, 0.20), (0.55, 0.09, 0.07)
+
+
+def fruit(mm, repere, centre, rayon, couleur):
+    profil = [(rayon * math.sin(a), rayon * math.cos(a) + 0.001) for a in np.linspace(-math.pi / 2, math.pi / 2, 5)]
+    tourner_profil(mm, repere @ Matrix.Translation(centre), profil, couleur, n=8)
+
+
+def fruits(mm, repere):
+    for k in range(4):
+        a = TOUR * k / 4 + 0.4
+        fruit(mm, repere, Vector((0.105 * math.cos(a), 0.105 * math.sin(a), HAUT_DU_SAL - 0.005)), 0.040, ROUGE_GRENADE)
+    for k in range(13):
+        r, a = 0.115 * math.sqrt((k + 0.5) / 13), k * 2.39996
+        couleur = FIGUE if k % 3 else FIGUE_VERTE
+        fruit(mm, repere, Vector((r * math.cos(a), r * math.sin(a), HAUT_DU_SAL + 0.022 - 0.12 * r)), 0.026, couleur)
+
+
+# « הַגּוֹזָלוֹת שֶׁעַל גַּבֵּי הַסַּלִּים » (Bikkourim 3:5) : « תּוֹלִים מֵאֲחוֹרֵי הַסַּלִּים … וְלֹא עַל גַּבֵּי הַסַּלִּים מַמָּשׁ » (Bartenoura) ;
+# pendu par les pattes, le long du z du repère jusqu'à la tête. Teinte et taille : CHOIX.
+TOR = (0.40, 0.35, 0.30)
+
+
+def gozal(mm, repere):
+    tourner_profil(mm, repere, ((0.0, 0.004), (0.020, 0.016), (0.050, 0.030), (0.090, 0.029), (0.120, 0.017),
+                                (0.135, 0.019), (0.155, 0.015), (0.166, 0.003)), TOR, n=10)
+
+
+# Une corbeille pleine, posée à `repere` ; `oiseaux` pendus à son bord, derrière (−y du repère).
+def corbeille(couleur, oiseaux=0):
+    def construire(mm, repere):
+        sal(couleur)(mm, repere)
+        for k in range(oiseaux):
+            a = -math.pi / 2 + 0.45 * (k - (oiseaux - 1) / 2)
+            bord = Vector(((BORD_DU_SAL + 0.02) * math.cos(a), (BORD_DU_SAL + 0.02) * math.sin(a), HAUT_DU_SAL - 0.01))
+            gozal(mm, repere @ repere_vers(bord, -HAUT_Z, Vector((math.cos(a), math.sin(a), 0.0))))
+    return construire
+
+
+# Le métal d'une corbeille plaquée et ses fruits font deux objets : la matière suit la couleur.
+def poser_la_corbeille(h, nom, repere, couleur, oiseaux=0, os_=None):
+    for partie, construire in (("sal", corbeille(couleur, oiseaux)), ("peri", fruits)):
+        mm = Maillage()
+        construire(mm, repere)
+        if os_:
+            lier(h, mm, f"{nom}_{partie}", materiau_de(mm), os_)
+        else:
+            porter(h, mm, f"{nom}_{partie}")
+
+
+# « נוֹטֵל הַסַּל עַל כְּתֵפוֹ » (Bikkourim 3:4) : sur l'épaule droite, penchée en dehors, la droite à son bord ; la gauche pend.
+def repere_du_sal_a_l_epaule(a):
+    return (Matrix.Translation(a.epaule["r"] + Vector((-0.12, 0.02, 0.075))) @ Matrix.Rotation(math.radians(-10.0), 4, "Y"))
+
+
+def sal_a_l_epaule(h, a, horloge, t):
+    repere = a.repere("spine_03", repere_du_sal_a_l_epaule(a))
+    bord = lambda poses: repere(poses) @ Vector((-(BORD_DU_SAL + 0.045), 0.0, HAUT_DU_SAL - 0.035))
+    return G.composer(G.debout(a, horloge, t, _alea(h.nom, 7), regard=0.05), G.bras(a, "r", bord),
+                      G.paume(a, "r", lambda poses: a.dans("spine_03", poses, G.GAUCHE)), G.doigts(a, "r", 0.75, 0.45),
+                      G.bras_ballant(a, "l"), G.doigts(a, "l", 0.35, 0.15))
+
+
+def _porteur(nom, concept, ou, cap, couleur=OSIER, oiseaux=0, apres=None):
+    def avec_sa_corbeille(h):
+        a = G.Acteur(h.squelette, h.sol)
+        poser_la_corbeille(h, nom, repere_du_sal_a_l_epaule(a), couleur, oiseaux, os_="spine_03")
+        return apres(h) if apres else h
+    return _israelite(nom, sal_a_l_epaule, ou, cap, concept, apres=avec_sa_corbeille)
+
+
+# « וְהַשּׁוֹר הוֹלֵךְ לִפְנֵיהֶם, וְקַרְנָיו מְצֻפּוֹת זָהָב, וַעֲטֶרֶת שֶׁל זַיִת בְּרֹאשׁוֹ » (Bikkourim 3:3) : les cornes dorées de leur
+# base à la pointe ; la couronne posée sur le haut de la tête, autour des cornes. Tresse et feuilles : CHOIX.
+OLIVIER = (0.30, 0.34, 0.20)
+COURONNE_CENTRE, COURONNE_RAYONS = Vector((1.88, 0.0, 1.19)), (0.16, 0.08)
+DESSUS_DE_LA_TETE = Vector((0.866, 0.0, -0.5))
+
+
+def dorer_les_cornes(objet):
+    me = objet.data
+    me.materials.append(metal())
+    couleurs = me.color_attributes["Color"]
+    for poly in me.polygons:
+        if all(abs(me.vertices[i].co.y) > 0.13 and me.vertices[i].co.z > 1.08 and me.vertices[i].co.x > 1.85
+               for i in poly.vertices):
+            poly.material_index = 1
+            for boucle in poly.loop_indices:
+                couleurs.data[boucle].color = (*OR, 1.0)
+
+
+def couronne_d_olivier(mm, repere):
+    haut = Vector((0.0, 1.0, 0.0)).cross(DESSUS_DE_LA_TETE).normalized()
+    anneau = [COURONNE_CENTRE + DESSUS_DE_LA_TETE * (COURONNE_RAYONS[1] * math.cos(a)) + Vector((0.0, COURONNE_RAYONS[0] * math.sin(a), 0.0))
+              for a in np.linspace(0.0, TOUR, 25)]
+    mm.nappe([[repere @ p for p in cercle] for cercle in tube_simple(anneau, 0.010, 6)], OLIVIER, "objet")
+    for p, q in zip(anneau, anneau[1:]):
+        tangente = (q - p).normalized()
+        for s in (-1.0, 1.0):
+            feuille = (tangente + haut.cross(tangente) * (0.8 * s)).normalized()
+            pave(mm, repere @ (p + feuille * 0.028), repere.to_3x3() @ feuille, repere.to_3x3() @ haut.cross(feuille),
+                 (0.055, 0.014), 0.002, OLIVIER, "objet")
+
+
+def _shor_des_bikkourim(h):
+    shor = amener_le_par(h, Vector((0.30, -2.90, h.sol + NUQUE_DU_PAR.z)), -90.0)
+    dorer_les_cornes(shor)
+    mm = Maillage()
+    couronne_d_olivier(mm, shor.matrix_basis)
+    porter(h, mm, f"{h.nom}_atara")
+    return h
+
+
+# Sur le Har HaBayit, devant le 'Heil : le bœuf devant eux, chacun son panier à l'épaule. Leur nombre et leur place : CHOIX.
+def _maalei_bikkourim():
+    places = ((166.0, -6.0, 180.0), (168.5, -3.0, 175.0), (170.5, -8.5, 185.0), (173.0, -4.5, 178.0),
+              (172.0, -11.5, 182.0))
+    return [_porteur(f"maalei_bikkourim_{k + 1}", "maalei_bikkourim", (x, y, Z_EZN - 6.0), cap,
+                     ARGENT if k == 3 else OSIER, oiseaux=2 if k in (1, 4) else 0,
+                     apres=_shor_des_bikkourim if k == 0 else None)
+            for k, (x, y, cap) in enumerate(places)]
+
+
+# « הִגִּיעַ לָעֲזָרָה וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר » (Bikkourim 3:4) : les Léviim sur le Doukhan, avec les instruments du tamid, CHOIX ;
+# deux porteurs entrent dans l'Ezrat Israël.
+def _shir_habikkourim():
+    return [_levi(k, genre) for k, genre in enumerate(LEVIIM_INSTRUMENTS)] + [
+        _porteur("shir_habikkourim_1", "shir_habikkourim", (-10.0, -3.0, Z_EZI), 178.0),
+        _porteur("shir_habikkourim_2", "shir_habikkourim", (-8.0, -0.5, Z_EZI), 183.0, OR)]
+
+
+# À la corne sud-ouest de l'autel, là où la corbeille sera posée (Rambam Bikkourim 3:12) : le cohen face au porteur.
+# Le lieu de la lecture, et ses gestes : CHOIX.
+PORTEUR_OU, COHEN_OU = (-58.0, -29.3, Z_AZ), (-58.0, -27.8, Z_AZ)
+SAL_DE_LA_TENOUFA = Vector((-58.0, -28.55, Z_AZ + 1.0 / AMA))
+
+
+def _mikra_bikkourim():
+    return [_porteur("mikra_bikkourim_1", "mikra_bikkourim", PORTEUR_OU, 90.0),
+            Role("mikra_bikkourim_2", "mikra_bikkourim", lambda: _un_cohen("mikra_bikkourim_2"), ecouter, COHEN_OU, -90.0,
+                 famille="cohanim"),
+            _porteur("mikra_bikkourim_3", "mikra_bikkourim", (-58.5, -32.5, Z_AZ), 92.0, oiseaux=2),
+            _porteur("mikra_bikkourim_4", "mikra_bikkourim", (-57.0, -34.2, Z_AZ), 98.0, ARGENT)]
+
+
+# « וְכֹהֵן מַנִּיחַ יָדוֹ תַחְתָּיו וּמְנִיפוֹ » (Bikkourim 3:6) : « מוֹלִיךְ וּמֵבִיא, מַעֲלֶה וּמוֹרִיד » (Mena'hot 5:6) — vers le cohen et
+# retour, puis de haut en bas ; à l'ouest de l'autel, « וְכָל שֶׁכֵּן בְּמַעֲרָבוֹ » (Bartenoura). L'ampleur : CHOIX.
+def sal_agite(horloge, t):
+    u = t / horloge.duree
+    va_et_vient = 0.07 * horloge.onde(t, 2.0) * (1.0 - G.lisse((u - 0.40) / 0.10))
+    haut_et_bas = 0.05 * horloge.onde(t, 2.0) * G.lisse((u - 0.45) / 0.10) * (1.0 - G.lisse((u - 0.90) / 0.08))
+    return SAL_DE_LA_TENOUFA + Vector((0.0, va_et_vient, haut_et_bas)) / AMA
+
+
+def _sal_de(ou, cap):
+    return lambda horloge, t, sol: vers_la_figure(ou, cap, sal_agite(horloge, t), sol)
+
+
+def tenir_par_les_bords(sal_ici):
+    def geste(h, a, horloge, t):
+        centre = sal_ici(horloge, t, a.sol)
+        return G.composer(G.debout(a, horloge, t, 0.3, regard=0.02), G.tete(flexion=0.10),
+                          G.bras(a, "l", centre + Vector((BORD_DU_SAL + 0.045, 0.0, HAUT_DU_SAL - 0.04))),
+                          G.bras(a, "r", centre + Vector((-(BORD_DU_SAL + 0.045), 0.0, HAUT_DU_SAL - 0.04))),
+                          G.paume(a, "l", -G.GAUCHE), G.paume(a, "r", G.GAUCHE), G.doigts(a, "l", 0.7, 0.4),
+                          G.doigts(a, "r", 0.7, 0.4))
+    return geste
+
+
+def main_dessous(sal_ici):
+    def geste(h, a, horloge, t):
+        dessous = sal_ici(horloge, t, a.sol) + Vector((-0.02, 0.07, -0.035))
+        return G.composer(G.debout(a, horloge, t, 0.6, regard=0.02), G.buste(flexion=0.06), G.tete(flexion=0.14),
+                          G.bras(a, "r", dessous), G.paume(a, "r", G.HAUT), G.doigts(a, "r", 0.15, 0.1),
+                          G.bras_ballant(a, "l"), G.doigts(a, "l", 0.35, 0.15))
+    return geste
+
+
+def _tenoufat_bikkourim():
+    porteur, cohen_ = _sal_de(PORTEUR_OU, 90.0), _sal_de(COHEN_OU, -90.0)
+
+    def corbeille_agitee(h, a, horloge, t, poses):
+        return Matrix.Translation(porteur(horloge, t, a.sol))
+
+    return [_israelite("tenoufat_bikkourim_1", tenir_par_les_bords(porteur), PORTEUR_OU, 90.0, "tenoufat_bikkourim")._replace(
+                accessoires=(Accessoire("sal", corbeille(OSIER, 2), corbeille_agitee), Accessoire("peri", fruits, corbeille_agitee))),
+            Role("tenoufat_bikkourim_2", "tenoufat_bikkourim", lambda: _un_cohen("tenoufat_bikkourim_2"), main_dessous(cohen_),
+                 COHEN_OU, -90.0, famille="cohanim")]
+
+
+# « וּמַנִּיחוֹ בְּצַד הַמִּזְבֵּחַ, בְּקֶרֶן דְּרוֹמִית מַעֲרָבִית, בִּדְרוֹמָהּ שֶׁל קֶרֶן » (Rambam Bikkourim 3:12) : les corbeilles posées à
+# terre au sud de la corne, à l'ouest du petit kevesh du yessod ; un cohen en emporte une (3:8). Leur nombre : CHOIX.
+CORBEILLES = ((-55.0, -26.5, OSIER, 2), (-54.6, -27.3, OSIER, 0), (-55.3, -27.9, ARGENT, 0), (-54.5, -28.4, OSIER, 2),
+              (-55.4, -29.0, OR, 0), (-54.6, -29.6, OSIER, 1))
+GOZALOT_OU = (-56.3, -26.2, Z_AZ)
+
+
+def _salei_bikkourim():
+    nom = "salei_bikkourim_1"
+
+    def batir():
+        h = _un_cohen(nom)
+        for k, (x, y, couleur, oiseaux) in enumerate(CORBEILLES):
+            place = vers_la_figure(GOZALOT_OU, -20.0, (x, y, Z_AZ), h.sol)
+            poser_la_corbeille(h, f"{nom}_{k + 1}", Matrix.Translation(place) @ Matrix.Rotation(1.3 * k, 4, "Z"), couleur,
+                               oiseaux)
+        tenir(h, "sal", corbeille(OSIER), "spine_03", repere_du_sal_tenu(h))
+        tenir(h, "peri", fruits, "spine_03", repere_du_sal_tenu(h))
+        return h
+
+    def geste(h, a, horloge, t):
+        centre = a.repere("spine_03", repere_du_sal_tenu(h))
+        cote = lambda s: lambda poses: centre(poses) @ Vector((s * (BORD_DU_SAL + 0.04), 0.0, HAUT_DU_SAL * 0.45))
+        return G.composer(G.debout(a, horloge, t, 0.2, regard=0.06), G.tete(flexion=0.12),
+                          G.bras(a, "l", cote(1.0)), G.bras(a, "r", cote(-1.0)),
+                          G.paume(a, "l", lambda poses: a.dans("spine_03", poses, -G.GAUCHE)),
+                          G.paume(a, "r", lambda poses: a.dans("spine_03", poses, G.GAUCHE)),
+                          G.doigts(a, "l", 0.45), G.doigts(a, "r", 0.45))
+    return [Role(nom, "salei_bikkourim", batir, geste, GOZALOT_OU, -20.0, famille="cohanim")]
+
+
+def repere_du_sal_tenu(h):
+    return Matrix.Translation(devant_poitrine(h, 0.30, 0.48))
+
+
+def roles_bikkourim():
+    return [*_maalei_bikkourim(), *_shir_habikkourim(), *_mikra_bikkourim(), *_tenoufat_bikkourim(), *_salei_bikkourim()]
+
+
+# Souccot au matin (Soucca 4:5, 4:9) : une étape, ses figurants.
+# « צְלוֹחִית שֶׁל זָהָב מַחֲזֶקֶת שְׁלשֶׁת לֻגִּים » (Soucca 4:9) : panse, col étroit, lèvre ; la forme est un CHOIX. Base à l'origine,
+# la bouche au bout du z.
+PROFIL_DE_LA_TZELOHIT = ((0.000, 0.002), (0.005, 0.050), (0.030, 0.070), (0.090, 0.072), (0.140, 0.050), (0.170, 0.022),
+                         (0.210, 0.018), (0.220, 0.024), (0.225, 0.020))
+PANSE_DE_LA_TZELOHIT = 0.07
+
+
+def tzelohit(mm, repere):
+    tourner_profil(mm, repere, PROFIL_DE_LA_TZELOHIT, OR)
+
+
+# « הִגִּיעוּ לְשַׁעַר הַמַּיִם, תָּקְעוּ וְהֵרִיעוּ וְתָקְעוּ » (Soucca 4:9) : le cohen passe la porte, la tzelo'hit devant lui ;
+# deux cohanim sonnent sur le seuil. Qui sonne, et où : CHOIX.
+def _shaar_hamayim():
+    nom = "nissoukh_hamayim_1"
+
+    def batir():
+        h = _un_cohen(nom, (0.40, 0.30))
+        tenir(h, "tzelohit", tzelohit, "spine_03", repere_mizrak(h))
+        return h
+    return [Role(nom, "nissoukh_hamayim", batir, tenir_la_coupe(PANSE_DE_LA_TZELOHIT + 0.015), (-12.0, -86.8, Z_EZN), 90.0,
+                 famille="cohanim"),
+            _tokea("tekiot_shaar_hamayim_1", "tekiot_shaar_hamayim", (-15.0, -83.6, Z_EZN), -80.0),
+            _tokea("tekiot_shaar_hamayim_2", "tekiot_shaar_hamayim", (-9.0, -83.6, Z_EZN), -100.0)]
+
+
+# « עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ … וְלַמְנַסֵּךְ אוֹמְרִים לוֹ, הַגְבַּהּ יָדֶךָ » (Soucca 4:9) : face à l'ouest, derrière le sefel du
+# vin, la main levée au-dessus de celui de l'eau, « מַעֲרָבִי שֶׁל מַיִם » ; la hauteur du geste : CHOIX.
+SEFEL_HAMAYIM = (-50.5, -22.5, 9.3)
+MENASEKH_OU = (-48.9, -22.5, 9.0)
+
+
+def _nissoukh_hamayim():
+    nom = "nissoukh_hamayim_2"
+
+    def tzelohit_penchee(h):
+        bouche = vers_la_figure(MENASEKH_OU, 180.0, SEFEL_HAMAYIM, h.sol) + Vector((0.0, 0.0, 1.40))
+        axe = Vector((0.0, -0.45, -0.89)).normalized()
+        return repere_vers(bouche - axe * PROFIL_DE_LA_TZELOHIT[-1][0], axe, G.GAUCHE)
+
+    def batir():
+        h = _un_cohen(nom, (0.40, 0.30))
+        mm = Maillage()
+        tzelohit(mm, tzelohit_penchee(h))
+        porter(h, mm, f"{nom}_tzelohit")
+        return h
+
+    def geste(h, a, horloge, t):
+        panse = tzelohit_penchee(h) @ Vector((-(PANSE_DE_LA_TZELOHIT + 0.035), 0.0, 0.07))
+        return G.composer(G.debout(a, horloge, t, 0.3, regard=0.0), G.tete(flexion=0.18), G.buste(flexion=0.05),
+                          G.bras(a, "r", panse), G.paume(a, "r", G.GAUCHE), G.doigts(a, "r", 0.6, 0.4),
+                          G.bras_ballant(a, "l"), G.doigts(a, "l", 0.35, 0.15))
+    return [Role(nom, "nissoukh_hamayim", batir, geste, MENASEKH_OU, 180.0, famille="cohanim")]
+
+
+# « וּבָאִין וְזוֹקְפִין אוֹתָן בְּצִדֵּי הַמִּזְבֵּחַ, וְרָאשֵׁיהֶן כְּפוּפִין עַל גַּבֵּי הַמִּזְבֵּחַ » (Soucca 4:5) : « גְּבוֹהוֹת אַחַת עֶשְׂרֵה אַמָּה,
+# כְּדֵי שֶׁיְּהוּ גּוֹחוֹת עַל הַמִּזְבֵּחַ אַמָּה », « עַל הַיְּסוֹד מַנַּח לְהוּ » (Soucca 45a) — le long du yessod nord et ouest ;
+# leur nombre, leur écart et le feuillage : CHOIX.
+SAULE, BOIS_DE_SAULE = (0.32, 0.40, 0.20), (0.36, 0.22, 0.13)
+ARAVOT_NORD = [(x, 6.4) for x in np.arange(-51.5, -23.0, 1.25)]
+ARAVOT_OUEST = [(-53.35, y) for y in np.arange(4.5, -21.0, -1.25)]
+
+
+# `vers` : d'un point du Temple, en amot, au repère de la figure qui les porte.
+def arava(mm, vers, pied, dedans):
+    x, y = pied
+    d = Vector((*dedans, 0.0))
+    base = Vector((x, y, Z_AZ + 1.0))
+    chemin = [vers(base + d * dx + Vector((0.0, 0.0, dz))) for dx, dz in
+              ((0.0, 0.0), (1.0, 8.5), (1.35, 10.0), (2.0, 10.7), (2.6, 10.3))]
+    mm.nappe(tube(chemin, [0.020, 0.013, 0.010, 0.007, 0.003], 6), BOIS_DE_SAULE, "objet")
+    for k in range(26):
+        u = 0.35 + 0.63 * k / 25
+        i = min(int(u * (len(chemin) - 1)), len(chemin) - 2)
+        f = u * (len(chemin) - 1) - i
+        p = chemin[i].lerp(chemin[i + 1], f)
+        tige = (chemin[i + 1] - chemin[i]).normalized()
+        cote = tige.cross(Vector((0.0, 0.0, 1.0)) if abs(tige.z) < 0.9 else Vector((1.0, 0.0, 0.0))).normalized()
+        cote = Matrix.Rotation(2.4 * k, 3, tige) @ cote
+        feuille = (tige * 0.5 + cote).normalized()
+        pave(mm, p + feuille * 0.045, feuille, tige.cross(feuille).normalized(), (0.085, 0.013), 0.002, SAULE, "objet")
+
+
+def aravot(mm, vers):
+    for pied in ARAVOT_NORD:
+        arava(mm, vers, pied, (0.0, -1.0))
+    for pied in ARAVOT_OUEST:
+        arava(mm, vers, pied, (1.0, 0.0))
+
+
+# « וּבְעֵת שֶׁהָיוּ מְבִיאִין אוֹתָהּ וְסוֹדְרִין אוֹתָהּ תּוֹקְעִין וּמְרִיעִין וְתוֹקְעִין » (Rambam Loulav 7:21) : un cohen dresse la
+# dernière branche au nord, deux sonnent ; leur place : CHOIX.
+DRESSEUR_OU = (-30.25, 7.7, Z_AZ)
+
+
+def _aravot():
+    nom = "aravot_1"
+
+    def batir():
+        h = _un_cohen(nom)
+        mm = Maillage()
+        aravot(mm, lambda p: vers_la_figure(DRESSEUR_OU, -90.0, p, h.sol))
+        porter(h, mm, f"{nom}_aravot")
+        return h
+
+    def geste(h, a, horloge, t):
+        tige = vers_la_figure(DRESSEUR_OU, -90.0, (DRESSEUR_OU[0], 6.4, Z_AZ + 1.0), a.sol)
+        vers = Vector((0.0, -1.0, 8.5)).normalized()
+        return G.composer(G.debout(a, horloge, t, 0.2, regard=0.02), G.tete(flexion=-0.25), G.buste(flexion=0.08),
+                          G.bras(a, "l", tige + vers * 1.30 + Vector((0.04, 0.04, 0.0))),
+                          G.bras(a, "r", tige + vers * 0.90 + Vector((-0.04, 0.04, 0.0))),
+                          G.paume(a, "l", -G.GAUCHE + G.DEVANT), G.paume(a, "r", G.GAUCHE + G.DEVANT),
+                          G.doigts(a, "l", 0.8, 0.5), G.doigts(a, "r", 0.8, 0.5))
+    return [Role(nom, "aravot", batir, geste, DRESSEUR_OU, -90.0, famille="cohanim"),
+            _tokea("aravot_2", "aravot", (-27.0, 11.5, Z_AZ), -100.0),
+            _tokea("aravot_3", "aravot", (-34.0, 11.5, Z_AZ), -80.0)]
+
+
+# En amot : une boucle fermée par `sommets`, coins arrondis de `rayon` ; `depart` fait partir la figure plus loin sur la boucle.
+class Boucle(Stade):
+    def __init__(self, sommets, rayon, depart=0.0, pas=0.04):
+        sommets, r = [Vector(s) * AMA for s in sommets], rayon * AMA
+        points = []
+        for i, coin in enumerate(sommets):
+            avant, apres = sommets[i - 1], sommets[(i + 1) % len(sommets)]
+            debut, fin = coin + (avant - coin).normalized() * r, coin + (apres - coin).normalized() * r
+            points += [debut * (1 - u) ** 2 + coin * (2 * u * (1 - u)) + fin * u * u for u in np.linspace(0.0, 1.0, 8, endpoint=False)]
+            suivant = apres + (coin - apres).normalized() * r
+            m = max(2, int((suivant - fin).length / pas))
+            points += [fin.lerp(suivant, j / m) for j in range(m)]
+        self.points = points
+        self.cumul = [0.0]
+        for p, q in zip(points, points[1:] + points[:1]):
+            self.cumul.append(self.cumul[-1] + (q - p).length)
+        self.longueur = self.cumul[-1]
+        self.decalage = depart * AMA
+
+    def en(self, s):
+        return super().en(s + self.decalage)
+
+
+# « בְּכָל יוֹם וָיוֹם הָיוּ מַקִּיפִין אֶת הַמִּזְבֵּחַ בְּלוּלְבֵיהֶן בִּידֵיהֶן » (Rambam Loulav 7:23) ; les cohanim seuls, car
+# l'Israélite n'entre pas entre l'Oulam et l'autel (Tosfot Yom Tov sur Soucca 4:5). Autour de l'autel et de son kevesh, au sol ;
+# le sens, le nombre et l'etrog dans la gauche : CHOIX.
+TOUR_DE_L_AUTEL = ((-21.0, 9.0), (-55.2, 9.0), (-55.2, -55.5), (-25.5, -55.5), (-25.5, -26.0), (-21.0, -23.0))
+MAKIFIM = 6
+LOULAV, HADAS, ETROG = (0.46, 0.50, 0.25), (0.14, 0.30, 0.12), (0.85, 0.70, 0.18)
+
+
+def loulav(mm, repere):
+    tige = [Vector((0.0, 0.0, z)) for z in np.linspace(-0.12, 0.95, 6)]
+    mm.nappe([[repere @ p for p in a] for a in tube(tige, [0.012, 0.012, 0.011, 0.010, 0.008, 0.003], 6)], LOULAV, "objet")
+    for s in (-1.0, 1.0):
+        for k, z in enumerate(np.linspace(0.02, 0.32, 7)):
+            p = Vector((s * 0.018, 0.0, z))
+            pave(mm, repere @ (p + Vector((0.0, 0.0, 0.08))), repere.to_3x3() @ Vector((0.15 * s, 0.0, 1.0)).normalized(),
+                 repere.to_3x3() @ Vector((0.0, 1.0, 0.0)), (0.18, 0.02), 0.003, HADAS if k % 2 else SAULE, "objet")
+
+
+def etrog(mm, repere):
+    tourner_profil(mm, repere, ((-0.060, 0.004), (-0.050, 0.030), (-0.020, 0.042), (0.020, 0.042), (0.050, 0.028),
+                                (0.065, 0.006)), ETROG, n=12)
+
+
+def repere_du_loulav(h):
+    return repere_vers(devant_poitrine(h, 0.26, 0.34, -0.07), G.HAUT + G.DEVANT * 0.15, G.GAUCHE)
+
+
+def repere_de_l_etrog(h):
+    return repere_vers(devant_poitrine(h, 0.27, 0.38, 0.06), G.GAUCHE, G.HAUT)
+
+
+def loulav_et_etrog(h, a, horloge, t):
+    loulav_ = a.repere("spine_03", repere_du_loulav(h))
+    etrog_ = a.repere("spine_03", repere_de_l_etrog(h))
+    return G.composer(G.bras(a, "r", lambda poses: loulav_(poses) @ Vector((-0.03, 0.02, 0.0))),
+                      G.bras(a, "l", lambda poses: etrog_(poses) @ Vector((0.0, 0.03, 0.05))),
+                      G.paume(a, "r", lambda poses: a.dans("spine_03", poses, G.GAUCHE)),
+                      G.paume(a, "l", lambda poses: a.dans("spine_03", poses, G.HAUT - G.GAUCHE)),
+                      G.doigts(a, "r", 0.85, 0.5), G.doigts(a, "l", 0.55, 0.3))
+
+
+def _makif(k):
+    nom = f"hakafot_hamizbeach_{k + 1}"
+
+    def batir():
+        h = _un_cohen(nom)
+        tenir(h, "loulav", loulav, "spine_03", repere_du_loulav(h))
+        tenir(h, "etrog", etrog, "spine_03", repere_de_l_etrog(h))
+        return h
+    depart = Boucle(TOUR_DE_L_AUTEL, 2.5).longueur / AMA * k / MAKIFIM
+    return Role(nom, "hakafot_hamizbeach", batir, loulav_et_etrog, trajet=Boucle(TOUR_DE_L_AUTEL, 2.5, depart), vitesse=1.0,
+                famille="cohanim")
+
+
+def roles_souccot():
+    return [*_shaar_hamayim(), *_nissoukh_hamayim(), *_aravot(), *[_makif(k) for k in range(MAKIFIM)]]
+
+
+# « וּמְבִיאִין בִּימָה גְּדוֹלָה וְשֶׁל עֵץ הָיְתָה וּמַעֲמִידִין אוֹתָהּ בְּאֶמְצַע עֶזְרַת נָשִׁים » (Rambam 'Haguiga 3:4) : la cour va de
+# x 5 à 140. Six amot de côté, trois de haut, cinq marches à l'ouest : CHOIX.
+BIMA_OU = (72.5, 0.0, Z_EZN)
+COTE_DE_LA_BIMA = 6.0
+HAUT_DE_LA_BIMA = 3.0
+MARCHES_DE_LA_BIMA = 5
+LARGEUR_DES_MARCHES = 3.0
+SUR_LA_BIMA = Z_EZN + HAUT_DE_LA_BIMA
+
+
+def _bloc(mm, vers_ici, x0, x1, y0, y1, z0, z1):
+    est, nord = vers_ici((1.0, 0.0, 0.0)) - vers_ici((0.0, 0.0, 0.0)), vers_ici((0.0, 1.0, 0.0)) - vers_ici((0.0, 0.0, 0.0))
+    centre = vers_ici(((x0 + x1) / 2, (y0 + y1) / 2, z0))
+    pave(mm, centre, est.normalized(), nord.normalized(), ((x1 - x0) * AMA, (y1 - y0) * AMA), (z1 - z0) * AMA, CHENE, "objet")
+
+
+# La bima dans le repère d'une figure posée en `ou`, tournée vers `cap`.
+def bimat_etz(mm, ou, cap, sol):
+    cx, cy, z = BIMA_OU
+
+    def vers_ici(p):
+        return vers_la_figure(ou, cap, (cx + p[0], cy + p[1], z + p[2]), sol)
+    d, haut, planche = COTE_DE_LA_BIMA / 2, HAUT_DE_LA_BIMA, 0.25
+    _bloc(mm, vers_ici, -d, d, -d, d, haut - planche, haut)
+    for x0, x1, y0, y1 in ((-d, d, -d, -d + planche), (-d, d, d - planche, d), (-d, -d + planche, -d, d), (d - planche, d, -d, d)):
+        _bloc(mm, vers_ici, x0, x1, y0, y1, 0.0, haut - planche)
+    marche = haut / (MARCHES_DE_LA_BIMA + 1)
+    for k in range(MARCHES_DE_LA_BIMA):
+        _bloc(mm, vers_ici, -d - MARCHES_DE_LA_BIMA + k, -d, -LARGEUR_DES_MARCHES / 2, LARGEUR_DES_MARCHES / 2, 0.0, (k + 1) * marche)
+
+
+def sur_la_marche(k, y=0.0):
+    return (BIMA_OU[0] - COTE_DE_LA_BIMA / 2 - MARCHES_DE_LA_BIMA + k + 0.5, y, Z_EZN + (k + 1) * HAUT_DE_LA_BIMA / (MARCHES_DE_LA_BIMA + 1))
+
+
+# « לֹא בְּכִתְרוֹ » (Rambam Melakhim 2:1) : le roi a sa couronne ; un cercle d'or à six fleurons, CHOIX.
+def atara(h, fleurons=6, n=48):
+    yeux = h.points_objet(h.accessoires[0]).mean(axis=0)
+    z = float(yeux[2]) + 0.055
+    points = _crane_et_cheveux(h)
+    bande = points[np.abs(points[:, 2] - z) < 0.01]
+    cy = 0.5 * (bande[:, 1].min() + bande[:, 1].max())
+    r = _lisser_cercle(enveloppe(bande, (0.0, cy), n), 3) + 0.006
+    th = _angles(n)
+
+    def anneau(dehors, hauteur):
+        return [Vector(((a + dehors) * _vers(t)[0], cy + (a + dehors) * _vers(t)[1], z + hauteur(t))) for t, a in zip(th, r)]
+    pointe = lambda t: 0.026 + 0.024 * max(0.0, math.cos(fleurons * t)) ** 6
+    mm = Maillage()
+    mm.nappe([anneau(0.0, lambda t: 0.0), anneau(0.004, lambda t: 0.0), anneau(0.004, pointe), anneau(0.0, pointe),
+              anneau(0.0, lambda t: 0.0)], OR, "head")
+    lier(h, mm, f"{h.nom}_atara", metal(), "head")
+
+
+# L'argaman du « לְבוּשׁ מַלְכוּת » (Esther 8:15), sur la robe longue : CHOIX.
+ROBE_ROYALE = Habit("punkduck_medieval_dress", "Figure_Robe_Royale", ARGAMAN, longue=True)
+
+
+def melekh(nom, qui, gabarit):
+    h = Humain(nom, gabarit, qui=qui, **_poils(qui, False))
+    h.vetir_mpfb(ROBE_ROYALE)
+    h.detendre()
+    atara(h)
+    appliquer_visibilite(h, h.visible & ~h.efface)
+    return h
+
+
+# « יוֹצְאָה וְרֹאשָׁהּ פָּרוּעַ » est contre la dat yehoudit (Ketoubot 7:6) : la tête sous un voile.
+VOILE = Habit("elvs_charity_veil1", "Figure_Voile", LIN)
+
+
+def femme(nom, gabarit):
+    h = Humain(nom, gabarit, sourcils=1 + int(_alea(nom, 6) * 9))
+    h.vetir_mpfb(ROBE)
+    h.vetir_mpfb(VOILE)
+    h.detendre()
+    appliquer_visibilite(h, h.visible & ~h.efface)
+    return h
+
+
+MELEKH = "melekh"
+GABARIT_DU_MELEKH = Gabarit(1.76, age=0.55)
+SIEGE_DU_MELEKH = 0.46
+
+
+def _avec_la_bima(h, ou, cap):
+    mm = Maillage()
+    bimat_etz(mm, ou, cap, h.sol)
+    porter(h, mm, f"{h.nom}_bima")
+    return h
+
+
+# « וְהוּא יוֹשֵׁב עָלֶיהָ » (Sota 7:8) : il lit assis, tourné vers l'est où le peuple entre ; le siège et le cap sont des CHOIX.
+def _melekh_yoshev():
+    nom, ou = "parashat_hamelekh_1", (*BIMA_OU[:2], SUR_LA_BIMA)
+
+    def geste(h, a, horloge, t):
+        return lire_le_sefer(h, a, assis(a, horloge, t, SIEGE_DU_MELEKH), horloge, t)
+
+    def batir():
+        h = tenir_le_sefer(_avec_la_bima(melekh(nom, MELEKH, GABARIT_DU_MELEKH), ou, 0.0))
+        mm = Maillage()
+        tabouret(mm, Vector((0.0, RECUL_ASSIS, h.sol)), SIEGE_DU_MELEKH)
+        porter(h, mm, f"{nom}_kisse")
+        return h
+    return Role(nom, "parashat_hamelekh", batir, geste, ou, 0.0, sol_porte=True)
+
+
+# « אַגְרִיפָּס הַמֶּלֶךְ עָמַד וְקִבֵּל וְקָרָא עוֹמֵד » (Sota 7:8) : debout, la tête plus basse — il pleure (CHOIX du geste).
+def _agrippas():
+    nom, ou = "agrippas", (*BIMA_OU[:2], SUR_LA_BIMA)
+
+    def geste(h, a, horloge, t):
+        return G.composer(lire_le_sefer(h, a, G.debout(a, horloge, t, 0.3, regard=0.0), horloge, t), G.tete(flexion=0.45))
+
+    return Role(nom, "agrippas", lambda: tenir_le_sefer(_avec_la_bima(melekh(nom, "agrippas", Gabarit(1.73, age=0.45)), ou, 0.0)),
+                geste, ou, 0.0, sol_porte=True)
+
+
+# « וְכֹהֵן גָּדוֹל נוֹתְנָהּ לַמֶּלֶךְ, וְהַמֶּלֶךְ עוֹמֵד וּמְקַבֵּל » (Sota 7:8) : le rouleau fermé, droit, passe d'une paire de mains à
+# l'autre ; le roi tourné vers l'ouest, d'où il vient. Les places sur la bima et ses marches : CHOIX.
+MELEKH_OMED_OU = (*BIMA_OU[:2], SUR_LA_BIMA)
+COHEN_GADOL_A_LA_BIMA = (BIMA_OU[0] - 1.6, BIMA_OU[1], SUR_LA_BIMA)
+SEFER_FERME = 0.12
+SEFER_TENDU = 0.30
+
+
+def repere_du_sefer_tendu(h):
+    return repere_vers(devant_poitrine(h, SEFER_TENDU, 0.30), HAUT_Z, G.GAUCHE)
+
+
+def _mains_au_rouleau(a, cibles):
+    return G.composer(G.bras(a, "l", cibles["l"]), G.bras(a, "r", cibles["r"]),
+                      G.paume(a, "l", lambda poses: a.dans("spine_03", poses, -G.GAUCHE)),
+                      G.paume(a, "r", lambda poses: a.dans("spine_03", poses, G.GAUCHE)),
+                      G.doigts(a, "l", 0.9, 0.6), G.doigts(a, "r", 0.9, 0.6))
+
+
+def tendre_le_sefer(h, a, horloge, t):
+    rouleau = a.repere("spine_03", repere_du_sefer_tendu(h))
+    return G.composer(G.debout(a, horloge, t, 0.6, regard=0.0), G.tete(flexion=0.15),
+                      _mains_au_rouleau(a, {c: (lambda poses, s=s: rouleau(poses) @ Vector((s * SEFER_FERME / 2, 0.02, -0.10)))
+                                            for c, s in (("l", 1.0), ("r", -1.0))}))
+
+
+def recevoir_le_sefer(h, a, horloge, t):
+    loin = (MELEKH_OMED_OU[0] - COHEN_GADOL_A_LA_BIMA[0]) * AMA - SEFER_TENDU
+    return G.composer(G.debout(a, horloge, t, 0.6, regard=0.0), G.tete(flexion=0.15),
+                      _mains_au_rouleau(a, {c: devant_poitrine(h, loin - 0.02, 0.20, s * SEFER_FERME / 2)
+                                            for c, s in (("l", 1.0), ("r", -1.0))}))
+
+
+def _haavarat_hasefer():
+    def cohen_gadol_et_le_sefer():
+        h = cohen_gadol_en_or("haavarat_hasefer_1")
+        tenir(h, "sefer", lambda mm, r: sefer(mm, r, ecart=SEFER_FERME), "spine_03", repere_du_sefer_tendu(h))
+        return h
+
+    def passeur(nom, ou, gabarit, tete):
+        return Role(nom, "haavarat_hasefer", lambda: fidele(nom, "costume", gabarit, gris=gabarit.age > 0.7, tete=tete), ecouter,
+                    ou, 0.0, sol_porte=ou[2] > Z_EZN)
+    return [Role("haavarat_hasefer_5", "haavarat_hasefer",
+                 lambda: _avec_la_bima(melekh("haavarat_hasefer_5", MELEKH, GABARIT_DU_MELEKH), MELEKH_OMED_OU, 180.0),
+                 recevoir_le_sefer, MELEKH_OMED_OU, 180.0, sol_porte=True),
+            # En habits d'or : il les porte « בְּיוֹם עֲבוֹדָתוֹ וַאֲפִלּוּ שֶׁלֹּא בִּשְׁעַת עֲבוֹדָה » (Rambam Klei HaMikdash 8:11), CHOIX.
+            Role("haavarat_hasefer_1", "haavarat_hasefer", cohen_gadol_et_le_sefer, tendre_le_sefer, COHEN_GADOL_A_LA_BIMA, 0.0,
+                 famille="cohanim", sol_porte=True),
+            # Le segan hors de son service n'a pas l'avnet, qui est de sha'atnez (8:11) : en habit à lui, CHOIX.
+            passeur("haavarat_hasefer_2", sur_la_marche(2, 0.3), Gabarit(1.74, age=0.58), "talith"),
+            passeur("haavarat_hasefer_3", (BIMA_OU[0] - 9.2, 0.7, Z_EZN), Gabarit(1.69, age=0.78, peau="old_caucasian_male"),
+                    "talith"),
+            passeur("haavarat_hasefer_4", (BIMA_OU[0] - 11.0, -0.9, Z_EZN), Gabarit(1.72, age=0.42), "kippa")]
+
+
+# « וְכָל יִשְׂרָאֵל הָעוֹלִים לָחֹג מִתְקַבְּצִין סְבִיבָיו » (Rambam 'Haguiga 3:4) ; « הָאֲנָשִׁים וְהַנָּשִׁים וְהַטַּף » (Devarim 31:12).
+# Les hommes et les enfants autour de la bima, l'ouest laissé aux marches ; les femmes à la gezuztra, « שֶׁהַנָּשִׁים רוֹאוֹת
+# מִלְמַעְלָן וְהָאֲנָשִׁים מִלְּמַטָּן » (Middot 2:5). Les places : CHOIX.
+HOMMES_DU_KAHAL = ((80.0, 3.0), (80.5, -2.5), (79.0, 6.5), (78.6, -6.8), (82.8, 0.6), (76.2, 9.2), (75.2, -9.6), (83.2, 5.6),
+                   (83.6, -5.0), (71.0, 9.6), (70.0, -9.2), (85.8, -1.6))
+ENFANTS_DU_KAHAL = ((81.4, -0.9), (77.6, 8.0), (77.2, -8.4), (84.6, 3.4))
+# Sur la dalle nord de la gezuztra (y 64 à 67,5, dessus à 6,6), entre les dés de sa balustrade.
+FEMMES_DU_KAHAL = (65.0, 67.4, 71.6, 73.6, 78.0, 80.2)
+Y_DES_FEMMES, Z_DE_LA_GEZUZTRA = 65.3, 6.6
+
+
+def cap_vers_la_bima(x, y):
+    return math.degrees(math.atan2(BIMA_OU[1] - y, BIMA_OU[0] - x))
+
+
+def _ish(k, x, y):
+    nom = f"kahal_{k + 1}"
+    age = 0.30 + 0.60 * _alea(nom, 0)
+    gabarit = Gabarit(1.64 + 0.18 * _alea(nom, 1), age=age, poids=0.35 + 0.35 * _alea(nom, 2),
+                      peau="old_caucasian_male" if age > 0.8 else "middleage_caucasian_male")
+    return Role(nom, "kahal", lambda: fidele(nom, "costume", gabarit, gris=age > 0.7), ecouter, (x, y, Z_EZN),
+                cap_vers_la_bima(x, y) + 12.0 * (_alea(nom, 4) - 0.5))
+
+
+def _tinok(k, x, y):
+    nom = f"kahal_{len(HOMMES_DU_KAHAL) + k + 1}"
+    gabarit = Gabarit(1.12 + 0.16 * _alea(nom, 1), age=0.10 + 0.06 * _alea(nom, 0), peau="young_caucasian_male")
+    return Role(nom, "kahal", lambda: fidele(nom, "robe", gabarit, barbe=False), ecouter, (x, y, Z_EZN),
+                cap_vers_la_bima(x, y) + 16.0 * (_alea(nom, 4) - 0.5))
+
+
+def _isha(k, x):
+    nom = f"kahal_{len(HOMMES_DU_KAHAL) + len(ENFANTS_DU_KAHAL) + k + 1}"
+    age = 0.25 + 0.60 * _alea(nom, 0)
+    peau = "young_caucasian_female" if age < 0.4 else "old_caucasian_female" if age > 0.75 else "middleage_caucasian_female"
+    gabarit = Gabarit(1.55 + 0.10 * _alea(nom, 1), genre=0.0, age=age, muscle=0.4, poids=0.35 + 0.3 * _alea(nom, 2), peau=peau)
+    return Role(nom, "kahal", lambda: femme(nom, gabarit), ecouter, (x, Y_DES_FEMMES, Z_DE_LA_GEZUZTRA),
+                cap_vers_la_bima(x, Y_DES_FEMMES) + 10.0 * (_alea(nom, 4) - 0.5))
+
+
+def roles_hakhel():
+    return [_melekh_yoshev(), _agrippas(), *_haavarat_hasefer(),
+            *[_ish(k, x, y) for k, (x, y) in enumerate(HOMMES_DU_KAHAL)],
+            *[_tinok(k, x, y) for k, (x, y) in enumerate(ENFANTS_DU_KAHAL)],
+            *[_isha(k, x) for k, x in enumerate(FEMMES_DU_KAHAL)]]
+
+
+def rase(nom, gabarit, barbe, sourcils):
+    poils = _poils(nom, False)
+    poils.update(cheveux=None, sourcils=sourcils and poils["sourcils"])
+    if not barbe:
+        poils["barbe"] = None
+    h = Humain(nom, gabarit, **poils)
+    h.vetir_mpfb(COSTUME)
+    h.detendre()
+    appliquer_visibilite(h, h.visible & ~h.efface)
+    return h
+
+
+# « הָיָה נוֹטֵל שְׂעַר רֹאשׁ נִזְרוֹ וּמְשַׁלֵּחַ תַּחַת הַדּוּד » (Nazir 6:8), mouillé du bouillon de ses shelamim (Rambam Nezirout 8:2) :
+# à l'ouest du foyer de la lishka (120, −48), la main au-dessus du mur, où le feu paraît sous le chaudron. La place : CHOIX.
+NAZIR_OU = (115.0, -47.5, Z_EZN)
+SOUS_LE_DOUD = (117.6, -47.5, Z_EZN + 2.9)
+
+
+def touffe(mm, repere):
+    profil = [(0.018 * math.sin(a) + 0.018, 0.034 * math.cos(a) + 0.002) for a in np.linspace(-math.pi / 2, math.pi / 2, 6)]
+    tourner_profil(mm, repere, profil, BRUN, n=10)
+
+
+def repere_de_la_touffe(h):
+    a = G.Acteur(h.squelette, h.sol)
+    return repere_vers(a.poignet["r"] + a.jointure["r"] * 0.075 + a.paume["r"] * 0.012, a.paume["r"], a.jointure["r"])
+
+
+def jeter_le_sear(h, a, horloge, t):
+    lache = 0.5 - 0.5 * horloge.onde(t, 5.3)
+    feu = vers_la_figure(NAZIR_OU, 0.0, SOUS_LE_DOUD, a.sol) + HAUT_Z * (0.05 * lache)
+    return G.composer(G.debout(a, horloge, t, 0.4, regard=0.0), G.buste(flexion=0.14), G.tete(flexion=0.32),
+                      G.bras(a, "r", feu), G.paume(a, "r", -G.HAUT), G.doigts(a, "r", 0.55 - 0.25 * lache, 0.3))
+
+
+def _nazir():
+    nom = "nazir"
+
+    def batir():
+        h = rase(nom, Gabarit(1.74, age=0.40), barbe=True, sourcils=True)
+        tenir(h, "sear", touffe, "hand_r", repere_de_la_touffe(h))
+        return h
+    return Role(nom, nom, batir, jeter_le_sear, NAZIR_OU, 0.0)
+
+
+# « יְגַלַּח אֶת כָּל שְׂעָרוֹ אֶת רֹאשׁוֹ וְאֶת זְקָנוֹ וְאֵת גַּבֹּת עֵינָיו » (Vayikra 14:9) : rasé la veille, il remonte du mikve de la
+# lishka (Nega'im 14:8), habillé ; au bord sud de la cuve, tourné vers la porte : CHOIX.
+GABARIT_DU_METZORA = Gabarit(1.72, age=0.50)
+
+
+def le_metzora(nom):
+    return rase(nom, GABARIT_DU_METZORA, barbe=False, sourcils=False)
+
+
+# « הִכְנִיס רֹאשׁוֹ, וְנָתַן עַל תְּנוּךְ אָזְנוֹ » (Nega'im 14:9) ; « הַכֹּהֵן מִבִּפְנִים וְהַמְצֹרָע מִבַּחוּץ… וּפָנָיו לְמַעֲרָב » (Rambam
+# Me'houssrei Kappara 4:2) : sur le seuil de Nikanor, le metzora penche la tête dans l'Azara ; le cohen, le sang dans la paume
+# gauche, en touche du doigt droit le lobe de l'oreille droite — au nord du metzora tourné vers l'ouest. Les places : CHOIX.
+METZORA_AU_SEUIL = (0.45, 0.0, Z_EZI)
+PENCHE = 0.45
+OREILLE_DU_METZORA = (METZORA_AU_SEUIL[0] - 0.26 / AMA, 0.08 / AMA, Z_EZI + 1.52 / AMA)
+COHEN_A_L_OREILLE = (-1.3, 0.5, Z_EZI)
+SANG = (0.30, 0.015, 0.015)
+SHEMEN = (0.62, 0.50, 0.12)
+
+
+def passer_la_tete(h, a, horloge, t):
+    return G.composer(G.debout(a, horloge, t, 0.2, regard=0.0), G.buste(flexion=PENCHE), G.tete(flexion=-0.10),
+                      G.bras_ballant(a, "l"), G.bras_ballant(a, "r"))
+
+
+def goutte(couleur):
+    def construire(mm, repere):
+        tourner_profil(mm, repere, ((0.0, 0.028), (0.004, 0.024), (0.006, 0.0)), couleur, n=12)
+    return construire
+
+
+def repere_du_creux(h, cote):
+    a = G.Acteur(h.squelette, h.sol)
+    return repere_vers(a.poignet[cote] + a.jointure[cote] * 0.055 + a.paume[cote] * 0.012, a.paume[cote], a.jointure[cote])
+
+
+PAUME_OUVERTE = 0.32
+
+
+def paume_ouverte(h, a):
+    return G.composer(G.bras(a, "l", devant_poitrine(h, 0.30, PAUME_OUVERTE, 0.10)), G.paume(a, "l", G.HAUT), G.doigts(a, "l", 0.12, 0.1))
+
+
+def toucher_l_oreille(h, a, horloge, t):
+    oreille = vers_la_figure(COHEN_A_L_OREILLE, 0.0, OREILLE_DU_METZORA, a.sol)
+    main = oreille + Vector((0.03, 0.13, -0.02))
+    return G.composer(G.debout(a, horloge, t, 0.5, regard=0.0), G.tete(flexion=0.10), paume_ouverte(h, a),
+                      G.bras(a, "r", main), G.paume(a, "r", G.GAUCHE), G.doigts(a, "r", 0.45, 0.35))
+
+
+def _cohen_et_sa_paume(nom, couleur, ages):
+    def batir():
+        h = _un_cohen(nom, ages)
+        tenir(h, "creux", goutte(couleur), "hand_l", repere_du_creux(h, "l"))
+        return h
+    return batir
+
+
+# « טוֹבֵל אֶצְבָּעוֹ הַיְמָנִית בַּשֶּׁמֶן שֶׁבְּכַפּוֹ וּמַזֶּה שֶׁבַע פְּעָמִים כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳּדָשִׁים » (Rambam Me'houssrei Kappara 4:2) :
+# l'huile versée dans la paume gauche du compagnon, c'est lui qui trempe — « מִן הַשֶּׁמֶן אֲשֶׁר עַל כַּפּוֹ הַשְּׂמָאלִית » (Vayikra 14:16).
+# Tourné vers l'ouest dans l'Ezrat Israël, près de Nikanor ; celui qui a versé tient le log. Places et forme du vase : CHOIX.
+DUREE_DES_HAZAOT = 14.0
+
+
+def repere_du_log(h):
+    return repere_vers(devant_poitrine(h, 0.30, 0.38), G.HAUT, G.GAUCHE)
+
+
+def log(mm, repere):
+    tourner_profil(mm, repere, tuple((z * 0.7, r * 0.7) for z, r in PROFIL_DE_LA_TZELOHIT), BRONZE)
+
+
+def mazeh(h, a, horloge, t):
+    periode = horloge.duree / 7
+    u = (t % periode) / periode
+    trempe = 1.0 - G.lisse(u / 0.35)
+    fouet = G.lisse((u - 0.55) / 0.15) * (1.0 - G.lisse((u - 0.85) / 0.15))
+    creux = a.au("spine_03", devant_poitrine(h, 0.30, PAUME_OUVERTE, 0.10) + HAUT_Z * 0.07)
+    vise = a.au("spine_03", devant_poitrine(h, 0.50, 0.12, -0.04))
+
+    def droite(poses):
+        return creux(poses).lerp(vise(poses), 1.0 - trempe) + G.DEVANT * (0.06 * fouet) - HAUT_Z * (0.08 * fouet)
+    return G.composer(G.debout(a, horloge, t, 0.1, regard=0.0), G.tete(flexion=0.04), paume_ouverte(h, a),
+                      G.bras(a, "r", droite), G.paume(a, "r", -G.HAUT), G.doigts(a, "r", 0.45, 0.4))
+
+
+def _taharat_hametzora():
+    return [Role("taharat_hametzora_1", "taharat_hametzora", lambda: le_metzora("taharat_hametzora_1"), passer_la_tete,
+                 METZORA_AU_SEUIL, 180.0),
+            Role("taharat_hametzora_2", "taharat_hametzora", _cohen_et_sa_paume("taharat_hametzora_2", SANG, (0.40, 0.35)),
+                 toucher_l_oreille, COHEN_A_L_OREILLE, 0.0, famille="cohanim")]
+
+
+def _log_hashemen():
+    def yotzek():
+        h = _un_cohen("log_hashemen_1", (0.50, 0.35))
+        tenir(h, "log", log, "spine_03", repere_du_log(h))
+        return h
+    return [Role("log_hashemen_1", "log_hashemen", yotzek, tenir_la_coupe(0.7 * PANSE_DE_LA_TZELOHIT + 0.015), (-3.4, 2.1, Z_EZI),
+                 -120.0, famille="cohanim"),
+            Role("log_hashemen_2", "log_hashemen", _cohen_et_sa_paume("log_hashemen_2", SHEMEN, (0.35, 0.30)), mazeh,
+                 (-4.2, 0.4, Z_EZI), 180.0, duree=DUREE_DES_HAZAOT, famille="cohanim")]
+
+
+def roles_nazir():
+    return [_nazir(),
+            Role("metzora", "metzora", lambda: le_metzora("metzora"), ecouter, (25.0, 46.4, Z_EZN), -90.0),
+            *_taharat_hametzora(), *_log_hashemen()]
+
+
 # La visite libre : un lieu, un geste — la zerika à l'autel, deux Léviim qui jouent, un Israélite, la garde de Nikanor.
 FIGURES_DE_LA_VISITE = ("zerika", "leviim_6", "leviim_7", "anshei_maamad_1")
 
@@ -3169,7 +4325,10 @@ def animer_en_marche(h, role, terrain):
             pied = place @ (a.cheville[cote] + decalage)
             return terrain(pied.x, pied.y) - g
 
-        poses, bases = a.sq.resoudre(pas_de_marche(h, a, horloge, t, (s / foulee) % 1.0, foulee, sol))
+        regles = pas_de_marche(h, a, horloge, t, (s / foulee) % 1.0, foulee, sol)
+        if role.geste:
+            regles = G.composer(regles, role.geste(h, a, horloge, t))
+        poses, bases = a.sq.resoudre(regles)
         rec.image(f, bases, place)
         tenir_image(h, a, role, horloge, t, poses, tenus)
         if f % IMAGES == 0:
@@ -3259,7 +4418,11 @@ class Troupe(NamedTuple):
 
 
 TROUPES = {"figures": Troupe(roles_de_la_visite, VUES), "figures_tamid": Troupe(roles_du_tamid, VUES),
-           "figures_kippour": Troupe(roles_kippour, []), "figures_shoeva": Troupe(roles_shoeva, [])}
+           "figures_kippour": Troupe(roles_kippour, []), "figures_shoeva": Troupe(roles_shoeva, []),
+           "figures_pessah": Troupe(roles_pessah, []),
+           "figures_bikkourim": Troupe(roles_bikkourim, []), "figures_souccot": Troupe(roles_souccot, []),
+           "figures_hakhel": Troupe(roles_hakhel, []),
+           "figures_nazir": Troupe(roles_nazir, [])}
 
 
 def main():
@@ -3280,7 +4443,7 @@ def main():
             releves[cle] = releves.get(cle) or Terrain(*cle)
             terrains[role.nom] = releves[cle]
         else:
-            sols[role.nom] = _rayon_sol(role.ou[0] * AMA, role.ou[1] * AMA, role.ou[2] * AMA)
+            sols[role.nom] = role.ou[2] * AMA if role.sol_porte else _rayon_sol(role.ou[0] * AMA, role.ou[1] * AMA, role.ou[2] * AMA)
 
     boites, figures = {}, []
     for role in lot:
