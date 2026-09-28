@@ -518,11 +518,19 @@ const horsGeometrie = [ciel];
 const rendu = chaine(renderer, scene, camera, horsGeometrie);
 const detail = niveauxDeDetail(scene, camera);
 // Le film veut chaque image au plein détail, sans qu'un allègement arrivé en cours de prise ne la change.
-function alleger(racine) {
-  if (CINEMA) return;
+function maillagesDe(racine) {
   const maillages = [];
   racine.traverse((o) => { if (o.isMesh) maillages.push(o); });
-  detail.confier(maillages);
+  return maillages;
+}
+
+function alleger(racine) {
+  if (!CINEMA) detail.confier(maillagesDe(racine));
+}
+
+// Une torche tenue bouge par sa matrice : figée à sa première image, sa tuile restait en arrière de la main et de sa flamme.
+function allegerTroupe(troupe) {
+  if (!CINEMA) detail.confierMobiles(maillagesDe(troupe));
 }
 
 // La résolution suit ce que la machine tient. Baisser la définition d'un tiers coûte
@@ -825,7 +833,7 @@ function chargerTroupe(nom) {
     scene.add(troupe.scene);
     troupe.scene.updateMatrixWorld(true);
     troupes[nom] = troupe;
-    alleger(troupe.scene);
+    allegerTroupe(troupe.scene);
     suivreTorches(troupe);
     montrerTroupes();
   });

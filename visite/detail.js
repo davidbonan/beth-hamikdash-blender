@@ -65,6 +65,7 @@ export function niveauxDeDetail(scene, camera) {
   let tuiles = [];
   const file = [];
   const oublies = new WeakSet();
+  const mobiles = new WeakSet();
   let ouvriers = null;
 
   // La tuile lit sur son maillage ce que la visite y règle : sa matière, et ses ombres la nuit.
@@ -74,13 +75,12 @@ export function niveauxDeDetail(scene, camera) {
       : new THREE.Mesh(geometrie, maillage.material);
     if (maillage.isSkinnedMesh) {
       tuile.bind(maillage.skeleton, maillage.bindMatrix);
-      // Partagées et non copiées : un figurant qui marche emporte sa matrice, et une copie figée le laissait écarter du cadre.
-      tuile.matrixWorld = maillage.matrixWorld;
       tuile.bindMatrixInverse = maillage.bindMatrixInverse;
       tuile.boundingSphere = maillage.boundingSphere;
-    } else {
-      tuile.matrixWorld.copy(maillage.matrixWorld);
     }
+    // Partagée et non copiée : un figurant qui marche emporte sa matrice, et une copie figée le laissait écarter du cadre.
+    if (mobiles.has(maillage)) tuile.matrixWorld = maillage.matrixWorld;
+    else tuile.matrixWorld.copy(maillage.matrixWorld);
     for (const cle of ["material", "castShadow", "receiveShadow"]) Object.defineProperty(tuile, cle, { get: () => maillage[cle] });
     groupe.add(tuile);
     return tuile;
@@ -97,9 +97,10 @@ export function niveauxDeDetail(scene, camera) {
       const sphere = new THREE.Sphere(new THREE.Vector3(...centre), rayon);
       const pleine = partage(source, source.index, sphere);
       pleine.setDrawRange(debut * 3, nombre * 3);
-      const place = pose ?? sphere;
+      const suivie = mobiles.has(maillage) ? pose ?? sphere : null;
+      const place = suivie ?? sphere;
       tuiles.push({
-        source: maillage, maille: tuileDe(maillage, pleine), pleine, allegee: partage(source, index, sphere), pose,
+        source: maillage, maille: tuileDe(maillage, pleine), pleine, allegee: partage(source, index, sphere), suivie,
         centre: place.center.clone().applyMatrix4(maillage.matrixWorld), rayon: place.radius * echelle,
         niveaux: [{ ecart: 0, nombre: nombre * 3 }, ...niveaux],
       });
@@ -139,13 +140,20 @@ export function niveauxDeDetail(scene, camera) {
     return ouvrier;
   }
 
+  // Les plus lourds d'abord : ce sont eux qui font ramer.
+  function confier(maillages) {
+    file.push(...maillages.filter((m) => m.visible && m.geometry.index));
+    file.sort((a, b) => b.geometry.index.count - a.geometry.index.count);
+    envoyer();
+  }
+
   const oeil = new THREE.Vector3();
   return {
-    // Les plus lourds d'abord : ce sont eux qui font ramer.
-    confier(maillages) {
-      file.push(...maillages.filter((m) => m.visible && m.geometry.index));
-      file.sort((a, b) => b.geometry.index.count - a.geometry.index.count);
-      envoyer();
+    confier,
+    // Une troupe joue : ses tuiles suivent leur maillage, qu'il se meuve par ses os ou par sa matrice.
+    confierMobiles(maillages) {
+      for (const m of maillages) mobiles.add(m);
+      confier(maillages);
     },
     // Les tuiles d'un maillage qui quitte la scène la quittent avec lui ; celui encore en calcul ne sera pas installé.
     oublier(maillages) {
@@ -163,7 +171,7 @@ export function niveauxDeDetail(scene, camera) {
       const focale = hauteurImage / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
       camera.getWorldPosition(oeil);
       for (const t of tuiles) {
-        if (t.pose) t.centre.copy(t.pose.center).applyMatrix4(t.source.matrixWorld);
+        if (t.suivie) t.centre.copy(t.suivie.center).applyMatrix4(t.source.matrixWorld);
         const distance = Math.max(oeil.distanceTo(t.centre) - t.rayon, 1e-3);
         const admis = ECART_PIXELS * distance / focale;
         let n = 0;
