@@ -72,11 +72,14 @@ export function niveauxDeDetail(scene, camera) {
     const tuile = maillage.isSkinnedMesh
       ? new THREE.SkinnedMesh(geometrie, maillage.material)
       : new THREE.Mesh(geometrie, maillage.material);
-    tuile.matrixWorld.copy(maillage.matrixWorld);
     if (maillage.isSkinnedMesh) {
       tuile.bind(maillage.skeleton, maillage.bindMatrix);
-      tuile.bindMatrixInverse.copy(maillage.bindMatrixInverse);
+      // Partagées et non copiées : un figurant qui marche emporte sa matrice, et une copie figée le laissait écarter du cadre.
+      tuile.matrixWorld = maillage.matrixWorld;
+      tuile.bindMatrixInverse = maillage.bindMatrixInverse;
       tuile.boundingSphere = maillage.boundingSphere;
+    } else {
+      tuile.matrixWorld.copy(maillage.matrixWorld);
     }
     for (const cle of ["material", "castShadow", "receiveShadow"]) Object.defineProperty(tuile, cle, { get: () => maillage[cle] });
     groupe.add(tuile);
@@ -88,13 +91,16 @@ export function niveauxDeDetail(scene, camera) {
     const source = maillage.geometry;
     const index = new THREE.BufferAttribute(allege, 1);
     const echelle = maillage.matrixWorld.getMaxScaleOnAxis();
+    // Un corps animé se dessine par ses os, pas par sa matrice : sa distance se prend sur la sphère de sa pose.
+    const pose = maillage.isSkinnedMesh ? maillage.boundingSphere : null;
     for (const { centre, rayon, debut, nombre, niveaux } of calculees) {
       const sphere = new THREE.Sphere(new THREE.Vector3(...centre), rayon);
       const pleine = partage(source, source.index, sphere);
       pleine.setDrawRange(debut * 3, nombre * 3);
+      const place = pose ?? sphere;
       tuiles.push({
-        source: maillage, maille: tuileDe(maillage, pleine), pleine, allegee: partage(source, index, sphere),
-        centre: sphere.center.clone().applyMatrix4(maillage.matrixWorld), rayon: rayon * echelle,
+        source: maillage, maille: tuileDe(maillage, pleine), pleine, allegee: partage(source, index, sphere), pose,
+        centre: place.center.clone().applyMatrix4(maillage.matrixWorld), rayon: place.radius * echelle,
         niveaux: [{ ecart: 0, nombre: nombre * 3 }, ...niveaux],
       });
     }
@@ -157,6 +163,7 @@ export function niveauxDeDetail(scene, camera) {
       const focale = hauteurImage / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
       camera.getWorldPosition(oeil);
       for (const t of tuiles) {
+        if (t.pose) t.centre.copy(t.pose.center).applyMatrix4(t.source.matrixWorld);
         const distance = Math.max(oeil.distanceTo(t.centre) - t.rayon, 1e-3);
         const admis = ECART_PIXELS * distance / focale;
         let n = 0;
