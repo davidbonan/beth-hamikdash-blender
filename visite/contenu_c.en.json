@@ -857,5 +857,459 @@
       {"oeuvre": "Yoma", "ref": "7:1", "citation": "חַזַּן הַכְּנֶסֶת נוֹטֵל סֵפֶר תּוֹרָה וְנוֹתְנוֹ לְרֹאשׁ הַכְּנֶסֶת, וְרֹאשׁ הַכְּנֶסֶת נוֹתְנוֹ לַסְּגָן, וְהַסְּגָן נוֹתְנוֹ לְכֹהֵן גָּדוֹל, וְכֹהֵן גָּדוֹל עוֹמֵד וּמְקַבֵּל וְקוֹרֵא"}
     ],
     "note": "Tour's choice: their place during the reading, their age and dress. The deputy is dressed as a priest; the attendant and the head of the synagogue like the tour's Israelites."
+  },
+
+  "kat_shniya": {
+    "nom": "The second group",
+    "translit": "Kat shniya",
+    "resume": "The pesach is slaughtered in three groups, one after another. The first enters, the Azara fills and its doors are locked; when it has finished offering, they are opened again, it goes out and the second enters, then the third. Rabbi Yitzchak: three groups of thirty men each — kahal, edah, Israel.",
+    "cotes": [
+      "the second group",
+      "each with his lamb"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:7", "citation": "יָצְתָה כַת רִאשׁוֹנָה וְנִכְנְסָה כַת שְׁנִיָּה. יָצְתָה שְׁנִיָּה, נִכְנְסָה שְׁלִישִׁית"},
+      {"oeuvre": "Rambam Korban Pessa'h", "ref": "1:15", "citation": "שָׁלְמוּ מִלְּהַקְרִיב פּוֹתְחִין דַּלְתוֹת הָעֲזָרָה וְיוֹצֵאת כַּת הָרִאשׁוֹנָה וְנִכְנְסָה שְׁנִיָּה"},
+      {"oeuvre": "Pesachim", "ref": "64b", "citation": "אֵין הַפֶּסַח נִשְׁחָט אֶלָּא בְּשָׁלֹשׁ כִּתּוֹת שֶׁל שְׁלֹשִׁים שְׁלֹשִׁים בְּנֵי אָדָם"},
+      {"oeuvre": "Exode", "ref": "12:5", "citation": "שֶׂה תָמִים זָכָר בֶּן שָׁנָה יִהְיֶה לָכֶם מִן הַכְּבָשִׂים וּמִן הָעִזִּים תִּקָּחוּ"}
+    ],
+    "note": "Tour's choice: the waiting in the Ezrat Nashim and a lamb beside each man, its breed and fleece; the Torah allows a lamb or a kid. The Nikanor gate stays open, as throughout the tour, although the Mishnah has it closed while the first group is inside — by itself according to Abaye, closed by people according to Rava (Pesachim 64b)."
+  },
+
+  "bazikhin": {
+    "nom": "The rows of bazikhin",
+    "translit": "Shurot shel bazikhin",
+    "resume": "The kohanim stand in rows, bazikhin in hand — large cups to receive the blood: a row all of silver, a row all of gold, never mixed. The full bazikh passes from hand to hand to the altar, and one takes the full one before returning the empty. They had no base: wide at the top, pointed below, they could not be set on the ground, where the blood would have congealed.",
+    "cotes": [
+      "a row of silver",
+      "a row of gold",
+      "the pointed bottom"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:5", "citation": "הַכֹּהֲנִים עוֹמְדִים שׁוּרוֹת שׁוּרוֹת, וּבִידֵיהֶם בָּזִיכֵי כֶסֶף וּבָזִיכֵי זָהָב. שׁוּרָה שֶׁכֻּלָּהּ כֶּסֶף כֶּסֶף, וְשׁוּרָה שֶׁכֻּלָּהּ זָהָב זָהָב. לֹא הָיוּ מְעֹרָבִין. וְלֹא הָיוּ לַבָּזִיכִין שׁוּלַיִם, שֶׁמָּא יַנִּיחוּם וְיִקְרַשׁ הַדָּם"},
+      {"oeuvre": "Pesachim", "ref": "5:6", "citation": "נוֹתְנוֹ לַחֲבֵרוֹ וַחֲבֵרוֹ לַחֲבֵרוֹ, וּמְקַבֵּל אֶת הַמָּלֵא וּמַחֲזִיר אֶת הָרֵיקָן"},
+      {"oeuvre": "Bartenura sur Pesachim", "ref": "5:5", "citation": "בָּזִיכֵי. כַּפּוֹת גְּדוֹלוֹת לְקַבֵּל בָּהֶם הַדָּם… דְּהָכִי שַׁפִּיר טְפֵי… רְחָבִים הָיוּ מִלְמַעְלָה וְתַחְתֵּיהֶם חַדִּים, כְּדֵי שֶׁלֹּא יוּכְלוּ לֵישֵׁב עַל הַקַּרְקַע"},
+      {"oeuvre": "Rambam Korban Pessa'h", "ref": "1:13", "citation": "וְלֹא הָיוּ מְעֹרָבִים כְּדֵי שֶׁיִּהְיֶה לָהֶם נוֹי"}
+    ],
+    "note": "Tour's choice: two rows of four, facing each other, running from the place of slaughter to the north of the altar. The Mishnah gives neither their number nor their place; the pesach may be slaughtered anywhere in the Azara (Zevachim 5:8). The profile of the bazikhin is also a choice."
+  },
+
+  "shechitat_hapessah": {
+    "nom": "The slaughter and the throwing of the pesach",
+    "translit": "Shechitat haPesach",
+    "resume": "An Israelite slaughters: slaughter is valid when done by a non-kohen. The kohen receives the blood in a bazikh, and the blood passes from hand to hand to the kohen nearest the altar, who throws it in a single throw toward the yesod; the pesach needs only one application.",
+    "cotes": [
+      "the Israelite slaughters",
+      "the kohen receives",
+      "one throw toward the yesod"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:6", "citation": "שָׁחַט יִשְׂרָאֵל וְקִבֵּל הַכֹּהֵן, נוֹתְנוֹ לַחֲבֵרוֹ וַחֲבֵרוֹ לַחֲבֵרוֹ… כֹּהֵן הַקָּרוֹב אֵצֶל הַמִּזְבֵּחַ זוֹרְקוֹ זְרִיקָה אַחַת כְּנֶגֶד הַיְסוֹד"},
+      {"oeuvre": "Zeva'him", "ref": "5:8", "citation": "הַבְּכוֹר וְהַמַּעֲשֵׂר וְהַפֶּסַח… שְׁחִיטָתָן בְּכָל מָקוֹם בָּעֲזָרָה, וְדָמָן טָעוּן מַתָּנָה אַחַת, וּבִלְבָד שֶׁיִּתֵּן כְּנֶגֶד הַיְסוֹד"},
+      {"oeuvre": "Zeva'him", "ref": "3:1", "citation": "כָּל הַפְּסוּלִין שֶׁשָּׁחֲטוּ, שְׁחִיטָתָן כְּשֵׁרָה. שֶׁהַשְּׁחִיטָה כְשֵׁרָה בְּזָרִים"}
+    ],
+    "note": "Tour's choice: the place of slaughter, north of the rows; the lamb lying on its side, the knife and the gestures; the kohen who throws, facing the northern yesod."
+  },
+
+  "hallel_bepessah": {
+    "nom": "The Hallel and the trumpets",
+    "translit": "HaHallel vehachatzotzrot",
+    "resume": "While they slaughter and offer, the Levites read the Hallel; if they finish, they repeat it, and a third time if need be — which never happened. At each reading the trumpets sound three times: teki'a, teru'a, teki'a; the pesach has no libation, at which one usually sounds, so one sounds at the slaughter. The flute plays before the altar.",
+    "cotes": [
+      "the Levites",
+      "the trumpets",
+      "the flute, not shown"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:7", "citation": "קָרְאוּ אֶת הַהַלֵּל. אִם גָּמְרוּ שָׁנוּ, וְאִם שָׁנוּ שִׁלְּשׁוּ, אַף עַל פִּי שֶׁלֹּא שִׁלְּשׁוּ מִימֵיהֶם"},
+      {"oeuvre": "Rambam Korban Pessa'h", "ref": "1:11", "citation": "וְכָל זְמַן שֶׁהֵן שׁוֹחֲטִין וּמַקְרִיבִין קוֹרְאִים הַלְּוִיִּים אֶת הַהַלֵּל"},
+      {"oeuvre": "Rambam Korban Pessa'h", "ref": "1:12", "citation": "עַל כָּל קְרִיאָה וּקְרִיאָה תּוֹקְעִין שָׁלֹשׁ תְּקִיעוֹת בַּחֲצוֹצְרוֹת… הוֹאִיל וְאֵין לוֹ נְסָכִים לִתְקֹעַ בִּשְׁעַת נִסּוּךְ תּוֹקְעִין בִּשְׁעַת שְׁחִיטָה"},
+      {"oeuvre": "Arakhin", "ref": "2:3", "citation": "וּבִשְׁנֵים עָשָׂר יוֹם בַּשָּׁנָה הֶחָלִיל מַכֶּה לִפְנֵי הַמִּזְבֵּחַ. בִּשְׁחִיטַת פֶּסַח רִאשׁוֹן"}
+    ],
+    "note": "Tour's choice: the twelve Levites on the Dukhan with their instruments, as at the tamid; two kohanim with trumpets at the foot of the Dukhan. The flute is not shown."
+  },
+
+  "tolin_umafshitin": {
+    "nom": "Hanging and flaying",
+    "translit": "Tolin umafshitin",
+    "resume": "Iron hooks are fixed in the walls and in the pillars: on them the pesach is hung and flayed. Whoever has no room takes one of the thin, smooth rods kept there, lays it on his own shoulder and his fellow's, hangs the animal on it and flays it. Rabbi Eliezer: when the fourteenth falls on Shabbat, each lays his hand on the other's shoulder.",
+    "cotes": [
+      "the pillar's hook",
+      "the rod on two shoulders"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:9", "citation": "אֻנְקְלָיוֹת שֶׁל בַּרְזֶל הָיוּ קְבוּעִים בַּכְּתָלִים וּבָעַמּוּדִים, שֶׁבָּהֶן תּוֹלִין וּמַפְשִׁיטִין. וְכָל מִי שֶׁאֵין לוֹ מָקוֹם לִתְלוֹת וּלְהַפְשִׁיט, מַקְלוֹת דַּקִּים חֲלָקִים הָיוּ שָׁם, וּמֵנִיחַ עַל כְּתֵפוֹ וְעַל כֶּתֶף חֲבֵרוֹ, וְתוֹלֶה וּמַפְשִׁיט"},
+      {"oeuvre": "Middot", "ref": "3:5", "citation": "וְעָלָיו שְׁמֹנָה עַמּוּדִים נַנָּסִין, וּרְבִיעִין שֶׁל אֶרֶז עַל גַּבֵּיהֶן, וְאֻנְקְלָיוֹת שֶׁל בַּרְזֶל הָיוּ קְבוּעִין בָּהֶם"}
+    ],
+    "note": "Tour's choice: a lamb on the hook of a pillar of the Beit HaMitbachayim, and two men with a rod a little to the west; Israelites do the flaying, and their gestures are also a choice."
+  },
+
+  "magis": {
+    "nom": "The kohen with the magis",
+    "translit": "HaMagis",
+    "resume": "The pesach is opened and its emurim — the fats that go up on the altar — are taken out and put in a dish, the magis, and the kohen salts them and burns them on the altar.",
+    "cotes": [
+      "the magis",
+      "the great ma'arakha"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:10", "citation": "קְרָעוֹ וְהוֹצִיא אֵמוּרָיו, נְתָנוֹ בְמָגִיס וְהִקְטִירָן עַל גַּבֵּי הַמִּזְבֵּחַ"},
+      {"oeuvre": "Bartenura sur Pesachim", "ref": "5:10", "citation": "אֵמוּרָיו. הַחֲלָבִים הַקְּרֵבִים עַל גַּבֵּי הַמִּזְבֵּחַ. בְּמָגִיס. בִּקְעָרָה"},
+      {"oeuvre": "Rambam Korban Pessa'h", "ref": "1:14", "citation": "וּמוֹצִיא אֶת הָאֵימוּרִין וְנוֹתְנָן בִּכְלִי וּמוֹלְחָן וּמַקְטִירָן הַכֹּהֵן עַל גַּבֵּי הַמִּזְבֵּחַ"}
+    ],
+    "note": "Tour's choice: the magis, a deep silver dish; the kohen at the edge of the great ma'arakha, tilting the dish toward the fire."
+  },
+
+  "yoshvim_bacheil": {
+    "nom": "The second group, sitting in the Cheil",
+    "translit": "Yoshvim baCheil",
+    "resume": "When 14 Nisan falls on Shabbat, no one carries his pesach home: the first group sits on the Har HaBayit, the second in the Cheil, between the Soreg and the wall of the Ezrat Nashim, and the third stays standing in its place, in the Azara, until Shabbat ends. Each puts his pesach in its skin and slings it over his back.",
+    "cotes": [
+      "the last step of the Cheil",
+      "the pesach in its skin"
+    ],
+    "sources": [
+      {"oeuvre": "Pesachim", "ref": "5:10", "citation": "יָצְתָה כַת רִאשׁוֹנָה וְיָשְׁבָה לָהּ בְּהַר הַבַּיִת, שְׁנִיָּה בַּחֵיל, וְהַשְּׁלִישִׁית בִּמְקוֹמָהּ עוֹמֶדֶת. חֲשֵׁכָה, יָצְאוּ וְצָלוּ אֶת פִּסְחֵיהֶן"},
+      {"oeuvre": "Bartenura sur Pesachim", "ref": "5:10", "citation": "יָשְׁבָה לָהּ בְּהַר הַבַּיִת. בְּשַׁבָּת קָאָמַר… בַּחֵיל. בֵּין הַסּוֹרֵג לְחוֹמַת הָעֲזָרָה שֶׁל נָשִׁים"},
+      {"oeuvre": "Rambam Korban Pessa'h", "ref": "1:17", "citation": "אֵין כָּל אֶחָד וְאֶחָד מוֹלִיךְ אֶת פִּסְחוֹ לְבֵיתוֹ בְּשַׁבָּת… וְשׁוֹהִים הַכּל עַד מוֹצָאֵי שַׁבָּת"},
+      {"oeuvre": "Pesachim", "ref": "65b", "citation": "כׇּל אֶחָד וְאֶחָד נוֹתֵן פִּסְחוֹ בְּעוֹרוֹ, וּמַפְשִׁיל לַאֲחוֹרָיו"}
+    ],
+    "note": "Tour's choice: they sit on the last step of the Cheil, the pesach lying beside each rather than slung over his back."
+  },
+
+  "maalei_bikkourim": {
+    "nom": "Those who bring up the bikkurim",
+    "translit": "Ma'alei bikkurim",
+    "resume": "The towns of the ma'amad gather in its town, and in the morning the officer says: “Arise, let us go up to Zion, to the house of HaShem our God.” Those nearby bring fresh figs and grapes, those far away dried figs and raisins. The ox walks before them, its horns overlaid with gold, a crown of olive on its head. At the Har HaBayit each takes the basket on his own shoulder — even King Agrippas — and goes in as far as the Azara.",
+    "cotes": [
+      "the basket on the shoulder",
+      "the ox with golden horns",
+      "the olive crown"
+    ],
+    "sources": [
+      {"oeuvre": "Bikkourim", "ref": "3:2", "citation": "וְלַמַּשְׁכִּים, הָיָה הַמְמֻנֶּה אוֹמֵר, קוּמוּ וְנַעֲלֶה צִיּוֹן אֶל בֵּית ה' אֱלֹהֵינוּ"},
+      {"oeuvre": "Bikkourim", "ref": "3:3", "citation": "וְהַשּׁוֹר הוֹלֵךְ לִפְנֵיהֶם, וְקַרְנָיו מְצֻפּוֹת זָהָב, וַעֲטֶרֶת שֶׁל זַיִת בְּרֹאשׁוֹ"},
+      {"oeuvre": "Bikkourim", "ref": "3:4", "citation": "הִגִּיעוּ לְהַר הַבַּיִת, אֲפִלּוּ אַגְרִיפַּס הַמֶּלֶךְ נוֹטֵל הַסַּל עַל כְּתֵפוֹ וְנִכְנָס, עַד שֶׁמַּגִּיעַ לָעֲזָרָה"},
+      {"oeuvre": "Rambam Bikkourim", "ref": "3:12", "citation": "הִגִּיעַ לְהַר הַבַּיִת נוֹטֵל הַסַּל עַל כְּתֵפוֹ הוּא בְּעַצְמוֹ. וַאֲפִלּוּ הָיָה מֶלֶךְ גָּדוֹל שֶׁבְּיִשְׂרָאֵל"}
+    ],
+    "note": "Tour's choice: the number of bearers and their place; who carries a plated basket, who a wicker one; the ox on the Har HaBayit, its coat, the weave of the crown. The flute plays before them “until they reach the Har HaBayit” (3:4): it is not shown."
+  },
+
+  "shir_habikkourim": {
+    "nom": "The song of the Levites",
+    "translit": "Aromimkha",
+    "resume": "As soon as the bearers reach the Azara, the Levites begin the song: “I will extol You, HaShem, for You have lifted me up, and have not let my enemies rejoice over me.” The bikkurim require song, as they require waving and a shelamim offering.",
+    "cotes": [
+      "the Levites on the Dukhan",
+      "“Aromimkha”"
+    ],
+    "sources": [
+      {"oeuvre": "Bikkourim", "ref": "3:4", "citation": "הִגִּיעַ לָעֲזָרָה וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר, אֲרוֹמִמְךָ ה' כִּי דִלִּיתָנִי וְלֹא שִׂמַּחְתָּ אֹיְבַי לִי"},
+      {"oeuvre": "Rambam Bikkourim", "ref": "3:13", "citation": "מִשֶּׁיַּגִּיעוּ לַעֲזָרָה הַלְוִיִּם הָיוּ מַתְחִילִין וְקוֹרִין"},
+      {"oeuvre": "Rambam Bikkourim", "ref": "3:12", "citation": "וּכְשֵׁם שֶׁטְּעוּנִין תְּנוּפָה כָּךְ טְעוּנִין קָרְבַּן שְׁלָמִים [וְשִׁיר]"},
+      {"oeuvre": "Tehillim", "ref": "30:2", "citation": "אֲרוֹמִמְךָ ה' כִּי דִלִּיתָנִי וְלֹא שִׂמַּחְתָּ אֹיְבַי לִי"}
+    ],
+    "note": "Tour's choice: the twelve Levites on the Dukhan with the instruments of the tamid; two bearers entering the Ezrat Israel."
+  },
+
+  "mikra_bikkourim": {
+    "nom": "The reading of the bikkurim",
+    "translit": "Mikra bikkurim",
+    "resume": "With the basket still on his shoulder, the bearer says to the kohen “I declare today to HaShem your God that I have come into the land” (Deuteronomy 26:3), and reads up to “Arami oved avi”. At first, whoever could read read, and whoever could not was prompted; people then held back from bringing, so it was instituted that everyone be prompted, whether he knows how or not.",
+    "cotes": [
+      "the basket still on his shoulder",
+      "facing the kohen"
+    ],
+    "sources": [
+      {"oeuvre": "Bikkourim", "ref": "3:6", "citation": "עוֹדֵהוּ הַסַּל עַל כְּתֵפוֹ, קוֹרֵא מֵהִגַּדְתִּי הַיּוֹם לַה' אֱלֹהֶיךָ"},
+      {"oeuvre": "Deutéronome", "ref": "26:3", "citation": "וּבָאתָ אֶל הַכֹּהֵן אֲשֶׁר יִהְיֶה בַּיָּמִים הָהֵם וְאָמַרְתָּ אֵלָיו הִגַּדְתִּי הַיּוֹם לַה' אֱלֹהֶיךָ"},
+      {"oeuvre": "Bikkourim", "ref": "3:7", "citation": "בָּרִאשׁוֹנָה, כָּל מִי שֶׁיּוֹדֵעַ לִקְרוֹת, קוֹרֵא. וְכָל מִי שֶׁאֵינוֹ יוֹדֵעַ לִקְרוֹת, מַקְרִין אוֹתוֹ. נִמְנְעוּ מִלְּהָבִיא, הִתְקִינוּ שֶׁיְּהוּ מַקְרִין אֶת מִי שֶׁיּוֹדֵעַ וְאֶת מִי שֶׁאֵינוֹ יוֹדֵעַ"}
+    ],
+    "note": "Tour's choice: the place of the reading, near the south-west horn where the basket will be set down; the kohen listening; two bearers waiting. The one who prompts is not shown."
+  },
+
+  "tenoufat_bikkourim": {
+    "nom": "The waving of the bikkurim",
+    "translit": "Tenufat bikkurim",
+    "resume": "Reaching “Arami oved avi”, the bearer lowers the basket from his shoulder and holds it by its rim; the kohen puts his hand beneath it and waves it — forward and back, up and down —, and the bearer reads to the end of the passage. One may wave even east of the altar, all the more so to its west. For the waving, the Israelite enters the Ezrat Kohanim.",
+    "cotes": [
+      "the basket held by its rim",
+      "the kohen's hand beneath"
+    ],
+    "sources": [
+      {"oeuvre": "Bikkourim", "ref": "3:6", "citation": "הִגִּיעַ לַאֲרַמִּי אֹבֵד אָבִי, מוֹרִיד הַסַּל מֵעַל כְּתֵפוֹ וְאוֹחֲזוֹ בְשִׂפְתוֹתָיו, וְכֹהֵן מַנִּיחַ יָדוֹ תַחְתָּיו וּמְנִיפוֹ"},
+      {"oeuvre": "Mena'hot", "ref": "5:6", "citation": "מוֹלִיךְ וּמֵבִיא, מַעֲלֶה וּמוֹרִיד"},
+      {"oeuvre": "Bartenura sur Mena'hot", "ref": "5:6", "citation": "אַף בַּמִּזְרָח שֶׁל מִזְבֵּחַ יָכוֹל לְהָנִיף, וְכָל שֶׁכֵּן בְּמַעֲרָבוֹ דְּקָרוֹב יוֹתֵר לַהֵיכָל"},
+      {"oeuvre": "Bartenura sur Kelim", "ref": "1:8", "citation": "וְלִתְנוּפָה. דְּכֹהֵן מֵנִיחַ יָדוֹ תַחַת יַד הַבְּעָלִים וּמֵנִיף"}
+    ],
+    "note": "Tour's choice: the place, west of the altar near the south-west horn; the two men face to face; the extent of the motion."
+  },
+
+  "salei_bikkourim": {
+    "nom": "The baskets at the foot of the altar",
+    "translit": "Salei habikkurim",
+    "resume": "The bearer sets the basket beside the altar, at the south-west horn, on its south side, bows and goes out. The turtledoves and young pigeons hung behind the baskets — not on top, so as not to soil the fruit — are offered as olot. The rich bring their bikkurim in baskets overlaid with silver and gold, the poor in wicker baskets of peeled willow; baskets and bikkurim are given to the kohanim, but the rich get their baskets back. It is best to bring each species in its own basket; in a single one, barley at the bottom, then wheat, olives, dates, pomegranates, and figs above all.",
+    "cotes": [
+      "at the south-west horn",
+      "the birds behind the baskets",
+      "wicker, silver and gold"
+    ],
+    "sources": [
+      {"oeuvre": "Rambam Bikkourim", "ref": "3:12", "citation": "וּמַנִּיחוֹ בְּצַד הַמִּזְבֵּחַ בְּקֶרֶן דְּרוֹמִית מַעֲרָבִית בִּדְרוֹמָהּ שֶׁל קֶרֶן וְיִשְׁתַּחֲוֶה וְיֵצֵא"},
+      {"oeuvre": "Bikkourim", "ref": "3:5", "citation": "הַגּוֹזָלוֹת שֶׁעַל גַּבֵּי הַסַּלִּים, הָיוּ עוֹלוֹת"},
+      {"oeuvre": "Bartenura sur Bikkourim", "ref": "3:5", "citation": "שֶׁהָיוּ תּוֹלִים מֵאֲחוֹרֵי הַסַּלִּים שֶׁל בִּכּוּרִים תּוֹרִים וּבְנֵי יוֹנִים, וְלֹא עַל גַּבֵּי הַסַּלִּים מַמָּשׁ, שֶׁלֹּא יְטַנְּפוּם"},
+      {"oeuvre": "Bikkourim", "ref": "3:8", "citation": "הָעֲשִׁירִים מְבִיאִים בִּכּוּרֵיהֶם בִּקְלָתוֹת שֶׁל כֶּסֶף וְשֶׁל זָהָב, וְהָעֲנִיִּים מְבִיאִין אוֹתָם בְּסַלֵּי נְצָרִים שֶׁל עֲרָבָה קְלוּפָה, וְהַסַּלִּים וְהַבִּכּוּרִים נִתָּנִין לַכֹּהֲנִים"},
+      {"oeuvre": "Bartenura sur Bikkourim", "ref": "3:8", "citation": "קֻפּוֹת מְצֻפּוֹת כֶּסֶף וְזָהָב… סַלֵּי עֲנִיִּים נִתָּנִים לַכֹּהֲנִים, וּקְלָתוֹת שֶׁל עֲשִׁירִים מַחֲזִירִים לָהֶן"},
+      {"oeuvre": "Rambam Bikkourim", "ref": "3:7", "citation": "שְׂעוֹרִים מִלְּמַטָּה וְחִטִּים עַל גַּבֵּיהֶן וְזֵיתִים עַל גַּבֵּיהֶן וּתְמָרִים עַל גַּבֵּיהֶן וְרִמּוֹנִים עַל גַּבֵּיהֶן וּתְאֵנִים לְמַעְלָה מִן הַכְּלִי"}
+    ],
+    "note": "Tour's choice: the number of baskets and their arrangement, on the ground south of the horn; the number of birds; only the figs and pomegranates on top are shown; the kohen carrying one away."
+  },
+
+  "esser_kedushot": {
+    "nom": "The ten degrees of holiness",
+    "translit": "Eser kedushot",
+    "resume": "“There are ten degrees of holiness”: the land of Israel, walled cities, within the wall of Jerusalem, the Har HaBayit, the Cheil, the Ezrat Nashim, the Ezrat Israel, the Ezrat Kohanim, the space between the Ulam and the altar, the Heikhal and the Kodesh HaKodashim — eleven places for ten degrees. The Geonim explain that the land of Israel is not counted: the other degrees honour the place by keeping some impurity or some people out of it, which the land of Israel does not. Others say the first Tanna follows Rabbi Yose, for whom the space between the Ulam and the altar equals the Heikhal: he counts only ten.",
+    "cotes": [
+      "eleven places, ten degrees",
+      "each degree keeps someone out"
+    ],
+    "sources": [
+      {"oeuvre": "Kelim", "ref": "1:6", "citation": "עֶשֶׂר קְדֻשּׁוֹת הֵן, אֶרֶץ יִשְׂרָאֵל מְקֻדֶּשֶׁת מִכָּל הָאֲרָצוֹת"},
+      {"oeuvre": "Bartenura sur Kelim", "ref": "1:9", "citation": "וְעֶשֶׂר קְדֻשּׁוֹת דִּתְנַן בְּמַתְנִיתִין וְהָנָךְ אַחַד עָשָׂר נִינְהוּ, פֵּרְשׁוּ הַגְּאוֹנִים דְּאֶרֶץ יִשְׂרָאֵל אֵינָהּ מִמִּנְיַן הַקְּדֻשּׁוֹת"}
+    ],
+    "note": "Tour's choice: the first stop stands in Jerusalem, on the square before the western wall of the Har HaBayit; neither the land of Israel nor the walled cities are shown. No figures: each stop tells who may enter."
+  },
+
+  "nissoukh_hamayim": {
+    "nom": "The water libation",
+    "translit": "Nisukh hamayim",
+    "resume": "On the seven days of the festival, water is poured on the altar — a law given to Moshe at Sinai —, together with the wine libation of the morning tamid. The kohen fills a golden tzelochit holding three log at the Shiloach; at Sha'ar HaMayim they sound the trumpets. He goes up the kevesh, turns to his left and pours the water from the tzelochit into the western sefel, the one for water. They tell him: “Raise your hand!” — once, one poured it on his feet, and all the people pelted him with their etrogim.",
+    "cotes": [
+      "the golden tzelochit, three log",
+      "the raised hand"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "4:9", "citation": "צְלוֹחִית שֶׁל זָהָב מַחֲזֶקֶת שְׁלשֶׁת לֻגִּים הָיָה מְמַלֵּא מִן הַשִּׁלּוֹחַ… עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ… וְלַמְנַסֵּךְ אוֹמְרִים לוֹ, הַגְבַּהּ יָדֶךָ"},
+      {"oeuvre": "Rambam Temidin", "ref": "10:6", "citation": "כָּל שִׁבְעַת יְמֵי הֶחָג מְנַסְּכִין אֶת הַמַּיִם עַל גַּבֵּי הַמִּזְבֵּחַ. וְדָבָר זֶה הֲלָכָה לְמשֶׁה מִסִּינַי. וְעִם נִסּוּךְ הַיַּיִן שֶׁל תָּמִיד שֶׁל שַׁחַר הָיָה מְנַסֵּךְ הַמַּיִם"},
+      {"oeuvre": "Rambam Temidin", "ref": "10:7", "citation": "עָלָה לַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ וְנוֹתֵן הַמַּיִם מִן הַצְּלוֹחִית לְתוֹךְ הַסֵּפֶל שֶׁהָיָה שָׁם"}
+    ],
+    "note": "Tour's choice: the shape of the tzelochit; the kohen carrying it in both hands at Sha'ar HaMayim; at the altar, facing west behind the wine sefel, and the height of his hand. The kohen pouring the wine is not shown."
+  },
+
+  "tekiot_shaar_hamayim": {
+    "nom": "The trumpets of Sha'ar HaMayim",
+    "translit": "HaTeki'ot beSha'ar HaMayim",
+    "resume": "When the water from the Shiloach reaches Sha'ar HaMayim, they sound teki'a, teru'a, teki'a. Through this gate the tzelochit of water for the festival libation is brought in — hence its name, according to Abba Yose ben Chanan; Rabbi Eliezer ben Yaakov adds that the waters bubble up there, and will one day flow out from under the threshold of the House.",
+    "cotes": [
+      "teki'a, teru'a, teki'a",
+      "on the threshold"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "4:9", "citation": "הִגִּיעוּ לְשַׁעַר הַמַּיִם, תָּקְעוּ וְהֵרִיעוּ וְתָקָעוּ"},
+      {"oeuvre": "Middot", "ref": "2:6", "citation": "וְלָמָּה נִקְרָא שְׁמוֹ שַׁעַר הַמַּיִם. שֶׁבּוֹ מַכְנִיסִין צְלוֹחִית שֶׁל מַיִם שֶׁל נִסּוּךְ בֶּחָג. רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, וּבוֹ הַמַּיִם מְפַכִּים"}
+    ],
+    "note": "Tour's choice: two kohanim with silver trumpets, in the gateway, facing those coming up. Who sounds and where: the Mishnah does not say."
+  },
+
+  "aravot": {
+    "nom": "The aravot around the altar",
+    "translit": "Aravot",
+    "resume": "Below Jerusalem, at Motza, they gather tall willow branches; they come and stand them at the sides of the altar, their tops bent over it, and sound teki'a, teru'a, teki'a — every day of the seven days of the festival. Eleven amot tall, they overhang the altar by one ama: so they are set on the yesod, not on the ground.",
+    "cotes": [
+      "eleven amot",
+      "set on the yesod",
+      "bent one ama over the altar"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "4:5", "citation": "וּבָאִין וְזוֹקְפִין אוֹתָן בְּצִדֵּי הַמִּזְבֵּחַ, וְרָאשֵׁיהֶן כְּפוּפִין עַל גַּבֵּי הַמִּזְבֵּחַ. תָּקְעוּ וְהֵרִיעוּ וְתָקָעוּ"},
+      {"oeuvre": "Soucca", "ref": "45a", "citation": "וּגְבוֹהוֹת אַחַת עֶשְׂרֵה אַמָּה, כְּדֵי שֶׁיְּהוּ גּוֹחוֹת עַל הַמִּזְבֵּחַ אַמָּה… שְׁמַע מִינַּהּ אַיְּסוֹד מַנַּח לְהוּ"},
+      {"oeuvre": "Rambam Loulav", "ref": "7:21", "citation": "בְּכָל יוֹם וָיוֹם מִשִּׁבְעַת הַיָּמִים הָיוּ מְבִיאִין מֻרְבִּיּוֹת שֶׁל עֲרָבָה… וּבְעֵת שֶׁהָיוּ מְבִיאִין אוֹתָהּ וְסוֹדְרִין אוֹתָהּ תּוֹקְעִין וּמְרִיעִין וְתוֹקְעִין"}
+    ],
+    "note": "Tour's choice: the branches along the north and west yesod, where it runs the whole side; their number, spacing and foliage; the kohen standing up the last one and the two who sound."
+  },
+
+  "hakafot_hamizbeach": {
+    "nom": "Circling the altar",
+    "translit": "Hakafat hamizbeach",
+    "resume": "Every day of the festival they circle the altar once, saying: “Please, HaShem, save now! Please, HaShem, grant success now!”; on the seventh day, seven times. On leaving they say: “Beauty to you, altar!” The Rambam says they circled with their lulavim in hand; Bartenura, with the aravot. Only the kohanim circled: an Israelite does not enter between the Ulam and the altar.",
+    "cotes": [
+      "once a day, seven times on the seventh",
+      "lulavim in hand"
+    ],
+    "sources": [
+      {"oeuvre": "Soucca", "ref": "4:5", "citation": "בְּכָל יוֹם מַקִּיפִין אֶת הַמִּזְבֵּחַ פַּעַם אַחַת, וְאוֹמְרִים, אָנָּא ה' הוֹשִׁיעָה נָּא, אָנָּא ה' הַצְלִיחָה נָּא… וְאוֹתוֹ הַיּוֹם מַקִּיפִין אֶת הַמִּזְבֵּחַ שֶׁבַע פְּעָמִים"},
+      {"oeuvre": "Rambam Loulav", "ref": "7:23", "citation": "בְּכָל יוֹם וָיוֹם הָיוּ מַקִּיפִין אֶת הַמִּזְבֵּחַ בְּלוּלְבֵיהֶן בִּידֵיהֶן פַּעַם אַחַת"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Soucca 4:5", "citation": "ומיהו המקיפין לא היו אלא כהנים לכ\"ע שאע\"פ שישראל נכנס לצורך מצוה לעזרת כהנים מ\"מ בין האולם ולמזבח אינו נכנס"}
+    ],
+    "note": "Tour's choice: the lulavim, with the Rambam; six kohanim, the etrog in the left hand; the path on the ground around the altar and its kevesh, and its direction."
+  },
+
+  "hakhel": {
+    "nom": "Hakhel",
+    "translit": "Hakhel",
+    "resume": "Every seven years, at the close of the shemittah year, all Israel who came up for the festival — men, women and children — are assembled, and passages of the Torah are read to them that urge them to the mitzvot and strengthen their hands in the true faith. The king reads, at the close of the first day of Sukkot, at the start of chol hamoed of the eighth year, in the Ezrat Nashim. Trumpets are sounded throughout Jerusalem to gather the people.",
+    "cotes": [
+      "every seven years",
+      "at the close of the first day of Sukkot",
+      "the king reads"
+    ],
+    "sources": [
+      {"oeuvre": "Deutéronome", "ref": "31:10-12", "citation": "מִקֵּץ שֶׁבַע שָׁנִים בְּמֹעֵד שְׁנַת הַשְּׁמִטָּה בְּחַג הַסֻּכּוֹת… תִּקְרָא אֶת הַתּוֹרָה הַזֹּאת נֶגֶד כָּל יִשְׂרָאֵל בְּאָזְנֵיהֶם. הַקְהֵל אֶת הָעָם הָאֲנָשִׁים וְהַנָּשִׁים וְהַטַּף"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:1", "citation": "מִצְוַת עֲשֵׂה לְהַקְהִיל כָּל יִשְׂרָאֵל אֲנָשִׁים וְנָשִׁים וְטַף בְּכָל מוֹצָאֵי שְׁמִטָּה בַּעֲלוֹתָם לָרֶגֶל וְלִקְרוֹת בְּאָזְנֵיהֶם מִן הַתּוֹרָה פָּרָשִׁיּוֹת שֶׁהֵן מְזָרְזוֹת אוֹתָן בְּמִצְוֹת וּמְחַזְּקוֹת יְדֵיהֶם בְּדַת הָאֱמֶת"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:3", "citation": "בְּמוֹצָאֵי יוֹם טוֹב הָרִאשׁוֹן שֶׁל חַג הַסֻּכּוֹת שֶׁהוּא תְּחִלַּת יְמֵי חֻלּוֹ שֶׁל מוֹעֵד שֶׁל שָׁנָה שְׁמִינִית. וְהַמֶּלֶךְ הוּא שֶׁיִּקְרָא בְּאָזְנֵיהֶם. וּבְעֶזְרַת הַנָּשִׁים הָיוּ קוֹרִין"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:4", "citation": "תּוֹקְעִין בַּחֲצוֹצְרוֹת בְּכָל יְרוּשָׁלַיִם כְּדֵי לְהַקְהִיל אֶת הָעָם"}
+    ],
+    "note": "Tour's choice: the hour — no source gives it, and the tour only has morning light."
+  },
+
+  "bimat_hamelekh": {
+    "nom": "The wooden bima",
+    "translit": "Bima shel etz",
+    "resume": "For the reading, a large wooden bima is brought and set up in the middle of the Ezrat Nashim; the king goes up and sits on it, so that his reading is heard, and all Israel who came up for the festival gather around him. The Mishnah says “in the Azara”; but no one sits in the Azara except the kings of the house of David — so it was the Ezrat Nashim, the Gemara answers with Rav Chisda.",
+    "cotes": [
+      "a large wooden bima",
+      "in the middle of the Ezrat Nashim"
+    ],
+    "sources": [
+      {"oeuvre": "Sota", "ref": "7:8", "citation": "עוֹשִׂין לוֹ בִימָה שֶׁל עֵץ בָּעֲזָרָה, וְהוּא יוֹשֵׁב עָלֶיהָ"},
+      {"oeuvre": "Sota", "ref": "41b", "citation": "וְהָאָמַר מָר: אֵין יְשִׁיבָה בַּעֲזָרָה אֶלָּא לְמַלְכֵי בֵּית דָּוִד בִּלְבַד… כִּדְאָמַר רַב חִסְדָּא: בְּעֶזְרַת נָשִׁים, הָכָא נָמֵי בְּעֶזְרַת נָשִׁים"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:4", "citation": "וּמְבִיאִין בִּימָה גְּדוֹלָה וְשֶׁל עֵץ הָיְתָה וּמַעֲמִידִין אוֹתָהּ בְּאֶמְצַע עֶזְרַת נָשִׁים וְהַמֶּלֶךְ עוֹלֶה וְיוֹשֵׁב עָלֶיהָ כְּדֵי שֶׁיִּשְׁמְעוּ קְרִיאָתוֹ וְכָל יִשְׂרָאֵל הָעוֹלִים לָחֹג מִתְקַבְּצִין סְבִיבָיו"}
+    ],
+    "note": "Tour's choice: no source gives its measurements — six amot square, three high, five steps on the west; the king's seat, and his face turned east, where the people come in."
+  },
+
+  "haavarat_hasefer": {
+    "nom": "The scroll from hand to hand",
+    "translit": "Mi-yad le-yad",
+    "resume": "The synagogue attendant takes the Torah scroll and gives it to the head of the synagogue; the head of the synagogue gives it to the segan, the segan to the Kohen Gadol, the Kohen Gadol to the king — to honour him through the multitude. That each receives it in the presence of a greater one is all for the king's honour, says Abaye. The king rises and receives it standing.",
+    "cotes": [
+      "the attendant, the head of the synagogue, the segan, the Kohen Gadol",
+      "the king receives it standing"
+    ],
+    "sources": [
+      {"oeuvre": "Sota", "ref": "7:8", "citation": "חַזַּן הַכְּנֶסֶת נוֹטֵל סֵפֶר תּוֹרָה וְנוֹתְנָהּ לְרֹאשׁ הַכְּנֶסֶת, וְרֹאשׁ הַכְּנֶסֶת נוֹתְנָהּ לַסְּגָן, וְהַסְּגָן נוֹתְנָהּ לְכֹהֵן גָּדוֹל, וְכֹהֵן גָּדוֹל נוֹתְנָהּ לַמֶּלֶךְ, וְהַמֶּלֶךְ עוֹמֵד וּמְקַבֵּל"},
+      {"oeuvre": "Sota", "ref": "41b", "citation": "שָׁמְעַתְּ מִינַּהּ חוֹלְקִין כָּבוֹד לְתַלְמִיד בִּמְקוֹם הָרַב! אָמַר אַבָּיֵי: כּוּלָּהּ מִשּׁוּם כְּבוֹדוֹ דְּמֶלֶךְ"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:4", "citation": "וְכֹהֵן גָּדוֹל לַמֶּלֶךְ כְּדֵי לְהַדְּרוֹ בְּרֹב בְּנֵי אָדָם. וְהַמֶּלֶךְ מְקַבְּלוֹ כְּשֶׁהוּא עוֹמֵד"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "8:11", "citation": "לֹבְשָׁם בְּיוֹם עֲבוֹדָתוֹ וַאֲפִלּוּ שֶׁלֹּא בִּשְׁעַת עֲבוֹדָה חוּץ מִן הָאַבְנֵט מִפְּנֵי שֶׁהוּא שַׁעַטְנֵז"}
+    ],
+    "note": "Tour's choice: the moment shown, the closed scroll, upright, between the hands of the Kohen Gadol and the king; the Kohen Gadol in the golden garments without the avnet, on a day he serves; the segan, who may not wear the avnet outside the service, in clothes of his own; the places on the bima and its steps."
+  },
+
+  "parashat_hamelekh": {
+    "nom": "What the king reads",
+    "translit": "Parashat ha-melekh",
+    "resume": "The king reads sitting — and if he reads standing, it is praiseworthy. He opens, looks and blesses like any reader in the synagogue; he reads from “These are the words” to the end of the Shema, skips to “And if you listen”, then to “You shall surely tithe”, and from there reads in order to the end of the blessings and curses, stopping at “besides the covenant made with them at Chorev”. He rolls the scroll, blesses after it, and adds seven blessings; reading and blessings in the holy tongue, even if foreigners are present.",
+    "cotes": [
+      "from “These are the words” to the end of the curses",
+      "sitting, or standing",
+      "seven blessings"
+    ],
+    "sources": [
+      {"oeuvre": "Sota", "ref": "7:8", "citation": "וְהַמֶּלֶךְ עוֹמֵד וּמְקַבֵּל וְקוֹרֵא יוֹשֵׁב… וְקוֹרֵא מִתְּחִלַּת אֵלֶּה הַדְּבָרִים עַד שְׁמַע, וּשְׁמַע, וְהָיָה אִם שָׁמֹעַ, עַשֵּׂר תְּעַשֵּׂר, כִּי תְכַלֶּה לַעְשֵׂר, וּפָרָשַׁת הַמֶּלֶךְ, וּבְרָכוֹת וּקְלָלוֹת, עַד שֶׁגּוֹמֵר כָּל הַפָּרָשָׁה"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:3", "citation": "וְקוֹרֵא כְּשֶׁהוּא יוֹשֵׁב וְאִם קָרָא מְעֻמָּד הֲרֵי זֶה מְשֻׁבָּח… עַד סוֹף בְּרָכוֹת וּקְלָלוֹת עַד ״מִלְּבַד הַבְּרִית אֲשֶׁר כָּרַת אִתָּם בְּחֹרֵב״ וּפוֹסֵק"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:5", "citation": "הַקְּרִיאָה וְהַבְּרָכוֹת בִּלְשׁוֹן הַקֹּדֶשׁ… אַף עַל פִּי שֶׁיֵּשׁ שָׁם לוֹעֲזוֹת"},
+      {"oeuvre": "Rambam Melakhim", "ref": "2:1", "citation": "וְאֵין מִשְׁתַּמְּשִׁין בְּשַׁרְבִיטוֹ. וְלֹא בְּכִתְרוֹ"},
+      {"oeuvre": "Esther", "ref": "8:15", "citation": "בִּלְבוּשׁ מַלְכוּת תְּכֵלֶת וָחוּר וַעֲטֶרֶת זָהָב גְּדוֹלָה וְתַכְרִיךְ בּוּץ וְאַרְגָּמָן"}
+    ],
+    "note": "Tour's choice: the king's crown, a gold circlet with six points; his robe of argaman, the colour of Esther's “royal garment”; his seat; his features."
+  },
+
+  "agrippas": {
+    "nom": "King Agrippas",
+    "translit": "Agrippas ha-melekh",
+    "resume": "King Agrippas rose, received the scroll and read standing, and the Sages praised him: a king who waives his honour, his honour is not waived, says Rav Ashi — but a mitzvah is different. When he reached “You may not set over you a foreign man”, his eyes ran with tears. They said to him: “Fear not, Agrippas: you are our brother, you are our brother, you are our brother!” It is taught in the name of Rabbi Natan that at that hour, Israel incurred destruction, for having flattered Agrippas.",
+    "cotes": [
+      "he read standing",
+      "“you are our brother”"
+    ],
+    "sources": [
+      {"oeuvre": "Sota", "ref": "7:8", "citation": "אַגְרִיפָּס הַמֶּלֶךְ עָמַד וְקִבֵּל וְקָרָא עוֹמֵד, וְשִׁבְּחוּהוּ חֲכָמִים. וּכְשֶׁהִגִּיעַ לְלֹא תוּכַל לָתֵת עָלֶיךָ אִישׁ נָכְרִי, זָלְגוּ עֵינָיו דְּמָעוֹת. אָמְרוּ לוֹ, אַל תִּתְיָרֵא אַגְרִיפָּס, אָחִינוּ אָתָּה, אָחִינוּ אָתָּה, אָחִינוּ אָתָּה"},
+      {"oeuvre": "Sota", "ref": "41b", "citation": "מֶלֶךְ שֶׁמָּחַל עַל כְּבוֹדוֹ — אֵין כְּבוֹדוֹ מָחוּל… מִצְוָה שָׁאנֵי… תָּנָא מִשְּׁמֵיהּ דְּרַבִּי נָתָן: בְּאוֹתָהּ שָׁעָה נִתְחַיְּיבוּ שׂוֹנְאֵי יִשְׂרָאֵל כְּלָיָיה — שֶׁהֶחֱנִיפוּ לוֹ לְאַגְרִיפַּס"}
+    ],
+    "note": "Tour's choice: his features, his garment and his crown, like the other king's; his head bowed over the scroll. The Mishnah does not say which Agrippas it was."
+  },
+
+  "kahal": {
+    "nom": "The men, the women and the children",
+    "translit": "Ha-anashim ve-ha-nashim ve-ha-taf",
+    "resume": "Whoever is exempt from the pilgrimage is exempt from Hakhel too — except the women, the children and the uncircumcised, who are bound by it; the impure is exempt. Even great sages who know the whole Torah must listen with extra great attention; whoever cannot hear turns his heart to the reading, and sees himself as if he heard it from the mouth of the Almighty: the king is the messenger who makes God's words heard.",
+    "cotes": [
+      "men, women and children",
+      "the women on the gezuztra"
+    ],
+    "sources": [
+      {"oeuvre": "Deutéronome", "ref": "31:12", "citation": "הַקְהֵל אֶת הָעָם הָאֲנָשִׁים וְהַנָּשִׁים וְהַטַּף וְגֵרְךָ אֲשֶׁר בִּשְׁעָרֶיךָ"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:2", "citation": "כָּל הַפָּטוּר מִן הָרְאִיָּה פָּטוּר מִמִּצְוַת הַקְהֵל חוּץ מִן הַנָּשִׁים וְהַטַּף וְהֵעָרֵל. אֲבָל הַטָּמֵא פָּטוּר מִמִּצְוַת הַקְהֵל"},
+      {"oeuvre": "Rambam 'Haguiga", "ref": "3:6", "citation": "אֲפִלּוּ חֲכָמִים גְּדוֹלִים שֶׁיּוֹדְעִים כָּל הַתּוֹרָה כֻּלָּהּ חַיָּבִין לִשְׁמֹעַ בְּכַוָּנָה גְּדוֹלָה יְתֵרָה… שֶׁהַמֶּלֶךְ שָׁלִיחַ הוּא לְהַשְׁמִיעַ דִּבְרֵי הָאֵל"},
+      {"oeuvre": "Middot", "ref": "2:5", "citation": "וְהִקִּיפוּהָ כְצוֹצְרָה, שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן, כְּדֵי שֶׁלֹּא יְהוּ מְעֹרָבִין"},
+      {"oeuvre": "Ketoubot", "ref": "7:6", "citation": "וְאֵיזוֹהִי דַת יְהוּדִית, יוֹצְאָה וְרֹאשָׁהּ פָּרוּעַ"}
+    ],
+    "note": "Tour's choice: the women on the gezuztra, made so that they watch from above — the Mishnah does not name Hakhel; the men and children around the bima, their small number — all Israel was there — and their clothes; the women's veils."
+  },
+
+  "nazir": {
+    "nom": "The nazir",
+    "translit": "Nazir",
+    "resume": "His nazirite days complete, the nazir brings a lamb as an olah, a ewe as a chatat and a ram as shelamim. The chatat is slaughtered, then the olah, then the shelamim, and he shaves. He shaves in the Ezrat Nashim, in the chamber of the nazirites, at the south-east corner — not before the gate of the Azara is open, but not facing it: that would be contempt for the sanctuary. His shelamim are cooked there; he takes some broth, wets his hair with it and casts it into the fire under the pot. Then the kohen puts on his palms the ram's cooked foreleg, a challah and a rakik, and waves them: from then on wine is permitted to him.",
+    "cotes": [
+      "the hair into the fire under the pot",
+      "the gate of the Azara open"
+    ],
+    "sources": [
+      {"oeuvre": "Nombres", "ref": "6:18", "citation": "וְגִלַּח הַנָּזִיר פֶּתַח אֹהֶל מוֹעֵד אֶת רֹאשׁ נִזְרוֹ וְלָקַח אֶת שְׂעַר רֹאשׁ נִזְרוֹ וְנָתַן עַל הָאֵשׁ אֲשֶׁר תַּחַת זֶבַח הַשְּׁלָמִים"},
+      {"oeuvre": "Nazir", "ref": "6:9", "citation": "הַכֹּהֵן נוֹטֵל אֶת הַזְּרוֹעַ בְּשֵׁלָה מִן הָאַיִל, וְחַלַּת מַצָּה אַחַת מִן הַסַּל, וּרְקִיק מַצָּה אֶחָד, וְנוֹתֵן עַל כַּפֵּי הַנָּזִיר וּמְנִיפָן, וְאַחַר כָּךְ הֻתַּר הַנָּזִיר לִשְׁתּוֹת יַיִן"},
+      {"oeuvre": "Rambam Nezirout", "ref": "8:2", "citation": "וּמְבַשֵּׁל הַשְּׁלָמִים אוֹ שׁוֹלְקָן וְלוֹקֵחַ מִן הָרֹטֶב שֶׁל זִבְחֵי הַשְּׁלָמִים וְנוֹתֵן עַל הַשֵּׂעָר וְאַחַר כָּךְ מַשְׁלִיכוֹ לָאֵשׁ תַּחַת דּוּד הַשְּׁלָמִים"},
+      {"oeuvre": "Rambam Nezirout", "ref": "8:3", "citation": "וְהֵיכָן מְגַלֵּחַ שְׂעָרוֹ בְּעֶזְרַת הַנָּשִׁים בְּלִשְׁכַּת הַנְּזִירִים שֶׁהָיְתָה שָׁם בְּקֶרֶן מִזְרָחִית דְּרוֹמִית… וְאֵינוֹ מְגַלֵּחַ עַד שֶׁיִּהְיֶה פֶּתַח הָעֲזָרָה פָּתוּחַ… לֹא שֶׁיְּגַלַּח כְּנֶגֶד הַפֶּתַח שֶׁזֶּה בִּזְיוֹן מִקְדָּשׁ הוּא"}
+    ],
+    "note": "Tour's choice: his place west of the hearth and the gesture, the hand above the wall; the tuft in his hand; his beard, which the verse does not name — it says “the head of his nazirhood”; his clothes."
+  },
+
+  "metzora": {
+    "nom": "The metzora",
+    "translit": "Metzora",
+    "resume": "Once healed, the metzora is purified with cedar wood, hyssop, scarlet thread and two birds; all his flesh is shaved, he immerses, then enters Jerusalem and counts seven days. On the seventh he shaves again as the first time — head, beard, eyebrows —, immerses and waits for sunset. On the eighth he immerses once more, in the chamber of the metzora'im, at the north-west corner of the Ezrat Nashim: used to impurity, he may have become impure again since the day before. Rabbi Yehudah: he had no need to. Then he goes to stand at Sha'ar Nikanor.",
+    "cotes": [
+      "shaved on the seventh day",
+      "immersed on the eighth"
+    ],
+    "sources": [
+      {"oeuvre": "Lévitique", "ref": "14:9", "citation": "וְהָיָה בַיּוֹם הַשְּׁבִיעִי יְגַלַּח אֶת כָּל שְׂעָרוֹ אֶת רֹאשׁוֹ וְאֶת זְקָנוֹ וְאֵת גַּבֹּת עֵינָיו"},
+      {"oeuvre": "Rambam Me'houssrei Kappara", "ref": "4:1", "citation": "וּבַיּוֹם הַשְּׁבִיעִי מְגַלֵּחַ תִּגְלַחְתּוֹ שְׁנִיָּה כַּתִּגְלַחַת הָרִאשׁוֹנָה וְטוֹבֵל… מִפְּנֵי שֶׁהָיָה רָגִיל בְּטֻמְאָה… וְשֶׁמָּא נִטְמָא אַחַר שֶׁטָּבַל. לְפִיכָךְ טוֹבֵל בַּשְּׁמִינִי בְּעֶזְרַת הַנָּשִׁים בְּלִשְׁכַּת הַמְצֹרָעִים"},
+      {"oeuvre": "Negaïm", "ref": "14:8", "citation": "וְהַמְּצֹרָע טָבַל בְּלִשְׁכַּת הַמְּצֹרָעִים. בָּא וְעָמַד בְּשַׁעַר נִקָּנוֹר. רַבִּי יְהוּדָה אוֹמֵר, לֹא הָיָה צָרִיךְ טְבִילָה"},
+      {"oeuvre": "Middot", "ref": "2:5", "citation": "צְפוֹנִית מַעֲרָבִית, הִיא הָיְתָה לִשְׁכַּת מְצֹרָעִים"}
+    ],
+    "note": "Tour's choice: he comes out of the mikveh, dressed, turned toward the door; his place at the edge of the pool; his clothes."
+  },
+
+  "taharat_hametzora": {
+    "nom": "The metzora at Sha'ar Nikanor",
+    "translit": "Taharat ha-metzora",
+    "resume": "The metzora stands outside the Ezrat Israel, on the threshold of Sha'ar Nikanor, facing west — there stand all who lack atonement when they are purified, there the sotot are made to drink. The kohen waves the live asham with the log of oil. The asham is brought to the gate; the metzora puts both hands into the Azara, leans on it, and it is slaughtered at once. Two kohanim receive the blood: one in a vessel, which he throws on the altar; the other in his right hand, which he pours into his left. The kohen inside, the metzora outside: the metzora puts his head in, and the kohen puts blood on the lobe of his right ear; then his right hand, on the thumb; then his right foot, on the big toe. Rabbi Yehudah: he put all three in at once.",
+    "cotes": [
+      "on the threshold, facing west",
+      "the lobe, the thumb, the toe"
+    ],
+    "sources": [
+      {"oeuvre": "Negaïm", "ref": "14:9", "citation": "הִכְנִיס רֹאשׁוֹ, וְנָתַן עַל תְּנוּךְ אָזְנוֹ. יָדוֹ, וְנָתַן עַל בֹּהֶן יָדוֹ. רַגְלוֹ, וְנָתַן עַל בֹּהֶן רַגְלוֹ. רַבִּי יְהוּדָה אוֹמֵר, שְׁלָשְׁתָּם הָיָה מַכְנִיס כְּאֶחָד"},
+      {"oeuvre": "Rambam Me'houssrei Kappara", "ref": "4:2", "citation": "הַמְצֹרָע עוֹמֵד חוּץ לְעֶזְרַת יִשְׂרָאֵל כְּנֶגֶד פֶּתַח מִזְרָחִית בְּאַסְקֻפַּת שַׁעַר נִיקָנוֹר וּפָנָיו לְמַעֲרָב… וְאֶחָד בְּיָדוֹ הַיְמָנִית וּמְעָרֶה לְיָדוֹ הַשְּׂמָאלִית… הַכֹּהֵן מִבִּפְנִים וְהַמְצֹרָע מִבַּחוּץ. וּמַכְנִיס הַמְצֹרָע רֹאשׁוֹ וְנוֹתֵן הַכֹּהֵן מִן הַדָּם שֶׁבְּכַפּוֹ עַל תְּנוּךְ אָזְנוֹ הַיְמָנִית"},
+      {"oeuvre": "Sota", "ref": "1:5", "citation": "שֶׁשָּׁם מַשְׁקִין אֶת הַסּוֹטוֹת, וּמְטַהֲרִין אֶת הַיּוֹלְדוֹת, וּמְטַהֲרִין אֶת הַמְּצֹרָעִים"}
+    ],
+    "note": "Tour's choice: the moment of the ear; the places of the metzora and the kohen in the gate; the blood in the palm; their features and the metzora's clothes."
+  },
+
+  "log_hashemen": {
+    "nom": "The metzora's log of oil",
+    "translit": "Log shemen shel metzora",
+    "resume": "The kohen takes from the log of oil and pours it into his fellow's left palm — into his own is valid too. “The kohen dips his right finger in the oil that is on his left palm” and sprinkles seven times toward the Kodesh HaKodashim, dipping for each sprinkling; if he did not aim true, they remain valid. Then he puts the oil on the ear lobe, the thumb and the big toe, in place of the blood of the asham; the rest of the oil in his palm, on the head of the one being purified. What remains of the log is shared among the kohanim.",
+    "cotes": [
+      "into the fellow's left palm",
+      "seven sprinklings toward the Kodesh HaKodashim"
+    ],
+    "sources": [
+      {"oeuvre": "Lévitique", "ref": "14:15-16", "citation": "וְלָקַח הַכֹּהֵן מִלֹּג הַשָּׁמֶן וְיָצַק עַל כַּף הַכֹּהֵן הַשְּׂמָאלִית. וְטָבַל הַכֹּהֵן אֶת אֶצְבָּעוֹ הַיְמָנִית מִן הַשֶּׁמֶן אֲשֶׁר עַל כַּפּוֹ הַשְּׂמָאלִית וְהִזָּה מִן הַשֶּׁמֶן בְּאֶצְבָּעוֹ שֶׁבַע פְּעָמִים לִפְנֵי ה'"},
+      {"oeuvre": "Negaïm", "ref": "14:10", "citation": "נָטַל מִלֹּג הַשֶּׁמֶן וְיָצַק לְתוֹךְ כַּפּוֹ שֶׁל חֲבֵרוֹ. וְאִם יָצַק לְתוֹךְ כַּף עַצְמוֹ, יָצָא. טָבַל וְהִזָּה שֶׁבַע פְּעָמִים כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳּדָשִׁים, עַל כָּל הַזָּיָה טְבִילָה"},
+      {"oeuvre": "Rambam Me'houssrei Kappara", "ref": "4:2", "citation": "נוֹטֵל הַכֹּהֵן מִלּוֹג הַשֶּׁמֶן וְיוֹצֵק לְתוֹךְ כַפּוֹ שֶׁל חֲבֵרוֹ הַשְּׂמָאלִית… וְאִם הִזָּה וְלֹא כִּוֵּן כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳדָשִׁים כְּשֵׁרוֹת… וּשְׁאָר הַלּוֹג מִתְחַלֵּק לַכֹּהֲנִים"}
+    ],
+    "note": "Tour's choice: the one who sprinkles is the one with the oil in his palm, as the verse says; the two kohanim in the Ezrat Israel, near Nikanor, facing west; the shape and metal of the vessel."
   }
 }

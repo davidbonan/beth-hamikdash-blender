@@ -1,5 +1,5 @@
 {
- "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7) et le seder ha'avoda de Yom Kippour (Yoma 1–7) et la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. `figurants`, d'une station : ceux de la troupe qu'elle montre, par nom (`sair_hamishtaleach`) ou par concept (`leviim` pour les douze) ; `[]` n'en montre aucun, sans lui toute la troupe. En marche, un figurant change hors du cadre, sinon à l'arrivée. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `fondu` une station qu'aucun chemin à pied ne rejoint — un toit —, où l'on arrive et d'où l'on part sous le voile, sans `via`, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7), le seder ha'avoda de Yom Kippour (Yoma 1–7), la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4), le korban Pessa'h (Pessa'him 5:5–10), les bikkourim (Bikkourim 3:2–6), les dix degrés de sainteté (Kelim 1:6–9), Souccot au matin (Soucca 4:5, 4:9), Hakhel (Sota 7:8), le nazir et le metzora (Middot 2:5 ; Nega'im 14:7–10). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. `figurants`, d'une station : ceux de la troupe qu'elle montre, par nom (`sair_hamishtaleach`) ou par concept (`leviim` pour les douze) ; `[]` n'en montre aucun, sans lui toute la troupe. En marche, un figurant change hors du cadre, sinon à l'arrivée. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `fondu` une station qu'aucun chemin à pied ne rejoint — un toit —, où l'on arrive et d'où l'on part sous le voile, sans `via`, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
  "parcours": [
   {
    "id": "tamid",
@@ -1291,6 +1291,1457 @@
       "fr": "Arrivés à la porte qui sort à l'est, ils se tournent vers l'ouest et disent : « Nos pères, qui étaient en ce lieu, le dos au Heikhal de HaShem et la face à l'est, se prosternaient vers l'est, vers le soleil — et nous, vers HaShem sont nos yeux. » Rabbi Yehouda : ils le redisaient, « Nous sommes à HaShem, et vers HaShem sont nos yeux ».",
       "en": "Reaching the gate that leads out to the east, they turn their faces to the west and say: “Our fathers who were in this place had their backs to the Heikhal of HaShem and their faces eastward, and bowed eastward to the sun — but as for us, our eyes are to HaShem.” Rabbi Yehuda says: they would repeat, “We are HaShem’s, and to HaShem are our eyes.”",
       "he": "הגיעו לשער היוצא ממזרח, הפכו פניהם למערב ואמרו: ״אבותינו שהיו במקום הזה אחוריהם אל היכל ה׳ ופניהם קדמה, והמה משתחווים קדמה לשמש – ואנו ליה עינינו.״ רבי יהודה אומר: היו שונים ואומרים ״אנו ליה, וליה עינינו״."
+     }
+    }
+   ]
+  },
+  {
+   "id": "korban_pessah",
+   "troupe": "figures_pessah",
+   "titre": {
+    "fr": "Le korban Pessa'h",
+    "en": "The korban Pesach",
+    "he": "קרבן פסח"
+   },
+   "stations": [
+    {
+     "id": "kat_rishona",
+     "concept": "portes_azara",
+     "figurants": [
+      "kat_shniya"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:5"
+     },
+     "point": [
+      40,
+      0
+     ],
+     "sol": -10,
+     "cible": [
+      3,
+      6,
+      0
+     ],
+     "titre": {
+      "fr": "Le premier groupe entre",
+      "en": "The first group enters",
+      "he": "נכנסה כת ראשונה"
+     },
+     "texte": {
+      "fr": "Le 14 Nissan, le tamid de l'après-midi est égorgé une heure plus tôt que d'habitude — deux, si c'est un vendredi —, et le pessa'h après lui (Pessa'him 5:1). On l'égorge en trois groupes — « toute l'assemblée de la communauté d'Israël » : kahal, 'eda, Israël (Exode 12:6). Le premier groupe entre ; l'Azara s'emplit, et l'on ferme les portes de l'Azara.",
+      "en": "On 14 Nisan the afternoon tamid is slaughtered an hour earlier than usual — two, if it is a Friday —, and the pesach after it (Pesachim 5:1). It is slaughtered in three groups — “the whole assembly of the congregation of Israel”: kahal, edah, Israel (Exodus 12:6). The first group enters; the Azara fills, and the doors of the Azara are locked.",
+      "he": "בערבי פסחים התמיד של בין הערביים נשחט שעה קודם – ושתיים, אם חל בערב שבת –, והפסח אחריו (פסחים ה, א). הפסח נשחט בשלוש כתות, שנאמר ״ושחטו אותו כל קהל עדת ישראל״ – קהל ועדה וישראל (שמות יב, ו). נכנסה כת הראשונה, נתמלאה העזרה, נעלו דלתות העזרה."
+     }
+    },
+    {
+     "id": "shourot",
+     "concept": "bazikhin",
+     "figurants": [
+      "bazikhin"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:5"
+     },
+     "point": [
+      -14,
+      -20
+     ],
+     "sol": 0,
+     "cible": [
+      -31,
+      2,
+      -16
+     ],
+     "via": [
+      [
+       20,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       -12.5,
+       0
+      ],
+      [
+       -14,
+       -8
+      ]
+     ],
+     "titre": {
+      "fr": "Des rangées d'argent, des rangées d'or",
+      "en": "Rows of silver, rows of gold",
+      "he": "שורות של כסף ושורות של זהב"
+     },
+     "texte": {
+      "fr": "Teki'a, terou'a, teki'a. Les cohanim se tiennent en rangées, des bazikhin d'argent et d'or en main : une rangée toute d'argent, une rangée toute d'or, jamais mêlées — c'est plus beau ainsi (Bartenoura). Les bazikhin n'avaient pas de fond : larges en haut, pointus en bas (Bartenoura), pour qu'on ne les pose pas et que le sang ne fige pas.",
+      "en": "Teki'a, teru'a, teki'a. The kohanim stand in rows, silver and gold bazikhin in their hands: a row all of silver, a row all of gold, never mixed — it is finer so (Bartenura). The bazikhin had no base: wide at the top, pointed below (Bartenura), so that they would not be set down and the blood congeal.",
+      "he": "תקעו, הריעו ותקעו. הכהנים עומדים שורות שורות, ובידיהם בזיכי כסף ובזיכי זהב: שורה שכולה כסף כסף, ושורה שכולה זהב זהב, לא היו מעורבין – דהכי שפיר טפי (ברטנורא). ולא היו לבזיכין שוליים, שמא יניחום ויקרש הדם."
+     }
+    },
+    {
+     "id": "mi_yad_leyad",
+     "concept": "shechitat_hapessah",
+     "figurants": [
+      "bazikhin",
+      "shechitat_hapessah"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:6"
+     },
+     "point": [
+      -22,
+      -31
+     ],
+     "sol": 0,
+     "cible": [
+      -31,
+      1,
+      -22
+     ],
+     "titre": {
+      "fr": "De main en main jusqu'à l'autel",
+      "en": "From hand to hand to the altar",
+      "he": "מיד ליד עד המזבח"
+     },
+     "texte": {
+      "fr": "Un Israélite égorge, le cohen reçoit le sang ; il passe le bazikh à son compagnon, et son compagnon au sien, pour que beaucoup aient part à la mitzva (Rambam, Korban Pessa'h 1:14) — il reçoit le plein avant de rendre le vide. Le cohen le plus proche de l'autel le jette d'un seul jet vers le yessod. On égorge le pessa'h n'importe où dans l'Azara, et son sang ne demande qu'un seul don (Zeva'him 5:8).",
+      "en": "An Israelite slaughters, the kohen receives the blood; he passes the bazikh to his fellow, and his fellow to his, so that many may share in the mitzvah (Rambam, Korban Pesach 1:14) — he takes the full one before returning the empty. The kohen nearest the altar throws it in a single throw toward the yesod. The pesach may be slaughtered anywhere in the Azara, and its blood needs only one application (Zevachim 5:8).",
+      "he": "שחט ישראל וקיבל הכהן, נותנו לחברו וחברו לחברו, כדי שיתעסקו רבים במצוה (רמב״ם, קרבן פסח א, יד) – ומקבל את המלא ומחזיר את הריקן. כהן הקרוב אצל המזבח זורקו זריקה אחת כנגד היסוד. הפסח שחיטתו בכל מקום בעזרה, ודמו טעון מתנה אחת (זבחים ה, ח)."
+     }
+    },
+    {
+     "id": "hallel",
+     "concept": "hallel_bepessah",
+     "figurants": [
+      "leviim",
+      "hallel_bepessah"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:7"
+     },
+     "point": [
+      -20.5,
+      24
+     ],
+     "sol": 0,
+     "cible": [
+      -13,
+      1.5,
+      4
+     ],
+     "via": [
+      [
+       -20,
+       0
+      ],
+      [
+       -20,
+       16
+      ]
+     ],
+     "titre": {
+      "fr": "Le Hallel",
+      "en": "The Hallel",
+      "he": "ההלל"
+     },
+     "texte": {
+      "fr": "Tant qu'on égorge et qu'on offre, les Léviim lisent le Hallel (Rambam, Korban Pessa'h 1:11). S'ils ont fini, ils le reprennent ; s'ils l'ont repris, une troisième fois — mais jamais on n'en vint à la troisième. Rabbi Yehouda : le troisième groupe n'arrivait jamais à « J'aime, car HaShem entend », tant il était peu nombreux. À chaque lecture, les trompettes sonnent teki'a, terou'a, teki'a (Rambam, 1:12), et la flûte joue devant l'autel (Arakhin 2:3).",
+      "en": "While they slaughter and offer, the Levites read the Hallel (Rambam, Korban Pesach 1:11). If they finished, they repeated it; if they repeated it, a third time — though it never came to a third. Rabbi Yehudah: the third group never reached “I love, for HaShem hears”, because its people were few. At each reading the trumpets sound teki'a, teru'a, teki'a (Rambam, 1:12), and the flute plays before the altar (Arakhin 2:3).",
+      "he": "כל זמן שהן שוחטין ומקריבין קוראים הלוים את ההלל (רמב״ם, קרבן פסח א, יא). אם גמרו שנו, ואם שנו שילשו – אף על פי שלא שילשו מימיהם. רבי יהודה אומר: מימיהם של כת שלישית לא הגיעו ל״אהבתי כי ישמע ה׳״, מפני שעמה מועטין. על כל קריאה וקריאה תוקעין תקיעה תרועה ותקיעה (רמב״ם, שם א, יב), והחליל מכה לפני המזבח (ערכין ב, ג)."
+     }
+    },
+    {
+     "id": "ounkeliot",
+     "concept": "tolin_umafshitin",
+     "figurants": [
+      "tolin_umafshitin"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:9"
+     },
+     "point": [
+      -40,
+      -34
+     ],
+     "sol": 0,
+     "cible": [
+      -40,
+      3.5,
+      -53
+     ],
+     "via": [
+      [
+       -20,
+       16
+      ],
+      [
+       -20,
+       -12
+      ],
+      [
+       -40,
+       -22
+      ]
+     ],
+     "titre": {
+      "fr": "Les crochets de fer",
+      "en": "The iron hooks",
+      "he": "אונקליות של ברזל"
+     },
+     "texte": {
+      "fr": "Des crochets de fer sont fixés dans les murs et dans les colonnes : on y suspend le pessa'h et on le dépouille. Qui n'a pas de place pour suspendre prend l'une des baguettes minces et lisses posées là, la met sur son épaule et sur l'épaule de son compagnon, y suspend et dépouille. Rabbi Eliézer : quand le 14 tombe un Shabbat, chacun pose la main sur l'épaule de l'autre, et l'on suspend et dépouille ainsi.",
+      "en": "Iron hooks are fixed in the walls and in the pillars: on them the pesach is hung and flayed. Whoever has no room to hang it takes one of the thin, smooth rods kept there, lays it on his own shoulder and his fellow's, and hangs and flays. Rabbi Eliezer: when the fourteenth falls on Shabbat, each lays his hand on the other's shoulder, and so they hang and flay.",
+      "he": "אונקליות של ברזל היו קבועים בכתלים ובעמודים, שבהן תולין ומפשיטין. וכל מי שאין לו מקום לתלות ולהפשיט, מקלות דקים חלקים היו שם, ומניח על כתפו ועל כתף חברו, ותולה ומפשיט. רבי אליעזר אומר: ארבעה עשר שחל להיות בשבת, מניח ידו על כתף חברו ויד חברו על כתפו, ותולה ומפשיט."
+     }
+    },
+    {
+     "id": "emourim",
+     "concept": "magis",
+     "figurants": [
+      "magis"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:10"
+     },
+     "point": [
+      -38.5,
+      13
+     ],
+     "sol": 9,
+     "cible": [
+      -31,
+      10.8,
+      14.5
+     ],
+     "via": [
+      [
+       -40,
+       -22
+      ],
+      [
+       -20,
+       -12
+      ],
+      [
+       -20,
+       16
+      ],
+      [
+       -20,
+       42
+      ],
+      [
+       -26,
+       53.5
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -37,
+       22
+      ]
+     ],
+     "titre": {
+      "fr": "Les emourim sur l'autel",
+      "en": "The emurim on the altar",
+      "he": "האימורים על המזבח"
+     },
+     "texte": {
+      "fr": "On ouvre le pessa'h, on en retire les emourim — les parties offertes sur l'autel —, on les met dans un plat, le magis, et le cohen les sale et les fait fumer sur l'autel (Rambam, Korban Pessa'h 1:14). Puis on rouvre les portes : le premier groupe sort, le deuxième entre ; le deuxième sort, le troisième entre, et l'on fait pour chacun comme pour le premier (Pessa'him 5:7).",
+      "en": "The pesach is opened, its emurim — the parts offered on the altar — taken out and put in a dish, the magis, and the kohen salts them and burns them on the altar (Rambam, Korban Pesach 1:14). Then the doors are opened again: the first group goes out, the second comes in; the second goes out, the third comes in, and each is done like the first (Pesachim 5:7).",
+      "he": "קרעו והוציא אימוריו, נתנו במגיס, והכהן מולחן ומקטירן על גבי המזבח (רמב״ם, קרבן פסח א, יד). פותחין דלתות העזרה: יצתה כת ראשונה ונכנסה כת שנייה, יצתה שנייה נכנסה שלישית; כמעשה הראשונה כך מעשה השנייה והשלישית (פסחים ה, ז)."
+     }
+    },
+    {
+     "id": "baheil",
+     "concept": "yoshvim_bacheil",
+     "figurants": [
+      "yoshvim_bacheil"
+     ],
+     "source": {
+      "oeuvre": "Pesachim",
+      "ref": "5:10"
+     },
+     "point": [
+      153,
+      2
+     ],
+     "sol": -16,
+     "cible": [
+      151,
+      -14.5,
+      -14
+     ],
+     "via": [
+      [
+       -38,
+       26
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -26,
+       53.5
+      ],
+      [
+       -20,
+       42
+      ],
+      [
+       -19,
+       10
+      ],
+      [
+       -12.5,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       20,
+       0
+      ],
+      [
+       134,
+       0
+      ],
+      [
+       148,
+       0
+      ],
+      [
+       152,
+       1
+      ]
+     ],
+     "titre": {
+      "fr": "Assis dans le 'Heil",
+      "en": "Sitting in the Cheil",
+      "he": "יושבים בחיל"
+     },
+     "texte": {
+      "fr": "Quand le 14 tombe un Shabbat, on ne rapporte pas son pessa'h chez soi : le premier groupe sort s'asseoir sur le Har HaBayit, le deuxième ici, dans le 'Heil, et le troisième reste debout à sa place, dans l'Azara (Rambam, Korban Pessa'h 1:17). Chacun a mis son pessa'h dans sa peau, rejetée sur son dos (Pessa'him 65b). À la nuit, ils sortent et rôtissent leurs pessa'him.",
+      "en": "When the fourteenth falls on Shabbat, no one carries his pesach home: the first group goes out and sits on the Har HaBayit, the second here, in the Cheil, and the third stays standing in its place, in the Azara (Rambam, Korban Pesach 1:17). Each has put his pesach in its skin, slung over his back (Pesachim 65b). At nightfall they go out and roast their pesachim.",
+      "he": "אין כל אחד מוליך את פסחו לביתו בשבת: כת ראשונה יוצאת ויושבת בהר הבית, השנייה בחיל, והשלישית במקומה עומדת בעזרה (רמב״ם, קרבן פסח א, יז). כל אחד נותן פסחו בעורו ומפשילו לאחוריו (פסחים סה ע״ב). חשכה, יצאו וצלו את פסחיהן."
+     }
+    }
+   ]
+  },
+  {
+   "id": "bikkourim",
+   "troupe": "figures_bikkourim",
+   "titre": {
+    "fr": "Les bikkourim",
+    "en": "The bikkurim",
+    "he": "הבאת ביכורים"
+   },
+   "stations": [
+    {
+     "id": "har_habayit",
+     "concept": "maalei_bikkourim",
+     "figurants": [
+      "maalei_bikkourim"
+     ],
+     "source": {
+      "oeuvre": "Bikkourim",
+      "ref": "3:4"
+     },
+     "point": [
+      185,
+      12
+     ],
+     "sol": -16,
+     "cible": [
+      148,
+      -6,
+      0
+     ],
+     "titre": {
+      "fr": "Sur le Har HaBayit, le panier à l'épaule",
+      "en": "On the Har HaBayit, the basket on the shoulder",
+      "he": "בהר הבית, הסל על כתפו"
+     },
+     "texte": {
+      "fr": "Ils sont montés de la ville du ma'amad — « Levez-vous, montons à Sion, vers la maison de HaShem notre Dieu » —, le bœuf devant eux, les cornes plaquées d'or, une couronne d'olivier sur la tête, et la flûte qui joue devant eux jusqu'au Har HaBayit (3:2–4). Arrivés ici, même le roi Agrippas prend lui-même le panier sur l'épaule, et entre, jusqu'à ce qu'il atteigne l'Azara.",
+      "en": "They have come up from the town of the ma'amad — “Arise, let us go up to Zion, to the house of HaShem our God” —, the ox before them, its horns overlaid with gold and a crown of olive on its head, and the flute playing before them up to the Har HaBayit (3:2–4). Once here, even King Agrippas takes the basket on his own shoulder and goes in, until he reaches the Azara.",
+      "he": "עלו מעיר של מעמד – ״קומו ונעלה ציון אל בית ה׳ אלהינו״ –, והשור הולך לפניהם, וקרניו מצופות זהב ועטרה של זית בראשו, והחליל מכה לפניהם עד שמגיעים להר הבית (ג, ב–ד). הגיעו להר הבית, אפילו אגריפס המלך נוטל הסל על כתפו ונכנס, עד שמגיע לעזרה."
+     }
+    },
+    {
+     "id": "aromimkha",
+     "concept": "shir_habikkourim",
+     "figurants": [
+      "leviim",
+      "shir_habikkourim"
+     ],
+     "source": {
+      "oeuvre": "Bikkourim",
+      "ref": "3:4"
+     },
+     "point": [
+      -6,
+      1
+     ],
+     "sol": -2.5,
+     "cible": [
+      -13,
+      1.5,
+      8
+     ],
+     "fondu": true,
+     "titre": {
+      "fr": "« Je T'exalte, HaShem »",
+      "en": "“I will extol You, HaShem”",
+      "he": "״ארוממך ה׳״"
+     },
+     "texte": {
+      "fr": "Dès qu'ils atteignent l'Azara, les Léviim commencent le chant (Rambam, Bikkourim 3:13) : « Je T'exalte, HaShem, car Tu m'as relevé, et Tu n'as pas réjoui mes ennemis à mon sujet » (Psaumes 30:2).",
+      "en": "As soon as they reach the Azara, the Levites begin the song (Rambam, Bikkurim 3:13): “I will extol You, HaShem, for You have lifted me up, and have not let my enemies rejoice over me” (Psalms 30:2).",
+      "he": "הגיע לעזרה, ודיברו הלוים בשיר (רמב״ם, ביכורים ג, יג): ״ארוממך ה׳ כי דליתני ולא שימחת אויבי לי״ (תהלים ל, ב)."
+     }
+    },
+    {
+     "id": "higadti",
+     "concept": "mikra_bikkourim",
+     "figurants": [
+      "mikra_bikkourim"
+     ],
+     "source": {
+      "oeuvre": "Bikkourim",
+      "ref": "3:6"
+     },
+     "point": [
+      -66,
+      30
+     ],
+     "sol": 0,
+     "cible": [
+      -56,
+      2.5,
+      28
+     ],
+     "fondu": true,
+     "titre": {
+      "fr": "« J'ai déclaré aujourd'hui »",
+      "en": "“I declare today”",
+      "he": "״הגדתי היום״"
+     },
+     "texte": {
+      "fr": "Le panier encore sur l'épaule, il lit depuis « J'ai déclaré aujourd'hui à HaShem ton Dieu » (Deutéronome 26:3). Au début, qui savait lire lisait, et à qui ne savait pas, on faisait réciter ; on s'abstint alors d'apporter, et l'on établit de faire réciter tout le monde, qui sait comme qui ne sait pas (3:7).",
+      "en": "With the basket still on his shoulder, he reads from “I declare today to HaShem your God” (Deuteronomy 26:3). At first, whoever could read read, and whoever could not was prompted; people then held back from bringing, so it was instituted that everyone be prompted, whether he knows how or not (3:7).",
+      "he": "עודהו הסל על כתפו, קורא מ״הגדתי היום לה׳ אלהיך״ (דברים כו, ג). בראשונה, כל מי שיודע לקרות קורא, וכל מי שאינו יודע לקרות מקרין אותו. נמנעו מלהביא, התקינו שיהו מקרין את מי שיודע ואת מי שאינו יודע (ג, ז)."
+     }
+    },
+    {
+     "id": "arami_oved_avi",
+     "concept": "tenoufat_bikkourim",
+     "figurants": [
+      "tenoufat_bikkourim"
+     ],
+     "source": {
+      "oeuvre": "Bikkourim",
+      "ref": "3:6"
+     },
+     "point": [
+      -61,
+      31.5
+     ],
+     "sol": 0,
+     "cible": [
+      -55.5,
+      2,
+      27.5
+     ],
+     "titre": {
+      "fr": "« Un Araméen voulait perdre mon père »",
+      "en": "“An Aramean sought to destroy my father”",
+      "he": "״ארמי אובד אבי״"
+     },
+     "texte": {
+      "fr": "Arrivé à « Arami oved avi », il descend le panier de son épaule et le tient par ses bords ; le cohen glisse sa main dessous et l'agite, et il lit jusqu'à la fin du passage. Il le pose à côté de l'autel — à la corne sud-ouest, du côté sud (Rambam, Bikkourim 3:12) —, se prosterne et sort. Pour cette tenoufa, l'Israélite entre dans l'Ezrat Cohanim (Kelim 1:8).",
+      "en": "Reaching “Arami oved avi”, he lowers the basket from his shoulder and holds it by its rim; the kohen puts his hand beneath it and waves it, and he reads to the end of the passage. He sets it beside the altar — at the south-west horn, on its south side (Rambam, Bikkurim 3:12) —, bows and goes out. For this waving, the Israelite enters the Ezrat Kohanim (Kelim 1:8).",
+      "he": "הגיע ל״ארמי אובד אבי״, מוריד הסל מעל כתפו ואוחזו בשפתותיו, וכהן מניח ידו תחתיו ומניפו, וקורא עד שהוא גומר כל הפרשה. ומניחו בצד המזבח – בקרן דרומית מערבית, בדרומה של קרן (רמב״ם, ביכורים ג, יב) –, והשתחווה ויצא. לתנופה זו ישראל נכנס לעזרת כהנים (כלים א, ח)."
+     }
+    },
+    {
+     "id": "gozalot",
+     "concept": "salei_bikkourim",
+     "figurants": [
+      "salei_bikkourim"
+     ],
+     "source": {
+      "oeuvre": "Bikkourim",
+      "ref": "3:5"
+     },
+     "point": [
+      -60.5,
+      22
+     ],
+     "sol": 0,
+     "cible": [
+      -55,
+      0.8,
+      27.5
+     ],
+     "titre": {
+      "fr": "Les oiseaux et les corbeilles",
+      "en": "The birds and the baskets",
+      "he": "הגוזלות והסלים"
+     },
+     "texte": {
+      "fr": "Les tourterelles et les jeunes pigeons suspendus derrière les paniers — pas dessus, pour qu'ils ne salissent pas les fruits (Bartenoura) — sont offerts en olot. Les riches apportent leurs bikkourim dans des corbeilles plaquées d'argent et d'or, les pauvres dans des paniers d'osier de saule pelé ; paniers et bikkourim sont donnés aux cohanim (3:8), mais on rend aux riches leurs corbeilles (Bartenoura).",
+      "en": "The turtledoves and young pigeons hung behind the baskets — not on top, so as not to soil the fruit (Bartenura) — are offered as olot. The rich bring their bikkurim in baskets overlaid with silver and gold, the poor in wicker baskets of peeled willow; baskets and bikkurim are given to the kohanim (3:8), but the rich get their baskets back (Bartenura).",
+      "he": "הגוזלות שעל גבי הסלים – תולים אותם מאחורי הסלים ולא על גביהם ממש, שלא יטנפום (ברטנורא) – היו עולות. העשירים מביאים ביכוריהם בקלתות של כסף ושל זהב, והעניים בסלי נצרים של ערבה קלופה; והסלים והביכורים ניתנים לכהנים (ג, ח), וקלתות של עשירים מחזירים להן (ברטנורא)."
+     }
+    }
+   ]
+  },
+  {
+   "id": "esser_kedushot",
+   "titre": {
+    "fr": "Les dix degrés de sainteté",
+    "en": "The ten degrees of holiness",
+    "he": "עשר קדושות"
+   },
+   "stations": [
+    {
+     "id": "ir",
+     "concept": "esser_kedushot",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:6-8"
+     },
+     "point": [
+      -482.1,
+      399.9
+     ],
+     "sol": -51.6,
+     "cible": [
+      -296,
+      5,
+      200
+     ],
+     "titre": {
+      "fr": "Dix degrés de sainteté",
+      "en": "Ten degrees of holiness",
+      "he": "עשר קדושות"
+     },
+     "texte": {
+      "fr": "« Il y a dix degrés de sainteté. » La terre d'Israël est plus sainte que toutes les terres : c'est d'elle qu'on apporte l'omer, les bikkourim et les deux pains. Les villes entourées d'une muraille sont plus saintes : on en renvoie les metzora'im. À l'intérieur de la muraille de Jérusalem, c'est plus saint encore : on y mange les kodashim kalim et le ma'asser sheni.",
+      "en": "“There are ten degrees of holiness.” The land of Israel is holier than all lands: from it the omer, the bikkurim and the two loaves are brought. Walled cities are holier: the metzora'im are sent out of them. Within the wall of Jerusalem is holier still: there kodashim kalim and ma'aser sheni are eaten.",
+      "he": "עשר קדושות הן. ארץ ישראל מקודשת מכל הארצות, שמביאים ממנה העומר והביכורים ושתי הלחם. עיירות המוקפות חומה מקודשות ממנה, שמשלחים מתוכן את המצורעים. לפנים מן החומה מקודש מהם, שאוכלים שם קדשים קלים ומעשר שני."
+     }
+    },
+    {
+     "id": "har_habayit",
+     "concept": "sol_har_habayit",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:8"
+     },
+     "point": [
+      185,
+      0
+     ],
+     "sol": -16,
+     "cible": [
+      150,
+      -12,
+      0
+     ],
+     "fondu": true,
+     "titre": {
+      "fr": "Le Har HaBayit",
+      "en": "The Har HaBayit",
+      "he": "הר הבית"
+     },
+     "texte": {
+      "fr": "Le Har HaBayit est plus saint : les zavim et les zavot, les niddot et les yoldot n'y entrent pas. L'impur par le mort, lui, y entre, et même le mort lui-même. C'est le camp des Léviim, jusqu'à Sha'ar Nikanor ; de Nikanor vers l'intérieur, le camp de la Shekhina ; du Har HaBayit jusqu'à la muraille de Jérusalem, le camp d'Israël (Bartenoura).",
+      "en": "The Har HaBayit is holier: zavim and zavot, niddot and yoldot do not enter it. One impure through the dead does enter, and even the dead body itself. It is the camp of the Levites, up to Sha'ar Nikanor; from Nikanor inward, the camp of the Shekhinah; from the Har HaBayit to the wall of Jerusalem, the camp of Israel (Bartenura).",
+      "he": "הר הבית מקודש ממנו, שאין זבים וזבות, נדות ויולדות נכנסים לשם. טמא מת, ואפילו מת עצמו, מותר בהר הבית. משם מתחיל מחנה לוייה עד שער ניקנור; משער ניקנור ולפנים מחנה שכינה; ומהר הבית ולחוץ עד חומת ירושלים מחנה ישראל (ברטנורא)."
+     }
+    },
+    {
+     "id": "heil",
+     "concept": "heil",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:8"
+     },
+     "point": [
+      153,
+      4
+     ],
+     "sol": -16,
+     "cible": [
+      140,
+      -9,
+      0
+     ],
+     "fondu": true,
+     "titre": {
+      "fr": "Le 'Heil",
+      "en": "The Cheil",
+      "he": "החיל"
+     },
+     "texte": {
+      "fr": "Le 'Heil est plus saint : les non-Juifs et les impurs par le mort n'y entrent pas. C'est une défense des Sages : selon la Torah, l'impur par le mort pourrait entrer jusque dans l'Ezrat Nashim, qui fait encore partie du camp des Léviim (Bartenoura). Derrière vous, le Soreg, la clôture de dix tefa'him ; devant, les douze marches du 'Heil (Middot 2:3).",
+      "en": "The Cheil is holier: non-Jews and those impure through the dead do not enter it. This is a decree of the Sages: by Torah law, one impure through the dead could enter as far as the Ezrat Nashim, which is still part of the camp of the Levites (Bartenura). Behind you, the Soreg, the fence of ten handbreadths; ahead, the twelve steps of the Cheil (Middot 2:3).",
+      "he": "החיל מקודש ממנו, שאין גויים וטמא מת נכנסים לשם. והאי דטמאי מתים אין נכנסים מן החיל ולפנים – מדרבנן; דמדאורייתא אפילו בעזרת נשים שרי, שכל זה מחנה לוייה (ברטנורא). מאחוריך הסורג, גבוה עשרה טפחים; ולפניך שתים עשרה מעלות החיל (מידות ב, ג)."
+     }
+    },
+    {
+     "id": "ezrat_nashim",
+     "concept": "ezrat_nashim",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:8"
+     },
+     "point": [
+      128,
+      0
+     ],
+     "sol": -10,
+     "cible": [
+      10,
+      4,
+      0
+     ],
+     "fondu": true,
+     "titre": {
+      "fr": "L'Ezrat Nashim",
+      "en": "The Ezrat Nashim",
+      "he": "עזרת נשים"
+     },
+     "texte": {
+      "fr": "L'Ezrat Nashim est plus sainte : le tevoul yom — qui s'est immergé et attend le coucher du soleil — n'y entre pas, mais qui y entre n'est pas passible d'une 'hatat. C'est un décret du roi Yehoshafat et de son tribunal, et pour cette seule cour du camp des Léviim (Bartenoura).",
+      "en": "The Ezrat Nashim is holier: a tevul yom — one who has immersed and awaits sunset — does not enter it, but whoever enters is not liable to a chatat. It is a decree of King Jehoshaphat and his court, and for this court alone of the camp of the Levites (Bartenura).",
+      "he": "עזרת נשים מקודשת ממנו, שאין טבול יום נכנס לשם, ואין חייבים עליה חטאת. יהושפט ובית דינו גזרו על טבול יום שלא ייכנס לעזרת נשים, ולא בכל מחנה לוייה גזרו אלא בעזרת נשים בלבד (ברטנורא)."
+     }
+    },
+    {
+     "id": "ezrat_israel",
+     "concept": "ezrat_israel",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:8"
+     },
+     "point": [
+      -7,
+      0
+     ],
+     "sol": -2.5,
+     "cible": [
+      -30,
+      3,
+      0
+     ],
+     "via": [
+      [
+       20,
+       0
+      ],
+      [
+       3,
+       0
+      ]
+     ],
+     "titre": {
+      "fr": "L'Ezrat Israël",
+      "en": "The Ezrat Israel",
+      "he": "עזרת ישראל"
+     },
+     "texte": {
+      "fr": "L'Ezrat Israël est plus sainte : le me'houssar kippourim — pur, mais qui n'a pas encore apporté l'offrande qui achève sa purification — n'y entre pas ; et l'impur qui y entre par erreur doit une 'hatat (Bartenoura). Vous avez passé Sha'ar Nikanor : c'est le camp de la Shekhina.",
+      "en": "The Ezrat Israel is holier: a mechusar kippurim — pure, but not yet having brought the offering that completes his purification — does not enter it; and an impure person who enters it by mistake owes a chatat (Bartenura). You have passed Sha'ar Nikanor: this is the camp of the Shekhinah.",
+      "he": "עזרת ישראל מקודשת ממנה, שאין מחוסר כיפורים נכנס לשם, וחייבין עליה חטאת – הטמאים שנכנסו שם בשגגה (ברטנורא). עברת את שער ניקנור: כאן מחנה שכינה."
+     }
+    },
+    {
+     "id": "ezrat_cohanim",
+     "concept": "ezrat_israel",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:8"
+     },
+     "point": [
+      -18,
+      4
+     ],
+     "sol": 0,
+     "cible": [
+      -38,
+      6,
+      4
+     ],
+     "via": [
+      [
+       -12.5,
+       0
+      ]
+     ],
+     "titre": {
+      "fr": "L'Ezrat Cohanim",
+      "en": "The Ezrat Kohanim",
+      "he": "עזרת כהנים"
+     },
+     "texte": {
+      "fr": "L'Ezrat Cohanim est plus sainte : les Israélites n'y entrent qu'au moment où ils en ont besoin — pour la semikha, la she'hita et la tenoufa. La semikha, car on ne pose pas les mains par un envoyé ; la she'hita, valable par un non-cohen ; la tenoufa, où le cohen glisse sa main sous celle du propriétaire (Bartenoura).",
+      "en": "The Ezrat Kohanim is holier: Israelites enter it only when they need to — for semikhah, shechitah and tenufah. Semikhah, since one does not lay hands through an agent; shechitah, valid when done by a non-kohen; tenufah, where the kohen puts his hand beneath the owner's (Bartenura).",
+      "he": "עזרת הכהנים מקודשת ממנה, שאין ישראל נכנסים לשם אלא בשעת צורכיהם: לסמיכה, לשחיטה ולתנופה. סמיכה – שאי אפשר אלא בבעלים ולא ביד שלוחו; שחיטה – שהשחיטה כשרה בזר; תנופה – שכהן מניח ידו תחת יד הבעלים ומניף (ברטנורא)."
+     }
+    },
+    {
+     "id": "bein_haoulam",
+     "concept": "douze_marches_oulam",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:9"
+     },
+     "point": [
+      -55.5,
+      -14
+     ],
+     "sol": 0,
+     "cible": [
+      -64,
+      3,
+      0
+     ],
+     "via": [
+      [
+       -20,
+       -12
+      ],
+      [
+       -55.5,
+       -12
+      ]
+     ],
+     "titre": {
+      "fr": "Entre l'Oulam et l'autel",
+      "en": "Between the Ulam and the altar",
+      "he": "בין האולם ולמזבח"
+     },
+     "texte": {
+      "fr": "Entre l'Oulam et l'autel, c'est plus saint : les cohanim qui ont un défaut et ceux aux cheveux non taillés n'y entrent pas. Rabbi Yossi : en cinq choses cet espace est égal au Heikhal — on n'y entre ni avec un défaut, ni les cheveux non taillés, ni après avoir bu du vin, ni sans avoir lavé mains et pieds, et l'on s'en écarte pendant l'encens.",
+      "en": "Between the Ulam and the altar is holier: kohanim with a blemish and those with untrimmed hair do not enter it. Rabbi Yose: in five things this space is equal to the Heikhal — one does not enter it with a blemish, with untrimmed hair, having drunk wine, or with unwashed hands and feet, and one keeps away from it during the incense.",
+      "he": "בין האולם ולמזבח מקודש ממנה, שאין בעלי מומין ופרועי ראש נכנסים לשם. אמר רבי יוסי: בחמישה דברים בין האולם ולמזבח שווה להיכל – שאין בעלי מומין, ופרועי ראש, ושתויי יין, ושלא רחוץ ידיים ורגליים נכנסים לשם, ופורשין מבין האולם ולמזבח בשעת הקטרה."
+     }
+    },
+    {
+     "id": "heikhal",
+     "concept": "heikhal",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:9"
+     },
+     "point": [
+      -102,
+      0
+     ],
+     "sol": 6,
+     "cible": [
+      -130,
+      8,
+      0
+     ],
+     "via": [
+      [
+       -55,
+       2
+      ],
+      [
+       -100,
+       0
+      ]
+     ],
+     "titre": {
+      "fr": "Le Heikhal",
+      "en": "The Heikhal",
+      "he": "ההיכל"
+     },
+     "texte": {
+      "fr": "Le Heikhal est plus saint : nul n'y entre sans avoir lavé mains et pieds. Il mesure quarante amot d'est en ouest (Middot 4:7).",
+      "en": "The Heikhal is holier: no one enters it without having washed hands and feet. It measures forty amot from east to west (Middot 4:7).",
+      "he": "ההיכל מקודש ממנו, שאין נכנס לשם שלא רחוץ ידיים ורגליים. ותוכו ארבעים אמה (מידות ד, ז)."
+     }
+    },
+    {
+     "id": "kodesh_hakodashim",
+     "concept": "kodesh_hakodashim",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Kelim",
+      "ref": "1:9"
+     },
+     "point": [
+      -123,
+      2.5
+     ],
+     "sol": 6,
+     "cible": [
+      -138,
+      11,
+      0
+     ],
+     "via": [
+      [
+       -110,
+       2.5
+      ]
+     ],
+     "titre": {
+      "fr": "Le Kodesh HaKodashim",
+      "en": "The Kodesh HaKodashim",
+      "he": "קודש הקודשים"
+     },
+     "texte": {
+      "fr": "Le Kodesh HaKodashim est plus saint qu'eux tous : nul n'y entre, sinon le Cohen Gadol, à Yom Kippour, au moment du service. Derrière la parokhet, vingt amot (Middot 4:7).",
+      "en": "The Kodesh HaKodashim is holier than them all: no one enters it but the Kohen Gadol, on Yom Kippur, at the time of the service. Behind the parokhet, twenty amot (Middot 4:7).",
+      "he": "קודש הקודשים מקודש מהם, שאין נכנס לשם אלא כהן גדול ביום הכיפורים בשעת העבודה. מאחורי הפרוכת, עשרים אמה (מידות ד, ז)."
+     }
+    }
+   ]
+  },
+  {
+   "id": "souccot_baboker",
+   "troupe": "figures_souccot",
+   "titre": {
+    "fr": "Souccot au matin",
+    "en": "Sukkot morning",
+    "he": "סוכות בבוקר"
+   },
+   "stations": [
+    {
+     "id": "shaar_hamayim",
+     "concept": "shaar_hamayim",
+     "figurants": [
+      "nissoukh_hamayim_1",
+      "tekiot_shaar_hamayim"
+     ],
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "4:9"
+     },
+     "point": [
+      -12,
+      93.5
+     ],
+     "sol": -16,
+     "cible": [
+      -12,
+      -4,
+      85
+     ],
+     "titre": {
+      "fr": "À Sha'ar HaMayim",
+      "en": "At Sha'ar HaMayim",
+      "he": "בשער המים"
+     },
+     "texte": {
+      "fr": "À la fin de la nuit de Sho'éva, les trompettes ont donné le signal : aller remplir au Shilo'ah l'eau de la libation (Bartenoura sur Soucca 5:4). On en revient avec une tzelo'hit d'or de trois log. Arrivés à Sha'ar HaMayim, on sonne teki'a, terou'a, teki'a. C'est par elle qu'on fait entrer à la fête la tzelo'hit de la libation — d'où son nom (Middot 2:6).",
+      "en": "At the end of the night of Sho'evah, the trumpets gave the signal: go and fill the water for the libation from the Shiloach (Bartenura on Sukkah 5:4). They come back with a golden tzelochit holding three log. On reaching Sha'ar HaMayim, they sound teki'a, teru'a, teki'a. Through it the tzelochit of the libation is brought in at the festival — hence its name (Middot 2:6).",
+      "he": "בסוף ליל שמחת בית השואבה תקעו – זה סימן לילך ולמלאות מים לניסוך מן השילוח (ברטנורא, סוכה ה, ד). צלוחית של זהב מחזקת שלושת לוגין היה ממלא מן השילוח. הגיעו לשער המים, תקעו והריעו ותקעו. ולמה נקרא שמו שער המים? שבו מכניסין צלוחית של מים של ניסוך בחג (מידות ב, ו)."
+     }
+    },
+    {
+     "id": "nissoukh_hamayim",
+     "concept": "sefalim",
+     "figurants": [
+      "nissoukh_hamayim_2"
+     ],
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "4:9"
+     },
+     "point": [
+      -44,
+      19
+     ],
+     "sol": 9,
+     "cible": [
+      -50.5,
+      9.3,
+      22.5
+     ],
+     "via": [
+      [
+       -12,
+       88
+      ],
+      [
+       -12,
+       76
+      ],
+      [
+       -12,
+       66
+      ],
+      [
+       -20,
+       55
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -43,
+       21
+      ]
+     ],
+     "titre": {
+      "fr": "La libation de l'eau",
+      "en": "The water libation",
+      "he": "ניסוך המים"
+     },
+     "texte": {
+      "fr": "Il monte par le kevesh et tourne à sa gauche : deux sefalim d'argent sont là — Rabbi Yehouda : de chaux, noircis par le vin —, percés de deux becs fins, l'un plus large, l'autre plus étroit, pour qu'ils se vident ensemble ; à l'ouest celui de l'eau, à l'est celui du vin. L'eau se verse avec la libation de vin du tamid du matin (Rambam, Temidin 10:6). On dit au cohen : « Lève la main ! » — car une fois, l'un la versa sur ses pieds, et tout le peuple le bombarda de ses etroguim.",
+      "en": "He goes up the kevesh and turns to his left: two silver sefalim are there — Rabbi Yehudah: of lime, blackened by the wine —, pierced with two narrow spouts, one wider, one narrower, so that both empty together; the western one for water, the eastern one for wine. The water is poured with the wine libation of the morning tamid (Rambam, Temidin 10:6). They say to the kohen: “Raise your hand!” — for once one poured it over his feet, and all the people pelted him with their etrogim.",
+      "he": "עלה בכבש ופנה לשמאלו; שני ספלים של כסף היו שם – רבי יהודה אומר: של סיד היו, אלא שהיו מושחרין פניהם מפני היין –, ומנוקבין כמין שני חוטמין דקין, אחד מעובה ואחד דק, כדי שיהו שניהם כלין בבת אחת; מערבי של מים, מזרחי של יין. ועם ניסוך היין של תמיד של שחר היה מנסך המים (רמב״ם, תמידין י, ו). ולמנסך אומרים לו: הגבה ידך! שפעם אחת ניסך אחד על גבי רגליו, ורגמוהו כל העם באתרוגיהן."
+     }
+    },
+    {
+     "id": "aravot",
+     "concept": "aravot",
+     "figurants": [
+      "aravot"
+     ],
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "4:5"
+     },
+     "point": [
+      -20,
+      -14
+     ],
+     "sol": 0,
+     "cible": [
+      -38,
+      7,
+      -6
+     ],
+     "via": [
+      [
+       -43,
+       21
+      ],
+      [
+       -38,
+       26
+      ],
+      [
+       -38,
+       53
+      ],
+      [
+       -26,
+       53.5
+      ],
+      [
+       -20,
+       42
+      ],
+      [
+       -19,
+       10
+      ]
+     ],
+     "titre": {
+      "fr": "Les aravot",
+      "en": "The aravot",
+      "he": "הערבות"
+     },
+     "texte": {
+      "fr": "Il y a, en contrebas de Jérusalem, un lieu nommé Motza : on y descend cueillir de hautes branches de saule, on vient les dresser sur les côtés de l'autel, la tête penchée au-dessus de lui, et l'on sonne teki'a, terou'a, teki'a — chaque jour de la fête (Rambam, Loulav 7:21). Hautes de onze amot et dressées sur le yessod, elles dépassent l'autel d'une ama (Soucca 45a).",
+      "en": "Below Jerusalem there is a place called Motza: they go down there to gather tall willow branches, come and stand them at the sides of the altar, their tops bent over it, and sound teki'a, teru'a, teki'a — every day of the festival (Rambam, Lulav 7:21). Eleven amot tall and set on the yesod, they lean over the altar by one amah (Sukkah 45a).",
+      "he": "מקום היה למטה מירושלים ונקרא מוצא; יורדין לשם ומלקטין משם מורביות של ערבה, ובאין וזוקפין אותן בצידי המזבח וראשיהן כפופין על גבי המזבח, ותקעו והריעו ותקעו – בכל יום ויום משבעת הימים (רמב״ם, לולב ז, כא). אחת עשרה אמה היו, וזוקפין אותן על גבי היסוד, כדי שיהו גוחנות על המזבח אמה (סוכה מה ע״א)."
+     }
+    },
+    {
+     "id": "hakafot",
+     "concept": "hakafot_hamizbeach",
+     "figurants": [
+      "hakafot_hamizbeach",
+      "aravot_1"
+     ],
+     "source": {
+      "oeuvre": "Soucca",
+      "ref": "4:5"
+     },
+     "point": [
+      -55.5,
+      -14
+     ],
+     "sol": 0,
+     "cible": [
+      -40,
+      4,
+      -8
+     ],
+     "via": [
+      [
+       -20,
+       -12
+      ],
+      [
+       -55.5,
+       -12
+      ]
+     ],
+     "titre": {
+      "fr": "Autour de l'autel",
+      "en": "Around the altar",
+      "he": "הקפת המזבח"
+     },
+     "texte": {
+      "fr": "Chaque jour, on fait une fois le tour de l'autel en disant : « De grâce, HaShem, sauve donc ! De grâce, HaShem, fais donc réussir ! » — Rabbi Yehouda : « Ani vaho, sauve donc ! » ; et le septième jour, sept fois. En partant, on dit : « Beauté à toi, autel ! » — Rabbi Eliézer : « À Yah et à toi, autel ! » Les aravot en main selon Bartenoura, les loulavim selon le Rambam (Loulav 7:23) ; et seuls les cohanim, car l'Israélite n'entre pas entre l'Oulam et l'autel (Tosfot Yom Tov).",
+      "en": "Each day they go around the altar once, saying: “Please, HaShem, save now! Please, HaShem, grant success now!” — Rabbi Yehudah: “Ani vaho, save now!”; and on the seventh day, seven times. On leaving they say: “Beauty to you, altar!” — Rabbi Eliezer: “To Yah and to you, altar!” Willows in hand according to Bartenura, lulavim according to the Rambam (Lulav 7:23); and only the kohanim, for an Israelite does not enter between the Ulam and the altar (Tosafot Yom Tov).",
+      "he": "בכל יום מקיפין את המזבח פעם אחת ואומרים: ״אנא ה׳ הושיעה נא, אנא ה׳ הצליחה נא״ – רבי יהודה אומר: ״אני והו הושיעה נא״; ואותו היום מקיפין את המזבח שבע פעמים. בשעת פטירתן אומרים: ״יופי לך מזבח, יופי לך מזבח״ – רבי אליעזר אומר: ״ליה ולך מזבח״. בערבה לדעת הברטנורא, בלולביהם לדעת הרמב״ם (לולב ז, כג); ולא היו המקיפין אלא כהנים, שבין האולם ולמזבח ישראל אינו נכנס (תוספות יום טוב)."
+     }
+    }
+   ]
+  },
+  {
+   "id": "hakhel",
+   "troupe": "figures_hakhel",
+   "titre": {
+    "fr": "Hakhel",
+    "en": "Hakhel",
+    "he": "הקהל"
+   },
+   "stations": [
+    {
+     "id": "hakhel",
+     "concept": "hakhel",
+     "figurants": [
+      "parashat_hamelekh",
+      "kahal"
+     ],
+     "source": {
+      "oeuvre": "Deutéronome",
+      "ref": "31:10-12"
+     },
+     "point": [
+      95,
+      30
+     ],
+     "sol": -10,
+     "cible": [
+      72.5,
+      -3,
+      -40
+     ],
+     "titre": {
+      "fr": "Rassemble le peuple",
+      "en": "Assemble the people",
+      "he": "הקהל את העם"
+     },
+     "texte": {
+      "fr": "« Au terme de sept ans, au temps de l'année de shemita, à la fête de Souccot… tu liras cette Torah devant tout Israël. Rassemble le peuple, les hommes, les femmes et les enfants » (Deutéronome 31:10–12). Au sortir du premier jour de la fête, dans l'année qui suit la shemita, on sonne des trompettes dans tout Jérusalem pour rassembler le peuple (Sota 7:8 ; Rambam, 'Haguiga 3:3–4).",
+      "en": "“At the end of seven years, at the time of the shemittah year, at the festival of Sukkot… you shall read this Torah before all Israel. Assemble the people, the men, the women and the children” (Deuteronomy 31:10–12). At the close of the first day of the festival, in the year after the shemittah, trumpets are sounded throughout Jerusalem to gather the people (Sotah 7:8; Rambam, Chagigah 3:3–4).",
+      "he": "״מקץ שבע שנים במועד שנת השמיטה בחג הסוכות… תקרא את התורה הזאת נגד כל ישראל באזניהם. הקהל את העם האנשים והנשים והטף״ (דברים לא, י–יב). במוצאי יום טוב הראשון של חג, בשמיני במוצאי שביעית, תוקעין בחצוצרות בכל ירושלים כדי להקהיל את העם (סוטה ז, ח; רמב״ם, חגיגה ג, ג–ד)."
+     }
+    },
+    {
+     "id": "bima",
+     "concept": "bimat_hamelekh",
+     "figurants": [
+      "parashat_hamelekh",
+      "kahal"
+     ],
+     "source": {
+      "oeuvre": "Sota",
+      "ref": "7:8"
+     },
+     "point": [
+      100,
+      20
+     ],
+     "sol": -10,
+     "cible": [
+      72.5,
+      -6.5,
+      0
+     ],
+     "via": [
+      [
+       110,
+       12
+      ]
+     ],
+     "titre": {
+      "fr": "La bima de bois",
+      "en": "The wooden bima",
+      "he": "בימה של עץ"
+     },
+     "texte": {
+      "fr": "On lui fait une bima de bois, et il s'assoit dessus. La Mishna la dit « dans l'Azara » ; mais nul ne s'assoit dans l'Azara, sinon les rois de la maison de David — c'était donc l'Ezrat Nashim, répond la Guemara avec Rav 'Hisda (Sota 41a–b). Le Rambam la dresse au milieu de l'Ezrat Nashim, pour qu'on entende sa lecture, et tout Israël monté pour la fête se rassemble autour (Rambam, 'Haguiga 3:4).",
+      "en": "A wooden bima is made for him, and he sits on it. The Mishnah says “in the Azara”; but no one sits in the Azara except the kings of the house of David — so it was the Ezrat Nashim, the Gemara answers with Rav Chisda (Sotah 41a–b). The Rambam sets it in the middle of the Ezrat Nashim, so that his reading is heard, and all Israel who came up for the festival gather around it (Rambam, Chagigah 3:4).",
+      "he": "עושין לו בימה של עץ, והוא יושב עליה. המשנה אומרת ״בעזרה״; והאמר מר: אין ישיבה בעזרה אלא למלכי בית דוד בלבד! – כדאמר רב חסדא: בעזרת נשים, הכא נמי בעזרת נשים (סוטה מא ע״א–ע״ב). הרמב״ם מעמידה באמצע עזרת נשים, כדי שישמעו קריאתו, וכל ישראל העולים לחוג מתקבצין סביביו (רמב״ם, חגיגה ג, ד)."
+     }
+    },
+    {
+     "id": "mi_yad_leyad",
+     "concept": "haavarat_hasefer",
+     "figurants": [
+      "haavarat_hasefer"
+     ],
+     "source": {
+      "oeuvre": "Sota",
+      "ref": "7:8"
+     },
+     "point": [
+      67,
+      13
+     ],
+     "sol": -10,
+     "cible": [
+      68,
+      -6.5,
+      0
+     ],
+     "titre": {
+      "fr": "De main en main",
+      "en": "From hand to hand",
+      "he": "מיד ליד"
+     },
+     "texte": {
+      "fr": "Le 'hazan de la synagogue prend le sefer Torah et le donne au chef de la synagogue, le chef de la synagogue au segan, le segan au Cohen Gadol, le Cohen Gadol au roi — pour l'honorer par la multitude (Rambam, 'Haguiga 3:4). Le roi le reçoit debout, et lit assis.",
+      "en": "The synagogue attendant takes the Torah scroll and gives it to the head of the synagogue, the head of the synagogue to the deputy, the deputy to the Kohen Gadol, the Kohen Gadol to the king — to honour him through the multitude (Rambam, Chagigah 3:4). The king receives it standing, and reads sitting.",
+      "he": "חזן הכנסת נוטל ספר תורה ונותנה לראש הכנסת, וראש הכנסת נותנה לסגן, והסגן נותנה לכהן גדול, וכהן גדול נותנה למלך – כדי להדרו ברוב בני אדם (רמב״ם, חגיגה ג, ד). והמלך עומד ומקבל, וקורא יושב."
+     }
+    },
+    {
+     "id": "agrippas",
+     "concept": "agrippas",
+     "figurants": [
+      "agrippas",
+      "kahal"
+     ],
+     "source": {
+      "oeuvre": "Sota",
+      "ref": "7:8"
+     },
+     "point": [
+      80,
+      -8
+     ],
+     "sol": -10,
+     "cible": [
+      72.5,
+      -5.5,
+      0
+     ],
+     "titre": {
+      "fr": "« Tu es notre frère »",
+      "en": "“You are our brother”",
+      "he": "״אחינו אתה״"
+     },
+     "texte": {
+      "fr": "Le roi Agrippas se leva, reçut et lut debout, et les Sages le louèrent. Arrivé à « Tu ne pourras pas mettre sur toi un homme étranger » (Deutéronome 17:15), ses yeux coulèrent de larmes. On lui dit : « Ne crains pas, Agrippas : tu es notre frère, tu es notre frère, tu es notre frère ! » On enseigne au nom de Rabbi Nathan qu'à cet instant Israël encourut l'anéantissement, pour avoir flatté Agrippas (Sota 41b).",
+      "en": "King Agrippas stood, received and read standing, and the Sages praised him. When he reached “You may not set over you a foreign man” (Deuteronomy 17:15), his eyes ran with tears. They said to him: “Fear not, Agrippas: you are our brother, you are our brother, you are our brother!” It is taught in the name of Rabbi Natan that at that moment Israel incurred destruction, for having flattered Agrippas (Sotah 41b).",
+      "he": "אגריפס המלך עמד וקיבל וקרא עומד, ושיבחוהו חכמים. וכשהגיע ל״לא תוכל לתת עליך איש נכרי״ (דברים יז, טו), זלגו עיניו דמעות. אמרו לו: אל תתירא אגריפס, אחינו אתה, אחינו אתה, אחינו אתה! תנא משמיה דרבי נתן: באותה שעה נתחייבו שונאי ישראל כלייה, שהחניפו לו לאגריפס (סוטה מא ע״ב)."
+     }
+    },
+    {
+     "id": "ma_koreh",
+     "concept": "parashat_hamelekh",
+     "figurants": [
+      "parashat_hamelekh",
+      "kahal"
+     ],
+     "source": {
+      "oeuvre": "Sota",
+      "ref": "7:8"
+     },
+     "point": [
+      76,
+      16
+     ],
+     "sol": -10,
+     "cible": [
+      72.5,
+      -6,
+      0
+     ],
+     "titre": {
+      "fr": "Ce que lit le roi",
+      "en": "What the king reads",
+      "he": "מה המלך קורא"
+     },
+     "texte": {
+      "fr": "Il lit depuis « Voici les paroles » jusqu'au Shema', puis le Shema', « Et si vous écoutez », « Tu prélèveras la dîme », « Quand tu auras achevé de prélever », la section du roi, les bénédictions et les malédictions, jusqu'à la fin du passage (Deutéronome 1–28). Il dit les bénédictions que dit le Cohen Gadol, mais celle des fêtes au lieu du pardon de la faute.",
+      "en": "He reads from “These are the words” up to the Shema, then the Shema, “And if you listen”, “You shall surely tithe”, “When you have finished tithing”, the section of the king, the blessings and the curses, to the end of the passage (Deuteronomy 1–28). He says the blessings the Kohen Gadol says, but that of the festivals instead of the forgiveness of sin.",
+      "he": "וקורא מתחילת ״אלה הדברים״ עד ״שמע״, ו״שמע״, ו״והיה אם שמוע״, ״עשר תעשר״, ״כי תכלה לעשר״, ופרשת המלך, וברכות וקללות, עד שגומר כל הפרשה (דברים א–כח). ברכות שכהן גדול מברך אותן, המלך מברך אותן, אלא שנותן של רגלים תחת מחילת העוון."
+     }
+    }
+   ]
+  },
+  {
+   "id": "nazir_umetzora",
+   "troupe": "figures_nazir",
+   "titre": {
+    "fr": "Le nazir et le metzora",
+    "en": "The nazir and the metzora",
+    "he": "הנזיר והמצורע"
+   },
+   "stations": [
+    {
+     "id": "arba_lishkot",
+     "concept": "ezrat_nashim",
+     "figurants": [],
+     "source": {
+      "oeuvre": "Middot",
+      "ref": "2:5"
+     },
+     "point": [
+      60,
+      -8
+     ],
+     "sol": -10,
+     "cible": [
+      120,
+      2,
+      48
+     ],
+     "titre": {
+      "fr": "Quatre cours sans toit",
+      "en": "Four unroofed courts",
+      "he": "ארבע לשכות שאינן מקורות"
+     },
+     "texte": {
+      "fr": "Aux quatre coins de l'Ezrat Nashim, quatre lishkot de quarante amot, sans toit — ainsi seront-elles, dit Ézéchiel : « des cours qetourot aux quatre coins du parvis » (Ézéchiel 46:22), et qetourot veut dire sans toit. Au sud-est, celle des nazirs ; au nord-est, celle du bois, où les cohanim qui ont un défaut trient les bûches — le bois où l'on trouve un ver est impropre à l'autel ; au nord-ouest, celle des metzora'im ; au sud-ouest, Rabbi Eliézer ben Yaakov a oublié à quoi elle servait — Abba Shaoul : on y mettait le vin et l'huile, c'est la lishka de Beit Shemanya.",
+      "en": "At the four corners of the Ezrat Nashim, four chambers of forty amot, unroofed — so they will be, says Ezekiel: “courts ketorot in the four corners of the court” (Ezekiel 46:22), and ketorot means unroofed. At the south-east, that of the nazirites; at the north-east, that of the wood, where kohanim with blemishes sort the logs — wood in which a worm is found is unfit for the altar; at the north-west, that of the metzora'im; at the south-west, Rabbi Eliezer ben Yaakov forgot what it was for — Abba Shaul: wine and oil were kept there, it is the chamber of Beit Shemanya.",
+      "he": "ארבע לשכות היו בארבע מקצועותיה של עזרת הנשים, של ארבעים ארבעים אמה, ולא היו מקורות; וכך הם עתידים להיות, שנאמר ״בארבעת מקצעות החצר חצרות קטרות״ (יחזקאל מו, כב) – ואין קטורות אלא שאינן מקורות. דרומית מזרחית – לשכת הנזירים; מזרחית צפונית – לשכת העצים, ששם הכהנים בעלי מומין מתליעין העצים, וכל עץ שנמצא בו תולעת פסול מעל גבי המזבח; צפונית מערבית – לשכת מצורעים; מערבית דרומית – אמר רבי אליעזר בן יעקב: שכחתי מה הייתה משמשת. אבא שאול אומר: שם היו נותנין יין ושמן, היא הייתה נקראת לשכת בית שמניה."
+     }
+    },
+    {
+     "id": "lishkat_hanezirim",
+     "concept": "lishkat_hanezirim",
+     "figurants": [
+      "nazir"
+     ],
+     "source": {
+      "oeuvre": "Nazir",
+      "ref": "6:8-9"
+     },
+     "point": [
+      112,
+      37
+     ],
+     "sol": -10,
+     "cible": [
+      120,
+      -8,
+      48
+     ],
+     "via": [
+      [
+       72,
+       8
+      ],
+      [
+       100,
+       8
+      ],
+      [
+       120,
+       10
+      ],
+      [
+       120,
+       22
+      ],
+      [
+       120,
+       33
+      ]
+     ],
+     "titre": {
+      "fr": "La lishka des nazirs",
+      "en": "The chamber of the nazirites",
+      "he": "לשכת הנזירים"
+     },
+     "texte": {
+      "fr": "Son nazirat accompli, le nazir apporte un agneau en ola, une brebis en 'hatat, un bélier en shelamim (Nombres 6:14). Il se rase ici, et seulement quand la porte de l'Azara est ouverte — mais pas face à elle, ce serait mépris du sanctuaire (Rambam, Nezirout 8:3). On y cuit ses shelamim ; il mouille ses cheveux de leur bouillon et les jette au feu sous le chaudron (8:2). Puis le cohen pose sur ses paumes l'épaule cuite du bélier, une 'halla et un rakik, et les agite : désormais le vin lui est permis.",
+      "en": "His nazirite term complete, the nazir brings a lamb as an olah, a ewe as a chatat, a ram as shelamim (Numbers 6:14). He shaves here, and only while the gate of the Azara is open — but not facing it, which would be contempt for the sanctuary (Rambam, Nezirut 8:3). His shelamim are cooked here; he wets his hair with their broth and casts it into the fire under the pot (8:2). Then the kohen puts on his palms the ram's cooked foreleg, a challah and a rakik, and waves them: from then on wine is permitted to him.",
+      "he": "מלאו ימי נזרו, מביא כבש בן שנתו לעולה, וכבשה בת שנתה לחטאת, ואיל לשלמים (במדבר ו, יד). מגלח כאן, ואינו מגלח עד שיהיה פתח העזרה פתוח – לא שיגלח כנגד הפתח, שזה בזיון מקדש (רמב״ם, נזירות ח, ג). כאן מבשלין את שלמיו, ולוקח מן הרוטב ונותן על השער ומשליכו לאש תחת הדוד (ח, ב). הכהן נוטל את הזרוע בשלה מן האיל, וחלת מצה אחת ורקיק מצה אחד, ונותן על כפי הנזיר ומניפן, ואחר כך הותר הנזיר לשתות יין."
+     }
+    },
+    {
+     "id": "lishkat_hametzoraim",
+     "concept": "lishkat_hametzoraim",
+     "figurants": [
+      "metzora"
+     ],
+     "source": {
+      "oeuvre": "Negaïm",
+      "ref": "14:7-8"
+     },
+     "point": [
+      25,
+      -37
+     ],
+     "sol": -10,
+     "cible": [
+      25,
+      -12,
+      -53
+     ],
+     "via": [
+      [
+       120,
+       33
+      ],
+      [
+       120,
+       10
+      ],
+      [
+       72,
+       0
+      ],
+      [
+       45,
+       -8
+      ],
+      [
+       25,
+       -8
+      ],
+      [
+       25,
+       -33
+      ]
+     ],
+     "titre": {
+      "fr": "La lishka des metzora'im",
+      "en": "The chamber of the metzora'im",
+      "he": "לשכת המצורעים"
+     },
+     "texte": {
+      "fr": "Le huitième jour, le metzora apporte trois bêtes : 'hatat, asham et ola ; le pauvre, une 'hatat et une ola d'oiseaux. Il s'immerge ici — Rabbi Yehouda : il n'en avait pas besoin —, car il a pu redevenir impur depuis la veille, lui qui avait l'habitude de l'impureté (Rambam, Me'houssrei Kappara 4:1). La veille, au septième jour, on l'a rasé tout entier : la tête, la barbe, les sourcils (Lévitique 14:9).",
+      "en": "On the eighth day the metzora brings three animals: chatat, asham and olah; the poor man, a chatat and an olah of birds. He immerses here — Rabbi Yehudah: he had no need to —, for he may have become impure again since the day before, being used to impurity (Rambam, Mechusrei Kapparah 4:1). The day before, on the seventh day, he was shaved entirely: head, beard, eyebrows (Leviticus 14:9).",
+      "he": "ביום השמיני מביא שלוש בהמות, חטאת ואשם ועולה, והדל מביא חטאת העוף ועולת העוף. טובל כאן – רבי יהודה אומר: לא היה צריך טבילה –, מפני שהיה רגיל בטומאה, ושמא נטמא אחר שטבל (רמב״ם, מחוסרי כפרה ד, א). אמש, ביום השביעי, גילח את כל שערו: את ראשו ואת זקנו ואת גבות עיניו (ויקרא יד, ט)."
+     }
+    },
+    {
+     "id": "shaar_nikanor",
+     "concept": "taharat_hametzora",
+     "figurants": [
+      "taharat_hametzora"
+     ],
+     "source": {
+      "oeuvre": "Negaïm",
+      "ref": "14:8-9"
+     },
+     "point": [
+      -9,
+      1
+     ],
+     "sol": -2.5,
+     "cible": [
+      2,
+      0.3,
+      0
+     ],
+     "via": [
+      [
+       25,
+       -33
+      ],
+      [
+       25,
+       -8
+      ],
+      [
+       20,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       -6,
+       0
+      ]
+     ],
+     "titre": {
+      "fr": "Sur le seuil de Nikanor",
+      "en": "On the threshold of Nikanor",
+      "he": "באסקופת שער ניקנור"
+     },
+     "texte": {
+      "fr": "Le metzora se tient hors de l'Ezrat Israël, sur le seuil de Sha'ar Nikanor, face à l'ouest (Rambam, Me'houssrei Kappara 4:2) — là où l'on fait boire la sota et où l'on purifie les yoldot et les metzora'im (Sota 1:5). Il pose ses deux mains sur son asham, on l'égorge, et deux cohanim reçoivent le sang : l'un dans un vase, qu'il jette sur l'autel ; l'autre dans sa main, qu'il apporte au metzora. Il passe la tête, et le cohen met du sang sur le lobe de son oreille ; sa main, sur le pouce ; son pied, sur le gros orteil — Rabbi Yehouda : les trois ensemble.",
+      "en": "The metzora stands outside the Ezrat Israel, on the threshold of Sha'ar Nikanor, facing west (Rambam, Mechusrei Kapparah 4:2) — where the sotah is made to drink and the yoldot and metzora'im are purified (Sotah 1:5). He lays both hands on his asham, it is slaughtered, and two kohanim receive the blood: one in a vessel, which he throws on the altar; the other in his hand, which he brings to the metzora. He puts his head in, and the kohen puts blood on the lobe of his ear; his hand, on the thumb; his foot, on the big toe — Rabbi Yehudah: all three at once.",
+      "he": "המצורע עומד חוץ לעזרת ישראל, באסקופת שער ניקנור, ופניו למערב (רמב״ם, מחוסרי כפרה ד, ב) – ששם משקין את הסוטות ומטהרין את היולדות ומטהרין את המצורעים (סוטה א, ה). סמך שתי ידיו על האשם ושחטו, וקיבלו שני כהנים את דמו, אחד בכלי ואחד ביד: זה שקיבל בכלי זורקו על קיר המזבח, וזה שקיבל ביד בא לו אצל המצורע. הכניס ראשו, ונתן על תנוך אזנו; ידו, ונתן על בוהן ידו; רגלו, ונתן על בוהן רגלו. רבי יהודה אומר: שלושתם היה מכניס כאחד."
+     }
+    },
+    {
+     "id": "log_hashemen",
+     "concept": "log_hashemen",
+     "figurants": [
+      "taharat_hametzora_1",
+      "log_hashemen"
+     ],
+     "source": {
+      "oeuvre": "Negaïm",
+      "ref": "14:10"
+     },
+     "point": [
+      -10,
+      -2
+     ],
+     "sol": -2.5,
+     "cible": [
+      0,
+      0.2,
+      -1
+     ],
+     "titre": {
+      "fr": "Le log d'huile",
+      "en": "The log of oil",
+      "he": "לוג השמן"
+     },
+     "texte": {
+      "fr": "Le cohen prend du log d'huile et le verse dans la paume de son compagnon — la gauche (Rambam, Me'houssrei Kappara 4:2) ; dans la sienne, c'est valable aussi. On y trempe le doigt droit et l'on asperge sept fois vers le Kodesh HaKodashim, en trempant à chaque fois. Puis on vient au metzora et l'on met l'huile là où l'on a mis le sang ; le reste de l'huile de la paume, on le met sur la tête de celui qui se purifie.",
+      "en": "The kohen takes from the log of oil and pours it into his fellow's palm — the left one (Rambam, Mechusrei Kapparah 4:2); into his own is valid too. The right finger is dipped in it and sprinkled seven times toward the Kodesh HaKodashim, dipping for each sprinkling. Then they come to the metzora and put the oil where the blood was put; the rest of the oil in the palm is put on the head of the one being purified.",
+      "he": "נטל מלוג השמן ויצק לתוך כפו של חברו – השמאלית (רמב״ם, מחוסרי כפרה ד, ב); ואם יצק לתוך כף עצמו, יצא. טבל והזה שבע פעמים כנגד בית קודש הקודשים, על כל הזאה טבילה. בא לו אצל המצורע: מקום שהוא נותן את הדם, שם הוא נותן את השמן; והנותר מן השמן אשר על כף הכהן ייתן על ראש המיטהר."
      }
     }
    ]

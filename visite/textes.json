@@ -261,7 +261,24 @@
       "Shemot Rabba": "שמות רבה",
       "Shir HaShirim Rabba": "שיר השירים רבה",
       "Teshouvot HaRadbaz II": "שו\"ת הרדב\"ז ח\"ב",
-      "Ta'anit": "תענית"
+      "Ta'anit": "תענית",
+      "Bikkourim": "ביכורים",
+      "Sota": "סוטה",
+      "Nazir": "נזיר",
+      "Deutéronome": "דברים",
+      "Tehillim": "תהלים",
+      "Rambam Korban Pessa'h": "רמב״ם, הלכות קרבן פסח",
+      "Rambam Bikkourim": "רמב״ם, הלכות ביכורים",
+      "Rambam Loulav": "רמב״ם, הלכות שופר וסוכה ולולב",
+      "Rambam 'Haguiga": "רמב״ם, הלכות חגיגה",
+      "Rambam Nezirout": "רמב״ם, הלכות נזירות",
+      "Rambam Me'houssrei Kappara": "רמב״ם, הלכות מחוסרי כפרה",
+      "Rambam Melakhim": "רמב״ם, הלכות מלכים",
+      "Bartenura sur Kelim": "ברטנורא על כלים",
+      "Bartenura sur Bikkourim": "ברטנורא על ביכורים",
+      "Bartenura sur Pesachim": "ברטנורא על פסחים",
+      "Bartenura sur Mena'hot": "ברטנורא על מנחות",
+      "Esther": "אסתר"
     }
   },
   "en": {
@@ -440,7 +457,24 @@
       "Shemot Rabba": "Shemot Rabbah",
       "Shir HaShirim Rabba": "Shir HaShirim Rabbah",
       "Teshouvot HaRadbaz II": "Responsa of the Radbaz, vol. II",
-      "Ta'anit": "Ta'anit"
+      "Ta'anit": "Ta'anit",
+      "Bikkourim": "Bikkurim",
+      "Sota": "Sotah",
+      "Nazir": "Nazir",
+      "Deutéronome": "Deuteronomy",
+      "Tehillim": "Psalms",
+      "Rambam Korban Pessa'h": "Rambam, Hilchot Korban Pesach",
+      "Rambam Bikkourim": "Rambam, Hilchot Bikkurim",
+      "Rambam Loulav": "Rambam, Hilchot Shofar veSukkah veLulav",
+      "Rambam 'Haguiga": "Rambam, Hilchot Chagigah",
+      "Rambam Nezirout": "Rambam, Hilchot Nezirut",
+      "Rambam Me'houssrei Kappara": "Rambam, Hilchot Mechusarei Kapparah",
+      "Rambam Melakhim": "Rambam, Hilchot Melachim",
+      "Bartenura sur Kelim": "Bartenura on Kelim",
+      "Bartenura sur Bikkourim": "Bartenura on Bikkurim",
+      "Bartenura sur Pesachim": "Bartenura on Pesachim",
+      "Bartenura sur Mena'hot": "Bartenura on Menachot",
+      "Esther": "Esther"
     }
   }
 }

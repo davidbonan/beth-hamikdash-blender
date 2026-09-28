@@ -169,6 +169,11 @@ const TROUPES = {
   figures_tamid: { glb: "./figures_tamid.glb", json: "./figures_tamid.json" },
   figures_kippour: { glb: "./figures_kippour.glb", json: "./figures_kippour.json" },
   figures_shoeva: { glb: "./figures_shoeva.glb", json: "./figures_shoeva.json" },
+  figures_pessah: { glb: "./figures_pessah.glb", json: "./figures_pessah.json" },
+  figures_bikkourim: { glb: "./figures_bikkourim.glb", json: "./figures_bikkourim.json" },
+  figures_souccot: { glb: "./figures_souccot.glb", json: "./figures_souccot.json" },
+  figures_hakhel: { glb: "./figures_hakhel.glb", json: "./figures_hakhel.json" },
+  figures_nazir: { glb: "./figures_nazir.glb", json: "./figures_nazir.json" },
 };
 const TROUPE_LIBRE = "figures";
 const [reperes, { cadrages: CADRAGES_DU_PLAN }, haltesCinema, { parcours: PARCOURS }, ...distributions] =
