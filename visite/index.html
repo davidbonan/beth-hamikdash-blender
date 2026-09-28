@@ -561,18 +561,6 @@
   #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%); }
   #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%); }
   #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%); }
-  /* La barre a la longueur qu'elle dit, sur le disque juste au-dessus : la carte est à l'échelle du Temple. */
-  #minicarte .echelle {
-    display: flex; flex-direction: column; align-items: center; gap: 3px; margin: 6px 0 0; padding: 5px 0 4px;
-    pointer-events: none; font-size: 11px; line-height: 1.2; color: #f3efe6; font-variant-numeric: tabular-nums;
-    border: 1px solid rgba(203,192,170,.35); border-radius: 6px;
-    background: rgba(13,12,11,.55); backdrop-filter: blur(3px);
-  }
-  #minicarte .echelle i { display: block; height: 5px; border: 1.5px solid #f3efe6; border-top: 0; }
-  #minicarte .echelle p { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 5px; margin: 0; }
-  #minicarte .echelle span { white-space: nowrap; }
-  #minicarte .echelle .amot { font-weight: 600; }
-  #minicarte .echelle .metres { color: #cbc0aa; }
   #plan {
     position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
     padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))
@@ -593,6 +581,19 @@
   #plan button:active { transform: scale(.96); }
   #plan .fermer { width: 34px; padding: 0; font-size: 18px; }
   #plan svg { flex: 1; min-height: 0; width: 100%; }
+  /* La barre a la longueur qu'elle dit, au pixel près du plan affiché : il est à l'échelle du Temple. */
+  #plan .echelle {
+    position: absolute; bottom: calc(16px + var(--marge-bas)); left: calc(16px + var(--marge-gauche));
+    display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 10px 4px;
+    pointer-events: none; font-size: 12px; line-height: 1.2; color: #f3efe6; font-variant-numeric: tabular-nums;
+    border: 1px solid rgba(203,192,170,.35); border-radius: 6px;
+    background: rgba(13,12,11,.7); backdrop-filter: blur(3px);
+  }
+  #plan .echelle i { display: block; height: 5px; border: 1.5px solid #f3efe6; border-top: 0; }
+  #plan .echelle p { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 5px; margin: 0; }
+  #plan .echelle span { white-space: nowrap; }
+  #plan .echelle .amot { font-weight: 600; }
+  #plan .echelle .metres { color: #cbc0aa; }
   image.dessous { opacity: .3; filter: grayscale(1); }
   /* L'image dit le lieu : la zone qui se touche reste invisible jusqu'au survol. */
   .lieux rect { fill: transparent; stroke: transparent; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
@@ -754,7 +755,6 @@
 
 <div id="minicarte">
 <button class="disque" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg><span class="rose" aria-hidden="true"><span class="nord" data-texte="nord">N</span><span class="sud" data-texte="sud">S</span><span class="est" data-texte="est">E</span><span class="ouest" data-texte="ouest">O</span></span></button>
-<div class="echelle"><i></i><p><span class="amot"></span><span class="metres"></span></p></div>
 </div>
 
 <div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>
@@ -764,6 +764,7 @@
     <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
   </div>
   <svg></svg>
+  <div class="echelle"><i></i><p><span class="amot"></span><span class="metres"></span></p></div>
 </div>
 
 <div id="manche"><i></i></div>

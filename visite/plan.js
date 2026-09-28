@@ -8,7 +8,7 @@ const LONGUEUR_VISITEUR = 18;  // px, la flèche du plan entier
 const HAUTEUR_ETAGE = 10;      // mètres : un lieu qui commence plus haut est à l'étage
 const PART_MINI = 0.5;         // du plus petit côté de la zone, ce que la minicarte montre autour du visiteur
 const FENETRE_MINI_MIN = 28;   // mètres
-const PART_ECHELLE = 0.4;      // de la largeur de la minicarte, ce que sa barre d'échelle couvre au plus
+const PART_ECHELLE = 0.25;     // de la largeur du cadrage, ce que la barre d'échelle du plan couvre au plus
 const LONGUEURS_ECHELLE = [100, 50, 25, 20, 10, 5]; // amot
 const FLECHE = "M 1 0 L -0.6 0.65 L -0.3 0 L -0.6 -0.65 Z";
 
@@ -31,14 +31,13 @@ export const lieuxSouterrains = (cadrages) => new Set(cadrages.filter((c) => c.c
 
 export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerLieu, allerEntree }) {
   const bouton = document.querySelector("#minicarte .disque");
-  const echelleMini = document.querySelector("#minicarte .echelle");
   const fenetre = document.querySelector("#plan");
   const mini = bouton.querySelector("svg");
   const entier = fenetre.querySelector("svg");
   const choix = fenetre.querySelector(".cadrages");
+  const barre = fenetre.querySelector(".echelle");
   let ici = cadrages[0];
   let pose = null;
-  let coteMini = null;
 
   const souterrains = lieuxSouterrains(cadrages);
   // Du plus petit au plus grand : le premier cadrage de plein air qui contient le visiteur est le plus détaillé.
@@ -156,15 +155,19 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
     dessinerPlan(cadrage);
     for (const b of choix.children) b.setAttribute("aria-pressed", String(b.dataset.cadrage === cadrage.id));
     etiqueter();
+    graduer();
   }
 
-  // La plus longue barre ronde en amot qui tienne, dite aussi en mètres : la carte est à l'échelle du Temple.
+  // La plus longue barre ronde en amot qui tienne, dite aussi en mètres : le plan est à l'échelle du Temple.
   function graduer() {
-    const amot = LONGUEURS_ECHELLE.find((l) => l * ama <= PART_ECHELLE * coteMini) ?? LONGUEURS_ECHELLE.at(-1);
+    const echelle = echelleDuPlan();
+    if (!echelle) return;
+    const cadrage = cadrages.find((c) => c.id === entier.dataset.cadrage);
+    const amot = LONGUEURS_ECHELLE.find((l) => l * ama <= PART_ECHELLE * largeurDe(cadrage)) ?? LONGUEURS_ECHELLE.at(-1);
     const metres = new Intl.NumberFormat(langue(), { maximumFractionDigits: 1 }).format(amot * ama);
-    echelleMini.querySelector("i").style.width = `${(100 * amot * ama / coteMini).toFixed(2)}%`;
-    echelleMini.querySelector(".amot").textContent = `${amot} ${texte("amot")}`;
-    echelleMini.querySelector(".metres").textContent = `${metres} ${texte("metres")}`;
+    barre.querySelector("i").style.width = `${(amot * ama * echelle).toFixed(1)}px`;
+    barre.querySelector(".amot").textContent = `${amot} ${texte("amot")}`;
+    barre.querySelector(".metres").textContent = `${metres} ${texte("metres")}`;
   }
 
   const ouvert = () => !fenetre.hidden;
@@ -182,8 +185,9 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
   function rafraichir() {
     for (const b of choix.children) b.textContent = nomDeZone(b.dataset.cadrage);
     nommer();
-    if (coteMini) graduer();
-    if (ouvert()) etiqueter();
+    if (!ouvert()) return;
+    etiqueter();
+    graduer();
   }
 
   // La minicarte prend l'image de la zone où l'on se tient, et n'en montre que les abords.
@@ -194,10 +198,6 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
     ici = zone;
     const cote = Math.max(FENETRE_MINI_MIN, PART_MINI * Math.min(largeurDe(zone), hauteurDe(zone)));
     mini.setAttribute("viewBox", `${pose.x - cote / 2} ${pose.z - cote / 2} ${cote} ${cote}`);
-    if (cote !== coteMini) {
-      coteMini = cote;
-      graduer();
-    }
     poser(mini, cote / 15);
     const echelle = ouvert() && echelleDuPlan();
     if (echelle) poser(entier, LONGUEUR_VISITEUR / echelle);
@@ -224,7 +224,11 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
     else allerLieu(lieu.dataset.lieu);
   });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && ouvert()) fermer(); });
-  addEventListener("resize", () => { if (ouvert()) etiqueter(); });
+  addEventListener("resize", () => {
+    if (!ouvert()) return;
+    etiqueter();
+    graduer();
+  });
 
   return { suivre, rafraichir };
 }
