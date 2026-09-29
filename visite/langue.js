@@ -112,12 +112,15 @@ function accueillir() {
   };
 }
 
+// Un lien qui porte `?lang=` a déjà choisi : il passe avant la langue retenue et la remplace.
 export function installerLangue(tous) {
   textes = tous;
-  const retenue = lireRetenu(CLEF);
-  const connue = retenue !== null && Object.hasOwn(textes, retenue);
-  courante = connue ? retenue : langueDuNavigateur();
+  const connue = (code) => code !== null && Object.hasOwn(textes, code);
+  const demandee = new URLSearchParams(location.search).get("lang");
+  if (connue(demandee)) retenir(CLEF, demandee);
+  const choisie = [demandee, lireRetenu(CLEF)].find(connue);
+  courante = choisie ?? langueDuNavigateur();
   traduirePage();
   brancherSelecteur();
-  if (connue) signalerChoix(); else accueillir();
+  if (choisie) signalerChoix(); else accueillir();
 }

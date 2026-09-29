@@ -180,6 +180,8 @@ const [reperes, { cadrages: CADRAGES_DU_PLAN }, haltesCinema, { parcours: PARCOU
   await Promise.all([json("./reperes.json"), json("./plan.json"), CINEMA ? json("./cinema.json") : null,
     json("./parcours.json"), ...Object.values(TROUPES).map((t) => json(t.json))]);
 const figurants = Object.fromEntries(Object.keys(TROUPES).map((nom, i) => [nom, distributions[i]]));
+// Ce que la scène du Temple cadre d'elle-même, avant que les troupes n'y ajoutent leurs figurants.
+const REPERES_DU_TEMPLE = new Set([...Object.keys(reperes.emprises), ...reperes.entrees.map((e) => e.id), ...reperes.vues.map((v) => v.id)]);
 // Un concept joué par plusieurs troupes — les Léviim, douze au tamid, deux en visite libre — prend la boîte de toutes.
 const unirBoites = (a, b) => (a ? {
   min: a.min.map((v, k) => Math.min(v, b.min[k])),
@@ -1380,12 +1382,10 @@ await accorderLangue(langue());
 // ---------------------------------------------------------------------------
 // boucle
 // ---------------------------------------------------------------------------
-const demande = new URLSearchParams(location.search).get("vue");
 // La visite s'ouvre au-delà du Soreg, dans l'axe de la porte orientale : le 'Heil et
 // la porte de l'Ezrat Nashim se franchissent à pied, avant tout le reste.
 const depart = reperes.entrees.find((e) => e.id === "face_porte_est") || reperes.entrees[0];
 prendreVue(depart);
-if (demande) allerVers(demande);
 
 const horloge = new THREE.Clock();
 let image = 0;
@@ -1513,6 +1513,22 @@ choixParcours.onchange = () => {
   guides.ouvrir(id);
 };
 
+// Un figurant n'est dans la scène qu'avec sa troupe, à l'heure de son service : on le montre à la station qui l'appelle.
+function stationQuiMontre(id) {
+  const stations = PARCOURS.flatMap((p) => p.stations.map((station, rang) => ({ parcours: p.id, rang, station })));
+  return stations.find(({ station }) => station.concept === id)
+    ?? stations.find(({ station }) => station.figurants?.some((nom) => nom.replace(/_\d+$/, "") === id));
+}
+
+function montrerDemande(id) {
+  const trouvee = !REPERES_DU_TEMPLE.has(id) && stationQuiMontre(id);
+  if (!trouvee) return allerVers(id);
+  aide.classList.add("parti");
+  guides.ouvrir(trouvee.parcours, trouvee.rang);
+}
+const demande = new URLSearchParams(location.search).get("vue");
+if (demande) montrerDemande(demande);
+
 renderer.setAnimationLoop(() => {
   if (enReprise) return;
   const dt = Math.min(horloge.getDelta(), 0.1);
@@ -1593,7 +1609,8 @@ if (CINEMA) {
   dessiner(0);
   parent.postMessage({ type: "cinema", pret: true }, location.origin);
   window.__cinema = { ...film, figer: () => renderer.setAnimationLoop(null) };
-} else if (!initiationSuivie()) {
+} else if (!initiationSuivie() && !guides.ouvert()) {
+  // Ouverte sur une station, la carte du parcours tient la place de celle de l'initiation : elle attendra une autre visite.
   aide.classList.add("parti");
   // Le voile du chargement finit de se lever avant qu'on s'adresse au visiteur.
   langueChoisie.then(() => setTimeout(commencerInitiation, 700));
@@ -1602,6 +1619,7 @@ if (CINEMA) {
 // Points d'accroche de la vérification headless (cdp.py) : sans eux, impossible de
 // savoir depuis un terminal si la page a fini de charger ni ce qu'elle montre.
 window.__vue = (id) => { allerVers(id); dessiner(0); };
+window.__demande = montrerDemande;
 window.__vues = () => [...reperes.entrees, ...reperes.vues].map((v) => v.id);
 window.__cam = (x, y, z, cx, cy, cz) => {
   camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); piedsY = y - OEIL;

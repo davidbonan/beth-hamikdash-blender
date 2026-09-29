@@ -12,6 +12,8 @@ Un seul dépôt : Netlify déploie `main` à chaque push, en ~3 minutes.
 | `site/` | l'accueil (fr, en, he), robots, sitemap, favicon, feuille de style, `accueil.js`. Les trois `index.html` sont **générés** par `python3 site/accueil.py` depuis ses textes : modifier le script, pas les pages |
 | `site/images/` | l'affiche (`affiche_*.webp`), l'image de partage (`partage.jpg`) et les huit images des degrés (`<degré>_1000` et `_2000.webp`), voir « L'accueil, une montée en images » |
 | `visite/` | la visite, servie à `/visite/` ; `?cinema` la fait marcher seule (plus utilisé par l'accueil) |
+| `site/fiches.mjs` | une page par fiche et par langue (`/fiche/<id>/`, `/en/…`, `/he/…`) et `sitemap-fiches.xml`, **générées au build** dans `dist/`, jamais commitées ; style `site/fiche.css` |
+| `site/images/fiches/` | l'image de chaque fiche, 1200 × 630, page et `og:image` — voir « Les images des fiches » |
 | `construire_site.sh` | assemble `dist/` = `site/` + `visite/` filtrée ; c'est la commande de build Netlify |
 | `netlify.toml` | dossier publié, redirection `www`, cache des assets |
 
@@ -96,6 +98,21 @@ boucle de la page (`window.__cinema.figer()`) et avance lui-même (`__cinema.ava
 sous SwiftShader la scène met des secondes par image, et une boucle laissée libre
 dérive le temps du parcours pendant la capture. Le temps 1.5 est la première image
 après le fondu d'ouverture ; 48, les quinze marches devant Nikanor.
+
+## Les images des fiches
+
+Chaque page de fiche montre la vue que son « Voir dans la visite » ouvre : `/visite/?vue=<id>&lang=<code>`.
+`?vue=` cadre un repère du Temple ; un concept qui n'en est pas un — un figurant, un rite, un
+vêtement — ouvre la première station de parcours qui le montre (`concept`, sinon `figurants`),
+avec sa troupe et son heure. Les images se refont quand la scène, un cadrage ou une station change :
+
+```bash
+cd "$TMPDIR" && npm i playwright-core                     # une fois par dossier jetable
+node <dépôt>/.claude/skills/publier/images_fiches.mjs http://127.0.0.1:<port>/visite/ <dépôt>/site/images/fiches [--seulement id,id]
+```
+
+Sous Metal, environ cinq minutes pour les 158. Une fiche sans image garde `partage.jpg`, et
+`site/fiches.mjs` le dit au build (`sans image : <id>`).
 
 ## Vérifier que c'est en ligne
 

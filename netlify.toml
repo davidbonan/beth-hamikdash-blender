@@ -2,6 +2,10 @@
   command = "./construire_site.sh"
   publish = "dist"
 
+# site/fiches.mjs importe visite/sefaria.js, un module sans package.json : Node le reconnaît seul depuis la 22.
+[build.environment]
+  NODE_VERSION = "22"
+
 [[redirects]]
   from = "https://www.bethhamikdach.com/*"
   to = "https://bethhamikdach.com/:splat"

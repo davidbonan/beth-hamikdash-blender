@@ -1,0 +1,28 @@
+html { scroll-snap-type: none; }
+.fiche { max-width: 46em; margin: 0 auto; padding: 0 var(--marge) calc(56px + env(safe-area-inset-bottom, 0px)); }
+.fiche .barre { justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; }
+.fiche .barre .maison { padding-inline: 0; opacity: .9; font-family: "Marcellus", serif; letter-spacing: .04em; }
+.fiche .barre .maison bdi[lang="he"] { font-family: "Frank Ruhl Libre", serif; }
+.fiche article { padding-top: clamp(28px, 6vh, 64px); }
+.fiche .zone { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--lin-sourd); }
+:root[lang="he"] .fiche .zone { font-size: 14px; letter-spacing: 0; }
+.fiche h1 { margin-top: 8px; font-size: clamp(34px, 6vw, 52px); line-height: 1.08; text-wrap: balance; }
+.fiche .nom-he { margin-top: 6px; font-size: clamp(24px, 3.4vw, 32px); color: var(--or); text-align: left; }
+.fiche .translit { margin-top: 2px; font-style: italic; color: var(--lin-sourd); }
+.fiche .vue { margin: 28px 0 0; }
+.fiche .vue img {
+  width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover;
+  border-radius: 3px; outline: 1px solid var(--trait); outline-offset: -1px; background: #1b1814;
+}
+.fiche .action { margin-top: 22px; }
+.fiche .texte { margin-top: 36px; }
+.fiche .resume { font-size: 19px; line-height: 1.55; }
+.fiche h2 { margin-top: 36px; font-size: 13px; text-transform: uppercase; letter-spacing: .14em; color: var(--or); }
+:root[lang="he"] .fiche h2 { font-size: 17px; letter-spacing: 0; }
+.fiche ul { margin: 12px 0 0; padding: 0; list-style: none; }
+.fiche li { padding: 10px 0; border-top: 1px solid var(--trait); }
+.fiche .sources a { text-decoration-color: var(--or-sourd); text-underline-offset: 3px; }
+.fiche .sources a:hover { text-decoration-color: var(--or); }
+.fiche .sources em { display: block; margin-top: 4px; color: var(--lin-sourd); }
+.fiche .note { margin-top: 36px; padding: 14px 16px; border-inline-start: 2px solid var(--or-sourd); background: rgba(246, 241, 230, .04); }
+.fiche .note b { display: block; margin-bottom: 4px; font-weight: 600; }

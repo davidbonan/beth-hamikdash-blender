@@ -261,6 +261,14 @@
     border: 1px solid var(--trait); border-radius: 4px; background: none; cursor: pointer;
   }
   #fermer:hover { color: var(--encre); border-color: var(--sourd); }
+  #copier {
+    position: absolute; top: 14px; inset-inline-end: 32px; width: 26px; height: 26px; padding: 6px;
+    color: var(--sourd); border: 1px solid transparent; border-radius: 4px; background: none; cursor: pointer;
+    opacity: .7; transition: opacity .15s ease, color .15s ease;
+  }
+  #copier:hover, #copier:focus-visible { opacity: 1; color: var(--encre); border-color: var(--trait); }
+  #copier svg { display: block; width: 100%; height: 100%; }
+  #copier.copie { opacity: 1; color: var(--or); }
   .zone {
     font-size: 11px; text-transform: uppercase; letter-spacing: .13em;
     color: var(--sourd); margin: 0 0 6px;
@@ -715,6 +723,9 @@
   <symbol id="icone-pas" viewBox="0 0 24 24">
     <path d="M7.5 3.5c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4H6.1c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM6.2 13h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4ZM16.5 9c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4h-2.8c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM15.2 18.5h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4Z" fill="currentColor"/>
   </symbol>
+  <symbol id="icone-lien" viewBox="0 0 24 24">
+    <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1.4 1.4M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
   <symbol id="icone-loupe" viewBox="0 0 24 24">
     <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/>
     <path d="m15 15 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -858,7 +869,10 @@
 <div id="voile"><p data-texte="preparation">préparation…</p></div>
 
 <aside id="fiche">
-  <div id="poignee"><button id="fermer" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button></div>
+  <div id="poignee">
+    <button id="copier" type="button" title="Copier le lien de la fiche" aria-label="Copier le lien de la fiche" data-titre="copier_lien"><svg aria-hidden="true"><use href="#icone-lien"></use></svg></button>
+    <button id="fermer" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
+  </div>
   <div id="corps"></div>
 </aside>
 

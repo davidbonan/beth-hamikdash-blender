@@ -185,12 +185,12 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     afficher();
   }
 
-  function ouvrir(id) {
+  function ouvrir(id, rang = 0) {
     guide = liste.find((p) => p.id === id) ?? liste[0];
     stations = guide.stations;
     racine.hidden = false;
     changerDeTroupe(guide.troupe);
-    sauter(0);
+    sauter(rang);
   }
 
   function fermer() {
