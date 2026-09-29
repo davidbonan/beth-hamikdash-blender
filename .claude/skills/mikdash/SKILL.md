@@ -22,8 +22,9 @@ Trois cas à ne jamais confondre :
 1. **Ce que dit la source** — la michna, la guemara, le Rambam.
 2. **Ce que le projet a retenu** — `fiche_technique_beit_hamikdash.md`, qui arbitre
    les divergences pour le film.
-3. **Ce qui est réellement modélisé** — `beit_hamikdash_blockout.py`, la géométrie
-   construite, qui peut avoir pris du retard sur la fiche.
+3. **Ce qui est réellement modélisé** — `blockout/` (un module par zone, lancé par
+   `beit_hamikdash_blockout.py`), la géométrie construite, qui peut avoir pris du retard
+   sur la fiche.
 
 Une réponse utile dit lequel des trois elle décrit. Quand ils divergent, le dire est
 l'information principale.

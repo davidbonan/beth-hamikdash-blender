@@ -28,7 +28,8 @@ from mathutils.bvhtree import BVHTree
 RACINE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RACINE))
 import beit_hamikdash_gestes as G  # noqa: E402
-from beit_hamikdash_figures import Gabarit, Humain, appliquer_visibilite  # noqa: E402
+from figurants.corps import Gabarit, Humain  # noqa: E402
+from figurants.habillage import appliquer_visibilite  # noqa: E402
 
 SORTIE = RACINE / "keruvim.blend"
 AMA = 0.48

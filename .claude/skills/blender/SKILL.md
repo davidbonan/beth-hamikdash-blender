@@ -11,8 +11,8 @@ BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
 
 ## L'invariant : le script est la source, le .blend est l'artefact
 
-`beit_hamikdash_blockout.py` **construit** la scène ; `beit_hamikdash.blend` en est
-la sortie. Toute modification faite à la main dans l'interface de Blender est perdue
+`beit_hamikdash_blockout.py` et son paquet `blockout/` **construisent** la scène ;
+`beit_hamikdash.blend` en est la sortie. Toute modification faite à la main dans l'interface de Blender est perdue
 à la reconstruction suivante. Une correction se porte donc **dans le script**, jamais
 dans le .blend. Même chose pour les caméras, qui vivent dans `cameras.json`.
 
@@ -25,7 +25,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
-| `beit_hamikdash_blockout.py` | construit le Temple, son pays et la foule du jour | rien (mémoire) |
+| `beit_hamikdash_blockout.py` | construit le Temple, son pays et la foule du jour, zone par zone (`blockout/`, voir plus bas) | rien (mémoire) |
 | `beit_hamikdash_cameras.py` | pose les plans déclarés dans `cameras.json` | rien (mémoire) |
 | `beit_hamikdash_export.py` | images clés couleur + profondeur, ou planche de contrôle | `renders/blockout/` ou `renders/planche/`, **et le .blend** |
 | `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
@@ -34,7 +34,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
 | `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
 | `beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
-| `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés, une troupe par parcours (gestes : `beit_hamikdash_gestes.py`) | `visite/figures*.glb`, `visite/figures*.json` |
+| `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés, une troupe par parcours (`figurants/`, voir plus bas ; gestes : `beit_hamikdash_gestes.py`) | `visite/figures*.glb`, `visite/figures*.json` |
 | `beit_hamikdash_seir.py` | le bouc émissaire de Kippour, champ de distance polygonisé comme le bœuf (outillage commun : `beit_hamikdash_champ.py`), que les figures posent à côté du Cohen Gadol | `seir.blend` |
 | `beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `shor.blend` |
 | `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
@@ -44,6 +44,43 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
 seule commande. Ce qui suit sert quand on veut les lancer soi-même.
+
+## Où vit le code du blockout et des figurants
+
+Les deux gros scripts ne sont plus que des points d'entrée ; leur code est dans deux paquets
+à côté d'eux. L'incantation ne change pas : `-P beit_hamikdash_blockout.py`,
+`-P beit_hamikdash_figures.py`.
+
+```
+blockout/
+  primitives/   parametres (AMA, Z_*, FOULE, RACINE, m) · noeuds · pierre · tissage · matieres (MAT_*)
+                volumes (box, cyl, revolution…) · gravures · ouvrages (lishka, shaar, moulure, escalier…)
+  nettoyage · har_habayit · ezrat_nashim · azara · lishkot · heil · modenature_azara
+  mizbeach · sous_l_azara
+  bayit/        oulam · heikhal · kelim · parokhot · parois_d_or · kodesh_hakodashim
+  pays/         calage · herode · place_du_kotel · ville · jerusalem (celui qui bâtit le pays)
+  foule · finitions (dessus foulés, biseau, tailles) · eclairage
+figurants/
+  matieres · etoffes (MPFB) · corps (Gabarit, Humain) · maillage · habillage · ustensiles
+  mise_en_scene (gestes, reperes, Accessoire) · bigdei_kehouna · tenues (levi, fidele)
+  danse · role (Role et les rôles partagés) · betes (seir, par, seh) · animation
+  troupes/      figures · figures_tamid · figures_kippour · … · figures_nazir
+```
+
+- **Un module de zone bâtit à l'import.** `SECTIONS`, dans `beit_hamikdash_blockout.py`,
+  les importe dans l'ordre de construction — c'est lui la table des matières. Une zone
+  nouvelle, c'est un module de plus et une ligne dans `SECTIONS`, à sa place : l'ordre
+  compte, `finitions` biseaute et creuse ce qui existe déjà.
+- **Chaque module importe nommément ce qu'il lit des autres** (`from .azara import AX0, …`).
+  Une cote d'une zone voisine s'importe de la zone qui la pose, jamais ne se recopie.
+- **Les points d'entrée purgent leur paquet de `sys.modules`** avant de l'importer :
+  Blender garde les modules d'un *Run Script* à l'autre, et sans purge le second ne
+  bâtirait rien.
+- Les figurants : une troupe = un module de `figurants/troupes/`, qui porte ses rôles
+  (`roles_kippour()`…) ; la table `TROUPES` et `main()` restent dans
+  `beit_hamikdash_figures.py`. Ce que deux troupes partagent descend dans un module commun
+  (`role`, `mise_en_scene`, `ustensiles`, `betes`), jamais d'une troupe à l'autre — seule
+  `troupes/figures`, la visite libre, reprend ses rôles au tamid.
 
 ## Où atterrissent les sorties
 
@@ -90,7 +127,7 @@ Le plan se nomme comme on veut : `CAM_03_Heikhal`, `3`, `03`, ou `heikhal`.
 
 ## Reconstruire la scène
 
-Après toute modification de `beit_hamikdash_blockout.py`. Compte ~5 s.
+Après toute modification de `blockout/` ou de `beit_hamikdash_blockout.py`. Compte ~5 s.
 
 ```bash
 # vérifier que le script tourne (rien n'est sauvegardé)
@@ -156,7 +193,7 @@ ombré ; c'est lui que le modèle retaille, avec l'esquisse validée du motif qu
 en porte la composition (`ESQUISSES`). Changer un motif, c'est corriger son guide ou
 son prompt (`MOTIFS`), retailler, regarder la tuile, puis recomposer l'atlas et reconstruire.
 
-`FOULE = True` en tête du blockout ajoute les figures de Yom Kippour : le peuple dans
+`FOULE = True` dans `blockout/primitives/parametres.py` ajoute les figures de Yom Kippour : le peuple dans
 l'Ezrat Israël, les cohanim dans l'Ezrat Kohanim, les Léviim et leurs instruments sur
 le Doukhan, les masses de l'Ezrat Nashim et du Har HaBayit. `False` (défaut) ne bâtit
 que l'architecture : 9 178 objets contre 18 913.
@@ -275,8 +312,8 @@ Les trois vêtements se copient seuls dans `data/clothes/`, depuis `suits02/suit
 - **Pas de `bpy.ops` pour créer de la géométrie** dans le blockout : chaque appel
   d'opérateur réévalue le graphe de dépendances, coût quadratique en nombre d'objets.
   Les volumes se posent en `bpy.data` via les helpers `box`, `cyl`, `cone`, `sphere`,
-  `prism`, `tore`, `cyl_between` — s'il manque une forme, écrire un helper de plus,
-  pas un opérateur.
+  `prism`, `tore`, `cyl_between` (`blockout/primitives/volumes.py`) — s'il manque une
+  forme, écrire un helper de plus, pas un opérateur.
 - **1 ama = `AMA` mètres**, et le .blend porte la valeur en propriété de scène
   (`scene["AMA_metres"]`). Les helpers convertissent : **tout se donne en amot**
   dans le script, jamais en mètres.
