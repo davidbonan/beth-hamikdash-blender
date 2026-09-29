@@ -31,6 +31,8 @@ export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE, ROCHE,
                           KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
+// Le dôme éclairant est beige et désaturé : à 1, l'or au soleil n'en reflétait qu'un gris-vert.
+const REFLET_DU_METAL = 1.6;
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping, tenue à jour par visite.js.
@@ -976,6 +978,7 @@ export function habiller(materiau, horloges, jeux) {
                       uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
+  if (famille === METAL || famille === MIKSHE) materiau.envMapIntensity = REFLET_DU_METAL;
   if (famille === BRAISE) {
     materiau.color = new THREE.Color(CHARBON);
     materiau.emissive = new THREE.Color(ORGE);

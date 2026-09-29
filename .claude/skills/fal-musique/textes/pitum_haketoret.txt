@@ -1,0 +1,44 @@
+# Pitum haketoret — Keritot 6a, texte du siddour
+# étiquettes du mp3, puis [nom de section | durée en s | ton du passage]
+
+titre: Pitum Haketoret
+artiste: David Bonan
+source: Pitum haketoret — Keritot 6a
+
+[Verse 1 | 30 | calm storytelling, steady like the daily rhythm of morning and evening]
+תָּנוּ רַבָּנָן פִּטּוּם הַקְּטֹרֶת כֵּיצַד
+שְׁלֹש מֵאוֹת וְשִׁשִּׁים וּשְׁמוֹנָה מָנִים הָיוּ בָהּ
+שְׁלֹש מֵאוֹת וְשִׁשִּׁים וַחֲמִשָּׁה כְּמִנְיַן יְמוֹת הַחַמָּה
+מָנֶה לְכָל יוֹם
+פְּרַס בַּשַּׁחֲרִית וּפְרַס בֵּין הָעַרְבָּיִם
+
+[Verse 2 | 30 | hushed awe at the High Priest and Yom Kippur, delicate careful phrasing on the finely ground incense]
+וּשְׁלשָׁה מָנִים יְתֵרִים
+שֶׁמֵּהֶם מַכְנִיס כֹּהֵן גָּדוֹל מְלֹא חָפְנָיו בְּיוֹם הַכִּפּוּרִים
+וּמַחֲזִירָן לְמַכְתֶּשֶׁת בְּעֶרֶב יוֹם הַכִּפּוּרִים
+וְשׁוֹחֲקָן יָפֶה יָפֶה
+כְּדֵי שֶׁתְּהֵא דַקָּה מִן הַדַּקָּה
+
+[The Eleven Spices | 36 | each spice name sung distinctly like a precious treasure, a small melodic lift on every name, fragrant radiant wonder, weights sung firmly]
+וְאַחַד עָשָׂר סַמָּנִים הָיוּ בָהּ, וְאֵלּוּ הֵן
+הַצֳּרִי וְהַצִּפֹּרֶן הַחֶלְבְּנָה וְהַלְּבוֹנָה
+מִשְׁקַל שִׁבְעִים שִׁבְעִים מָנֶה
+מוֹר וּקְצִיעָה שִׁבֹּלֶת נֵרְדְּ וְכַרְכֹּם
+מִשְׁקַל שִׁשָּׁה עָשָׂר שִׁשָּׁה עָשָׂר מָנֶה
+הַקּשְׁטְ שְׁנֵים עָשָׂר וְקִלּוּפָה שְׁלשָׁה וְקִנָּמוֹן תִּשְׁעָה
+
+[Verse 3 | 24 | flowing practical momentum]
+בֹּרִית כַּרְשִׁינָה תִּשְׁעָה קַבִּין
+יֵין קַפְרִיסִין סְאִין תְּלָתָא וְקַבִּין תְּלָתָא
+וְאִם אֵין לוֹ יֵין קַפְרִיסִין
+מֵבִיא חֲמַר חִוַּרְיָן עַתִּיק
+
+[Bridge | 22.5 | mysterious and airy like rising smoke, Rabbi Natan's words as a respectful aside]
+מֶלַח סְדוֹמִית רֹבַע הַקָּב
+מַעֲלֶה עָשָׁן כָּל שֶׁהוּא
+רַבִּי נָתָן הַבַּבְלִי אוֹמֵר
+אַף כִּפַּת הַיַּרְדֵּן כָּל שֶׁהוּא
+
+[Final | 18.75 | grave and weighty, solemn fear of the law, last words sung slowly and heavily]
+וְאִם נָתַן בָּהּ דְּבַשׁ פְּסָלָהּ
+וְאִם חִסַּר אַחַת מִכָּל סַמָּנֶיהָ חַיָּב מִיתָה

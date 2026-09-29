@@ -343,17 +343,24 @@ const VOILE = {
 const ETALONNAGE = {
   uniforms: { tDiffuse: { value: null }, uTemps: { value: 0 },
               uFroid: { value: new THREE.Color(0.94, 0.97, 1.06) },
-              uChaud: { value: new THREE.Color(1.05, 1.00, 0.94) },
+              uChaud: { value: new THREE.Color(0.99, 1.00, 1.03) },
+              uVibrance: { value: 0.35 }, uContraste: { value: 0.25 },
               uVignette: { value: 0.30 }, uGrain: { value: 0.016 } },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
     uniform vec3 uFroid, uChaud;
-    uniform float uTemps, uVignette, uGrain;
+    uniform float uTemps, uVibrance, uContraste, uVignette, uGrain;
     varying vec2 vUv;
     void main(){
       vec3 c = texture2D(tDiffuse, vUv).rgb;
       float clair = dot(c, vec3(0.2126, 0.7152, 0.0722));
+      // ACES rend le ciel et le bronze gris : la vibrance les relève, et épargne la pierre claire, qu'elle jaunissait.
+      float chroma = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
+      float blancChaud = smoothstep(0.0, 0.08, c.r - c.b) * smoothstep(0.5, 0.75, clair);
+      c = clamp(mix(vec3(clair), c, 1.0 + uVibrance * (1.0 - chroma) * (1.0 - blancChaud)), 0.0, 1.0);
+      c = mix(c, c * c * (3.0 - 2.0 * c), uContraste);
+      clair = dot(c, vec3(0.2126, 0.7152, 0.0722));
       c *= mix(uFroid, uChaud, smoothstep(0.12, 0.88, clair));
 
       vec2 d = vUv - 0.5;
