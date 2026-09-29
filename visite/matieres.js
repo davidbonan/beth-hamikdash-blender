@@ -953,16 +953,32 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 }
 `;
 
-/** Le morceau de three, sa boucle directionnelle encadrée : ce qu'elle ajoute est repris par la pénombre. */
+/**
+ * Le morceau de three, sa boucle directionnelle encadrée : ce qu'elle ajoute est repris par la pénombre.
+ * Sur une matière cuite, l'appoint — la seule directionnelle sans ombre, que three range après le
+ * soleil — s'écarte dans `mAppoint` : sans ombre, il traversait les murs des salles.
+ */
 function soleilEnPenombre() {
   const morceau = THREE.ShaderChunk.lights_fragment_begin;
   const avant = "#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )";
   const apres = "#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )";
-  if (!morceau.includes(avant) || !morceau.includes(apres)) throw new Error("three a changé lights_fragment_begin : pénombre perdue");
-  return morceau
-    .replace(avant, "ReflectedLight avantSoleil = reflectedLight;\n" + avant)
-    .replace(apres, "reflectedLight.directDiffuse = mix(avantSoleil.directDiffuse, reflectedLight.directDiffuse, mPenombre);\n"
-                    + "reflectedLight.directSpecular = mix(avantSoleil.directSpecular, reflectedLight.directSpecular, mPenombre);\n" + apres);
+  const appel = "RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );";
+  const debut = morceau.indexOf(avant), fin = morceau.indexOf(apres);
+  const boucle = morceau.slice(debut, fin);
+  if (debut < 0 || fin < 0 || !boucle.includes(appel)) throw new Error("three a changé lights_fragment_begin : pénombre perdue");
+  const ecartee = boucle.replace(appel, `
+    #if defined( USE_LIGHTMAP ) && ( UNROLLED_LOOP_INDEX >= NUM_DIR_LIGHT_SHADOWS )
+      ${appel.replace("reflectedLight )", "mAppoint )")}
+    #else
+      ${appel}
+    #endif`);
+  return morceau.slice(0, debut)
+    + "ReflectedLight avantSoleil = reflectedLight;\n"
+    + "ReflectedLight mAppoint = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n"
+    + ecartee
+    + "reflectedLight.directDiffuse = mix(avantSoleil.directDiffuse, reflectedLight.directDiffuse, mPenombre);\n"
+    + "reflectedLight.directSpecular = mix(avantSoleil.directSpecular, reflectedLight.directSpecular, mPenombre);\n"
+    + morceau.slice(fin);
 }
 
 /**
@@ -1075,6 +1091,12 @@ export function habiller(materiau, horloges, jeux) {
           float mCiel = dot(cielPlat, LUMA);
           float mRelief = mCiel > 1e-4 ? max(dot(mCielRelief, LUMA), 1e-4) / mCiel : 1.0;
         #endif
+        #ifdef USE_LIGHTMAP
+          // Le rebond du ciel est cuit dans la carte : l'appoint ne garde que la part de ciel qu'elle a reçue, entière dehors, nulle dans une salle.
+          float mPartDuCiel = clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0);
+          reflectedLight.directDiffuse += mAppoint.directDiffuse * mPartDuCiel * mPenombre;
+          reflectedLight.directSpecular += mAppoint.directSpecular * mPartDuCiel * mPenombre;
+        #endif
         #ifdef TEMPERE
           float mTemperance = temperance(dot(reflectedLight.directDiffuse
                                              + mSansDirection * BRDF_Lambert(material.diffuseColor), LUMA));
@@ -1101,7 +1123,7 @@ export function habiller(materiau, horloges, jeux) {
           reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
           // Sous un toit, pierre ou or reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue.
           #ifdef REFLET_DU_CIEL
-            reflectedLight.indirectSpecular *= clamp(dot(lightMapIrradiance, LUMA) / max(mCiel, 1e-4), 0.0, 1.0);
+            reflectedLight.indirectSpecular *= mPartDuCiel;
           #endif
         #endif
         #ifdef TEMPERE

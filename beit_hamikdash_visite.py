@@ -42,7 +42,8 @@ from mathutils import Matrix, Vector
 
 RACINE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(RACINE))
-from beit_hamikdash_occlusion import cuire_occlusion, reglages_de_la_lumiere, retenus, separer_collees  # noqa: E402
+from beit_hamikdash_occlusion import (cuire_occlusion, reglages_de_la_lumiere, reglages_du_concept, retenus,  # noqa: E402
+                                      separer_collees)
 from beit_hamikdash_recuisson import Recuisson, empreinte, verrou  # noqa: E402
 
 DOSSIER = RACINE / "visite"
@@ -355,7 +356,7 @@ def cuire(fusionnes, chantier, lampes):
     separer_collees([obj for _, obj, _ in choisis])
     reglages = reglages_de_la_lumiere(lampes)
     tailles = {ident: taille for ident, _, taille in choisis}
-    empreintes = {ident: empreinte(obj, tailles.get(ident, 0), reglages) for ident, obj in fusionnes.items()}
+    empreintes = {ident: empreinte(obj, tailles.get(ident, 0), reglages_du_concept(ident, reglages)) for ident, obj in fusionnes.items()}
     if recuisson is not None:
         eclaires = recuisson.cibles(fusionnes, empreintes)
         if "--simuler" in sys.argv:

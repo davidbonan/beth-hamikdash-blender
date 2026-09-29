@@ -227,9 +227,12 @@ LAMBRIS_Y = GAZIT_NUS["N"]
 FOND, MONTANT, TRAVERSE, PANNEAU = 0.25, 0.15, 0.22, 0.08    # saillies successives sur le mur
 LAMBRIS_X = [GAZIT_NUS["O"] + (GAZIT_NUS["E"] - GAZIT_NUS["O"]) * k / 4 for k in range(5)]
 LARGEUR_MONTANT = 0.6
-# Traverses : (bas, haut, sculptée). La première passe au-dessus du dossier du Nasi, la
-# deuxième tombe sur le rang de cèdre des murs voisins.
-TRAVERSES = ((Z_AZ, Z_AZ + 1.2, False), (Z_AZ + 7.0, Z_AZ + 9.0, True),
+# Traverses : (bas, haut, sculptée). La plus basse est le dossier du dernier gradin, qui vient
+# s'y adosser ; la première sculptée passe au-dessus du dossier du Nasi, la deuxième tombe sur
+# le rang de cèdre des murs voisins.
+GRADINS_H = (0.9, 1.5, 2.1)
+DOSSIER_DES_JUGES = Z_AZ + GRADINS_H[-1] + 1.2
+TRAVERSES = ((Z_AZ, DOSSIER_DES_JUGES, False), (Z_AZ + 7.0, Z_AZ + 9.0, True),
              (RANGS_CEDRE[0] - 0.5, RANGS_CEDRE[0] + 1.5, True), (Z_AZ + 19.0, Z_AZ + 21.0, True),
              (RANGS_CEDRE[1] - 0.2, GAZIT_PLAFOND, False))
 box("Lishkat_HaGazit_lambris_fond", GAZIT_NUS["O"], GAZIT_NUS["E"], LAMBRIS_Y - FOND, LAMBRIS_Y,
@@ -283,12 +286,18 @@ for k in range(PLAFOND_POUTRES):
 SANHEDRIN_X = (GAZIT_X0 + GAZIT_X1) / 2
 SANHEDRIN_Y = AY1 + T + PETAH_HOL_GAZIT[0] + 0.5
 SANHEDRIN_R0 = 2.2
-GRADINS_H = (0.9, 1.5, 2.1)
-GRADINS_PAS = math.pi / 24
+ARC_PAS = math.pi / 48
 PLAT = 0.12                    # épaisseur des tablettes de marbre
-# L'estrade du Nasi prend les six tronçons du milieu, au niveau du deuxième gradin.
-ESTRADE = range(9, 15)
-DOSSERET = (5.2, 5.4, 3.3)     # mur d'appui derrière le dernier gradin : rayons, hauteur
+NEZ = 0.08                     # ce que la tablette déborde vers le centre
+MARGELLE = 0.6                 # le marbre au bord du dernier gradin, devant le cèdre
+# Le tribunal est bâti dans la salle, pas posé dedans : le dernier gradin court jusqu'aux murs,
+# le dos à la traverse basse du lambris, qui lui sert de dossier. L'estrade du Nasi est ce même
+# dernier gradin, avancé au milieu de l'arc, et on y monte par les deux premiers, resserrés.
+TRIBUNAL_NORD = NU_TRAVERSE
+ESTRADE = (math.radians(45), math.radians(135))
+MARCHES_ESTRADE = ((SANHEDRIN_R0 - 0.5, SANHEDRIN_R0, 0.45), (SANHEDRIN_R0, SANHEDRIN_R0 + 0.5, GRADINS_H[0]),
+                   (SANHEDRIN_R0 + 0.5, SANHEDRIN_R0 + 1.0, GRADINS_H[1]))
+ESTRADE_R0 = SANHEDRIN_R0 + 1.0
 
 
 def gazit_point(r, angle, t=0.0):
@@ -297,40 +306,73 @@ def gazit_point(r, angle, t=0.0):
             SANHEDRIN_Y + r * math.sin(angle) + t * math.cos(angle))
 
 
-def troncon(name, r0, r1, k, z0, z1, mat=None):
-    """Le k-ième tronçon de couronne entre `r0` et `r1` : un quadrilatère, jamais un n-gone concave."""
-    a0, a1 = k * GRADINS_PAS, (k + 1) * GRADINS_PAS
-    prism(name, [gazit_point(r0, a0), gazit_point(r1, a0), gazit_point(r1, a1), gazit_point(r0, a1)],
-          z0, z1, "80_Lishkot", mat)
+def gazit_nu(angle):
+    """Distance du centre de l'arc au nu de la salle dans la direction `angle` : le lambris au nord, la pierre à l'est et à l'ouest."""
+    dx, dy = math.cos(angle), math.sin(angle)
+    portees = [(TRIBUNAL_NORD - SANHEDRIN_Y) / dy] if dy > 1e-9 else []
+    if abs(dx) > 1e-9:
+        portees.append((GAZIT_NUS["E" if dx > 0 else "O"] - SANHEDRIN_X) / dx)
+    return min(portees)
 
 
-def gradin(name, r0, r1, k, h):
+def gazit_angles(a0, a1):
+    """Les angles du secteur au pas de l'arc, et ceux des coins de la salle qui y tombent."""
+    coins = (math.atan2(TRIBUNAL_NORD - SANHEDRIN_Y, GAZIT_NUS[c] - SANHEDRIN_X) for c in "EO")
+    n = max(1, round((a1 - a0) / ARC_PAS))
+    return sorted({a0 + (a1 - a0) * i / n for i in range(n + 1)} | {a for a in coins if a0 < a < a1})
+
+
+def couronne(name, r0, r1, secteur, z0, z1, mat=None):
+    """Le secteur de couronne entre les rayons `r0` et `r1`, d'un seul tenant ; `r1` à None, il
+    court jusqu'aux murs. Posé en tronçons, l'arc cuisait une lumière par tronçon et se lisait en
+    dalles dépareillées."""
+    angles = gazit_angles(*secteur)
+    n = len(angles)
+    dedans = [gazit_point(r0, a) for a in angles]
+    dehors = [gazit_point(gazit_nu(a) if r1 is None else r1, a) for a in angles]
+    verts = [(x, y, z) for z in (z0, z1) for x, y in dedans + dehors]
+    ib, ob, it, ot = 0, n, 2 * n, 3 * n
+    faces = [[ob, ot, it, ib], [ib + n - 1, it + n - 1, ot + n - 1, ob + n - 1]]
+    for i in range(n - 1):
+        j = i + 1
+        faces += [[it + i, ot + i, ot + j, it + j], [ib + j, ob + j, ob + i, ib + i],
+                  [ib + j, ib + i, it + i, it + j], [ob + i, ob + j, ot + j, ot + i]]
+    return mesh_from_pydata(name, verts, faces, "80_Lishkot", mat)
+
+
+def gradin(name, r0, r1, secteur, h):
     """Corps de pierre et tablette de marbre, dont le nez déborde vers le centre."""
-    troncon(f"{name}_corps", r0, r1, k, Z_AZ, Z_AZ + h - PLAT)
-    troncon(f"{name}_tablette", r0 - 0.08, r1, k, Z_AZ + h - PLAT, Z_AZ + h, MAT_MARBRE())
+    couronne(f"{name}_corps", r0, r1, secteur, Z_AZ, Z_AZ + h - PLAT)
+    couronne(f"{name}_tablette", r0 - NEZ, r1, secteur, Z_AZ + h - PLAT, Z_AZ + h, MAT_MARBRE())
 
 
-for k in range(24):
-    if k in ESTRADE:
-        gradin(f"Lishkat_HaGazit_estrade_{k:02d}", SANHEDRIN_R0, DOSSERET[0], k, GRADINS_H[1])
-        for marche, (r0, h) in enumerate(((SANHEDRIN_R0 - 0.8, 0.5), (SANHEDRIN_R0 - 0.4, 1.0))):
-            gradin(f"Lishkat_HaGazit_estrade_{k:02d}_marche_{marche}", r0, r0 + 0.4, k, h)
-    else:
-        for rang, h in enumerate(GRADINS_H):
-            gradin(f"Lishkat_HaGazit_sanhedrin_{rang}_{k:02d}", SANHEDRIN_R0 + rang,
-                   SANHEDRIN_R0 + rang + 1, k, h)
-    troncon(f"Lishkat_HaGazit_dosseret_{k:02d}", DOSSERET[0], DOSSERET[1], k,
-            Z_AZ + GRADINS_H[2], Z_AZ + DOSSERET[2])
-    troncon(f"Lishkat_HaGazit_dosseret_{k:02d}_chaperon", DOSSERET[0] - 0.05, DOSSERET[1] + 0.05, k,
-            Z_AZ + DOSSERET[2], Z_AZ + DOSSERET[2] + 0.15, MAT_MARBRE())
-# Les pointes de l'arc se ferment sur des joues de marbre, qui suivent les gradins en escalier.
+def plateau(name, r0, secteur, h):
+    """Le dernier gradin, jusqu'aux murs : le marbre n'en borde que le nez, et derrière lui le
+    plancher de cèdre de la salle remonte à ce niveau — tout de marbre, il se lisait en scène."""
+    couronne(f"{name}_corps", r0, None, secteur, Z_AZ, Z_AZ + h - PLAT)
+    couronne(f"{name}_tablette", r0 - NEZ, r0 + MARGELLE, secteur, Z_AZ + h - PLAT, Z_AZ + h, MAT_MARBRE())
+    couronne(f"{name}_plancher", r0 + MARGELLE, None, secteur, Z_AZ + h - PLAT, Z_AZ + h, MAT_CEDRE_LAMBRIS())
+
+
+RAYONS = [SANHEDRIN_R0 + rang for rang in range(len(GRADINS_H))]
+for cote, secteur in (("E", (0.0, ESTRADE[0])), ("O", (ESTRADE[1], math.pi))):
+    for rang, h in enumerate(GRADINS_H[:-1]):
+        gradin(f"Lishkat_HaGazit_sanhedrin_{rang}_{cote}", RAYONS[rang], RAYONS[rang + 1], secteur, h)
+    plateau(f"Lishkat_HaGazit_sanhedrin_{len(RAYONS) - 1}_{cote}", RAYONS[-1], secteur, GRADINS_H[-1])
+plateau("Lishkat_HaGazit_estrade", ESTRADE_R0, ESTRADE, GRADINS_H[-1])
+for marche, (r0, r1, h) in enumerate(MARCHES_ESTRADE):
+    gradin(f"Lishkat_HaGazit_estrade_marche_{marche}", r0, r1, ESTRADE, h)
+# Les pointes de l'arc se ferment sur des joues de pierre chaperonnées de marbre, qui suivent
+# les gradins en escalier jusqu'au mur.
 for cote, angle in (("E", 0.0), ("O", math.pi)):
-    marches = [(SANHEDRIN_R0 - 0.15 + 0.15 * rang, SANHEDRIN_R0 + rang + 1, h + 0.3)
-               for rang, h in enumerate(GRADINS_H)] + [(DOSSERET[0], DOSSERET[1] + 0.1, DOSSERET[2] + 0.45)]
+    marches = [(RAYONS[rang] - 0.15 * (rang == 0), RAYONS[rang + 1] if rang + 1 < len(RAYONS) else gazit_nu(angle),
+                h + 0.3) for rang, h in enumerate(GRADINS_H)]
     for rang, (r0, r1, h) in enumerate(marches):
         (xa, _), (xb, _) = gazit_point(r0, angle), gazit_point(r1, angle)
-        box(f"Lishkat_HaGazit_joue_{cote}_{rang}", min(xa, xb), max(xa, xb), SANHEDRIN_Y - 0.25, SANHEDRIN_Y,
-            Z_AZ, Z_AZ + h, "80_Lishkot", MAT_MARBRE())
+        nom = f"Lishkat_HaGazit_joue_{cote}_{rang}"
+        box(nom, min(xa, xb), max(xa, xb), SANHEDRIN_Y - 0.25, SANHEDRIN_Y, Z_AZ, Z_AZ + h - PLAT, "80_Lishkot")
+        box(f"{nom}_chaperon", min(xa, xb), max(xa, xb), SANHEDRIN_Y - 0.25, SANHEDRIN_Y, Z_AZ + h - PLAT, Z_AZ + h,
+            "80_Lishkot", MAT_MARBRE())
 # « כַּחֲצִי גֹרֶן עֲגֻלָּה » : l'aire que l'arc enferme, marquée sur le cèdre d'un demi-disque de marbre
 # cerclé de bronze, là où se tiennent les parties devant le tribunal. CHOIX.
 GOREN_R = SANHEDRIN_R0 - 0.9
@@ -394,12 +436,13 @@ def kisse(name, angle, siege):
 
 # « הַנָּשִׂיא יוֹשֵׁב בָּאֶמְצַע וּזְקֵנִים יוֹשְׁבִים מִימִינוֹ וּשְׂמֹאלוֹ » (Tosefta Sanhedrin 8:1) : le Nasi
 # sur l'estrade, son siège plaqué d'or comme celui de Shlomo, « וַיְצַפֵּהוּ זָהָב מוּפָז » (Melakhim I
-# 10:18). L'Av Beit Din « יוֹשֵׁב מִימִינוֹ » (Rambam, Sanhedrin 1:3), au même niveau, sur le
-# deuxième gradin, le même siège en marbre. Le Nasi regarde le sud : sa droite est à
-# l'ouest, l'angle qui croît. Estrade, formes et matières : CHOIX.
-kisse("Lishkat_HaGazit_kisse_nasi", math.pi / 2, Siege(3.3, 0.85, Z_AZ + GRADINS_H[1], 4.6, MAT_OR_PLAQUE()))
-kisse("Lishkat_HaGazit_kisse_av_beit_din", math.radians(127),
-      Siege(SANHEDRIN_R0 + 0.95, 0.7, Z_AZ + GRADINS_H[1], 3.4, MAT_MARBRE()))
+# 10:18). L'Av Beit Din « יוֹשֵׁב מִימִינוֹ » (Rambam, Sanhedrin 1:3), au même niveau, sur
+# l'estrade, le même siège en marbre. Le Nasi regarde le sud : sa droite est à l'ouest,
+# l'angle qui croît. Les deux dossiers à un dixième d'ama du lambris. Estrade, formes et matières : CHOIX.
+SIEGE_R = gazit_nu(math.pi / 2) - 1.5
+kisse("Lishkat_HaGazit_kisse_nasi", math.pi / 2, Siege(SIEGE_R, 0.85, Z_AZ + GRADINS_H[-1], 4.6, MAT_OR_PLAQUE()))
+kisse("Lishkat_HaGazit_kisse_av_beit_din", math.radians(122),
+      Siege(SIEGE_R, 0.7, Z_AZ + GRADINS_H[-1], 3.4, MAT_MARBRE()))
 
 # « וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל » (Sanhedrin 4:3) :
 # debout, donc un pupitre chacun, au pied des deux pointes de l'arc. Pupitre tourné : CHOIX.

@@ -20,7 +20,8 @@ AIRE_MIN = 50.0
 TEXELS_PAR_FACE_MIN = 10
 TEXEL = 0.2
 # Une masse de chaux blanche sans joint ne cache aucun texel : à 20 cm, le Mizbea'h se lisait en pixels.
-TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03}
+# Une salle se voit à un mètre : à 20 cm, les gradins de la Lishkat HaGazit n'avaient que deux texels par marche.
+TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03, "lishkat_hagazit": 0.08}
 # Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
 MALGRE_AIRE = {"yessod"}
 TAILLE = (128, 2048)
@@ -59,6 +60,8 @@ ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
 ECHANTILLONS_REBONDS = 1024
 # L'adaptatif s'arrête au bruit, pas au plafond : à 0.02 l'Ezrat Nashim cuit deux fois plus vite pour 1,7 niveau sRGB d'écart.
 SEUIL_REBONDS = 0.02
+# Une salle qui ne voit le jour que par ses portes garde à 0.02 un grain que le débruitage étale en rouille sur le cèdre.
+SEUIL_DE = {"lishkat_hagazit": 0.005}
 TOUS = "tout"
 # Un rayon réfléchi par l'or vers la pierre tombe rarement, et fort : sans borne il laisse des étincelles dans la carte.
 BORNE_INDIRECTE = 4.0
@@ -480,12 +483,12 @@ def cuire_occlusion_de(obj, taille, portee):
 
 
 # La passe Diffuse sans couleur rend E/π, et la lightMap de three attend l'irradiance E.
-def cuire_lumiere_de(obj, taille, sources):
+def cuire_lumiere_de(obj, taille, sources, seuil):
     """Le ciel qui arrive sans rebond, et tout ce qui rebondit, sources comprises ; leur lumière directe reste à la visite."""
     scene = bpy.context.scene
     seuil_scene = scene.cycles.adaptive_threshold
     scene.cycles.samples = ECHANTILLONS_REBONDS
-    scene.cycles.adaptive_threshold = SEUIL_REBONDS
+    scene.cycles.adaptive_threshold = seuil
     image = bpy.data.images.new(obj.name, taille, taille, float_buffer=True, is_data=True)
     for source in sources:
         source.hide_render = False
@@ -580,6 +583,11 @@ def reglages_de_la_lumiere(lampes):
                  SEUIL_REBONDS, BORNE_INDIRECTE, lampes))
 
 
+def reglages_du_concept(ident, reglages):
+    """Les réglages de toutes les cartes, et ce que le concept a en propre : le changer ne recuit que lui."""
+    return f"{reglages} seuil={SEUIL_DE[ident]}" if ident in SEUIL_DE else reglages
+
+
 def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardees=None):
     """Cuit les concepts de `retenus`, faces collées séparées, dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
@@ -605,7 +613,7 @@ def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardee
             depart = time.time()
             if ident in eclaires:
                 chemin = sortie_lumiere / f"{ident}.webp"
-                echelle = ecrire_lumiere(cuire_lumiere_de(obj, 2 * taille, sources), chemin, pathlib.Path(brut))
+                echelle = ecrire_lumiere(cuire_lumiere_de(obj, 2 * taille, sources, SEUIL_DE.get(ident, SEUIL_REBONDS)), chemin, pathlib.Path(brut))
                 lumieres[ident] = {"carte": f"lumiere/{ident}.webp", "canal": canal, "echelle": echelle,
                                    "secondes": round(time.time() - depart)}
                 print(f"  lumière   {ident:26s} {taille:5d} px  ×{echelle:.2f}  {chemin.stat().st_size / 1e3:5.0f} ko  {time.time() - depart:4.0f} s", flush=True)
