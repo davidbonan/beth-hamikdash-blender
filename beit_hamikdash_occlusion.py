@@ -42,14 +42,14 @@ PAS_MAX = 128
 
 # Le soleil de visite/visite.js et le ciel vu de visite/ciel.js, en repère Blender : (x, y, z) three = (x, z, -y).
 SOLEIL = Vector((150.0, -55.0, 58.0)).normalized()
-SOLEIL_COULEUR = 0xFFD6A0
+SOLEIL_COULEUR = 0xFFE6C8
 SOLEIL_FORCE = 4.9
 DIAMETRE_SOLEIL = 0.0093
-CIEL = {"haut": 0x4D7FB8, "bas": 0xD8DCD4, "sol": 0xA89C86, "horizon": 6.0}
+CIEL = {"haut": 0x2F5FA6, "bas": 0xA8C6E6, "sol": 0xA89C86, "horizon": 6.0}
 # Ciel clair, soleil à 20° : le ciel pose au sol de l'ordre du tiers de ce qu'y pose le soleil. Le dôme vu, lui, est réglé pour l'écran.
 DIFFUS = 0.33
 # Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
-SATURATION_CIEL = 0.5
+SATURATION_CIEL = 0.27
 # La Menora, l'Arche et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
 LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 150.0, "hauteur": 0.35},
           "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},

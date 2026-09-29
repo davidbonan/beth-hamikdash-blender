@@ -55,7 +55,7 @@ const AIR = { densite: 4e-3, epaisseur: 110, effacement: [3800, 5600], pres: 150
               froid: [0.90, 0.94, 1.06], chaud: [1.20, 1.08, 0.92] };
 
 const HALO_DU_SOLEIL = [1.00, 0.84, 0.58];
-const VU = { haut: 0x4d7fb8, bas: 0xd8dcd4, sol: 0xa89c86, ambiance: 1.0,
+const VU = { haut: 0x2f5fa6, bas: 0xa8c6e6, sol: 0xa89c86, ambiance: 1.0,
              soleil: 2.2, etendue: 7e-5, horizon: 6.0, halo: HALO_DU_SOLEIL, etoiles: 0 };
 // Le dôme ÉCLAIRANT tient trois réglages que la scène ne sait pas calculer seule.
 //

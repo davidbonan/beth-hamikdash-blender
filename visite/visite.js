@@ -244,7 +244,7 @@ const AIR_DEHORS = brume.density;
 // Avant l'aube, sans lune, et à l'aube, sans soleil, l'astre n'est plus que la lueur de l'est.
 // `feu` : le feu de l'autel, qui brûle toute la nuit (Vayikra 6:2) et que le jour noie.
 const ECLAIRAGES = {
-  jour: { astre: { couleur: 0xffd6a0, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false },
+  jour: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false },
   nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true },
   fin_de_nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true },
   avant_l_aube: { astre: { couleur: 0xa9bde0, intensite: 0 }, appoint: 0, ciel: 0.05, cuite: 0.12, shoeva: false, feu: true },
