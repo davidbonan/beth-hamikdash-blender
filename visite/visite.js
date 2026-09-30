@@ -288,7 +288,8 @@ const FOV_VERTICAL = [50, 80];
 const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 6000);
 // La lampe de tête, là seulement où la lumière cuite laisse noir ; l'emprise du Heikhal couvre aussi ses cellules.
 const LAMPE_TETE = 6;
-const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5, taim: LAMPE_TETE,
+// HaKelim, fermée, ne voit le jour que par la baie du don : on n'y entre qu'en vol libre.
+const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5, taim: LAMPE_TETE, lishkat_hakelim: LAMPE_TETE,
   ...Object.fromEntries([...lieuxSouterrains(CADRAGES_DU_PLAN)].map((lieu) => [lieu, LAMPE_TETE])) };
 const lampe = new THREE.PointLight(0xffe9c4, 0, 26, 1.7);
 camera.add(lampe);

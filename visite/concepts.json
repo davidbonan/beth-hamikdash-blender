@@ -216,7 +216,8 @@
       "zone": "ezrat_nashim",
       "prefixes": [
         "Lishkat_HaKelim"
-      ]
+      ],
+      "lieu": true
     },
     {
       "id": "lishkat_chashaim",
