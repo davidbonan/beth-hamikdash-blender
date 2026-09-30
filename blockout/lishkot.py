@@ -2,13 +2,13 @@ import bpy
 import math
 from typing import NamedTuple
 
-from .primitives.parametres import TEFAH, Z_AZ, Z_EZI, Z_EZN
+from .primitives.parametres import TEFAH, Z_AZ, Z_EZI, Z_EZN, m
 from .primitives.pierre import ASSISE
 from .primitives.matieres import (MAT_AVNET, MAT_BRONZE, MAT_CEDRE, MAT_CEDRE_LAMBRIS, MAT_CHAUX, MAT_CHENE,
                                   MAT_EAU, MAT_FER, MAT_KETORET, MAT_KLAF, MAT_LAINE, MAT_LECHEM, MAT_LIN,
                                   MAT_MARBRE, MAT_OR, MAT_OR_PLAQUE, MAT_PEAU, MAT_SEL, MAT_SOL, MAT_SOLET,
                                   MAT_TERRE_CUITE, MAT_TEVEN, braise)
-from .primitives.volumes import (alea, box, cone, cyl, cyl_between, graver, mesh_from_pydata,
+from .primitives.volumes import (alea, box, cone, cyl, cyl_between, empty, graver, lampe, mesh_from_pydata,
                                  ner_sur_tablette, plaque, prism, revolution, sphere, tore)
 from .primitives.gravures import petur_tzitz
 from .primitives.ouvrages import (ECART_LISHKA, LISHKA_CORNICHE, LISHKA_DEBORD, LISHKA_PAREMENT, MESIBA_PORTE,
@@ -179,16 +179,6 @@ box("Beit_HaMoked_rashei_pispasin", MK_X0 + KITON_L + CLOISON, MK_X1 - KITON_L -
 # degrés descendent dans les cinq amot qui la séparent de Sha'ar HaNitzotz. CHOIX,
 # comme sa cote.
 PETAH_HOL_GAZIT = (4, 8)
-lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot",
-       [Porte("S", *PORTE_SHAAR, Z_AZ),
-        Porte("E", *PETAH_HOL_GAZIT, Z_AZ, centre=AY1 + T + PETAH_HOL_GAZIT[0] / 2)])
-maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
-box("Lishkat_HaGazit_sol_hol", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT, AY1 + T,
-    NORD_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL())
-# « וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל » est dit du Beit HaMoked (Middot 1:6) ; la même
-# limite tracée ici, sur l'axe du mur, est une analogie : CHOIX.
-box("Lishkat_HaGazit_rashei_pispasin", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT,
-    AXE_MUR_N - 0.1, AXE_MUR_N + 0.1, Z_AZ, Z_AZ + 0.03, "80_Lishkot", MAT_MARBRE())
 # « לִשְׁכַּת הַגָּזִית כְּמִין בְּסִילְקִי גְדוֹלָה הָיְתָה » (Yoma 25a) : une grande salle, dont aucune
 # source ne décrit le décor. Il se prend au Tanakh, pas à l'archéologie hérodienne : ni
 # colonne, ni entablement, ni fronton. Les murs sont de gazit, coupés de rangs de poutres,
@@ -201,26 +191,10 @@ box("Lishkat_HaGazit_rashei_pispasin", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LI
 GAZIT_NUS = {"O": GAZIT_X0 + LISHKA_PAREMENT, "E": GAZIT_X1 - LISHKA_PAREMENT,
              "S": NORD_Y0 + LISHKA_PAREMENT, "N": NORD_Y1 - LISHKA_PAREMENT}
 GAZIT_PLAFOND = Z_AZ + 30 - LISHKA_CORNICHE
-GAZIT_PORTE_S = ((GAZIT_X0 + GAZIT_X1 - PORTE_SHAAR[0]) / 2, (GAZIT_X0 + GAZIT_X1 + PORTE_SHAAR[0]) / 2)
-GAZIT_PORTE_E = (AY1 + T, AY1 + T + PETAH_HOL_GAZIT[0])
-SOL_CEDRE = 0.04
-
 # Un rang de poutres de cèdre après trois assises de pierre, deux fois : à mi-hauteur et
 # sous le plafond, sur le sud, l'est et l'ouest ; le nord est revêtu.
 ASSISES_PAR_RANG = 3
 RANGS_CEDRE = (Z_AZ + ASSISES_PAR_RANG * ASSISE, GAZIT_PLAFOND - 1)
-for n, z in enumerate(RANGS_CEDRE):
-    for face, bornes, cotes, mitres, reserve in (
-            ("S", (GAZIT_NUS["O"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["S"]), (False, True),
-             ("libre", "libre"), [GAZIT_PORTE_S] if z < Z_AZ + PORTE_SHAAR[1] else []),
-            ("O", (GAZIT_NUS["O"], GAZIT_NUS["O"], GAZIT_NUS["S"], GAZIT_NUS["N"]), (False, True), ("bute", "libre"), []),
-            ("E", (GAZIT_NUS["E"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["N"]), (True, False), ("bute", "libre"), [])):
-        moulure(f"Lishkat_HaGazit_keroutot_{n}_{face}", *bornes, z, ((0.0, 1.0, 1.0),), "80_Lishkot",
-                MAT_CEDRE(), saillie=0.3, mitres=mitres, cotes=cotes, reserve=reserve)
-
-box("Lishkat_HaGazit_sol_cedre", GAZIT_NUS["O"], GAZIT_NUS["E"], AXE_MUR_N + 0.1, GAZIT_NUS["N"],
-    Z_AZ, Z_AZ + SOL_CEDRE, "80_Lishkot", MAT_CEDRE_LAMBRIS())
-
 # Le revêtement du nord, du sol au plafond : un fond, quatre travées de montants, et des
 # traverses qui passent devant eux. Chaque case entre montants et traverses porte un panneau.
 LAMBRIS_Y = GAZIT_NUS["N"]
@@ -235,8 +209,40 @@ DOSSIER_DES_JUGES = Z_AZ + GRADINS_H[-1] + 1.2
 TRAVERSES = ((Z_AZ, DOSSIER_DES_JUGES, False), (Z_AZ + 7.0, Z_AZ + 9.0, True),
              (RANGS_CEDRE[0] - 0.5, RANGS_CEDRE[0] + 1.5, True), (Z_AZ + 19.0, Z_AZ + 21.0, True),
              (RANGS_CEDRE[1] - 0.2, GAZIT_PLAFOND, False))
-box("Lishkat_HaGazit_lambris_fond", GAZIT_NUS["O"], GAZIT_NUS["E"], LAMBRIS_Y - FOND, LAMBRIS_Y,
-    Z_AZ, GAZIT_PLAFOND, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+# « חַלּוֹנֵי שְׁקֻפִים אֲטֻמִים » (Melakhim I 6:4), les fenêtres du Bayit, en claire-voie : la salle n'a de
+# ciel qu'au nord, sur le 'Heil — à l'est et à l'ouest, Sha'ar HaNitzotz, HaGola et HaEtz la serrent de
+# trop près. Le troisième rang de panneaux du lambris s'y ouvre, case pour case, au-dessus du tribunal. CHOIX.
+CLAIRE_VOIE = [(xa + LARGEUR_MONTANT / 2 + 0.35, xb - LARGEUR_MONTANT / 2 - 0.35, TRAVERSES[2][1] + 0.35, TRAVERSES[3][0] - 0.35)
+               for xa, xb in zip(LAMBRIS_X, LAMBRIS_X[1:])]
+lishka("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_EZN, Z_AZ + 30, "80_Lishkot",
+       [Porte("S", *PORTE_SHAAR, Z_AZ),
+        Porte("E", *PETAH_HOL_GAZIT, Z_AZ, centre=AY1 + T + PETAH_HOL_GAZIT[0] / 2)],
+       fenetres={"N": CLAIRE_VOIE})
+maake("Lishkat_HaGazit", GAZIT_X0, GAZIT_X1, NORD_Y0, NORD_Y1, Z_AZ + 30, "80_Lishkot")
+box("Lishkat_HaGazit_sol_hol", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT, AY1 + T,
+    NORD_Y1 - LISHKA_PAREMENT, Z_EZN, Z_AZ, "80_Lishkot", MAT_SOL())
+# « וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל » est dit du Beit HaMoked (Middot 1:6) ; la même
+# limite tracée ici, sur l'axe du mur, est une analogie : CHOIX.
+box("Lishkat_HaGazit_rashei_pispasin", GAZIT_X0 + LISHKA_PAREMENT, GAZIT_X1 - LISHKA_PAREMENT,
+    AXE_MUR_N - 0.1, AXE_MUR_N + 0.1, Z_AZ, Z_AZ + 0.03, "80_Lishkot", MAT_MARBRE())
+GAZIT_PORTE_S = ((GAZIT_X0 + GAZIT_X1 - PORTE_SHAAR[0]) / 2, (GAZIT_X0 + GAZIT_X1 + PORTE_SHAAR[0]) / 2)
+GAZIT_PORTE_E = (AY1 + T, AY1 + T + PETAH_HOL_GAZIT[0])
+SOL_CEDRE = 0.04
+
+for n, z in enumerate(RANGS_CEDRE):
+    for face, bornes, cotes, mitres, reserve in (
+            ("S", (GAZIT_NUS["O"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["S"]), (False, True),
+             ("libre", "libre"), [GAZIT_PORTE_S] if z < Z_AZ + PORTE_SHAAR[1] else []),
+            ("O", (GAZIT_NUS["O"], GAZIT_NUS["O"], GAZIT_NUS["S"], GAZIT_NUS["N"]), (False, True), ("bute", "libre"), []),
+            ("E", (GAZIT_NUS["E"], GAZIT_NUS["E"], GAZIT_NUS["S"], GAZIT_NUS["N"]), (True, False), ("bute", "libre"), [])):
+        moulure(f"Lishkat_HaGazit_keroutot_{n}_{face}", *bornes, z, ((0.0, 1.0, 1.0),), "80_Lishkot",
+                MAT_CEDRE(), saillie=0.3, mitres=mitres, cotes=cotes, reserve=reserve)
+
+box("Lishkat_HaGazit_sol_cedre", GAZIT_NUS["O"], GAZIT_NUS["E"], AXE_MUR_N + 0.1, GAZIT_NUS["N"],
+    Z_AZ, Z_AZ + SOL_CEDRE, "80_Lishkot", MAT_CEDRE_LAMBRIS())
+
+paroi_percee("Lishkat_HaGazit_lambris_fond", GAZIT_NUS["O"], GAZIT_NUS["E"], LAMBRIS_Y - FOND, LAMBRIS_Y,
+             Z_AZ, GAZIT_PLAFOND, "80_Lishkot", MAT_CEDRE_LAMBRIS(), CLAIRE_VOIE)
 for k, x in enumerate(LAMBRIS_X):
     x0 = min(max(x - LARGEUR_MONTANT / 2, GAZIT_NUS["O"]), GAZIT_NUS["E"] - LARGEUR_MONTANT)
     box(f"Lishkat_HaGazit_lambris_montant_{k}", x0, x0 + LARGEUR_MONTANT,
@@ -260,9 +266,9 @@ for k, (z0, z1, sculptee) in enumerate(TRAVERSES):
             sphere(f"Lishkat_HaGazit_lambris_traverse_{k}_peka_{rang}_{i:02d}",
                    u0 + (u1 - u0) * (i + 0.5) / pekaim, NU_TRAVERSE + 0.04, zp, PEKA_R,
                    "80_Lishkot", MAT_CEDRE_LAMBRIS(), segs=8)
-# Les panneaux : un par case, en retrait des montants et des traverses qui les cadrent.
+# Les panneaux : un par case, en retrait des montants et des traverses qui les cadrent, sauf au rang de la claire-voie.
 for j, ((_, bas, _), (haut, _, _)) in enumerate(zip(TRAVERSES, TRAVERSES[1:])):
-    for k, (xa, xb) in enumerate(zip(LAMBRIS_X, LAMBRIS_X[1:])):
+    for k, (xa, xb) in enumerate(zip(LAMBRIS_X, LAMBRIS_X[1:]) if j != 2 else ()):
         box(f"Lishkat_HaGazit_lambris_panneau_{j}{k}", xa + LARGEUR_MONTANT / 2 + 0.35, xb - LARGEUR_MONTANT / 2 - 0.35,
             LAMBRIS_Y - FOND - PANNEAU, LAMBRIS_Y - FOND, bas + 0.35, haut - 0.35, "80_Lishkot", MAT_CEDRE_LAMBRIS())
 
@@ -468,6 +474,25 @@ for rang in range(3):
         box(f"{nom}_pied_{k}", x, x + 0.6, y1 - 0.7, y1 - 0.1, Z_AZ, Z_AZ + 0.68, "80_Lishkot")
     box(f"{nom}_assise", SANHEDRIN_X - 4, SANHEDRIN_X + 4, y1 - 0.8, y1, Z_AZ + 0.68, Z_AZ + 0.85,
         "80_Lishkot", MAT_MARBRE())
+# Le jour de la claire-voie ne descend pas jusqu'aux juges : deux lampes de terre sur chaque mur de
+# pierre, l'une au-dessus du tribunal, l'autre au milieu de la salle, à hauteur de main levée. Leur
+# lueur est une lampe de la scène, que la visite allume et dont la cuisson prend le rebond. CHOIX.
+LUEURS_Y, LUEURS_Z = (SANHEDRIN_Y + 2.5, GAZIT_NUS["S"] + 5.5), Z_AZ + 6
+for cote, x, normale in (("E", GAZIT_NUS["E"], (-1, 0)), ("O", GAZIT_NUS["O"], (1, 0))):
+    for k, y in enumerate(LUEURS_Y):
+        nom = f"Lishkat_HaGazit_ner_{cote}{k}"
+        ner_sur_tablette(nom, x, y, normale, LUEURS_Z, "80_Lishkot")
+        lueur = lampe(f"Lishkat_HaGazit_lueur_{cote}{k}", 'POINT', (m(x + normale[0] * 0.2), m(y), m(LUEURS_Z + 0.35)))
+        lueur.data.energy = 50.0
+        lueur.data.color = (1.0, 0.85, 0.63)
+        lueur.data.shadow_soft_size = m(0.1)
+# La boîte que ces lueurs éclairent dans la visite, faces intérieures des murs comprises.
+salle = empty("Lishkat_HaGazit_salle", (GAZIT_NUS["O"] + GAZIT_NUS["E"]) / 2, (GAZIT_NUS["S"] + GAZIT_NUS["N"]) / 2,
+              (Z_AZ + GAZIT_PLAFOND) / 2, "80_Lishkot")
+salle.empty_display_type = 'CUBE'
+salle.empty_display_size = 1.0
+salle.scale = (m((GAZIT_NUS["E"] - GAZIT_NUS["O"]) / 2 + 0.3), m((GAZIT_NUS["N"] - GAZIT_NUS["S"]) / 2 + 0.3),
+               m((GAZIT_PLAFOND - Z_AZ) / 2 + 0.3))
 # Lishkat HaGola : « שָׁם הָיָה בוֹר קָבוּעַ, וְהַגַּלְגַּל נָתוּן עָלָיו, וּמִשָּׁם מַסְפִּיקִים מַיִם
 # לְכָל הָעֲזָרָה » (Middot 5:4). Elle alimente la cour et s'ouvre dessus : DANS l'Azara,
 # contre la face intérieure du mur nord, comme les trois du sud — « שֵׁשׁ לְשָׁכוֹת הָיוּ

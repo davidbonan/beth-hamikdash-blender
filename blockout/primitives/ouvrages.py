@@ -141,7 +141,15 @@ def _bandes(x0, x1, y0, y1, dedans, dehors, adossee):
     return bandes
 
 
-def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None, tremies=()):
+def fenetres_hautes(a0, a1, zb, zh, portes):
+    """Une baie de LISHKA_BAIE toutes les douze amot environ entre `a0` et `a1`, sauf au droit des `portes`."""
+    n = max(2, round((a1 - a0) / 12))
+    centres = (a0 + (a1 - a0) * (k + 0.5) / n for k in range(n)) if zh - zb >= 2 else ()
+    return [(c - LISHKA_BAIE / 2, c + LISHKA_BAIE / 2, zb, zh) for c in centres
+            if not any(c + LISHKA_BAIE / 2 > b0 and c - LISHKA_BAIE / 2 < b1 for b0, b1, _, _ in portes)]
+
+
+def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None, tremies=(), fenetres=None):
     """Chambre du pourtour, creuse : socle, murs percés de baies, bandeau, corniche qui la couvre.
 
     Posée en boîte nue, une lishka ne se lit pas : à 750 amot elle n'a ni pied, ni
@@ -152,7 +160,8 @@ def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None, tr
     quand ce seuil est plus bas que lui. Le sol intérieur n'est pas bâti ici : il dépend
     de ce que la chambre enjambe. `adossee` : la face collée à un mur d'enceinte, qui lui
     sert de mur — ni parement, ni socle, ni saillie. `tremies` : ce que la corniche laisse
-    ouvert, le puits d'une mesiba qui monte au-dessus d'elle.
+    ouvert, le puits d'une mesiba qui monte au-dessus d'elle. `fenetres` : {face: [(u0, u1, zb, zh)]},
+    les baies de ces faces à la place des fenêtres hautes qu'elles auraient reçues.
     """
     zs, zc = z0 + LISHKA_SOCLE, z1 - LISHKA_CORNICHE
     d = LISHKA_PAREMENT
@@ -198,13 +207,10 @@ def lishka(name, x0, x1, y0, y1, z0, z1, col, portes, adossee=None, mat=None, tr
                    "O": ("y", x0, -1), "E": ("y", x1, 1)}[face],
                   c, p.seuil, min(z_bandeau, p.seuil + p.hauteur + 1), d, col, mat,
                   metal=p.metal, largeur=p.largeur, hauteur=p.hauteur, cadre=min(2.0, p.largeur / 4))
-        n = max(2, round((a1 - a0) / 12))
-        for k in range(n) if z_baie1 - z_baie0 >= 2 else ():
-            c = a0 + (a1 - a0) * (k + 0.5) / n
-            u0, u1 = c - LISHKA_BAIE / 2, c + LISHKA_BAIE / 2
-            if any(u1 > b0 and u0 < b1 for b0, b1, _, _ in baies):
-                continue
-            baies.append((u0, u1, z_baie0, z_baie1))
+        if fenetres is not None and face in fenetres:
+            baies += fenetres[face]
+        else:
+            baies += fenetres_hautes(a0, a1, z_baie0, z_baie1, baies)
         paroi_percee(f"{name}_{face}", *bornes, zs, zc, col, mat, baies)
 
 

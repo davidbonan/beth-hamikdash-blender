@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, assombrir, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
+import { habiller, assombrir, eclairerLaSalle, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
@@ -353,6 +353,9 @@ function vaciller(dt) {
     l.intensity = eclat * (0.93 + 0.04 * Math.sin(t * 7.3 + i) + 0.03 * Math.sin(t * 17.9 + i * 2.1));
   });
   if (shoeva?.lueur) shoeva.lueur.intensity = eclat ? LUEUR.intensite * (0.9 + 0.1 * Math.sin(t * 11.3)) : 0;
+  lueursGazit.forEach((l, i) => {
+    l.w = LUEUR_GAZIT.intensite * (0.94 + 0.04 * Math.sin(t * 8.3 + i * 1.7) + 0.02 * Math.sin(t * 19.1 + i));
+  });
   if (lumiereMenora) {
     lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
   }
@@ -381,6 +384,17 @@ function allumerMenora(flammes) {
   // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
   const point = centre.divideScalar(flammes.length).add(new THREE.Vector3(0, 0.35, 0));
   lumiereMenora = poserLampe(MENORA, point, PROFIL.sanctuaire);
+}
+
+// Les lampes de terre de la Lishkat HaGazit, une lueur par mèche : sans elles, la salle n'avait que sa
+// lumière cuite, qui n'a pas de direction, et la pierre comme les gradins y rendaient à plat.
+const LUEUR_GAZIT = { couleur: 0xffd8a0, intensite: 4 };
+let lueursGazit = [];
+
+function allumerLesLueurs(lueurs) {
+  if (!lueurs?.points.length) return;
+  const salle = new THREE.Box3(new THREE.Vector3(...lueurs.salle.min), new THREE.Vector3(...lueurs.salle.max));
+  lueursGazit = eclairerLaSalle(salle, lueurs.points, LUEUR_GAZIT.couleur);
 }
 
 // Les mâts d'or de l'Ezrat Nashim, qui ne brûlent que la nuit de Sim'hat Beit HaSho'éva (Soucca 5:2).
@@ -606,6 +620,7 @@ scene.add(gltf.scene);
 // aucun sol, et la visite s'ouvrait un mètre au-dessus du dallage.
 gltf.scene.updateMatrixWorld(true);
 allumerMenora(reperes.flammes);
+allumerLesLueurs(reperes.lueurs);
 eclairerKodeshHakodashim(reperes.arche, reperes.braises);
 
 const murs = [];                        // collision : les étoffes en sont exclues

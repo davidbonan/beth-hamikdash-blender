@@ -49,6 +49,24 @@ export function assombrir(boite) {
   PENOMBRE_MAX.value.copy(boite.max);
 }
 
+// Les lueurs d'une salle close (Box3, mètres) : des lampes sans carte d'ombre, qui n'éclairent que ce
+// qui est dans sa boîte. Une lampe de three à ombre prend une unité de texture à tous les nuanceurs,
+// et la nuit en est déjà au bord des seize ; sans ombre, elle passerait les murs. `w` : les candela.
+const LUEURS_MAX = 4;
+const PORTEE_LUEUR = 14.0;
+const LUEURS = { value: Array.from({ length: LUEURS_MAX }, () => new THREE.Vector4()) };
+const LUEUR_COULEUR = { value: new THREE.Color() };
+const LUEUR_MIN = { value: new THREE.Vector3(1, 1, 1) };
+const LUEUR_MAX = { value: new THREE.Vector3(0, 0, 0) };
+
+/** Pose les lueurs de la salle ; renvoie un Vector4 par lampe, dont visite.js fait vaciller le `w`. */
+export function eclairerLaSalle(boite, points, couleur) {
+  LUEUR_MIN.value.copy(boite.min);
+  LUEUR_MAX.value.copy(boite.max);
+  LUEUR_COULEUR.value.set(couleur);
+  return points.slice(0, LUEURS_MAX).map((p, i) => LUEURS.value[i].set(...p, 0));
+}
+
 const PIXEL = /* glsl */`
 uniform float uHauteurImage;
 varying float vPixel;
@@ -146,6 +164,8 @@ varying vec3 vMonde;
 varying vec3 vNMonde;
 uniform float uTemps;
 uniform vec3 uPenombreMin, uPenombreMax;
+uniform vec4 uLueurs[${LUEURS_MAX}];
+uniform vec3 uLueurCouleur, uLueurMin, uLueurMax;
 varying float vPixel;
 
 // 1 dehors, PENOMBRE_RESTE dans la pièce sans lumière : le ciel n'y entre pas.
@@ -978,8 +998,25 @@ function soleilEnPenombre() {
     + ecartee
     + "reflectedLight.directDiffuse = mix(avantSoleil.directDiffuse, reflectedLight.directDiffuse, mPenombre);\n"
     + "reflectedLight.directSpecular = mix(avantSoleil.directSpecular, reflectedLight.directSpecular, mPenombre);\n"
+    + LUEURS_DE_LA_SALLE
     + morceau.slice(fin);
 }
+
+// Comme une lampe ponctuelle de three, la carte d'ombre en moins : la pénombre ne les touche pas.
+const LUEURS_DE_LA_SALLE = /* glsl */`
+#if defined( RE_Direct )
+  if (all(greaterThan(vMonde, uLueurMin)) && all(lessThan(vMonde, uLueurMax))) {
+    for (int i = 0; i < ${LUEURS_MAX}; i++) {
+      vec3 versLueur = (viewMatrix * vec4(uLueurs[i].xyz, 1.0)).xyz - geometryPosition;
+      float distanceLueur = length(versLueur);
+      directLight.direction = versLueur / distanceLueur;
+      directLight.color = uLueurCouleur * uLueurs[i].w * getDistanceAttenuation(distanceLueur, ${PORTEE_LUEUR.toFixed(1)}, 2.0);
+      directLight.visible = true;
+      RE_Direct(directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight);
+    }
+  }
+#endif
+`;
 
 /**
  * Branche le calcul procédural sur une matière standard, sans la remplacer : le
@@ -992,7 +1029,8 @@ export function habiller(materiau, horloges, jeux) {
   if (!famille) return;
   const uniformes = { uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
-                      uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX };
+                      uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX,
+                      uLueurs: LUEURS, uLueurCouleur: LUEUR_COULEUR, uLueurMin: LUEUR_MIN, uLueurMax: LUEUR_MAX };
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === METAL || famille === MIKSHE) materiau.envMapIntensity = REFLET_DU_METAL;
   if (famille === BRAISE) {

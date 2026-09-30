@@ -51,10 +51,13 @@ CIEL = {"haut": 0x2F5FA6, "bas": 0xA8C6E6, "sol": 0xA89C86, "horizon": 6.0}
 DIFFUS = 0.33
 # Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
 SATURATION_CIEL = 0.27
-# La Menora, l'Arche et les braises de visite/visite.js (candela, et le souffle moyen des braises) ; en repère three, comme reperes.json.
+# La Menora, l'Arche, les braises et les lueurs de la Lishkat HaGazit de visite/visite.js (candela, et le souffle
+# moyen des braises) ; en repère three, comme reperes.json. `une_par_point` : la visite y allume une lampe par
+# position, et non une seule à leur centre.
 LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 150.0, "hauteur": 0.35},
           "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},
-          "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0}}
+          "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0},
+          "lueurs": {"couleur": 0xFFD8A0, "intensite": 4.0, "hauteur": 0.0, "une_par_point": True}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
 ECHANTILLONS_REBONDS = 1024
@@ -277,16 +280,16 @@ def poser_lampes(scene, points):
         if not positions:
             continue
         reglage = LAMPES[nature]
-        x, y, z = np.mean(positions, axis=0)
-        lampe = bpy.data.lights.new(nature, "POINT")
-        lampe.energy = 4 * math.pi * reglage["intensite"]
-        lampe.color = tuple(lineaire(reglage["couleur"]))
-        lampe.shadow_soft_size = 0.0
-        lampe.use_soft_falloff = False
-        source = bpy.data.objects.new(nature, lampe)
-        source.location = (x, -z, y + reglage["hauteur"])
-        scene.collection.objects.link(source)
-        sources.append(source)
+        for x, y, z in positions if reglage.get("une_par_point") else [np.mean(positions, axis=0)]:
+            lampe = bpy.data.lights.new(nature, "POINT")
+            lampe.energy = 4 * math.pi * reglage["intensite"]
+            lampe.color = tuple(lineaire(reglage["couleur"]))
+            lampe.shadow_soft_size = 0.0
+            lampe.use_soft_falloff = False
+            source = bpy.data.objects.new(nature, lampe)
+            source.location = (x, -z, y + reglage["hauteur"])
+            scene.collection.objects.link(source)
+            sources.append(source)
     return sources
 
 
@@ -592,7 +595,7 @@ def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardee
     """Cuit les concepts de `retenus`, faces collées séparées, dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
     `gardees` ({"occlusion": {...}, "lumiere": {...}} d'un reperes.json) garde ces cartes-là au lieu de les recuire.
-    `lampes` : {"flammes": [...], "arche": [...], "braises": [...]}, positions en repère three, dont le rebond se cuit aussi.
+    `lampes` : {"flammes": [...], "arche": [...], "braises": [...], "lueurs": [...]}, positions en repère three, dont le rebond se cuit aussi.
     Renvoie ({concept: {"carte", "canal", "secondes"}}, {concept: {"carte", "canal", "echelle", "secondes"}}) pour reperes.json."""
     if TOUS in eclaires:
         eclaires = {ident for ident, _, _ in choisis}

@@ -312,6 +312,13 @@ def lampes(prefixe):
             for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
+def boite_de(nom):
+    """La boîte d'un vide CUBE, dans les axes de la visite."""
+    coins = [bpy.data.objects[nom].matrix_world @ Vector((sx, sy, sz)) for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)]
+    visite = [(c.x, c.z, -c.y) for c in coins]
+    return {"min": [min(v[i] for v in visite) for i in range(3)], "max": [max(v[i] for v in visite) for i in range(3)]}
+
+
 def livrer(chantier):
     """Remplace l'export servi par celui du chantier, cartes d'abord, reperes.json en dernier : la visite reste servie pendant la cuisson."""
     reperes = json.loads((chantier / "reperes.json").read_text(encoding="utf-8"))
@@ -369,6 +376,7 @@ def exporter(chantier):
     regles = concepts()
     connus = {ident for _, ident in regles}
     flammes, arche, braises = lampes("Menora_flamme"), lampes("Aron_lumiere"), lampes("Machta_braise")
+    lueurs = {"points": lampes("Lishkat_HaGazit_lueur"), "salle": boite_de("Lishkat_HaGazit_salle")}
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
@@ -395,7 +403,7 @@ def exporter(chantier):
 
     # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
     cartes = ({}, {}, {}) if "--sans-occlusion" in sys.argv else cuire(
-        fusionnes, chantier, {"flammes": flammes, "arche": arche, "braises": braises})
+        fusionnes, chantier, {"flammes": flammes, "arche": arche, "braises": braises, "lueurs": lueurs["points"]})
     if cartes is None:
         return False
     occlusion, lumiere, empreintes = cartes
@@ -443,6 +451,7 @@ def exporter(chantier):
         "flammes": flammes,
         "arche": arche,
         "braises": braises,
+        "lueurs": lueurs,
         "occlusion": occlusion,
         "lumiere": lumiere,
         "empreintes": empreintes,
