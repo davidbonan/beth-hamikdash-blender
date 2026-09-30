@@ -636,9 +636,16 @@ function conceptDe(objet) {
   return undefined;
 }
 
+// Le groupe que l'export a cuit (ses extras) : un concept, ou `_non_classe`, dont les podiums plafonnent les salles sous l'Ezrat Israël.
+function groupeCuitDe(objet) {
+  for (let n = objet; n; n = n.parent) if (n.userData.concept) return n.userData.concept;
+  return undefined;
+}
+
 const maillages = [];
 gltf.scene.traverse((o) => {
   if (!o.isMesh) return;
+  o.userData.groupeCuit = groupeCuitDe(o);
   o.userData.concept = conceptDe(o);
   maillages.push(o);
 });
@@ -658,8 +665,8 @@ gltf.scene.traverse((o) => {
   o.castShadow = true;
   o.receiveShadow = true;
   if (!brut) {
-    const occlusion = occlusions.get(o.userData.concept);
-    const lumiere = lumieres.get(o.userData.concept);
+    const occlusion = occlusions.get(o.userData.groupeCuit);
+    const lumiere = lumieres.get(o.userData.groupeCuit);
     // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
     if (occlusion || lumiere || sousSonde.has(o)) o.material = o.material.clone();
     if (occlusion) o.material.aoMap = occlusion;
