@@ -21,7 +21,9 @@ TEXELS_PAR_FACE_MIN = 10
 TEXEL = 0.2
 # Une masse de chaux blanche sans joint ne cache aucun texel : à 20 cm, le Mizbea'h se lisait en pixels.
 # Une salle se voit à un mètre : à 20 cm, les gradins de la Lishkat HaGazit n'avaient que deux texels par marche.
-TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03, "lishkat_hagazit": 0.08}
+SALLES_CLOSES = ("lishkat_hagazit", "lishkat_hagola", "beit_hahalifot", "lishkat_hamedichin", "lishkat_haparva",
+                 "lishkat_hamelach", "lishkat_haetz", "beit_hatevila")
+TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03} | dict.fromkeys(SALLES_CLOSES, 0.08)
 # Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
 MALGRE_AIRE = {"yessod"}
 TAILLE = (128, 2048)
@@ -64,7 +66,7 @@ ECHANTILLONS_REBONDS = 1024
 # L'adaptatif s'arrête au bruit, pas au plafond : à 0.02 l'Ezrat Nashim cuit deux fois plus vite pour 1,7 niveau sRGB d'écart.
 SEUIL_REBONDS = 0.02
 # Une salle qui ne voit le jour que par ses portes garde à 0.02 un grain que le débruitage étale en rouille sur le cèdre.
-SEUIL_DE = {"lishkat_hagazit": 0.005}
+SEUIL_DE = dict.fromkeys(SALLES_CLOSES, 0.005)
 TOUS = "tout"
 # Un rayon réfléchi par l'or vers la pierre tombe rarement, et fort : sans borne il laisse des étincelles dans la carte.
 BORNE_INDIRECTE = 4.0

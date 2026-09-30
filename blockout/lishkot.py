@@ -204,7 +204,7 @@ LARGEUR_MONTANT = 0.6
 # Traverses : (bas, haut, sculptée). La plus basse est le dossier du dernier gradin, qui vient
 # s'y adosser ; la première sculptée passe au-dessus du dossier du Nasi, la deuxième tombe sur
 # le rang de cèdre des murs voisins.
-GRADINS_H = (0.9, 1.5, 2.1)
+GRADINS_H = (0.9, 1.8, 2.7)
 DOSSIER_DES_JUGES = Z_AZ + GRADINS_H[-1] + 1.2
 TRAVERSES = ((Z_AZ, DOSSIER_DES_JUGES, False), (Z_AZ + 7.0, Z_AZ + 9.0, True),
              (RANGS_CEDRE[0] - 0.5, RANGS_CEDRE[0] + 1.5, True), (Z_AZ + 19.0, Z_AZ + 21.0, True),
@@ -284,7 +284,8 @@ for k in range(PLAFOND_POUTRES):
 # « וּבַחֵצִי שֶׁל חֹל הָיוּ הַסַּנְהֶדְרִין יוֹשְׁבִין » (Rambam, Beit HaBe'hira 5:17) — « אֵין יְשִׁיבָה בָּעֲזָרָה
 # אֶלָּא לְמַלְכֵי בֵית דָּוִד » (Yoma 25a) : tout ce qui s'assied est au nord de la limite.
 # « כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה » (Sanhedrin 4:3) : trois gradins en
-# demi-cercle, ouvert vers le sud. Son diamètre passe au nord du פתח de 'hol, pour que les
+# demi-cercle, ouvert vers le sud, étiré en largeur : entre son centre et le lambris, la salle
+# n'a que cinq amot. Son diamètre passe au nord du פתח de 'hol, pour que les
 # pointes de l'arc ne le bouchent pas. Entre l'arc et la limite, ceux qui sont « לִפְנֵיהֶם ».
 # La salle, vingt amot, tient la disposition, pas le nombre : ni soixante et onze juges ni
 # trois rangs d'élèves n'y ont chacun leur place. Des tablettes de marbre, comme les
@@ -292,38 +293,53 @@ for k in range(PLAFOND_POUTRES):
 SANHEDRIN_X = (GAZIT_X0 + GAZIT_X1) / 2
 SANHEDRIN_Y = AY1 + T + PETAH_HOL_GAZIT[0] + 0.5
 SANHEDRIN_R0 = 2.2
+ELARGI = 2.0                   # ce que l'arc gagne en largeur de chaque côté, à profondeur égale
 ARC_PAS = math.pi / 48
 PLAT = 0.12                    # épaisseur des tablettes de marbre
 NEZ = 0.08                     # ce que la tablette déborde vers le centre
 MARGELLE = 0.6                 # le marbre au bord du dernier gradin, devant le cèdre
 # Le tribunal est bâti dans la salle, pas posé dedans : le dernier gradin court jusqu'aux murs,
 # le dos à la traverse basse du lambris, qui lui sert de dossier. L'estrade du Nasi est ce même
-# dernier gradin, avancé au milieu de l'arc, et on y monte par les deux premiers, resserrés.
+# dernier gradin, avancé au milieu de l'arc, et on y monte par des marches d'un demi-gradin.
 TRIBUNAL_NORD = NU_TRAVERSE
 ESTRADE = (math.radians(45), math.radians(135))
-MARCHES_ESTRADE = ((SANHEDRIN_R0 - 0.5, SANHEDRIN_R0, 0.45), (SANHEDRIN_R0, SANHEDRIN_R0 + 0.5, GRADINS_H[0]),
-                   (SANHEDRIN_R0 + 0.5, SANHEDRIN_R0 + 1.0, GRADINS_H[1]))
 ESTRADE_R0 = SANHEDRIN_R0 + 1.0
+GIRON, CONTREMARCHE = 0.4, GRADINS_H[0] / 2
+MARCHES_ESTRADE = [(ESTRADE_R0 - GIRON * (n + 1), ESTRADE_R0 - GIRON * n, GRADINS_H[-1] - CONTREMARCHE * (n + 1))
+                   for n in reversed(range(round(GRADINS_H[-1] / CONTREMARCHE) - 1))]
 
 
 def gazit_point(r, angle, t=0.0):
-    """Point à `r` du centre de l'arc dans la direction `angle`, décalé de `t` en travers."""
-    return (SANHEDRIN_X + r * math.cos(angle) - t * math.sin(angle),
+    """Point du rang `r` de l'arc dans la direction `angle`, décalé de `t` en travers : à `r` du
+    centre en profondeur, à `r + ELARGI` en largeur."""
+    return (SANHEDRIN_X + (r + ELARGI) * math.cos(angle) - t * math.sin(angle),
             SANHEDRIN_Y + r * math.sin(angle) + t * math.cos(angle))
 
 
 def gazit_nu(angle):
-    """Distance du centre de l'arc au nu de la salle dans la direction `angle` : le lambris au nord, la pierre à l'est et à l'ouest."""
+    """Le rang de l'arc qui touche le nu de la salle dans la direction `angle` : le lambris au nord, la pierre à l'est et à l'ouest."""
     dx, dy = math.cos(angle), math.sin(angle)
     portees = [(TRIBUNAL_NORD - SANHEDRIN_Y) / dy] if dy > 1e-9 else []
     if abs(dx) > 1e-9:
-        portees.append((GAZIT_NUS["E" if dx > 0 else "O"] - SANHEDRIN_X) / dx)
+        portees.append((GAZIT_NUS["E" if dx > 0 else "O"] - SANHEDRIN_X) / dx - ELARGI)
     return min(portees)
+
+
+def gazit_coin(cote):
+    """L'angle où l'arc rencontre le coin du lambris et du mur `cote`, par dichotomie : l'écart
+    entre les deux portées de gazit_nu décroît avec l'angle."""
+    def ecart(a):
+        return (TRIBUNAL_NORD - SANHEDRIN_Y) / math.tan(a) + ELARGI * math.cos(a) - (GAZIT_NUS[cote] - SANHEDRIN_X)
+
+    a0, a1 = 1e-6, math.pi - 1e-6
+    for _ in range(60):
+        a0, a1 = (a0, (a0 + a1) / 2) if ecart((a0 + a1) / 2) < 0 else ((a0 + a1) / 2, a1)
+    return (a0 + a1) / 2
 
 
 def gazit_angles(a0, a1):
     """Les angles du secteur au pas de l'arc, et ceux des coins de la salle qui y tombent."""
-    coins = (math.atan2(TRIBUNAL_NORD - SANHEDRIN_Y, GAZIT_NUS[c] - SANHEDRIN_X) for c in "EO")
+    coins = (gazit_coin(c) for c in "EO")
     n = max(1, round((a1 - a0) / ARC_PAS))
     return sorted({a0 + (a1 - a0) * i / n for i in range(n + 1)} | {a for a in coins if a0 < a < a1})
 
@@ -381,7 +397,7 @@ for cote, angle in (("E", 0.0), ("O", math.pi)):
             "80_Lishkot", MAT_MARBRE())
 # « כַּחֲצִי גֹרֶן עֲגֻלָּה » : l'aire que l'arc enferme, marquée sur le cèdre d'un demi-disque de marbre
 # cerclé de bronze, là où se tiennent les parties devant le tribunal. CHOIX.
-GOREN_R = SANHEDRIN_R0 - 0.9
+GOREN_R = MARCHES_ESTRADE[0][0] - 0.3
 GOREN_Z = Z_AZ + SOL_CEDRE
 prism("Lishkat_HaGazit_goren", [gazit_point(GOREN_R, math.pi * i / 16) for i in range(17)],
       GOREN_Z, GOREN_Z + 0.02, "80_Lishkot", MAT_MARBRE())
@@ -446,7 +462,7 @@ def kisse(name, angle, siege):
 # l'estrade, le même siège en marbre. Le Nasi regarde le sud : sa droite est à l'ouest,
 # l'angle qui croît. Les deux dossiers à un dixième d'ama du lambris. Estrade, formes et matières : CHOIX.
 SIEGE_R = gazit_nu(math.pi / 2) - 1.5
-kisse("Lishkat_HaGazit_kisse_nasi", math.pi / 2, Siege(SIEGE_R, 0.85, Z_AZ + GRADINS_H[-1], 4.6, MAT_OR_PLAQUE()))
+kisse("Lishkat_HaGazit_kisse_nasi", math.pi / 2, Siege(SIEGE_R, 0.85, Z_AZ + GRADINS_H[-1], 4.2, MAT_OR_PLAQUE()))
 kisse("Lishkat_HaGazit_kisse_av_beit_din", math.radians(122),
       Siege(SIEGE_R, 0.7, Z_AZ + GRADINS_H[-1], 3.4, MAT_MARBRE()))
 

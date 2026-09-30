@@ -111,7 +111,7 @@ function brancher(morceau, info, garde) {
 export function epargner() {
   THREE.ShaderChunk.lights_fragment_begin = brancher(brancher(THREE.ShaderChunk.lights_fragment_begin,
     "getPointLightInfo( pointLight, geometryPosition, directLight );", "directLight.visible"),
-    "getDirectionalLightInfo( directionalLight, directLight );", "dot( geometryNormal, directLight.direction ) > 0.0");
+    "getDirectionalLightInfo( directionalLight, directLight );", "dot( nonPerturbedNormal, directLight.direction ) > 0.0");
 }
 
 /** Le morceau de three, sa fonction mise de côté, la nôtre à sa place. */
