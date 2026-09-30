@@ -35,8 +35,9 @@ const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE,
 const REFLET_DU_METAL = 1.6;
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
-// Exposition du tonemapping, tenue à jour par visite.js.
-export const EXPOSITION = { value: 1 };
+// Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
+export const EXPOSITION_DEHORS = 0.68;
+export const EXPOSITION = { value: EXPOSITION_DEHORS };
 // La pièce sans lumière (Box3, mètres), et ce qui y reste du ciel : ambiance, rebond,
 // soleil et environnement réfléchi y sont ramenés à cette part. Le point qui l'éclaire
 // — les braises — est une lampe ordinaire, que la pénombre ne touche pas.
@@ -209,16 +210,17 @@ float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
 // parement au soleil, vers 1,3. Réglés au soleil, veines et relief salissaient donc
 // tout ce qu'il ne touche pas. temperance() est l'exposant qui ramène un rapport de
 // matière, à cette clarté-là, au contraste qu'il a au soleil.
+// Le soleil se juge à l'exposition du dehors : à celle de l'œil adapté (×8) il saturait, et la pierre des salles perdait grain et relief.
 uniform float uExposition;
-const float CLARTE_SOLEIL = 1.3;
-float ecranACES(float L){
-  float v = L * uExposition / 0.6;
+const float CLARTE_SOLEIL = 1.3, EXPOSITION_SOLEIL = ${EXPOSITION_DEHORS.toFixed(2)};
+float ecranACES(float L, float exposition){
+  float v = L * exposition / 0.6;
   v = (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081);
   return pow(clamp(v, 0.0, 1.0), 1.0 / 2.2);
 }
-float contrasteEcran(float L){ return ecranACES(L * 1.1) - ecranACES(L / 1.1); }
+float contrasteEcran(float L, float exposition){ return ecranACES(L * 1.1, exposition) - ecranACES(L / 1.1, exposition); }
 float temperance(float clarte){
-  return clamp(contrasteEcran(CLARTE_SOLEIL) / max(contrasteEcran(clarte), 1e-4), 0.0, 1.0);
+  return clamp(contrasteEcran(CLARTE_SOLEIL, EXPOSITION_SOLEIL) / max(contrasteEcran(clarte, uExposition), 1e-4), 0.0, 1.0);
 }
 #endif
 // Une octave plus serrée que le pixel rend sa moyenne au lieu de scintiller.

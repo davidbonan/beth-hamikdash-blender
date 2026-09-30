@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, assombrir, eclairerLaSalle, ETOFFES, HAUTEUR_IMAGE, EXPOSITION } from "./matieres.js";
+import { habiller, assombrir, eclairerLaSalle, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
@@ -221,9 +221,7 @@ const CONCEPTS = await conceptsEn(langue());
 // 4,8 cm du placage d'or à trois cents mètres.
 const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance" });
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-const EXPOSITION_DEHORS = 0.68;
 renderer.toneMappingExposure = EXPOSITION_DEHORS;
-EXPOSITION.value = renderer.toneMappingExposure;
 renderer.shadowMap.enabled = true;
 // Le profil lourd ne s'en sert pas : `ombres.js` y remplace la lecture de la carte
 // par une pénombre variable. Il reste le réglage du profil léger, qui garde celle-ci.
