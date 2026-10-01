@@ -10,7 +10,7 @@ import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, domeVu, lumieresDu } from "./ciel.js";
-import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
+import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
@@ -256,7 +256,7 @@ gltf.scene.traverse((o) => {
 });
 const sousSonde = new Set(brut ? [] : separerDuHeikhal(
   maillages.filter((o) => DANS_HEIKHAL.has(o.userData.concept)), EMPRISES.get("heikhal")));
-const eclairage = eclairerLeTemple({ scene, renderer, rendu, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple: gltf.scene, sousSonde,
+const eclairage = eclairerLeTemple({ scene, renderer, rendu, detail, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple: gltf.scene, sousSonde,
   emprises: EMPRISES, reperes, horsGeometrie, annoncerAttente });
 
 gltf.scene.traverse((o) => {
@@ -271,6 +271,7 @@ gltf.scene.traverse((o) => {
   o.material.side = ETOFFES.has(o.material.name) ? THREE.DoubleSide : THREE.FrontSide;
   o.castShadow = true;
   o.receiveShadow = true;
+  porterAuLoin(o);
   if (!brut) {
     const occlusion = occlusions.get(o.userData.groupeCuit);
     const lumiere = lumieres.get(o.userData.groupeCuit);
@@ -692,6 +693,7 @@ alleger(gltf.scene);
 async function reprendre() {
   eclairage.refaireLesReflets();
   scene.traverse((o) => { if (o.isLight && o.shadow) o.shadow.needsUpdate = true; });
+  eclairage.retracerLOmbreLointaine();
   await rechargerCartes();
   if (!brut) refleterLeHeikhal();
 }

@@ -444,6 +444,43 @@ def rabattre_les_minuscules(obj, taille):
     return 0
 
 
+# Plus étroite, une île longue n'a parfois aucun centre de texel dedans : les facettes d'un fût cannelé cuisaient noires.
+LARGEUR_ILE_MIN = 2.0
+
+
+def elargir_les_etroites(obj, taille):
+    """Étire en travers, jusqu'à LARGEUR_ILE_MIN texels, les îles plus étroites ; renvoie leur nombre."""
+    maillage = obj.data
+    uv = maillage.uv_layers.active.data
+    coins = np.empty(len(uv) * 2)
+    uv.foreach_get("uv", coins)
+    coins = coins.reshape(-1, 2) * taille
+    boucles_de, aires = {}, {}
+    for face, ile in zip(maillage.polygons, iles(maillage, uv)):
+        boucles_de.setdefault(ile, []).extend(face.loop_indices)
+        aires[ile] = aires.get(ile, 0.0) + aire_uv(uv, face) * taille * taille
+    elargies = 0
+    for ile, boucles in boucles_de.items():
+        if aires[ile] < TEXEL_ILE_MIN:
+            continue
+        ecarts = coins[boucles] - coins[boucles].mean(axis=0)
+        travers = np.linalg.eigh(ecarts.T @ ecarts)[1][:, 0]
+        cotes = ecarts @ travers
+        largeur = np.ptp(cotes)
+        if largeur >= LARGEUR_ILE_MIN:
+            continue
+        coins[boucles] += np.outer(cotes * (LARGEUR_ILE_MIN / largeur - 1), travers)
+        elargies += 1
+    uv.foreach_set("uv", (coins / taille).ravel())
+    return elargies
+
+
+def empaqueter(taille):
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.uv.pack_islands(margin=2.0 / taille, rotate=True)
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
 def deplier(obj, taille):
     obj.data.uv_layers.active = obj.data.uv_layers.new(name=COUCHE)
     for o in bpy.context.view_layer.objects:
@@ -452,8 +489,13 @@ def deplier(obj, taille):
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=2.0 / taille, area_weight=0.0)
-    bpy.ops.uv.pack_islands(margin=2.0 / taille, rotate=True)
     bpy.ops.object.mode_set(mode="OBJECT")
+    # Empaqueté d'abord : c'est l'empaquetage qui dit ce qu'une île mesure en texels.
+    empaqueter(taille)
+    elargies = elargir_les_etroites(obj, taille)
+    if elargies:
+        empaqueter(taille)
+        print(f"  îles étroites élargies : {obj.name:26s} {elargies}", flush=True)
     # Le rabattage vient APRÈS l'empaquetage, et rien ne le suit : c'est l'empaquetage qui fixe
     # l'échelle, donc ce qu'une île mesure en texels, et une île rabattue est plate en UV —
     # réempaqueter derrière, l'atlas entier s'effondrait sur une île d'un texel.
@@ -583,7 +625,7 @@ def ecrire_lumiere(irradiance, chemin, brut):
 
 def reglages_de_la_lumiere(lampes):
     """Ce qui fait la lumière de toutes les cartes à la fois : le changer les invalide toutes."""
-    return repr((TEXEL, TAILLE, ECHANTILLONS, PORTEE, PORTEE_SOUS_SONDE, SOLEIL[:], SOLEIL_COULEUR, SOLEIL_FORCE,
+    return repr((TEXEL, TAILLE, LARGEUR_ILE_MIN, ECHANTILLONS, PORTEE, PORTEE_SOUS_SONDE, SOLEIL[:], SOLEIL_COULEUR, SOLEIL_FORCE,
                  DIAMETRE_SOLEIL, CIEL, DIFFUS, SATURATION_CIEL, LAMPES, ALBEDO_VISITE, ECHANTILLONS_REBONDS,
                  SEUIL_REBONDS, BORNE_INDIRECTE, lampes))
 

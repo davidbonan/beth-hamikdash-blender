@@ -107,7 +107,7 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `beit_hamikdash_nappes.py`, `beit_hamikdash_parokhet.py` et `beit_hamikdash_gravures.py` les refabriquent. |
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
-| `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur. |
+| `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur ; la carte lointaine du Har HaBayit, tracée une fois. |
 | `visite/occlusion.js` | Charge les cartes cuites : la lumière indirecte, posée en `lightMap`, et l'occlusion, en `aoMap`. |
 | `visite/adaptation.js` | L'œil qui s'habitue : l'exposition monte à mesure que le ciel se ferme autour du visiteur. |
 | `visite/sonde.js` | Le reflet du Heikhal : la salle rendue une fois depuis le milieu des kelim, éclairée par la seule Menora, remplace le ciel pour ce qui s'y trouve. |
@@ -274,12 +274,43 @@ demi-résolution et où le pas du demi-flottant dépasse le rayon lui-même.
 Les ombres portées avaient la même dureté partout : le pied d'une colonne et la crête
 d'un mur à quarante mètres y avaient un bord aussi net l'un que l'autre. Le soleil fait
 un demi-degré, et l'ombre qu'il porte s'élargit d'un centimètre par mètre séparant
-l'objet de ce qui le reçoit. `visite/ombres.js` cherche d'abord ce qui bouche le soleil,
-en tire la distance moyenne, et c'est elle qui donne le rayon du filtrage — un contact
-reste tranchant, l'ombre d'une façade de cinquante mètres ne l'est plus. three n'offre
+l'objet de ce qui le reçoit. `visite/ombres.js` lit la distance de ce qui bouche le
+soleil, et c'est elle qui donne la largeur du bord — un contact reste tranchant, l'ombre
+d'une façade de cinquante mètres ne l'est plus. three n'offre
 pas de point d'entrée : on renomme SA fonction dans son propre morceau de nuanceur, et
 le module **échoue bruyamment** si une version future change ce nom, plutôt que de rendre
 des ombres dures sans le dire.
+
+Cette carte est une fenêtre serrée de quatre-vingts mètres, qui suit le visiteur : hors
+d'elle il n'y avait pas d'ombre du tout, et celles de l'Ezrat Nashim naissaient d'un
+trait à quarante mètres. Une seconde carte, deux fois plus large que haute, tient tout
+le Har HaBayit entre ses murs, à quinze centimètres le texel. Le Temple ne bouge pas :
+elle se trace une fois par moment du jour — le décor seul, sans figurants, tuiles
+nivelées — et ne coûte ensuite aucune passe de géométrie. Les deux se fondent sur les
+six derniers mètres de la fenêtre. Chaque prise s'y compare au plan de la face plutôt
+qu'à un biais constant : sous un soleil de vingt degrés, celui qu'il faudrait au dallage
+décollerait toutes les ombres de leur pied. Elle prend une unité de texture à chaque
+nuanceur, et la nuit de Sim'hat Beit HaSho'éva en est à quinze sur seize.
+
+La pénombre se rendait d'abord par douze prises tournées d'un angle tiré du pixel : le
+bord sortait en trame, et la trame, attachée à l'écran, glissait sur la pierre à chaque
+pas. Les deux cartes se lisent maintenant sur un carré de quatre texels de côté pondérés
+en tente, ancré dans le monde. La fenêtre donne le bord net, douze centimètres ; la
+carte lointaine le bord large, quarante-cinq, et la distance du bloqueur ; on passe de
+l'une à l'autre avec cette distance. Ce que la carte lointaine ne voit pas — un denticule,
+un balustre, un figurant — garde donc le bord net, même porté de loin.
+
+Les deux cartes du soleil se tracent par la face tournée vers lui, et non par l'arrière
+comme three : sous un bandeau de façade, l'ombre est plus mince qu'un texel, et par
+l'arrière elle sortait en dents de scie ou en pointillé. Ce qui l'empêche de s'ombrer
+elle-même, c'est la lecture au plan de la face. Les lampes, lues sans ce plan, gardent
+la face arrière — le sol du Heikhal se striait sinon —, et le profil léger aussi.
+
+La grille des deux cartes est cisaillée sur les murs (`grilleSurLesMurs`) : un axe suit
+les arêtes est-ouest, l'autre les arêtes nord-sud, à surface de texel égale. En biais
+dans la grille, l'arête d'un bandeau y montait en marches d'un texel, et son ombre de dix
+centimètres ondulait d'autant. three refait la projection de l'œil en créant sa carte :
+le cisaillement vit dans `updateProjectionMatrix`, pas dans la matrice seule.
 
 Enfin le **grain**, qui ne correspond à rien de physique ici : rien ne le produit, aucune
 source ne le demande. Il est là parce que l'absence de grain est ce qui reste de plus
@@ -296,8 +327,9 @@ un vignettage.
 | bureau | 9,0 ms | 9,4 | **11,6** |
 | profil léger | 2,6 ms | 3,1 | **3,1** |
 
-La pénombre à elle seule vaut 1,75 ms des 2,6 : vingt-quatre prises dans la carte d'ombre
-au lieu de neuf. Le profil léger ne la prend pas et garde le PCF de three.
+La pénombre à elle seule valait 1,75 ms des 2,6 : vingt-quatre prises dans la carte d'ombre
+au lieu de neuf — trente-deux depuis qu'elle se lit en tente, sans écart mesurable. Le
+profil léger ne la prend pas et garde le PCF de three.
 
 **Le lien géométrie ↔ encyclopédie.** `concepts.json` déclare, pour chaque concept,
 les préfixes de noms d'objets qui le composent — le préfixe le plus long gagne. L'export

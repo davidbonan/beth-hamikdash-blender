@@ -17,7 +17,7 @@
  */
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
-import { assemblage } from "./ombres.js";
+import { OMBRE_LOINTAINE, assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
@@ -1041,7 +1041,8 @@ export function habiller(materiau, horloges, jeux) {
   const uniformes = { uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX,
-                      uLueurs: LUEURS, uLueurCouleur: LUEUR_COULEUR, uLueurMin: LUEUR_MIN, uLueurMax: LUEUR_MAX };
+                      uLueurs: LUEURS, uLueurCouleur: LUEUR_COULEUR, uLueurMin: LUEUR_MIN, uLueurMax: LUEUR_MAX,
+                      ...OMBRE_LOINTAINE };
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === METAL || famille === MIKSHE) materiau.envMapIntensity = REFLET_DU_METAL;
   if (famille === BRAISE) {
@@ -1097,8 +1098,7 @@ export function habiller(materiau, horloges, jeux) {
 
     nuanceur.fragmentShader = greffable(nuanceur.fragmentShader)
       .greffer("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
-      .greffer("#include <shadowmap_pars_fragment>",
-               PROFIL.ombres.penombre ? assemblage() : "#include <shadowmap_pars_fragment>")
+      .greffer("#include <shadowmap_pars_fragment>", assemblage("vMonde", "normalize(vNMonde)"))
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
       // La normale vient de l'attribut, pas des dérivées de la position : c'est elle

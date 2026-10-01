@@ -4,6 +4,7 @@ import { astreDu, environnement, lumieresDu, peindreDome, teinterAir } from "./c
 import { laisserPeindre } from "./fil.js";
 import { TEMPS_FLAMME, flamme } from "./flamme.js";
 import { assombrir, eclairerLaSalle } from "./matieres.js";
+import { FINESSE_LOINTAINE, cadrerLesOmbres, tracerOmbreLointaine } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 
 // Le soleil est posé loin devant la caméra, pas à sa hauteur : la fenêtre d'ombre le
@@ -56,7 +57,7 @@ function coupesDeLaShoeva(candelabres) {
   return centresDesGroupes(sommets.filter((p) => p.y > haut - 0.02), 0.25);
 }
 
-export function eclairerLeTemple({ scene, renderer, rendu, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple, sousSonde,
+export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple, sousSonde,
   emprises, reperes, horsGeometrie, annoncerAttente }) {
   let braise = null;
   let vacillement = 0;
@@ -222,6 +223,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, astres: { soleil, app
     soleil.intensity = lumieres.astre.intensite;
     directionDeLAstre = astreDu(voulu);
     ANCRE_OMBRE.set(Infinity, Infinity, Infinity);
+    ombreLointaineTracee = false;
     appoint.intensity = lumieres.appoint;
     cielAmbiant.intensity = lumieres.ciel;
     peindreDome(ciel, voulu);
@@ -260,7 +262,21 @@ export function eclairerLeTemple({ scene, renderer, rendu, astres: { soleil, app
   // calculée depuis un pas en arrière.
   const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
 
+  // Le Har HaBayit entre ses murs, du dallage au faîte du Heikhal : ce que la carte lointaine tient.
+  const enceinte = emprises.get("mur_har_habayit").clone();
+  enceinte.min.y = emprises.get("sol_har_habayit").min.y;
+  enceinte.max.y = new THREE.Box3().setFromObject(temple).max.y;
+  let ombreLointaineTracee = false;
+
+  function tracerLOmbreLointaine() {
+    cadrerLesOmbres(directionDeLAstre, enceinte);
+    detail.niveler(FINESSE_LOINTAINE);
+    tracerOmbreLointaine(renderer, scene);
+    ombreLointaineTracee = true;
+  }
+
   function suivreSoleil(oeil, ombresMobilesPres) {
+    if (!ombreLointaineTracee) tracerLOmbreLointaine();
     if (ombresMobilesPres(ANCRE_OMBRE)) soleil.shadow.needsUpdate = true;
     if (oeil.distanceToSquared(ANCRE_OMBRE) < PAS_OMBRE * PAS_OMBRE) return;
     ANCRE_OMBRE.copy(oeil);
@@ -285,6 +301,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, astres: { soleil, app
 
   return {
     passerAu, vaciller, suivreSoleil, refaireLesReflets,
+    retracerLOmbreLointaine() { ombreLointaineTracee = false; },
     get moment() { return moment; },
     get lampesPosees() { return lampesPosees; },
   };

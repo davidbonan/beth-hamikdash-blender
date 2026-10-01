@@ -82,6 +82,7 @@ export function niveauxDeDetail(scene, camera) {
     if (mobiles.has(maillage)) tuile.matrixWorld = maillage.matrixWorld;
     else tuile.matrixWorld.copy(maillage.matrixWorld);
     for (const cle of ["material", "castShadow", "receiveShadow"]) Object.defineProperty(tuile, cle, { get: () => maillage[cle] });
+    tuile.layers.mask = maillage.layers.mask;
     groupe.add(tuile);
     return tuile;
   }
@@ -155,6 +156,16 @@ export function niveauxDeDetail(scene, camera) {
     envoyer();
   }
 
+  // Le niveau le plus léger dont l'écart tient sous `admis` mètres.
+  function poser(t, admis, lisible) {
+    let n = 0;
+    while (n + 1 < t.niveaux.length && t.niveaux[n + 1].ecart <= admis) n++;
+    const niveau = t.niveaux[n];
+    t.maille.visible = niveau.nombre > 0 && lisible && present(t.source);
+    t.maille.geometry = n === 0 ? t.pleine : t.allegee;
+    if (n > 0) t.allegee.setDrawRange(niveau.debut, niveau.nombre);
+  }
+
   const oeil = new THREE.Vector3();
   return {
     confier,
@@ -181,14 +192,12 @@ export function niveauxDeDetail(scene, camera) {
       for (const t of tuiles) {
         if (t.suivie) t.centre.copy(t.suivie.center).applyMatrix4(t.source.matrixWorld);
         const distance = Math.max(oeil.distanceTo(t.centre) - t.rayon, 1e-3);
-        const admis = ECART_PIXELS * distance / focale;
-        let n = 0;
-        while (n + 1 < t.niveaux.length && t.niveaux[n + 1].ecart <= admis) n++;
-        const niveau = t.niveaux[n];
-        t.maille.visible = niveau.nombre > 0 && t.rayon * focale / distance >= RAYON_VISIBLE && present(t.source);
-        t.maille.geometry = n === 0 ? t.pleine : t.allegee;
-        if (n > 0) t.allegee.setDrawRange(niveau.debut, niveau.nombre);
+        poser(t, ECART_PIXELS * distance / focale, t.rayon * focale / distance >= RAYON_VISIBLE);
       }
+    },
+    // Pour une carte tracée d'ailleurs que de l'œil : tout le décor au même écart, jusqu'au prochain `choisir`.
+    niveler(admis) {
+      for (const t of tuiles) poser(t, admis, true);
     },
   };
 }
