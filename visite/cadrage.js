@@ -7,6 +7,8 @@ const PAS_RECUL = 0.4;
 const essai = new THREE.PerspectiveCamera();
 const coin = new THREE.Vector3();
 
+export const enBoite = (b) => new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max));
+
 export function unirEmprises(emprises, ids) {
   const boite = new THREE.Box3();
   for (const id of ids) {

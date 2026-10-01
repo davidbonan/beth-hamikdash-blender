@@ -54,7 +54,7 @@ est `immutable`.
 Deux régimes : les médias portent chacun leur propre empreinte, le code et les données
 portent un cachet commun calculé sur tout le site. Les chemins que la visite construit à
 l'exécution (`contenu_${f}.${code}.json`) échappent à la réécriture : `json()` dans
-`visite.js` relit le cachet dans son `import.meta.url` et l'ajoute lui-même. D'où la
+`encyclopedie.js` relit le cachet dans son `import.meta.url` et l'ajoute lui-même. D'où la
 règle — un nouveau média se cite par un littéral entier (`"matieres/pierre_c_1024.webp"`,
 pas `` `${nom}_c_1024.webp` ``), sinon `empreintes.py` ne le voit pas.
 

@@ -82,7 +82,15 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | Fichier | Rôle |
 |---|---|
 | `visite/index.html` | La page. Aucune dépendance locale : three.js est chargé depuis un CDN. |
-| `visite/visite.js` | Scène, marche, collisions, regard, désignation. |
+| `visite/visite.js` | Le chef d'orchestre : la scène, le chargement du Temple et l'habillage de ses matières, la barre, la boucle d'image, et ce qui relie les modules ci-dessous. |
+| `visite/marche.js` | Le marcheur : ses pieds sur le dallage, ses collisions, son vol libre, et la tête qu'il tourne. |
+| `visite/eclairage.js` | Les lampes du Temple — Menora, Arche, braises, feu de l'autel, mâts de la Shoéva —, l'astre dont l'ombre suit le visiteur, et le passage d'un moment du jour à l'autre. |
+| `visite/figurants.js` | Les figurants, en troupes : celle de la visite libre et celle de chaque parcours, chargées à la demande, montrées station par station, libérées en partant. |
+| `visite/vues.js` | Où poser le visiteur, et vers quoi le tourner, pour une entrée, une vue de `reperes.json` ou un élément. |
+| `visite/designation.js` | Ce que le curseur ou le doigt vise dans la scène, et l'élément que l'initiation montre du doigt. |
+| `visite/encyclopedie.js` | Le chargement des données : les concepts de la charnière fusionnés avec les trois relevés et leurs traductions. |
+| `visite/pannes.js` | Ce qui tourne mal : l'erreur de chargement qu'on affiche, et le contexte WebGL qu'un téléphone retire puis rend. |
+| `visite/fil.js` | Rendre le fil de la page au navigateur entre deux tranches de calcul, ou le temps qu'il peigne une image. |
 | `visite/pilotage.js` | Les commandes : clavier au bureau, manche du pouce gauche et regard du pouce droit au doigt. |
 | `visite/initiation.js` | Les premiers pas : regarder, avancer, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis le « ? » de la barre. Quitter le sol, monter et redescendre s'apprennent à part, la première fois qu'on demande le vol libre. |
 | `visite/parcours.js`, `visite/parcours.json` | Les parcours guidés, au choix dans le menu « Parcours… » : le tamid du matin (neuf stations, Tamid 1–7), le seder ha'avoda de Yom Kippour (dix-sept stations, de la Lishkat Parhedrin au Heikhal du soir, Yoma 1–7), la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4), le korban Pessa'h (7 stations, Pessa'him 5:5–10), les bikkourim (5 stations, Bikkourim 3:2–6), les dix degrés de sainteté (9 stations, Kelim 1:6–9, sans figurants), Souccot au matin (4 stations, Soucca 4:5, 4:9), Hakhel (5 stations, Sota 7:8) et le nazir et le metzora (5 stations, Middot 2:5 ; Nega'im 14:7–10). La visite marche seule d'une station à la suivante — au pas, ×2 ou ×4 — sauf vers les hauts qu'aucun escalier ne dessert (l'étage du Beit Avtinas, les tevilot du Sha'ar HaMayim et du Beit HaParva), rejoints en fondu, et dit ce qu'on y voit ; chaque station ne montre que ses `figurants` ; la fiche du concept attend derrière le lien « Lire la fiche » de la carte. Les stations, en amot comme `cinema.json`, portent leurs points de passage et leur source. |

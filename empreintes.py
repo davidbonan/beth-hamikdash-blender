@@ -22,7 +22,7 @@ Deux régimes, parce que les poids n'ont rien de commun :
     pire qu'un graphe en retard. Ils pèsent ensemble moins d'un mégaoctet.
 
 Les seuls chemins que ce script ne voit pas sont ceux que la visite construit à
-l'exécution (`contenu_${f}.${code}.json`) : visite.js relit le cachet dans son propre
+l'exécution (`contenu_${f}.${code}.json`) : encyclopedie.js relit le cachet dans son propre
 `import.meta.url` et l'ajoute lui-même. D'où la règle : on ne touche pas ici aux
 `.json` cités depuis un `.js`.
 """
@@ -83,7 +83,7 @@ def version(cible, porteur, medias, sceau):
     if cible.suffix in MEDIAS:
         return medias[cible]
     if cible.suffix == ".json" and porteur.suffix == ".js":
-        return None                       # visite.js le fait à l'exécution, via json()
+        return None                       # encyclopedie.js le fait à l'exécution, via json()
     return sceau
 
 

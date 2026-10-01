@@ -2,52 +2,33 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, assombrir, eclairerLaSalle, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
+import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { niveauxDeDetail } from "./detail.js";
-import { astreDu, brumer, domeVu, environnement, lumieresDu, peindreDome, teinterAir } from "./ciel.js";
+import { brumer, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
-import { PROFIL, plafonner } from "./qualite.js";
+import { PROFIL } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
 import { initiation } from "./initiation.js";
-import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
+import { enBoite, unirEmprises } from "./cadrage.js";
 import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
-import { TEMPS_FLAMME, flamme } from "./flamme.js";
-import { PAS, SOUS_PAS } from "./trajet.js";
-import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
-
-const AMA = 0.48;
-const OEIL = 1.55;        // yeux d'un homme de l'époque (1,65 m), sous les 1,75 m des silhouettes
-const RAYON = 0.38;       // demi-largeur du marcheur
-// Les degrés du 'Heil, de Nikanor et de l'Oulam font tous 1/2 ama — 0,24 m de haut
-// comme de giron. La garde se place juste au-dessus de MONTEE et ne porte qu'à une
-// peau : la première contremarche qu'elle voit est deux girons plus loin, jamais
-// celle qu'on s'apprête à gravir.
-// MONTEE suit la plus haute marche du parcours : celle d'une ama qui porte le Doukhan
-// (Middot 2:6, selon R. Eliézer ben Yaakov), sur toute la largeur de la cour. À 0,28 m, l'Azara restait hors d'atteinte.
-const MONTEE = AMA + 0.02;
-const CHUTE = 0.60;        // au-delà, il n'y a pas de sol : le pas est refusé
-const FENTE = 0.25;        // un pied : le vide plus étroit que lui s'enjambe sans y penser
-// Ce qu'un repère d'entrée peut manquer son sol, en plus ou en moins. Il donne sa
-// hauteur à la main, et la fenêtre de la marche est celle d'un pas : trois des neuf
-// étaient 2,5 amot au-dessus de leur dallage, et on s'y posait en l'air.
-const APLOMB = 1.5;
-const COURSE = 2.4;       // multiplicateur
-const GARDE = 0.06;       // peau du rayon de garde, devant le marcheur
-const VOL = 9.0;          // m/s en vol libre
-// Le pas ne s'établit ni ne s'éteint d'un coup : une vitesse qui bascule de 0 à 3,4
-// m/s à l'image près se lit en saccade, et c'est elle qu'on prend pour un manque de
-// framerate. 0,09 s, c'est trente centimètres de glissé à l'arrêt — le pied qui se pose.
-const REPONSE = 0.09;
-const LISSAGE_REGARD = 0.045;
+import { AMA, OEIL, marcheur } from "./marche.js";
+import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
+import { veillerAuxPannes } from "./pannes.js";
+import { laisserPeindre, rendreLaMain } from "./fil.js";
+import { TROUPES, TROUPE_LIBRE, troupesDeFigurants } from "./figurants.js";
+import { eclairerLeTemple } from "./eclairage.js";
+import { designation } from "./designation.js";
+import { vuesDuTemple } from "./vues.js";
+import { conceptsEn, contenusSources, json } from "./encyclopedie.js";
 
 // Une étoffe ne barre pas le passage. La parokhet en particulier : le Cohen Gadol la
 // franchit, et une visite qui s'arrête devant elle n'atteint jamais le Kodesh
@@ -72,108 +53,17 @@ THREE.Mesh.prototype.raycast = acceleratedRaycast;
 // ---------------------------------------------------------------------------
 const $ = (s) => document.querySelector(s);
 const etat = $("#etat"), jauge = $("#jauge i");
+const pannes = veillerAuxPannes({ etat, chargement: $("#chargement") });
 
-// Une erreur de chargement laissait l'écran figé sur son dernier état sans rien dire :
-// le voile ne se lève qu'en fin de module, et un module qui jette ne lève rien.
-const echouer = (quoi) => {
-  if (contexte?.isContextLost()) return quandContextePerdu();
-  etat.textContent = `${texte("echec")} ${quoi}`;
-  etat.style.color = "#e0836a";
-};
-addEventListener("error", (e) => echouer(e.message || e.error));
-addEventListener("unhandledrejection", (e) => echouer(e.reason?.message || e.reason));
-
-// Un iPhone à court de mémoire retire son contexte à la page : plus rien ne se dessine, et la compilation en cours
-// jetait « shaderSource … must be an instance of WebGLShader ». Visite lancée, on attend que le navigateur le rende
-// et on renvoie ce que three ne sait pas refaire seul (reprendre) ; pendant le chargement, ou s'il ne revient pas,
-// la page se recharge d'elle-même. Une rechute aussitôt après ne boucle pas : elle le dit et attend qu'on touche l'écran.
-let contexte = null;
-let visiteLancee = false;
-let derniereReprise = -Infinity;
-let enReprise = false;
-let contexteAbandonne = false;
-const PERTE = "visite-contexte-perdu";
-const RECHUTE_MS = 120000;
-const ATTENTE_RESTITUTION_MS = 5000;
-function lireStockage(cle) {
-  try { return sessionStorage.getItem(cle); } catch { return null; }
-}
-function ecrireStockage(cle, valeur) {
-  try { sessionStorage.setItem(cle, valeur); } catch { /* navigation privée : la page rechargera, sans garde-fou */ }
-}
-let contexteEnPerte = false;
-function quandContextePerdu() {
-  if (contexteEnPerte) return;
-  contexteEnPerte = true;
-  if (!visiteLancee || Date.now() - derniereReprise < RECHUTE_MS) return abandonnerContexte();
-  attendreRestitution();
-}
-function attendreRestitution() {
-  setTimeout(() => {
-    if (!contexte.isContextLost()) return;
-    if (document.hidden) return document.addEventListener("visibilitychange", attendreRestitution, { once: true });
-    abandonnerContexte();
-  }, ATTENTE_RESTITUTION_MS);
-}
-async function quandContexteRendu() {
-  if (!contexteEnPerte || contexteAbandonne) return;
-  contexteEnPerte = false;
-  derniereReprise = Date.now();
-  enReprise = true;
-  try {
-    await reprendre();
-  } finally {
-    enReprise = false;
-  }
-}
-function abandonnerContexte() {
-  contexteAbandonne = true;
-  const rechute = Date.now() - Number(lireStockage(PERTE) ?? 0) < RECHUTE_MS;
-  ecrireStockage(PERTE, String(Date.now()));
-  if (!rechute) return location.reload();
-  document.documentElement.classList.add("perdu");
-  ecrire(etat, "contexte_perdu");
-  etat.style.color = "";
-  $("#chargement").onclick = () => location.reload();
-}
-
-// Le cachet que le build appose sur ./visite.js voyage jusqu'ici : les données qu'on
-// demande par un nom construit le portent comme celles qu'il a pu réécrire.
-const VERSION = new URL(import.meta.url).search;
-
-async function json(chemin, obligatoire = true) {
-  const r = await fetch(chemin + VERSION);
-  if (!r.ok) {
-    if (obligatoire) throw new Error(`${chemin} : ${r.status}`);
-    return null;                                  // encyclopédie encore incomplète
-  }
-  return r.json();
-}
-
-const FICHIERS_CONTENU = ["a", "b", "c"];
 const [textes, fiche, ...contenus] = await Promise.all([
   json("./textes.json"),
   json("./concepts.json"),
-  ...FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.json`, false)),
+  ...contenusSources(),
 ]);
 installerLangue(textes);
 // Encadrée par l'accueil, la scène marche seule et se tait : ni barre, ni fiche, ni initiation.
 const CINEMA = new URLSearchParams(location.search).has("cinema");
 document.documentElement.classList.toggle("cinema", CINEMA);
-// Une troupe pour la visite libre, une par parcours : chacune descend la première fois qu'on la demande.
-// Chemins écrits en entier : empreintes.py ne signe que ceux qu'il lit.
-const TROUPES = {
-  figures: { glb: "./figures.glb", json: "./figures.json" },
-  figures_tamid: { glb: "./figures_tamid.glb", json: "./figures_tamid.json" },
-  figures_kippour: { glb: "./figures_kippour.glb", json: "./figures_kippour.json" },
-  figures_shoeva: { glb: "./figures_shoeva.glb", json: "./figures_shoeva.json" },
-  figures_pessah: { glb: "./figures_pessah.glb", json: "./figures_pessah.json" },
-  figures_bikkourim: { glb: "./figures_bikkourim.glb", json: "./figures_bikkourim.json" },
-  figures_souccot: { glb: "./figures_souccot.glb", json: "./figures_souccot.json" },
-  figures_hakhel: { glb: "./figures_hakhel.glb", json: "./figures_hakhel.json" },
-  figures_nazir: { glb: "./figures_nazir.glb", json: "./figures_nazir.json" },
-};
-const TROUPE_LIBRE = "figures";
 const [reperes, { cadrages: CADRAGES_DU_PLAN }, haltesCinema, { parcours: PARCOURS }, ...distributions] =
   await Promise.all([json("./reperes.json"), json("./plan.json"), CINEMA ? json("./cinema.json") : null,
     json("./parcours.json"), ...Object.values(TROUPES).map((t) => json(t.json))]);
@@ -189,26 +79,9 @@ for (const { emprises, vues } of distributions) {
   for (const [id, boite] of Object.entries(emprises)) reperes.emprises[id] = unirBoites(reperes.emprises[id], boite);
   reperes.vues.push(...vues.filter((vue) => !reperes.vues.some((v) => v.id === vue.id)));
 }
-const enBoite = (b) => new THREE.Box3(new THREE.Vector3(...b.min), new THREE.Vector3(...b.max));
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) => [id, enBoite(b)]));
 
-const traductions = new Map();
-function contenusTraduits(code) {
-  if (!traductions.has(code)) {
-    traductions.set(code, Promise.all(FICHIERS_CONTENU.map((f) => json(`./contenu_${f}.${code}.json`, false))));
-  }
-  return traductions.get(code);
-}
-
-const apport = (contenusDuFichier, id) => contenusDuFichier.find((x) => x && x[id])?.[id] || {};
-
-async function conceptsEn(code) {
-  const traduits = code === LANGUE_SOURCE ? [] : await contenusTraduits(code);
-  return new Map(fiche.concepts.map((c) =>
-    [c.id, { ...c, ...apport(contenus, c.id), ...apport(traduits, c.id) }]));
-}
-
-const CONCEPTS = await conceptsEn(langue());
+const CONCEPTS = await conceptsEn(langue(), fiche, contenus);
 
 // ---------------------------------------------------------------------------
 // scène
@@ -225,9 +98,7 @@ renderer.shadowMap.enabled = true;
 // par une pénombre variable. Il reste le réglage du profil léger, qui garde celle-ci.
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
-contexte = renderer.getContext();
-renderer.domElement.addEventListener("webglcontextlost", quandContextePerdu);
-renderer.domElement.addEventListener("webglcontextrestored", quandContexteRendu);
+pannes.surveiller(renderer, () => reprendre());
 
 const scene = new THREE.Scene();
 const brume = brumer(scene);
@@ -252,16 +123,8 @@ const appoint = new THREE.DirectionalLight(0xb9c6d4, lumieresDu("jour").appoint)
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
-// Le soleil est posé loin devant la caméra, pas à sa hauteur : la fenêtre d'ombre le
-// suit, et il faut que ce qui la surplombe — la façade fait cinquante mètres — tienne
-// entre son `near` et son `far`.
-const RECUL_SOLEIL = 200;
-
 const ciel = domeVu(5700);
 scene.add(ciel);
-// L'or est métallique : sans environnement à réfléchir, il rend noir.
-const reflets = { jour: environnement(renderer) };
-scene.environment = reflets.jour.texture;
 
 // Le champ est fixé à l'HORIZONTALE, pas à la verticale. Un champ vertical constant
 // vaut 94° de large en 16/9 et 31° sur un téléphone tenu debout : on y visiterait le
@@ -279,238 +142,6 @@ const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5, taim: LAMPE_TETE,
 const lampe = new THREE.PointLight(0xffe9c4, 0, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
-
-// L'Arche éclaire le Kodesh HaKodashim : « עד שלא ניטל הארון היה נכנס ויוצא לאורו של ארון »
-// (Yerushalmi Yoma 5:3, fiche §8e) — une lumière posée entre les keruvim, qui ne vacille
-// pas et dont la portée meurt avant les murs. Les braises de la ma'hta, elles, vacillent à
-// la mesure d'un bassin de charbons — pas d'une flamme : deux sinus incommensurables et un
-// peu de hasard, jamais une période. Elles ne sont plus que le point chaud de la pièce.
-const ARCHE = { couleur: 0xffeed2, intensite: 9, portee: 6, carte: 512 };
-// Remonter `intensite` rallume les stries d'auto-ombre sur la calotte des keruvim : les regarder avant de conclure.
-const BRAISE = { couleur: 0xff7a2a, intensite: 6, portee: 8, carte: 512 };
-let braise = null;
-let vacillement = 0;
-// Le feu de l'autel, une lampe au-dessus des ma'arakhot : de nuit, la seule lumière de l'Azara (Tamid 1:4).
-const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteur: 3.0 };
-let feuDeLAutel = null;
-let lampesPosees = 0;
-
-// La scène ne bouge pas : la carte cubique se calcule une fois, au premier rendu.
-function poserLampe(reglage, position, ombrage) {
-  const carte = Math.min(reglage.carte, ombrage.carte);
-  const lumiere = new THREE.PointLight(reglage.couleur, reglage.intensite, reglage.portee, 2);
-  lumiere.position.copy(position);
-  lumiere.castShadow = ombrage.ombre;
-  lumiere.shadow.autoUpdate = false;
-  lumiere.shadow.needsUpdate = true;
-  lumiere.shadow.mapSize.set(carte, carte);
-  lumiere.shadow.camera.near = 0.05;
-  lumiere.shadow.camera.far = reglage.portee;
-  lumiere.shadow.bias = -0.002;
-  // Pas de `normalBias` ici, contrairement au soleil : ces trois lampes éclairent des
-  // objets plus fins que le décalage qu'il faudrait. Une penne d'aile fait 2,5 mm, et
-  // 2 cm — l'ordre de grandeur qui vaut pour le soleil — la traversent : la lumière
-  // passe sous les ailes, les keruvim perdent l'ombre propre de leur visage et les
-  // marches du Heikhal voient la leur se décoller du sol.
-  scene.add(lumiere);
-  return lumiere;
-}
-
-function eclairerKodeshHakodashim(arche, braises) {
-  if (!arche?.length || !braises?.length) return;
-  const lumiereArche = poserLampe(ARCHE, new THREE.Vector3(...arche[0]), PROFIL.sanctuaire);
-  braise = poserLampe(BRAISE, new THREE.Vector3(...braises[0]), PROFIL.sanctuaire);
-  // La pièce n'a aucune ouverture, mais le ciel y entrait quand même — par l'ambiance, par
-  // le rebond, par l'or qui le réfléchit. La pénombre est dans la pièce, pas dans le
-  // temps : elle se lit sur la position de chaque point, et la fumée y prend la lumière
-  // des deux sources.
-  assombrir(EMPRISES.get("kodesh_hakodashim"));
-  rendu.enfumer(EMPRISES.get("kodesh_hakodashim"), braise.position, lumiereArche.position);
-}
-
-function vaciller(dt) {
-  vacillement += dt;
-  const t = vacillement;
-  TEMPS_FLAMME.value = t;
-  const eclat = lumieresDu(moment).shoeva ? SHOEVA.intensite : 0;
-  shoeva?.lampes.forEach((l, i) => {
-    l.intensity = eclat * (0.93 + 0.04 * Math.sin(t * 7.3 + i) + 0.03 * Math.sin(t * 17.9 + i * 2.1));
-  });
-  if (shoeva?.lueur) shoeva.lueur.intensity = eclat ? LUEUR.intensite * (0.9 + 0.1 * Math.sin(t * 11.3)) : 0;
-  lueursGazit.forEach((l, i) => {
-    l.w = LUEUR_GAZIT.intensite * (0.94 + 0.04 * Math.sin(t * 8.3 + i * 1.7) + 0.02 * Math.sin(t * 19.1 + i));
-  });
-  if (lumiereMenora) {
-    lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
-  }
-  if (feuDeLAutel) {
-    feuDeLAutel.intensity = lumieresDu(moment).feu ? FEU.intensite * (0.9 + 0.06 * Math.sin(t * 2.3) + 0.04 * Math.sin(t * 6.1 + 1.3)) : 0;
-  }
-  if (!braise) return;
-  const souffle = 0.86 + 0.09 * Math.sin(t * 1.7) + 0.05 * Math.sin(t * 4.3 + 1.0) + 0.04 * (Math.random() - 0.5);
-  braise.intensity = BRAISE.intensite * souffle;
-}
-
-// L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
-const MENORA = { couleur: 0xffe1aa, intensite: 150, portee: 18, carte: 512 };
-let lumiereMenora = null;
-
-function allumerMenora(flammes) {
-  if (!flammes?.length) return;
-  const centre = new THREE.Vector3();
-  flammes.forEach((p, i) => {
-    const meche = flamme(i * 2.39);
-    meche.position.set(...p);
-    scene.add(meche);
-    horsGeometrie.push(meche);
-    centre.add(meche.position);
-  });
-  // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
-  const point = centre.divideScalar(flammes.length).add(new THREE.Vector3(0, 0.35, 0));
-  lumiereMenora = poserLampe(MENORA, point, PROFIL.sanctuaire);
-}
-
-// Les lampes de terre de la Lishkat HaGazit, une lueur par mèche : sans elles, la salle n'avait que sa
-// lumière cuite, qui n'a pas de direction, et la pierre comme les gradins y rendaient à plat.
-const LUEUR_GAZIT = { couleur: 0xffd8a0, intensite: 4 };
-let lueursGazit = [];
-
-function allumerLesLueurs(lueurs) {
-  if (!lueurs?.points.length) return;
-  const salle = new THREE.Box3(new THREE.Vector3(...lueurs.salle.min), new THREE.Vector3(...lueurs.salle.max));
-  lueursGazit = eclairerLaSalle(salle, lueurs.points, LUEUR_GAZIT.couleur);
-}
-
-// Les mâts d'or de l'Ezrat Nashim, qui ne brûlent que la nuit de Sim'hat Beit HaSho'éva (Soucca 5:2).
-const SHOEVA = { couleur: 0xffc58a, intensite: 600, portee: 200, carte: 1024 };
-const HAUTEUR_FLAMME_SHOEVA = 1.2;
-// Les torches de la ronde, en une lueur sans ombre : une lampe par torche, c'est un nuanceur par torche.
-const LUEUR = { couleur: 0xffa860, intensite: 40, portee: 16, hauteur: 1.5 };   // m : des mèches de caleçons et de ceintures de cohanim (Soucca 5:3)
-let moment = "jour";
-let directionDeLAstre = astreDu(moment);
-let shoeva = null;
-let lumiereCuiteDuCiel = null;
-
-// Le Heikhal et le Kodesh HaKodashim ont leur lumière cuite à leurs propres lampes, que la nuit n'éteint pas.
-function eclaireParSesLampes(maillage) {
-  if (sousSonde.has(maillage)) return true;
-  const centre = maillage.geometry.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(maillage.matrixWorld);
-  return EMPRISES.get("kodesh_hakodashim").containsPoint(centre);
-}
-
-// De proche en proche : deux points à moins de `pas` l'un de l'autre sont du même groupe.
-function centresDesGroupes(points, pas) {
-  let groupes = [];
-  for (const p of points) {
-    const voisins = groupes.filter((g) => g.some((q) => q.distanceTo(p) < pas));
-    groupes = [...groupes.filter((g) => !voisins.includes(g)), [p, ...voisins.flat()]];
-  }
-  return groupes.map((g) => g.reduce((somme, p) => somme.add(p), new THREE.Vector3()).divideScalar(g.length));
-}
-
-// Le bord des coupes est le plus haut du mât : ses sommets, groupés, donnent le centre de chacune.
-function coupesDeLaShoeva(candelabres) {
-  const sommets = [];
-  for (const o of candelabres) {
-    const position = o.geometry.attributes.position;
-    for (let i = 0; i < position.count; i++) {
-      sommets.push(new THREE.Vector3().fromBufferAttribute(position, i).applyMatrix4(o.matrixWorld));
-    }
-  }
-  const haut = sommets.reduce((max, p) => Math.max(max, p.y), -Infinity);
-  return centresDesGroupes(sommets.filter((p) => p.y > haut - 0.02), 0.25);
-}
-
-// Une lampe par mât, au milieu de ses quatre coupes : seize lampes à carte d'ombre, c'est seize cubes à rendre.
-function poserShoeva() {
-  const candelabres = [];
-  gltf.scene.traverse((o) => { if (o.isMesh && o.userData.concept === "candelabres_shoeva") candelabres.push(o); });
-  const coupes = coupesDeLaShoeva(candelabres);
-  const flammes = coupes.map((coupe, i) => {
-    const meche = flamme(i * 2.39, HAUTEUR_FLAMME_SHOEVA);
-    meche.position.copy(coupe).y -= 0.1;
-    scene.add(meche);
-    horsGeometrie.push(meche);
-    return meche;
-  });
-  const lampes = centresDesGroupes(coupes, 2).map((mat) =>
-    poserLampe(SHOEVA, mat.add(new THREE.Vector3(0, HAUTEUR_FLAMME_SHOEVA / 2, 0)), PROFIL.feux));
-  return { candelabres, flammes, lampes, lueur: eclairerLaRonde(EMPRISES.get("hassidim_veanshei_maase")) };
-}
-
-function eclairerLaRonde(ronde) {
-  if (!ronde) return null;
-  const lueur = new THREE.PointLight(LUEUR.couleur, 0, LUEUR.portee, 2);
-  ronde.getCenter(lueur.position).y += LUEUR.hauteur;
-  scene.add(lueur);
-  return lueur;
-}
-
-// L'intensité de jour de chaque lumière cuite au ciel seul, celle que le moment module.
-function lumieresCuitesAuCiel() {
-  const intensites = new Map();
-  gltf.scene.traverse((o) => {
-    if (o.isMesh && o.material.lightMap && !eclaireParSesLampes(o)) intensites.set(o.material, o.material.lightMapIntensity);
-  });
-  return intensites;
-}
-
-function allumerLeFeu() {
-  const dessus = EMPRISES.get("maarakhot");
-  const foyer = dessus.getCenter(new THREE.Vector3()).setY(dessus.max.y + FEU.hauteur);
-  return poserLampe(FEU, foyer, PROFIL.feux);
-}
-
-// Les mâts et le feu ne sont posés qu'à la première nuit : le visiteur de jour n'en paie ni les lampes ni les nuanceurs.
-// Posées avant que « préparation… » soit peint, la boucle compilerait leurs nuanceurs dans son image, figée, sans l'avoir montré.
-async function passerAu(voulu) {
-  if (voulu === moment) return;
-  const eclairage = lumieresDu(voulu);
-  const lampesAPoser = (feuDeLAutel === null && eclairage.feu) || (shoeva === null && eclairage.shoeva);
-  if (!lampesAPoser) return eclairerAu(voulu);
-  await annoncerAttente(async () => {
-    eclairerAu(voulu);
-    await rendu.compiler();
-    // La première image de nuit trace les cartes d'ombre des lampes : sous le voile, et non au premier pas.
-    await laisserPeindre();
-  });
-}
-
-function eclairerAu(voulu) {
-  const quitte = moment;
-  moment = voulu;
-  const eclairage = lumieresDu(voulu);
-  soleil.color.set(eclairage.astre.couleur);
-  soleil.intensity = eclairage.astre.intensite;
-  directionDeLAstre = astreDu(voulu);
-  ANCRE_OMBRE.set(Infinity, Infinity, Infinity);
-  appoint.intensity = eclairage.appoint;
-  cielAmbiant.intensity = eclairage.ciel;
-  peindreDome(ciel, voulu);
-  teinterAir(brume, voulu);
-  reflets[voulu] ??= environnement(renderer, voulu);
-  scene.environment = reflets[voulu].texture;
-  // Le ciel de jour revient à la fin de chaque parcours ; celui d'un autre moment se refait en un fondu s'il revient.
-  if (quitte !== "jour") {
-    reflets[quitte].dispose();
-    delete reflets[quitte];
-  }
-  lumiereCuiteDuCiel ??= lumieresCuitesAuCiel();
-  for (const [materiau, intensite] of lumiereCuiteDuCiel) materiau.lightMapIntensity = intensite * eclairage.cuite;
-  if (feuDeLAutel === null && eclairage.feu) {
-    feuDeLAutel = allumerLeFeu();
-    lampesPosees++;
-  }
-  if (shoeva === null && eclairage.shoeva) {
-    shoeva = poserShoeva();
-    lampesPosees++;
-  }
-  if (shoeva !== null) {
-    for (const f of shoeva.flammes) f.visible = eclairage.shoeva;
-    // Les coupes sont sous la lampe de leur mât : leur ombre posait quatre disques noirs sur les murs.
-    for (const o of shoeva.candelabres) o.castShadow = !eclairage.shoeva;
-  }
-}
 
 // Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
 // tout entière. Les flammes de la Menora non plus : elles ne sont pas une surface à ombrer.
@@ -561,16 +192,6 @@ const obstacles = [];
 
 // Par tranches, et non d'un bloc : une seconde de calcul figeait la page, et un téléphone en met plusieurs.
 const TRANCHE_MS = 30;
-const rendreLaMain = () => new Promise((reprise) => {
-  const canal = new MessageChannel();
-  canal.port1.onmessage = () => reprise();
-  canal.port2.postMessage(null);
-});
-// Sans cette image, « préparation… » ne s'affichait jamais ; un onglet caché n'en donne aucune, d'où le délai.
-const laisserPeindre = () => new Promise((suite) => {
-  requestAnimationFrame(() => setTimeout(suite));
-  setTimeout(suite, 200);
-});
 async function construireArbres(maillages) {
   let debut = performance.now();
   for (const maillage of maillages) {
@@ -603,11 +224,9 @@ scene.add(gltf.scene);
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
 // aucun sol, et la visite s'ouvrait un mètre au-dessus du dallage.
 gltf.scene.updateMatrixWorld(true);
-allumerMenora(reperes.flammes);
-allumerLesLueurs(reperes.lueurs);
-eclairerKodeshHakodashim(reperes.arche, reperes.braises);
 
 const murs = [];                        // collision : les étoffes en sont exclues
+const marche = marcheur(camera, murs);
 const horloges = [];                    // uniformes de temps à faire avancer
 const brut = new URLSearchParams(location.search).has("brut");
 const IDS = new Set(CONCEPTS.keys());
@@ -637,6 +256,8 @@ gltf.scene.traverse((o) => {
 });
 const sousSonde = new Set(brut ? [] : separerDuHeikhal(
   maillages.filter((o) => DANS_HEIKHAL.has(o.userData.concept)), EMPRISES.get("heikhal")));
+const eclairage = eclairerLeTemple({ scene, renderer, rendu, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple: gltf.scene, sousSonde,
+  emprises: EMPRISES, reperes, horsGeometrie, annoncerAttente });
 
 gltf.scene.traverse((o) => {
   if (!o.isMesh) return;
@@ -682,208 +303,9 @@ if (!brut) {
 }
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
-const troupes = {};
-const chargements = {};
-const MARGE_GESTE = 0.35;
-const EMPRISES_FIGURANTS = Object.fromEntries(Object.entries(figurants).map(([nom, { emprises }]) =>
-  [nom, Object.values(emprises).map(enBoite)]));
-// La voulue change à la demande, la présente sous le voile du fondu qui suit.
-let troupeVoulue = TROUPE_LIBRE, troupePresente = TROUPE_LIBRE;
-// Les figurants que l'étape d'un parcours appelle, par nom ou par concept ; null : toute la troupe.
-let appeles = null;
-const PRISE = new THREE.MeshBasicMaterial();
-const HAUTEUR_FLAMME_TORCHE = 0.3;
-
-// Le clic vise une boîte portée par le figurant : un rayon sur un corps animé transforme chaque sommet en JavaScript.
-function prendreEnMain(figurant) {
-  const emprise = new THREE.Box3();
-  figurant.traverse((o) => {
-    if (!o.isMesh) return;
-    o.material.side = ETOFFES.has(o.material.name) ? THREE.DoubleSide : THREE.FrontSide;
-    o.castShadow = PROFIL.figurants.ombre;
-    o.receiveShadow = true;
-    if (!o.isSkinnedMesh) return;
-    o.computeBoundingSphere();
-    o.boundingSphere.radius += MARGE_GESTE;
-    o.computeBoundingBox();
-    emprise.union(o.boundingBox.clone().applyMatrix4(o.matrix));
-  });
-  const prise = new THREE.Mesh(new THREE.BoxGeometry(...emprise.getSize(new THREE.Vector3()).toArray()), PRISE);
-  emprise.getCenter(prise.position);
-  prise.visible = false;
-  prise.userData.concept = conceptDe(figurant);
-  figurant.add(prise);
-  return prise;
-}
-
-// Où le figurant peut paraître : sa prise, et tout le trajet de son concept s'il marche ou danse.
-function etendueDe(figurant, prise, emprises, animations) {
-  const etendue = new THREE.Box3().setFromObject(prise);
-  const bouge = animations.some((clip) => clip.tracks.some((piste) => piste.name === `${figurant.name}.position`));
-  const trajet = bouge && emprises[conceptDe(figurant)];
-  return trajet ? etendue.union(enBoite(trajet)) : etendue;
-}
-
-// La tête d'étoupe est au bout du manche, sur l'axe y du maillage : la flamme s'y pose, droite, quoi que fasse la torche.
-function allumerTorches(figurant, rang) {
-  const torches = [];
-  figurant.traverse((o) => { if (o.isMesh && /_avouka(_\d+)?$/.test(o.name)) torches.push(o); });
-  return torches.map((torche, i) => {
-    torche.geometry.computeBoundingBox();
-    const meche = flamme((rang + i) * 1.93, HAUTEUR_FLAMME_TORCHE);
-    scene.add(meche);
-    horsGeometrie.push(meche);
-    return { torche, meche, bout: new THREE.Vector3(0, torche.geometry.boundingBox.max.y - 0.06, 0) };
-  });
-}
-
-function suivreTorches(troupe) {
-  if (!troupe.torches.length) return;
-  troupe.scene.updateMatrixWorld();
-  for (const { torche, meche, bout } of troupe.torches) meche.position.copy(bout).applyMatrix4(torche.matrixWorld);
-}
-
-const estAppele = (figurant) => appeles === null || appeles.has(figurant.name) || appeles.has(conceptDe(figurant));
-
-// Caché, un figurant sort de ce que le doigt vise, et ses torches s'éteignent.
-function montrerFigurant({ figurant, prise, torches }, visible) {
-  figurant.visible = visible;
-  for (const { meche } of torches) meche.visible = visible;
-  const rang = obstacles.indexOf(prise);
-  if (visible && rang < 0) obstacles.push(prise);
-  if (!visible && rang >= 0) obstacles.splice(rang, 1);
-}
-
-// Les autres troupes se cachent ; de la présente, les figurants que l'étape appelle.
-function montrerTroupes() {
-  for (const [nom, troupe] of Object.entries(troupes)) {
-    const presente = nom === troupePresente;
-    troupe.scene.visible = presente;
-    for (const membre of troupe.membres) montrerFigurant(membre, presente && estAppele(membre.figurant));
-  }
-}
-
-// En marche, un figurant ne paraît ni ne disparaît sous les yeux : il attend d'être hors du cadre.
-const cadre = new THREE.Frustum(), projection = new THREE.Matrix4();
-function relayerHorsDuCadre() {
-  const troupe = troupes[troupePresente];
-  if (!troupe) return;
-  cadre.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  for (const membre of troupe.membres) {
-    const voulu = estAppele(membre.figurant);
-    if (membre.figurant.visible !== voulu && !cadre.intersectsBox(membre.etendue)) montrerFigurant(membre, voulu);
-  }
-}
-
-function texturesDe(racine) {
-  const textures = new Set();
-  racine.traverse((o) => {
-    if (o.isMesh) for (const valeur of Object.values(o.material)) if (valeur?.isTexture) textures.add(valeur);
-  });
-  return [...textures];
-}
-
-// Envoyées d'un bloc à la première image de la troupe, ses textures figeaient la marche : une par image, avant qu'elle n'entre.
-async function envoyerTextures(textures) {
-  for (const texture of textures) {
-    renderer.initTexture(texture);
-    await laisserPeindre();
-  }
-}
-
-function rendreLaMemoire(maillages) {
-  const materiaux = new Set(maillages.map((m) => m.material));
-  for (const maillage of maillages) {
-    maillage.geometry.dispose();
-    maillage.skeleton?.dispose();
-  }
-  for (const materiau of materiaux) {
-    for (const valeur of Object.values(materiau)) if (valeur?.isTexture) valeur.dispose();
-    materiau.dispose();
-  }
-}
-
-// Compilés avant d'entrer en scène : sinon la première image qui les voit fige la marche le temps de leurs nuanceurs.
-async function poserFigurants({ scene: troupe, animations }, emprises) {
-  const textures = texturesDe(troupe);
-  // Un figurant se lit sur quelques centaines de pixels au plus : le profil léger ramène ses textures à cette mesure.
-  await Promise.all(textures.map((t) => plafonner(t, PROFIL.textures.figurants)));
-  const melangeur = new THREE.AnimationMixer(troupe);
-  for (const clip of animations) melangeur.clipAction(clip).play();
-  melangeur.update(0);
-  troupe.updateMatrixWorld(true);
-  let rang = 0;
-  const membres = troupe.children.map((figurant) => {
-    const prise = prendreEnMain(figurant);
-    prise.updateMatrixWorld();
-    const torches = allumerTorches(figurant, rang);
-    rang += torches.length;
-    return { figurant, prise, torches, etendue: etendueDe(figurant, prise, emprises, animations) };
-  });
-  await envoyerTextures(textures);
-  await compilerSousLesLampes(troupe);
-  return { scene: troupe, melangeur, membres, torches: membres.flatMap((m) => m.torches) };
-}
-
-// Une lampe posée pendant la compilation change la clé de chaque nuanceur : on recompile jusqu'à ce que l'éclairage n'ait plus bougé.
-async function compilerSousLesLampes(objet) {
-  let lampes;
-  do {
-    lampes = lampesPosees;
-    await rendu.compiler(objet);
-  } while (lampes !== lampesPosees);
-}
-
-// Une troupe renvoyée pendant sa descente est libérée à l'arrivée, sans entrer en scène.
-function chargerTroupe(nom) {
-  if (chargements[nom]) return chargements[nom];
-  const chargement = chargeur.loadAsync(TROUPES[nom].glb).then((glb) => poserFigurants(glb, figurants[nom].emprises)).then((troupe) => {
-    if (chargements[nom] !== chargement) return libererTroupe(troupe);
-    scene.add(troupe.scene);
-    troupe.scene.updateMatrixWorld(true);
-    troupes[nom] = troupe;
-    allegerTroupe(troupe.scene);
-    suivreTorches(troupe);
-    montrerTroupes();
-  });
-  chargements[nom] = chargement;
-  return chargement;
-}
-chargerTroupe(TROUPE_LIBRE);
-
-// Chaque troupe de parcours pèse des dizaines de textures : gardées toutes, les trois parcours menaient la mémoire GPU de 0,7 à 1,2 Go.
-function libererTroupe({ scene: troupe, melangeur, membres, torches }) {
-  scene.remove(troupe);
-  for (const { meche } of torches) {
-    scene.remove(meche);
-    horsGeometrie.splice(horsGeometrie.indexOf(meche), 1);
-    meche.material.dispose();
-  }
-  for (const { prise } of membres) {
-    const rang = obstacles.indexOf(prise);
-    if (rang >= 0) obstacles.splice(rang, 1);
-    prise.geometry.dispose();
-  }
-  melangeur.stopAllAction();
-  melangeur.uncacheRoot(troupe);
-  const maillages = [];
-  troupe.traverse((o) => { if (o.isMesh && o.material !== PRISE) maillages.push(o); });
-  detail.oublier(maillages);
-  rendreLaMemoire(maillages);
-}
-
-function renvoyerTroupe(nom) {
-  const troupe = troupes[nom];
-  delete chargements[nom];
-  delete troupes[nom];
-  if (troupe) libererTroupe(troupe);
-}
-
-function presenterTroupe(voulue) {
-  troupePresente = voulue;
-  montrerTroupes();
-  for (const nom of Object.keys(chargements)) if (nom !== voulue && nom !== TROUPE_LIBRE) renvoyerTroupe(nom);
-}
+const troupes = troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, alleger: allegerTroupe, obstacles, horsGeometrie,
+  distributions: figurants, conceptDe, lampesPosees: () => eclairage.lampesPosees });
+troupes.charger(TROUPE_LIBRE);
 
 // Jérusalem autour du Temple descend en dernier : on s'y pose aussi, et on s'y cogne.
 async function poserPays({ scene: pays }) {
@@ -908,209 +330,16 @@ async function poserPays({ scene: pays }) {
 chargeur.loadAsync("./pays.glb").then(poserPays);
 
 // ---------------------------------------------------------------------------
-// marche
-// ---------------------------------------------------------------------------
-const BAS = new THREE.Vector3(0, -1, 0);
-const versLeBas = new THREE.Raycaster();
-const versLAvant = new THREE.Raycaster();
-
-const sonde = new THREE.Vector3();
-
-function solSous(origine, portee) {
-  versLeBas.set(origine, BAS);
-  versLeBas.far = portee;
-  // Une face tournée vers le bas — le dessous d'un mur posé sur la dalle — n'est pas
-  // un sol : sans ce filtre on marche à l'intérieur des murs.
-  for (const t of versLeBas.intersectObjects(murs, false)) {
-    if (!t.face || t.face.normal.y > 0.25) return t.point.y;
-  }
-  return null;
-}
-
-function solEn(x, z, piedsY) {
-  return solSous(sonde.set(x, piedsY + MONTEE, z), MONTEE + CHUTE);
-}
-
-// Le pas qui arrive sur du vide regarde un pied plus loin dans le même sens : une fente
-// plus étroite qu'un pied ne fait tomber personne. Un quart d'ama d'air sépare la tête
-// du kevesh de l'autel (Zeva'him 62b), un cheveu le petit kevesh du sovev — et le rayon
-// de sol, tiré en un point, y tombait à chaque fois : l'autel ne se montait pas.
-function solEnjambe(x, z, piedsY, direction) {
-  return solEn(x, z, piedsY) ?? solEn(x + direction.x * FENTE, z + direction.z * FENTE, piedsY);
-}
-
-// Le rayon de garde part AU-DESSUS de ce qui est franchissable. Plus bas, il heurtait
-// la deuxième marche avant qu'on ait gravi la première : les degrés du 'Heil et de
-// Nikanor font 1/2 ama — 0,24 m — et un corps de 0,38 m de rayon en couvre deux. Tout
-// ce qui est sous MONTEE se monte ; la garde ne juge donc que ce qui est au-dessus,
-// et sa portée se limite à une peau, pas au rayon du corps.
-function murDevant(depuis, piedsY, direction, distance) {
-  versLAvant.far = distance + GARDE;
-  for (const hauteur of [MONTEE + 0.02, 1.55]) {
-    versLAvant.set(new THREE.Vector3(depuis.x, piedsY + hauteur, depuis.z), direction);
-    if (versLAvant.intersectObjects(murs, false).length) return true;
-  }
-  return false;
-}
-
-let piedsY = 0;
-const avant = new THREE.Vector3(), droite = new THREE.Vector3();
-const HAUT = new THREE.Vector3(0, 1, 0), pas = new THREE.Vector3();
-// Le clavier, le pouce et le pilote automatique aboutissent tous à `voulu` : la marche
-// n'en connaît qu'un, et ses collisions valent donc pour les trois.
-const voulu = new THREE.Vector3(), lisse = new THREE.Vector3();
-let cible = null;
-
-// Le Temple ne se laisse pas traverser n'importe où : on monte à l'Ezrat Nashim par
-// les douze degrés du 'Heil, à l'Azara par les quinze marches, et l'autel se contourne.
-// C'est l'architecture, pas un défaut — mais un modèle se regarde aussi d'ailleurs que
-// d'où l'on a le droit de se tenir : le vol libre est là pour ça.
-let vol = false;
-
-function vitesseVoulue() {
-  const vitesse = (vol ? VOL : PAS) * (manette.course ? COURSE : 1);
-  const manuel = Math.abs(manette.long) + Math.abs(manette.lat) + Math.abs(manette.vert);
-  if (manuel > 0.02) cible = null;
-  if (cible) {
-    voulu.copy(cible).sub(camera.position);
-    if (!vol) voulu.y = 0;
-    if (voulu.lengthSq() < (vol ? 1.4 : 0.36)) { cible = null; return voulu.set(0, 0, 0); }
-    return voulu.normalize().multiplyScalar(vitesse);
-  }
-  camera.getWorldDirection(avant);
-  if (!vol) avant.y = 0;
-  avant.normalize();
-  droite.crossVectors(avant, HAUT).normalize();
-  voulu.set(0, 0, 0).addScaledVector(avant, manette.long).addScaledVector(droite, manette.lat);
-  if (vol) voulu.addScaledVector(HAUT, manette.vert);
-  // La diagonale ne va pas plus vite que le droit devant, mais un pouce à mi-course
-  // marche à mi-vitesse : c'est la longueur qui est bridée, pas normalisée.
-  const force = Math.min(voulu.length(), 1);
-  return force < 1e-3 ? voulu.set(0, 0, 0) : voulu.normalize().multiplyScalar(vitesse * force);
-}
-
-function marcher(dt) {
-  pas.set(lisse.x, 0, lisse.z);
-  const vitesse = pas.length();
-  if (vitesse < 0.02) return;
-  pas.divideScalar(vitesse);
-  // Le pas se découpe : à bas framerate un seul bond franchirait la garde.
-  let reste = Math.min(vitesse * dt, 1.2);
-  while (reste > 1e-4) {
-    const distance = Math.min(reste, SOUS_PAS);
-    reste -= distance;
-    const x = camera.position.x + pas.x * distance, z = camera.position.z + pas.z * distance;
-    const sol = murDevant(camera.position, piedsY, pas, distance) ? null : solEnjambe(x, z, piedsY, pas);
-    if (sol === null) {                            // un mur, ou le vide : le pas est refusé
-      lisse.set(0, 0, 0);                          // et l'élan avec, sinon il pousse contre
-      cible = null;
-      return;
-    }
-    piedsY = sol;
-    camera.position.set(x, sol + OEIL, z);
-  }
-}
-
-function avancer(dt) {
-  vitesseVoulue();
-  lisse.lerp(voulu, 1 - Math.exp(-dt / REPONSE));
-  if (lisse.lengthSq() < 4e-4) {
-    lisse.set(0, 0, 0);
-    return;
-  }
-  if (!vol) return marcher(dt);
-  camera.position.addScaledVector(lisse, dt);
-  piedsY = camera.position.y - OEIL;
-}
-
-function poser([x, y, z]) {
-  const sol = vol ? null : solSous(sonde.set(x, y + APLOMB, z), APLOMB * 2);
-  piedsY = sol === null ? y : sol;
-  camera.position.set(x, piedsY + OEIL, z);
-  lisse.set(0, 0, 0);
-  cible = null;
-}
-
-// Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du parcours du
-// Cohen Gadol. Le nord de Blender devient -Z une fois passé en Y-haut.
-function orienterCap({ cap, tangage = 0 }) {
-  const a = THREE.MathUtils.degToRad(cap);
-  const t = THREE.MathUtils.degToRad(tangage);
-  const { x, y, z } = camera.position;
-  camera.lookAt(x + Math.cos(a) * 10, y + Math.tan(t) * 10, z - Math.sin(a) * 10);
-  accorderRegard();
-}
-
-function orienterVers(point) {
-  camera.lookAt(point);
-  accorderRegard();
-}
-
-function atterrir() {
-  const { x, y, z } = camera.position;
-  // Une marche au-dessus de l'œil : en rasant la dalle en vol, il a pu passer dessous.
-  const sol = solSous(sonde.set(x, y + MONTEE, z), Infinity);
-  if (sol === null) return false;
-  piedsY = sol;
-  camera.position.y = sol + OEIL;
-  return true;
-}
-
-// ---------------------------------------------------------------------------
-// regard
-// ---------------------------------------------------------------------------
-// Le regard suit le glissé, pas le curseur : bouton relâché, la souris redevient
-// libre pour la barre du haut et la fiche. Il rejoint sa consigne au lieu d'y sauter :
-// à 45 ms le retard ne se sent pas, et le tremblement du doigt ne passe plus.
-const TANGAGE_MAX = Math.PI / 2 - 0.02;
-const regard = new THREE.Euler(0, 0, 0, "YXZ");
-const capVise = { lacet: 0, tangage: 0 };
-
-function tourner(dLacet, dTangage) {
-  capVise.lacet -= dLacet;
-  capVise.tangage = THREE.MathUtils.clamp(capVise.tangage - dTangage, -TANGAGE_MAX, TANGAGE_MAX);
-  noterRegard(Math.abs(dLacet) + Math.abs(dTangage));
-}
-
-// Après un `lookAt`, la consigne est ce que la caméra montre : sans ça le lissage
-// ramènerait aussitôt le regard là où il était avant le déplacement.
-function accorderRegard() {
-  regard.setFromQuaternion(camera.quaternion);
-  regard.z = 0;
-  capVise.lacet = regard.y;
-  capVise.tangage = regard.x;
-}
-
-function lisserRegard(dt) {
-  const k = 1 - Math.exp(-dt / LISSAGE_REGARD);
-  regard.y += (capVise.lacet - regard.y) * k;
-  regard.x += (capVise.tangage - regard.x) * k;
-  regard.z = 0;
-  camera.quaternion.setFromEuler(regard);
-}
-
-// ---------------------------------------------------------------------------
 // interrogation
 // ---------------------------------------------------------------------------
-const viseur = new THREE.Raycaster();
-const PORTEE = 140;       // ce qu'un clic peut interroger
-const ecran = new THREE.Vector2();
+const PORTEE_DU_PILOTE = 120;
 const survol = $("#survol");
 const { montrer, fermer, rafraichir } = panneau(CONCEPTS);
+const designe = designation({ camera, obstacles, concepts: CONCEPTS });
 let survole = null;
 
-const normaliser = (clientX, clientY) =>
-  ecran.set((clientX / innerWidth) * 2 - 1, -(clientY / innerHeight) * 2 + 1);
-
-function conceptSous(coords) {
-  viseur.setFromCamera(coords, camera);
-  viseur.far = PORTEE;
-  const touche = viseur.intersectObjects(obstacles, false);
-  return touche.length ? touche[0].object.userData.concept || null : null;
-}
-
 function interroger(clientX, clientY) {
-  const id = conceptSous(normaliser(clientX, clientY));
+  const id = designe.conceptTouche(clientX, clientY);
   if (!id) {
     fermer();
     return;
@@ -1119,64 +348,9 @@ function interroger(clientX, clientY) {
   noterInterrogation();
 }
 
-// Le pilote automatique n'ouvre aucun passage : il pousse le marcheur vers le point
-// visé avec la même commande qu'un pouce, donc les mêmes murs l'arrêtent. Un point
-// qui n'a pas de sol sous lui — un mur, une corniche — ne se demande pas.
 function seRendreA(clientX, clientY) {
-  viseur.setFromCamera(normaliser(clientX, clientY), camera);
-  viseur.far = 120;
-  const [touche] = viseur.intersectObjects(murs, false);
-  if (!touche) return;
-  if (vol) { cible = touche.point.clone(); return; }
-  const sol = solEn(touche.point.x, touche.point.z, touche.point.y);
-  if (sol !== null) cible = new THREE.Vector3(touche.point.x, sol, touche.point.z);
-}
-
-// L'initiation désigne un élément réellement à l'écran : « touchez un élément » ne dit
-// rien à qui ne sait pas encore ce qui s'interroge. La marque reste accrochée à son
-// point du monde, et on en cherche une autre quand il sort du cadre ou passe derrière
-// un mur. Seul un élément documenté se montre : la première fiche n'est pas un manque.
-const SONDES = [[0, 0], [0.3, 0], [-0.3, 0], [0, -0.3], [0.3, -0.3], [-0.3, -0.3], [0.6, 0], [-0.6, 0]];
-const CADRE = 0.85;
-const RECONTROLE = 15;     // images entre deux contrôles, ou deux recherches vaines
-const montre = { id: null, point: new THREE.Vector3(), images: 0, prochaineRecherche: 0 };
-const projete = new THREE.Vector3();
-
-function reperer() {
-  viseur.far = PORTEE;
-  for (const [x, y] of SONDES) {
-    viseur.setFromCamera(ecran.set(x, y), camera);
-    const [touche] = viseur.intersectObjects(obstacles, false);
-    const id = touche?.object.userData.concept;
-    if (id && CONCEPTS.get(id)?.resume) {
-      montre.id = id;
-      montre.point.copy(touche.point);
-      return;
-    }
-  }
-  montre.id = null;
-}
-
-function projeter(point) {
-  projete.copy(point).project(camera);
-  return projete.z < 1 && Math.abs(projete.x) < CADRE && Math.abs(projete.y) < CADRE;
-}
-
-function elementAMontrer() {
-  const image = ++montre.images;
-  const toujoursVu = montre.id !== null && projeter(montre.point) &&
-    (image % RECONTROLE !== 0 || conceptSous(ecran.set(projete.x, projete.y)) === montre.id);
-  if (!toujoursVu) {
-    if (image < montre.prochaineRecherche) return null;
-    reperer();
-    if (montre.id === null || !projeter(montre.point)) {
-      montre.id = null;
-      montre.prochaineRecherche = image + RECONTROLE;
-      return null;
-    }
-  }
-  return { nom: CONCEPTS.get(montre.id).nom,
-           clientX: ((projete.x + 1) / 2) * innerWidth, clientY: ((1 - projete.y) / 2) * innerHeight };
+  const point = designe.pointTouche(murs, PORTEE_DU_PILOTE, [clientX, clientY]);
+  if (point) marche.seRendreVers(point);
 }
 
 // ---------------------------------------------------------------------------
@@ -1184,36 +358,35 @@ function elementAMontrer() {
 // ---------------------------------------------------------------------------
 const mode = $("#mode"), boutonVol = $("#vol");
 function afficherMode() {
-  ecrire(mode, vol ? "en_vol" : "a_pied");
-  mode.classList.toggle("vole", vol);
-  ecrire(boutonVol, vol ? "pied" : "vol");
-  manette.modeVol(vol);
+  ecrire(mode, marche.vol ? "en_vol" : "a_pied");
+  mode.classList.toggle("vole", marche.vol);
+  ecrire(boutonVol, marche.vol ? "pied" : "vol");
+  manette.modeVol(marche.vol);
 }
 
 function basculerVol() {
-  if (vol && !atterrir()) return;
-  vol = !vol;
+  if (!marche.basculerVol()) return;
   afficherMode();
-  cible = null;
-  if (vol) noterEnvol(); else noterAtterrissage();
+  if (marche.vol) noterEnvol(); else noterAtterrissage();
 }
 boutonVol.onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
 
 // Une vue dit comment on s'y tient : une cour se montre d'en haut, le reste depuis le dallage.
 function tenirLaVue(enVol) {
-  if (vol === enVol) return;
-  vol = enVol;
-  afficherMode();
-  cible = null;
+  if (marche.tenirLeVol(enVol)) afficherMode();
 }
 
 const { lancerInitiation, initiationSuivie, noterRegard, noterDeplacement, noterInterrogation,
         noterEnvol, noterAtterrissage, noterAltitude } = initiation({
-  elementAMontrer, estEnVol: () => vol,
+  elementAMontrer: designe.elementAMontrer, estEnVol: () => marche.vol,
 });
 
 const manette = commandes(renderer.domElement, {
-  regarder: tourner, interroger, allerAu: seRendreA, basculerVol,
+  regarder(dLacet, dTangage) {
+    marche.tourner(dLacet, dTangage);
+    noterRegard(Math.abs(dLacet) + Math.abs(dTangage));
+  },
+  interroger, allerAu: seRendreA, basculerVol,
 });
 afficherMode();
 
@@ -1258,7 +431,7 @@ function remplirAller() {
 }
 aller.onchange = () => {
   const id = aller.value;
-  fondu(() => allerVers(id));
+  fondu(() => vues.allerVers(id));
   aller.value = "";
   aller.blur();
 };
@@ -1286,78 +459,12 @@ chercher.onchange = () => {
   const id = chercher.value;
   if (!id) return;
   montrer(id);
-  fondu(() => allerElement(id));
+  fondu(() => vues.allerElement(id));
   chercher.value = "";
   chercher.blur();
 };
 
-// ---------------------------------------------------------------------------
-// vues
-// ---------------------------------------------------------------------------
-const RECUL_AUTO = 60;
-// Le premier côté d'où l'élément se voit sans mur devant ; l'est d'abord, l'axe du parcours.
-const CAPS_AUTO = [180, 0, 90, 270];
-const centreDe = (boite) => boite.getCenter(new THREE.Vector3());
-
-function piedsDe(vue) {
-  if (vue.position) return vue.position;
-  const oeil = oeilQuiCadre(camera, unirEmprises(EMPRISES, vue.cadre),
-    { cap: vue.cap, hauteur: vue.sol + OEIL, reculMax: vue.recul_max ?? RECUL_AUTO });
-  return [oeil.x, vue.sol, oeil.z];
-}
-
-function prendreVue(vue) {
-  tenirLaVue(!!vue.vol);
-  poser(piedsDe(vue));
-  if (vue.cadre) orienterVers(centreDe(unirEmprises(EMPRISES, vue.cadre)));
-  else orienterCap(vue);
-}
-
-function voitLeConcept(oeil, centre, id) {
-  viseur.set(oeil, centre.clone().sub(oeil).normalize());
-  viseur.far = oeil.distanceTo(centre);
-  const [touche] = viseur.intersectObjects(obstacles, false);
-  return !touche || touche.object.userData.concept === id;
-}
-
-function piedsQuiVoient(id, boite) {
-  const centre = centreDe(boite);
-  let repli = null;
-  for (const cap of CAPS_AUTO) {
-    const approche = oeilQuiCadre(camera, boite, { cap, hauteur: centre.y, reculMax: RECUL_AUTO });
-    const sol = solSous(sonde.set(approche.x, centre.y + OEIL, approche.z), Infinity);
-    if (sol === null) continue;
-    const oeil = oeilQuiCadre(camera, boite, { cap, hauteur: sol + OEIL, reculMax: RECUL_AUTO });
-    const pieds = [oeil.x, sol, oeil.z];
-    repli ??= pieds;
-    if (voitLeConcept(oeil, centre, id)) return pieds;
-  }
-  if (repli) return repli;
-  const oeil = oeilQuiCadre(camera, boite, { cap: CAPS_AUTO[0], hauteur: centre.y, reculMax: RECUL_AUTO });
-  return [oeil.x, centre.y - OEIL, oeil.z];
-}
-
-// « Un élément… » montre toujours l'élément, jamais l'entrée qui porterait le même nom.
-function allerElement(id) {
-  const vue = reperes.vues.find((v) => v.id === `vue_${id}`);
-  if (vue) {
-    prendreVue(vue);
-    return true;
-  }
-  const boite = EMPRISES.get(id);
-  if (!boite) return false;
-  tenirLaVue(false);
-  poser(piedsQuiVoient(id, boite));
-  orienterVers(centreDe(boite));
-  return true;
-}
-
-function allerVers(id) {
-  const vue = [...reperes.entrees, ...reperes.vues].find((v) => v.id === id);
-  if (!vue) return allerElement(id);
-  prendreVue(vue);
-  return true;
-}
+const vues = vuesDuTemple({ camera, marche, emprises: EMPRISES, reperes, obstacles, tenirLeVol: tenirLaVue });
 
 // ---------------------------------------------------------------------------
 // lieux et plan
@@ -1373,13 +480,13 @@ const lieuEn = (point) => LIEUX.find((id) => EMPRISES.get(id).containsPoint(poin
 
 const planMiddot = plan({
   cadrages: CADRAGES_DU_PLAN, emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS, ama: AMA,
-  entrees: reperes.entrees.map((e) => ({ ...e, position: piedsDe(e) })),
-  allerLieu: (id) => fondu(() => allerElement(id)),
-  allerEntree: (id) => fondu(() => allerVers(id)),
+  entrees: reperes.entrees.map((e) => ({ ...e, position: vues.piedsDe(e) })),
+  allerLieu: (id) => fondu(() => vues.allerElement(id)),
+  allerEntree: (id) => fondu(() => vues.allerVers(id)),
 });
 
 async function accorderLangue(code) {
-  const traduits = await conceptsEn(code);
+  const traduits = await conceptsEn(code, fiche, contenus);
   if (code !== langue()) return;                // un choix plus récent est passé pendant le chargement
   for (const [id, concept] of traduits) CONCEPTS.set(id, concept);
   remplirAller();
@@ -1398,45 +505,16 @@ await accorderLangue(langue());
 // La visite s'ouvre au-delà du Soreg, dans l'axe de la porte orientale : le 'Heil et
 // la porte de l'Ezrat Nashim se franchissent à pied, avant tout le reste.
 const depart = reperes.entrees.find((e) => e.id === "face_porte_est") || reperes.entrees[0];
-prendreVue(depart);
+vues.prendreVue(depart);
 
 const horloge = new THREE.Clock();
 let image = 0;
 
-// L'ombre portée est une fenêtre de 110 amot ; à l'échelle du Har HaBayit une seule
-// carte figée serait illisible. Elle suit donc le visiteur — mais par sauts, pas à
-// chaque image : la refaire coûte une passe de géométrie entière, la troisième de
-// l'image après la principale et celle de l'occlusion, et la fenêtre fait cinquante
-// mètres de large quand on n'avance que d'une douzaine de centimètres par image, en
-// courant. Tant qu'on ne la rafraîchit pas, three garde aussi la matrice qui va avec :
-// carte et matrice restent d'accord, et l'ombre reste juste — elle est simplement
-// calculée depuis un pas en arrière.
-const ANCRE_OMBRE = new THREE.Vector3(Infinity, Infinity, Infinity);
-const PAS_OMBRE = PROFIL.ombres.portee / 10;
-
-// Une carte figée garderait l'ombre des figurants à leur pose de départ.
-const figurantsDansLOmbre = () => PROFIL.figurants.ombre && troupePresente in troupes
-  && EMPRISES_FIGURANTS[troupePresente].some((b) => b.distanceToPoint(ANCRE_OMBRE) < PROFIL.ombres.portee);
-
-function suivreSoleil() {
-  if (figurantsDansLOmbre()) soleil.shadow.needsUpdate = true;
-  if (camera.position.distanceToSquared(ANCRE_OMBRE) < PAS_OMBRE * PAS_OMBRE) return;
-  ANCRE_OMBRE.copy(camera.position);
-  soleil.target.position.copy(camera.position);
-  soleil.position.copy(camera.position).addScaledVector(directionDeLAstre, RECUL_SOLEIL);
-  soleil.target.updateMatrixWorld();
-  soleil.shadow.needsUpdate = true;
-}
-
 function dessiner(dt) {
   for (const u of horloges) u.value += dt;
-  vaciller(dt);
-  const troupe = troupes[troupePresente];
-  if (troupe) {
-    troupe.melangeur.update(dt);
-    suivreTorches(troupe);
-  }
-  suivreSoleil();
+  eclairage.vaciller(dt);
+  troupes.animer(dt);
+  eclairage.suivreSoleil(camera.position, troupes.ombresPres);
   ciel.position.copy(camera.position);
   detail.choisir(HAUTEUR_IMAGE.value);
   rendu.rendre();
@@ -1457,7 +535,7 @@ function ajusterEchelle(dt) {
   dimensionner();
 }
 
-const lieuOccupe = () => lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
+const lieuOccupe = () => lieuEn(corps.set(camera.position.x, marche.piedsY + 1, camera.position.z));
 let lieuPresent = null;
 // Le lieu se relève toutes les quatre images ; la lampe et l'air le rejoignent au temps écoulé, pas à l'image.
 const IMAGES_ENTRE_RELEVES = 4;
@@ -1493,38 +571,35 @@ let film = null;
 function preterLaCamera(trajet) {
   film = trajet;
   if (trajet) return;
-  piedsY = camera.position.y - OEIL;
-  accorderRegard();
+  marche.suivreLaCamera();
+  marche.accorderRegard();
 }
 
 const guides = parcours({
-  parcours: PARCOURS, camera, sol: solEn, oeil: OEIL, ama: AMA,
+  parcours: PARCOURS, camera, sol: marche.solEn, oeil: OEIL, ama: AMA,
   marcher: preterLaCamera,
   // Qui n'a pas quitté le cadre de toute la marche change à l'arrivée.
   arriver: () => {
     preterLaCamera(null);
-    montrerTroupes();
+    troupes.montrer();
   },
   poserA: (pieds, cible) => fondu(() => {
     tenirLaVue(false);
-    poser(pieds);
-    orienterVers(cible);
+    marche.poser(pieds);
+    marche.orienterVers(cible);
   }),
   changerDeMoment: (voulu) => {
-    if (voulu === moment) return;
-    fondu(() => passerAu(voulu));
+    if (voulu === eclairage.moment) return;
+    fondu(() => eclairage.passerAu(voulu));
   },
   changerDeTroupe: (voulue = TROUPE_LIBRE) => {
-    if (voulue === troupeVoulue) return;
-    troupeVoulue = voulue;
-    chargerTroupe(voulue);
-    fondu(() => presenterTroupe(voulue));
+    if (troupes.demander(voulue)) fondu(() => troupes.presenter(voulue));
   },
   appelerFigurants: (noms) => fondu(() => {
-    appeles = noms ? new Set(noms) : null;
-    montrerTroupes();
+    troupes.appeler(noms);
+    troupes.montrer();
   }),
-  relayerFigurants: (noms) => { appeles = noms ? new Set(noms) : null; },
+  relayerFigurants: troupes.appeler,
   ouvrirFiche: montrer,
   fermerFiche: fermer,
 });
@@ -1547,7 +622,7 @@ function stationQuiMontre(id) {
 
 function montrerDemande(id) {
   const trouvee = !REPERES_DU_TEMPLE.has(id) && stationQuiMontre(id);
-  if (!trouvee) return allerVers(id);
+  if (!trouvee) return vues.allerVers(id);
   aide.classList.add("parti");
   guides.ouvrir(trouvee.parcours, trouvee.rang);
 }
@@ -1557,7 +632,7 @@ if (demande) montrerDemande(demande);
 // Le survol n'a pas besoin de 60 Hz.
 function afficherSurvol() {
   const p = manette.pointeur;
-  survole = p.survole && !manette.tourne ? conceptSous(ecran.set(p.x, p.y)) : null;
+  survole = p.survole && !manette.tourne ? designe.conceptSous(p.x, p.y) : null;
   const c = survole && CONCEPTS.get(survole);
   survol.classList.toggle("vu", !!c);
   if (!c) return;
@@ -1569,29 +644,29 @@ function afficherSurvol() {
 function afficherPosition() {
   position.textContent = brut
     ? `${(camera.position.x / AMA).toFixed(0)} · ` +
-      `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
+      `${(-camera.position.z / AMA).toFixed(0)} · ${(marche.piedsY / AMA).toFixed(0)} ${texte("amot")}`
     : (lieuPresent ? CONCEPTS.get(lieuPresent).nom : "");
   planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieuPresent);
 }
 
 function suivreLeFilm(dt) {
   film.avancer(dt);
-  piedsY = camera.position.y - OEIL;
+  marche.suivreLaCamera();
 }
 
 function conduire(dt) {
-  lisserRegard(dt);
+  marche.lisserRegard(dt);
   avantLePas.copy(camera.position);
-  avancer(dt);
+  marche.avancer(dt, manette);
   noterDeplacement(camera.position.distanceTo(avantLePas));
-  if (vol) noterAltitude(camera.position.y - avantLePas.y);
-  if (entame || lisse.lengthSq() <= 0.01) return;
+  if (marche.vol) noterAltitude(camera.position.y - avantLePas.y);
+  if (entame || marche.elan <= 0.01) return;
   entame = true;                                  // le rappel a servi, il s'efface
   aide.classList.add("parti");
 }
 
 renderer.setAnimationLoop(() => {
-  if (enReprise) return;
+  if (pannes.enReprise) return;
   const dt = Math.min(horloge.getDelta(), 0.1);
   const filme = film !== null;
   if (filme) suivreLeFilm(dt); else conduire(dt);
@@ -1599,7 +674,7 @@ renderer.setAnimationLoop(() => {
   depuisLeReleve += dt;
   if (++image % IMAGES_ENTRE_RELEVES === 0) {
     releverLeLieu();
-    if (filme) relayerHorsDuCadre();
+    if (filme) troupes.relayerHorsDuCadre();
     else {
       afficherSurvol();
       afficherPosition();
@@ -1610,16 +685,12 @@ renderer.setAnimationLoop(() => {
 });
 
 $("#chargement").classList.add("parti");
-visiteLancee = true;
+pannes.lancer();
 alleger(gltf.scene);
 
 // Three renvoie seul géométries et images ; les cartes relâchées, les environnements, les ombres figées et le reflet du Heikhal sont à refaire.
 async function reprendre() {
-  for (const m of Object.keys(reflets)) {
-    reflets[m].dispose();
-    reflets[m] = environnement(renderer, m);
-  }
-  scene.environment = reflets[moment].texture;
+  eclairage.refaireLesReflets();
   scene.traverse((o) => { if (o.isLight && o.shadow) o.shadow.needsUpdate = true; });
   await rechargerCartes();
   if (!brut) refleterLeHeikhal();
@@ -1632,7 +703,7 @@ function commencerInitiation() {
 }
 $("#rejouer").onclick = (e) => { e.currentTarget.blur(); commencerInitiation(); };
 if (CINEMA) {
-  film = cinema({ parcours: haltesCinema, camera, sol: solEn, oeil: OEIL, ama: AMA, voile,
+  film = cinema({ parcours: haltesCinema, camera, sol: marche.solEn, oeil: OEIL, ama: AMA, voile,
     signaler: (etat) => parent.postMessage({ type: "cinema", ...etat }, location.origin) });
   film.avancer(0);
   dessiner(0);
@@ -1647,12 +718,12 @@ if (CINEMA) {
 
 // Points d'accroche de la vérification headless (cdp.py) : sans eux, impossible de
 // savoir depuis un terminal si la page a fini de charger ni ce qu'elle montre.
-window.__vue = (id) => { allerVers(id); dessiner(0); };
+window.__vue = (id) => { vues.allerVers(id); dessiner(0); };
 window.__demande = montrerDemande;
 window.__vues = () => [...reperes.entrees, ...reperes.vues].map((v) => v.id);
 window.__cam = (x, y, z, cx, cy, cz) => {
-  camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); piedsY = y - OEIL;
-  accorderRegard(); dessiner(0);
+  camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); marche.suivreLaCamera();
+  marche.accorderRegard(); dessiner(0);
 };
 window.__rendre = () => dessiner(0);
 window.__etat = () => {
@@ -1660,8 +731,8 @@ window.__etat = () => {
   const d = 180 / Math.PI;
   return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
            x: +camera.position.x.toFixed(3), y: +camera.position.y.toFixed(3), z: +camera.position.z.toFixed(3),
-           piedsY: +piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
-           fov: +camera.fov.toFixed(1), vol, lieu: lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z)),
+           piedsY: +marche.piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
+           fov: +camera.fov.toFixed(1), vol: marche.vol, lieu: lieuOccupe(),
            exposition: +renderer.toneMappingExposure.toFixed(3), fermeture: +oeilAdapte.fermeture.toFixed(2),
            luminance: rendu.luminance && +rendu.luminance.toFixed(4) };
 };
@@ -1671,15 +742,15 @@ window.__ombres = (actives) => {
   scene.traverse((o) => { if (o.isMesh) o.material.needsUpdate = true; });
   dessiner(0);
 };
-Object.defineProperty(window, "__figurants", { get: () => Promise.all(Object.values(chargements)) });
+Object.defineProperty(window, "__figurants", { get: troupes.chargements });
 window.__moteur = { renderer, scene };
-window.__sol = solEn;
+window.__sol = marche.solEn;
 window.__mur = (origine, direction, portee) => {
   const rayon = new THREE.Raycaster(new THREE.Vector3(...origine), new THREE.Vector3(...direction).normalize(), 0, portee);
   const [touche] = rayon.intersectObjects(murs, false);
   return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
 };
 window.__parcours = guides;
-window.__figurantsVus = () => troupes[troupePresente]?.membres.filter((m) => m.figurant.visible).map((m) => m.figurant.name) ?? [];
-window.__temps = (t) => { troupes[troupePresente]?.melangeur.setTime(t); dessiner(0); };
+window.__figurantsVus = troupes.figurantsVus;
+window.__temps = (t) => { troupes.reglerLeTemps(t); dessiner(0); };
 window.__pret = true;
