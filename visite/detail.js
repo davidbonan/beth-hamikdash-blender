@@ -130,6 +130,13 @@ export function niveauxDeDetail(scene, camera) {
     ouvriers = null;
   }
 
+  // Un ouvrier tombé — son simplificateur n'est pas descendu — ne rend jamais son maillage : la file attendait pour toujours.
+  // Ce qu'elle tenait reste au plein détail, et le prochain maillage confié rappelle des ouvriers neufs.
+  function abandonner() {
+    file.length = 0;
+    if (ouvriers) congedier();
+  }
+
   function demarrer() {
     const ouvrier = { calcul: new Worker(new URL("./simplification.js", import.meta.url), { type: "module" }), maillage: null };
     ouvrier.calcul.onmessage = ({ data }) => {
@@ -137,6 +144,7 @@ export function niveauxDeDetail(scene, camera) {
       ouvrier.maillage = null;
       envoyer();
     };
+    ouvrier.calcul.onerror = abandonner;
     return ouvrier;
   }
 

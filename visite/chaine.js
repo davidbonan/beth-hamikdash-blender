@@ -471,14 +471,17 @@ class Profondeur extends Pass {
     for (const o of this.voiles) o.visible = false;
     const autoClear = renderer.autoClear;
     renderer.autoClear = false;
-    renderer.setRenderTarget(readBuffer);
-    renderer.clear();
     this.scene.overrideMaterial = this.materiau;
-    renderer.render(this.scene, this.camera);
-    this.scene.overrideMaterial = null;
-    renderer.autoClear = autoClear;
-    for (const o of this.voiles) o.visible = true;
-    this.voiles.length = 0;
+    try {
+      renderer.setRenderTarget(readBuffer);
+      renderer.clear();
+      renderer.render(this.scene, this.camera);
+    } finally {
+      this.scene.overrideMaterial = null;
+      renderer.autoClear = autoClear;
+      for (const o of this.voiles) o.visible = true;
+      this.voiles.length = 0;
+    }
   }
 }
 
@@ -593,28 +596,35 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const pieceEnfumeeVue = () => pieceEnfumee !== null && champ.setFromProjectionMatrix(
     vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(pieceEnfumee);
 
-  function rendre() {
-    voile.enabled = pieceEnfumeeVue();
+  function rendreGeometrie() {
     const caches = horsGeo.filter((o) => o.visible);
     for (const o of caches) o.visible = false;
     scene.overrideMaterial = GEOMETRIE;
     renderer.getClearColor(teinteFond);
     const alphaFond = renderer.getClearAlpha();
-    // Alpha nul = pas de géométrie : c'est ainsi que la passe suivante reconnaît le
-    // ciel, la distance étant stockée dans ce même canal.
-    renderer.setClearColor(0x000000, 0);
-    renderer.setRenderTarget(cibleGeo);
-    renderer.clear();
     const fond = camera.far;
-    // La fumée y lit ce qui coupe ses rayons : sans le fond de sa pièce, elle se voyait à travers les murs.
-    camera.far = voile.enabled ? Math.max(FOND_GEOMETRIE, fondDeLaPiece()) : FOND_GEOMETRIE;
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
-    camera.far = fond;
-    camera.updateProjectionMatrix();
-    scene.overrideMaterial = null;
-    renderer.setClearColor(teinteFond, alphaFond);
-    for (const o of caches) o.visible = true;
+    try {
+      // Alpha nul = pas de géométrie : c'est ainsi que la passe suivante reconnaît le
+      // ciel, la distance étant stockée dans ce même canal.
+      renderer.setClearColor(0x000000, 0);
+      renderer.setRenderTarget(cibleGeo);
+      renderer.clear();
+      // La fumée y lit ce qui coupe ses rayons : sans le fond de sa pièce, elle se voyait à travers les murs.
+      camera.far = voile.enabled ? Math.max(FOND_GEOMETRIE, fondDeLaPiece()) : FOND_GEOMETRIE;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    } finally {
+      camera.far = fond;
+      camera.updateProjectionMatrix();
+      scene.overrideMaterial = null;
+      renderer.setClearColor(teinteFond, alphaFond);
+      for (const o of caches) o.visible = true;
+    }
+  }
+
+  function rendre() {
+    voile.enabled = pieceEnfumeeVue();
+    rendreGeometrie();
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
@@ -624,8 +634,11 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
     scene.matrixWorldAutoUpdate = false;
-    composeur.render();
-    scene.matrixWorldAutoUpdate = true;
+    try {
+      composeur.render();
+    } finally {
+      scene.matrixWorldAutoUpdate = true;
+    }
   }
 
   // Compilés hors cible, les nuanceurs prendraient le tonemapping de l'écran : la scène se rend dans le composeur, sans lui.
@@ -653,9 +666,11 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   function compilerOmbres(objets) {
     const brume = scene.fog;
     scene.fog = null;
-    const pret = compilerSous(objets, ombrePortee);
-    scene.fog = brume;
-    return pret;
+    try {
+      return compilerSous(objets, ombrePortee);
+    } finally {
+      scene.fog = brume;
+    }
   }
 
   return { rendre, redimensionner, enfumer, compiler, get luminance() { return photometre.luminance; } };

@@ -118,7 +118,7 @@ async function suivreParcours(dossier) {
     await page.evaluate(() => window.__figurants)
     await page.waitForFunction(() => !document.querySelector('.noir'), null, { timeout: 180000 })
     for (let i = 0; i < n; i++) {
-      await page.evaluate((i) => window.__parcours.aller(i), i)
+      await page.evaluate((i) => window.__parcours.sauter(i), i)
       await page.waitForTimeout(500)
       await page.evaluate((t) => window.__temps(t), 3 + i)
       await laisserRendre()
@@ -141,7 +141,7 @@ async function suivreParcours(dossier) {
         console.log(`fondu ${i} -> ${i + 1}`, JSON.stringify({ ecart }), Math.abs(ecart) > 0.3 ? 'SOL PERDU' : 'ok')
         continue
       }
-      await page.evaluate((i) => window.__parcours.aller(i), i)
+      await page.evaluate((i) => window.__parcours.sauter(i), i)
       await page.waitForTimeout(300)
       const marche = await page.evaluate((DEGAGEMENT) => {
         document.querySelector('#parcours .suivant').click()
@@ -171,7 +171,7 @@ async function suivreParcours(dossier) {
       }, DEGAGEMENT)
       // La même marche à grands pas — une image de 0,1 s à l'allure ×4 — : l'escalier doit se gravir quand même.
       // Le retour à la station passe par le fondu : on lui laisse le temps de poser la caméra.
-      await page.evaluate((i) => window.__parcours.aller(i), i)
+      await page.evaluate((i) => window.__parcours.sauter(i), i)
       await page.waitForTimeout(300)
       marche.ecartVite = await page.evaluate(() => {
         document.querySelector('#parcours .suivant').click()

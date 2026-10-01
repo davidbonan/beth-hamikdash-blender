@@ -8,6 +8,7 @@ const HAUTEUR = 3;
 const RESOLUTION = 256;
 // L'épaisseur d'une parokhet : l'extérieure, tournée vers la salle, en est ; l'intérieure non.
 const MARGE = 0.25;
+let reflet = null;
 
 // sculptures_murs court aussi dans le Kodesh HaKodashim : ce qui sort de la salle devient un maillage frère.
 export function separerDuHeikhal(maillages, salle) {
@@ -63,19 +64,25 @@ export function sonderHeikhal(renderer, scene, { kelim, materiaux, lumieres, cac
   caches.forEach((o) => { o.visible = false; });
   scene.fog.density = 0;
   for (const m of reflets.keys()) m.envMapIntensity = 0;
-  camera.update(renderer, scene);
-  lumieres.forEach((l, i) => { l.intensity = intensites[i]; });
-  caches.forEach((o, i) => { o.visible = visibles[i]; });
-  scene.fog.density = densite;
-  for (const [m, intensite] of reflets) m.envMapIntensity = intensite;
+  try {
+    camera.update(renderer, scene);
+  } finally {
+    lumieres.forEach((l, i) => { l.intensity = intensites[i]; });
+    caches.forEach((o, i) => { o.visible = visibles[i]; });
+    scene.fog.density = densite;
+    for (const [m, intensite] of reflets) m.envMapIntensity = intensite;
+  }
 
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const reflet = pmrem.fromCubemap(cible.texture).texture;
+  const ancien = reflet;
+  reflet = pmrem.fromCubemap(cible.texture);
   pmrem.dispose();
   cible.dispose();
+  // Refaite après une perte de contexte, la sonde remplace son reflet sans changer de nuanceur.
   for (const materiau of materiaux) {
-    materiau.envMap = reflet;
+    materiau.needsUpdate = materiau.envMap === null;
+    materiau.envMap = reflet.texture;
     materiau.envMapIntensity = INTENSITE;
-    materiau.needsUpdate = true;
   }
+  ancien?.dispose();
 }

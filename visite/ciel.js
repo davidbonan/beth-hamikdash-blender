@@ -98,10 +98,22 @@ const ECLAIRANT_AUBE = { haut: 0x3a4152, bas: 0x565c68, sol: 0x4a463e, ambiance:
                          soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0.30, 0.20, 0.12], etoiles: 0 };
 // Au chant du coq du 16 Tishri (Soucca 5:4), la même lune pleine se couche à l'ouest.
 const LUNE_COUCHANTE = new THREE.Vector3(-150, 35, -20).normalize();
-const CIELS = { jour: { vu: VU, eclairant: ECLAIRANT }, nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT },
-                fin_de_nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, astre: LUNE_COUCHANTE },
-                avant_l_aube: { vu: VU_AVANT_L_AUBE, eclairant: ECLAIRANT_AVANT_L_AUBE },
-                aube: { vu: VU_AUBE, eclairant: ECLAIRANT_AUBE } };
+// La lumière de chaque moment qu'un parcours demande. La nuit est celle de Sim'hat Beit HaSho'éva
+// (Soucca 5:2) : le 16 Tishri, la lune pleine se lève à l'est, là où la visite pose son soleil du matin.
+// La lumière cuite est celle du ciel de jour : la nuit n'en garde que ce que la lune en laisse.
+// Avant l'aube, sans lune, et à l'aube, sans soleil, l'astre n'est plus que la lueur de l'est.
+// `feu` : le feu de l'autel, qui brûle toute la nuit (Vayikra 6:2) et que le jour noie.
+const LUMIERES_DE_NUIT = { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true };
+const CIELS = {
+  jour: { vu: VU, eclairant: ECLAIRANT,
+          lumieres: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false } },
+  nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, lumieres: LUMIERES_DE_NUIT },
+  fin_de_nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, astre: LUNE_COUCHANTE, lumieres: LUMIERES_DE_NUIT },
+  avant_l_aube: { vu: VU_AVANT_L_AUBE, eclairant: ECLAIRANT_AVANT_L_AUBE,
+                  lumieres: { astre: { couleur: 0xa9bde0, intensite: 0 }, appoint: 0, ciel: 0.05, cuite: 0.12, shoeva: false, feu: true } },
+  aube: { vu: VU_AUBE, eclairant: ECLAIRANT_AUBE,
+          lumieres: { astre: { couleur: 0xb4c0d8, intensite: 0.6 }, appoint: 0.03, ciel: 0.05, cuite: 0.25, shoeva: false, feu: true } },
+};
 
 // Le dégradé des deux dômes, et le ciel que l'air ajoute à ce qu'il éloigne.
 const DEGRADE = /* glsl */`
@@ -114,6 +126,7 @@ const DEGRADE = /* glsl */`
   }`;
 
 export const astreDu = (moment) => CIELS[moment].astre ?? SOLEIL;
+export const lumieresDu = (moment) => CIELS[moment].lumieres;
 
 function dome(rayon, teintes, astre = SOLEIL) {
   return new THREE.Mesh(

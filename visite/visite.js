@@ -9,7 +9,7 @@ import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { niveauxDeDetail } from "./detail.js";
-import { astreDu, brumer, domeVu, environnement, peindreDome, teinterAir } from "./ciel.js";
+import { astreDu, brumer, domeVu, environnement, lumieresDu, peindreDome, teinterAir } from "./ciel.js";
 import { epargner as epargnerOmbres, regler as reglerOmbres } from "./ombres.js";
 import { PROFIL, plafonner } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
@@ -21,6 +21,7 @@ import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
 import { TEMPS_FLAMME, flamme } from "./flamme.js";
+import { PAS, SOUS_PAS } from "./trajet.js";
 import { LANGUE_SOURCE, ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
 
 const AMA = 0.48;
@@ -32,7 +33,6 @@ const RAYON = 0.38;       // demi-largeur du marcheur
 // celle qu'on s'apprête à gravir.
 // MONTEE suit la plus haute marche du parcours : celle d'une ama qui porte le Doukhan
 // (Middot 2:6, selon R. Eliézer ben Yaakov), sur toute la largeur de la cour. À 0,28 m, l'Azara restait hors d'atteinte.
-const MARCHE = 0.5 * 0.48; // 1/2 ama
 const MONTEE = AMA + 0.02;
 const CHUTE = 0.60;        // au-delà, il n'y a pas de sol : le pas est refusé
 const FENTE = 0.25;        // un pied : le vide plus étroit que lui s'enjambe sans y penser
@@ -40,10 +40,8 @@ const FENTE = 0.25;        // un pied : le vide plus étroit que lui s'enjambe s
 // hauteur à la main, et la fenêtre de la marche est celle d'un pas : trois des neuf
 // étaient 2,5 amot au-dessus de leur dallage, et on s'y posait en l'air.
 const APLOMB = 1.5;
-const PAS = 3.4;          // m/s
 const COURSE = 2.4;       // multiplicateur
 const GARDE = 0.06;       // peau du rayon de garde, devant le marcheur
-const SOUS_PAS = 0.12;    // MARCHE - GARDE : le pas d'intégration qui ne saute rien
 const VOL = 9.0;          // m/s en vol libre
 // Le pas ne s'établit ni ne s'éteint d'un coup : une vitesse qui bascule de 0 à 3,4
 // m/s à l'image près se lit en saccade, et c'est elle qu'on prend pour un manque de
@@ -235,36 +233,22 @@ const scene = new THREE.Scene();
 const brume = brumer(scene);
 const AIR_DEHORS = brume.density;
 
-// La lumière de chaque moment qu'un parcours demande. La nuit est celle de Sim'hat Beit HaSho'éva
-// (Soucca 5:2) : le 16 Tishri, la lune pleine se lève à l'est, là où la visite pose son soleil du matin.
-// La lumière cuite est celle du ciel de jour : la nuit n'en garde que ce que la lune en laisse.
-// Au chant du coq, la même lune, couchante à l'ouest (ciel.js).
-// Avant l'aube, sans lune, et à l'aube, sans soleil, l'astre n'est plus que la lueur de l'est.
-// `feu` : le feu de l'autel, qui brûle toute la nuit (Vayikra 6:2) et que le jour noie.
-const ECLAIRAGES = {
-  jour: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false },
-  nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true },
-  fin_de_nuit: { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true },
-  avant_l_aube: { astre: { couleur: 0xa9bde0, intensite: 0 }, appoint: 0, ciel: 0.05, cuite: 0.12, shoeva: false, feu: true },
-  aube: { astre: { couleur: 0xb4c0d8, intensite: 0.6 }, appoint: 0.03, ciel: 0.05, cuite: 0.25, shoeva: false, feu: true },
-};
-
 // L'ambiance ne doit PAS peser autant que le soleil. À 0,75 contre 1,9, chaque face
 // recevait presque autant de lumière sans direction que de lumière du matin : le
 // calcaire y perdait sa teinte et le modelé avec, et les murs rendaient un aplat gris.
 // Le rapport compte plus que les niveaux — même arbitrage que le ciel du blockout.
 // Elle descend une seconde fois, avec `ambiance` dans ciel.js : ce que ce réglage-ci
 // corrigeait pour les parements, il restait à le corriger pour tout ce qui est à plat.
-const cielAmbiant = new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, ECLAIRAGES.jour.ciel);
+const cielAmbiant = new THREE.HemisphereLight(0xd5dbe0, 0x9c8b6c, lumieresDu("jour").ciel);
 scene.add(cielAmbiant);
 // Matin, à l'est : l'axe de l'avoda, et la lumière qui rase la façade. Plus bas sur
 // l'horizon, le soleil traverse plus d'atmosphère : il perd de la force et gagne de
 // l'ambre, et c'est ce qui empêche un rasant de rendre le calcaire crayeux.
-const soleil = new THREE.DirectionalLight(ECLAIRAGES.jour.astre.couleur, ECLAIRAGES.jour.astre.intensite);
+const soleil = new THREE.DirectionalLight(lumieresDu("jour").astre.couleur, lumieresDu("jour").astre.intensite);
 reglerOmbres(soleil);
 epargnerOmbres();
 scene.add(soleil, soleil.target);
-const appoint = new THREE.DirectionalLight(0xb9c6d4, ECLAIRAGES.jour.appoint);  // rebond du ciel à l'ouest
+const appoint = new THREE.DirectionalLight(0xb9c6d4, lumieresDu("jour").appoint);  // rebond du ciel à l'ouest
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
@@ -348,7 +332,7 @@ function vaciller(dt) {
   vacillement += dt;
   const t = vacillement;
   TEMPS_FLAMME.value = t;
-  const eclat = ECLAIRAGES[moment].shoeva ? SHOEVA.intensite : 0;
+  const eclat = lumieresDu(moment).shoeva ? SHOEVA.intensite : 0;
   shoeva?.lampes.forEach((l, i) => {
     l.intensity = eclat * (0.93 + 0.04 * Math.sin(t * 7.3 + i) + 0.03 * Math.sin(t * 17.9 + i * 2.1));
   });
@@ -360,7 +344,7 @@ function vaciller(dt) {
     lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
   }
   if (feuDeLAutel) {
-    feuDeLAutel.intensity = ECLAIRAGES[moment].feu ? FEU.intensite * (0.9 + 0.06 * Math.sin(t * 2.3) + 0.04 * Math.sin(t * 6.1 + 1.3)) : 0;
+    feuDeLAutel.intensity = lumieresDu(moment).feu ? FEU.intensite * (0.9 + 0.06 * Math.sin(t * 2.3) + 0.04 * Math.sin(t * 6.1 + 1.3)) : 0;
   }
   if (!braise) return;
   const souffle = 0.86 + 0.09 * Math.sin(t * 1.7) + 0.05 * Math.sin(t * 4.3 + 1.0) + 0.04 * (Math.random() - 0.5);
@@ -481,7 +465,7 @@ function allumerLeFeu() {
 // Posées avant que « préparation… » soit peint, la boucle compilerait leurs nuanceurs dans son image, figée, sans l'avoir montré.
 async function passerAu(voulu) {
   if (voulu === moment) return;
-  const eclairage = ECLAIRAGES[voulu];
+  const eclairage = lumieresDu(voulu);
   const lampesAPoser = (feuDeLAutel === null && eclairage.feu) || (shoeva === null && eclairage.shoeva);
   if (!lampesAPoser) return eclairerAu(voulu);
   await annoncerAttente(async () => {
@@ -495,7 +479,7 @@ async function passerAu(voulu) {
 function eclairerAu(voulu) {
   const quitte = moment;
   moment = voulu;
-  const eclairage = ECLAIRAGES[voulu];
+  const eclairage = lumieresDu(voulu);
   soleil.color.set(eclairage.astre.couleur);
   soleil.intensity = eclairage.astre.intensite;
   directionDeLAstre = astreDu(voulu);
@@ -686,13 +670,14 @@ const oeilAdapte = adaptation(obstacles);
 
 // Les nuanceurs se compilent hors du fil de la page pendant que les arbres s'y construisent.
 await Promise.all([rendu.compiler(), construireArbres(obstacles)]);
+const refleterLeHeikhal = () => sonderHeikhal(renderer, scene, {
+  kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
+  materiaux: materiauxHeikhal,
+  lumieres: [soleil, appoint, lampe, cielAmbiant],
+  caches: [ciel],
+});
 if (!brut) {
-  sonderHeikhal(renderer, scene, {
-    kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
-    materiaux: materiauxHeikhal,
-    lumieres: [soleil, appoint, lampe, cielAmbiant],
-    caches: [ciel],
-  });
+  refleterLeHeikhal();
   await rendu.compiler();                 // le reflet de la salle change les nuanceurs de son or
 }
 
@@ -1240,21 +1225,27 @@ const voile = $("#voile");
 // délai est celui de la transition du voile, à l'aller seulement : on repart de noir.
 // Deux fondus qui se chevauchent — une station et le moment de son parcours — ne lèvent le voile qu'au dernier.
 let fondus = 0;
-function fondu(action) {
+const FONDU_MS = 170;
+async function fondu(action) {
   fondus++;
   voile.classList.add("noir");
-  setTimeout(async () => {
+  try {
+    await new Promise((noir) => setTimeout(noir, FONDU_MS));
     await action();
+  } finally {
     if (--fondus === 0) voile.classList.remove("noir");
-  }, 170);
+  }
 }
 
 // Chaque lampe de nuit recompile tous les nuanceurs de la scène : Safari s'y fige jusqu'à neuf secondes, le voile dit qu'il prépare.
 async function annoncerAttente(travail) {
   voile.classList.add("attente");
-  await laisserPeindre();
-  await travail();
-  voile.classList.remove("attente");
+  try {
+    await laisserPeindre();
+    await travail();
+  } finally {
+    voile.classList.remove("attente");
+  }
 }
 
 const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
@@ -1468,9 +1459,13 @@ function ajusterEchelle(dt) {
 
 const lieuOccupe = () => lieuEn(corps.set(camera.position.x, piedsY + 1, camera.position.z));
 let lieuPresent = null;
+// Le lieu se relève toutes les quatre images ; la lampe et l'air le rejoignent au temps écoulé, pas à l'image.
+const IMAGES_ENTRE_RELEVES = 4;
+const REPONSE_LIEU = 0.23;
+let depuisLeReleve = 0;
 // La lampe garde l'éclat qu'on lui voyait avant que l'œil ne s'adapte.
-function accorderLampe(lieu) {
-  lampe.intensity += ((LAMPE_PAR_LIEU[lieu] ?? 0) / oeilAdapte.facteur - lampe.intensity) * 0.25;
+function accorderLampe(lieu, part) {
+  lampe.intensity += ((LAMPE_PAR_LIEU[lieu] ?? 0) / oeilAdapte.facteur - lampe.intensity) * part;
 }
 // Le Heikhal et le Kodesh HaKodashim s'éclairent à leurs lampes, réglées sans adaptation.
 const SANS_ADAPTATION = new Set(["heikhal", "kodesh_hakodashim"]);
@@ -1480,8 +1475,16 @@ function accorderExposition(dt) {
   renderer.toneMappingExposure = EXPOSITION.value = EXPOSITION_DEHORS * facteur;
 }
 // L'air ne rend que le ciel : sous un toit il n'a rien à rendre, et son voile couvrait le cèdre des lishkot.
-function accorderAir() {
-  brume.density += (AIR_DEHORS * (1 - oeilAdapte.fermeture) - brume.density) * 0.25;
+function accorderAir(part) {
+  brume.density += (AIR_DEHORS * (1 - oeilAdapte.fermeture) - brume.density) * part;
+}
+
+function releverLeLieu() {
+  const part = 1 - Math.exp(-depuisLeReleve / REPONSE_LIEU);
+  depuisLeReleve = 0;
+  lieuPresent = lieuOccupe();
+  accorderLampe(lieuPresent, part);
+  accorderAir(part);
 }
 
 // Le cinéma comme le parcours prennent la caméra le temps d'un trajet : la boucle la leur prête.
@@ -1551,53 +1554,56 @@ function montrerDemande(id) {
 const demande = new URLSearchParams(location.search).get("vue");
 if (demande) montrerDemande(demande);
 
-renderer.setAnimationLoop(() => {
-  if (enReprise) return;
-  const dt = Math.min(horloge.getDelta(), 0.1);
-  if (film) {
-    film.avancer(dt);
-    piedsY = camera.position.y - OEIL;
-    if (++image % 4 === 0) {
-      lieuPresent = lieuOccupe();
-      accorderLampe(lieuPresent);
-      accorderAir();
-      relayerHorsDuCadre();
-    }
-    accorderExposition(dt);
-    ajusterEchelle(dt);
-    dessiner(dt);
-    return;
-  }
+// Le survol n'a pas besoin de 60 Hz.
+function afficherSurvol() {
+  const p = manette.pointeur;
+  survole = p.survole && !manette.tourne ? conceptSous(ecran.set(p.x, p.y)) : null;
+  const c = survole && CONCEPTS.get(survole);
+  survol.classList.toggle("vu", !!c);
+  if (!c) return;
+  survol.textContent = c.nom;
+  survol.style.left = `${p.clientX}px`;
+  survol.style.top = `${p.clientY + 20}px`;
+}
+
+function afficherPosition() {
+  position.textContent = brut
+    ? `${(camera.position.x / AMA).toFixed(0)} · ` +
+      `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
+    : (lieuPresent ? CONCEPTS.get(lieuPresent).nom : "");
+  planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieuPresent);
+}
+
+function suivreLeFilm(dt) {
+  film.avancer(dt);
+  piedsY = camera.position.y - OEIL;
+}
+
+function conduire(dt) {
   lisserRegard(dt);
   avantLePas.copy(camera.position);
   avancer(dt);
   noterDeplacement(camera.position.distanceTo(avantLePas));
   if (vol) noterAltitude(camera.position.y - avantLePas.y);
+  if (entame || lisse.lengthSq() <= 0.01) return;
+  entame = true;                                  // le rappel a servi, il s'efface
+  aide.classList.add("parti");
+}
+
+renderer.setAnimationLoop(() => {
+  if (enReprise) return;
+  const dt = Math.min(horloge.getDelta(), 0.1);
+  const filme = film !== null;
+  if (filme) suivreLeFilm(dt); else conduire(dt);
   ajusterEchelle(dt);
-
-  if (!entame && lisse.lengthSq() > 0.01) {       // le rappel a servi, il s'efface
-    entame = true;
-    aide.classList.add("parti");
-  }
-
-  if (++image % 4 === 0) {                        // le survol n'a pas besoin de 60 Hz
-    const p = manette.pointeur;
-    survole = p.survole && !manette.tourne ? conceptSous(ecran.set(p.x, p.y)) : null;
-    const c = survole && CONCEPTS.get(survole);
-    survol.classList.toggle("vu", !!c);
-    if (c) {
-      survol.textContent = c.nom;
-      survol.style.left = `${p.clientX}px`;
-      survol.style.top = `${p.clientY + 20}px`;
+  depuisLeReleve += dt;
+  if (++image % IMAGES_ENTRE_RELEVES === 0) {
+    releverLeLieu();
+    if (filme) relayerHorsDuCadre();
+    else {
+      afficherSurvol();
+      afficherPosition();
     }
-    lieuPresent = lieuOccupe();
-    accorderLampe(lieuPresent);
-    accorderAir();
-    position.textContent = brut
-      ? `${(camera.position.x / AMA).toFixed(0)} · ` +
-        `${(-camera.position.z / AMA).toFixed(0)} · ${(piedsY / AMA).toFixed(0)} ${texte("amot")}`
-      : (lieuPresent ? CONCEPTS.get(lieuPresent).nom : "");
-    planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieuPresent);
   }
   accorderExposition(dt);
   dessiner(dt);
@@ -1607,7 +1613,7 @@ $("#chargement").classList.add("parti");
 visiteLancee = true;
 alleger(gltf.scene);
 
-// Three renvoie seul géométries et images ; les cartes relâchées, les environnements et les ombres figées sont à refaire.
+// Three renvoie seul géométries et images ; les cartes relâchées, les environnements, les ombres figées et le reflet du Heikhal sont à refaire.
 async function reprendre() {
   for (const m of Object.keys(reflets)) {
     reflets[m].dispose();
@@ -1616,6 +1622,7 @@ async function reprendre() {
   scene.environment = reflets[moment].texture;
   scene.traverse((o) => { if (o.isLight && o.shadow) o.shadow.needsUpdate = true; });
   await rechargerCartes();
+  if (!brut) refleterLeHeikhal();
 }
 
 // Au premier passage l'initiation remplace le rappel des commandes ; le « ? » la rejoue.

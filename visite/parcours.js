@@ -18,15 +18,12 @@
  * sortant, à ceux de la visite libre.
  */
 import * as THREE from "three";
-import { polyligne } from "./cinema.js";
+import { PAS, REPONSE_SOL, SOUS_PAS, cibleEnM, lisse, pointEnM, polyligne } from "./trajet.js";
 import { ecrire, langue, libelle, suivreLangue } from "./langue.js";
 import { lireRetenu, retenir } from "./memoire.js";
 
-const VITESSE = 3.4;           // m/s : le pas de la marche libre (PAS de visite.js), sans courir
 const RAMPE = 1.2;             // s : on part et on s'arrête sans à-coup
-const REPONSE_SOL = 0.22;      // s : une marche de 1/2 ama se glisse, elle ne se saute pas
-const SOUS_PAS = 0.12;         // m : la sonde de sol ne saute aucune contremarche, quel que soit le framerate ou l'allure
-const ECART_DEPART = 2;        // m : plus loin de sa station, on y est reposé avant de repartir
+const ECART_DEPART = 2;        // m, à plat : plus loin de sa station, on y est reposé avant de repartir
 const PORTEE_REGARD = 6;       // m : en marchant, on regarde le chemin devant soi
 const TOURNER_DEPART = 3;      // m : le temps de quitter des yeux ce qu'on regardait
 const TOURNER_ARRIVEE = 8;     // m : le temps de se tourner vers ce que la station montre
@@ -35,7 +32,6 @@ const MEMOIRE_ALLURE = "visite.parcours.allure";
 // Sur un téléphone la carte couvre la moitié basse de la scène : pendant la marche elle se replie d'elle-même.
 const ECRAN_ETROIT = matchMedia("(max-width: 720px), (max-height: 520px)");
 const CHEVRON_GAUCHE = "M8.5 2 2.5 8l6 6", CHEVRON_DROIT = "M3.5 2l6 6-6 6", COCHE = "M1 8.5l3.5 4L11 3";
-const lisse = (u) => u * u * (3 - 2 * u);
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
 export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, changerDeTroupe,
@@ -48,8 +44,8 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   const allure = carte.querySelector(".allure"), fiche = carte.querySelector(".fiche");
   const motSuivant = suivant.querySelector("span"), traceSuivant = suivant.querySelector("path"), tracePrecedent = precedent.querySelector("path");
 
-  const enM = ([x, z]) => new THREE.Vector3(x * ama, 0, z * ama);
-  const cibleEnM = ([x, y, z]) => new THREE.Vector3(x * ama, y * ama, z * ama);
+  const enM = ([x, z]) => pointEnM(ama, [x, z]);
+  const cibleDe = (station) => cibleEnM(ama, station.cible);
   const piedsDe = (station) => [station.point[0] * ama, station.sol * ama, station.point[1] * ama];
   const traduit = (champ) => champ[langue()] ?? champ.fr;
   const momentDe = (station) => station.moment ?? guide.moment ?? "jour";
@@ -57,6 +53,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   let guide = null, stations = [];
   let courante = -1, origine = -1;
   let trajet = null;
+  let demande = 0;
   let facteur = ALLURES.includes(+lireRetenu(MEMOIRE_ALLURE)) ? +lireRetenu(MEMOIRE_ALLURE) : 1;
   let repliee = false, deplieeEnMarche = false;
   const ouvert = () => !racine.hidden;
@@ -93,7 +90,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   // Aller en avant suit les points de passage de la station visée ; revenir les
   // reprend à l'envers, ceux de la station qu'on quitte.
   function etapesVers(i) {
-    const depart = camera.position.clone();
+    const depart = camera.position.clone().setY(0);
     const via = i > courante ? (stations[i].via ?? []) : [...(stations[courante].via ?? [])].reverse();
     return [depart, ...via.map(enM), enM(stations[i].point)];
   }
@@ -109,9 +106,9 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     const etapes = etapesVers(i);
     const chemin = polyligne(etapes);
     const longueur = etapes.reduce((d, p, k) => d + (k ? p.distanceTo(etapes[k - 1]) : 0), 0);
-    const duree = longueur / VITESSE + RAMPE;   // chaque rampe coûte la moitié de sa durée
+    const duree = longueur / PAS + RAMPE;   // chaque rampe coûte la moitié de sa durée
     const regardDe = camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(10).add(camera.position);
-    const regardVers = cibleEnM(station.cible);
+    const regardVers = cibleDe(station);
     const regard = new THREE.Vector3(), devant = new THREE.Vector3();
     let temps = 0, parcouru = 0;
     let pieds = camera.position.y - oeil;
@@ -120,7 +117,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     function pas(dt) {
       temps += dt;
       const cadence = lisse(Math.min(temps / RAMPE, 1)) * lisse(Math.min(Math.max(duree - temps, 0) / RAMPE, 1));
-      parcouru = Math.min(parcouru + VITESSE * cadence * dt, longueur);
+      parcouru = Math.min(parcouru + PAS * cadence * dt, longueur);
       const u = temps >= duree ? 1 : parcouru / longueur;
       const point = chemin(u);
       const sonde = sol(point.x, point.z, pieds);
@@ -139,7 +136,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
       avancer(dtReel) {
         let reste = dtReel * facteur;
         while (reste > 0) {
-          const dt = Math.min(reste, SOUS_PAS / VITESSE);
+          const dt = Math.min(reste, SOUS_PAS / PAS);
           reste -= dt;
           if (pas(dt)) return finir(i);
         }
@@ -164,29 +161,36 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
 
   const aPied = (i) => !stations[i].fondu && !stations[courante].fondu;
 
+  function ecartALaStation() {
+    const [x, , z] = piedsDe(stations[courante]);
+    return Math.hypot(camera.position.x - x, camera.position.z - z);
+  }
+
   // Loin de sa station — le visiteur a marché de lui-même —, la ligne droite traverserait
-  // un mur : on le repose d'abord là où le parcours l'a laissé.
-  function aller(i) {
+  // un mur : on le repose d'abord là où le parcours l'a laissé, et la marche ne part qu'une fois posé.
+  async function aller(i) {
     if (!aPied(i)) return sauter(i);
-    if (camera.position.distanceTo(new THREE.Vector3(...piedsDe(stations[courante]))) > ECART_DEPART) {
-      poserA(piedsDe(stations[courante]), cibleEnM(stations[courante].cible));
-    }
-    partirVers(i);
+    const numero = ++demande;
+    if (ecartALaStation() > ECART_DEPART) await poserA(piedsDe(stations[courante]), cibleDe(stations[courante]));
+    if (numero === demande) partirVers(i);
   }
 
   function sauter(i) {
+    demande++;
     if (trajet) marcher(null);
     trajet = null;
     courante = i;
     fermerFiche();
     changerDeMoment(momentDe(stations[i]));
     appelerFigurants(stations[i].figurants);
-    poserA(piedsDe(stations[i]), cibleEnM(stations[i].cible));
+    poserA(piedsDe(stations[i]), cibleDe(stations[i]));
     afficher();
   }
 
   function ouvrir(id, rang = 0) {
-    guide = liste.find((p) => p.id === id) ?? liste[0];
+    const choisi = liste.find((p) => p.id === id);
+    if (!choisi) return;
+    guide = choisi;
     stations = guide.stations;
     racine.hidden = false;
     changerDeTroupe(guide.troupe);
@@ -194,6 +198,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   }
 
   function fermer() {
+    demande++;
     if (trajet) marcher(null);
     trajet = null;
     racine.hidden = true;
@@ -228,7 +233,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   // sans attendre les images, puis compare l'œil au dallage que la station déclare.
   const ecartSol = () => camera.position.y - oeil - stations[courante].sol * ama;
   return {
-    ouvrir, fermer, aller: sauter, ouvert, liste: () => liste.map((p) => p.id),
+    ouvrir, fermer, sauter, ouvert, liste: () => liste.map((p) => p.id),
     stations: (id) => liste.find((p) => p.id === id).stations,
     station: () => courante, nombre: () => stations.length, trajet: () => trajet, ecartSol,
   };

@@ -1020,6 +1020,15 @@ const LUEURS_DE_LA_SALLE = /* glsl */`
 #endif
 `;
 
+// Un morceau que three aurait renommé laissait la greffe sans effet, et la matière nue sans rien dire.
+const greffable = (source) => ({
+  source,
+  greffer(repere, greffe) {
+    if (!source.includes(repere)) throw new Error(`three a changé ${repere} : matière non habillée`);
+    return greffable(source.replace(repere, greffe));
+  },
+});
+
 /**
  * Branche le calcul procédural sur une matière standard, sans la remplacer : le
  * modèle d'éclairage, les ombres et le tonemapping de three restent ceux d'origine.
@@ -1074,20 +1083,21 @@ export function habiller(materiau, horloges, jeux) {
   const refletDuCiel = () => (materiau.envMap ? "" : "#define REFLET_DU_CIEL\n");
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
-    nuanceur.vertexShader = nuanceur.vertexShader
-      .replace("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;\n"
+    nuanceur.vertexShader = greffable(nuanceur.vertexShader)
+      .greffer("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;\n"
                + "#ifdef GRAVURE\nvarying vec2 vGravure;\n#endif\n")
-      .replace("#include <begin_vertex>",
+      .greffer("#include <begin_vertex>",
                "#include <begin_vertex>\n#ifdef FIL\ntransformed = grossirFil(transformed, objectNormal);\n#endif\n" +
                "vMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPixel = pixelVu(transformed);\n" +
                // L'exporteur glTF retourne v (0 en haut) ; l'atlas se lit v montant, comme
                // Blender l'a écrit et comme la parokhet — sinon la plaque keruv lit la tuile
                // fleuron, et la timora un quart vide.
-               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n");
+               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n")
+      .source;
 
-    nuanceur.fragmentShader = nuanceur.fragmentShader
-      .replace("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
-      .replace("#include <shadowmap_pars_fragment>",
+    nuanceur.fragmentShader = greffable(nuanceur.fragmentShader)
+      .greffer("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
+      .greffer("#include <shadowmap_pars_fragment>",
                PROFIL.ombres.penombre ? assemblage() : "#include <shadowmap_pars_fragment>")
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
@@ -1095,7 +1105,7 @@ export function habiller(materiau, horloges, jeux) {
       // qui décide si la face est un sol ou un mur, et sur quel axe courent les
       // joints. Tirée des dérivées, elle devenait aléatoire aux angles rasants et
       // chaque pixel changeait d'avis — la pierre grouillait.
-      .replace("#include <clipping_planes_fragment>", /* glsl */`
+      .greffer("#include <clipping_planes_fragment>", /* glsl */`
         #include <clipping_planes_fragment>
         vec3 mTeinte, mPente, mFeu; float mRugo;
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);
@@ -1103,14 +1113,14 @@ export function habiller(materiau, horloges, jeux) {
       // Le soleil et le rebond sont des lumières directionnelles, qui ne connaissent
       // aucun mur : la pénombre reprend ce que leur boucle a ajouté. Les lampes
       // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.
-      .replace("#include <lights_fragment_begin>", soleilEnPenombre())
-      .replace("#include <color_fragment>",
+      .greffer("#include <lights_fragment_begin>", soleilEnPenombre())
+      .greffer("#include <color_fragment>",
                "#include <color_fragment>\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
       // La teinte d'un minéral se pose APRÈS l'éclairage : son exposant dépend de la
       // clarté reçue. Le relief, lui, se tempère sur la lumière du ciel seule — celle
       // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
       // La lumière cuite remplace le ciel sans direction, et prend le relief que ce ciel donne à la normale du grain.
-      .replace("#include <lights_fragment_end>", /* glsl */`
+      .greffer("#include <lights_fragment_end>", /* glsl */`
         #if defined(TEMPERE) || defined(USE_LIGHTMAP)
           const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
           vec3 cielPlat = getAmbientLightIrradiance(ambientLightColor);
@@ -1171,21 +1181,22 @@ export function habiller(materiau, horloges, jeux) {
           reflectedLight.directDiffuse *= mTeinteVue;
           reflectedLight.indirectDiffuse *= mTeinteVue;
         #endif`)
-      .replace("#include <roughnessmap_fragment>",
+      .greffer("#include <roughnessmap_fragment>",
                "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + mRugo, 0.03, 1.0);")
       // L'incandescence est une TEXTURE, pas une constante de matière : une braise dont
       // chaque point rougeoie autant est une boîte orange, et c'est ce que la visite
       // montrait. Ailleurs `mFeu` vaut 1 et l'émission reste celle de three.
-      .replace("#include <emissivemap_fragment>",
+      .greffer("#include <emissivemap_fragment>",
                "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= mFeu;")
       // Le joint se creuse pour la LUMIERE et pas seulement pour la couleur. Sans UV
       // ni tangentes, la voie ordinaire serait la derivee d'ecran, bannie ici parce
       // qu'elle explose aux angles rasants. Mais la hauteur est ici une fonction
       // ecrite de la position dans le monde : sa pente s'obtient en la derivant, ce
       // qui ne depend pas du pixel voisin et ne grouille donc jamais.
-      .replace("#include <normal_fragment_maps>", /* glsl */`
+      .greffer("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
-        normal = normalize(normal - mat3(viewMatrix) * mPente);`);
+        normal = normalize(normal - mat3(viewMatrix) * mPente);`)
+      .source;
   };
   materiau.customProgramCacheKey = () => `mikdash-${drapeaux}${refletDuCiel()}`;
 }
