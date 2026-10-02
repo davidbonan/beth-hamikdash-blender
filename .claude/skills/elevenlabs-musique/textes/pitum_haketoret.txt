@@ -1,44 +1,71 @@
 # Pitum haketoret — Keritot 6a, texte du siddour
-# étiquettes du mp3, puis [nom de section | durée en s | ton du passage]
+# étiquettes du mp3, puis [nom de section | durée en s | ton du passage | arrangement],
+# puis chaque ligne chantée et, dessous, son hébreu
 
 titre: Pitum Haketoret
 artiste: David Bonan
 source: Pitum haketoret — Keritot 6a
 
-[Verse 1 | 30 | calm storytelling, steady like the daily rhythm of morning and evening]
+[Verse 1 | 30 | calm storytelling, steady like the daily rhythm of morning and evening | gentle opening, piano and voice with light strings, soft dynamics]
+Tanu rabanan pitum haketoret keitsad
 תָּנוּ רַבָּנָן פִּטּוּם הַקְּטֹרֶת כֵּיצַד
+Shelosh me'ot veshishim ushmona manim hayu vah
 שְׁלֹש מֵאוֹת וְשִׁשִּׁים וּשְׁמוֹנָה מָנִים הָיוּ בָהּ
+Shelosh me'ot veshishim vachamisha keminyan yemot hachama
 שְׁלֹש מֵאוֹת וְשִׁשִּׁים וַחֲמִשָּׁה כְּמִנְיַן יְמוֹת הַחַמָּה
+Mane lechol yom
 מָנֶה לְכָל יוֹם
+Peras bashacharit ufras bein ha'arbayim
 פְּרַס בַּשַּׁחֲרִית וּפְרַס בֵּין הָעַרְבָּיִם
 
-[Verse 2 | 30 | hushed awe at the High Priest and Yom Kippur, delicate careful phrasing on the finely ground incense]
+[Verse 2 | 30 | hushed awe at the High Priest and Yom Kippur, delicate careful phrasing on the finely ground incense | same gentle pulse, strings a little fuller]
+Ushlosha manim yeterim
 וּשְׁלשָׁה מָנִים יְתֵרִים
+Shemehem machnis kohen gadol melo chofnav beyom hakipurim
 שֶׁמֵּהֶם מַכְנִיס כֹּהֵן גָּדוֹל מְלֹא חָפְנָיו בְּיוֹם הַכִּפּוּרִים
+Umachaziran lemachteshet be'erev yom hakipurim
 וּמַחֲזִירָן לְמַכְתֶּשֶׁת בְּעֶרֶב יוֹם הַכִּפּוּרִים
+Veshochakan yafe yafe
 וְשׁוֹחֲקָן יָפֶה יָפֶה
+Kedei shetehe daka min hadaka
 כְּדֵי שֶׁתְּהֵא דַקָּה מִן הַדַּקָּה
 
-[The Eleven Spices | 36 | each spice name sung distinctly like a precious treasure, a small melodic lift on every name, fragrant radiant wonder, weights sung firmly]
+[The Eleven Spices | 36 | each spice name sung distinctly like a precious treasure, a small melodic lift on every name, fragrant radiant wonder, weights sung firmly | light lilting rhythm, qanun accents on the spice names, moderate dynamics]
+Ve'achad asar samanim hayu vah, ve'elu hen
 וְאַחַד עָשָׂר סַמָּנִים הָיוּ בָהּ, וְאֵלּוּ הֵן
+Hatsori vehatsiporen hachelbena vehalevona
 הַצֳּרִי וְהַצִּפֹּרֶן הַחֶלְבְּנָה וְהַלְּבוֹנָה
+Mishkal shiv'im shiv'im mane
 מִשְׁקַל שִׁבְעִים שִׁבְעִים מָנֶה
+Mor uktsi'a shibolet nerd vecharkom
 מוֹר וּקְצִיעָה שִׁבֹּלֶת נֵרְדְּ וְכַרְכֹּם
+Mishkal shisha asar shisha asar mane
 מִשְׁקַל שִׁשָּׁה עָשָׂר שִׁשָּׁה עָשָׂר מָנֶה
+Hakosht shenem asar vekilufa shelosha vekinamon tish'a
 הַקּשְׁטְ שְׁנֵים עָשָׂר וְקִלּוּפָה שְׁלשָׁה וְקִנָּמוֹן תִּשְׁעָה
 
-[Verse 3 | 24 | flowing practical momentum]
+[Verse 3 | 24 | flowing practical momentum | fuller arrangement, frame drum and strings, stronger dynamics]
+Borit karshina tish'a kabin
 בֹּרִית כַּרְשִׁינָה תִּשְׁעָה קַבִּין
+Yein kafrisin se'in telata vekabin telata
 יֵין קַפְרִיסִין סְאִין תְּלָתָא וְקַבִּין תְּלָתָא
+Ve'im ein lo yein kafrisin
 וְאִם אֵין לוֹ יֵין קַפְרִיסִין
+Mevi chamar chivaryan atik
 מֵבִיא חֲמַר חִוַּרְיָן עַתִּיק
 
-[Bridge | 22.5 | mysterious and airy like rising smoke, Rabbi Natan's words as a respectful aside]
+[Bridge | 22.5 | mysterious and airy like rising smoke, Rabbi Natan's words as a respectful aside | sparser arrangement at the same tempo, no percussion, ney and strings, soft dynamics]
+Melach sedomit rova hakav
 מֶלַח סְדוֹמִית רֹבַע הַקָּב
+Ma'ale ashan kol shehu
 מַעֲלֶה עָשָׁן כָּל שֶׁהוּא
+Rabi Natan habavli omer
 רַבִּי נָתָן הַבַּבְלִי אוֹמֵר
+Af kipat hayarden kol shehu
 אַף כִּפַּת הַיַּרְדֵּן כָּל שֶׁהוּא
 
-[Final | 18.75 | grave and weighty, solemn fear of the law, last words sung slowly and heavily]
+[Final | 18.75 | grave and weighty, solemn fear of the law, last words sung slowly and heavily | stronger accents, low strings, firm dynamics]
+Ve'im natan bah devash pesalah
 וְאִם נָתַן בָּהּ דְּבַשׁ פְּסָלָהּ
+Ve'im chisar achat mikol samaneha chayav mita
 וְאִם חִסַּר אַחַת מִכָּל סַמָּנֶיהָ חַיָּב מִיתָה

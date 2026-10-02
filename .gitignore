@@ -16,4 +16,5 @@ dist/
 
 pays/.tuiles/
 
-.claude/skills/fal-musique/reference.mp3
+.claude/skills/elevenlabs-musique/reference.mp3
+.claude/skills/elevenlabs-musique/references_televersees.json
