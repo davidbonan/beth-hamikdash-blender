@@ -1907,13 +1907,13 @@
       "carte": "lumiere/_non_classe.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 16
+      "secondes": 17
     },
     "aliyah": {
       "carte": "lumiere/aliyah.webp",
       "canal": 0,
       "echelle": 1.0,
-      "secondes": 11
+      "secondes": 13
     },
     "arche_wilson": {
       "carte": "lumiere/arche_wilson.webp",
@@ -1924,14 +1924,14 @@
     "azara": {
       "carte": "lumiere/azara.webp",
       "canal": 0,
-      "echelle": 2.25,
-      "secondes": 92
+      "echelle": 2.5,
+      "secondes": 94
     },
     "batiment": {
       "carte": "lumiere/batiment.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 22
+      "secondes": 17
     },
     "beit_avtinas": {
       "carte": "lumiere/beit_avtinas.webp",
@@ -1943,103 +1943,103 @@
       "carte": "lumiere/beit_din_haazara.webp",
       "canal": 0,
       "echelle": 0.75,
-      "secondes": 4
+      "secondes": 3
     },
     "beit_din_har_habayit": {
       "carte": "lumiere/beit_din_har_habayit.webp",
       "canal": 0,
       "echelle": 0.5,
-      "secondes": 4
+      "secondes": 3
     },
     "beit_hahalifot": {
       "carte": "lumiere/beit_hahalifot.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 146
+      "secondes": 124
     },
     "beit_hamitbahayim": {
       "carte": "lumiere/beit_hamitbahayim.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 9
+      "secondes": 5
     },
     "beit_hamoked": {
       "carte": "lumiere/beit_hamoked.webp",
       "canal": 1,
       "echelle": 2.0,
-      "secondes": 34
+      "secondes": 25
     },
     "beit_hanitzotz": {
       "carte": "lumiere/beit_hanitzotz.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 8
+      "secondes": 5
     },
     "beit_hatevila": {
       "carte": "lumiere/beit_hatevila.webp",
       "canal": 0,
       "echelle": 4.5,
-      "secondes": 15
+      "secondes": 14
     },
     "candelabres_shoeva": {
       "carte": "lumiere/candelabres_shoeva.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 7
+      "secondes": 5
     },
     "doukhan": {
       "carte": "lumiere/doukhan.webp",
       "canal": 0,
-      "echelle": 1.0,
-      "secondes": 4
+      "echelle": 0.75,
+      "secondes": 3
     },
     "douze_marches_oulam": {
       "carte": "lumiere/douze_marches_oulam.webp",
       "canal": 0,
-      "echelle": 2.75,
-      "secondes": 7
+      "echelle": 3.0,
+      "secondes": 4
     },
     "esplanade_herode": {
       "carte": "lumiere/esplanade_herode.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 204
+      "secondes": 131
     },
     "ezrat_israel": {
       "carte": "lumiere/ezrat_israel.webp",
       "canal": 0,
       "echelle": 0.75,
-      "secondes": 7
+      "secondes": 4
     },
     "ezrat_nashim": {
       "carte": "lumiere/ezrat_nashim.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 361
+      "secondes": 282
     },
     "gefen_zahav": {
       "carte": "lumiere/gefen_zahav.webp",
       "canal": 0,
       "echelle": 4.5,
-      "secondes": 15
+      "secondes": 9
     },
     "gezuztra": {
       "carte": "lumiere/gezuztra.webp",
       "canal": 1,
       "echelle": 2.25,
-      "secondes": 49
+      "secondes": 34
     },
     "heikhal": {
       "carte": "lumiere/heikhal.webp",
       "canal": 0,
-      "echelle": 3.75,
-      "secondes": 25
+      "echelle": 4.0,
+      "secondes": 20
     },
     "heil": {
       "carte": "lumiere/heil.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 60
+      "secondes": 63
     },
     "kaleh_orev": {
       "carte": "lumiere/kaleh_orev.webp",
@@ -2063,43 +2063,43 @@
       "carte": "lumiere/kotel.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 27
+      "secondes": 29
     },
     "lishkat_beit_shemanya": {
       "carte": "lumiere/lishkat_beit_shemanya.webp",
       "canal": 1,
       "echelle": 2.25,
-      "secondes": 24
+      "secondes": 28
     },
     "lishkat_chashaim": {
       "carte": "lumiere/lishkat_chashaim.webp",
       "canal": 1,
       "echelle": 0.75,
-      "secondes": 4
+      "secondes": 6
     },
     "lishkat_haetz": {
       "carte": "lumiere/lishkat_haetz.webp",
       "canal": 1,
       "echelle": 1.0,
-      "secondes": 60
+      "secondes": 67
     },
     "lishkat_haetzim": {
       "carte": "lumiere/lishkat_haetzim.webp",
       "canal": 1,
       "echelle": 1.5,
-      "secondes": 19
+      "secondes": 23
     },
     "lishkat_hagazit": {
       "carte": "lumiere/lishkat_hagazit.webp",
       "canal": 1,
       "echelle": 1.25,
-      "secondes": 130
+      "secondes": 134
     },
     "lishkat_hagola": {
       "carte": "lumiere/lishkat_hagola.webp",
       "canal": 1,
       "echelle": 0.75,
-      "secondes": 58
+      "secondes": 59
     },
     "lishkat_hakelim": {
       "carte": "lumiere/lishkat_hakelim.webp",
@@ -2111,127 +2111,127 @@
       "carte": "lumiere/lishkat_hamedichin.webp",
       "canal": 1,
       "echelle": 1.5,
-      "secondes": 53
+      "secondes": 57
     },
     "lishkat_hamelach": {
       "carte": "lumiere/lishkat_hamelach.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 63
+      "secondes": 68
     },
     "lishkat_hametzoraim": {
       "carte": "lumiere/lishkat_hametzoraim.webp",
       "canal": 1,
       "echelle": 2.5,
-      "secondes": 24
+      "secondes": 26
     },
     "lishkat_hanezirim": {
       "carte": "lumiere/lishkat_hanezirim.webp",
       "canal": 1,
-      "echelle": 3.5,
-      "secondes": 23
+      "echelle": 3.25,
+      "secondes": 25
     },
     "lishkat_haparva": {
       "carte": "lumiere/lishkat_haparva.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 53
+      "secondes": 58
     },
     "lishkat_osei_chavitin": {
       "carte": "lumiere/lishkat_osei_chavitin.webp",
       "canal": 1,
       "echelle": 3.75,
-      "secondes": 11
+      "secondes": 12
     },
     "lishkat_parhedrin": {
       "carte": "lumiere/lishkat_parhedrin.webp",
       "canal": 1,
       "echelle": 1.75,
-      "secondes": 9
+      "secondes": 11
     },
     "lishkat_pinchas": {
       "carte": "lumiere/lishkat_pinchas.webp",
       "canal": 1,
       "echelle": 2.0,
-      "secondes": 32
+      "secondes": 36
     },
     "lishkot_haleviim": {
       "carte": "lumiere/lishkot_haleviim.webp",
       "canal": 1,
       "echelle": 2.0,
-      "secondes": 4
+      "secondes": 5
     },
     "maake": {
       "carte": "lumiere/maake.webp",
       "canal": 0,
       "echelle": 3.5,
-      "secondes": 6
+      "secondes": 7
     },
     "maarakhot": {
       "carte": "lumiere/maarakhot.webp",
       "canal": 0,
       "echelle": 9.25,
-      "secondes": 4
+      "secondes": 5
     },
     "mekhonot": {
       "carte": "lumiere/mekhonot.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 41
+      "secondes": 48
     },
     "mesiba": {
       "carte": "lumiere/mesiba.webp",
       "canal": 0,
       "echelle": 2.5,
-      "secondes": 13
+      "secondes": 14
     },
     "mesiba_bira": {
       "carte": "lumiere/mesiba_bira.webp",
       "canal": 0,
-      "echelle": 0.75,
+      "echelle": 1.0,
       "secondes": 3
     },
     "mizbeach": {
       "carte": "lumiere/mizbeach.webp",
       "canal": 0,
       "echelle": 3.0,
-      "secondes": 103
+      "secondes": 109
     },
     "mur_har_habayit": {
       "carte": "lumiere/mur_har_habayit.webp",
       "canal": 0,
-      "echelle": 2.25,
-      "secondes": 221
+      "echelle": 2.0,
+      "secondes": 232
     },
     "mur_herode": {
       "carte": "lumiere/mur_herode.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 292
+      "secondes": 304
     },
     "oulam": {
       "carte": "lumiere/oulam.webp",
       "canal": 0,
       "echelle": 4.0,
-      "secondes": 78
+      "secondes": 88
     },
     "parokhet": {
       "carte": "lumiere/parokhet.webp",
       "canal": 0,
       "echelle": 4.5,
-      "secondes": 83
+      "secondes": 89
     },
     "petah_oulam": {
       "carte": "lumiere/petah_oulam.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 10
+      "secondes": 11
     },
     "place_kotel": {
       "carte": "lumiere/place_kotel.webp",
       "canal": 0,
       "echelle": 2.25,
-      "secondes": 222
+      "secondes": 227
     },
     "pont_maghrebins": {
       "carte": "lumiere/pont_maghrebins.webp",
@@ -2273,25 +2273,25 @@
       "carte": "lumiere/portiques.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 187
+      "secondes": 207
     },
     "quinze_marches": {
       "carte": "lumiere/quinze_marches.webp",
       "canal": 0,
       "echelle": 2.0,
-      "secondes": 6
+      "secondes": 8
     },
     "shaar_hamayim": {
       "carte": "lumiere/shaar_hamayim.webp",
       "canal": 1,
       "echelle": 2.5,
-      "secondes": 6
+      "secondes": 9
     },
     "shaar_hanitzotz": {
       "carte": "lumiere/shaar_hanitzotz.webp",
       "canal": 1,
       "echelle": 1.5,
-      "secondes": 5
+      "secondes": 7
     },
     "shaar_kiponus": {
       "carte": "lumiere/shaar_kiponus.webp",
@@ -2303,55 +2303,55 @@
       "carte": "lumiere/shaar_nikanor.webp",
       "canal": 1,
       "echelle": 2.5,
-      "secondes": 7
+      "secondes": 8
     },
     "shaar_shushan": {
       "carte": "lumiere/shaar_shushan.webp",
       "canal": 1,
       "echelle": 2.25,
-      "secondes": 4
+      "secondes": 5
     },
     "shaar_tadi": {
       "carte": "lumiere/shaar_tadi.webp",
       "canal": 1,
       "echelle": 1.0,
-      "secondes": 4
+      "secondes": 5
     },
     "sol_har_habayit": {
       "carte": "lumiere/sol_har_habayit.webp",
       "canal": 0,
       "echelle": 1.25,
-      "secondes": 277
+      "secondes": 290
     },
     "soreg": {
       "carte": "lumiere/soreg.webp",
       "canal": 0,
       "echelle": 1.5,
-      "secondes": 4
+      "secondes": 5
     },
     "taim": {
       "carte": "lumiere/taim.webp",
       "canal": 0,
       "echelle": 1.75,
-      "secondes": 47
+      "secondes": 53
     },
     "yakhin_boaz": {
       "carte": "lumiere/yakhin_boaz.webp",
       "canal": 0,
       "echelle": 3.25,
-      "secondes": 17
+      "secondes": 19
     },
     "yam": {
       "carte": "lumiere/yam.webp",
       "canal": 0,
       "echelle": 2.75,
-      "secondes": 302
+      "secondes": 310
     },
     "yessod": {
       "carte": "lumiere/yessod.webp",
       "canal": 0,
       "echelle": 2.5,
-      "secondes": 10
+      "secondes": 7
     }
   },
   "empreintes": {
