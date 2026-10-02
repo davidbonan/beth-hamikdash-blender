@@ -1,6 +1,6 @@
 """Correction ciblée d'une image déjà générée, sur fal.ai.
 
-    python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_09A_debut_….png \
+    python3 .claude/skills/fal-retouche/retouche.py --image render/style/CAM_09A_debut_….png \
         --zone 38%,22%,18%,44% --instruction "la Menora a sept branches, pas neuf" --simulation
 
 Le reste de l'image ne se regénère pas : ce qui sort du modèle est **recomposé** sur

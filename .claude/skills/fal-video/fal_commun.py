@@ -1,7 +1,7 @@
 """Plomberie fal.ai partagée par les générations image et vidéo.
 
 L'accès à fal.ai — clé, téléversement sur le CDN, file d'attente — et la résolution
-des images clés d'un plan dans `renders/blockout/`.
+des images clés d'un plan dans `render/blockout/`.
 
 Les prompts ne vivent pas ici : ils se donnent en ligne de commande. Le dépôt n'en
 tient aucun catalogue, parce que ce qu'on demande à un modèle change à chaque essai
@@ -19,7 +19,7 @@ import urllib.error
 import urllib.request
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-DOSSIER_IMAGES = os.path.join(RACINE, "renders", "blockout")
+DOSSIER_IMAGES = os.path.join(RACINE, "render", "blockout")
 
 URL_JETON = "https://rest.alpha.fal.ai/storage/auth/token?storage_type=fal-cdn-v3"
 URL_FILE = "https://queue.fal.run"
@@ -36,7 +36,7 @@ def images_de_frame(camera, etiquette):
     for chemin in (couleur, profondeur):
         if not os.path.exists(chemin):
             raise SystemExit(f"Image absente : {chemin} — l'exporter avec "
-                             f"beit_hamikdash_export.py")
+                             f"modele/beit_hamikdash_export.py")
     return couleur, profondeur
 
 

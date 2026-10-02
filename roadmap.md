@@ -11,7 +11,7 @@ constate, ce qu'on touche, et comment on saura que c'est fait.
 ## Majeur
 
 ### 3. Parcours narré — `done`
-- **Constat.** Visite libre sans fil : le visiteur atterrit face à la porte est et ne sait ni où aller ni pourquoi. Le mp3 de `audio/` (Ishay Ribo, Seder HaAvoda) n'est utilisé nulle part.
+- **Constat.** Visite libre sans fil : le visiteur atterrit face à la porte est et ne sait ni où aller ni pourquoi. Le mp3 de `render/audio/` (Ishay Ribo, Seder HaAvoda) n'est utilisé nulle part.
 - **Touche.** Nouveau module `visite/parcours.js` : liste de stations `{ entree, concept, texte }` dans un `parcours.json` traduit comme `textes.json`. Entre deux stations, le pilote automatique existant (`cible` dans `vitesseVoulue`, `visite/visite.js`) marche à pied ; à l'arrivée, `montrer(concept)` ouvre la fiche et un bouton « Suivant » apparaît dans la barre. Premier parcours : le Tamid du matin (Tamid 1–7), du Beit HaMoked au Doukhan, 8 à 10 stations.
 - **Fait quand.** Un visiteur qui ne touche que « Suivant » traverse le Temple dans l'ordre du service et lit une fiche à chaque arrêt.
 - **Fait.** `visite/parcours.js` + `parcours.json`, neuf stations du Beit HaMoked à l'Ezrat Israël, puis le seder ha'avoda de Yom Kippour en douze stations (Lishkat Parhedrin, Sha'ar HaMayim, Beit HaParva, le taureau, le sort, la ma'hta, le Kodesh HaKodashim, la parokhet, l'autel d'or, le bouc émissaire, la lecture dans l'Ezrat Nashim, retour au Beit HaParva) ; menu « Parcours… » dans la barre, allure ×1 / ×2 / ×4 sur la carte. La marche reprend la polyligne du cinéma (points de passage autour de l'autel, sol sondé) plutôt que le pilote automatique, qui ne contourne rien ; « Suivant » pendant la marche saute à l'arrivée. Pas de son.

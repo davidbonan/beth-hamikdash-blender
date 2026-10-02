@@ -11,13 +11,13 @@ BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
 
 ## L'invariant : le script est la source, le .blend est l'artefact
 
-`beit_hamikdash_blockout.py` et son paquet `blockout/` **construisent** la scène ;
-`beit_hamikdash.blend` en est la sortie. Toute modification faite à la main dans l'interface de Blender est perdue
+`modele/beit_hamikdash_blockout.py` et son paquet `modele/blockout/` **construisent** la scène ;
+`modele/beit_hamikdash.blend` en est la sortie. Toute modification faite à la main dans l'interface de Blender est perdue
 à la reconstruction suivante. Une correction se porte donc **dans le script**, jamais
-dans le .blend. Même chose pour les caméras, qui vivent dans `cameras.json`.
+dans le .blend. Même chose pour les caméras, qui vivent dans `modele/cameras.json`.
 
 Corollaire : le .blend sur le disque date du dernier **export** —
-`beit_hamikdash_export.py` est le seul script qui appelle `wm.save_mainfile`. Le
+`modele/beit_hamikdash_export.py` est le seul script qui appelle `wm.save_mainfile`. Le
 blockout seul, en headless, jette sa géométrie en quittant. Pour reconstruire *et*
 sauvegarder, il faut donc chaîner blockout, caméras et export dans la même instance.
 
@@ -25,22 +25,22 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 
 | Script | Ce qu'il fait | Écrit |
 |---|---|---|
-| `beit_hamikdash_blockout.py` | construit le Temple, son pays et la foule du jour, zone par zone (`blockout/`, voir plus bas) | rien (mémoire) |
-| `beit_hamikdash_cameras.py` | pose les plans déclarés dans `cameras.json` | rien (mémoire) |
-| `beit_hamikdash_export.py` | images clés couleur + profondeur, ou planche de contrôle | `renders/blockout/` ou `renders/planche/`, **et le .blend** |
-| `beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
-| `beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
-| `beit_hamikdash_marche.py` | **lit** la scène et rejoue la règle de marche de la visite : où l'on passe à pied, où l'on bute et pourquoi | `renders/marche/marche.png` |
-| `beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
-| `beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
-| `beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
-| `beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés, une troupe par parcours (`figurants/`, voir plus bas ; gestes : `beit_hamikdash_gestes.py`) | `visite/figures*.glb`, `visite/figures*.json` |
-| `beit_hamikdash_seir.py` | le bouc émissaire de Kippour, champ de distance polygonisé comme le bœuf (outillage commun : `beit_hamikdash_champ.py`), que les figures posent à côté du Cohen Gadol | `seir.blend` |
-| `beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `shor.blend` |
-| `beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `keruvim.blend` |
-| `beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
-| `beit_hamikdash_gravures.py` | les figures des parois (keruv, palmette, timora, fleuron, bouton) : atlas de modelé et silhouettes composés des tuiles taillées de `gravures/`, que le blockout lit pour poser chaque figure sur sa paroi | `visite/matieres/gravures_3072.webp`, `gravures.json` |
-| `beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
+| `modele/beit_hamikdash_blockout.py` | construit le Temple, son pays et la foule du jour, zone par zone (`modele/blockout/`, voir plus bas) | rien (mémoire) |
+| `modele/beit_hamikdash_cameras.py` | pose les plans déclarés dans `modele/cameras.json` | rien (mémoire) |
+| `modele/beit_hamikdash_export.py` | images clés couleur + profondeur, ou planche de contrôle | `render/blockout/` ou `render/planche/`, **et le .blend** |
+| `modele/beit_hamikdash_analyse_plans.py` | recouvrement début/fin de chaque plan, glisse de l'image | rien |
+| `modele/beit_hamikdash_inspect.py` | **lit** la scène sauvegardée et répond | rien |
+| `modele/beit_hamikdash_marche.py` | **lit** la scène et rejoue la règle de marche de la visite : où l'on passe à pied, où l'on bute et pourquoi | `render/marche/marche.png` |
+| `modele/beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
+| `modele/beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
+| `modele/beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
+| `modele/beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés, une troupe par parcours (`modele/figurants/`, voir plus bas ; gestes : `modele/beit_hamikdash_gestes.py`) | `visite/figures*.glb`, `visite/figures*.json` |
+| `modele/beit_hamikdash_seir.py` | le bouc émissaire de Kippour, champ de distance polygonisé comme le bœuf (outillage commun : `modele/beit_hamikdash_champ.py`), que les figures posent à côté du Cohen Gadol | `modele/seir.blend` |
+| `modele/beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `modele/shor.blend` |
+| `modele/beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `modele/keruvim.blend` |
+| `modele/beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `modele/tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
+| `modele/beit_hamikdash_gravures.py` | les figures des parois (keruv, palmette, timora, fleuron, bouton) : atlas de modelé et silhouettes composés des tuiles taillées de `modele/gravures/`, que le blockout lit pour poser chaque figure sur sa paroi | `visite/matieres/gravures_3072.webp`, `gravures.json` |
+| `modele/beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
 seule commande. Ce qui suit sert quand on veut les lancer soi-même.
@@ -48,11 +48,11 @@ seule commande. Ce qui suit sert quand on veut les lancer soi-même.
 ## Où vit le code du blockout et des figurants
 
 Les deux gros scripts ne sont plus que des points d'entrée ; leur code est dans deux paquets
-à côté d'eux. L'incantation ne change pas : `-P beit_hamikdash_blockout.py`,
-`-P beit_hamikdash_figures.py`.
+à côté d'eux. L'incantation ne change pas : `-P modele/beit_hamikdash_blockout.py`,
+`-P modele/beit_hamikdash_figures.py`.
 
 ```
-blockout/
+modele/blockout/
   primitives/   parametres (AMA, Z_*, FOULE, RACINE, m) · noeuds · pierre · tissage · matieres (MAT_*)
                 volumes (box, cyl, revolution…) · gravures · ouvrages (lishka, shaar, moulure, escalier…)
   nettoyage · har_habayit · ezrat_nashim · azara · lishkot · heil · modenature_azara
@@ -60,14 +60,14 @@ blockout/
   bayit/        oulam · heikhal · kelim · parokhot · parois_d_or · kodesh_hakodashim
   pays/         calage · herode · place_du_kotel · ville · jerusalem (celui qui bâtit le pays)
   foule · finitions (dessus foulés, biseau, tailles) · eclairage
-figurants/
+modele/figurants/
   matieres · etoffes (MPFB) · corps (Gabarit, Humain) · maillage · habillage · ustensiles
   mise_en_scene (gestes, reperes, Accessoire) · bigdei_kehouna · tenues (levi, fidele)
   danse · role (Role et les rôles partagés) · betes (seir, par, seh) · animation
   troupes/      figures · figures_tamid · figures_kippour · … · figures_nazir
 ```
 
-- **Un module de zone bâtit à l'import.** `SECTIONS`, dans `beit_hamikdash_blockout.py`,
+- **Un module de zone bâtit à l'import.** `SECTIONS`, dans `modele/beit_hamikdash_blockout.py`,
   les importe dans l'ordre de construction — c'est lui la table des matières. Une zone
   nouvelle, c'est un module de plus et une ligne dans `SECTIONS`, à sa place : l'ordre
   compte, `finitions` biseaute et creuse ce qui existe déjà.
@@ -76,22 +76,22 @@ figurants/
 - **Les points d'entrée purgent leur paquet de `sys.modules`** avant de l'importer :
   Blender garde les modules d'un *Run Script* à l'autre, et sans purge le second ne
   bâtirait rien.
-- Les figurants : une troupe = un module de `figurants/troupes/`, qui porte ses rôles
+- Les figurants : une troupe = un module de `modele/figurants/troupes/`, qui porte ses rôles
   (`roles_kippour()`…) ; la table `TROUPES` et `main()` restent dans
-  `beit_hamikdash_figures.py`. Ce que deux troupes partagent descend dans un module commun
+  `modele/beit_hamikdash_figures.py`. Ce que deux troupes partagent descend dans un module commun
   (`role`, `mise_en_scene`, `ustensiles`, `betes`), jamais d'une troupe à l'autre — seule
   `troupes/figures`, la visite libre, reprend ses rôles au tamid.
 
 ## Où atterrissent les sorties
 
-Un dossier par étape du pipeline, et **rien à la racine de `renders/`** :
+Un dossier par étape du pipeline, et **rien à la racine de `render/`** :
 
 | Dossier | Écrit par | Contenu |
 |---|---|---|
-| `renders/blockout/` | `beit_hamikdash_export.py` | couleur + profondeur 1920 × 1080, entrées de l'i2i |
-| `renders/planche/` | `beit_hamikdash_export.py -- --planche` | contrôle 640 × 360 + `planche.html` + `planche.jpg` (mosaïque du README, versionnée) |
-| `renders/style/` | `fal_image.py` | images clés stylisées |
-| `renders/video/` | `fal_video.py` | mp4 |
+| `render/blockout/` | `modele/beit_hamikdash_export.py` | couleur + profondeur 1920 × 1080, entrées de l'i2i |
+| `render/planche/` | `modele/beit_hamikdash_export.py -- --planche` | contrôle 640 × 360 + `planche.html` + `planche.jpg` (mosaïque du README, versionnée) |
+| `render/style/` | `fal_image.py` | images clés stylisées |
+| `render/video/` | `fal_video.py` | mp4 |
 
 Les chemins sont des constantes : `SOUS_DOSSIER_BLOCKOUT` / `SOUS_DOSSIER_PLANCHE`
 dans l'export, `DOSSIER_IMAGES` / `DOSSIER_SORTIE` dans les scripts fal. En déplacer
@@ -100,15 +100,15 @@ un se fait là, pas en déplaçant les fichiers.
 ## Répondre à une question sur la scène — `inspect`
 
 C'est le point d'entrée par défaut. Il ne reconstruit rien : il ouvre le .blend et
-répond en une seconde. Ne pas mettre `-P beit_hamikdash_blockout.py` devant.
+répond en une seconde. Ne pas mettre `-P modele/beit_hamikdash_blockout.py` devant.
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --scene
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --objets Doukhan
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --camera CAM_03_Heikhal
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit heikhal
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit heikhal fin
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule 01
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --scene
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --objets Doukhan
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --camera CAM_03_Heikhal
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --voit heikhal
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --voit heikhal fin
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --foule 01
 ```
 
 | Commande | Répond à |
@@ -127,73 +127,73 @@ Le plan se nomme comme on veut : `CAM_03_Heikhal`, `3`, `03`, ou `heikhal`.
 
 ## Reconstruire la scène
 
-Après toute modification de `blockout/` ou de `beit_hamikdash_blockout.py`. Compte ~5 s.
+Après toute modification de `modele/blockout/` ou de `modele/beit_hamikdash_blockout.py`. Compte ~5 s.
 
 ```bash
 # vérifier que le script tourne (rien n'est sauvegardé)
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_blockout.py
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_blockout.py
 
 # reconstruire ET sauvegarder le .blend (c'est l'export qui sauvegarde)
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py \
-    -P beit_hamikdash_cameras.py \
-    -P beit_hamikdash_export.py -- --planche
+$BLENDER -b modele/beit_hamikdash.blend \
+    -P modele/beit_hamikdash_blockout.py \
+    -P modele/beit_hamikdash_cameras.py \
+    -P modele/beit_hamikdash_export.py -- --planche
 ```
 
 Le blockout annonce en dernière ligne son compte d'objets et de collections — la
 vérification la plus rapide qu'il n'a rien cassé.
 
-Les keruvim de la kaporet ne sont pas bâtis par le blockout : il lit `keruvim.blend`, écrit
-par `beit_hamikdash_keruvim.py` (MakeHuman, ~2 min, sans .blend en entrée). Après toute
+Les keruvim de la kaporet ne sont pas bâtis par le blockout : il lit `modele/keruvim.blend`, écrit
+par `modele/beit_hamikdash_keruvim.py` (MakeHuman, ~2 min, sans .blend en entrée). Après toute
 modification de ce script, le relancer puis reconstruire la scène :
 
 ```bash
-$BLENDER -b -P beit_hamikdash_keruvim.py
+$BLENDER -b -P modele/beit_hamikdash_keruvim.py
 ```
 
-Même chose pour les douze bœufs du Yam : le blockout lit `shor.blend`, écrit par
-`beit_hamikdash_shor.py` (~5 s, numpy de Blender). Après toute retouche du bœuf :
+Même chose pour les douze bœufs du Yam : le blockout lit `modele/shor.blend`, écrit par
+`modele/beit_hamikdash_shor.py` (~5 s, numpy de Blender). Après toute retouche du bœuf :
 
 ```bash
-$BLENDER -b -P beit_hamikdash_shor.py
+$BLENDER -b -P modele/beit_hamikdash_shor.py
 ```
 
 Même logique pour le motif des Parokhot : il n'est pas de la géométrie mais une carte,
 `visite/matieres/parokhet_2048.webp` (et `parokhet.json`, la palette des quatre laines),
-écrite par `beit_hamikdash_parokhet.py` (~20 s, numpy de Blender, `cwebp` sur le PATH) et
+écrite par `modele/beit_hamikdash_parokhet.py` (~20 s, numpy de Blender, `cwebp` sur le PATH) et
 lue par `parokhet()` du blockout comme par le nuanceur étoffe de la visite. Les figures —
 lion, keruv — sont tissées par gpt-image-2 depuis des guides, comme les gravures :
-`tissages/` est la source versionnée, `--guides` redessine les guides, `--tisser <nom>` fait
+`modele/tissages/` est la source versionnée, `--guides` redessine les guides, `--tisser <nom>` fait
 tisser une figure (FAL_AI_KEY dans `.env`). Les contours des guides — les siens et ceux des
-parois du Bayit — vivent dans `beit_hamikdash_contours.py`. Après toute modification :
+parois du Bayit — vivent dans `modele/beit_hamikdash_contours.py`. Après toute modification :
 
 ```bash
-$BLENDER -b -P beit_hamikdash_parokhet.py
+$BLENDER -b -P modele/beit_hamikdash_parokhet.py
 ```
 
 Et pour les figures gravées des parois du Bayit — keruvim, timorot, fleurons, sur les murs
-d'or, les vantaux du Heikhal et les jambages des portes des cours — `beit_hamikdash_gravures.py`
+d'or, les vantaux du Heikhal et les jambages des portes des cours — `modele/beit_hamikdash_gravures.py`
 (~5 s) compose l'atlas de modelé `visite/matieres/gravures_3072.webp` **et** `gravures.json`,
 la silhouette de chaque figure tracée sur la carte même, à partir des tuiles taillées
-de `gravures/` (keruv et palmette des murs et des vantaux, timora des jambages, fleuron, bouton : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
+de `modele/gravures/` (keruv et palmette des murs et des vantaux, timora des jambages, fleuron, bouton : des bas-reliefs rendus par gpt-image-2 sur fal.ai,
 versionnés parce qu'un modèle ne rend jamais deux fois la même image — la luminance donne le
 modelé, la distance au bord le volume). Le blockout **lit ce JSON** pour poser chaque
 figure à sa silhouette — en saillie sur l'or du Bayit, taillée dans la pierre des jambages —, une face dont les UV visent la tuile ; sans lui il s'arrête net.
-La rasterisation commune aux deux cartes est `beit_hamikdash_carte.py`.
+La rasterisation commune aux deux cartes est `modele/beit_hamikdash_carte.py`.
 
 ```bash
-$BLENDER -b -P beit_hamikdash_gravures.py                        # l'atlas, depuis gravures/
-$BLENDER -b -P beit_hamikdash_gravures.py -- --guides            # redessine les guides (gravures/guides/)
-$BLENDER -b -P beit_hamikdash_gravures.py -- --tailler timora    # fait retailler une tuile (~0,08 $, FAL_AI_KEY)
+$BLENDER -b -P modele/beit_hamikdash_gravures.py                        # l'atlas, depuis modele/gravures/
+$BLENDER -b -P modele/beit_hamikdash_gravures.py -- --guides            # redessine les guides (modele/gravures/guides/)
+$BLENDER -b -P modele/beit_hamikdash_gravures.py -- --tailler timora    # fait retailler une tuile (~0,08 $, FAL_AI_KEY)
 ```
 
 Le guide d'un motif est son dessin procédural — composition, iconographie, cadrage —
 ombré ; c'est lui que le modèle retaille, avec l'esquisse validée du motif quand
-`gravures/esquisses/` en a une. Le keruv et la palmette n'ont pas de guide : leur esquisse seule
+`modele/gravures/esquisses/` en a une. Le keruv et la palmette n'ont pas de guide : leur esquisse seule
 en porte la composition (`ESQUISSES`). Changer un motif, c'est corriger son guide ou
 son prompt (`MOTIFS`), retailler, regarder la tuile, puis recomposer l'atlas et reconstruire.
 
-`FOULE = True` dans `blockout/primitives/parametres.py` ajoute les figures de Yom Kippour : le peuple dans
+`FOULE = True` dans `modele/blockout/primitives/parametres.py` ajoute les figures de Yom Kippour : le peuple dans
 l'Ezrat Israël, les cohanim dans l'Ezrat Kohanim, les Léviim et leurs instruments sur
 le Doukhan, les masses de l'Ezrat Nashim et du Har HaBayit. `False` (défaut) ne bâtit
 que l'architecture : 9 178 objets contre 18 913.
@@ -201,8 +201,8 @@ que l'architecture : 9 178 objets contre 18 913.
 ## Exporter la visite 3D
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_plan.py [-- heikhal sous_terrain]
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_plan.py [-- heikhal sous_terrain]
 open visite/index.html
 ```
 
@@ -222,7 +222,7 @@ fin de sortie sous « volumes sans concept » : c'est la liste de ce qu'il reste
 nommer.
 
 L'export **cuit l'occlusion du ciel** avant d'aplatir les matières
-(`beit_hamikdash_occlusion.py`) : chaque concept d'architecture — aire ≥ 50 m², au moins 10
+(`modele/beit_hamikdash_occlusion.py`) : chaque concept d'architecture — aire ≥ 50 m², au moins 10
 texels par face, hors Kodesh HaKodashim qui a sa pénombre — perd d'abord ses faces collées
 contre une autre, ou les fait reculer d'1 cm si le recouvrement n'est que partiel (cachées, elles
 cuisaient noires), puis reçoit une couche UV `Occlusion` et une carte `visite/occlusion/<concept>.webp`,
@@ -231,7 +231,7 @@ puis réduite en WebP à perte (`cwebp` sur le PATH), portée 8 m, 3 m dans le H
 sonde de `visite/sonde.js` écarte déjà le ciel. C'est l'essentiel du temps de l'export :
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --sans-occlusion   # itération rapide
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --sans-occlusion   # itération rapide
 ```
 
 Sans cuisson, le .glb sort sans couche `Occlusion` et `reperes.json` sans cartes : la visite
@@ -248,7 +248,7 @@ Toute cuisson — ciblée (`--recuire`) ou complète (`--lumiere tout`) — pass
 
 ## Les figurants
 
-`beit_hamikdash_figures.py` lit le .blend et écrit une **troupe** : `visite/<troupe>.glb` et `visite/<troupe>.json`
+`modele/beit_hamikdash_figures.py` lit le .blend et écrit une **troupe** : `visite/<troupe>.glb` et `visite/<troupe>.json`
 (emprises et vues, une par rôle plus les familles `cohanim` et `leviim`, que la visite ajoute à `reperes.json`).
 Chaque rôle porte le nom de son concept — `zerika`, `leviim_3`, `anshei_maamad_1` — et c'est par ce nom que la visite
 ouvre sa fiche au clic. Rien n'entre dans le .blend ni dans `temple.glb` : le film ne les voit pas.
@@ -260,7 +260,7 @@ Neuf troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours la 
 |---|---|---|
 | `figures` | `roles_de_la_visite()`, 5 | la zerika, deux Léviim, un anshei ma'amad, le Lévi de garde à Nikanor |
 | `figures_tamid` | `roles_du_tamid()`, 22 | les gestes du tamid du matin, douze Léviim, deux enfants, deux anshei ma'amad |
-| `figures_kippour` | `roles_kippour()`, 39 | le Cohen Gadol une fois par étape du seder ha'avoda — habits d'or (`bigdei_zahav_*`) ou de lin (`bigdei_lavan_*`), taureau (`shor.blend`), boucs (`seir.blend`), kalpi, ma'hta, mizrak, sefer —, les anciens du Beit Din et ceux de la kehouna, les tenants du drap, le segan et le chef de maison, ceux qui passent le rouleau, cinq cohanim et sept Israélites prosternés |
+| `figures_kippour` | `roles_kippour()`, 39 | le Cohen Gadol une fois par étape du seder ha'avoda — habits d'or (`bigdei_zahav_*`) ou de lin (`bigdei_lavan_*`), taureau (`modele/shor.blend`), boucs (`modele/seir.blend`), kalpi, ma'hta, mizrak, sefer —, les anciens du Beit Din et ceux de la kehouna, les tenants du drap, le segan et le chef de maison, ceux qui passent le rouleau, cinq cohanim et sept Israélites prosternés |
 | `figures_shoeva` | `roles_shoeva()`, 26 | la nuit de l'Ezrat Nashim : Léviim des quinze marches, trompettes, ronde aux torches |
 | `figures_pessah` | `roles_pessah()`, 37 | le korban Pessa'h : le deuxième groupe et ses agneaux, les rangées de bazikhin d'or et d'argent, la she'hita et le sang de main en main, le Hallel des Léviim, les crochets et la baguette, le magis, le troisième groupe assis sur le 'Heil |
 | `figures_bikkourim` | `roles_bikkourim()`, 26 | les porteurs et le taureau aux cornes dorées, les Léviim d'« Aromimkha », la lecture et la tenoufa, les corbeilles et les tourterelles |
@@ -269,9 +269,9 @@ Neuf troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours la 
 | `figures_nazir` | `roles_nazir()`, 6 | le nazir au foyer de sa lishka, le metzora au mikve puis sur le seuil de Nikanor, le sang à l'oreille, les sept aspersions d'huile |
 
 ```sh
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py                            # la visite libre
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- --troupe figures_tamid  # un quart d'heure
-/Applications/Blender.app/Contents/MacOS/Blender -b beit_hamikdash.blend -P beit_hamikdash_figures.py -- --troupe figures_kippour zerika   # un essai
+/Applications/Blender.app/Contents/MacOS/Blender -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_figures.py                            # la visite libre
+/Applications/Blender.app/Contents/MacOS/Blender -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_figures.py -- --troupe figures_tamid  # un quart d'heure
+/Applications/Blender.app/Contents/MacOS/Blender -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_figures.py -- --troupe figures_kippour zerika   # un essai
 ```
 
 Un essai réécrit le .glb de sa troupe avec ses seuls rôles : relancer la troupe entière avant de committer.
@@ -279,7 +279,7 @@ Un essai réécrit le .glb de sa troupe avec ses seuls rôles : relancer la trou
 Une troupe peut jouer plusieurs fois le même homme : chaque étape d'un parcours dit ses `figurants` (`parcours.json`,
 noms de rôles ou de concepts) et la visite ne montre qu'eux — le Cohen Gadol de Kippour a quatorze rôles, jamais deux à
 la fois. `le_cohen_gadol(nom)` leur donne une seule stature, un seul teint (`Humain(…, qui=)`) et une seule peau.
-Le bouc se regénère à part (`$BLENDER -b -P beit_hamikdash_seir.py`, quelques secondes), avant la troupe de Kippour.
+Le bouc se regénère à part (`$BLENDER -b -P modele/beit_hamikdash_seir.py`, quelques secondes), avant la troupe de Kippour.
 
 Torches et trompettes ne sont pas liées à la peau : `Accessoire` les anime objet par objet, et la visite allume la
 tête de chaque `*_avouka`.
@@ -312,7 +312,7 @@ Les trois vêtements se copient seuls dans `data/clothes/`, depuis `suits02/suit
 - **Pas de `bpy.ops` pour créer de la géométrie** dans le blockout : chaque appel
   d'opérateur réévalue le graphe de dépendances, coût quadratique en nombre d'objets.
   Les volumes se posent en `bpy.data` via les helpers `box`, `cyl`, `cone`, `sphere`,
-  `prism`, `tore`, `cyl_between` (`blockout/primitives/volumes.py`) — s'il manque une
+  `prism`, `tore`, `cyl_between` (`modele/blockout/primitives/volumes.py`) — s'il manque une
   forme, écrire un helper de plus, pas un opérateur.
 - **1 ama = `AMA` mètres**, et le .blend porte la valeur en propriété de scène
   (`scene["AMA_metres"]`). Les helpers convertissent : **tout se donne en amot**

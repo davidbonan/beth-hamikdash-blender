@@ -44,7 +44,7 @@ profondeur (repérage rapide), `--sans-rendu` déclare sans lancer Blender,
 
 ## Où ça atterrit
 
-`renders/blockout/<caméra>_debut.png`, `_fin.png`, et leurs `_profondeur.png`
+`render/blockout/<caméra>_debut.png`, `_fin.png`, et leurs `_profondeur.png`
 en 1920 × 1080. Ce sont exactement les entrées du skill **fal-video** :
 
 ```bash
@@ -53,14 +53,14 @@ python3 .claude/skills/fal-video/fal_image.py --camera CAM_04_Rampe --frame debu
 python3 .claude/skills/fal-video/fal_image.py --camera CAM_04_Rampe --frame fin \
     --prompt "..." --seed 4041
 python3 .claude/skills/fal-video/fal_video.py --camera CAM_04_Rampe \
-    --depart renders/style/..._debut_....png --fin renders/style/..._fin_....png \
+    --depart render/style/..._debut_....png --fin render/style/..._fin_....png \
     --prompt "the camera rises along the ramp"
 ```
 
 ## Lire la mesure avant de payer une génération
 
 `ajouter` et `rendre` finissent par le tableau de
-`beit_hamikdash_analyse_plans.py`. Un image-to-video à deux frames n'interpole que ce
+`modele/beit_hamikdash_analyse_plans.py`. Un image-to-video à deux frames n'interpole que ce
 que les deux images ont en commun ; ce que la frame de fin montre et que celle de
 début ne montrait pas, le modèle doit l'inventer.
 
@@ -75,13 +75,13 @@ Un plan qui ne renvoie aucune géométrie a sa caméra dans un mur.
 
 ## Vérifier ce que le cadre contient vraiment
 
-Avant de styliser, `beit_hamikdash_inspect.py` répond sur la scène sauvegardée, en
+Avant de styliser, `modele/beit_hamikdash_inspect.py` répond sur la scène sauvegardée, en
 une seconde, sans rien reconstruire (skill **blender**) :
 
 ```bash
 BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit CAM_04_Rampe
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --camera CAM_04_Rampe
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --voit CAM_04_Rampe
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --camera CAM_04_Rampe
 ```
 
 `--voit` tire une grille de rayons dans le cadre en tenant compte de l'occultation :
@@ -92,7 +92,7 @@ ce qui est derrière lui depuis le sol de la cour.
 
 ## La déclaration est le fichier
 
-`cameras.json`, à la racine, est la source ; le .blend en est l'artefact, réécrit à
+`modele/cameras.json`, à la racine, est la source ; le .blend en est l'artefact, réécrit à
 chaque rendu. Une caméra ajoutée à la main dans l'interface de Blender est perdue à
 la reconstruction suivante. `camera.py` écrit ce fichier, mais il s'édite aussi
 directement — c'est du JSON, un objet par plan, `capteur` et `clip_fin` en champs

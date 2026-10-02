@@ -13,14 +13,14 @@ identiques.
 
 ```bash
 # 1. lire les coordonnées de la zone sur une copie quadrillée
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_03_Heikhal_debut_….png --reperes
+python3 .claude/skills/fal-retouche/retouche.py --image render/style/CAM_03_Heikhal_debut_….png --reperes
 
 # 2. vérifier la zone et l'instruction sans payer
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_03_Heikhal_debut_….png \
+python3 .claude/skills/fal-retouche/retouche.py --image render/style/CAM_03_Heikhal_debut_….png \
     --zone 38%,22%,18%,44% --instruction "la Menora a sept branches, pas neuf" --simulation
 
 # 3. générer
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_03_Heikhal_debut_….png \
+python3 .claude/skills/fal-retouche/retouche.py --image render/style/CAM_03_Heikhal_debut_….png \
     --zone 38%,22%,18%,44% --instruction "la Menora a sept branches, pas neuf"
 ```
 
@@ -99,7 +99,7 @@ que la matière voulue (feuilles d'or martelé à joints et clous, dalles veiné
 dans la brume, grain, halo sur les flammes).
 
 ```bash
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_04_Parokhet_debut_….png \
+python3 .claude/skills/fal-retouche/retouche.py --image render/style/CAM_04_Parokhet_debut_….png \
     --methode plein --portee matiere --instruction "The gold walls are sheets of hammered gold nailed over cedar, …"
 ```
 
@@ -123,8 +123,8 @@ zone corrigée garde de l'image en cours. La seconde parokhet a été réaligné
 un seul passage.
 
 ```bash
-python3 .claude/skills/fal-retouche/retouche.py --image renders/style/CAM_04_Parokhet_debut_….png \
-    --reference renders/style/CAM_03_Heikhal_debut_gpt2_c1.00_g3.5_seed30301.png \
+python3 .claude/skills/fal-retouche/retouche.py --image render/style/CAM_04_Parokhet_debut_….png \
+    --reference render/style/CAM_03_Heikhal_debut_gpt2_c1.00_g3.5_seed30301.png \
     --zone 29%,0%,42%,75% --instruction "the curtain is rewoven with the very same design as the reference frame: …"
 ```
 

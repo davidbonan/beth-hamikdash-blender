@@ -23,8 +23,8 @@ Netlify porte le certificat. `davidbonan.io/visite` redirige en 301 vers ici.
 ## La séquence
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire   # si le .blend a bougé — skill cuisson
-python3 beit_hamikdash_traductions.py                          # doit répondre « traductions à jour »
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --recuire   # si le .blend a bougé — skill cuisson
+python3 modele/beit_hamikdash_traductions.py                          # doit répondre « traductions à jour »
 ./construire_site.sh && (cd dist && python3 -m http.server 8790)   # relecture locale, facultative
 git add -u site visite && git commit && git push origin main
 ```
@@ -43,7 +43,7 @@ balise `<base>`. Netlify redirige `/visite` → `/visite/` de lui-même.
 
 ## Les empreintes, et pourquoi le déployé n'est pas la source
 
-`empreintes.py`, lancé par `construire_site.sh` sur `dist/`, appose sur chaque URL
+`site/empreintes.py`, lancé par `construire_site.sh` sur `dist/`, appose sur chaque URL
 d'asset l'empreinte de son contenu : `visite.js?v=03a1168a`, `temple.glb?v=7823c773`.
 C'est la seule différence entre l'arbre de travail et ce que Netlify sert, et elle est
 la raison pour laquelle une modification se voit sans vider le cache — le contenu
@@ -56,7 +56,7 @@ portent un cachet commun calculé sur tout le site. Les chemins que la visite co
 l'exécution (`contenu_${f}.${code}.json`) échappent à la réécriture : `json()` dans
 `encyclopedie.js` relit le cachet dans son `import.meta.url` et l'ajoute lui-même. D'où la
 règle — un nouveau média se cite par un littéral entier (`"matieres/pierre_c_1024.webp"`,
-pas `` `${nom}_c_1024.webp` ``), sinon `empreintes.py` ne le voit pas.
+pas `` `${nom}_c_1024.webp` ``), sinon `site/empreintes.py` ne le voit pas.
 
 En local, servir `visite/` directement marche comme avant : sans build il n'y a pas
 d'empreinte, `import.meta.url` n'a pas de query, et `json()` ajoute une chaîne vide.
@@ -66,7 +66,7 @@ d'empreinte, `import.meta.url` n'a pas de query, et `json()` ajoute une chaîne 
 L'accueil ne montre que des images : l'affiche en seuil (`affiche_*.webp`, c'est l'image
 du Har HaBayit), puis les degrés de sainteté (Kelim 1:8-9) un à un, chacun par l'image
 stylisée du film prise de ce point (`site/images/<degré>_1000` et `_2000.webp`, sources
-dans `renders/style/` : ACC_01 à 05 pour les cinq premières, CAM_08, CAM_09A et CAM_11
+dans `render/style/` : ACC_01 à 05 pour les cinq premières, CAM_08, CAM_09A et CAM_11
 pour l'Oulam, le Heikhal et le Kodesh HaKodashim), et le Kodesh HaKodashim en finale
 plein écran. L'ordre des degrés et la vue de la visite prise du même point sont `DEGRES`
 dans `site/accueil.py` ; chaque image mène à `/visite/?vue=<vue>`. Une échelle fixe sur le
@@ -137,7 +137,7 @@ node "$visite" https://bethhamikdach.com/visite/ [capture.png]
 
 `--mobile` passe en 390 × 844 tactile. `--planche <dossier>` capture en plus chaque
 entrée et chaque vue de `reperes.json` puis assemble `planche.html` et `planche.jpg` :
-c'est la vérification des cadrages après toute retouche de `beit_hamikdash_visite.py`
+c'est la vérification des cadrages après toute retouche de `modele/beit_hamikdash_visite.py`
 (`--seulement id,id` pour n'en refaire que quelques-unes). `--parcours <dossier>` suit
 chaque parcours guidé de `parcours.json` (`--seulement tamid` pour un seul) : une capture
 par station dans `<dossier>/<parcours>/`, et chaque marche jouée à la main, au rayon —

@@ -20,7 +20,7 @@
 
 # Les pages sont la seule porte d'entrée et gardent leur URL nue : elles se revalident
 # à chaque visite, et ramènent les URL signées du jour. Tout ce qu'elles citent porte
-# l'empreinte de son contenu (empreintes.py) — changer un fichier change son URL, donc
+# l'empreinte de son contenu (site/empreintes.py) — changer un fichier change son URL, donc
 # rien de ce qui est gardé sous ces URL-là ne peut être périmé, et rien n'a à expirer.
 [[headers]]
   for = "/*.html"

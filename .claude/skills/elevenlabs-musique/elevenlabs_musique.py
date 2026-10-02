@@ -3,7 +3,7 @@
     python3 .claude/skills/elevenlabs-musique/elevenlabs_musique.py \
         --texte .claude/skills/elevenlabs-musique/textes/pitum_haketoret_complet.txt --simulation
 
-La recette est celle qui a donné `audio/musique/pitum_haketoret_complet_direct_translittere_accent_hebreu.mp3` :
+La recette est celle qui a donné `render/audio/musique/pitum_haketoret_complet_direct_translittere_accent_hebreu.mp3` :
 30 s de `reference.mp3` (hors git, à fournir) conditionnent tout le morceau, une voix de garçon
 d'environ 6 ans chante le texte translittéré, l'intro est instrumentale, l'outro au piano, et chaque
 section varie l'arrangement sans changer de tempo ni de chanteur. Le texte, son découpage, le ton et
@@ -32,7 +32,7 @@ from dataclasses import dataclass
 
 DOSSIER = os.path.dirname(os.path.abspath(__file__))
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(DOSSIER)))
-DOSSIER_SORTIE = os.path.join(RACINE, "audio", "musique")
+DOSSIER_SORTIE = os.path.join(RACINE, "render", "audio", "musique")
 REFERENCE = os.path.join(DOSSIER, "reference.mp3")
 REFERENCES_TELEVERSEES = os.path.join(DOSSIER, "references_televersees.json")
 

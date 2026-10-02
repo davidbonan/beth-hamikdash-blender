@@ -6,7 +6,7 @@ racine="$(cd "$(dirname "$0")" && pwd)"
 dist="${1:-$racine/dist}"
 
 mkdir -p "$dist/visite"
-rsync -a --delete --delete-excluded --exclude='visite/' --exclude='accueil.py' --exclude='*.mjs' --exclude='.DS_Store' "$racine/site/" "$dist/"
+rsync -a --delete --delete-excluded --exclude='visite/' --exclude='*.py' --exclude='*.mjs' --exclude='.DS_Store' "$racine/site/" "$dist/"
 rsync -a --delete \
   --include='index.html' --include='apercu.jpg' --include='temple.glb' --include='figures*.glb' --include='pays.glb' \
   --include='*.js' --include='*.json' --include='mini_*.png' \
@@ -17,6 +17,6 @@ rsync -a --delete \
   "$racine/visite/" "$dist/visite/"
 
 node "$racine/site/fiches.mjs" "$dist"
-python3 "$racine/empreintes.py" "$dist"
+python3 "$racine/site/empreintes.py" "$dist"
 
 echo "site assemblé dans $dist"

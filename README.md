@@ -16,58 +16,64 @@ retour sur l'Even HaShetiya — celle de Moïse, cachée sous le Temple et rév�
 54a ; Rambam *Beit HaBe'hira* 4:1), avec la kaporet et ses deux keruvim (fiche §8h) ;
 dans l'Oulam, **Ya'hin et Boaz** sont debout aux cotes de *Melakhim I* 7 (fiche §8a-bis).
 
-![Planche de contrôle : première et dernière image de chaque plan](renders/planche/planche.jpg)
+![Planche de contrôle : première et dernière image de chaque plan](render/planche/planche.jpg)
 
-*Planche de contrôle — une ligne par plan de `cameras.json`, première image à gauche,
+*Planche de contrôle — une ligne par plan de `modele/cameras.json`, première image à gauche,
 dernière à droite.*
 
 ## Fichiers
 
+Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `visite/` le donne à parcourir dans le navigateur, `site/` l'entoure de ses pages. `render/` reçoit ce qu'on tourne et ce qu'on chante avec — images clés, plans, montages, musique — et reste hors git.
+
 | Fichier | Rôle |
 |---|---|
 | `fiche_technique_beit_hamikdash.md` | Référence architecturale : cotes en amot, sources (*Middot*, *Yoma*, *Tamid*, *Pesa'him*, Rambam), matériaux, §9 = liste des erreurs à ne jamais laisser passer. |
-| `beit_hamikdash_blockout.py` | Script Blender : génère toute la scène en volumes. **Aucune caméra.** Point d'entrée : il importe dans l'ordre (`SECTIONS`) les zones du paquet `blockout/`. |
-| `blockout/` | Le code du blockout, une zone par module — `har_habayit`, `ezrat_nashim`, `azara`, `lishkot`, `heil`, `mizbeach`, `sous_l_azara`, `bayit/` (Oulam, Heikhal, kelim, Parokhot, parois d'or, Kodesh HaKodashim), `pays/`, `foule`, `finitions`, `eclairage` — et ce qu'elles partagent dans `primitives/` : paramètres, matières, volumes, gravures, ouvrages. |
-| `cameras.json` | Les plans : nom, focale, durée, course de la caméra et course de sa cible, en amot. La source ; le .blend en est l'artefact. |
-| `beit_hamikdash_cameras.py` | Pose dans la scène les plans déclarés dans `cameras.json`. |
-| `beit_hamikdash.blend` | Scène générée (à regénérer après toute modification du script ou de `cameras.json`). |
-| `beit_hamikdash_export.py` | Images clés : planche de contrôle 640 × 360 (`-- --planche`), ou fichiers de production couleur + profondeur 1920 × 1080. Seul script qui sauvegarde le .blend. |
-| `beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
-| `beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre. Ne reconstruit rien. |
-| `beit_hamikdash_marche.py` | Rejoue la règle de marche de la visite sur une grille posée sur la scène et dit où l'on passe à pied, où l'on bute et pourquoi — marche trop haute, vide, fente, mur. Ne reconstruit rien. |
-| `beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun, les points d'entrée et la lumière cuite. Lit le .blend, ne le réécrit pas. |
-| `beit_hamikdash_occlusion.py` | La lumière indirecte (ou l'occlusion du ciel) cuite par Cycles sur l'architecture de la visite : une couche UV et une carte WebP par concept. Appelé par le précédent. |
-| `beit_hamikdash_figures.py` | Les figurants de la visite, en troupes : chaque figure fait un geste que la Mishna lui donne, à la place qu'elle lui donne, et chaque parcours n'appelle que la sienne. Visite libre (`figures`) : la zerika à l'autel, deux Léviim qui jouent sur le Doukhan, un anshei ma'amad dans l'Ezrat Israël, le Lévi de garde à Nikanor. Tamid (`figures_tamid`) : kiddoush yadayim au Kiyor, montée du kevesh, zerika, salage des membres, bois de la ma'arakha, hatavat hanerot dans le Heikhal, douze Léviim et deux enfants au Doukhan, deux anshei ma'amad. Yom Kippour (`figures_kippour`) : le Cohen Gadol à chaque étape du seder ha'avoda, en habits d'or ou de lin selon l'heure — écoutant les anciens à la Lishkat Parhedrin, pleurant au Beit Avtinas avec les anciens de la kehouna, derrière le drap de lin aux tevilot, jetant le sang du tamid, sur son taureau, au tirage au sort, à la ma'hta, aux aspersions, aux cornes de l'autel d'or, sur le bouc émissaire, lisant la Torah, aux lampes de la Menora le soir —, et l'Azara prosternée face contre terre (*Yoma* 6:2) ; chaque étape n'en montre qu'un (`figurants` dans `parcours.json`). Sim'hat Beit HaSho'éva (`figures_shoeva`) : la nuit de l'Ezrat Nashim. Korban Pessa'h (`figures_pessah`) : les groupes, les rangées de bazikhin, le sang de main en main, le Hallel, les crochets. Bikkourim (`figures_bikkourim`) : la montée des corbeilles, « Aromimkha », la lecture et la tenoufa. Souccot au matin (`figures_souccot`) : la libation de l'eau, les aravot, le tour de l'autel. Hakhel (`figures_hakhel`) : le roi sur la bima de bois, le rouleau de main en main, le peuple autour. Nazir et metzora (`figures_nazir`) : le nazir au foyer de sa lishka, le metzora au mikve et sur le seuil de Nikanor. Un rôle = un concept = une fiche. Corps MakeHuman (CC0), vêtus et animés, fidèles pieds nus (*Berakhot* 9:5) ; écrit `visite/<troupe>.glb` et `.json`. Ni le .blend ni le film ne les voient. Point d'entrée : la table `TROUPES` et l'export ; le code est dans `figurants/`. |
-| `figurants/` | Le code des figurants : un module par troupe dans `troupes/` (`figures`, `figures_tamid`, `figures_kippour`…), et ce qu'elles partagent — corps MakeHuman (`corps`, `etoffes`), habillage et bigdei kehouna, ustensiles, bêtes, mise en scène et danse, rôles communs, animation. |
-| `beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
-| `beit_hamikdash_seir.py` | Le bouc émissaire de Kippour, en champ de distance comme le bœuf de la Mer (`beit_hamikdash_shor.py`) — chèvre noire du pays, barbe, cornes en cimeterre ; écrit `seir.blend`, que `beit_hamikdash_figures.py` pose à côté du Cohen Gadol. Grille et polygonisation communes : `beit_hamikdash_champ.py`. |
-| `beit_hamikdash_keruvim.py` | Les deux keruvim de la kaporet : enfants MakeHuman agenouillés, mains jointes, ailes plumées ; écrit `keruvim.blend`, que le blockout lit. À relancer après toute modification de ce script, puis reconstruire la scène. |
-| `keruvim.blend` | Les deux maillages générés (à regénérer après toute modification du script précédent). |
-| `beit_hamikdash_parokhet.py` | Le motif tissé des deux Parokhot — deux grands keruvim face à face qui portent une couronne, deux lions assis entre leurs sabots —, lu d'un dessin validé redessiné sur fond vert par gpt-image-2 (`tissages/`, source versionnée) — en carte : R = hauteur du bombé, (G, B) = face du tissage qui affleure, alpha = figure ; écrit `visite/matieres/parokhet_2048.webp` et `parokhet.json` (laines, dosages, palette), que la matière du blockout et le nuanceur de la visite lisent tous deux en coordonnées de rideau. À relancer après toute modification, puis reconstruire. |
-| `beit_hamikdash_gravures.py` | Les motifs des parois du Bayit — keruv, palmette, timora, fleuron, bouton, cordon, tresse, panneau. Le script dessine les guides de la timora, du fleuron et du bouton (composition et iconographie, en dômes et sillons) ; le keruv et la palmette n'ont pas de guide mais une esquisse validée (`gravures/esquisses/`) ; les cinq **figures** sont ensuite taillées par gpt-image-2 (fal.ai) dans la manière de l'ornement judéen du Second Temple — ossuaires, portes de 'Houlda —, les tuiles taillées `gravures/*.png` étant la source versionnée. Le **cordon, la tresse et le panneau ne passent par aucun modèle** : une torsade est une figure géométrique qu'un compas dit exactement, et surtout une tuile qui se RÉPÈTE le long d'une paroi doit s'aboucher au pixel avec sa voisine, ce qu'aucun modèle ne garantit deux fois de suite. Le tout compose l'atlas `visite/matieres/gravures_3072.webp`, neuf tuiles de 1024, toutes prises (luminance = modelé, distance au bord = volume), plus `gravures.json` : la silhouette de chaque motif, tracée sur la carte même. Sur l'or du Bayit le blockout pose chaque figure à cette silhouette en **saillie** de 0,10 ama, sa face aux UV qui visent la tuile ; sur la pierre des jambages il la taille 0,07 ama sous le nu, et le support perd le trou par un booléen. La matière et le nuanceur lisent le modelé. Une bande qui répète une tuile (`_bande_saillante`) n'est qu'UNE plaque dont le dessus se subdivise, là où des centaines de tuiles isolées auraient été autant d'objets. À relancer après toute modification, puis reconstruire — et `TAILLE_TUILE` / `TEXEL_GRAVURE` (`visite/matieres.js`) et le nom de fichier (`visite/nappes.js`) suivent la grille. |
-| `gravures/` | Les tuiles taillées (`keruv.png`, `palmette.png`, `timora.png`, `fleuron.png`, `bouton.png`), sources de l'atlas ; les esquisses validées du keruv, de sa tête et de la palmette dans `esquisses/` ; les guides des motifs qui en ont un dans `guides/`. `keruv_dresse.png`, hors de l'atlas, reste l'esquisse du keruv tissé de la parokhet. |
-| `beit_hamikdash_carte.py` | La rasterisation partagée des deux précédents : remplir un contour, bomber, creuser un sillon, fondre, tracer une silhouette, écrire le WebP. |
-| `beit_hamikdash_contours.py` | Les contours des figures — corps du keruv, bras, plis, crâne à deux faces, aile plumée, corolle, dattier à sept palmes — les rubans et le lissage de Chaikin qui en font des silhouettes. Importé par les deux scripts de cartes, dont les guides partagent ces figures. |
+| `modele/beit_hamikdash_blockout.py` | Script Blender : génère toute la scène en volumes. **Aucune caméra.** Point d'entrée : il importe dans l'ordre (`SECTIONS`) les zones du paquet `modele/blockout/`. |
+| `modele/blockout/` | Le code du blockout, une zone par module — `har_habayit`, `ezrat_nashim`, `azara`, `lishkot`, `heil`, `mizbeach`, `sous_l_azara`, `bayit/` (Oulam, Heikhal, kelim, Parokhot, parois d'or, Kodesh HaKodashim), `pays/`, `foule`, `finitions`, `eclairage` — et ce qu'elles partagent dans `primitives/` : paramètres, matières, volumes, gravures, ouvrages. |
+| `modele/cameras.json` | Les plans : nom, focale, durée, course de la caméra et course de sa cible, en amot. La source ; le .blend en est l'artefact. |
+| `modele/beit_hamikdash_cameras.py` | Pose dans la scène les plans déclarés dans `modele/cameras.json`. |
+| `modele/beit_hamikdash.blend` | Scène générée (à regénérer après toute modification du script ou de `modele/cameras.json`). |
+| `modele/beit_hamikdash_export.py` | Images clés : planche de contrôle 640 × 360 (`-- --planche`), ou fichiers de production couleur + profondeur 1920 × 1080. Seul script qui sauvegarde le .blend. |
+| `modele/beit_hamikdash_analyse_plans.py` | Mesure, plan par plan, ce que les deux frames ont en commun — le chiffre qui décide si un i2v peut tenir le plan. |
+| `modele/beit_hamikdash_inspect.py` | Lit la scène sauvegardée et répond : où est un objet, ce qu'une caméra a vraiment dans le cadre. Ne reconstruit rien. |
+| `modele/beit_hamikdash_marche.py` | Rejoue la règle de marche de la visite sur une grille posée sur la scène et dit où l'on passe à pied, où l'on bute et pourquoi — marche trop haute, vide, fente, mur. Ne reconstruit rien. |
+| `modele/beit_hamikdash_visite.py` | Exporte la scène vers la visite interactive : un maillage par concept, l'emprise de chacun, les points d'entrée et la lumière cuite. Lit le .blend, ne le réécrit pas. |
+| `modele/beit_hamikdash_occlusion.py` | La lumière indirecte (ou l'occlusion du ciel) cuite par Cycles sur l'architecture de la visite : une couche UV et une carte WebP par concept. Appelé par le précédent. |
+| `modele/beit_hamikdash_figures.py` | Les figurants de la visite, en troupes : chaque figure fait un geste que la Mishna lui donne, à la place qu'elle lui donne, et chaque parcours n'appelle que la sienne. Visite libre (`figures`) : la zerika à l'autel, deux Léviim qui jouent sur le Doukhan, un anshei ma'amad dans l'Ezrat Israël, le Lévi de garde à Nikanor. Tamid (`figures_tamid`) : kiddoush yadayim au Kiyor, montée du kevesh, zerika, salage des membres, bois de la ma'arakha, hatavat hanerot dans le Heikhal, douze Léviim et deux enfants au Doukhan, deux anshei ma'amad. Yom Kippour (`figures_kippour`) : le Cohen Gadol à chaque étape du seder ha'avoda, en habits d'or ou de lin selon l'heure — écoutant les anciens à la Lishkat Parhedrin, pleurant au Beit Avtinas avec les anciens de la kehouna, derrière le drap de lin aux tevilot, jetant le sang du tamid, sur son taureau, au tirage au sort, à la ma'hta, aux aspersions, aux cornes de l'autel d'or, sur le bouc émissaire, lisant la Torah, aux lampes de la Menora le soir —, et l'Azara prosternée face contre terre (*Yoma* 6:2) ; chaque étape n'en montre qu'un (`figurants` dans `parcours.json`). Sim'hat Beit HaSho'éva (`figures_shoeva`) : la nuit de l'Ezrat Nashim. Korban Pessa'h (`figures_pessah`) : les groupes, les rangées de bazikhin, le sang de main en main, le Hallel, les crochets. Bikkourim (`figures_bikkourim`) : la montée des corbeilles, « Aromimkha », la lecture et la tenoufa. Souccot au matin (`figures_souccot`) : la libation de l'eau, les aravot, le tour de l'autel. Hakhel (`figures_hakhel`) : le roi sur la bima de bois, le rouleau de main en main, le peuple autour. Nazir et metzora (`figures_nazir`) : le nazir au foyer de sa lishka, le metzora au mikve et sur le seuil de Nikanor. Un rôle = un concept = une fiche. Corps MakeHuman (CC0), vêtus et animés, fidèles pieds nus (*Berakhot* 9:5) ; écrit `visite/<troupe>.glb` et `.json`. Ni le .blend ni le film ne les voient. Point d'entrée : la table `TROUPES` et l'export ; le code est dans `modele/figurants/`. |
+| `modele/figurants/` | Le code des figurants : un module par troupe dans `troupes/` (`figures`, `figures_tamid`, `figures_kippour`…), et ce qu'elles partagent — corps MakeHuman (`corps`, `etoffes`), habillage et bigdei kehouna, ustensiles, bêtes, mise en scène et danse, rôles communs, animation. |
+| `modele/beit_hamikdash_gestes.py` | Les gestes des figurants : IK à deux os, marche, balancement, écriture des actions. Importé par le précédent. |
+| `modele/beit_hamikdash_seir.py` | Le bouc émissaire de Kippour, en champ de distance comme le bœuf de la Mer (`modele/beit_hamikdash_shor.py`) — chèvre noire du pays, barbe, cornes en cimeterre ; écrit `modele/seir.blend`, que `modele/beit_hamikdash_figures.py` pose à côté du Cohen Gadol. Grille et polygonisation communes : `modele/beit_hamikdash_champ.py`. |
+| `modele/beit_hamikdash_keruvim.py` | Les deux keruvim de la kaporet : enfants MakeHuman agenouillés, mains jointes, ailes plumées ; écrit `modele/keruvim.blend`, que le blockout lit. À relancer après toute modification de ce script, puis reconstruire la scène. |
+| `modele/keruvim.blend` | Les deux maillages générés (à regénérer après toute modification du script précédent). |
+| `modele/beit_hamikdash_parokhet.py` | Le motif tissé des deux Parokhot — deux grands keruvim face à face qui portent une couronne, deux lions assis entre leurs sabots —, lu d'un dessin validé redessiné sur fond vert par gpt-image-2 (`modele/tissages/`, source versionnée) — en carte : R = hauteur du bombé, (G, B) = face du tissage qui affleure, alpha = figure ; écrit `visite/matieres/parokhet_2048.webp` et `parokhet.json` (laines, dosages, palette), que la matière du blockout et le nuanceur de la visite lisent tous deux en coordonnées de rideau. À relancer après toute modification, puis reconstruire. |
+| `modele/beit_hamikdash_gravures.py` | Les motifs des parois du Bayit — keruv, palmette, timora, fleuron, bouton, cordon, tresse, panneau. Le script dessine les guides de la timora, du fleuron et du bouton (composition et iconographie, en dômes et sillons) ; le keruv et la palmette n'ont pas de guide mais une esquisse validée (`modele/gravures/esquisses/`) ; les cinq **figures** sont ensuite taillées par gpt-image-2 (fal.ai) dans la manière de l'ornement judéen du Second Temple — ossuaires, portes de 'Houlda —, les tuiles taillées `modele/gravures/*.png` étant la source versionnée. Le **cordon, la tresse et le panneau ne passent par aucun modèle** : une torsade est une figure géométrique qu'un compas dit exactement, et surtout une tuile qui se RÉPÈTE le long d'une paroi doit s'aboucher au pixel avec sa voisine, ce qu'aucun modèle ne garantit deux fois de suite. Le tout compose l'atlas `visite/matieres/gravures_3072.webp`, neuf tuiles de 1024, toutes prises (luminance = modelé, distance au bord = volume), plus `gravures.json` : la silhouette de chaque motif, tracée sur la carte même. Sur l'or du Bayit le blockout pose chaque figure à cette silhouette en **saillie** de 0,10 ama, sa face aux UV qui visent la tuile ; sur la pierre des jambages il la taille 0,07 ama sous le nu, et le support perd le trou par un booléen. La matière et le nuanceur lisent le modelé. Une bande qui répète une tuile (`_bande_saillante`) n'est qu'UNE plaque dont le dessus se subdivise, là où des centaines de tuiles isolées auraient été autant d'objets. À relancer après toute modification, puis reconstruire — et `TAILLE_TUILE` / `TEXEL_GRAVURE` (`visite/matieres.js`) et le nom de fichier (`visite/nappes.js`) suivent la grille. |
+| `modele/gravures/` | Les tuiles taillées (`keruv.png`, `palmette.png`, `timora.png`, `fleuron.png`, `bouton.png`), sources de l'atlas ; les esquisses validées du keruv, de sa tête et de la palmette dans `esquisses/` ; les guides des motifs qui en ont un dans `guides/`. `keruv_dresse.png`, hors de l'atlas, reste l'esquisse du keruv tissé de la parokhet. |
+| `modele/beit_hamikdash_carte.py` | La rasterisation partagée des deux précédents : remplir un contour, bomber, creuser un sillon, fondre, tracer une silhouette, écrire le WebP. |
+| `modele/beit_hamikdash_contours.py` | Les contours des figures — corps du keruv, bras, plis, crâne à deux faces, aile plumée, corolle, dattier à sept palmes — les rubans et le lissage de Chaikin qui en font des silhouettes. Importé par les deux scripts de cartes, dont les guides partagent ces figures. |
 | `visite/` | La visite elle-même : page web où l'on marche dans le Temple et où l'on clique un élément pour savoir ce que c'est, avec sa source. |
 | `.claude/skills/camera/` | Skill Claude Code + `camera.py` : déclare un plan, en rend les deux images clés et mesure son recouvrement, en une commande. |
 | `.claude/skills/blender/` | Skill Claude Code : les incantations headless des huit scripts, et l'invariant « le script est la source, le .blend est l'artefact ». |
 | `.claude/skills/fal-video/` | Skill Claude Code + `fal_image.py` / `fal_video.py` : stylise une frame clé et génère un plan sur fal.ai en ligne de commande. |
 | `.claude/skills/fal-retouche/` | Skill Claude Code + `retouche.py` : corrige un défaut localisé d'une image validée sans regénérer le cadre. |
 | `.claude/skills/mikdash/` | Skill Claude Code : banque de sources (*Middot*, *Tamid*, *Yoma*, Rambam) pour répondre cote en main plutôt que de mémoire. |
-| `renders/` | Sorties, une étape du pipeline par dossier — voir ci-dessous. |
-### Le dossier `renders/`
+| `site/` | Les pages autour de la visite : accueil (`accueil.py`), fiches (`fiches.mjs`), et `empreintes.py`, qui signe les URL de `dist/`. `construire_site.sh`, à la racine, assemble le tout. |
+| `render/` | Sorties du film et de la musique, une étape du pipeline par dossier — voir ci-dessous. |
+
+### Le dossier `render/`
 
 Un dossier par étape, et rien à la racine :
 
 | Dossier | Étape | Contenu |
 |---|---|---|
-| `renders/blockout/` | 1 | rendus Blender 1920 × 1080 : `<caméra>_{debut,fin}.png` et `..._profondeur.png`. Ce sont les entrées de l'i2i. |
-| `renders/planche/` | 1 | planche de contrôle 640 × 360 + `planche.html` : première et dernière image de chaque plan, avec focale et frames. `planche.jpg` les assemble en une mosaïque. |
-| `renders/style/` | 2 | images clés stylisées (`fal_image.py`). |
-| `renders/video/` | 4 | les mp4 (`fal_video.py`). |
+| `render/blockout/` | 1 | rendus Blender 1920 × 1080 : `<caméra>_{debut,fin}.png` et `..._profondeur.png`. Ce sont les entrées de l'i2i. |
+| `render/planche/` | 1 | planche de contrôle 640 × 360 + `planche.html` : première et dernière image de chaque plan, avec focale et frames. `planche.jpg` les assemble en une mosaïque. |
+| `render/style/` | 2 | images clés stylisées (`fal_image.py`). |
+| `render/video/` | 4 | les mp4 (`fal_video.py`). |
+| `render/montage/` | 5 | les clips montés et leurs pistes. |
+| `render/audio/` | — | la musique (`render/audio/musique/`, skill `elevenlabs-musique`) et les morceaux de référence. |
 
 Le dossier est ignoré par git : ce sont des artefacts, ils se regénèrent. Seule
-exception, `renders/planche/planche.jpg`, versionnée pour s'afficher en tête de ce README.
+exception, `render/planche/planche.jpg`, versionnée pour s'afficher en tête de ce README.
 
 L'export **remet `render.filepath` à vide avant de sauvegarder** le .blend. Sans quoi
 n'importe quel rendu d'animation lancé ensuite déverse ses frames dans le dernier
@@ -78,6 +84,8 @@ dossier rendu, sous le nom du dernier fichier suffixé du numéro d'image.
 Une page web où l'on marche dans le Temple à hauteur d'homme et où l'on clique un
 élément pour obtenir sa fiche : nom hébreu, cotes en amot, et la source, en lien vers
 le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
+
+Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `visite/` le donne à parcourir dans le navigateur, `site/` l'entoure de ses pages. `render/` reçoit ce qu'on tourne et ce qu'on chante avec — images clés, plans, montages, musique — et reste hors git.
 
 | Fichier | Rôle |
 |---|---|
@@ -97,14 +105,14 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/trajet.js` | Le pas du marcheur et le trajet d'une caméra qui marche seule : la vitesse, le sous-pas qui ne saute aucune contremarche, la polyligne des points de passage — ce que la marche libre, les parcours et le cinéma ont en commun. |
 | `visite/cadrage.js` | D'où un élément tient entier dans le champ de l'écran : le recul le long d'un cap, borné. |
 | `visite/plan.js` | Le plan : minicarte qui suit le visiteur sur l'image de sa zone, plan entier dont chaque lieu et chaque entrée se touchent pour s'y rendre. |
-| `visite/plan.json`, `visite/plans/` | Le Temple vu du dessus, une image par cadrage — Har HaBayit, Ezrat Nashim, Azara, Heikhal en coupe, souterrains — et l'emprise en mètres de chacune. Artefacts — `beit_hamikdash_plan.py` les rend depuis le .blend. |
+| `visite/plan.json`, `visite/plans/` | Le Temple vu du dessus, une image par cadrage — Har HaBayit, Ezrat Nashim, Azara, Heikhal en coupe, souterrains — et l'emprise en mètres de chacune. Artefacts — `modele/beit_hamikdash_plan.py` les rend depuis le .blend. |
 | `visite/fiche.js` | La fiche d'un concept : panneau latéral au bureau, tiroir à deux crans au doigt, et les liens Sefaria. |
 | `visite/qualite.js` | Le profil de rendu — ombres, occlusion, grain, définition — selon ce que la machine tient. Au profil léger, les cartes de lumière cuite et l'atlas des gravures sont ramenés à 1024, les textures des figurants à 512 : un iPhone perd son contexte WebGL passé quelques centaines de mégaoctets. Les lampes du sanctuaire y gardent leurs ombres, en cartes de 256 : sans elles la ménora éclairait le Kodesh HaKodashim à travers le mur. |
 | `visite/detail.js`, `visite/simplification.js` | Les niveaux de détail : chaque maillage découpé en tuiles, chaque tuile allégée en niveaux (meshoptimizer, dans deux Workers, après l'ouverture, sur ses seuls sommets), et rendue au plus léger dont l'écart tient sous un pixel. Les Workers sont congédiés une fois la file vide : un tas WebAssembly ne rend jamais sa mémoire, et gardés ils pesaient 400 Mo sur iPhone. Les maillages d'origine restent, cachés, pour les rayons. |
 | `visite/echelle.js` | La définition qui suit ce que la machine tient : des paliers du profil (un téléphone part de la définition de son écran CSS et monte jusqu'à 1,5 tant qu'il tient 60 images, une montée de trop se jugeant en trente images), jugés sur la médiane des 120 dernières images — une image figée par un chargement ne fait plus perdre un palier —, et une remontée ratée qui attend deux fois plus longtemps avant de se retenter — sans quoi l'échelle battait entre deux paliers toutes les trois secondes. |
 | `visite/matieres.js` | Les matières : l'appareil de pierre écrit en coordonnées de monde comme dans Blender, et les nappes photographiques posées par-dessus. |
 | `visite/nappes.js` | Les cinq jeux de scans, chargés en 1024 sur toutes les machines. |
-| `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `beit_hamikdash_nappes.py`, `beit_hamikdash_parokhet.py` et `beit_hamikdash_gravures.py` les refabriquent. |
+| `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `modele/beit_hamikdash_nappes.py`, `modele/beit_hamikdash_parokhet.py` et `modele/beit_hamikdash_gravures.py` les refabriquent. |
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur ; la carte lointaine du Har HaBayit, tracée une fois. |
@@ -123,7 +131,7 @@ le passage sur Sefaria. Le film montre le Temple ; la visite le laisse regarder.
 | `visite/occlusion/` | Une carte d'occlusion par concept que l'export n'a pas cuit en lumière, WebP. Artefact de l'export. |
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout   # regénère temple.glb, reperes.json, lumiere/
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --lumiere tout   # regénère temple.glb, reperes.json, lumiere/
 cd visite && python3 -m http.server 8777                       # puis http://127.0.0.1:8777/
 ```
 
@@ -131,7 +139,7 @@ Un serveur est nécessaire : la page est un module ES, `file://` ne la charge pa
 
 **En ligne.** Netlify déploie ce dépôt sur https://bethhamikdach.com à chaque push sur
 `main` : `construire_site.sh` assemble `dist/` — les pages de `site/` et la visite filtrée
-sous `dist/visite/` —, `empreintes.py` appose sur chaque URL d'asset l'empreinte de son
+sous `dist/visite/` —, `site/empreintes.py` appose sur chaque URL d'asset l'empreinte de son
 contenu (`visite.js?v=03a1168a`), et `netlify.toml` dit le reste : les pages se revalident
 à chaque visite, tout ce qu'elles citent est `immutable`. Une modification se voit donc
 sans vider le cache, sur mobile comme ailleurs. La visite est servie à `/visite/` ;
@@ -179,7 +187,7 @@ le dallage de l'Azara se couvrait des lichens verts du calcaire scanné. La tein
 ce que Blender et les bancs du meleke ont décidé — c'est aussi ce qui fait qu'une
 retouche dans la scène ne demande jamais de retoucher une image.
 
-Six jeux, tous CC0, refabriqués par `beit_hamikdash_nappes.py` : *worn_rock_natural_01*,
+Six jeux, tous CC0, refabriqués par `modele/beit_hamikdash_nappes.py` : *worn_rock_natural_01*,
 *beige_wall_001*, *hinoki_planks* et *rough_linen* de [Poly Haven](https://polyhaven.com),
 *Metal007* et *Marble001* d'[ambientCG](https://ambientcg.com). 2,3 Mo en 1024, téléphone compris. L'or
 n'en tire que son terni : une feuille BATTUE a des creux, et
@@ -345,7 +353,7 @@ exactement ce qu'il reste à déclarer dans `concepts.json`.
 **Les langues.** Français, hébreu, anglais : choisies au premier passage, retenues dans
 le navigateur, changées au drapeau de la barre. Le français est la source, et la même
 discipline vaut pour lui : **tout changement dans `concepts.json` ou `contenu_*.json` se
-reporte dans les miroirs `.en` et `.he`**. `python3 beit_hamikdash_traductions.py` dit ce
+reporte dans les miroirs `.en` et `.he`**. `python3 modele/beit_hamikdash_traductions.py` dit ce
 qui manque ou a dérivé — un concept nouveau, une cote ajoutée, une source changée — et
 sort en erreur tant qu'il en reste. Une langue non traduite retombe sur le français.
 
@@ -407,7 +415,7 @@ sur tout le pourtour, sans les ouvertures qu'il avait (*Middot* 2:3). S'y cogner
 buter sur un manque du modèle, pas sur l'architecture.
 
 **Ce que la marche a révélé du blockout.** Marcher dans un modèle en éprouve la
-continuité, ce qu'aucun rendu de caméra ne fait — et `beit_hamikdash_marche.py` la
+continuité, ce qu'aucun rendu de caméra ne fait — et `modele/beit_hamikdash_marche.py` la
 mesure sans y marcher : il rejoue la règle de collision sur une grille au pas du
 marcheur, relie les cases qu'on enchaîne dans les deux sens, et nomme chaque frontière
 avec sa raison. Ce qu'il dit aujourd'hui :
@@ -436,23 +444,23 @@ source n'a été relevée affiche « pas encore documenté », jamais une cote p
 BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
 
 # la scène seule, pour vérifier que le script tourne (rien n'est sauvegardé)
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_blockout.py
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_blockout.py
 
-# la scène, les plans de cameras.json, et la planche de contrôle — le .blend est sauvegardé
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py \
-    -P beit_hamikdash_cameras.py \
-    -P beit_hamikdash_export.py -- --planche
-open renders/planche/planche.html
+# la scène, les plans de modele/cameras.json, et la planche de contrôle — le .blend est sauvegardé
+$BLENDER -b modele/beit_hamikdash.blend \
+    -P modele/beit_hamikdash_blockout.py \
+    -P modele/beit_hamikdash_cameras.py \
+    -P modele/beit_hamikdash_export.py -- --planche
+open render/planche/planche.html
 ```
 
-Ou : Blender → onglet *Scripting* → ouvrir `beit_hamikdash_blockout.py` depuis le disque
-(le paquet `blockout/` est à côté) → *Run Script*. Vérifié sur
+Ou : Blender → onglet *Scripting* → ouvrir `modele/beit_hamikdash_blockout.py` depuis le disque
+(le paquet `modele/blockout/` est à côté) → *Run Script*. Vérifié sur
 Blender 5.2 : **9 178 objets** en architecture seule (`FOULE = False`), **18 913** avec
 la foule de Yom Kippour. Les marqueurs de timeline changent de caméra automatiquement ;
 `Ctrl+Numpad0` pour activer une caméra.
 
-Constantes dans `blockout/primitives/parametres.py` : `AMA = 0.48` (Rav 'Haïm Naeh), `MENORA_DROITE` (branches
+Constantes dans `modele/blockout/primitives/parametres.py` : `AMA = 0.48` (Rav 'Haïm Naeh), `MENORA_DROITE` (branches
 droites Rambam / courbes), `GEVIIM_RENVERSES` (coupes de la Menora bouche en bas, comme au
 dessin du Rambam), `PORTES_HEIKHAL_OUVERTES` (battants rabattus dans
 l'embrasure, comme pendant l'avoda), `FOULE` (peuple, cohanim, Léviim et leurs
@@ -477,7 +485,7 @@ rentrante, ce qui compte parce que c'est la passe Normal qui conditionne l'i2i.
 
 ### Poser un plan
 
-Les caméras ne sont pas dans le script : elles vivent dans `cameras.json`, un objet par
+Les caméras ne sont pas dans le script : elles vivent dans `modele/cameras.json`, un objet par
 plan — nom, focale, durée, course de l'objectif et course de son point de visée, en
 amot. Un seul point ne bouge pas, deux donnent une droite, plus donnent une polyligne.
 
@@ -487,16 +495,16 @@ python3 .claude/skills/camera/camera.py ajouter --nom CAM_04_Rampe --focale 35 \
 ```
 
 La commande écrit la déclaration, rebâtit la scène, rend les deux images clés du plan
-dans `renders/blockout/` et affiche la mesure de recouvrement. `lister`, `rendre` et
+dans `render/blockout/` et affiche la mesure de recouvrement. `lister`, `rendre` et
 `supprimer` complètent le jeu. Détail dans `.claude/skills/camera/SKILL.md`.
 
 ### Interroger la scène sans la reconstruire
 
-`beit_hamikdash_inspect.py` ouvre le .blend sauvegardé et répond — pas de
-`-P beit_hamikdash_blockout.py` devant, donc pas de reconstruction :
+`modele/beit_hamikdash_inspect.py` ouvre le .blend sauvegardé et répond — pas de
+`-P modele/beit_hamikdash_blockout.py` devant, donc pas de reconstruction :
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --voit CAM_04_Rampe
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --voit CAM_04_Rampe
 ```
 
 `--scene` (défaut) donne les collections, les plans et l'étendue ; `--objets <motif>`
@@ -506,7 +514,7 @@ mesuré à la grille de rayons et par part d'écran. C'est cette dernière qui r
 questions du type « la fenêtre du Beit Avtinas montre-t-elle la cour » sans y répondre
 à l'œil. Le plan se nomme en entier, par son numéro, ou par un fragment de son nom.
 
-Le .blend qu'il lit date du dernier export : `beit_hamikdash_export.py` est le seul
+Le .blend qu'il lit date du dernier export : `modele/beit_hamikdash_export.py` est le seul
 script qui appelle `wm.save_mainfile`.
 
 ### Matière et rendu
@@ -528,7 +536,7 @@ redessiner chaque arête à chaque image.
 | `marbre_herode` | le corps du bâtiment : **assises** de 8 amot (CHOIX), trois marbres tirés par assise (*Baba Batra* 4a), **poli**, sans liseré ciselé, veiné par le scan *Marble001* recalé sur chaque bloc — le même que la visite (CHOIX) |
 | `bois` | cèdre des plafonds (*Melakhim I* 6:9), chêne des maltera'ot (*Middot* 3:7) |
 | `etoffe` | bigdei lavan, laine de la foule (quand `FOULE` est vrai) |
-| `parokhet` | les deux rideaux : **les quatre laines dans chaque cordon** (*Shekalim* 8:5), et quatre **faces** du tissage qui les dosent autrement — fond de tekhelet assombri d'argaman (Menachot 43b), ailes en rangs de plumes de lin, de cramoisi et de pourpre, lions cramoisis à crinière de trois couleurs —, lues dans la carte de `beit_hamikdash_parokhet.py` : deux grands keruvim face à face dont les ailes portent une couronne, deux lions assis entre leurs sabots, composition validée le 22/09 et tissée par gpt-image-2 ; aucun fil d'or (Ex. 26:31). Moyennées à parts égales, les quatre laines rendaient un mauve uni ; en grille d'aplats vectoriels, un papier peint |
+| `parokhet` | les deux rideaux : **les quatre laines dans chaque cordon** (*Shekalim* 8:5), et quatre **faces** du tissage qui les dosent autrement — fond de tekhelet assombri d'argaman (Menachot 43b), ailes en rangs de plumes de lin, de cramoisi et de pourpre, lions cramoisis à crinière de trois couleurs —, lues dans la carte de `modele/beit_hamikdash_parokhet.py` : deux grands keruvim face à face dont les ailes portent une couronne, deux lions assis entre leurs sabots, composition validée le 22/09 et tissée par gpt-image-2 ; aucun fil d'or (Ex. 26:31). Moyennées à parts égales, les quatre laines rendaient un mauve uni ; en grille d'aplats vectoriels, un papier peint |
 | `bois_sculpte` | les maltera'ot, « קוֹרוֹת מְצֻיָּרוֹת וּמְכֻיָּרוֹת » (Bartenura sur *Middot* 3:7) : le fil du bois plus un relief de rinceaux en travers |
 | `terre` | les collines : roche et garrigue mêlées au bruit, **terrasses** en dents de scie lues en Z (pas de 4 amot), et le **voile** ci-dessous |
 | `eau` | l'eau du Kiyor, sombre et lisse |
@@ -563,9 +571,9 @@ quatre fenêtres hautes). Pour les images clés seulement, **`--rendu-cycles`** 
 en Cycles 128 échantillons, GPU si disponible :
 
 ```bash
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
-    -P beit_hamikdash_export.py -- --rendu-cycles
+$BLENDER -b modele/beit_hamikdash.blend \
+    -P modele/beit_hamikdash_blockout.py -P modele/beit_hamikdash_cameras.py \
+    -P modele/beit_hamikdash_export.py -- --rendu-cycles
 ```
 
 Deux frames par plan, pas la totalité de la timeline : le film ne sort pas de Blender.
@@ -574,19 +582,19 @@ retombent alors à un seul échantillon — ils ne dépendent pas de l'échantil
 Compter large : sur Metal (M5 Pro), un intérieur en 640 × 360 met déjà ~2 min,
 chargement du .blend compris.
 
-Le blockout n'est à rechaîner que si le **script** ou `cameras.json` ont changé :
+Le blockout n'est à rechaîner que si le **script** ou `modele/cameras.json` ont changé :
 l'export sauvegarde le .blend, donc pour re-rendre sur la scène déjà générée il suffit
-de `-P beit_hamikdash_export.py -- --planche`.
+de `-P modele/beit_hamikdash_export.py -- --planche`.
 
 Et la mesure qui va avec — pour chaque plan, ce que ses deux frames ont en commun :
 
 ```bash
-$BLENDER -b beit_hamikdash.blend \
-    -P beit_hamikdash_blockout.py -P beit_hamikdash_cameras.py \
-    -P beit_hamikdash_analyse_plans.py
+$BLENDER -b modele/beit_hamikdash.blend \
+    -P modele/beit_hamikdash_blockout.py -P modele/beit_hamikdash_cameras.py \
+    -P modele/beit_hamikdash_analyse_plans.py
 ```
 
-**Un plan à couverture faible se coupe en deux dans `cameras.json`, jamais au prompt.**
+**Un plan à couverture faible se coupe en deux dans `modele/cameras.json`, jamais au prompt.**
 Un i2v à deux frames n'interpole que ce que les deux frames partagent : un panoramique
 de 142°, un relevé de 56° pour 46° de champ, une traversée de mur, une grue qui
 franchit une ligne d'horizon ne partagent rien. Deux caméras à la place d'une, chacune
@@ -609,7 +617,7 @@ Quatre étapes, chacune vérifiable avant de payer la suivante.
    `inspect.py -- --voit CAM_04_Rampe` — plutôt que de le juger sur la planche : une
    caméra dans un mur, un sujet masqué par l'autel, cela se mesure.
 
-   Sortie : `renders/blockout/CAM_04_Rampe_{debut,fin}.png` et leurs `_profondeur.png`.
+   Sortie : `render/blockout/CAM_04_Rampe_{debut,fin}.png` et leurs `_profondeur.png`.
    La carte de profondeur est normalisée 0-1 sur la plage réellement visible du frame
    (mesurée sur la passe Z), **échelle logarithmique, proche = blanc** : ni le proche ni
    le lointain n'est écrasé.
@@ -637,7 +645,7 @@ Quatre étapes, chacune vérifiable avant de payer la suivante.
 
    ```bash
    python3 .claude/skills/fal-video/fal_video.py --camera CAM_04_Rampe \
-       --depart renders/style/..._debut_....png --fin renders/style/..._fin_....png \
+       --depart render/style/..._debut_....png --fin render/style/..._fin_....png \
        --prompt "the camera rises slowly along the ramp; nothing else moves"
    ```
 
@@ -658,7 +666,7 @@ Clé `FAL_AI_KEY` dans le `.env` à la racine.
 - Mizbea'h **blanc** (chaulé) avec **rampe**, jamais d'escalier. Oulam **sans portes**.
 - Quatre vêtements de lin blanc pour tout le service intérieur de Kippour (Lév. 16:4). Les huit vêtements d'or ne se montrent qu'au revêtement, sur la parole « il revêtait les habits d'or » (*Yoma* 3:4, 7:3) — jamais dans un plan intérieur.
 - Pas de coupole, arc en fer à cheval, minaret, statue, colonne corinthienne intérieure.
-- Mouvements de caméra lents uniquement : travelling, grue, pan. Aucun zoom, aucune caméra portée. Mesuré, pas jugé à l'œil : `beit_hamikdash_analyse_plans.py` donne la glisse de l'image en largeurs de cadre par seconde, et refuse au-delà de 0,06.
+- Mouvements de caméra lents uniquement : travelling, grue, pan. Aucun zoom, aucune caméra portée. Mesuré, pas jugé à l'œil : `modele/beit_hamikdash_analyse_plans.py` donne la glisse de l'image en largeurs de cadre par seconde, et refuse au-delà de 0,06.
 - Portes de l'Azara **ouvertes**, Nikanor comprise : elles le sont dès l'aube (*Tamid* 3:7 ; *Yoma* 3:1–2). Fermées, elles bouchent l'axe est-ouest, qui est l'axe du bâtiment.
 - Personne dans une zone qui lui est fermée (fiche §12) : peuple à l'est de l'Ezrat Israël, Léviim sur le Doukhan, cohanim au-delà, Cohen Gadol seul dans le Kodesh HaKodashim ; Oulam et Heikhal vides à l'heure de l'encens. Contrôlé sur les deux frames avant toute génération vidéo, puis sur le mp4.
 
@@ -954,7 +962,7 @@ devant : l'Oulam couvert était aussi clair que la cour, et le Heikhal, sans ouv
 le ciel, rendait un or plat de maquette. Deux ajouts, vérifiés en captures contre la
 version précédente, même glb, même pose.
 
-- **L'occlusion du ciel est cuite par Cycles** à l'export (`beit_hamikdash_occlusion.py`)
+- **L'occlusion du ciel est cuite par Cycles** à l'export (`modele/beit_hamikdash_occlusion.py`)
   et posée en `aoMap` (`visite/occlusion.js`) : elle n'assombrit que la lumière sans
   direction, le soleil et les lampes gardent leurs ombres. Portée 8 m. 53 concepts, 1,8 Mo
   de WebP, +1,2 Mo de glb pour les UV, ~11 min de cuisson sur Metal (M5 Pro). Cuite au
@@ -1091,7 +1099,7 @@ et places restent des CHOIX, la présence de chaque objet ne l'est pas (fiche §
 ## Licence
 
 - **Code** — scripts Python, JavaScript, shell et `visite/index.html` : [MIT](LICENSE).
-- **Contenus** — `beit_hamikdash.blend`, `visite/temple.glb`, la fiche technique, ce README,
+- **Contenus** — `modele/beit_hamikdash.blend`, `visite/temple.glb`, la fiche technique, ce README,
   les textes de la visite (`visite/*.json`) et les images : [CC BY 4.0](LICENSE-CC-BY-4.0),
   © 2026 David Bonan.
 - **Textures** de `visite/matieres/` : refabriquées depuis des jeux CC0 de Poly Haven et

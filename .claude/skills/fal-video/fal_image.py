@@ -44,7 +44,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fal_commun import RACINE, cle_api, genere, images_de_frame, telecharge, televerse
 
-DOSSIER_SORTIE = os.path.join(RACINE, "renders", "style")
+DOSSIER_SORTIE = os.path.join(RACINE, "render", "style")
 LARGEUR, HAUTEUR = 1920, 1080
 
 
@@ -265,7 +265,7 @@ PHRASE_REFERENCE = (
 def arguments():
     analyseur = argparse.ArgumentParser(description="Stylisation d'une frame clé sur fal.ai")
     analyseur.add_argument("--camera", required=True,
-                           help="nom de la caméra, tel qu'il est dans cameras.json")
+                           help="nom de la caméra, tel qu'il est dans modele/cameras.json")
     analyseur.add_argument("--frame", choices=("debut", "fin"), default="debut")
     analyseur.add_argument("--prompt", required=True,
                            help="ce que le cadre doit devenir : matière, lumière, gens")

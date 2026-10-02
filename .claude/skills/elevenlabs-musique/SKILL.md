@@ -6,7 +6,7 @@ description: Génère un chant liturgique hébreu sur elevenlabs.io (Music v2.5)
 # Musique d'un texte
 
 `elevenlabs_musique.py` chante un texte hébreu dans le style d'une chanson de référence.
-La recette est celle de `audio/musique/pitum_haketoret_complet_direct_translittere_accent_hebreu.mp3`,
+La recette est celle de `render/audio/musique/pitum_haketoret_complet_direct_translittere_accent_hebreu.mp3`,
 retenue après une trentaine d'essais ; le texte, son découpage, le ton et l'arrangement
 de chaque section viennent d'un fichier.
 
@@ -22,8 +22,8 @@ python3 .claude/skills/elevenlabs-musique/elevenlabs_musique.py --texte .claude/
     --etiqueter ~/Downloads/"Pitum Haketoret.mp3"
 ```
 
-Sortie : `audio/musique/<nom>.mp3` (puis `<nom>_2.mp3`…, jamais écrasé), avec à côté
-le `.json` exact envoyé à ElevenLabs. `audio/` est hors git.
+Sortie : `render/audio/musique/<nom>.mp3` (puis `<nom>_2.mp3`…, jamais écrasé), avec à côté
+le `.json` exact envoyé à ElevenLabs. `render/` est hors git.
 
 Chaque mp3 sort étiqueté, prêt pour Musique : ID3 v2.3 (UTF-16, pour l'hébreu) avec
 titre, artiste et artiste de l'album, album (= titre, piste 1/1), genre « Jewish

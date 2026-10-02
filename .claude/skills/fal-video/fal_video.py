@@ -4,8 +4,8 @@
         --prompt "the camera glides forward down the hall"
 
 Le modèle relie deux images clés : la première et la dernière frame du plan. Par
-défaut ce sont les rendus Blender de `renders/blockout/`, mais on lui donne plutôt
-les frames stylisées de `renders/style/` avec `--depart` et `--fin` — c'est là que le
+défaut ce sont les rendus Blender de `render/blockout/`, mais on lui donne plutôt
+les frames stylisées de `render/style/` avec `--depart` et `--fin` — c'est là que le
 film prend sa matière.
 
 Le prompt i2v ne décrit **que le mouvement de caméra** : ce qui est dans le cadre est
@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fal_commun import (RACINE, cle_api, genere, images_du_plan, telecharge, televerse)
 
-DOSSIER_SORTIE = os.path.join(RACINE, "renders", "video")
+DOSSIER_SORTIE = os.path.join(RACINE, "render", "video")
 
 
 # --- modèles -----------------------------------------------------------------
@@ -233,7 +233,7 @@ MODELES = {
 def arguments():
     analyseur = argparse.ArgumentParser(description="Génération vidéo fal.ai en ligne de commande")
     analyseur.add_argument("--camera", required=True,
-                           help="nom de la caméra, tel qu'il est dans cameras.json")
+                           help="nom de la caméra, tel qu'il est dans modele/cameras.json")
     analyseur.add_argument("--prompt", required=True,
                            help="le mouvement de caméra, et lui seul")
     analyseur.add_argument("--negatif", default="",
@@ -241,9 +241,9 @@ def arguments():
     analyseur.add_argument("--modele", choices=sorted(MODELES), default="veo-lite")
     analyseur.add_argument("--duree", type=int, help="secondes générées (défaut : le maximum du modèle)")
     analyseur.add_argument("--depart", help="image de première frame "
-                                            "(défaut : renders/blockout/<caméra>_debut.png)")
+                                            "(défaut : render/blockout/<caméra>_debut.png)")
     analyseur.add_argument("--fin", help="image de dernière frame "
-                                         "(défaut : renders/blockout/<caméra>_fin.png)")
+                                         "(défaut : render/blockout/<caméra>_fin.png)")
     analyseur.add_argument("--sans-fin", action="store_true",
                            help="n'impose aucune frame de fin : le modèle invente le mouvement "
                                 "(les endpoints image-to-video seuls)")

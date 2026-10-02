@@ -2,11 +2,10 @@
 __pycache__/
 *.blend1
 .DS_Store
-renders/*
-!renders/planche/
-renders/planche/*
-!renders/planche/planche.jpg
-audio/
+render/*
+!render/planche/
+render/planche/*
+!render/planche/planche.jpg
 .venv/
 
 visite/matieres/.scans/
@@ -14,7 +13,7 @@ visite/matieres/.scans/
 visite/profil/
 dist/
 
-pays/.tuiles/
+modele/pays/.tuiles/
 
 .claude/skills/elevenlabs-musique/reference.mp3
 .claude/skills/elevenlabs-musique/references_televersees.json

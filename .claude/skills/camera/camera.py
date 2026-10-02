@@ -1,4 +1,4 @@
-"""Déclare un plan dans `cameras.json`, puis en exporte les deux images clés.
+"""Déclare un plan dans `modele/cameras.json`, puis en exporte les deux images clés.
 
     python3 .claude/skills/camera/camera.py lister
     python3 .claude/skills/camera/camera.py ajouter --nom CAM_04_Rampe --focale 35 \
@@ -28,8 +28,9 @@ import subprocess
 import sys
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-FICHIER = os.path.join(RACINE, "cameras.json")
-BLEND = os.path.join(RACINE, "beit_hamikdash.blend")
+MODELE = os.path.join(RACINE, "modele")
+FICHIER = os.path.join(MODELE, "cameras.json")
+BLEND = os.path.join(MODELE, "beit_hamikdash.blend")
 BLENDER = os.environ.get("BLENDER", "/Applications/Blender.app/Contents/MacOS/Blender")
 
 SCRIPTS = ("beit_hamikdash_blockout.py", "beit_hamikdash_cameras.py",
@@ -38,7 +39,7 @@ BRUIT = ("Deprecation", "use_nodes", "Read blend", "Blender quit", "Blender 5",
          "Fra:", "Saved:", "Not freed memory")
 
 
-# --- cameras.json -------------------------------------------------------------
+# --- modele/cameras.json -------------------------------------------------------------
 
 def lire():
     if not os.path.exists(FICHIER):
@@ -102,7 +103,7 @@ def blender(args_scripts, planche):
         raise SystemExit(f"Blender introuvable : {BLENDER} — donner le chemin dans $BLENDER.")
     commande = [BLENDER, "-b", BLEND]
     for script in SCRIPTS:
-        commande += ["-P", os.path.join(RACINE, script)]
+        commande += ["-P", os.path.join(MODELE, script)]
     commande += ["--", *(["--planche"] if planche else []), *args_scripts]
 
     processus = subprocess.Popen(commande, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -152,7 +153,7 @@ def commande_supprimer(args):
         raise SystemExit(f"{args.nom} n'est pas déclaré.")
     fiche["cameras"] = [c for c in fiche["cameras"] if c["nom"] != args.nom]
     ecrire(fiche)
-    print(f"{args.nom} retiré. Les images déjà rendues restent dans renders/.")
+    print(f"{args.nom} retiré. Les images déjà rendues restent dans render/.")
     return 0
 
 
@@ -185,7 +186,7 @@ def analyseur():
     ajouter.add_argument("--sans-rendu", action="store_true", help="déclarer sans lancer Blender")
     ajouter.set_defaults(fonction=commande_ajouter)
 
-    supprimer = commandes.add_parser("supprimer", help="retirer un plan de cameras.json")
+    supprimer = commandes.add_parser("supprimer", help="retirer un plan de modele/cameras.json")
     supprimer.add_argument("--nom", required=True)
     supprimer.set_defaults(fonction=commande_supprimer)
 

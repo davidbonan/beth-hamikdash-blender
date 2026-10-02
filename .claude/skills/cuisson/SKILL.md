@@ -9,8 +9,8 @@ description: Recuit les cartes de lumière de la visite 3D (visite/lumiere/) dan
 BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
 ```
 
-`beit_hamikdash_visite.py` exporte la visite ; en chemin, `beit_hamikdash_occlusion.py` cuit
-une carte par concept et `beit_hamikdash_recuisson.py` décide lesquelles refaire. `reperes.json`
+`modele/beit_hamikdash_visite.py` exporte la visite ; en chemin, `modele/beit_hamikdash_occlusion.py` cuit
+une carte par concept et `modele/beit_hamikdash_recuisson.py` décide lesquelles refaire. `reperes.json`
 garde sous `empreintes` celle de **chaque** concept, cuit ou non — maillage après séparation des
 faces collées, taille, couches UV, matières, réglages de lumière (soleil, ciel, lampes,
 échantillons…) — et chaque carte sa durée de cuisson en `secondes`.
@@ -18,8 +18,8 @@ faces collées, taille, couches UV, matières, réglages de lumière (soleil, ci
 ## Règle 1 — recuire ciblé, avec ses impacts
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire                               # le recuit
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --recuire lishkat_hagazit,azara        # + ces concepts, qui doivent se cuire
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --recuire                               # le recuit
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --recuire lishkat_hagazit,azara        # + ces concepts, qui doivent se cuire
 ```
 
 `--recuire` recuit en lumière :
@@ -52,7 +52,7 @@ Les voisins ne sont recuits que sur un rang : le rebond du rebond reste. Après 
 retouches cumulées, ou avant une publication importante, recuire tout :
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_visite.py -- --lumiere tout      # ~1 h
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --lumiere tout      # ~1 h
 ```
 
 Première cuisson avec ce mécanisme : aucune carte n'a encore d'empreinte, `--recuire` recuit tout.

@@ -22,8 +22,8 @@ Trois cas à ne jamais confondre :
 1. **Ce que dit la source** — la michna, la guemara, le Rambam.
 2. **Ce que le projet a retenu** — `fiche_technique_beit_hamikdash.md`, qui arbitre
    les divergences pour le film.
-3. **Ce qui est réellement modélisé** — `blockout/` (un module par zone, lancé par
-   `beit_hamikdash_blockout.py`), la géométrie construite, qui peut avoir pris du retard
+3. **Ce qui est réellement modélisé** — `modele/blockout/` (un module par zone, lancé par
+   `modele/beit_hamikdash_blockout.py`), la géométrie construite, qui peut avoir pris du retard
    sur la fiche.
 
 Une réponse utile dit lequel des trois elle décrit. Quand ils divergent, le dire est
@@ -40,7 +40,7 @@ l'information principale.
    reconstitutions modernes (Machon HaMikdash, archéologie) avec leurs liens.
 
 Pour une question de géométrie construite, le skill `blender` ; pour ce qu'un cadre
-montre vraiment, `beit_hamikdash_inspect.py -- --voit <plan>`.
+montre vraiment, `modele/beit_hamikdash_inspect.py -- --voit <plan>`.
 
 ## Lire les sources
 

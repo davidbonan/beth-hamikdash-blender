@@ -9,11 +9,11 @@ Deux scripts, deux étapes du pipeline :
 
 | Script | Étape | Entrée | Sortie |
 |---|---|---|---|
-| `fal_image.py` | stylise une frame clé | `renders/blockout/` | `renders/style/` |
-| `fal_video.py` | relie deux frames en vidéo | `renders/style/` | `renders/video/` |
+| `fal_image.py` | stylise une frame clé | `render/blockout/` | `render/style/` |
+| `fal_video.py` | relie deux frames en vidéo | `render/style/` | `render/video/` |
 
 Les entrées viennent du skill **camera**, qui pose le plan et exporte
-`renders/blockout/<caméra>_{debut,fin}.png` et leurs `_profondeur.png`.
+`render/blockout/<caméra>_{debut,fin}.png` et leurs `_profondeur.png`.
 La plomberie commune — clé API, téléversement CDN, file d'attente — est dans
 `fal_commun.py`.
 
@@ -31,7 +31,7 @@ python3 .claude/skills/fal-video/fal_image.py --camera CAM_03_Heikhal --frame fi
 
 | Option | Défaut | Effet |
 |---|---|---|
-| `--camera` | requis | nom de la caméra, tel qu'il est dans `cameras.json` |
+| `--camera` | requis | nom de la caméra, tel qu'il est dans `modele/cameras.json` |
 | `--frame debut\|fin` | `debut` | quelle frame clé styliser |
 | `--prompt` | requis | ce que le cadre doit devenir — voir « Écrire le prompt » |
 | `--modele` | `gpt2` | voir la table ci-dessous |
@@ -165,7 +165,7 @@ quand la géométrie en imposait **14**, avec des maisons deux fois plus petites
 hommes debout devant elles. Le test qui tranche, avant d'accuser un modèle :
 
 ```bash
-$BLENDER -b beit_hamikdash.blend -P beit_hamikdash_inspect.py -- --foule <plan>
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_inspect.py -- --foule <plan>
 ```
 
 Mesuré sur ce plan large, sur 1 621 figures : **0 / 462** sur l'esplanade — le mur les
@@ -185,7 +185,7 @@ premier plan sont ressorties à 50 px pour 50 px prédits.
 
 ## Deux frames, une seule image, ou une coupe
 
-`beit_hamikdash_analyse_plans.py` mesure, pour chaque plan, la part de la frame de fin
+`modele/beit_hamikdash_analyse_plans.py` mesure, pour chaque plan, la part de la frame de fin
 **déjà visible au début** — ce qu'elle laisse de côté, le modèle doit l'inventer.
 Trois régimes, trois conduites :
 
@@ -193,7 +193,7 @@ Trois régimes, trois conduites :
 |---|---|
 | **100 % / caméra fixe** | **Une seule image + prompt de mouvement** (`--sans-fin`). Deux frames identiques ne donnent rien à interpoler ; le modèle comble en inventant une dérive. Ce qui bouge est dans les corps, la fumée, les tissus |
 | **couverture ≥ 40 %** | Deux frames. La frame de fin porte un contenu qu'on veut contrôler et qu'il ne faut pas laisser inventer |
-| **couverture < 40 %** | Le plan se coupe **dans Blender**, il ne se rattrape pas au prompt : deux caméras dans `cameras.json` au lieu d'une |
+| **couverture < 40 %** | Le plan se coupe **dans Blender**, il ne se rattrape pas au prompt : deux caméras dans `modele/cameras.json` au lieu d'une |
 
 Un travelling **avant** garde une couverture haute même quand plus une pierre n'est
 commune aux deux frames : l'image d'arrivée est l'agrandissement du centre de l'image
@@ -216,19 +216,19 @@ l'autre.
 
 ```bash
 # facteur = |C_debut - cible| / |C_fin - cible|, ici 1,1768
-ffmpeg -i renders/style/CAM_01_debut_….png -vf "scale=3239:1808,crop=2752:1536" \
-       renders/style/CAM_01_fin_derive.png
+ffmpeg -i render/style/CAM_01_debut_….png -vf "scale=3239:1808,crop=2752:1536" \
+       render/style/CAM_01_fin_derive.png
 ```
 
 Corollaire : un travelling qui ne change pas l'échelle d'au moins ~15 % ne se **voit**
-pas sur 8 s. Corriger la course dans `cameras.json`, pas au montage.
+pas sur 8 s. Corriger la course dans `modele/cameras.json`, pas au montage.
 
 ## Vidéo
 
 ```bash
 python3 .claude/skills/fal-video/fal_video.py --camera CAM_03_Heikhal --duree 8 \
-    --depart renders/style/CAM_03_Heikhal_debut_gpt2_c1.00_g3.5_seed30301.png \
-    --fin    renders/style/CAM_03_Heikhal_fin_gpt2_c1.00_g3.5_seed30301.png \
+    --depart render/style/CAM_03_Heikhal_debut_gpt2_c1.00_g3.5_seed30301.png \
+    --fin    render/style/CAM_03_Heikhal_fin_gpt2_c1.00_g3.5_seed30301.png \
     --prompt "the camera glides slowly forward down the hall; nothing else moves"
 ```
 
@@ -238,7 +238,7 @@ python3 .claude/skills/fal-video/fal_video.py --camera CAM_03_Heikhal --duree 8 
 | `--prompt` | requis | **le mouvement de caméra, et lui seul** |
 | `--modele` | `veo-lite` | voir la table ci-dessous |
 | `--duree N` | max du modèle | secondes générées |
-| `--depart` / `--fin` | `renders/blockout/<caméra>_{debut,fin}.png` | **pointer sur `renders/style/`** pour animer les frames stylisées |
+| `--depart` / `--fin` | `render/blockout/<caméra>_{debut,fin}.png` | **pointer sur `render/style/`** pour animer les frames stylisées |
 | `--negatif` | vide | pour les endpoints qui en prennent un |
 | `--sans-fin` | absent | n'impose aucune frame de fin (endpoints image-to-video seuls) |
 | `--seed N` | — | `veo*`, `seedance` |
