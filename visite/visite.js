@@ -745,7 +745,7 @@ window.__ombres = (actives) => {
   dessiner(0);
 };
 Object.defineProperty(window, "__figurants", { get: troupes.chargements });
-window.__moteur = { renderer, scene };
+window.__moteur = { renderer, scene, rendu };
 window.__sol = marche.solEn;
 window.__mur = (origine, direction, portee) => {
   const rayon = new THREE.Raycaster(new THREE.Vector3(...origine), new THREE.Vector3(...direction).normalize(), 0, portee);

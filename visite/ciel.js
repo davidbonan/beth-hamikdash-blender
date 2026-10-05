@@ -56,7 +56,7 @@ const AIR = { densite: 4e-3, epaisseur: 110, effacement: [3800, 5600], pres: 150
 
 const HALO_DU_SOLEIL = [1.00, 0.84, 0.58];
 const VU = { haut: 0x2f5fa6, bas: 0xa8c6e6, sol: 0xa89c86, ambiance: 1.0,
-             soleil: 2.2, etendue: 7e-5, horizon: 6.0, halo: HALO_DU_SOLEIL, etoiles: 0 };
+             soleil: 2.2, etendue: 7e-5, horizon: 6.0, halo: HALO_DU_SOLEIL, etoiles: 0, rayons: 1 };
 // Le dôme ÉCLAIRANT tient trois réglages que la scène ne sait pas calculer seule.
 //
 // `ambiance` pèse sur le dégradé et jamais sur le disque : c'est le rapport du soleil à
@@ -83,17 +83,17 @@ const ECLAIRANT = { haut: 0xb2aa9c, bas: 0xe0d9c9, sol: 0xcdc0a8, ambiance: 0.45
 // La nuit après le premier jour de Souccot (Soucca 5:2) : le 16 Tishri, la lune est pleine et
 // se lève à l'est au coucher du soleil. Elle prend donc la place du soleil du matin, disque compris.
 const VU_NUIT = { haut: 0x0a1222, bas: 0x1a2436, sol: 0x121212, ambiance: 1.0,
-                  soleil: 1.4, etendue: 7e-5, horizon: 6.0, halo: [0.05, 0.06, 0.08], etoiles: 0.8 };
+                  soleil: 1.4, etendue: 7e-5, horizon: 6.0, halo: [0.05, 0.06, 0.08], etoiles: 0.8, rayons: 0.25 };
 const ECLAIRANT_NUIT = { haut: 0x1e2636, bas: 0x262e3c, sol: 0x2a2620, ambiance: 0.45,
                          soleil: 0.25, etendue: 1.6e-3, horizon: 26.0, halo: [0.02, 0.02, 0.03], etoiles: 0 };
 // Avant l'aube d'un jour quelconque : sans lune, la phase n'en étant pas connue.
 const VU_AVANT_L_AUBE = { haut: 0x04070e, bas: 0x0a101c, sol: 0x0a0a0a, ambiance: 1.0,
-                          soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0, 0, 0], etoiles: 1.0 };
+                          soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0, 0, 0], etoiles: 1.0, rayons: 0 };
 const ECLAIRANT_AVANT_L_AUBE = { haut: 0x0e121a, bas: 0x12161e, sol: 0x14120e, ambiance: 0.45,
                                  soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0, 0, 0], etoiles: 0 };
 // « הֵאִיר פְּנֵי כָל הַמִּזְרָח » (Tamid 3:2) : l'est s'éclaire, le soleil n'est pas levé.
 const VU_AUBE = { haut: 0x1c2a44, bas: 0x6e7688, sol: 0x2a2826, ambiance: 1.0,
-                  soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0.55, 0.36, 0.20], etoiles: 0.15 };
+                  soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0.55, 0.36, 0.20], etoiles: 0.15, rayons: 0 };
 const ECLAIRANT_AUBE = { haut: 0x3a4152, bas: 0x565c68, sol: 0x4a463e, ambiance: 0.45,
                          soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0.30, 0.20, 0.12], etoiles: 0 };
 // Au chant du coq du 16 Tishri (Soucca 5:4), la même lune pleine se couche à l'ouest.
@@ -127,6 +127,7 @@ const DEGRADE = /* glsl */`
 
 export const astreDu = (moment) => CIELS[moment].astre ?? SOLEIL;
 export const lumieresDu = (moment) => CIELS[moment].lumieres;
+export const rayonsDu = (moment) => CIELS[moment].vu.rayons;
 
 function dome(rayon, teintes, astre = SOLEIL) {
   return new THREE.Mesh(

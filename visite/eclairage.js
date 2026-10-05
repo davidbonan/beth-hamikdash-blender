@@ -1,6 +1,6 @@
 // L'éclairage : les lampes du Temple, l'astre qui suit le visiteur, et le moment du jour qu'un parcours demande.
 import * as THREE from "three";
-import { astreDu, environnement, lumieresDu, peindreDome, teinterAir } from "./ciel.js";
+import { astreDu, environnement, rayonsDu, lumieresDu, peindreDome, teinterAir } from "./ciel.js";
 import { laisserPeindre } from "./fil.js";
 import { TEMPS_FLAMME, flamme } from "./flamme.js";
 import { assombrir, eclairerLaSalle } from "./matieres.js";
@@ -215,6 +215,10 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     });
   }
 
+  function eclairerLAirAu(voulu) {
+    rendu.eclairerLAir(astreDu(voulu), lumieresDu(voulu).astre.couleur, rayonsDu(voulu));
+  }
+
   function eclairerAu(voulu) {
     const quitte = moment;
     moment = voulu;
@@ -227,6 +231,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     appoint.intensity = lumieres.appoint;
     cielAmbiant.intensity = lumieres.ciel;
     peindreDome(ciel, voulu);
+    eclairerLAirAu(voulu);
     teinterAir(brume, voulu);
     reflets[voulu] ??= environnement(renderer, voulu);
     scene.environment = reflets[voulu].texture;
@@ -295,6 +300,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     scene.environment = reflets[moment].texture;
   }
 
+  eclairerLAirAu(moment);
   allumerMenora(reperes.flammes);
   allumerLesLueurs(reperes.lueurs);
   eclairerKodeshHakodashim(reperes.arche, reperes.braises);

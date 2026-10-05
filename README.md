@@ -114,7 +114,7 @@ Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `vi
 | `visite/nappes.js` | Les cinq jeux de scans, chargés en 1024 sur toutes les machines. |
 | `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `modele/beit_hamikdash_nappes.py`, `modele/beit_hamikdash_parokhet.py` et `modele/beit_hamikdash_gravures.py` les refabriquent. |
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. |
-| `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, anti-crénelage, étalonnage. |
+| `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, rayons de l'astre dans l'air des cours (marchés dans la carte d'ombre lointaine), anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur ; la carte lointaine du Har HaBayit, tracée une fois. |
 | `visite/occlusion.js` | Charge les cartes cuites : la lumière indirecte, posée en `lightMap`, et l'occlusion, en `aoMap`. |
 | `visite/adaptation.js` | L'œil qui s'habitue : l'exposition monte à mesure que le ciel se ferme autour du visiteur. |

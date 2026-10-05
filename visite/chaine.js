@@ -1,9 +1,9 @@
 /**
  * La chaîne d'image : ce qui est fait de la scène après qu'elle est rendue.
  *
- * Trois choses, dans cet ordre. L'OCCLUSION ambiante, qui pose les volumes. Le HALO,
- * qui fait déborder les hautes lumières. L'ADOUCISSEMENT des arêtes, qui vient en
- * dernier parce qu'il travaille sur l'image finie.
+ * Quatre choses, dans cet ordre. L'OCCLUSION ambiante, qui pose les volumes. Le HALO,
+ * qui fait déborder les hautes lumières. Les RAYONS, la lumière de l'astre dans l'air.
+ * L'ADOUCISSEMENT des arêtes, qui vient en dernier parce qu'il travaille sur l'image finie.
  *
  * L'anti-crénelage est ici et pas sur le moteur. `antialias: true` sur le
  * WebGLRenderer ne vaut que pour le tampon d'écran, dans lequel cette chaîne n'écrit
@@ -26,6 +26,8 @@
  * cible flottante : ce qu'on y lit ne dépend d'aucun réglage du moteur.
  */
 import * as THREE from "three";
+import { EXPOSITION_DEHORS } from "./matieres.js";
+import { OMBRE_LOINTAINE } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -323,6 +325,75 @@ const VOILE = {
     }`,
 };
 
+// Les RAYONS : la lumière de l'astre que l'air diffuse vers l'œil, là où la carte d'ombre lointaine dit que l'astre l'atteint.
+// Chaque pixel marche de l'œil à ce qu'il voit ; ce que le Temple met à l'ombre reste sombre dans l'air, et les faisceaux sont ce qui passe entre.
+// Au-delà, l'air éclairé de toute l'esplanade noyait l'ombre d'une colonne : les faisceaux se jouent près de l'œil.
+const PORTEE_RAYONS = 50;
+const PLAFOND_RAYONS = 0.45;
+// La poussière des cours tient au sol : entière jusqu'au dallage de l'Azara, elle a perdu les deux tiers de sa densité dix mètres plus haut.
+const SOL_DE_L_AIR = 0, EPAISSEUR_DE_L_AIR = 10;
+const BIAIS_RAYONS = 0.4 / 700;
+const RAYONS = {
+  uniforms: { tGeo: { value: null }, uCarteLointaine: { value: null }, uOmbreLointaine: { value: new THREE.Matrix4() },
+              uMonde: { value: new THREE.Matrix4() }, uVersLAstre: { value: new THREE.Vector3() },
+              uTanFov: { value: 0 }, uAspect: { value: 1 }, uDensite: { value: 0 } },
+  vertexShader: OCCLUSION.vertexShader,
+  fragmentShader: /* glsl */`
+    #include <packing>
+    uniform sampler2D tGeo, uCarteLointaine;
+    uniform mat4 uOmbreLointaine, uMonde;
+    uniform vec3 uVersLAstre;
+    uniform float uTanFov, uAspect, uDensite;
+    varying vec2 vUv;
+
+    // Hors de la carte, rien ne porte d'ombre : l'air y est au soleil.
+    float auSoleil(vec3 p){
+      vec3 coord = (uOmbreLointaine * vec4(p, 1.0)).xyz;
+      if (any(lessThan(coord, vec3(0.0))) || any(greaterThan(coord, vec3(1.0)))) return 1.0;
+      return step(coord.z - ${BIAIS_RAYONS.toFixed(6)}, unpackRGBAToDepth(texture2D(uCarteLointaine, coord.xy)));
+    }
+
+    void main(){
+      float z = texture2D(tGeo, vUv).a;
+      vec3 dirVue = normalize(vec3((vUv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0), -1.0));
+      vec3 o = uMonde[3].xyz;
+      vec3 d = normalize(mat3(uMonde) * dirVue);
+      float portee = min(z > 0.0 ? z / max(-dirVue.z, 1e-3) : ${PORTEE_RAYONS}.0, ${PORTEE_RAYONS}.0);
+      float pas = portee / ${PROFIL.rayons.prises}.0;
+      // Le départ décalé d'un pixel à l'autre : sans lui les pas se lisent en strates.
+      float depart = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+      float eclaire = 0.0;
+      for (int i = 0; i < ${PROFIL.rayons.prises}; i++) {
+        vec3 p = o + d * pas * (float(i) + depart);
+        eclaire += auSoleil(p) * exp(-max(p.y - ${SOL_DE_L_AIR.toFixed(1)}, 0.0) / ${EPAISSEUR_DE_L_AIR}.0);
+      }
+      // L'air diffuse vers l'avant : à contre-jour un faisceau brille, dos à l'astre il s'éteint.
+      const float g = 0.5;
+      float phase = (1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * dot(d, uVersLAstre), 1.5);
+      // L'air qui diffuse s'épaissit sans jamais dépasser ce plafond : face à l'astre, l'esplanade virait au blanc.
+      gl_FragColor = vec4(vec3(${PLAFOND_RAYONS} * (1.0 - exp(-uDensite * phase * eclaire * pas / ${PLAFOND_RAYONS}))), 1.0);
+    }`,
+};
+
+// Agrandis deux fois, les départs décalés des rayons se liraient en trame : neuf prises les fondent.
+const AIR_ECLAIRE = {
+  uniforms: { tDiffuse: { value: null }, tRayons: { value: null }, uPas: { value: new THREE.Vector2() }, uTeinte: { value: new THREE.Color() },
+              uRetenue: { value: 1 } },
+  vertexShader: OCCLUSION.vertexShader,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse, tRayons;
+    uniform vec2 uPas;
+    uniform vec3 uTeinte;
+    uniform float uRetenue;
+    varying vec2 vUv;
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      float rayons = 0.0;
+      for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) rayons += texture2D(tRayons, vUv + uPas * 1.5 * vec2(i, j)).r;
+      gl_FragColor = vec4(c.rgb + uTeinte * uRetenue * rayons / 9.0, c.a);
+    }`,
+};
+
 // L'ÉTALONNAGE, en toute fin : bascule de teinte, vignettage, grain.
 //
 // Il travaille sur l'image AFFICHÉE, pas sur le linéaire : c'est le geste d'un
@@ -503,6 +574,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
   const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
   const cibleFumee = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
+  const cibleRayons = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
 
   const teinteFond = new THREE.Color();
   const composeur = new EffectComposer(renderer,
@@ -537,6 +609,14 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const halo = PROFIL.halo && new UnrealBloomPass(
     new THREE.Vector2(1, 1), PROFIL.halo.force, PROFIL.halo.rayon, PROFIL.halo.seuil);
   if (halo) composeur.addPass(halo);
+  // Après le halo : les faisceaux sont déjà de la lumière diffusée, il les étalerait une seconde fois.
+  const rayons = new ShaderPass(RAYONS);
+  rayons.uniforms.tGeo.value = cibleGeo.texture;
+  rayons.uniforms.uCarteLointaine.value = OMBRE_LOINTAINE.uCarteLointaine.value;
+  const airEclaire = new ShaderPass(AIR_ECLAIRE);
+  airEclaire.uniforms.tRayons.value = cibleRayons.texture;
+  airEclaire.enabled = false;
+  composeur.addPass(airEclaire);
   composeur.addPass(new OutputPass());
 
   // Après la sortie, et pas avant : le FXAA cherche ses arêtes sur la luminance
@@ -566,6 +646,25 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     passeAO.uniforms.uAspect.value = camera.aspect;
     fumee.uniforms.uTanFov.value = passeAO.uniforms.uTanFov.value;
     fumee.uniforms.uAspect.value = camera.aspect;
+    cibleRayons.setSize(cibleGeo.width, cibleGeo.height);
+    airEclaire.uniforms.uPas.value.set(1 / cibleRayons.width, 1 / cibleRayons.height);
+    rayons.uniforms.uTanFov.value = passeAO.uniforms.uTanFov.value;
+    rayons.uniforms.uAspect.value = camera.aspect;
+  }
+
+  function eclairerLAir(versLAstre, teinte, eclat) {
+    airEclaire.enabled = eclat > 0;
+    airEclaire.uniforms.uTeinte.value.set(teinte);
+    rayons.uniforms.uVersLAstre.value.copy(versLAstre);
+    rayons.uniforms.uDensite.value = PROFIL.rayons.densite * eclat;
+  }
+
+  // Sous un toit l'œil ouvre : sans retenue, l'air du dehors y brûlait jusqu'au blanc.
+  function rendreLesRayons() {
+    airEclaire.uniforms.uRetenue.value = EXPOSITION_DEHORS / renderer.toneMappingExposure;
+    rayons.uniforms.uMonde.value.copy(camera.matrixWorld);
+    rayons.uniforms.uOmbreLointaine.value.copy(OMBRE_LOINTAINE.uOmbreLointaine.value);
+    rayons.render(renderer, cibleRayons, null, 0, false);
   }
 
   /** La pièce enfumée (Box3, en mètres), le point d'où monte la fumée et celui qui l'éclaire
@@ -631,6 +730,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
     passeAO.render(renderer, cibleAO, null, 0, false);
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
+    if (airEclaire.enabled) rendreLesRayons();
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
     scene.matrixWorldAutoUpdate = false;
@@ -673,5 +773,5 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     }
   }
 
-  return { rendre, redimensionner, enfumer, compiler, get luminance() { return photometre.luminance; } };
+  return { rendre, redimensionner, enfumer, eclairerLAir, compiler, get luminance() { return photometre.luminance; } };
 }
