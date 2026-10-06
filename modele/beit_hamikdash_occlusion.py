@@ -60,6 +60,8 @@ LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 150.0, "hauteur": 0.35},
           "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},
           "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0},
           "lueurs": {"couleur": 0xFFD8A0, "intensite": 4.0, "hauteur": 0.0, "une_par_point": True}}
+# Les lampes d'une salle, sous le concept dont elles signent la carte : les régler ne recuit que lui et ses voisins.
+LAMPES_DE_SALLE = {"arche_wilson": {"couleur": 0xFFE2B8, "intensite": 24.0, "hauteur": 0.0, "une_par_point": True}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
 ECHANTILLONS_REBONDS = 1024
@@ -281,7 +283,7 @@ def poser_lampes(scene, points):
     for nature, positions in points.items():
         if not positions:
             continue
-        reglage = LAMPES[nature]
+        reglage = (LAMPES | LAMPES_DE_SALLE)[nature]
         for x, y, z in positions if reglage.get("une_par_point") else [np.mean(positions, axis=0)]:
             lampe = bpy.data.lights.new(nature, "POINT")
             lampe.energy = 4 * math.pi * reglage["intensite"]
@@ -402,11 +404,27 @@ def application_du_plan(maillage, uv, face):
 TEXEL_ILE_MIN = 1.0
 
 
+def poser_sur_la_plus_proche(maillage, uv, orphelines, est_large):
+    """Pose chaque île de `orphelines` (ses faces) au centre UV de la plus proche des faces que `est_large` retient."""
+    larges = [face for face in maillage.polygons if est_large(face.index)]
+    if not larges:
+        return
+    arbre = BVHTree.FromPolygons([sommet.co for sommet in maillage.vertices], [tuple(face.vertices) for face in larges])
+    for faces in orphelines:
+        centre = sum((maillage.polygons[i].center for i in faces), Vector()) / len(faces)
+        hote = larges[arbre.find_nearest(centre)[2]]
+        pose = sum((uv[boucle].uv for boucle in hote.loop_indices), Vector((0.0, 0.0))) / hote.loop_total
+        for i in faces:
+            for boucle in maillage.polygons[i].loop_indices:
+                uv[boucle].uv = pose
+
+
 def rabattre_les_minuscules(obj, taille):
     """Rabat sur leur voisine les îles que le dépliage laisse sous le texel.
 
     Une île en découvre une autre : le flanc d'une taille ne touche que son chanfrein, qui
     est minuscule lui aussi, et ne trouve le fond qu'une fois le chanfrein rabattu dessus.
+    Celle qui ne touche rien de large — le montant d'un accoudoir, boîte à part — lit la face large la plus proche.
     """
     maillage = obj.data
     uv = maillage.uv_layers.active.data
@@ -439,9 +457,9 @@ def rabattre_les_minuscules(obj, taille):
                 ile_de[i] = accueil
                 faces_de[accueil].append(i)
         if len(restent) == len(minuscules):
-            return len(restent)
+            poser_sur_la_plus_proche(maillage, uv, [faces_de[ile] for ile in restent], lambda i: aires[ile_de[i]] >= TEXEL_ILE_MIN)
+            return
         minuscules = restent
-    return 0
 
 
 # Plus étroite, une île longue n'a parfois aucun centre de texel dedans : les facettes d'un fût cannelé cuisaient noires.
@@ -627,19 +645,23 @@ def reglages_de_la_lumiere(lampes):
     """Ce qui fait la lumière de toutes les cartes à la fois : le changer les invalide toutes."""
     return repr((TEXEL, TAILLE, LARGEUR_ILE_MIN, ECHANTILLONS, PORTEE, PORTEE_SOUS_SONDE, SOLEIL[:], SOLEIL_COULEUR, SOLEIL_FORCE,
                  DIAMETRE_SOLEIL, CIEL, DIFFUS, SATURATION_CIEL, LAMPES, ALBEDO_VISITE, ECHANTILLONS_REBONDS,
-                 SEUIL_REBONDS, BORNE_INDIRECTE, lampes))
+                 SEUIL_REBONDS, BORNE_INDIRECTE, {nature: lampes[nature] for nature in LAMPES}))
 
 
-def reglages_du_concept(ident, reglages):
+def reglages_du_concept(ident, reglages, lampes):
     """Les réglages de toutes les cartes, et ce que le concept a en propre : le changer ne recuit que lui."""
-    return f"{reglages} seuil={SEUIL_DE[ident]}" if ident in SEUIL_DE else reglages
+    if ident in SEUIL_DE:
+        reglages += f" seuil={SEUIL_DE[ident]}"
+    if ident in LAMPES_DE_SALLE:
+        reglages += f" lampes={LAMPES_DE_SALLE[ident]} {lampes[ident]}"
+    return reglages
 
 
 def cuire_occlusion(choisis, chantier, eclaires=frozenset(), lampes=None, gardees=None):
     """Cuit les concepts de `retenus`, faces collées séparées, dans `chantier`, en lumière indirecte ceux d'`eclaires` (TOUS pour tous) et en occlusion les autres.
 
     `gardees` ({"occlusion": {...}, "lumiere": {...}} d'un reperes.json) garde ces cartes-là au lieu de les recuire.
-    `lampes` : {"flammes": [...], "arche": [...], "braises": [...], "lueurs": [...]}, positions en repère three, dont le rebond se cuit aussi.
+    `lampes` : {"flammes": [...], "arche": [...], "braises": [...], "lueurs": [...], "arche_wilson": [...]}, positions en repère three par nature de LAMPES et de LAMPES_DE_SALLE, dont le rebond se cuit aussi.
     Renvoie ({concept: {"carte", "canal", "secondes"}}, {concept: {"carte", "canal", "echelle", "secondes"}}) pour reperes.json."""
     if TOUS in eclaires:
         eclaires = {ident for ident, _, _ in choisis}

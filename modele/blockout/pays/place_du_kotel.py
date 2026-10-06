@@ -2,13 +2,14 @@ import math
 from typing import NamedTuple
 from mathutils import Vector, geometry
 
-from ..primitives.parametres import AMA, Z_HAR
+from ..primitives.parametres import AMA, Z_HAR, m
 from ..primitives.noeuds import material
 from ..primitives.matieres import (MAT_ACIER_BLANC, MAT_BOIS_DU_PONT, MAT_BORNE_INCENDIE, MAT_BRONZE, MAT_CHENE,
                                    MAT_DALLAGE_DE_PRIERE, MAT_DALLAGE_KOTEL, MAT_FER_BRUN, MAT_INOX, MAT_MEHITSA,
                                    MAT_MURAILLE, MAT_OR, MAT_PIERRE, MAT_PIERRE_DE_JERUSALEM, MAT_PLASTIQUE,
-                                   MAT_PORTIQUE, MAT_RELIURES, MAT_SOL, MAT_TOILE, MAT_TOLE, MAT_VITRE)
-from ..primitives.volumes import FACES_BOITE, _cercle, alea, mesh_from_pydata, plage, revolution
+                                   MAT_PORTIQUE, MAT_RELIURES, MAT_SOL, MAT_TOILE, MAT_TOLE, MAT_VERRE_DE_SUSPENSION,
+                                   MAT_VITRE)
+from ..primitives.volumes import FACES_BOITE, _cercle, alea, empty, lampe, mesh_from_pydata, plage, revolution
 from .calage import (CLE_WILSON, CONTREMARCHE, CUVETTE_KOTEL, ESCALIER_PLACE, GARDE_CORPS, HARAM, KOTEL, LARGEUR_ESCALIER,
                      LARGEUR_PONT, MAILLE_PAYS, PARAPET_DE_PRIERE, PAYS_DONNEES, PLACE_KOTEL, PONT_MAGHREBINS,
                      PORTEE_WILSON, SALLES_WILSON, Z_HAUT_ESCALIER, Z_PLACE_HAUTE, Z_PLACE_KOTEL,
@@ -47,6 +48,7 @@ def place_du_kotel():
     salles_de_wilson()
     escalier_de_la_place()
     interieur_de_wilson()
+    suspensions_de_wilson()
     muret_de_priere()
     mobilier_de_la_place()
     arret_de_bus()
@@ -574,6 +576,36 @@ def interieur_de_wilson():
                 chaises += _chaise(p, vers_kotel + 0.4 * (alea(nom, 2) - 0.5), z)
     _poser("Wilson_chaises", chaises, MAT_PLASTIQUE())
     _poser("Wilson_tables", tables, MAT_PLASTIQUE())
+
+
+SUSPENSIONS_DE_WILSON = 4
+
+
+def suspensions_de_wilson():
+    """Les lanternes pendues sous la clé : la visite les allume, la cuisson en prend le rebond. Nombre, forme et place : CHOIX."""
+    _, u, _, longueur, _ = WILSON
+    fond, axe = longueur - 1, PORTEE_WILSON / 2
+    travee = fond / SUSPENSIONS_DE_WILSON
+    verre, coiffe = Z_PLACE_KOTEL + 4.2 / AMA, Z_PLACE_KOTEL + 4.6 / AMA
+    ferrures, verres = [], []
+    for k in range(SUSPENSIONS_DE_WILSON):
+        centre = _point_de_wilson(travee * (k + 0.5), axe)
+        ferrures += [_fut(centre, coiffe, coiffe + 0.05 / AMA, 0.2 / AMA),
+                     _fut(centre, coiffe + 0.05 / AMA, _sous_la_voute(axe), 0.012 / AMA, 4)]
+        verres.append(_fut(centre, verre, coiffe, 0.16 / AMA))
+        lueur = lampe(f"Wilson_lueur_{k}", 'POINT', (m(centre[0]), m(centre[1]), m(verre - 0.1 / AMA)))
+        lueur.data.energy = 300.0
+        lueur.data.color = (1.0, 0.87, 0.69)
+        lueur.data.shadow_soft_size = m(0.16 / AMA)
+    _poser("Wilson_suspensions", ferrures, MAT_FER_BRUN())
+    _poser("Wilson_suspensions_verres", verres, MAT_VERRE_DE_SUSPENSION())
+    # La boîte que ces lueurs éclairent dans la visite : la salle, du seuil au fond, tournée comme elle.
+    marge = 0.2 / AMA
+    salle = empty("Wilson_salle", *_point_de_wilson(fond / 2, axe), Z_PLACE_KOTEL + CLE_WILSON / 2, "00_HarHabayit")
+    salle.empty_display_type = 'CUBE'
+    salle.empty_display_size = 1.0
+    salle.rotation_euler.z = math.atan2(u[1], u[0])
+    salle.scale = (m(fond / 2 + marge), m(PORTEE_WILSON / 2 + marge), m(CLE_WILSON / 2 + marge))
 
 
 def _ligne(trace, hauteur, epaisseur):

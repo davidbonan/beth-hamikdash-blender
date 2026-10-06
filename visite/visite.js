@@ -21,7 +21,7 @@ import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
 import { AMA, OEIL, marcheur } from "./marche.js";
-import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte } from "./langue.js";
+import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte, titrer } from "./langue.js";
 import { veillerAuxPannes } from "./pannes.js";
 import { laisserPeindre, rendreLaMain } from "./fil.js";
 import { TROUPES, TROUPE_LIBRE, troupesDeFigurants } from "./figurants.js";
@@ -422,6 +422,21 @@ async function annoncerAttente(travail) {
   }
 }
 
+const boutonMoment = $("#moment");
+function afficherMoment() {
+  const faitNuit = eclairage.moment !== "jour";
+  boutonMoment.setAttribute("aria-pressed", String(faitNuit));
+  boutonMoment.querySelector("use").setAttribute("href", faitNuit ? "#icone-soleil" : "#icone-lune");
+  titrer(boutonMoment, faitNuit ? "moment_jour" : "moment_nuit");
+}
+
+async function passerAuMoment(voulu) {
+  if (voulu === eclairage.moment) return;
+  await fondu(() => eclairage.passerAu(voulu));
+  afficherMoment();
+}
+boutonMoment.onclick = (e) => { passerAuMoment(eclairage.moment === "jour" ? "nuit" : "jour"); e.currentTarget.blur(); };
+
 const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
 
 function remplirAller() {
@@ -589,10 +604,7 @@ const guides = parcours({
     marche.poser(pieds);
     marche.orienterVers(cible);
   }),
-  changerDeMoment: (voulu) => {
-    if (voulu === eclairage.moment) return;
-    fondu(() => eclairage.passerAu(voulu));
-  },
+  changerDeMoment: passerAuMoment,
   changerDeTroupe: (voulue = TROUPE_LIBRE) => {
     if (troupes.demander(voulue)) fondu(() => troupes.presenter(voulue));
   },

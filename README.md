@@ -92,7 +92,7 @@ Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `vi
 | `visite/index.html` | La page. Aucune dépendance locale : three.js est chargé depuis un CDN. |
 | `visite/visite.js` | Le chef d'orchestre : la scène, le chargement du Temple et l'habillage de ses matières, la barre, la boucle d'image, et ce qui relie les modules ci-dessous. |
 | `visite/marche.js` | Le marcheur : ses pieds sur le dallage, ses collisions, son vol libre, et la tête qu'il tourne. |
-| `visite/eclairage.js` | Les lampes du Temple — Menora, Arche, braises, feu de l'autel, mâts de la Shoéva —, l'astre dont l'ombre suit le visiteur, et le passage d'un moment du jour à l'autre. |
+| `visite/eclairage.js` | Les lampes du Temple — Menora, Arche, braises, feu de l'autel, mâts de la Shoéva —, les lueurs des salles closes (Lishkat HaGazit, arche de Wilson), l'astre dont l'ombre suit le visiteur, et le passage d'un moment du jour à l'autre : celui qu'un parcours demande, ou, en visite libre, le bouton jour / nuit de la barre. |
 | `visite/figurants.js` | Les figurants, en troupes : celle de la visite libre et celle de chaque parcours, chargées à la demande, montrées station par station, libérées en partant. |
 | `visite/vues.js` | Où poser le visiteur, et vers quoi le tourner, pour une entrée, une vue de `reperes.json` ou un élément. |
 | `visite/designation.js` | Ce que le curseur ou le doigt vise dans la scène, et l'élément que l'initiation montre du doigt. |

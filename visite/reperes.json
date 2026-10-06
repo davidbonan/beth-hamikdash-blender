@@ -1866,38 +1866,88 @@
     ]
   ],
   "lueurs": {
-    "points": [
-      [
-        -67.2959976196289,
-        3.0480000972747803,
-        -38.15999984741211
+    "lishkat_hagazit": {
+      "points": [
+        [
+          -67.2959976196289,
+          3.0480000972747803,
+          -38.15999984741211
+        ],
+        [
+          -67.2959976196289,
+          3.0480000972747803,
+          -30.239999771118164
+        ],
+        [
+          -74.78399658203125,
+          3.0480000972747803,
+          -38.15999984741211
+        ],
+        [
+          -74.78399658203125,
+          3.0480000972747803,
+          -30.239999771118164
+        ]
       ],
-      [
-        -67.2959976196289,
-        3.0480000972747803,
-        -30.239999771118164
-      ],
-      [
-        -74.78399658203125,
-        3.0480000972747803,
-        -38.15999984741211
-      ],
-      [
-        -74.78399658203125,
-        3.0480000972747803,
-        -30.239999771118164
+      "salle": [
+        0.25100404024124146,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.15664160251617432,
+        0.0,
+        0.0,
+        -0.1627604067325592,
+        0.0,
+        0.0,
+        17.83132553100586,
+        -5.468749523162842,
+        -0.9774435758590698,
+        1.0
       ]
-    ],
-    "salle": {
-      "min": [
-        -75.02400207519531,
-        -0.14400005340576172,
-        -39.74399948120117
+    },
+    "arche_wilson": {
+      "points": [
+        [
+          -179.56155395507812,
+          -20.65999984741211,
+          113.91120910644531
+        ],
+        [
+          -180.88088989257812,
+          -20.65999984741211,
+          107.20145416259766
+        ],
+        [
+          -182.2002410888672,
+          -20.65999984741211,
+          100.49169921875
+        ],
+        [
+          -183.51959228515625,
+          -20.65999984741211,
+          93.78194427490234
+        ]
       ],
-      "max": [
-        -67.05599975585938,
-        12.62399959564209,
-        -27.455997467041016
+      "salle": [
+        -0.013903875835239887,
+        -0.14644941687583923,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.307692289352417,
+        0.0,
+        -0.07071040570735931,
+        0.02879653498530388,
+        0.0,
+        0.0,
+        4.818915367126465,
+        -29.576932907104492,
+        6.679999351501465,
+        1.0
       ]
     }
   },
@@ -2175,12 +2225,6 @@
       "echelle": 1.75,
       "secondes": 16
     },
-    "arche_wilson": {
-      "carte": "lumiere/arche_wilson.webp",
-      "canal": 0,
-      "echelle": 1.5,
-      "secondes": 12
-    },
     "azara": {
       "carte": "lumiere/azara.webp",
       "canal": 0,
@@ -2223,12 +2267,6 @@
       "echelle": 2.25,
       "secondes": 5
     },
-    "esplanade_herode": {
-      "carte": "lumiere/esplanade_herode.webp",
-      "canal": 0,
-      "echelle": 1.75,
-      "secondes": 132
-    },
     "ezrat_nashim": {
       "carte": "lumiere/ezrat_nashim.webp",
       "canal": 0,
@@ -2240,12 +2278,6 @@
       "canal": 0,
       "echelle": 1.75,
       "secondes": 58
-    },
-    "kotel": {
-      "carte": "lumiere/kotel.webp",
-      "canal": 0,
-      "echelle": 1.5,
-      "secondes": 22
     },
     "lishkat_haetz": {
       "carte": "lumiere/lishkat_haetz.webp",
@@ -2294,12 +2326,6 @@
       "canal": 0,
       "echelle": 2.0,
       "secondes": 298
-    },
-    "place_kotel": {
-      "carte": "lumiere/place_kotel.webp",
-      "canal": 0,
-      "echelle": 2.25,
-      "secondes": 74
     },
     "pont_maghrebins": {
       "carte": "lumiere/pont_maghrebins.webp",
@@ -2384,12 +2410,36 @@
       "canal": 0,
       "echelle": 2.5,
       "secondes": 5
+    },
+    "arche_wilson": {
+      "carte": "lumiere/arche_wilson.webp",
+      "canal": 0,
+      "echelle": 2.0,
+      "secondes": 24
+    },
+    "esplanade_herode": {
+      "carte": "lumiere/esplanade_herode.webp",
+      "canal": 0,
+      "echelle": 1.75,
+      "secondes": 128
+    },
+    "kotel": {
+      "carte": "lumiere/kotel.webp",
+      "canal": 0,
+      "echelle": 1.5,
+      "secondes": 20
+    },
+    "place_kotel": {
+      "carte": "lumiere/place_kotel.webp",
+      "canal": 0,
+      "echelle": 2.25,
+      "secondes": 75
     }
   },
   "empreintes": {
     "_non_classe": "d13cb8baa381810ca04795c346acad0eecc7807f",
     "aliyah": "b46b5e7cb43d4ee79c286dfbbc8994d90145c849",
-    "arche_wilson": "b8665a699a4c1f5ff828083b3bcaf86486209f42",
+    "arche_wilson": "2c72cacb3b4004dbfe7de723c2aa98d7bb52b792",
     "aron": "aec0e8eeda366131f5a47d92a9bfcf586763ccdf",
     "azara": "163fd041963eba7c4356b913722dca26fdd66547",
     "batiment": "7b6b983e67197256be65fc745184f0c5a71a1981",

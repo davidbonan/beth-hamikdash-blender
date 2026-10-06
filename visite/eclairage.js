@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { astreDu, environnement, rayonsDu, lumieresDu, peindreDome, teinterAir } from "./ciel.js";
 import { laisserPeindre } from "./fil.js";
 import { TEMPS_FLAMME, flamme } from "./flamme.js";
-import { assombrir, eclairerLaSalle } from "./matieres.js";
+import { VERRE_ALLUME, assombrir, eclairerLaSalle } from "./matieres.js";
 import { FINESSE_LOINTAINE, cadrerLesOmbres, tracerOmbreLointaine } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 
@@ -25,9 +25,13 @@ const BRAISE = { couleur: 0xff7a2a, intensite: 6, portee: 8, carte: 512 };
 const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteur: 3.0 };
 // L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
 const MENORA = { couleur: 0xffe1aa, intensite: 150, portee: 18, carte: 512 };
-// Les lampes de terre de la Lishkat HaGazit, une lueur par mèche : sans elles, la salle n'avait que sa
-// lumière cuite, qui n'a pas de direction, et la pierre comme les gradins y rendaient à plat.
-const LUEUR_GAZIT = { couleur: 0xffd8a0, intensite: 4 };
+// Les lueurs d'une salle, par concept. Les lampes de terre de la Lishkat HaGazit, une par mèche : sans elles,
+// la salle n'avait que sa lumière cuite, qui n'a pas de direction, et la pierre comme les gradins y rendaient à plat.
+// Les suspensions de l'arche de Wilson sont électriques : elles ne vacillent pas.
+const LUEURS_DE = {
+  lishkat_hagazit: { couleur: 0xffd8a0, intensite: 4, vacille: true },
+  arche_wilson: { couleur: 0xffe2b8, intensite: 24 },
+};
 // Les mâts d'or de l'Ezrat Nashim, qui ne brûlent que la nuit de Sim'hat Beit HaSho'éva (Soucca 5:2).
 const SHOEVA = { couleur: 0xffc58a, intensite: 600, portee: 200, carte: 1024 };
 const HAUTEUR_FLAMME_SHOEVA = 1.2;
@@ -35,7 +39,7 @@ const HAUTEUR_FLAMME_SHOEVA = 1.2;
 const LUEUR = { couleur: 0xffa860, intensite: 40, portee: 16, hauteur: 1.5 };   // m : des mèches de caleçons et de ceintures de cohanim (Soucca 5:3)
 // Les projecteurs de la place du Kotel d'aujourd'hui, sans ombre : une carte par lampe prendrait une unité de texture à tous les nuanceurs.
 const PROJECTEUR = { couleur: 0xffe0b0, intensite: 800, portee: 110 };
-const VERRE_ALLUME = { matiere: "Verre_de_lampe", couleur: 0xffe6c0, eclat: 6 };
+const VERRE_DE_PROJECTEUR = "Verre_de_lampe";
 
 // De proche en proche : deux points à moins de `pas` l'un de l'autre sont du même groupe.
 function centresDesGroupes(points, pas) {
@@ -112,8 +116,8 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
       l.intensity = eclat * (0.93 + 0.04 * Math.sin(t * 7.3 + i) + 0.03 * Math.sin(t * 17.9 + i * 2.1));
     });
     if (shoeva?.lueur) shoeva.lueur.intensity = eclat ? LUEUR.intensite * (0.9 + 0.1 * Math.sin(t * 11.3)) : 0;
-    lueursGazit.forEach((l, i) => {
-      l.w = LUEUR_GAZIT.intensite * (0.94 + 0.04 * Math.sin(t * 8.3 + i * 1.7) + 0.02 * Math.sin(t * 19.1 + i));
+    meches.forEach(({ lueur, intensite }, i) => {
+      lueur.w = intensite * (0.94 + 0.04 * Math.sin(t * 8.3 + i * 1.7) + 0.02 * Math.sin(t * 19.1 + i));
     });
     if (lumiereMenora) {
       lumiereMenora.intensity = MENORA.intensite * (0.95 + 0.03 * Math.sin(t * 9.1) + 0.02 * Math.sin(t * 23.0 + 2.0));
@@ -143,12 +147,15 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     lumiereMenora = poserLampe(MENORA, point, PROFIL.sanctuaire);
   }
 
-  let lueursGazit = [];
+  const meches = [];
 
-  function allumerLesLueurs(lueurs) {
-    if (!lueurs?.points.length) return;
-    const salle = new THREE.Box3(new THREE.Vector3(...lueurs.salle.min), new THREE.Vector3(...lueurs.salle.max));
-    lueursGazit = eclairerLaSalle(salle, lueurs.points, LUEUR_GAZIT.couleur);
+  function allumerLesSalles(salles) {
+    for (const [concept, { points, salle }] of Object.entries(salles)) {
+      const { couleur, intensite, vacille } = LUEURS_DE[concept];
+      const lueurs = eclairerLaSalle(new THREE.Matrix4().fromArray(salle), points, couleur);
+      if (vacille) meches.push(...lueurs.map((lueur) => ({ lueur, intensite })));
+      else for (const lueur of lueurs) lueur.w = intensite;
+    }
   }
 
   let moment = "jour";
@@ -200,7 +207,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
 
   function poserLesProjecteurs() {
     const verres = new Set();
-    temple.traverse((o) => { if (o.isMesh && o.material.name === VERRE_ALLUME.matiere) verres.add(o.material); });
+    temple.traverse((o) => { if (o.isMesh && o.material.name === VERRE_DE_PROJECTEUR) verres.add(o.material); });
     for (const verre of verres) verre.emissive = new THREE.Color(VERRE_ALLUME.couleur);
     const lampes = (reperes.projecteurs ?? []).map((point) => {
       const lampe = new THREE.PointLight(PROJECTEUR.couleur, 0, PROJECTEUR.portee, 2);
@@ -328,7 +335,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
 
   eclairerLAirAu(moment);
   allumerMenora(reperes.flammes);
-  allumerLesLueurs(reperes.lueurs);
+  allumerLesSalles(reperes.lueurs);
   eclairerKodeshHakodashim(reperes.arche, reperes.braises);
 
   return {

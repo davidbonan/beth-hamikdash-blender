@@ -458,6 +458,7 @@ MAT_SIKRA = lambda: material("Sikra", (0.55, 0.10, 0.06))          # le 'hout ha
 MAT_INOX = lambda: metal("Inox", (0.72, 0.72, 0.73), 0.25)
 MAT_PLASTIQUE = lambda: material("Plastique_blanc", (0.88, 0.88, 0.86))
 MAT_VERRE_DE_LAMPE = lambda: material("Verre_de_lampe", (0.90, 0.89, 0.84))    # projecteurs et lanternes : la visite les fait luire de nuit
+MAT_VERRE_DE_SUSPENSION = lambda: material("Verre_de_suspension", (0.90, 0.89, 0.84))    # les suspensions de l'arche de Wilson : la visite les fait luire jour et nuit
 MAT_VITRE = lambda: vitre("Vitre", (0.05, 0.06, 0.07))
 MAT_BETON = lambda: material("Beton", (0.70, 0.68, 0.64))
 MAT_PORTIQUE = lambda: material("Portique", (0.55, 0.56, 0.58))

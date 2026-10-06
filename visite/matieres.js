@@ -20,10 +20,10 @@ import { PROFIL } from "./qualite.js";
 import { OMBRE_LOINTAINE, assemblage } from "./ombres.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
-const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
+const LISSE = 0, PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
       LAMBRIS = 16, MIKSHE = 17, CHAUX = 18, KOTEL_HERODIEN = 19, KOTEL_OMEYYADE = 20, KOTEL_MAMELOUK = 21,
-      DALLE_KOTEL = 22, DALLE_DE_PRIERE = 23;
+      DALLE_KOTEL = 22, DALLE_DE_PRIERE = 23, LUMINAIRE = 24;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
@@ -51,23 +51,29 @@ export function assombrir(boite) {
   PENOMBRE_MAX.value.copy(boite.max);
 }
 
-// Les lueurs d'une salle close (Box3, mètres) : des lampes sans carte d'ombre, qui n'éclairent que ce
-// qui est dans sa boîte. Une lampe de three à ombre prend une unité de texture à tous les nuanceurs,
+// Les lueurs d'une salle close : des lampes sans carte d'ombre, qui n'éclairent que ce qui est dans sa
+// boîte, tournée comme elle. Une lampe de three à ombre prend une unité de texture à tous les nuanceurs,
 // et la nuit en est déjà au bord des seize ; sans ombre, elle passerait les murs. `w` : les candela.
+const SALLES_MAX = 2;
 const LUEURS_MAX = 4;
 const PORTEE_LUEUR = 14.0;
-const LUEURS = { value: Array.from({ length: LUEURS_MAX }, () => new THREE.Vector4()) };
-const LUEUR_COULEUR = { value: new THREE.Color() };
-const LUEUR_MIN = { value: new THREE.Vector3(1, 1, 1) };
-const LUEUR_MAX = { value: new THREE.Vector3(0, 0, 0) };
+const LUEURS = { value: Array.from({ length: SALLES_MAX * LUEURS_MAX }, () => new THREE.Vector4()) };
+const LUEUR_COULEUR = { value: Array.from({ length: SALLES_MAX }, () => new THREE.Color()) };
+// Du monde au cube unité de la salle ; tant qu'elle n'est pas posée, tout point tombe dehors.
+const VERS_SALLE = { value: Array.from({ length: SALLES_MAX }, () => new THREE.Matrix4().makeScale(0, 0, 0).setPosition(2, 2, 2)) };
+let sallesEclairees = 0;
 
-/** Pose les lueurs de la salle ; renvoie un Vector4 par lampe, dont visite.js fait vaciller le `w`. */
-export function eclairerLaSalle(boite, points, couleur) {
-  LUEUR_MIN.value.copy(boite.min);
-  LUEUR_MAX.value.copy(boite.max);
-  LUEUR_COULEUR.value.set(couleur);
-  return points.slice(0, LUEURS_MAX).map((p, i) => LUEURS.value[i].set(...p, 0));
+/** Pose les lueurs d'une salle ; renvoie un Vector4 par lampe, dont l'appelant règle le `w`. */
+export function eclairerLaSalle(versSalle, points, couleur) {
+  if (sallesEclairees === SALLES_MAX) throw new Error(`plus de ${SALLES_MAX} salles à lueurs : relever SALLES_MAX`);
+  const salle = sallesEclairees++;
+  VERS_SALLE.value[salle].copy(versSalle);
+  LUEUR_COULEUR.value[salle].set(couleur);
+  return points.slice(0, LUEURS_MAX).map((p, i) => LUEURS.value[salle * LUEURS_MAX + i].set(...p, 0));
 }
+
+// Le verre d'une lampe allumée : celui des projecteurs, que la nuit allume, et celui des suspensions, qui ne s'éteint pas.
+export const VERRE_ALLUME = { couleur: 0xffe6c0, eclat: 6 };
 
 const PIXEL = /* glsl */`
 uniform float uHauteurImage;
@@ -153,7 +159,7 @@ const FAMILLES = {
   Eau_Kiyor: EAU,
   Chaux_blanche: CHAUX, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
   Solet: ENDUIT, Teven: ENDUIT, Klaf: ENDUIT,
-  Chaux_noircie: SUIE, Braise: BRAISE,
+  Chaux_noircie: SUIE, Braise: BRAISE, Verre_de_suspension: LUMINAIRE,
 };
 
 // La braise sort du .glb en boîte rouge uniforme : sa couleur de base est celle que
@@ -168,14 +174,23 @@ varying vec3 vMonde;
 varying vec3 vNMonde;
 uniform float uTemps;
 uniform vec3 uPenombreMin, uPenombreMax;
-uniform vec4 uLueurs[${LUEURS_MAX}];
-uniform vec3 uLueurCouleur, uLueurMin, uLueurMax;
+uniform vec4 uLueurs[${SALLES_MAX * LUEURS_MAX}];
+uniform vec3 uLueurCouleur[${SALLES_MAX}];
+uniform mat4 uVersSalle[${SALLES_MAX}];
 varying float vPixel;
 
 // 1 dehors, PENOMBRE_RESTE dans la pièce sans lumière : le ciel n'y entre pas.
 float penombre(vec3 p){
   bool dedans = all(greaterThan(p, uPenombreMin)) && all(lessThan(p, uPenombreMax));
   return dedans ? ${PENOMBRE_RESTE.toFixed(2)} : 1.0;
+}
+
+// 0 dans une salle à lueurs : sans carte d'ombre, une lampe du dehors y passerait les murs.
+float horsDesSalles(vec3 p){
+  for (int salle = 0; salle < ${SALLES_MAX}; salle++) {
+    if (all(lessThan(abs((uVersSalle[salle] * vec4(p, 1.0)).xyz), vec3(1.0)))) return 0.0;
+  }
+  return 1.0;
 }
 
 float alea1(float p){ p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
@@ -989,13 +1004,23 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 }
 `;
 
+// Three range les lampes ponctuelles sans carte d'ombre après les autres : une salle à lueurs n'en reçoit que les siennes.
+function lampesSansOmbreHorsDesSalles(morceau) {
+  const lecture = "getPointLightInfo( pointLight, geometryPosition, directLight );";
+  if (!morceau.includes(lecture)) throw new Error("three a changé lights_fragment_begin : les lampes sans ombre passent les murs des salles");
+  return morceau.replace(lecture, `${lecture}
+    #if UNROLLED_LOOP_INDEX >= NUM_POINT_LIGHT_SHADOWS
+      directLight.color *= mHorsDesSalles;
+    #endif`);
+}
+
 /**
  * Le morceau de three, sa boucle directionnelle encadrée : ce qu'elle ajoute est repris par la pénombre.
  * Sur une matière cuite, l'appoint — la seule directionnelle sans ombre, que three range après le
  * soleil — s'écarte dans `mAppoint` : sans ombre, il traversait les murs des salles.
  */
 function soleilEnPenombre() {
-  const morceau = THREE.ShaderChunk.lights_fragment_begin;
+  const morceau = lampesSansOmbreHorsDesSalles(THREE.ShaderChunk.lights_fragment_begin);
   const avant = "#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )";
   const apres = "#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )";
   const appel = "RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );";
@@ -1021,12 +1046,15 @@ function soleilEnPenombre() {
 // Comme une lampe ponctuelle de three, la carte d'ombre en moins : la pénombre ne les touche pas.
 const LUEURS_DE_LA_SALLE = /* glsl */`
 #if defined( RE_Direct )
-  if (all(greaterThan(vMonde, uLueurMin)) && all(lessThan(vMonde, uLueurMax))) {
+  for (int salle = 0; salle < ${SALLES_MAX}; salle++) {
+    vec3 dansLaSalle = (uVersSalle[salle] * vec4(vMonde, 1.0)).xyz;
+    if (any(greaterThan(abs(dansLaSalle), vec3(1.0)))) continue;
     for (int i = 0; i < ${LUEURS_MAX}; i++) {
-      vec3 versLueur = (viewMatrix * vec4(uLueurs[i].xyz, 1.0)).xyz - geometryPosition;
+      vec4 lueur = uLueurs[salle * ${LUEURS_MAX} + i];
+      vec3 versLueur = (viewMatrix * vec4(lueur.xyz, 1.0)).xyz - geometryPosition;
       float distanceLueur = length(versLueur);
       directLight.direction = versLueur / distanceLueur;
-      directLight.color = uLueurCouleur * uLueurs[i].w * getDistanceAttenuation(distanceLueur, ${PORTEE_LUEUR.toFixed(1)}, 2.0);
+      directLight.color = uLueurCouleur[salle] * lueur.w * getDistanceAttenuation(distanceLueur, ${PORTEE_LUEUR.toFixed(1)}, 2.0);
       directLight.visible = true;
       RE_Direct(directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight);
     }
@@ -1050,12 +1078,15 @@ const greffable = (source) => ({
 export function habiller(materiau, horloges, jeux) {
   // Une matière `_grave` est sa matière de base, plus la carte des gravures.
   const gravure = materiau.name.endsWith("_grave");
-  const famille = FAMILLES[gravure ? materiau.name.slice(0, -"_grave".length) : materiau.name];
-  if (!famille) return;
+  const nom = gravure ? materiau.name.slice(0, -"_grave".length) : materiau.name;
+  // Un feuillage ou un drapeau sans famille reste nu : vu des deux côtés, il lirait à l'endroit la lumière cuite de son envers.
+  if (!(nom in FAMILLES) && ETOFFES.has(nom)) return;
+  // Sans famille, une matière reste lisse mais prend pénombre, lueurs et lumière cuite : nue, elle recevrait le ciel entier sous un toit.
+  const famille = FAMILLES[nom] ?? LISSE;
   const uniformes = { uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
                       uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX,
-                      uLueurs: LUEURS, uLueurCouleur: LUEUR_COULEUR, uLueurMin: LUEUR_MIN, uLueurMax: LUEUR_MAX,
+                      uLueurs: LUEURS, uLueurCouleur: LUEUR_COULEUR, uVersSalle: VERS_SALLE,
                       ...OMBRE_LOINTAINE };
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
   if (famille === METAL || famille === MIKSHE) materiau.envMapIntensity = REFLET_DU_METAL;
@@ -1063,6 +1094,10 @@ export function habiller(materiau, horloges, jeux) {
     materiau.color = new THREE.Color(CHARBON);
     materiau.emissive = new THREE.Color(ORGE);
     materiau.emissiveIntensity = 1.6;
+  }
+  if (famille === LUMINAIRE) {
+    materiau.emissive = new THREE.Color(VERRE_ALLUME.couleur);
+    materiau.emissiveIntensity = VERRE_ALLUME.eclat;
   }
 
   const jeu = jeux.get(NAPPE_DE[famille]);
@@ -1123,7 +1158,8 @@ export function habiller(materiau, horloges, jeux) {
         #include <clipping_planes_fragment>
         vec3 mTeinte, mPente, mFeu; float mRugo;
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);
-        float mPenombre = penombre(vMonde);`)
+        float mPenombre = penombre(vMonde);
+        float mHorsDesSalles = horsDesSalles(vMonde);`)
       // Le soleil et le rebond sont des lumières directionnelles, qui ne connaissent
       // aucun mur : la pénombre reprend ce que leur boucle a ajouté. Les lampes
       // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.

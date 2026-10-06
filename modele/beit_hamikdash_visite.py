@@ -44,7 +44,7 @@ from mathutils import Matrix, Vector
 
 MODELE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(MODELE))
-from beit_hamikdash_occlusion import (cuire_occlusion, reglages_de_la_lumiere, reglages_du_concept, retenus,  # noqa: E402
+from beit_hamikdash_occlusion import (LAMPES_DE_SALLE, cuire_occlusion, reglages_de_la_lumiere, reglages_du_concept, retenus,  # noqa: E402
                                       separer_collees)
 from beit_hamikdash_recuisson import Recuisson, empreinte, verrou  # noqa: E402
 
@@ -308,6 +308,10 @@ def en_metres(vue, emprises):
     return sortie
 
 
+# Le concept d'une salle à lueurs → le préfixe de ses lampes (`_lueur`) et de son vide CUBE (`_salle`) dans le blockout.
+SALLES_A_LUEURS = {"lishkat_hagazit": "Lishkat_HaGazit", "arche_wilson": "Wilson"}
+
+
 # À lire avant le tri des objets : ce sont des lampes, pas des maillages.
 def lampes(prefixe):
     return [[o.matrix_world.translation.x, o.matrix_world.translation.z, -o.matrix_world.translation.y]
@@ -319,11 +323,13 @@ def vides(prefixe):
             for o in sorted(bpy.data.objects, key=lambda o: o.name) if o.type == "EMPTY" and o.name.startswith(prefixe)]
 
 
-def boite_de(nom):
-    """La boîte d'un vide CUBE, dans les axes de la visite."""
-    coins = [bpy.data.objects[nom].matrix_world @ Vector((sx, sy, sz)) for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)]
-    visite = [(c.x, c.z, -c.y) for c in coins]
-    return {"min": [min(v[i] for v in visite) for i in range(3)], "max": [max(v[i] for v in visite) for i in range(3)]}
+VISITE_VERS_BLENDER = Matrix(((1, 0, 0, 0), (0, 0, -1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))
+
+
+def repere_de(nom):
+    """Des axes de la visite à ceux d'un vide CUBE, dont l'intérieur est le cube unité : les colonnes d'une Matrix4 de three."""
+    vers_le_vide = bpy.data.objects[nom].matrix_world.inverted() @ VISITE_VERS_BLENDER
+    return [vers_le_vide[ligne][colonne] for colonne in range(4) for ligne in range(4)]
 
 
 def livrer(chantier):
@@ -371,7 +377,7 @@ def cuire(fusionnes, chantier, lampes):
     separer_collees([obj for _, obj, _ in choisis])
     reglages = reglages_de_la_lumiere(lampes)
     tailles = {ident: taille for ident, _, taille in choisis}
-    empreintes = {ident: empreinte(obj, tailles.get(ident, 0), reglages_du_concept(ident, reglages)) for ident, obj in fusionnes.items()}
+    empreintes = {ident: empreinte(obj, tailles.get(ident, 0), reglages_du_concept(ident, reglages, lampes)) for ident, obj in fusionnes.items()}
     if sans_recuire:
         sans_carte = recuisson.modifies(empreintes) & recuisson.cuits
         print(f"\n  sans recuisson : {len(sans_carte)} concepts sans carte jusqu'au prochain --recuire : {', '.join(sorted(sans_carte))}\n", flush=True)
@@ -389,7 +395,8 @@ def exporter(chantier):
     regles = concepts()
     connus = {ident for _, ident in regles}
     flammes, arche, braises = lampes("Menora_flamme"), lampes("Aron_lumiere"), lampes("Machta_braise")
-    lueurs = {"points": lampes("Lishkat_HaGazit_lueur"), "salle": boite_de("Lishkat_HaGazit_salle")}
+    lueurs = {salle: {"points": lampes(f"{prefixe}_lueur"), "salle": repere_de(f"{prefixe}_salle")}
+              for salle, prefixe in SALLES_A_LUEURS.items()}
     projecteurs = vides("Kotel_projecteur_")
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
@@ -417,7 +424,8 @@ def exporter(chantier):
 
     # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
     cartes = ({}, {}, {}) if "--sans-occlusion" in sys.argv else cuire(
-        fusionnes, chantier, {"flammes": flammes, "arche": arche, "braises": braises, "lueurs": lueurs["points"]})
+        fusionnes, chantier, {"flammes": flammes, "arche": arche, "braises": braises, "lueurs": lueurs["lishkat_hagazit"]["points"],
+                              **{salle: lueurs[salle]["points"] for salle in LAMPES_DE_SALLE}})
     if cartes is None:
         return False
     occlusion, lumiere, empreintes = cartes

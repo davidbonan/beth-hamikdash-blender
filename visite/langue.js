@@ -21,6 +21,12 @@ export function ecrire(element, clef) {
   element.textContent = texte(clef);
 }
 
+export function titrer(element, clef) {
+  element.dataset.titre = clef;
+  element.title = texte(clef);
+  if (element.hasAttribute("aria-label")) element.setAttribute("aria-label", element.title);
+}
+
 function traduirePage() {
   const racine = document.documentElement;
   racine.lang = courante;
@@ -28,10 +34,7 @@ function traduirePage() {
   document.title = texte("titre");
   for (const el of document.querySelectorAll("[data-texte]")) el.textContent = texte(el.dataset.texte);
   for (const el of document.querySelectorAll("[data-texte-html]")) el.innerHTML = texte(el.dataset.texteHtml);
-  for (const el of document.querySelectorAll("[data-titre]")) {
-    el.title = texte(el.dataset.titre);
-    if (el.hasAttribute("aria-label")) el.setAttribute("aria-label", el.title);
-  }
+  for (const el of document.querySelectorAll("[data-titre]")) titrer(el, el.dataset.titre);
   document.querySelector("#langue-courante use").setAttribute("href", `#drapeau-${courante}`);
 }
 

@@ -41,7 +41,8 @@ X peut être un concept sans carte (Kiyor, Menora, ustensiles, trop petits pour 
 la sortie le liste sous « modifiés sans carte à eux » et recuit ses voisins.
 
 Toutes les autres cartes restent telles quelles. Un réglage de lumière changé change toutes
-les empreintes : `--recuire` recuit alors tout, sans qu'on le demande.
+les empreintes : `--recuire` recuit alors tout, sans qu'on le demande — sauf les lampes d'une
+salle (`LAMPES_DE_SALLE`), qui ne signent que la carte de leur concept.
 
 Lancer `--recuire` directement, sans simulation préalable.
 
