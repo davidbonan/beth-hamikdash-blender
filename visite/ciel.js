@@ -176,11 +176,22 @@ export function domeVu(rayon) {
   return m;
 }
 
+// Un seul filtre, gardé : jeté après usage, ses nuanceurs se recompilaient au suivant, page figée.
+let filtre = null;
+export function filtrePMREM(renderer) {
+  if (filtre) return filtre;
+  filtre = new THREE.PMREMGenerator(renderer);
+  // Compilé pour une cible et non pour l'écran, dont l'espace de couleur entre dans la clé du nuanceur.
+  const cible = renderer.getRenderTarget(), tampon = new THREE.WebGLRenderTarget(1, 1);
+  renderer.setRenderTarget(tampon);
+  filtre.compileCubemapShader();
+  renderer.setRenderTarget(cible);
+  tampon.dispose();
+  return filtre;
+}
+
 export function environnement(renderer, moment = "jour") {
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const cible = pmrem.fromScene(new THREE.Scene().add(dome(20, CIELS[moment].eclairant, astreDu(moment))), 0.04, 0.1, 200);
-  pmrem.dispose();
-  return cible;
+  return filtrePMREM(renderer).fromScene(new THREE.Scene().add(dome(20, CIELS[moment].eclairant, astreDu(moment))), 0.04, 0.1, 200);
 }
 
 export function peindreDome(domeVu, moment) {

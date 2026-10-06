@@ -1,7 +1,6 @@
 // L'éclairage : les lampes du Temple, l'astre qui suit le visiteur, et le moment du jour qu'un parcours demande.
 import * as THREE from "three";
 import { astreDu, environnement, rayonsDu, lumieresDu, peindreDome, teinterAir } from "./ciel.js";
-import { laisserPeindre } from "./fil.js";
 import { TEMPS_FLAMME, flamme } from "./flamme.js";
 import { VERRE_ALLUME, assombrir, eclairerLaSalle } from "./matieres.js";
 import { FINESSE_LOINTAINE, cadrerLesOmbres, tracerOmbreLointaine } from "./ombres.js";
@@ -232,11 +231,9 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     const lampesAPoser = (feuDeLAutel === null && lumieres.feu) || (shoeva === null && lumieres.shoeva)
       || (projecteurs === null && lumieres.projecteurs);
     if (!lampesAPoser) return eclairerAu(voulu);
-    await annoncerAttente(async () => {
+    await annoncerAttente(async (suivre) => {
       eclairerAu(voulu);
-      await rendu.compiler();
-      // La première image de nuit trace les cartes d'ombre des lampes : sous le voile, et non au premier pas.
-      await laisserPeindre();
+      await rendu.compiler(scene, suivre);
     });
   }
 

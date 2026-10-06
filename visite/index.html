@@ -70,25 +70,28 @@
   #chargement.parti { opacity: 0; pointer-events: none; }
   /* Sans contexte, la scène ne reviendra pas : le voile reste, quoi que le chargement fasse ensuite. */
   html.perdu #chargement { opacity: 1; pointer-events: auto; cursor: pointer; }
-  html.perdu #jauge, html.perdu #restant { visibility: hidden; }
+  html.perdu #chargement .jauge, html.perdu #restant { visibility: hidden; }
   html.perdu #etat { max-width: min(34ch, calc(100vw - 48px)); margin: 0 auto; line-height: 1.5; }
   #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
   #chargement p { margin: 0; color: #d6cebf; font-size: 13px; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
   #restant { min-height: 1.4em; font-variant-numeric: tabular-nums; }
-  #jauge { width: 260px; max-width: 70vw; height: 2px; background: #2a2724; overflow: hidden; }
-  #jauge i { display: block; height: 100%; width: 0; background: var(--or); transition: width .3s ease; }
+  .jauge { width: 260px; max-width: 70vw; height: 2px; background: #2a2724; overflow: hidden; }
+  /* En transform et non en largeur : le compositeur la fait glisser même quand la page se fige. */
+  .jauge i { display: block; height: 100%; background: var(--or); transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
+  :root[dir="rtl"] .jauge i { transform-origin: right; }
 
   /* ---- voile des déplacements ---- */
   /* Une téléportation qui coupe net laisse le visiteur sans savoir d'où il vient : le
      noir bref rend le saut lisible au lieu de le subir. */
   #voile {
     position: fixed; inset: 0; z-index: 30; background: #0d0c0b;
-    display: grid; place-content: center;
+    display: grid; place-content: center; justify-items: center; gap: 18px;
     opacity: 0; pointer-events: none; transition: opacity .34s ease;
   }
   #voile.noir { opacity: 1; transition-duration: .16s; }
-  #voile p { margin: 0; color: #d6cebf; font-size: 13px; visibility: hidden; }
-  #voile.attente p { visibility: visible; }
+  #voile p { margin: 0; color: #d6cebf; font-size: 13px; }
+  #voile > * { visibility: hidden; }
+  #voile.attente > * { visibility: visible; }
 
   /* ---- cinéma : la scène seule, encadrée par l'accueil ---- */
   html.cinema #accueil, html.cinema #chargement, html.cinema #barre, html.cinema #aide, html.cinema #manche,
@@ -751,7 +754,7 @@
 
 <div id="chargement">
   <h1 data-texte="lieu">Beit HaMikdach</h1>
-  <div id="jauge"><i></i></div>
+  <div class="jauge"><i></i></div>
   <p id="etat" data-texte="chargement">chargement de la scène…</p>
   <p id="restant"></p>
 </div>
@@ -878,7 +881,7 @@
   </div>
 </div>
 
-<div id="voile"><p data-texte="preparation">préparation…</p></div>
+<div id="voile"><div class="jauge"><i></i></div><p data-texte="preparation">préparation…</p></div>
 
 <aside id="fiche">
   <div id="poignee">

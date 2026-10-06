@@ -195,7 +195,7 @@ try {
   await page.waitForFunction(
     () => document.querySelector('#chargement')?.classList.contains('parti'),
     null,
-    { timeout: 90000 }
+    { timeout: 300000 }
   )
   console.log('scene prete')
   console.log('etat', JSON.stringify(await page.evaluate(() => window.__etat())))

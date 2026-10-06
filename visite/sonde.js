@@ -1,5 +1,6 @@
 // Le Heikhal ne voit pas le ciel : son or reflète la salle, rendue une fois à la seule lumière de la Menora.
 import * as THREE from "three";
+import { filtrePMREM } from "./ciel.js";
 
 export const DANS_HEIKHAL = new Set(["heikhal", "portes_heikhal", "sculptures_murs", "menora", "shulchan",
                                      "mizbeach_hazahav", "parokhet"]);
@@ -73,10 +74,8 @@ export function sonderHeikhal(renderer, scene, { kelim, materiaux, lumieres, cac
     for (const [m, intensite] of reflets) m.envMapIntensity = intensite;
   }
 
-  const pmrem = new THREE.PMREMGenerator(renderer);
   const ancien = reflet;
-  reflet = pmrem.fromCubemap(cible.texture);
-  pmrem.dispose();
+  reflet = filtrePMREM(renderer).fromCubemap(cible.texture);
   cible.dispose();
   // Refaite après une perte de contexte, la sonde remplace son reflet sans changer de nuanceur.
   for (const materiau of materiaux) {

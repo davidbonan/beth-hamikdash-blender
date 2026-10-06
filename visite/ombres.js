@@ -58,6 +58,7 @@ export const OMBRE_LOINTAINE = {
 export function porterAuLoin(maillage) {
   maillage.layers.enable(CALQUE_LOINTAIN);
 }
+export const profondeurLointaine = (maillage) => (maillage.layers.test(lointaine.layers) ? PROFONDEUR_SEULE : null);
 
 // Les arêtes du Temple courent d'est en ouest et du nord au sud : en biais dans la grille des texels, l'ombre d'un bandeau sortait en dents de scie.
 function grilleSurLesMurs(regard) {
@@ -108,19 +109,17 @@ export function cadrerLesOmbres(versLAstre, enceinte) {
     new THREE.Matrix4().copy(VERS_UNITE).multiply(fenetre.projectionMatrix).multiply(lointaine.matrixWorldInverse));
 }
 
-// Sans brume, comme la carte de three : elle compte dans la clé du nuanceur, qui se recompilerait ici.
+// Une scène à part, sans brume : tracée sur la vraie, la carte y laissait un éclairage vide dont three tirait d'autres nuanceurs d'ombre, compilés page figée.
+const decorLointain = Object.assign(new THREE.Scene(), { overrideMaterial: PROFONDEUR_SEULE });
 export function tracerOmbreLointaine(renderer, scene) {
-  const brume = scene.fog, cible = renderer.getRenderTarget();
+  const cible = renderer.getRenderTarget();
   const fond = renderer.getClearColor(new THREE.Color()), alphaFond = renderer.getClearAlpha();
-  scene.fog = null;
-  scene.overrideMaterial = PROFONDEUR_SEULE;
+  decorLointain.children = scene.children;
   try {
     renderer.setClearColor(0xffffff, 1);
     renderer.setRenderTarget(cibleLointaine);
-    renderer.render(scene, lointaine);
+    renderer.render(decorLointain, lointaine);
   } finally {
-    scene.overrideMaterial = null;
-    scene.fog = brume;
     renderer.setClearColor(fond, alphaFond);
     renderer.setRenderTarget(cible);
   }

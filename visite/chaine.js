@@ -26,8 +26,9 @@
  * cible flottante : ce qu'on y lit ne dépend d'aucun réglage du moteur.
  */
 import * as THREE from "three";
+import { parTranches } from "./fil.js";
 import { EXPOSITION_DEHORS } from "./matieres.js";
-import { OMBRE_LOINTAINE } from "./ombres.js";
+import { OMBRE_LOINTAINE, profondeurLointaine } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -560,15 +561,40 @@ class Profondeur extends Pass {
  * `horsGeo` : ce qui ne doit pas entrer dans la passe de géométrie. Le dôme de ciel
  * en fait partie — il enveloppe la scène, et il occluerait tout.
  */
-// La matière que three prête à un maillage pour la carte d'ombre du soleil (WebGLShadowMap.getDepthMaterial) : face retournée, cartes recopiées.
+// La matière que three prête à un maillage pour la carte d'ombre du soleil ou d'une lampe (WebGLShadowMap.getDepthMaterial) : face retournée, cartes recopiées.
 const FACE_OMBRE = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
 const RECOPIEES = ["map", "alphaMap", "alphaTest", "displacementMap", "displacementScale", "displacementBias"];
-function ombrePortee({ castShadow, material }) {
+const OMBRE_DU_SOLEIL = () => new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+const OMBRE_D_UNE_LAMPE = () => new THREE.MeshDistanceMaterial();
+const ombrePortee = (creer) => ({ castShadow, material }) => {
   if (!castShadow) return null;
-  const ombre = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: material.shadowSide ?? FACE_OMBRE[material.side] });
+  const ombre = Object.assign(creer(), { side: material.shadowSide ?? FACE_OMBRE[material.side] });
   for (const cle of RECOPIEES) ombre[cle] = material[cle] ?? ombre[cle];
   return ombre;
-}
+};
+// La carte lointaine se trace d'un œil dont le calque ne voit aucune lampe.
+const SANS_LAMPES = null;
+
+const PLEIN_ECRAN = new THREE.BufferGeometry()
+  .setAttribute("position", new THREE.Float32BufferAttribute([-1, 3, 0, -1, -1, 0, 3, -1, 0], 3))
+  .setAttribute("uv", new THREE.Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
+// Un seul relevé pour tous les programmes : compileAsync interroge chacun toutes les 10 ms, un demi-million d'allers-retours avec le GPU sur iPhone.
+const RELEVE_MS = 50;
+const compterLesLies = (programmes) => programmes.filter((programme) => programme.isReady()).length;
+const liaison = (renderer, suivre) => new Promise((lies) => {
+  // Les programmes déjà liés ne comptent pas : au passage à la nuit, ceux du jour mettaient la jauge à mi-course d'entrée.
+  const acquis = compterLesLies(renderer.info.programs);
+  const releve = setInterval(() => {
+    const programmes = renderer.info.programs;
+    const prets = compterLesLies(programmes);
+    if (prets < programmes.length) return suivre(Math.max(0, prets - acquis) / (programmes.length - acquis));
+    suivre(1);
+    clearInterval(releve);
+    lies();
+  }, RELEVE_MS);
+});
+// Three n'interroge un programme qu'à son premier usage, dans l'image qui le trace : interrogés avant elle, par tranches.
+const interrogerAvantUsage = (programme) => programme.getUniforms();
 
 export function chaine(renderer, scene, camera, horsGeo = []) {
   const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
@@ -742,24 +768,38 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   }
 
   // Compilés hors cible, les nuanceurs prendraient le tonemapping de l'écran : la scène se rend dans le composeur, sans lui.
-  // compileAsync ne voit que la matière de chaque objet : celles des passes de géométrie et de profondeur se compilaient à leur première image, figée.
-  function compiler(objets = scene) {
+  // compile ne voit que la matière de chaque objet : celles des passes de géométrie et de profondeur se compilaient à leur première image, figée.
+  async function compiler(objets = scene, suivre = () => {}) {
     renderer.setRenderTarget(composeur.readBuffer);
-    const prets = [renderer.compileAsync(objets, camera, scene)];
-    for (const materiau of [GEOMETRIE, profondeur?.materiau].filter(Boolean)) prets.push(compilerSous(objets, () => materiau));
-    prets.push(compilerOmbres(objets));
+    renderer.compile(objets, camera, scene);
+    compilerPleinEcran(passesEnTampon());
+    for (const materiau of [GEOMETRIE, profondeur?.materiau].filter(Boolean)) compilerSous(objets, () => materiau);
+    compilerOmbres(objets);
+    compilerSous(objets, profondeurLointaine, SANS_LAMPES);
     renderer.setRenderTarget(null);
-    return Promise.all(prets);
+    compilerPleinEcran([etalonnage.material]);
+    await liaison(renderer, suivre);
+    await parTranches([...renderer.info.programs], interrogerAvantUsage);
+  }
+
+  // Une passe plein écran se trace hors scène, sans lampes ni brume dans la clé de son nuanceur : compilée à la première image, elle la figeait.
+  function compilerPleinEcran(materiaux) {
+    renderer.compile(new THREE.Group().add(...materiaux.map((materiau) => new THREE.Mesh(PLEIN_ECRAN, materiau))), camera);
+  }
+
+  function passesEnTampon() {
+    const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
+    return [passeAO, passeComposition, fumee, voile, rayons, airEclaire, arretes].map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.
-  function compilerSous(objets, habit) {
+  function compilerSous(objets, habit, lampes = scene) {
     const doubles = new THREE.Group();
     objets.traverse((o) => {
       const materiau = o.isMesh && habit(o);
       if (materiau) doubles.add(Object.assign(o.clone(false), { material: materiau }));
     });
-    return renderer.compileAsync(doubles, camera, scene);
+    renderer.compile(doubles, camera, lampes);
   }
 
   // La carte d'ombre se trace sans scène, donc sans brume, et three compte la brume dans la clé de chaque nuanceur.
@@ -767,7 +807,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     const brume = scene.fog;
     scene.fog = null;
     try {
-      return compilerSous(objets, ombrePortee);
+      for (const ombre of [OMBRE_DU_SOLEIL, OMBRE_D_UNE_LAMPE]) compilerSous(objets, ombrePortee(ombre));
     } finally {
       scene.fog = brume;
     }
