@@ -103,16 +103,17 @@ const LUNE_COUCHANTE = new THREE.Vector3(-150, 35, -20).normalize();
 // La lumière cuite est celle du ciel de jour : la nuit n'en garde que ce que la lune en laisse.
 // Avant l'aube, sans lune, et à l'aube, sans soleil, l'astre n'est plus que la lueur de l'est.
 // `feu` : le feu de l'autel, qui brûle toute la nuit (Vayikra 6:2) et que le jour noie.
-const LUMIERES_DE_NUIT = { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true };
+// `projecteurs` : ceux de la place du Kotel d'aujourd'hui, allumés tant que le soleil n'est pas levé.
+const LUMIERES_DE_NUIT = { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true, projecteurs: true };
 const CIELS = {
   jour: { vu: VU, eclairant: ECLAIRANT,
-          lumieres: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false } },
+          lumieres: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false, projecteurs: false } },
   nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, lumieres: LUMIERES_DE_NUIT },
   fin_de_nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, astre: LUNE_COUCHANTE, lumieres: LUMIERES_DE_NUIT },
   avant_l_aube: { vu: VU_AVANT_L_AUBE, eclairant: ECLAIRANT_AVANT_L_AUBE,
-                  lumieres: { astre: { couleur: 0xa9bde0, intensite: 0 }, appoint: 0, ciel: 0.05, cuite: 0.12, shoeva: false, feu: true } },
+                  lumieres: { astre: { couleur: 0xa9bde0, intensite: 0 }, appoint: 0, ciel: 0.05, cuite: 0.12, shoeva: false, feu: true, projecteurs: true } },
   aube: { vu: VU_AUBE, eclairant: ECLAIRANT_AUBE,
-          lumieres: { astre: { couleur: 0xb4c0d8, intensite: 0.6 }, appoint: 0.03, ciel: 0.05, cuite: 0.25, shoeva: false, feu: true } },
+          lumieres: { astre: { couleur: 0xb4c0d8, intensite: 0.6 }, appoint: 0.03, ciel: 0.05, cuite: 0.25, shoeva: false, feu: true, projecteurs: true } },
 };
 
 // Le dégradé des deux dômes, et le ciel que l'air ajoute à ce qu'il éloigne.

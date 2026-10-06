@@ -58,7 +58,7 @@ modele/blockout/
   nettoyage · har_habayit · ezrat_nashim · azara · lishkot · heil · modenature_azara
   mizbeach · sous_l_azara
   bayit/        oulam · heikhal · kelim · parokhot · parois_d_or · kodesh_hakodashim
-  pays/         calage · herode · place_du_kotel · ville · jerusalem (celui qui bâtit le pays)
+  pays/         calage · herode · place_du_kotel · second_oeuvre · facades_du_kotel · parc_de_police · mobilier_du_kotel · ville · jerusalem (celui qui bâtit le pays)
   foule · finitions (dessus foulés, biseau, tailles) · eclairage
 modele/figurants/
   matieres · etoffes (MPFB) · corps (Gabarit, Humain) · maillage · habillage · ustensiles
@@ -236,6 +236,9 @@ $BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --
 
 Sans cuisson, le .glb sort sans couche `Occlusion` et `reperes.json` sans cartes : la visite
 reste cohérente, simplement sans occlusion cuite. À relancer sans l'option avant de publier.
+
+`-- --sans-recuire` ne cuit rien non plus mais garde la carte de chaque concept que la scène n'a pas
+changé : seuls les concepts retouchés sortent sans carte, jusqu'au prochain `--recuire`.
 
 Un concept peut cuire sa **lumière indirecte** à la place de son occlusion : le ciel vu de la
 visite (ramené au tiers du soleil au sol, `DIFFUS`) et tout ce qui rebondit, soleil compris,

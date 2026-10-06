@@ -90,7 +90,13 @@ def cote(altitude_m):
 
 
 def sol_naturel(x, y):
-    """Cote du relief réel en (x, y) de la scène, interpolée, en amot."""
+    """Cote du relief en (x, y) de la scène, interpolée, en amot ; dans la cuvette du Kotel,
+    jamais plus haut que la place."""
+    z = _relief_brut(x, y)
+    return min(z, Z_PLACE_HAUTE) if _dans((x, y), CUVETTE_KOTEL) else z
+
+
+def _relief_brut(x, y):
     est, nord = depuis_scene(x, y)
     u, v = (est - RELIEF.x0) / RELIEF.pas, (nord - RELIEF.y0) / RELIEF.pas
     i = min(max(int(u), 0), RELIEF.n - 2)
@@ -187,6 +193,14 @@ SALLES_WILSON = _anneau_scene(PAYS_DONNEES["salles_wilson"])
 PONT_MAGHREBINS = [vers_scene(*p) for p in PAYS_DONNEES["pont_maghrebins"]]
 ESCALIER_PLACE = ([_plus_proche_sur_l_anneau(vers_scene(*PAYS_DONNEES["escalier_place"][0]), PLACE_KOTEL)]
                   + [vers_scene(*p) for p in PAYS_DONNEES["escalier_place"]])
+# Le relief à 30 m ne voit ni la place ni la falaise du quartier juif : il descend en pente douce
+# du quartier juif au pied du Kotel, dix mètres au-dessus des dalles. La cuvette est ce qui est
+# de plain-pied avec la place — la place, Beit HaLiba à l'ouest, le parc des voitures et les
+# contrôles au sud jusqu'à la muraille, les fouilles sous le pont à l'est. Relevée sur le plan OSM.
+CUVETTE_KOTEL = _anneau_scene([
+    (-188, -149), (-184, -140), (-149, -132), (-134, -130), (-122, -127), (-123, -120), (-101, -116),
+    (-91, -174), (-81, -230), (-77, -258), (-95, -300), (-112, -345), (-165, -345), (-170, -300),
+    (-186, -262), (-185, -241), (-177, -233), (-172, -225), (-177, -198), (-203, -201), (-212, -153)])
 PORTEE_WILSON, CLE_WILSON = 13 / AMA, 6.1 / AMA    # l'arche : portée, et sa clé au-dessus du sol d'aujourd'hui
 LARGEUR_PONT, GARDE_CORPS = 3 / AMA, 1.1 / AMA
 CONTREMARCHE, LARGEUR_ESCALIER = 0.16 / AMA, 3.5 / AMA
@@ -218,11 +232,11 @@ MAILLE_PAYS = PAYS_DONNEES["relief"]["pas"] * math.sqrt(2) / AMA
 
 
 def _creuse_pour_la_place(p):
-    """Dans la place ou les salles de Wilson, ou à moins d'une maille : une maille à cheval
+    """Dans la cuvette ou les salles de Wilson, ou à moins d'une maille : une maille à cheval
     sur leur bord remontait en talus au-dessus du dallage. Le soutènement, aussi épais,
     couvre ce qu'on abaisse."""
     return any(_dans(p, anneau) or _distance_a_l_anneau(p, anneau) < MAILLE_PAYS
-               for anneau in (PLACE_KOTEL, SALLES_WILSON))
+               for anneau in (CUVETTE_KOTEL, SALLES_WILSON))
 
 
 Z_HAUT_ESCALIER = sol_naturel(*ESCALIER_PLACE[-1])
@@ -245,7 +259,7 @@ def _nappe_du_pays():
     nœud prend le plus bas de ses voisins du dehors : une maille à cheval sur le mur
     reste ainsi sous lui au lieu de monter en talus devant son parement."""
     n = RELIEF.n
-    touches = HARAM + PLACE_KOTEL + SALLES_WILSON + ESCALIER_PLACE
+    touches = HARAM + CUVETTE_KOTEL + SALLES_WILSON + ESCALIER_PLACE
     x_min = min(x for x, _ in touches) - 2 * MAILLE_PAYS
     x_max = max(x for x, _ in touches) + 2 * MAILLE_PAYS
     y_min = min(y for _, y in touches) - 2 * MAILLE_PAYS
@@ -259,7 +273,7 @@ def _nappe_du_pays():
                 if _dans((x, y), HARAM) or _dans_le_carre(x, y):
                     dessous.append(j * n + i)
                 elif _creuse_pour_la_place((x, y)):
-                    z = Z_PLACE_KOTEL - 1
+                    z = min(z, Z_PLACE_KOTEL - 1)
                 else:
                     z = _sol_le_long_de_l_escalier((x, y), z)
             verts.append((x, y, z))

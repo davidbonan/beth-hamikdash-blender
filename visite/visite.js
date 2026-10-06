@@ -753,6 +753,7 @@ window.__mur = (origine, direction, portee) => {
   return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
 };
 window.__parcours = guides;
+window.__moment = (voulu) => eclairage.passerAu(voulu);
 window.__figurantsVus = troupes.figurantsVus;
 window.__temps = (t) => { troupes.reglerLeTemps(t); dessiner(0); };
 window.__pret = true;

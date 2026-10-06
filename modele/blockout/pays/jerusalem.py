@@ -5,15 +5,19 @@ from ..har_habayit import HX1
 from .calage import PAYS, _nappe_du_pays
 from .herode import esplanade_herode, murs_herode
 from .place_du_kotel import place_du_kotel
-from .ville import _cases_baties, murailles, olivier, ville
+from .facades_du_kotel import facades_du_kotel
+from .mobilier_du_kotel import mobilier_du_kotel
+from .ville import _cases_baties, jardin_archeologique, murailles, olivier, ville
 
 
 _nappe_du_pays()
 esplanade_herode()
 murs_herode()
-place_du_kotel()
+facades_du_kotel(place_du_kotel())
+mobilier_du_kotel()
 murailles()
 CASES_BATIES = _cases_baties(ville())
+jardin_archeologique()
 # Les oliviers du mont des Oliviers et de la pente du Kidron, là où rien n'est bâti.
 for i in range(1300):
     nom = f"Olivier_{i:04d}"

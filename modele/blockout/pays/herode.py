@@ -120,6 +120,8 @@ def soutenement(anneau, z_pied, ouvert, epaisseur=MAILLE_PAYS, portee=12):
         points = [(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n) for k in range(n + 1)]
         for troncon in _troncons_hors(points, ouvert):
             p, q = troncon[0], troncon[-1]
+            if math.dist(p, q) < 2:    # un bout de côté resté hors de `ouvert` dressait une lame de mur en travers de la place
+                continue
             haut = max(sol_naturel(x + ux * portee, y + uy * portee) for x, y in (p, troncon[len(troncon) // 2], q))
             if haut <= z_pied + 1:
                 continue

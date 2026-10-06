@@ -45,6 +45,10 @@ les empreintes : `--recuire` recuit alors tout, sans qu'on le demande.
 
 Lancer `--recuire` directement, sans simulation préalable.
 
+Pour livrer une retouche sans cuire du tout : `-- --sans-recuire`. Les cartes des concepts intacts
+restent, les concepts retouchés sortent sans carte — la sortie les nomme — et gardent leur empreinte :
+le `--recuire` suivant les refait, eux et leurs voisins. Il ne cuit pas et ne prend pas le verrou.
+
 Nommer un concept après `--recuire` seulement pour ce que l'empreinte ne voit pas : une retouche
 de `matieres.js` ou d'un nuanceur de la visite, ou une carte qu'on juge fausse.
 

@@ -22,14 +22,15 @@ import { OMBRE_LOINTAINE, assemblage } from "./ombres.js";
 // Familles : le nom de la matière exportée décide du traitement.
 const PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
-      LAMBRIS = 16, MIKSHE = 17, CHAUX = 18, KOTEL_HERODIEN = 19, KOTEL_OMEYYADE = 20, KOTEL_MAMELOUK = 21;
+      LAMBRIS = 16, MIKSHE = 17, CHAUX = 18, KOTEL_HERODIEN = 19, KOTEL_OMEYYADE = 20, KOTEL_MAMELOUK = 21,
+      DALLE_KOTEL = 22, DALLE_DE_PRIERE = 23;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
   "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Robe_Royale", "Figure_Voile", "Figure_Meil",
-  "Figure_Ephod"]);
+  "Figure_Ephod", "Toile_blanche", "Drapeau_blanc", "Drapeau_bleu", "Caprier", "Caprier_sec", "Palme"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
-const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, MURAILLE, ROCHE,
+const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
                           KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
 // Le dôme éclairant est beige et désaturé : à 1, l'or au soleil n'en reflétait qu'un gris-vert.
 const REFLET_DU_METAL = 1.6;
@@ -95,7 +96,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
-                   13: "pierre", 14: "pierre", 15: "pierre", 19: "pierre", 20: "pierre", 21: "pierre",
+                   13: "pierre", 14: "pierre", 15: "pierre", 19: "pierre", 20: "pierre", 21: "pierre", 22: "pierre", 23: "pierre",
                    3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois", 18: "enduit" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
@@ -128,6 +129,7 @@ const CARREAU = {
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
   // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
   13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
+  22: [1.6, 0.35, 0.20, 0.60, 0.45], 23: [1.6, 0.35, 0.20, 0.60, 0.45],
   19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65], 21: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
   15: [1.0, 0.60, 0.40, 1.60, 0.70],
@@ -138,15 +140,16 @@ const CARREAU = {
 
 const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
+  Dallage_kotel: DALLE_KOTEL, Dallage_de_priere: DALLE_DE_PRIERE, Pierre_de_Jerusalem: MAISON,
   Pierre_kotel_herodien: KOTEL_HERODIEN, Pierre_kotel_omeyyade: KOTEL_OMEYYADE, Pierre_kotel_mamelouk: KOTEL_MAMELOUK,
   Maisons: MAISON, Pierre_colonne: TAMBOUR,
   Marbre_blanc: MARBRE, Marbre_Herode: MARBRE_HERODE,
   Or: METAL, Or_plaque: METAL, Or_mikshe: MIKSHE, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
-  Fer: METAL, Fer_lame: METAL,
+  Fer: METAL, Fer_lame: METAL, Fer_brun: METAL, Tole: METAL, Acier_blanc: METAL,
   Cedre: BOIS, Cedre_echelle_montant: BOIS, Cedre_echelle_barreau: BOIS, Chene: BOIS, Chene_sculpte: BOIS,
-  Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS, Cedre_lambris: LAMBRIS,
+  Bois_du_pont: BOIS, Bois_maarakha: BOIS, Bois_roussi: BOIS, Bois_charbon: BOIS, Cedre_lambris: LAMBRIS,
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
-  Peau: ETOFFE, Laine: ETOFFE, Avnet_kilayim: ETOFFE,
+  Toile_blanche: ETOFFE, Peau: ETOFFE, Laine: ETOFFE, Avnet_kilayim: ETOFFE,
   Eau_Kiyor: EAU,
   Chaux_blanche: CHAUX, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
   Solet: ENDUIT, Teven: ENDUIT, Klaf: ENDUIT,
@@ -430,16 +433,20 @@ float penteRampe(float d, vec2 rampe, float pixel){
 // la tache de vingt amot qui assombrit la dalle est le passage de la cour, et une dalle
 // foulée est aussi plus lustrée. Le dessus d'un mur prend la première et pas la seconde
 // — personne n'y marche.
-void dalles(vec3 P, out vec3 teinte, out vec3 pente, out float rugo, out float usure,
+// rovad : la largeur d'une rangée ; longueurs : les deux longueurs de dalle ; nuance : l'écart de valeur d'une dalle à l'autre.
+struct Pavage { float rovad; vec2 longueurs; float nuance; };
+const Pavage PAVAGE_DES_COURS = Pavage(ROVAD_DALLE, vec2(8.0, 10.0), 0.03);
+
+void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float rugo, out float usure,
             out vec4 photo){
   float g = grain(P * 7.0, empreinteMax() * 7.0);
   // Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
   // s'empilent sur X et chacune court sur Z, d'un bout à l'autre de la cour.
   float ligne, sensX, sensZ;
-  float dx = ecart(P.x, ROVAD_DALLE, ligne, sensX);
+  float dx = ecart(P.x, pavage.rovad, ligne, sensX);
   float num = floor(ligne);
   float tireRang = alea1(num * 1.7 + 3.1);
-  float longueur = tireRang > 0.5 ? 10.0 : 8.0;   // Melakhim I 7:10, comme les murs
+  float longueur = tireRang > 0.5 ? pavage.longueurs.y : pavage.longueurs.x;   // dans les cours : Melakhim I 7:10, comme les murs
   // Les joints en travers se décalent d'une rangée à la suivante : alignés, ils
   // feraient une grille, et la rangée cesserait de se lire comme une rangée.
   float v = P.z + (mod(num, 2.0) * 0.5 + tireRang * 0.37) * longueur * AMA;
@@ -450,7 +457,7 @@ void dalles(vec3 P, out vec3 teinte, out vec3 pente, out float rugo, out float u
   float lit = min(horsJoint(dx, JOINT_DALLE, pixelX), horsJoint(dz, JOINT_DALLE, pixelZ));
   float tireDalle = alea3(vec3(floor(colonne), num, 0.0));
   usure = grain(P / (20.0 * AMA));
-  teinte = vec3((1.0 + (g - 0.5) * 0.10) * (0.985 + tireDalle * 0.03) * mix(0.70, 1.0, lit))
+  teinte = vec3((1.0 + (g - 0.5) * 0.10) * (1.0 - pavage.nuance * 0.5 + tireDalle * pavage.nuance) * mix(0.70, 1.0, lit))
          * mix(vec3(1.0), OMBRE_JOINT, 0.45 * usure);
   vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
   pente = penteRampe(d, vec2(0.0, JOINT_DALLE), dx < dz ? pixelX : pixelZ) * dir * (CREUX_DALLE / AMA);
@@ -512,7 +519,7 @@ Bloc tailler(vec3 P, vec3 N, Appareil a){
 void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
   if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
     float usure;
-    dalles(P, teinte, pente, rugo, usure, photo);
+    dalles(P, PAVAGE_DES_COURS, teinte, pente, rugo, usure, photo);
     return;
   }
   Bloc b = tailler(P, N, a);
@@ -558,7 +565,7 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
 void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
   if (abs(N.y) > 0.7) {
     float usure;
-    dalles(P, teinte, pente, rugo, usure, photo);
+    dalles(P, PAVAGE_DES_COURS, teinte, pente, rugo, usure, photo);
     return;
   }
   Bloc b = tailler(P, N, Appareil(ASSISE_HERODE, 8.0, 10.0, DEBORD, JOINT_MARBRE, LISERE_MARBRE));
@@ -757,10 +764,17 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   }
   else if (FAMILLE == 13) {          // le dallage des cours : rangées, et lustre
     float usure;
-    dalles(P, teinte, pente, rugo, usure, photo);
+    dalles(P, PAVAGE_DES_COURS, teinte, pente, rugo, usure, photo);
     // Une dalle passée est plus sombre ET plus lisse. C'est ce lustre, et non la
     // teinte, qui sépare une cour lavée d'une esplanade de grès ; même lecture qu'au
     // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
+    rugo -= usure * 0.18;
+  }
+  else if (FAMILLE == 22 || FAMILLE == 23) {   // la place du Kotel : pavé en rangs étroits, grandes dalles devant le mur
+    float usure;
+    Pavage pavage = Pavage(1.6, vec2(2.0, 3.2), 0.08);
+    if (FAMILLE == 22) pavage = Pavage(0.9, vec2(1.3, 2.2), 0.14);
+    dalles(P, pavage, teinte, pente, rugo, usure, photo);
     rugo -= usure * 0.18;
   }
   else if (FAMILLE == 19) {

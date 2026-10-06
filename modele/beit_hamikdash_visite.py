@@ -20,6 +20,8 @@ d'occlusion, et reperes.json sans cartes, ce qui reste cohérent.
 `-- --recuire [azara,oulam]` ne recuit en lumière que ces concepts, ceux dont la carte ne correspond
 plus à la scène, et leurs voisins (`beit_hamikdash_recuisson.py`) ; les autres cartes restent.
 `-- --simuler`, avec `--recuire`, dit ce qui serait recuit et combien de temps, sans rien cuire.
+`-- --sans-recuire` ne cuit rien non plus, mais garde la carte de chaque concept que la scène n'a pas changé ;
+les autres sortent sans carte, et le prochain `--recuire` les refera.
 Une seule cuisson à la fois sur la machine, worktrees compris.
 
 Le lien géométrie ↔ encyclopédie passe par `visite/concepts.json` : chaque concept y
@@ -312,6 +314,11 @@ def lampes(prefixe):
             for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
+def vides(prefixe):
+    return [[o.matrix_world.translation.x, o.matrix_world.translation.z, -o.matrix_world.translation.y]
+            for o in sorted(bpy.data.objects, key=lambda o: o.name) if o.type == "EMPTY" and o.name.startswith(prefixe)]
+
+
 def boite_de(nom):
     """La boîte d'un vide CUBE, dans les axes de la visite."""
     coins = [bpy.data.objects[nom].matrix_world @ Vector((sx, sy, sz)) for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)]
@@ -355,15 +362,21 @@ def cuire(fusionnes, chantier, lampes):
     choisis = list(retenus(fusionnes))
     eclaires = frozenset(filter(None, (option("--lumiere") or "").split(",")))
     demandes, recuisson, gardees = recuisson_demandee(), None, None
-    if demandes is not None:
+    sans_recuire = "--sans-recuire" in sys.argv
+    if demandes is not None or sans_recuire:
         if eclaires:
             raise ValueError("--recuire choisit lui-même ce qui cuit en lumière : ne pas y joindre --lumiere")
         precedent = json.loads((DOSSIER / "reperes.json").read_text(encoding="utf-8"))
-        recuisson = Recuisson(precedent, demandes, {ident for ident, _, _ in choisis})
+        recuisson = Recuisson(precedent, demandes or frozenset(), {ident for ident, _, _ in choisis})
     separer_collees([obj for _, obj, _ in choisis])
     reglages = reglages_de_la_lumiere(lampes)
     tailles = {ident: taille for ident, _, taille in choisis}
     empreintes = {ident: empreinte(obj, tailles.get(ident, 0), reglages_du_concept(ident, reglages)) for ident, obj in fusionnes.items()}
+    if sans_recuire:
+        sans_carte = recuisson.modifies(empreintes) & recuisson.cuits
+        print(f"\n  sans recuisson : {len(sans_carte)} concepts sans carte jusqu'au prochain --recuire : {', '.join(sorted(sans_carte))}\n", flush=True)
+        intacts = [choisi for choisi in choisis if choisi[0] not in sans_carte]
+        return (*cuire_occlusion(intacts, chantier, frozenset(), lampes, recuisson.gardees(frozenset(sans_carte))), empreintes)
     if recuisson is not None:
         eclaires = recuisson.cibles(fusionnes, empreintes)
         if "--simuler" in sys.argv:
@@ -377,6 +390,7 @@ def exporter(chantier):
     connus = {ident for _, ident in regles}
     flammes, arche, braises = lampes("Menora_flamme"), lampes("Aron_lumiere"), lampes("Machta_braise")
     lueurs = {"points": lampes("Lishkat_HaGazit_lueur"), "salle": boite_de("Lishkat_HaGazit_salle")}
+    projecteurs = vides("Kotel_projecteur_")
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
@@ -452,6 +466,7 @@ def exporter(chantier):
         "arche": arche,
         "braises": braises,
         "lueurs": lueurs,
+        "projecteurs": projecteurs,
         "occlusion": occlusion,
         "lumiere": lumiere,
         "empreintes": empreintes,
@@ -507,7 +522,7 @@ def main():
     DOSSIER.mkdir(exist_ok=True)
     if "--pays" in sys.argv:
         return exporter_pays()
-    sans_cuisson = "--sans-occlusion" in sys.argv or "--simuler" in sys.argv
+    sans_cuisson = bool({"--sans-occlusion", "--simuler", "--sans-recuire"} & set(sys.argv))
     with contextlib.nullcontext() if sans_cuisson else verrou(), \
             tempfile.TemporaryDirectory(prefix="visite_") as chantier:
         if exporter(pathlib.Path(chantier)):

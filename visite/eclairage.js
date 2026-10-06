@@ -33,6 +33,9 @@ const SHOEVA = { couleur: 0xffc58a, intensite: 600, portee: 200, carte: 1024 };
 const HAUTEUR_FLAMME_SHOEVA = 1.2;
 // Les torches de la ronde, en une lueur sans ombre : une lampe par torche, c'est un nuanceur par torche.
 const LUEUR = { couleur: 0xffa860, intensite: 40, portee: 16, hauteur: 1.5 };   // m : des mèches de caleçons et de ceintures de cohanim (Soucca 5:3)
+// Les projecteurs de la place du Kotel d'aujourd'hui, sans ombre : une carte par lampe prendrait une unité de texture à tous les nuanceurs.
+const PROJECTEUR = { couleur: 0xffe0b0, intensite: 800, portee: 110 };
+const VERRE_ALLUME = { matiere: "Verre_de_lampe", couleur: 0xffe6c0, eclat: 6 };
 
 // De proche en proche : deux points à moins de `pas` l'un de l'autre sont du même groupe.
 function centresDesGroupes(points, pas) {
@@ -151,6 +154,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
   let moment = "jour";
   let directionDeLAstre = astreDu(moment);
   let shoeva = null;
+  let projecteurs = null;
   let lumiereCuiteDuCiel = null;
 
   // Le Heikhal et le Kodesh HaKodashim ont leur lumière cuite à leurs propres lampes, que la nuit n'éteint pas.
@@ -194,6 +198,19 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     return intensites;
   }
 
+  function poserLesProjecteurs() {
+    const verres = new Set();
+    temple.traverse((o) => { if (o.isMesh && o.material.name === VERRE_ALLUME.matiere) verres.add(o.material); });
+    for (const verre of verres) verre.emissive = new THREE.Color(VERRE_ALLUME.couleur);
+    const lampes = (reperes.projecteurs ?? []).map((point) => {
+      const lampe = new THREE.PointLight(PROJECTEUR.couleur, 0, PROJECTEUR.portee, 2);
+      lampe.position.set(...point);
+      scene.add(lampe);
+      return lampe;
+    });
+    return { lampes, verres };
+  }
+
   function allumerLeFeu() {
     const dessus = emprises.get("maarakhot");
     const foyer = dessus.getCenter(new THREE.Vector3()).setY(dessus.max.y + FEU.hauteur);
@@ -205,7 +222,8 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
   async function passerAu(voulu) {
     if (voulu === moment) return;
     const lumieres = lumieresDu(voulu);
-    const lampesAPoser = (feuDeLAutel === null && lumieres.feu) || (shoeva === null && lumieres.shoeva);
+    const lampesAPoser = (feuDeLAutel === null && lumieres.feu) || (shoeva === null && lumieres.shoeva)
+      || (projecteurs === null && lumieres.projecteurs);
     if (!lampesAPoser) return eclairerAu(voulu);
     await annoncerAttente(async () => {
       eclairerAu(voulu);
@@ -249,6 +267,14 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     if (shoeva === null && lumieres.shoeva) {
       shoeva = poserShoeva();
       lampesPosees++;
+    }
+    if (projecteurs === null && lumieres.projecteurs) {
+      projecteurs = poserLesProjecteurs();
+      lampesPosees++;
+    }
+    if (projecteurs !== null) {
+      for (const lampe of projecteurs.lampes) lampe.intensity = lumieres.projecteurs ? PROJECTEUR.intensite : 0;
+      for (const verre of projecteurs.verres) verre.emissiveIntensity = lumieres.projecteurs ? VERRE_ALLUME.eclat : 0;
     }
     if (shoeva !== null) {
       for (const f of shoeva.flammes) f.visible = lumieres.shoeva;

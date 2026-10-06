@@ -42,7 +42,7 @@ def enduit_noirci(name, rgb, bande):
     liens.new(suie.outputs["Color"], _bsdf(mat).inputs["Base Color"])
     return mat
 
-def dallage(name, rgb):
+def dallage(name, rgb, rovad=ROVAD_DALLE, longueurs=PIERRE_LONG):
     """Sol en rangées de dalles — ROVAD_DALLE plus haut pour la source.
 
     C'est le joint, à la lumière rasante de l'aube, qui donne au dallage sa fuyante :
@@ -74,14 +74,14 @@ def dallage(name, rgb):
     liens.new(_position(mat), p.inputs["Vector"])
     # Les rovadim se comptent en sortant du Heikhal, qui est à l'ouest : les rangées
     # s'empilent donc sur X et chacune court sur Y, d'un bout à l'autre de la cour.
-    rang, ecart_x = _module(mat, p.outputs["X"], ROVAD_DALLE)
+    rang, ecart_x = _module(mat, p.outputs["X"], rovad)
     numero = _calc(mat, "FLOOR", rang)
     tire_rang = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, 120)
     tire_rang.noise_dimensions = '1D'
     liens.new(numero, tire_rang.inputs["W"])
     longue = _calc(mat, "GREATER_THAN", tire_rang.outputs["Value"], 0.5)
-    longueur = _calc(mat, "MULTIPLY_ADD", longue, PIERRE_LONG[1] - PIERRE_LONG[0],
-                     PIERRE_LONG[0])
+    longueur = _calc(mat, "MULTIPLY_ADD", longue, longueurs[1] - longueurs[0],
+                     longueurs[0])
     # Les joints en travers se décalent d'une rangée à la suivante : alignés, ils
     # feraient une grille, et la rangée cesserait de se lire comme une rangée.
     decal = _calc(mat, "MULTIPLY",
@@ -457,10 +457,34 @@ MAT_SIKRA = lambda: material("Sikra", (0.55, 0.10, 0.06))          # le 'hout ha
 # Les abords du Kotel d'aujourd'hui.
 MAT_INOX = lambda: metal("Inox", (0.72, 0.72, 0.73), 0.25)
 MAT_PLASTIQUE = lambda: material("Plastique_blanc", (0.88, 0.88, 0.86))
+MAT_VERRE_DE_LAMPE = lambda: material("Verre_de_lampe", (0.90, 0.89, 0.84))    # projecteurs et lanternes : la visite les fait luire de nuit
 MAT_VITRE = lambda: vitre("Vitre", (0.05, 0.06, 0.07))
 MAT_BETON = lambda: material("Beton", (0.70, 0.68, 0.64))
 MAT_PORTIQUE = lambda: material("Portique", (0.55, 0.56, 0.58))
 MAT_BORNE_INCENDIE = lambda: material("Borne_incendie", (0.60, 0.10, 0.08))
+MAT_TOILE = lambda: material("Toile_blanche", (0.90, 0.88, 0.82))        # parasols, auvents, palissades de chantier
+MAT_FER_BRUN = lambda: metal("Fer_brun", (0.16, 0.12, 0.09), 0.6)          # grilles et garde-corps de la place
+MAT_MEHITSA = lambda: metal("Mehitsa", (0.62, 0.48, 0.26), 0.5)
+MAT_CAPRIER = lambda: material("Caprier", (0.27, 0.33, 0.15))             # les câpriers qui pendent du Kotel
+MAT_DRAPEAU_BLANC = lambda: material("Drapeau_blanc", (0.92, 0.92, 0.92))
+MAT_DRAPEAU_BLEU = lambda: material("Drapeau_bleu", (0.02, 0.14, 0.55))
+MAT_TABLE_DE_PRIERE = lambda: material("Table_de_priere", (0.34, 0.12, 0.09))
+MAT_TOLE = lambda: metal("Tole", (0.58, 0.60, 0.62), 0.5)
+MAT_BOIS_DU_PONT = lambda: bois("Bois_du_pont", (0.36, 0.22, 0.13))
+# La pierre de Jérusalem des bâtiments d'aujourd'hui autour de la place : un parement de moellons sciés, beige doré.
+MAT_PIERRE_DE_JERUSALEM = lambda: pierre("Pierre_de_Jerusalem", (0.70, 0.63, 0.50),
+                                         Appareil(0.8, (1.5, 2.5), DEBORD_ASSISE, JOINT, LISERE))
+# Le pavé de la place haute, en rangs étroits le long du Kotel, et les grandes dalles claires de l'aire de prière.
+MAT_DALLAGE_KOTEL = lambda: dallage("Dallage_kotel", (0.66, 0.60, 0.50), 0.9, (1.3, 2.2))
+MAT_DALLAGE_DE_PRIERE = lambda: dallage("Dallage_de_priere", (0.74, 0.69, 0.58), 1.6, (2.0, 3.2))
+MAT_ACIER_BLANC = lambda: metal("Acier_blanc", (0.82, 0.82, 0.80), 0.5)    # les palées du pont des Maghrébins
+MAT_PALME = lambda: material("Palme", (0.20, 0.30, 0.12))
+MAT_BLEU_POLICE = lambda: material("Bleu_police", (0.05, 0.16, 0.50))   # la bande et la rampe lumineuse des voitures de police
+MAT_PNEU = lambda: material("Pneu", (0.03, 0.03, 0.03))
+MAT_BOUGAINVILLEE = lambda: material("Bougainvillee", (0.55, 0.10, 0.32))   # au pied de la porte des Maghrébins
+MAT_CARROSSERIE_SOMBRE = lambda: material("Carrosserie_sombre", (0.10, 0.11, 0.13))
+MAT_CAPRIER_SEC = lambda: material("Caprier_sec", (0.40, 0.36, 0.20))      # les touffes de l'an passé
+MAT_VELOURS = lambda: material("Velours_de_l_aron", (0.10, 0.09, 0.28))    # la parokhet des arons de la place
 MAT_RELIURES = (lambda: material("Reliure_rouge", (0.35, 0.08, 0.07)),
                 lambda: material("Reliure_bleue", (0.08, 0.12, 0.30)),
                 lambda: material("Reliure_noire", (0.06, 0.05, 0.05)))

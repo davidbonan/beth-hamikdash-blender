@@ -56,6 +56,16 @@
       "zone": "har_habayit",
       "prefixes": [
         "Kotel_place",
+        "Kotel_nord",
+        "Kotel_falaise",
+        "Kotel_controle",
+        "Kotel_voiture",
+        "Kotel_rampe",
+        "Kotel_palmiers",
+        "Aish_HaTorah",
+        "Makhkama",
+        "Fondation_du_Kotel",
+        "Beit_HaLiba",
         "Arret_bus_kotel"
       ],
       "lieu": true
