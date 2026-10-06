@@ -778,6 +778,17 @@ function commencerInitiation() {
   lancerInitiation();
 }
 $("#rejouer").onclick = (e) => { e.currentTarget.blur(); commencerInitiation(); };
+
+const reglages = $("#reglages"), boutonReglages = $("#reglages-ouvrir");
+function montrerReglages(ouverts) {
+  reglages.classList.toggle("ouverts", ouverts);
+  boutonReglages.setAttribute("aria-expanded", String(ouverts));
+}
+boutonReglages.onclick = (e) => { e.currentTarget.blur(); montrerReglages(!reglages.classList.contains("ouverts")); };
+// La langue déplie sa liste dans le menu : seul un réglage fait le referme.
+reglages.addEventListener("click", (e) => { if (!e.target.closest("#langue-courante")) montrerReglages(false); });
+addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#reglages, #reglages-ouvrir")) montrerReglages(false); });
+addEventListener("keydown", (e) => { if (e.key === "Escape") montrerReglages(false); });
 if (CINEMA) {
   film = cinema({ parcours: haltesCinema, camera, sol: marche.solEn, oeil: OEIL, ama: AMA, voile,
     signaler: (etat) => parent.postMessage({ type: "cinema", ...etat }, location.origin) });

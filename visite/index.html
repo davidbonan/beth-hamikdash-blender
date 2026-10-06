@@ -184,7 +184,14 @@
   #mode.vole { color: var(--or); }
   #position { margin-inline-start: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
               white-space: nowrap; font-size: 12px; color: #9a9182; font-variant-numeric: tabular-nums; }
-  #barre #rejouer, #barre #langue-courante, #barre #moment { width: var(--commande); padding: 0; font-weight: 600; }
+  #barre #rejouer, #barre #langue-courante, #barre #moment, #barre #reglages-ouvrir {
+    width: var(--commande); padding: 0; font-weight: 600;
+  }
+  /* Langue, heure et « ? » gardent leur place dans la barre large ; l'étroite les range sous « ⋯ ». */
+  #reglages { display: contents; }
+  #langue { order: -1; }
+  #rejouer { order: 1; }
+  #barre #reglages-ouvrir { display: none; }
   #moment svg { width: 17px; height: 17px; }
   /* Un parcours tient son heure : le visiteur ne la change qu'en visite libre. */
   body:has(#parcours:not([hidden])) #moment { display: none; }
@@ -651,6 +658,23 @@
     #minicarte { width: 92px; top: calc(62px + var(--marge-haut)); }
   }
 
+  /* ---- barre étroite : ce qu'on règle une fois se range sous « ⋯ » ---- */
+  @media (max-width: 720px) {
+    #barre #reglages-ouvrir { display: inline-grid; }
+    #reglages {
+      position: absolute; top: 100%; inset-inline-end: calc(12px + max(var(--marge-gauche), var(--marge-droite)));
+      display: flex; flex-direction: column; gap: 2px; min-width: 200px; padding: 4px; border-radius: 5px;
+      border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.94);
+    }
+    #reglages:not(.ouverts) { display: none; }
+    #barre #reglages > button, #barre #langue-courante {
+      display: grid; grid-template-columns: 21px auto; justify-content: start; column-gap: 10px;
+      width: 100%; padding: 0 10px; font-weight: 400; border-color: transparent; background: none;
+    }
+    #reglages > button::after, #langue-courante::after { content: attr(title); }
+    #langue-menu { position: static; min-width: 0; padding: 2px 0 0; border: 0; background: none; }
+  }
+
   /* ---- petit écran : la fiche devient un tiroir ---- */
   @media (max-width: 720px) {
     #fiche {
@@ -681,6 +705,7 @@
       border-radius: 2px; background: var(--trait);
     }
     #fermer { top: 10px; inset-inline-end: 18px; width: 34px; height: 34px; line-height: 32px; font-size: 19px; }
+    #copier { top: 10px; inset-inline-end: 58px; width: 34px; height: 34px; padding: 9px; }
   }
 
   /* ---- téléphone couché : large et bas ---- */
@@ -702,6 +727,7 @@
     #poignee { margin: 0; padding: 16px 0 4px; cursor: default; touch-action: auto; }
     #poignee::before { content: none; }
     #fermer { top: 12px; inset-inline-end: 0; }
+    #copier { top: 12px; inset-inline-end: 40px; }
   }
 </style>
 
@@ -760,21 +786,25 @@
 </div>
 
 <div id="barre">
-  <div id="langue">
-    <button id="langue-courante" type="button" title="Langue" aria-label="Langue" data-titre="langue"
-            aria-haspopup="true" aria-expanded="false"><svg class="drapeau" aria-hidden="true"><use href="#drapeau-fr"></use></svg></button>
-    <div id="langue-menu" hidden></div>
-  </div>
   <label class="menu" title="Aller à…" data-titre="aller"><svg class="icone" aria-hidden="true"><use href="#icone-porte"></use></svg><select id="aller"><option value="" data-texte="aller">Aller à…</option></select></label>
   <label class="menu" title="Un élément…" data-titre="chercher"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select></label>
   <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="vol">Vol libre</button>
-  <button id="moment" type="button" title="Passer à la nuit" aria-label="Passer à la nuit" aria-pressed="false"
-          data-titre="moment_nuit"><svg aria-hidden="true"><use href="#icone-lune"></use></svg></button>
+  <div id="reglages">
+    <div id="langue">
+      <button id="langue-courante" type="button" title="Langue" aria-label="Langue" data-titre="langue"
+              aria-haspopup="true" aria-expanded="false"><svg class="drapeau" aria-hidden="true"><use href="#drapeau-fr"></use></svg></button>
+      <div id="langue-menu" hidden></div>
+    </div>
+    <button id="moment" type="button" title="Passer à la nuit" aria-label="Passer à la nuit" aria-pressed="false"
+            data-titre="moment_nuit"><svg aria-hidden="true"><use href="#icone-lune"></use></svg></button>
+    <button id="rejouer" type="button" title="Revoir les premiers pas" aria-label="Revoir les premiers pas"
+            data-titre="initiation_titre">?</button>
+  </div>
   <label class="menu" title="Suivre un service, station par station" data-titre="parcours_titre"><svg class="icone" aria-hidden="true"><use href="#icone-pas"></use></svg><select id="parcours-choix"><option value="" data-texte="parcours_menu">Parcours…</option></select></label>
   <span id="mode" data-texte="a_pied">à pied</span>
   <span id="position"></span>
-  <button id="rejouer" type="button" title="Revoir les premiers pas" aria-label="Revoir les premiers pas"
-          data-titre="initiation_titre">?</button>
+  <button id="reglages-ouvrir" type="button" title="Réglages" aria-label="Réglages" data-titre="reglages"
+          aria-haspopup="true" aria-expanded="false">⋯</button>
 </div>
 
 <div id="survol"></div>
