@@ -761,7 +761,9 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   function rendre() {
     voile.enabled = pieceEnfumeeVue();
     const eclaire = rayons && airEclaire.enabled;
+    // Les matrices de la scène se refont à la passe de géométrie, que la suite fige : sans elle, on les refait ici.
     if (passeAO || voile.enabled || eclaire) rendreGeometrie();
+    else scene.updateMatrixWorld();
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
