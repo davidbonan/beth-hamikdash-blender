@@ -1,7 +1,7 @@
-// Le décor se rend par tuiles, chacune au niveau le plus léger dont l'écart tient sous un pixel : un téléphone ne peut pas trier dix millions de triangles par image.
+// Le décor se rend par tuiles, chacune au niveau le plus léger dont l'écart tient sous celui du profil, un pixel ou deux : un téléphone ne peut pas trier dix millions de triangles par image.
 import * as THREE from "three";
+import { PROFIL } from "./qualite.js";
 
-const ECART_PIXELS = 1;
 // Sous un pixel et demi de rayon, une silhouette lointaine ne se lit plus : elle ne vaut pas son appel de dessin.
 const RAYON_VISIBLE = 1.5;
 // Assez de triangles pour qu'une tuile vaille son appel de dessin, assez de tuiles pour que le lointain s'allège.
@@ -192,7 +192,7 @@ export function niveauxDeDetail(scene, camera) {
       for (const t of tuiles) {
         if (t.suivie) t.centre.copy(t.suivie.center).applyMatrix4(t.source.matrixWorld);
         const distance = Math.max(oeil.distanceTo(t.centre) - t.rayon, 1e-3);
-        poser(t, ECART_PIXELS * distance / focale, t.rayon * focale / distance >= RAYON_VISIBLE);
+        poser(t, PROFIL.ecartDetail * distance / focale, t.rayon * focale / distance >= RAYON_VISIBLE);
       }
     },
     // Pour une carte tracée d'ailleurs que de l'œil : tout le décor au même écart, jusqu'au prochain `choisir`.

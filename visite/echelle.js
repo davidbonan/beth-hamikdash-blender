@@ -10,11 +10,15 @@ const VIF_MS = 18;
 const ESSAI_S = 10;
 const PAUSE_S = 15;
 const PAUSE_MAX_S = 120;
+// Au dernier palier, la médiane restée lente ce nombre d'images de suite : la machine ne tient pas ce profil.
+const IMAGES_A_BOUT = 600;
+// Au premier palier, la médiane restée vive ce nombre d'images de suite, une minute : la machine tiendrait mieux.
+const IMAGES_A_L_AISE = 3600;
 
-// `paliers` du plus fin au plus grossier ; on part de `depart`.
-export function regulerEchelle(paliers, depart) {
+// `paliers` du plus fin au plus grossier ; on part de `depart`. `quandABout` : le dernier palier ne suffit pas ; `quandALAise` : le premier est tenu sans peine.
+export function regulerEchelle(paliers, depart, { quandABout, quandALAise }) {
   let palier = paliers.indexOf(depart), images = 0, attente = IMAGES_ENTRE_CHANGEMENTS;
-  let montee = -Infinity, remontee = 0, pause = PAUSE_S;
+  let montee = -Infinity, remontee = 0, pause = PAUSE_S, lentes = 0, vives = 0;
   const durees = new Float32Array(IMAGES_ENTRE_CHANGEMENTS);
   const mediane = () => {
     const n = Math.min(images, IMAGES_ENTRE_CHANGEMENTS);
@@ -36,6 +40,10 @@ export function regulerEchelle(paliers, depart) {
         palier--;
         attente = IMAGES_APRES_MONTEE;
       } else {
+        lentes = typique > LENT_MS ? lentes + 1 : 0;
+        if (lentes === IMAGES_A_BOUT) quandABout();
+        vives = palier === 0 && typique < VIF_MS ? vives + 1 : 0;
+        if (vives === IMAGES_A_L_AISE) quandALAise();
         return null;
       }
       images = 0;

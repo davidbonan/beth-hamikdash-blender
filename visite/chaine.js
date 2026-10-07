@@ -186,6 +186,8 @@ const COMPOSITION = {
 // Le parcours se fait en demi-définition, sur la grille de la passe de géométrie qu'il lit :
 // au quart les volutes perdent leur détail. Il écrit la lumière reprise et, en alpha, ce qui
 // traverse ; `VOILE` pose ça sur l'image.
+// En mètres. De plus loin la pièce est close — ses murs, sa parokhet extérieure à 1,3 m — et la fumée coupée partout : dans le champ, elle coûtait pourtant sa passe, et au profil très léger celle de géométrie.
+const RECUL_FUMEE = 2;
 const FUMEE = {
   uniforms: { tGeo: { value: null },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
@@ -334,7 +336,7 @@ const PLAFOND_RAYONS = 0.45;
 // La poussière des cours tient au sol : entière jusqu'au dallage de l'Azara, elle a perdu les deux tiers de sa densité dix mètres plus haut.
 const SOL_DE_L_AIR = 0, EPAISSEUR_DE_L_AIR = 10;
 const BIAIS_RAYONS = 0.4 / 700;
-const RAYONS = {
+const RAYONS = PROFIL.rayons && {
   uniforms: { tGeo: { value: null }, uCarteLointaine: { value: null }, uOmbreLointaine: { value: new THREE.Matrix4() },
               uMonde: { value: new THREE.Matrix4() }, uVersLAstre: { value: new THREE.Vector3() },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uDensite: { value: 0 } },
@@ -610,11 +612,14 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const passeScene = new RenderPass(scene, camera);
   passeScene.clear = !PROFIL.preProfondeur;
   composeur.addPass(passeScene);
-  const passeAO = new ShaderPass(OCCLUSION);
-  passeAO.renderToScreen = false;
-  const passeComposition = new ShaderPass(COMPOSITION);
-  passeComposition.uniforms.tAO.value = cibleAO.texture;
-  composeur.addPass(passeComposition);
+  const passeAO = PROFIL.occlusion > 0 && new ShaderPass(OCCLUSION);
+  const passeComposition = passeAO && new ShaderPass(COMPOSITION);
+  if (passeAO) {
+    passeAO.renderToScreen = false;
+    passeAO.uniforms.tGeo.value = cibleGeo.texture;
+    passeComposition.uniforms.tAO.value = cibleAO.texture;
+    composeur.addPass(passeComposition);
+  }
   const fumee = new ShaderPass(FUMEE);
   fumee.uniforms.tGeo.value = cibleGeo.texture;
   const voile = new ShaderPass(VOILE);
@@ -636,13 +641,15 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     new THREE.Vector2(1, 1), PROFIL.halo.force, PROFIL.halo.rayon, PROFIL.halo.seuil);
   if (halo) composeur.addPass(halo);
   // Après le halo : les faisceaux sont déjà de la lumière diffusée, il les étalerait une seconde fois.
-  const rayons = new ShaderPass(RAYONS);
-  rayons.uniforms.tGeo.value = cibleGeo.texture;
-  rayons.uniforms.uCarteLointaine.value = OMBRE_LOINTAINE.uCarteLointaine.value;
-  const airEclaire = new ShaderPass(AIR_ECLAIRE);
-  airEclaire.uniforms.tRayons.value = cibleRayons.texture;
-  airEclaire.enabled = false;
-  composeur.addPass(airEclaire);
+  const rayons = RAYONS && new ShaderPass(RAYONS);
+  const airEclaire = rayons && new ShaderPass(AIR_ECLAIRE);
+  if (rayons) {
+    rayons.uniforms.tGeo.value = cibleGeo.texture;
+    rayons.uniforms.uCarteLointaine.value = OMBRE_LOINTAINE.uCarteLointaine.value;
+    airEclaire.uniforms.tRayons.value = cibleRayons.texture;
+    airEclaire.enabled = false;
+    composeur.addPass(airEclaire);
+  }
   composeur.addPass(new OutputPass());
 
   // Après la sortie, et pas avant : le FXAA cherche ses arêtes sur la luminance
@@ -654,7 +661,6 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   // chercher partout, et il l'effacerait en même temps.
   const etalonnage = new ShaderPass(ETALONNAGE);
   composeur.addPass(etalonnage);
-  passeAO.uniforms.tGeo.value = cibleGeo.texture;
 
   // Un composeur construit sur sa propre cible fige sa définition à 1 : la scène était rendue en CSS, puis agrandie.
   function redimensionner(l, h, definition) {
@@ -667,18 +673,23 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     voile.uniforms.uPas.value.set(1 / cibleFumee.width, 1 / cibleFumee.height);
     halo?.setSize(composeur.renderTarget1.width, composeur.renderTarget1.height);
     arretes.material.uniforms.resolution.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
-    passeComposition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
-    passeAO.uniforms.uTanFov.value = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
-    passeAO.uniforms.uAspect.value = camera.aspect;
-    fumee.uniforms.uTanFov.value = passeAO.uniforms.uTanFov.value;
+    const tanFov = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+    if (passeAO) {
+      passeComposition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
+      passeAO.uniforms.uTanFov.value = tanFov;
+      passeAO.uniforms.uAspect.value = camera.aspect;
+    }
+    fumee.uniforms.uTanFov.value = tanFov;
     fumee.uniforms.uAspect.value = camera.aspect;
+    if (!rayons) return;
     cibleRayons.setSize(cibleGeo.width, cibleGeo.height);
     airEclaire.uniforms.uPas.value.set(1 / cibleRayons.width, 1 / cibleRayons.height);
-    rayons.uniforms.uTanFov.value = passeAO.uniforms.uTanFov.value;
+    rayons.uniforms.uTanFov.value = tanFov;
     rayons.uniforms.uAspect.value = camera.aspect;
   }
 
   function eclairerLAir(versLAstre, teinte, eclat) {
+    if (!rayons) return;
     airEclaire.enabled = eclat > 0;
     airEclaire.uniforms.uTeinte.value.set(teinte);
     rayons.uniforms.uVersLAstre.value.copy(versLAstre);
@@ -718,7 +729,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     return fond;
   }
 
-  const pieceEnfumeeVue = () => pieceEnfumee !== null && champ.setFromProjectionMatrix(
+  const pieceEnfumeeVue = () => pieceEnfumee !== null && pieceEnfumee.distanceToPoint(camera.position) < RECUL_FUMEE && champ.setFromProjectionMatrix(
     vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(pieceEnfumee);
 
   function rendreGeometrie() {
@@ -749,14 +760,15 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function rendre() {
     voile.enabled = pieceEnfumeeVue();
-    rendreGeometrie();
+    const eclaire = rayons && airEclaire.enabled;
+    if (passeAO || voile.enabled || eclaire) rendreGeometrie();
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
-    passeAO.render(renderer, cibleAO, null, 0, false);
+    if (passeAO) passeAO.render(renderer, cibleAO, null, 0, false);
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
-    if (airEclaire.enabled) rendreLesRayons();
+    if (eclaire) rendreLesRayons();
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
     scene.matrixWorldAutoUpdate = false;
@@ -789,7 +801,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function passesEnTampon() {
     const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
-    return [passeAO, passeComposition, fumee, voile, rayons, airEclaire, arretes].map((passe) => passe.material).concat(PHOTOMETRIE, halos);
+    return [passeAO, passeComposition, fumee, voile, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.

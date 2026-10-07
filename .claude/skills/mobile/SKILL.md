@@ -15,6 +15,7 @@ n'écoute que sur 127.0.0.1.
 | `ordre.py '<corps async>'` | Exécute du JavaScript dans la page la plus récente et imprime le retour. Les crochets de `visite.js` y sont : `__vue`, `__etat`, `__rendre`, `__parcours`, `__moteur` (`renderer`, `scene`). |
 | `parcourir.py <dossier> [--vues a,b] [--requete qualite=haute]` | Ouvre la visite, attend `__pret`, passe l'accueil, capture chaque vue (`simctl io screenshot`) et relève rythme et état dans `mesures.json`. |
 | `promenade.py <dossier> [--parcours tamid] [--stations n]` | Ce qu'un visiteur fait : chaque parcours guidé, station par station, en marchant à l'allure réelle. Capture à chaque arrivée, relevé toutes les 2 s dans `promenade.json` — c'est ce qui voit une fuite de mémoire ou une saccade. |
+| `comparer.py [--profils basse,minimale] [--echelles 0.75,0.55] [--tours 3]` | Le coût d'une image d'un profil à l'autre : recharge la visite sous chaque profil en alternance, épingle la définition (`__echelle`) et imprime par vue la médiane de `__chrono`, les triangles et les appels. |
 | `memoire.sh` | Empreinte (celle que jetsam juge sur iPhone) des processus WebContent (JavaScript) et GPU (textures) du simulateur. Demande de sortir du bac à sable (`footprint`). |
 
 ## Démarrer

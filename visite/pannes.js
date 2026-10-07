@@ -1,5 +1,6 @@
 // Ce qui tourne mal : une erreur de chargement, et le contexte WebGL qu'un téléphone à court de mémoire retire à la page.
 import { ecrire, texte } from "./langue.js";
+import { seReplier } from "./qualite.js";
 
 const PERTE = "visite-contexte-perdu";
 const RECHUTE_MS = 120000;
@@ -28,6 +29,7 @@ export function veillerAuxPannes({ etat, chargement }) {
   function quandContextePerdu() {
     if (contexteEnPerte) return;
     contexteEnPerte = true;
+    seReplier();
     if (!visiteLancee || Date.now() - derniereReprise < RECHUTE_MS) return abandonnerContexte();
     attendreRestitution();
   }

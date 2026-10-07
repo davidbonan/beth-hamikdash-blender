@@ -11,7 +11,7 @@ import { chaine } from "./chaine.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
-import { PROFIL } from "./qualite.js";
+import { PROFIL, seRelever, seReplier } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
@@ -603,7 +603,7 @@ const avantLePas = new THREE.Vector3();
 // À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
-const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart);
+const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart, { quandABout: seReplier, quandALAise: seRelever });
 function ajusterEchelle(dt) {
   const voulue = regulateur.suivre(dt, performance.now() / 1000);
   if (voulue === null) return;
@@ -813,6 +813,7 @@ window.__cam = (x, y, z, cx, cy, cz) => {
   marche.accorderRegard(); dessiner(0);
 };
 window.__rendre = () => dessiner(0);
+window.__echelle = (voulue) => { echelle = voulue; dimensionner(); dessiner(0); };
 window.__etat = () => {
   const e = new THREE.Euler(0, 0, 0, "YXZ").setFromQuaternion(camera.quaternion);
   const d = 180 / Math.PI;
