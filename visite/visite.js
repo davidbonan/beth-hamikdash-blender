@@ -201,7 +201,7 @@ async function glisser(trait, part, duree) {
   await laisserPeindre();
 }
 // La jauge de « préparation… » avance au poids de chaque étape : sa part de l'attente dans Safari d'iPhone, où elle dure.
-const POIDS = { arbres: 1, textures: 1, nuanceurs: 10, reflet: 3, image: 4 };
+const POIDS = { arbres: 1, textures: 1, nuanceurs: 10, reflet: 3, detail: 3, image: 4 };
 // Le reflet et la première image figent la page : leur durée s'estime en parts de celle de la compilation.
 const GELS = { reflet: 0.3, image: 0.35 };
 let dureeCompilation = 0;
@@ -332,10 +332,13 @@ async function envoyerLesTextures() {
   await parTranches(textures, enJaugeant("textures", textures.size, (texture) => renderer.initTexture(texture)));
 }
 
+// Dès ses arbres construits, pendant que les nuanceurs se compilent : confié après la première image, le décor se traçait entier vingt secondes, à une image toutes les deux secondes sur un vieil iPad.
+const allegerLeTemple = () => alleger(gltf.scene);
+
 // Les nuanceurs se compilent hors du fil de la page pendant que les arbres s'y construisent.
 await Promise.all([
   compilerEnJaugeant(),
-  parTranches(obstacles, enJaugeant("arbres", obstacles.length, construireArbre)).then(envoyerLesTextures),
+  parTranches(obstacles, enJaugeant("arbres", obstacles.length, construireArbre)).then(allegerLeTemple).then(envoyerLesTextures),
 ]);
 const refleterLeHeikhal = () => sonderHeikhal(renderer, scene, {
   kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
@@ -738,6 +741,7 @@ function conduire(dt) {
   aide.classList.add("parti");
 }
 
+await detail.acheve((part) => avancer("detail", part));
 await glisserPendantLeGel("image");
 renderer.setAnimationLoop(() => {
   if (pannes.enReprise || pannes.contextePerdu || imageSuspendue) return;
@@ -761,7 +765,6 @@ renderer.setAnimationLoop(() => {
 // La première image fige Safari plusieurs secondes : le voile ne part qu'une fois qu'elle est rendue.
 laisserPeindre().then(() => $("#chargement").classList.add("parti"));
 pannes.lancer();
-alleger(gltf.scene);
 
 // Three renvoie seul géométries et images ; les cartes relâchées, les environnements, les ombres figées et le reflet du Heikhal sont à refaire.
 async function reprendre() {

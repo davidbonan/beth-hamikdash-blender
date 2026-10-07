@@ -67,6 +67,7 @@ export function niveauxDeDetail(scene, camera) {
   const oublies = new WeakSet();
   const mobiles = new WeakSet();
   let ouvriers = null;
+  let attente = null;
 
   // La tuile lit sur son maillage ce que la visite y règle : sa matière, et ses ombres la nuit.
   function tuileDe(maillage, geometrie) {
@@ -110,7 +111,19 @@ export function niveauxDeDetail(scene, camera) {
   }
 
   // Le tas WebAssembly d'un ouvrier ne rend jamais ce qu'il a pris : ouvriers gardés, la page pesait 400 Mo de plus dans Safari d'iPhone.
+  const enCalcul = () => file.length + (ouvriers?.filter((o) => o.maillage).length ?? 0);
+
+  function rendreCompte() {
+    if (!attente) return;
+    const restants = enCalcul();
+    attente.avancer(1 - restants / attente.total);
+    if (restants > 0) return;
+    attente.finir();
+    attente = null;
+  }
+
   function envoyer() {
+    rendreCompte();
     if (file.length === 0) {
       if (ouvriers?.every((o) => !o.maillage)) congedier();
       return;
@@ -136,6 +149,7 @@ export function niveauxDeDetail(scene, camera) {
   function abandonner() {
     file.length = 0;
     if (ouvriers) congedier();
+    rendreCompte();
   }
 
   function demarrer() {
@@ -169,6 +183,13 @@ export function niveauxDeDetail(scene, camera) {
   const oeil = new THREE.Vector3();
   return {
     confier,
+    // Tenue quand plus rien de ce qui a été confié n'est en calcul : jusque-là le décor se trace entier.
+    acheve(avancer) {
+      return new Promise((finir) => {
+        attente = { total: Math.max(enCalcul(), 1), avancer, finir };
+        rendreCompte();
+      });
+    },
     // Une troupe joue : ses tuiles suivent leur maillage, qu'il se meuve par ses os ou par sa matrice.
     confierMobiles(maillages) {
       for (const m of maillages) mobiles.add(m);
