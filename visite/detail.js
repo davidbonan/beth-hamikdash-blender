@@ -192,7 +192,7 @@ export function niveauxDeDetail(scene, camera) {
       for (const t of tuiles) {
         if (t.suivie) t.centre.copy(t.suivie.center).applyMatrix4(t.source.matrixWorld);
         const distance = Math.max(oeil.distanceTo(t.centre) - t.rayon, 1e-3);
-        poser(t, PROFIL.ecartDetail * distance / focale, t.rayon * focale / distance >= RAYON_VISIBLE);
+        poser(t, PROFIL.ecartDetail * distance / focale, distance <= PROFIL.porteeDetail && t.rayon * focale / distance >= RAYON_VISIBLE);
       }
     },
     // Pour une carte tracée d'ailleurs que de l'œil : tout le décor au même écart, jusqu'au prochain `choisir`.

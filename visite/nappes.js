@@ -29,16 +29,6 @@ const JEUX = {
   marbre: { couleur: "matieres/marbre_c_1024.webp", normale: "matieres/marbre_n_1024.webp", moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
   etoffe: { normale: "matieres/etoffe_n_1024.webp" },
 };
-// Les mêmes au quart des texels. Chemins en littéraux entiers : le site n'empreinte que ceux-là.
-const JEUX_LEGERS = {
-  pierre: { ...JEUX.pierre, couleur: "matieres/pierre_c_512.webp", normale: "matieres/pierre_n_512.webp" },
-  enduit: { ...JEUX.enduit, couleur: "matieres/enduit_c_512.webp", normale: "matieres/enduit_n_512.webp" },
-  bois: { ...JEUX.bois, couleur: "matieres/bois_c_512.webp", normale: "matieres/bois_n_512.webp" },
-  metal: { ...JEUX.metal, couleur: "matieres/metal_c_512.webp", normale: "matieres/metal_n_512.webp" },
-  marbre: { ...JEUX.marbre, couleur: "matieres/marbre_c_512.webp", normale: "matieres/marbre_n_512.webp" },
-  etoffe: { ...JEUX.etoffe, normale: "matieres/etoffe_n_512.webp" },
-};
-const JEUX_PAR_TAILLE = { 1024: JEUX, 512: JEUX_LEGERS };
 
 export async function nappes() {
   const chargeur = new THREE.TextureLoader();
@@ -53,7 +43,7 @@ export async function nappes() {
   };
 
   const jeux = new Map();
-  await Promise.all(Object.entries(JEUX_PAR_TAILLE[PROFIL.textures.nappes]).map(async ([nom, jeu]) => {
+  await Promise.all(Object.entries(PROFIL.textures.nappes ? JEUX : {}).map(async ([nom, jeu]) => {
     const [couleur, normale] = await Promise.all([
       jeu.couleur ? chargeur.loadAsync(jeu.couleur) : null,
       chargeur.loadAsync(jeu.normale),

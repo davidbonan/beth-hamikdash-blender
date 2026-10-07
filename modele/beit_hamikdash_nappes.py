@@ -2,8 +2,7 @@
 
     python3 modele/beit_hamikdash_nappes.py
 
-Six jeux, tous CC0 : quatre de Poly Haven, deux d'ambientCG. Deux fichiers par jeu,
-à deux tailles : 1024, et 512 pour le profil sobre.
+Six jeux, tous CC0 : quatre de Poly Haven, deux d'ambientCG. Deux fichiers par jeu.
 La COULEUR porte la rugosité dans son canal alpha — l'alpha du WebP est codé à part et
 à pleine définition, là où le bleu partirait en 4:2:0 avec le reste de la chrominance.
 La NORMALE est en convention OpenGL, vert vers le haut, celle qu'attend three.
@@ -22,8 +21,6 @@ import urllib.request
 SORTIE = pathlib.Path(__file__).resolve().parents[1] / "visite" / "matieres"
 BRUT = SORTIE / ".scans"
 TAILLE = 1024
-# Le profil sobre de la visite : le quart des texels, et autant de mémoire graphique en moins.
-TAILLE_LEGERE = 512
 
 # Le calcaire est le meleke de Jérusalem : crème, piqué, sans veine. Les travertins
 # sciés, eux, se lisent en carrelage de salle de bain, et les roches de falaise en
@@ -84,27 +81,6 @@ def moyenne(png):
     return ([canal(k, table) for k in range(3)], canal(3, range(256)) / 255)
 
 
-def fabriquer(nom, taille):
-    """Écrit la normale et, s'il en a une, la couleur du jeu à cette taille ; rend le PNG de la couleur."""
-    normale = BRUT / f"{nom}_normale_{taille}.png"
-    ffmpeg("-i", str(BRUT / f"{nom}_normale.jpg"), "-vf", f"scale={taille}:{taille}",
-           "-frames:v", "1", str(normale))
-    subprocess.run(["cwebp", "-quiet", "-q", "88", "-m", "6", "-sharp_yuv",
-                    str(normale), "-o", str(SORTIE / f"{nom}_n_{taille}.webp")], check=True)
-    if nom in SANS_COULEUR:
-        return None
-    couleur = BRUT / f"{nom}_couleur_{taille}.png"
-    ffmpeg("-i", str(BRUT / f"{nom}_couleur.jpg"), "-i", str(BRUT / f"{nom}_rugosite.jpg"),
-           "-filter_complex",
-           f"[0:v]scale={taille}:{taille},format=rgb24[c];"
-           f"[1:v]scale={taille}:{taille},format=gray[r];[c][r]alphamerge",
-           "-frames:v", "1", str(couleur))
-    subprocess.run(["cwebp", "-quiet", "-q", "82", "-alpha_q", "72", "-m", "6",
-                    "-sharp_yuv", str(couleur),
-                    "-o", str(SORTIE / f"{nom}_c_{taille}.webp")], check=True)
-    return couleur
-
-
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
     scans_poly_haven()
@@ -112,17 +88,28 @@ def main():
 
     print("  À recopier dans visite/nappes.js :")
     for nom in (*POLY_HAVEN, *AMBIENT_CG):
-        fabriquer(nom, TAILLE_LEGERE)
-        couleur = fabriquer(nom, TAILLE)
-        if not couleur:
+        normale = BRUT / f"{nom}_normale_{TAILLE}.png"
+        ffmpeg("-i", str(BRUT / f"{nom}_normale.jpg"), "-vf", f"scale={TAILLE}:{TAILLE}",
+               "-frames:v", "1", str(normale))
+        subprocess.run(["cwebp", "-quiet", "-q", "88", "-m", "6", "-sharp_yuv",
+                        str(normale), "-o", str(SORTIE / f"{nom}_n_{TAILLE}.webp")], check=True)
+        if nom in SANS_COULEUR:
             continue
+        couleur = BRUT / f"{nom}_couleur_{TAILLE}.png"
+        ffmpeg("-i", str(BRUT / f"{nom}_couleur.jpg"), "-i", str(BRUT / f"{nom}_rugosite.jpg"),
+               "-filter_complex",
+               f"[0:v]scale={TAILLE}:{TAILLE},format=rgb24[c];"
+               f"[1:v]scale={TAILLE}:{TAILLE},format=gray[r];[c][r]alphamerge",
+               "-frames:v", "1", str(couleur))
+        subprocess.run(["cwebp", "-quiet", "-q", "82", "-alpha_q", "72", "-m", "6",
+                        "-sharp_yuv", str(couleur),
+                        "-o", str(SORTIE / f"{nom}_c_{TAILLE}.webp")], check=True)
         teinte, rugosite = moyenne(couleur)
         print(f"  {nom}: {{ moyenne: [{teinte[0]:.4f}, {teinte[1]:.4f}, "
               f"{teinte[2]:.4f}], rugosite: {rugosite:.4f} }},")
 
-    for taille in (TAILLE, TAILLE_LEGERE):
-        octets = sum(f.stat().st_size for f in SORTIE.glob(f"*_[cn]_{taille}.webp"))
-        print(f"\n  {taille} : {octets / 1e6:.2f} Mo")
+    octets = sum(f.stat().st_size for f in SORTIE.glob(f"*_{TAILLE}.webp"))
+    print(f"\n  {TAILLE} : {octets / 1e6:.2f} Mo")
 
 
 main()
