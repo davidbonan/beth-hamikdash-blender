@@ -11,7 +11,7 @@ import { chaine } from "./chaine.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
-import { PROFIL, seRelever, seReplier } from "./qualite.js";
+import { NIVEAU, PROFIL, brancherChoix, seRelever, seReplier } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { nomDeZone, panneau } from "./fiche.js";
@@ -23,6 +23,7 @@ import { parcours } from "./parcours.js";
 import { AMA, OEIL, marcheur } from "./marche.js";
 import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte, titrer } from "./langue.js";
 import { veillerAuxPannes } from "./pannes.js";
+import { confier, lireConfie, oublierConfie } from "./memoire.js";
 import { laisserPeindre, parTranches } from "./fil.js";
 import { TROUPES, TROUPE_LIBRE, troupesDeFigurants } from "./figurants.js";
 import { eclairerLeTemple } from "./eclairage.js";
@@ -702,8 +703,14 @@ function montrerDemande(id) {
   aide.classList.add("parti");
   guides.ouvrir(trouvee.parcours, trouvee.rang);
 }
+// Changer de qualité recharge la visite : le visiteur y retrouve sa place et son heure.
+const REPRISE = "visite-reprise";
+const reprise = JSON.parse(lireConfie(REPRISE) ?? "null");
 const demande = new URLSearchParams(location.search).get("vue");
-if (demande) montrerDemande(demande);
+if (reprise) {
+  oublierConfie(REPRISE);
+  poserLOeil(new THREE.Vector3().fromArray(reprise.position), new THREE.Vector3().fromArray(reprise.regard));
+} else if (demande) montrerDemande(demande);
 
 // Le survol n'a pas besoin de 60 Hz.
 function afficherSurvol() {
@@ -765,6 +772,7 @@ renderer.setAnimationLoop(() => {
 // La première image fige Safari plusieurs secondes : le voile ne part qu'une fois qu'elle est rendue.
 laisserPeindre().then(() => $("#chargement").classList.add("parti"));
 pannes.lancer();
+if (reprise?.moment === "nuit") passerAuMoment("nuit");
 
 // Three renvoie seul géométries et images ; les cartes relâchées, les environnements, les ombres figées et le reflet du Heikhal sont à refaire.
 async function reprendre() {
@@ -789,9 +797,16 @@ function montrerReglages(ouverts) {
 }
 boutonReglages.onclick = (e) => { e.currentTarget.blur(); montrerReglages(!reglages.classList.contains("ouverts")); };
 // La langue déplie sa liste dans le menu : seul un réglage fait le referme.
-reglages.addEventListener("click", (e) => { if (!e.target.closest("#langue-courante")) montrerReglages(false); });
+reglages.addEventListener("click", (e) => { if (!e.target.closest("#langue-courante, #qualite-courante")) montrerReglages(false); });
 addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#reglages, #reglages-ouvrir")) montrerReglages(false); });
 addEventListener("keydown", (e) => { if (e.key === "Escape") montrerReglages(false); });
+brancherChoix({ recharger: () => {
+  const regard = camera.getWorldDirection(new THREE.Vector3()).add(camera.position);
+  confier(REPRISE, JSON.stringify({ position: camera.position.toArray(), regard: regard.toArray(), moment: eclairage.moment }));
+  const url = new URL(location);
+  url.searchParams.delete("qualite");
+  location.replace(url);
+} });
 if (CINEMA) {
   film = cinema({ parcours: haltesCinema, camera, sol: marche.solEn, oeil: OEIL, ama: AMA, voile,
     signaler: (etat) => parent.postMessage({ type: "cinema", ...etat }, location.origin) });
@@ -811,9 +826,13 @@ if (CINEMA) {
 window.__vue = (id) => { vues.allerVers(id); dessiner(0); };
 window.__demande = montrerDemande;
 window.__vues = () => [...reperes.entrees, ...reperes.vues].map((v) => v.id);
+function poserLOeil(position, regard) {
+  camera.position.copy(position); camera.lookAt(regard); marche.suivreLaCamera();
+  marche.accorderRegard();
+}
 window.__cam = (x, y, z, cx, cy, cz) => {
-  camera.position.set(x, y, z); camera.lookAt(cx, cy, cz); marche.suivreLaCamera();
-  marche.accorderRegard(); dessiner(0);
+  poserLOeil(new THREE.Vector3(x, y, z), new THREE.Vector3(cx, cy, cz));
+  dessiner(0);
 };
 window.__rendre = () => dessiner(0);
 window.__echelle = (voulue) => { echelle = voulue; dimensionner(); dessiner(0); };
@@ -823,7 +842,7 @@ window.__etat = () => {
   return { lacet: +(e.y * d).toFixed(2), tangage: +(e.x * d).toFixed(2), roulis: +(e.z * d).toFixed(4),
            x: +camera.position.x.toFixed(3), y: +camera.position.y.toFixed(3), z: +camera.position.z.toFixed(3),
            piedsY: +marche.piedsY.toFixed(3), vise: survole, echelle: +echelle.toFixed(2),
-           fov: +camera.fov.toFixed(1), vol: marche.vol, lieu: lieuOccupe(),
+           fov: +camera.fov.toFixed(1), vol: marche.vol, lieu: lieuOccupe(), niveau: NIVEAU,
            exposition: +renderer.toneMappingExposure.toFixed(3), fermeture: +oeilAdapte.fermeture.toFixed(2),
            luminance: rendu.luminance && +rendu.luminance.toFixed(4) };
 };

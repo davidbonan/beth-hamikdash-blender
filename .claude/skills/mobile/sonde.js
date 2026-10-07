@@ -68,7 +68,8 @@
   function instrumenter(gl, toile) {
     if (gl.__sonde) return;
     gl.__sonde = true;
-    toile.addEventListener("webglcontextlost", () => { perdu = true; noter("contexte_perdu", { ...memoire() }); vider(); });
+    // Le banc de `qualite.js` jette son contexte, sur une toile jamais posée dans la page : ce n'est pas une perte.
+    toile.addEventListener("webglcontextlost", () => { if (!toile.isConnected) return; perdu = true; noter("contexte_perdu", { ...memoire() }); vider(); });
     toile.addEventListener("webglcontextrestored", () => {
       perdu = false;
       tailles.clear();
@@ -178,7 +179,8 @@
     noter("contexte", { version: gl.getParameter(gl.VERSION), rendu: gl.getParameter(gl.RENDERER),
                         maxTexture: gl.getParameter(gl.MAX_TEXTURE_SIZE), samples: gl.getParameter(gl.MAX_SAMPLES),
                         floatColor: !!gl.getExtension("EXT_color_buffer_float"), halfColor: !!gl.getExtension("EXT_color_buffer_half_float"),
-                        floatBlend: !!gl.getExtension("EXT_float_blend"), largeur: toile.width, hauteur: toile.height, dpr: devicePixelRatio });
+                        floatBlend: !!gl.getExtension("EXT_float_blend"), parallele: !!gl.getExtension("KHR_parallel_shader_compile"),
+                        banc: window.__banc ?? null, largeur: toile.width, hauteur: toile.height, dpr: devicePixelRatio });
   }
   const getContext = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function (type, ...reste) {

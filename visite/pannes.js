@@ -1,17 +1,11 @@
 // Ce qui tourne mal : une erreur de chargement, et le contexte WebGL qu'un téléphone à court de mémoire retire à la page.
 import { ecrire, texte } from "./langue.js";
-import { seReplier } from "./qualite.js";
+import { confier, lireConfie } from "./memoire.js";
+import { tomber } from "./qualite.js";
 
 const PERTE = "visite-contexte-perdu";
 const RECHUTE_MS = 120000;
 const ATTENTE_RESTITUTION_MS = 5000;
-
-function lireStockage(cle) {
-  try { return sessionStorage.getItem(cle); } catch { return null; }
-}
-function ecrireStockage(cle, valeur) {
-  try { sessionStorage.setItem(cle, valeur); } catch { /* navigation privée : la page rechargera, sans garde-fou */ }
-}
 
 export function veillerAuxPannes({ etat, chargement }) {
   // Un iPhone à court de mémoire retire son contexte à la page : plus rien ne se dessine, et la compilation en cours
@@ -29,7 +23,7 @@ export function veillerAuxPannes({ etat, chargement }) {
   function quandContextePerdu() {
     if (contexteEnPerte) return;
     contexteEnPerte = true;
-    seReplier();
+    tomber();
     if (!visiteLancee || Date.now() - derniereReprise < RECHUTE_MS) return abandonnerContexte();
     attendreRestitution();
   }
@@ -53,8 +47,8 @@ export function veillerAuxPannes({ etat, chargement }) {
   }
   function abandonnerContexte() {
     contexteAbandonne = true;
-    const rechute = Date.now() - Number(lireStockage(PERTE) ?? 0) < RECHUTE_MS;
-    ecrireStockage(PERTE, String(Date.now()));
+    const rechute = Date.now() - Number(lireConfie(PERTE) ?? 0) < RECHUTE_MS;
+    confier(PERTE, String(Date.now()));
     if (!rechute) return location.reload();
     document.documentElement.classList.add("perdu");
     ecrire(etat, "contexte_perdu");
