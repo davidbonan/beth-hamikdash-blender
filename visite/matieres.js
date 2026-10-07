@@ -32,6 +32,8 @@ export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
                           KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
+// Celles qui gardent leur appareil au profil sobre : les murs, les sols, l'or, et l'étoffe pour les keruvim de la Parokhet.
+const ESSENTIELLES = new Set([PIERRE, DALLE, METAL, ETOFFE]);
 // Le dôme éclairant est beige et désaturé : à 1, l'or au soleil n'en reflétait qu'un gris-vert.
 const REFLET_DU_METAL = 1.6;
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
@@ -1100,9 +1102,10 @@ export function habiller(materiau, horloges, jeux) {
     materiau.emissiveIntensity = VERRE_ALLUME.eclat;
   }
 
-  const jeu = jeux.get(NAPPE_DE[famille]);
+  const rendue = PROFIL.habillageEssentiel && !ESSENTIELLES.has(famille) ? LISSE : famille;
+  const jeu = jeux.get(NAPPE_DE[rendue]);
   if (jeu) {
-    const [cote, couleur, chroma, relief, rugosite] = CARREAU[famille];
+    const [cote, couleur, chroma, relief, rugosite] = CARREAU[rendue];
     uniformes.uNappeN = { value: jeu.normale };
     uniformes.uCarreau = { value: new THREE.Vector4(1 / cote, couleur, relief, rugosite) };
     uniformes.uChroma = { value: chroma };
@@ -1120,9 +1123,9 @@ export function habiller(materiau, horloges, jeux) {
     uniformes.uRayonFil = { value: rayonFil };
     materiau.transparent = true;
   }
-  const drapeaux = `#define FAMILLE ${famille}\n`
+  const drapeaux = `#define FAMILLE ${rendue}\n`
     + (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
-    + (MINERAUX.has(famille) ? "#define TEMPERE\n" : "")
+    + (MINERAUX.has(rendue) ? "#define TEMPERE\n" : "")
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
     + (parokhet ? "#define PAROKHET\n" : "")

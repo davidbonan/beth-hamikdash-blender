@@ -32,10 +32,14 @@
   // La mémoire GPU que la page réserve, estimée à chaque allocation : c'est elle qui fait perdre le contexte sur iPhone.
   const octets = { textures: 0, tampons: 0, rendus: 0 };
   const tailles = new Map();
+  // `?budget=<Mo>` : le contexte tombe dès que la page en réserve davantage — la limite qu'un vieil iPad a et que le simulateur n'a pas.
+  const budget = (Number(new URLSearchParams(location.search).get("budget")) || Infinity) * 1048576;
+  let retirerLeContexte = null;
   const compter = (famille, objet, taille, forme = "") => {
     if (!objet) return;
     octets[famille] += taille - (tailles.get(objet)?.taille ?? 0);
     tailles.set(objet, { famille, taille, forme });
+    if (octets.textures + octets.tampons + octets.rendus > budget) retirerLeContexte?.();
   };
   const oublier = (famille, objet) => {
     if (!objet || !tailles.has(objet)) return;
@@ -117,6 +121,29 @@
       if (!s) noter("shader_nul", { perdu: gl.isContextLost(), ...memoire() });
       return s;
     };
+    // `?autopsie` : chaque programme se nomme au journal puis se lie sans attendre — le dernier nommé sans « programme_lie » est celui qui fait tomber le contexte.
+    if (new URLSearchParams(location.search).has("autopsie")) {
+      const sources = new WeakMap(), fragments = new WeakMap(), sommets = new WeakMap();
+      window.__programmes ??= [];
+      envelopper("shaderSource", (nuanceur, source) => sources.set(nuanceur, source));
+      envelopper("attachShader", (programme, nuanceur) => {
+        (gl.getShaderParameter(nuanceur, gl.SHADER_TYPE) === gl.FRAGMENT_SHADER ? fragments : sommets).set(programme, sources.get(nuanceur) ?? "");
+      });
+      const lier = gl.linkProgram.bind(gl);
+      const pause = Number(new URLSearchParams(location.search).get("autopsie"));
+      let rang = 0;
+      gl.linkProgram = (programme) => {
+        const fragment = fragments.get(programme) ?? "";
+        noter("programme", { rang: ++rang, nom: /#define SHADER_NAME (\S+)/.exec(fragment)?.[1], matiere: /#define SHADER_TYPE (\S+)/.exec(fragment)?.[1],
+                             octets: fragment.length, definitions: (fragment.match(/^#define \w+/gm) ?? []).map((d) => d.slice(8)).join(" ") });
+        vider();
+        window.__programmes.push({ sommet: sommets.get(programme), fragment });
+        lier(programme);
+        const lie = gl.getProgramParameter(programme, gl.LINK_STATUS);
+        noter("programme_lie", { rang, lie, perdu: gl.isContextLost() });
+        for (const fin = performance.now() + pause; performance.now() < fin;);
+      };
+    }
     // Le coût d'une image entière, GPU compris : la lecture d'un pixel attend que tout soit tracé. Médiane de `n` images.
     // Le coût d'une image en régime, GPU compris : `n` images enchaînées, puis la lecture d'un pixel d'une
     // cible à part attend que toutes soient tracées. Le plus lent de CPU et GPU fixe ce débit.
@@ -145,6 +172,7 @@
     // Ce qu'un iPhone à court de mémoire fait subir à la page, à la demande.
     // iOS rend parfois le contexte qu'il a retiré : ce que la page devient alors se vérifie ici.
     const perte = gl.getExtension("WEBGL_lose_context");
+    retirerLeContexte = () => { if (!gl.isContextLost()) perte.loseContext(); };
     window.__perdreContexte = () => perte.loseContext();
     window.__restituerContexte = () => perte.restoreContext();
     noter("contexte", { version: gl.getParameter(gl.VERSION), rendu: gl.getParameter(gl.RENDERER),

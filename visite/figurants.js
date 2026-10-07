@@ -178,6 +178,7 @@ export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, d
 
   // Une troupe renvoyée pendant sa descente est libérée à l'arrivée, sans entrer en scène.
   function chargerTroupe(nom) {
+    if (!PROFIL.figurants.presents) return Promise.resolve();
     if (chargements[nom]) return chargements[nom];
     const chargement = chargeur.loadAsync(TROUPES[nom].glb).then((glb) => poserFigurants(glb, distributions[nom].emprises)).then((troupe) => {
       if (chargements[nom] !== chargement) return libererTroupe(troupe);

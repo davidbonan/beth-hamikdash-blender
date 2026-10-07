@@ -374,7 +374,7 @@ async function poserPays({ scene: pays }) {
   scene.add(pays);
   alleger(pays);
 }
-chargeur.loadAsync("./pays.glb").then(poserPays);
+if (PROFIL.paysage) chargeur.loadAsync("./pays.glb").then(poserPays);
 
 // ---------------------------------------------------------------------------
 // interrogation
@@ -740,7 +740,7 @@ function conduire(dt) {
 
 await glisserPendantLeGel("image");
 renderer.setAnimationLoop(() => {
-  if (pannes.enReprise || imageSuspendue) return;
+  if (pannes.enReprise || pannes.contextePerdu || imageSuspendue) return;
   const dt = Math.min(horloge.getDelta(), 0.1);
   const filme = film !== null;
   if (filme) suivreLeFilm(dt); else conduire(dt);

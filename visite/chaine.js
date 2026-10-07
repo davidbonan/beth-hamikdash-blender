@@ -9,7 +9,7 @@
  * WebGLRenderer ne vaut que pour le tampon d'écran, dans lequel cette chaîne n'écrit
  * jamais : la scène va dans une cible hors écran. C'est donc cette cible qui est
  * multi-échantillonnée, quatre prises par pixel pour les arêtes, les cordes et les
- * échelons. Le FXAA final reprend ce que le MSAA ne voit pas : la passe d'occlusion,
+ * échelons — sauf au profil sobre, qui s'en passe. Le FXAA final reprend ce que le MSAA ne voit pas : la passe d'occlusion,
  * calculée en demi-résolution, et le disque solaire.
  *
  * OCCLUSION AMBIANTE.
@@ -606,7 +606,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   const teinteFond = new THREE.Color();
   const composeur = new EffectComposer(renderer,
-    new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+    new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: PROFIL.antiCrenelage }));
   const profondeur = PROFIL.preProfondeur && new Profondeur(scene, camera);
   if (profondeur) composeur.addPass(profondeur);
   const passeScene = new RenderPass(scene, camera);

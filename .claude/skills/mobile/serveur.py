@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""serveur.py [--port 8791] [--journal fichier.jsonl] — sert la visite telle qu'elle est dans l'arbre de travail, sonde injectée.
+"""serveur.py [--port 8791] [--journal fichier.jsonl] [--reseau] — sert la visite telle qu'elle est dans l'arbre de travail, sonde injectée.
 
 /visite/ sert visite/, / sert site/. index.html de la visite reçoit sonde.js avant son module : la page
 rapporte ses erreurs, ses pertes de contexte, son rythme d'images et sa mémoire GPU à /__journal, et
 exécute ce que ordre.py lui envoie. Écoute sur 127.0.0.1 seulement : le simulateur iOS partage le
-loopback du Mac. Rien n'est mis en cache : un rechargement voit toujours le code du disque.
+loopback du Mac ; --reseau l'ouvre au réseau local, pour un vrai appareil. Rien n'est mis en cache : un rechargement voit toujours le code du disque.
 """
 import argparse
 import json
@@ -151,9 +151,10 @@ def main():
     arguments = argparse.ArgumentParser()
     arguments.add_argument("--port", type=int, default=8791)
     arguments.add_argument("--journal", default=str(Path.cwd() / "journal.jsonl"))
+    arguments.add_argument("--reseau", action="store_true")
     options = arguments.parse_args()
     journal = open(options.journal, "a", encoding="utf-8")
-    serveur = ThreadingHTTPServer(("127.0.0.1", options.port), Gestionnaire)
+    serveur = ThreadingHTTPServer(("0.0.0.0" if options.reseau else "127.0.0.1", options.port), Gestionnaire)
     print(f"visite sondée sur http://localhost:{options.port}/visite/ — journal {options.journal}", flush=True)
     try:
         serveur.serve_forever()

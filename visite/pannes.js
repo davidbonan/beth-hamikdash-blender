@@ -81,5 +81,6 @@ export function veillerAuxPannes({ etat, chargement }) {
     },
     lancer() { visiteLancee = true; },
     get enReprise() { return enReprise; },
+    get contextePerdu() { return contexteEnPerte; },
   };
 }
