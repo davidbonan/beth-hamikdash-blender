@@ -44,7 +44,6 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
   const pleinAir = cadrages.filter((c) => !c.lieux)
     .sort((a, b) => largeurDe(a) * hauteurDe(a) - largeurDe(b) * hauteurDe(b));
   const nomDe = (id) => concepts.get(id)?.nom ?? id;
-  const nomHebreu = (id) => concepts.get(id)?.he || nomDe(id);
 
   // Une coupe dit ce qu'elle tranche ; en plein air, ce qui se voit d'en haut et tient tout entier dans le cadre.
   function lieuxDe(cadrage) {
@@ -88,7 +87,7 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
       rect.append(noeud("title"));
       groupeLieux.append(rect);
       etiquettes.append(noeud("text", {
-        x: (b.min.x + b.max.x) / 2, y: (b.min.z + b.max.z) / 2, "data-lieu": id, lang: "he" }));
+        x: (b.min.x + b.max.x) / 2, y: (b.min.z + b.max.z) / 2, "data-lieu": id }));
     }
     const groupeEntrees = noeud("g", { class: "entrees" });
     for (const e of entreesDe(cadrage)) {
@@ -107,7 +106,7 @@ export function plan({ cadrages, emprises, lieux, entrees, concepts, ama, allerL
       const e = entrees.find((x) => x.id === point.dataset.entree);
       point.firstChild.textContent = libelle("entrees", e.id) ?? e.nom;
     }
-    for (const t of entier.querySelectorAll("text[data-lieu]")) t.textContent = nomHebreu(t.dataset.lieu);
+    for (const t of entier.querySelectorAll("text[data-lieu]")) t.textContent = nomDe(t.dataset.lieu);
   }
 
   function echelleDuPlan() {

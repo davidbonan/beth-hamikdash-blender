@@ -73,10 +73,9 @@ export function marcheur(camera, murs) {
   let piedsY = 0;
   const avant = new THREE.Vector3(), droite = new THREE.Vector3();
   const HAUT = new THREE.Vector3(0, 1, 0), pas = new THREE.Vector3();
-  // Le clavier, le pouce et le pilote automatique aboutissent tous à `voulu` : la marche
-  // n'en connaît qu'un, et ses collisions valent donc pour les trois.
+  // Le clavier et le pouce aboutissent tous deux à `voulu` : la marche n'en connaît
+  // qu'un, et ses collisions valent donc pour les deux.
   const voulu = new THREE.Vector3(), lisse = new THREE.Vector3();
-  let cible = null;
 
   // Le Temple ne se laisse pas traverser n'importe où : on monte à l'Ezrat Nashim par
   // les douze degrés du 'Heil, à l'Azara par les quinze marches, et l'autel se contourne.
@@ -87,36 +86,17 @@ export function marcheur(camera, murs) {
   function basculerVol() {
     if (vol && !atterrir()) return false;
     vol = !vol;
-    cible = null;
     return true;
   }
 
   function tenirLeVol(enVol) {
     if (vol === enVol) return false;
     vol = enVol;
-    cible = null;
     return true;
-  }
-
-  // Le pilote automatique n'ouvre aucun passage : il pousse le marcheur vers le point
-  // visé avec la même commande qu'un pouce, donc les mêmes murs l'arrêtent. Un point
-  // qui n'a pas de sol sous lui — un mur, une corniche — ne se demande pas.
-  function seRendreVers(point) {
-    if (vol) { cible = point.clone(); return; }
-    const sol = solEn(point.x, point.z, point.y);
-    if (sol !== null) cible = new THREE.Vector3(point.x, sol, point.z);
   }
 
   function vitesseVoulue(manette) {
     const vitesse = (vol ? VOL : PAS) * (manette.course ? COURSE : 1);
-    const manuel = Math.abs(manette.long) + Math.abs(manette.lat) + Math.abs(manette.vert);
-    if (manuel > 0.02) cible = null;
-    if (cible) {
-      voulu.copy(cible).sub(camera.position);
-      if (!vol) voulu.y = 0;
-      if (voulu.lengthSq() < (vol ? 1.4 : 0.36)) { cible = null; return voulu.set(0, 0, 0); }
-      return voulu.normalize().multiplyScalar(vitesse);
-    }
     camera.getWorldDirection(avant);
     if (!vol) avant.y = 0;
     avant.normalize();
@@ -143,7 +123,6 @@ export function marcheur(camera, murs) {
       const sol = murDevant(camera.position, piedsY, pas, distance) ? null : solEnjambe(x, z, piedsY, pas);
       if (sol === null) {                            // un mur, ou le vide : le pas est refusé
         lisse.set(0, 0, 0);                          // et l'élan avec, sinon il pousse contre
-        cible = null;
         return;
       }
       piedsY = sol;
@@ -168,7 +147,6 @@ export function marcheur(camera, murs) {
     piedsY = sol === null ? y : sol;
     camera.position.set(x, piedsY + OEIL, z);
     lisse.set(0, 0, 0);
-    cible = null;
   }
 
   // Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du parcours du
@@ -227,7 +205,7 @@ export function marcheur(camera, murs) {
 
   return {
     solSous, solEn, avancer, poser, orienterCap, orienterVers, tourner, accorderRegard, lisserRegard,
-    basculerVol, tenirLeVol, seRendreVers,
+    basculerVol, tenirLeVol,
     suivreLaCamera() { piedsY = camera.position.y - OEIL; },
     get piedsY() { return piedsY; },
     get vol() { return vol; },

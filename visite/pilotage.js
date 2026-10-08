@@ -2,11 +2,11 @@
  * Commandes du visiteur.
  *
  * Le clavier et les deux pouces aboutissent au MÊME état : trois axes, un cran de
- * course, et trois gestes — regarder, interroger, s'y rendre. Rien ici ne connaît la
+ * course, et deux gestes — regarder, interroger. Rien ici ne connaît la
  * scène ; la marche, ses collisions et le regard restent dans visite.js.
  *
- * Au doigt, le bas gauche de l'écran est un manche qui naît sous le pouce : un
- * manche posé d'avance oblige à viser un cercle qu'on ne regarde pas. Tout le reste
+ * Au doigt, le bas gauche de l'écran est un manche : au repos il se montre à sa place,
+ * pour qu'on sache qu'il existe, et il vient sous le pouce dès qu'on le pose. Tout le reste
  * tourne la tête ; couché, le pouce gauche monte plus haut et le manche avec. Un appui
  * bref reste un appui bref des deux côtés, sans quoi la moitié gauche du Temple ne
  * s'interrogerait plus.
@@ -23,7 +23,6 @@ const POUSSEE = 1.32;          // pousser au-delà du cercle, c'est courir
 // ne clique : sans ces deux seuils-là, tout appui tactile se lit en glissé.
 const APPUI_MS = 320;
 const APPUI_PX = { mouse: 5, pen: 5, touch: 16 };
-const DOUBLE_MS = 330, DOUBLE_PX = 48;
 
 const AVANT = ["KeyW", "KeyZ", "ArrowUp"], ARRIERE = ["KeyS", "ArrowDown"];
 const GAUCHE = ["KeyA", "KeyQ", "ArrowLeft"], DROITE = ["KeyD", "ArrowRight"];
@@ -31,7 +30,7 @@ const CAPTEES = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"];
 
 const borner = (v, min, max) => Math.min(Math.max(v, min), max);
 
-export function commandes(toile, { regarder, interroger, allerAu, basculerVol }) {
+export function commandes(toile, { regarder, interroger, basculerVol }) {
   const etat = {
     long: 0, lat: 0, vert: 0, course: false, tourne: false,
     pointeur: { x: 0, y: 0, clientX: 0, clientY: 0, survole: false },
@@ -41,7 +40,7 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
   // ---- clavier ----
   const touches = new Set();
   const enfoncee = (liste) => liste.some((c) => touches.has(c));
-  const horsDeLaScene = () => !!document.activeElement?.closest?.("#barre, #fiche, #accueil, #initiation, #plan");
+  const horsDeLaScene = () => !!document.activeElement?.closest?.("#barre, #fiche, #accueil, #initiation, #plan, #recherche, #qualite-choix");
 
   addEventListener("keydown", (e) => {
     if (horsDeLaScene()) return;
@@ -83,6 +82,7 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
   function rangerManche() {
     manche.long = manche.lat = 0;
     manche.course = false;
+    cercle.style.left = cercle.style.top = bouton.style.transform = "";
     cercle.classList.remove("vu", "court");
   }
 
@@ -113,18 +113,6 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
   // ---- glissés ----
   const glisses = new Map();
   let idManche = null, idRegard = null;
-  let dernier = { t: 0, x: 0, y: 0 };
-
-  function appuyer(x, y) {
-    const t = performance.now();
-    if (t - dernier.t < DOUBLE_MS && Math.hypot(x - dernier.x, y - dernier.y) < DOUBLE_PX) {
-      dernier = { t: 0, x: 0, y: 0 };
-      allerAu(x, y);
-      return;
-    }
-    dernier = { t, x, y };
-    interroger(x, y);
-  }
 
   const sousLePouceGauche = (x, y) =>
     x < innerWidth * ZONE_MANCHE && (innerWidth > innerHeight || y > innerHeight * ZONE_MANCHE_DEBOUT);
@@ -178,7 +166,7 @@ export function commandes(toile, { regarder, interroger, allerAu, basculerVol })
     recomposer();
     const bref = performance.now() - g.t < APPUI_MS;
     if (e.type === "pointerup" && bref && g.parcours < (APPUI_PX[e.pointerType] ?? APPUI_PX.mouse))
-      appuyer(e.clientX, e.clientY);
+      interroger(e.clientX, e.clientY);
   }
 
   toile.addEventListener("pointerup", relacher);

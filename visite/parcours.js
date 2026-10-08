@@ -41,7 +41,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   const nom = carte.querySelector(".nom"), rang = carte.querySelector(".rang"), source = carte.querySelector(".source");
   const titre = carte.querySelector("h2"), texte = carte.querySelector(".texte");
   const precedent = carte.querySelector(".precedent"), suivant = carte.querySelector(".suivant");
-  const allure = carte.querySelector(".allure"), fiche = carte.querySelector(".fiche");
+  const allure = carte.querySelector(".allure"), facteurAffiche = allure.querySelector("b"), fiche = carte.querySelector(".fiche");
   const motSuivant = suivant.querySelector("span"), traceSuivant = suivant.querySelector("path"), tracePrecedent = precedent.querySelector("path");
 
   const enM = ([x, z]) => pointEnM(ama, [x, z]);
@@ -74,7 +74,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     const [arriere, avant] = document.documentElement.dir === "rtl" ? [CHEVRON_DROIT, CHEVRON_GAUCHE] : [CHEVRON_GAUCHE, CHEVRON_DROIT];
     tracePrecedent.setAttribute("d", arriere);
     traceSuivant.setAttribute("d", derniere() ? COCHE : avant);
-    allure.textContent = `×${facteur}`;
+    facteurAffiche.textContent = `×${facteur}`;
     fiche.disabled = trajet !== null || !station.concept;
     carte.classList.toggle("en-marche", trajet !== null);
     carte.classList.toggle("repliee", estRepliee());
@@ -210,7 +210,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
   function accelerer() {
     facteur = ALLURES[(ALLURES.indexOf(facteur) + 1) % ALLURES.length];
     retenir(MEMOIRE_ALLURE, String(facteur));
-    allure.textContent = `×${facteur}`;
+    facteurAffiche.textContent = `×${facteur}`;
   }
 
   // Pendant la marche, `courante` est déjà la station visée : « Suivant » y saute, « Précédent » revient d'où l'on part.

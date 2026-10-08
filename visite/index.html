@@ -50,7 +50,7 @@
   /* ---- chargement ---- */
   #chargement {
     position: fixed; inset: 0; z-index: 40; display: grid; place-content: center;
-    gap: 18px; text-align: center; color: var(--pierre); background: #0d0c0b;
+    justify-items: center; gap: 18px; text-align: center; color: var(--pierre); background: #0d0c0b;
     overflow: hidden; transition: opacity .6s ease;
   }
   /* Le Temple qu'on attend, flou, plutôt qu'un écran noir : l'aperçu de 32 px en ligne couvre l'attente de apercu.jpg. */
@@ -70,11 +70,12 @@
   #chargement.parti { opacity: 0; pointer-events: none; }
   /* Sans contexte, la scène ne reviendra pas : le voile reste, quoi que le chargement fasse ensuite. */
   html.perdu #chargement { opacity: 1; pointer-events: auto; cursor: pointer; }
-  html.perdu #chargement .jauge, html.perdu #restant { visibility: hidden; }
+  html.perdu #chargement .jauge, html.perdu #restant, html.perdu #chargement .gestes { visibility: hidden; }
   html.perdu #etat { max-width: min(34ch, calc(100vw - 48px)); margin: 0 auto; line-height: 1.5; }
   #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
   #chargement p { margin: 0; color: #d6cebf; font-size: 13px; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
   #restant { min-height: 1.4em; font-variant-numeric: tabular-nums; }
+  #chargement .gestes { margin-top: 10px; padding-inline: 16px; line-height: 1.8; }
   .jauge { width: 260px; max-width: 70vw; height: 2px; background: #2a2724; overflow: hidden; }
   /* En transform et non en largeur : le compositeur la fait glisser même quand la page se fige. */
   .jauge i { display: block; height: 100%; background: var(--or); transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
@@ -95,7 +96,7 @@
 
   /* ---- cinéma : la scène seule, encadrée par l'accueil ---- */
   html.cinema #accueil, html.cinema #chargement, html.cinema #barre, html.cinema #aide, html.cinema #manche,
-  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #fiche, html.cinema #plan,
+  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #fiche, html.cinema #plan, html.cinema #recherche, html.cinema #qualite-choix,
   html.cinema #parcours { display: none !important; }
   html.cinema canvas { pointer-events: none; }
 
@@ -116,10 +117,12 @@
   }
 
   /* ---- manche du pouce gauche ---- */
-  /* Il naît sous le pouce plutôt qu'à une place fixe : un cercle posé d'avance oblige
-     à viser une cible qu'on ne regarde pas. */
+  /* Au repos il dit où poser le pouce ; posé, il vient sous lui : on ne vise pas un cercle qu'on ne regarde pas. */
+  :root { --manche-x: max(80px, 24%); --manche-y: calc(100% - 130px - var(--marge-bas)); }
+  @media (max-height: 520px) { :root { --manche-x: 90px; } }
   #manche {
-    position: fixed; z-index: 12; width: 116px; height: 116px; margin: -58px 0 0 -58px;
+    position: fixed; left: var(--manche-x); top: var(--manche-y);
+    z-index: 12; width: 116px; height: 116px; margin: -58px 0 0 -58px;
     border-radius: 50%; border: 1px solid rgba(203,192,170,.30);
     background: rgba(13,12,11,.28); backdrop-filter: blur(2px);
     opacity: 0; pointer-events: none; transition: opacity .16s ease;
@@ -131,6 +134,17 @@
     border: 1px solid rgba(240,233,218,.45); transform: translate(-50%, -50%);
   }
   #manche.court i { background: rgba(154,107,31,.55); border-color: var(--or); }
+  @media (hover: none) and (pointer: coarse) {
+    #manche { opacity: .6; }
+    #manche.vu { opacity: 1; }
+    /* La carte d'un parcours tient le bas de l'écran : repliée, le manche passe au-dessus ; dépliée, il attend le pouce. */
+    body:has(#parcours:not([hidden])) { --manche-y: calc(100% - 160px - var(--marge-bas)); }
+    body:has(#parcours:not([hidden]) .carte:not(.repliee)) #manche:not(.vu) { opacity: 0; }
+  }
+  /* Le tiroir de la fiche monte à 46 % de la hauteur : au repos, le manche en sortirait à moitié. */
+  @media (max-width: 720px) and (min-height: 521px) {
+    body:has(#fiche.ouverte) #manche:not(.vu) { opacity: 0; }
+  }
 
   /* ---- montée et descente, en vol seulement ---- */
   #vertical {
@@ -179,15 +193,16 @@
   #barre button:active, #barre .menu:active { transform: scale(.96); }
   /* Un select prend la largeur de sa plus longue option : borné, il cède sa place au lieu de pousser la barre à la ligne. */
   #aller { flex: 0 1 12em; min-width: 7em; text-overflow: ellipsis; }
-  #chercher { flex: 0 1 16em; min-width: 7em; text-overflow: ellipsis; }
+  #barre #chercher { display: inline-flex; align-items: center; gap: 7px; }
+  #chercher .icone { width: 15px; height: 15px; }
   #mode { font-size: 12px; letter-spacing: .04em; color: #9a9182; white-space: nowrap; }
   #mode.vole { color: var(--or); }
   #position { margin-inline-start: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
               white-space: nowrap; font-size: 12px; color: #9a9182; font-variant-numeric: tabular-nums; }
-  #barre #rejouer, #barre #langue-courante, #barre #qualite-courante, #barre #moment, #barre #reglages-ouvrir {
+  #barre #langue-courante, #barre #qualite-courante, #barre #moment, #barre #reglages-ouvrir {
     width: var(--commande); padding: 0; font-weight: 600;
   }
-  /* Langue, heure et « ? » gardent leur place dans la barre large ; l'étroite les range sous « ⋯ ». */
+  /* Langue, heure et aide gardent leur place dans la barre large ; l'étroite les range sous « ⋯ ». */
   #reglages { display: contents; }
   #langue { order: -1; }
   #rejouer { order: 1; }
@@ -199,24 +214,48 @@
   /* ---- langue ---- */
   .drapeau { display: block; width: 21px; height: 14px; border-radius: 2px;
              box-shadow: 0 0 0 1px rgba(203,192,170,.25); }
-  #langue, #qualite { position: relative; }
-  #barre #langue-courante, #barre #qualite-courante { display: grid; place-items: center; align-self: stretch; }
-  #langue-menu, #qualite-menu {
+  #langue { position: relative; }
+  #barre #langue-courante { display: grid; place-items: center; align-self: stretch; }
+  #langue-menu {
     position: absolute; top: calc(100% + 6px); inset-inline-start: 0; min-width: 150px;
     display: flex; flex-direction: column; gap: 2px; padding: 4px; border-radius: 5px;
     border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.94);
   }
-  #barre #langue-menu button, #barre #qualite-menu button {
+  #barre #langue-menu button {
     display: flex; align-items: center; gap: 10px; text-align: start;
     border-color: transparent; background: none;
   }
-  #barre #langue-menu button:hover, #barre #qualite-menu button:hover { border-color: var(--or); }
+  #barre #langue-menu button:hover { border-color: var(--or); }
 
   /* ---- qualité ---- */
-  #qualite-menu { min-width: 190px; }
-  #barre #qualite-menu button[aria-pressed="true"] { color: var(--or); }
-  #barre #qualite-menu button[disabled] { opacity: .45; cursor: default; }
-  #qualite-menu small { padding: 4px 10px 2px; font-size: 11px; line-height: 1.3; color: #9a9182; }
+  #qualite-choix {
+    position: fixed; inset: 0; z-index: 28; display: grid; place-items: center; grid-template-rows: minmax(0, 1fr);
+    padding: calc(16px + var(--marge-haut)) calc(16px + var(--marge-droite)) calc(16px + var(--marge-bas)) calc(16px + var(--marge-gauche));
+    background: rgba(13,12,11,.6);
+  }
+  #qualite-choix .cadre {
+    width: min(360px, 100%); padding: 14px 16px 16px; border-radius: 8px; color: #e8e0d0;
+    max-height: 100%; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
+    border: 1px solid rgba(203,192,170,.22); background: rgba(20,18,16,.96); box-shadow: 0 12px 32px rgba(0,0,0,.45);
+  }
+  #qualite-choix .tete { display: flex; align-items: center; margin-bottom: 10px; }
+  #qualite-choix .niveaux { display: flex; flex-direction: column; gap: 6px; }
+  #qualite-choix .niveaux button {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; padding: 6px 12px;
+    font: inherit; font-size: 15px; text-align: start; color: #e8e0d0; cursor: pointer;
+    border: 1px solid rgba(203,192,170,.18); border-radius: 6px; background: none;
+  }
+  #qualite-choix .niveaux button:hover, #qualite-choix [aria-pressed="true"] { border-color: var(--or); color: #f3efe6; }
+  #qualite-choix [aria-pressed="true"] > span:first-child::before { content: "✓ "; color: #d9a441; }
+  #qualite-choix .niveaux .auto { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding-block: 10px; }
+  #qualite-choix .auto small { font-size: 12px; line-height: 1.4; color: #a9a094; }
+  #qualite-choix h3 { margin: 10px 0 2px; color: #a9a094; }
+  /* La pastille dit ce que la machine en fera, le mot à côté le dit à qui ne distingue pas les couleurs. */
+  #qualite-choix .charge { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: #a9a094; white-space: nowrap; }
+  #qualite-choix .charge::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #6fae6a; }
+  #qualite-choix [data-charge="risque"]::before { background: #d9a441; }
+  #qualite-choix [data-charge="lourd"]::before { background: #d2553f; }
+  #qualite-choix .consigne { margin: 12px 0 0; font-size: 12px; line-height: 1.4; color: #a9a094; }
 
   #accueil {
     position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; justify-items: center;
@@ -358,12 +397,13 @@
   #initiation .progres i { display: block; width: 0; height: 100%; background: var(--or); transition: width .2s ease; }
   #initiation .finie .pied { justify-content: center; }
   #initiation .finie .progres { display: none; }
-  #initiation .passer {
+  #initiation .pied button {
     font: inherit; font-size: 13px; padding: 5px 12px; color: #c8bfae; background: none;
     border: 1px solid rgba(203,192,170,.28); border-radius: 4px; cursor: pointer;
   }
-  #initiation .passer:hover { border-color: var(--or); color: #f0e9da; }
-  #initiation .finie .passer { padding: 7px 22px; color: #f3efe6; background: var(--or); border-color: var(--or); }
+  #initiation .pied button:hover { border-color: var(--or); color: #f0e9da; }
+  #initiation .finie .pied button { padding: 7px 16px; }
+  #initiation .finie .passer { color: #f3efe6; background: var(--or); border-color: var(--or); }
   @keyframes paraitre { from { opacity: 0; transform: translateY(6px); } }
 
   /* Le geste se montre là où il se fait ; dès qu'on le fait, la démonstration s'efface.
@@ -398,7 +438,7 @@
   @keyframes balayer { 0%, 100% { transform: translateX(-62px); } 50% { transform: translateX(62px); } }
 
   #initiation .manche-fantome {
-    position: absolute; left: max(80px, 24%); top: 54%; width: 116px; height: 116px;
+    position: absolute; left: var(--manche-x); top: var(--manche-y); width: 116px; height: 116px;
     margin: -58px 0 0 -58px; border: 1px dashed rgba(203,192,170,.6); border-radius: 50%;
     background: rgba(13,12,11,.3);
   }
@@ -462,7 +502,7 @@
 
   /* Au doigt, en vol, les flèches ▲ ▼ tiennent le bas à droite : la carte monte au-dessus. */
   @media (hover: none) and (pointer: coarse) {
-    html.vol #initiation .carte { bottom: calc(156px + var(--marge-bas)); }
+    #initiation .carte { bottom: calc(204px + var(--marge-bas)); }
   }
   /* Le tiroir de la fiche monte à 46 % de la hauteur : la carte reste au-dessus de lui. */
   @media (max-width: 720px) and (min-height: 521px) {
@@ -492,6 +532,7 @@
     display: flex; align-items: baseline; margin: 0 0 4px; font-size: 11px; text-transform: uppercase;
     letter-spacing: .13em; color: #a9a094; cursor: pointer;
   }
+  #parcours .carte:not(.repliee) .etape { flex-wrap: wrap; }
   #parcours .etape .rang::before, #parcours .etape .source::before { content: "·"; margin-inline: .5em; }
   #parcours .etape::after { content: "⌄"; margin-inline-start: auto; padding-inline-start: 12px; font-size: 15px; line-height: 0; }
   #parcours h2 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
@@ -511,7 +552,8 @@
   #parcours .pied button:hover:not(:disabled) { border-color: var(--or); color: #f0e9da; }
   #parcours .pied button:disabled { opacity: .35; cursor: default; }
   #parcours .allure { min-width: 44px; font-variant-numeric: tabular-nums; }
-  #parcours .quitter { margin-inline-start: auto; }
+  #parcours .suivant { margin-inline-start: auto; }
+  #parcours .allure b { font-weight: inherit; }
   #parcours .pied .suivant { color: #f3efe6; background: var(--or); border-color: var(--or); }
   #parcours .pied i { display: none; font-style: normal; }
   /* En SVG, pas en ‹ › : dans la carte repliée Chrome reflétait le glyphe hébreu à contresens. parcours.js choisit le tracé. */
@@ -531,13 +573,16 @@
     flex: 1; min-width: 0; font-size: 15px; cursor: pointer;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  #parcours .repliee .quitter { margin-inline-start: 0; }
+  #parcours .repliee .suivant { margin-inline-start: 0; }
+  #parcours .repliee .quitter { order: -2; }
   /* Le tiroir de la fiche monte à 46 % de la hauteur : la carte reste au-dessus de lui. */
   @media (max-width: 720px) {
     #parcours .carte { bottom: calc(16px + var(--marge-bas)); }
     #parcours .pied i { display: inline-block; }
     #parcours .pied span { display: none; }
-    #parcours .pied button { padding: 6px 14px; font-size: 15px; }
+    #parcours .pied button { padding: 6px 12px; font-size: 14px; }
+    #parcours .carte:not(.repliee) .pied :is(.allure, .suivant) span { display: inline; }
+    #parcours .carte:not(.repliee) .suivant { display: inline-flex; flex-direction: row-reverse; align-items: center; gap: 7px; }
   }
   @media (max-width: 720px) and (min-height: 521px) {
     body:has(#fiche.ouverte) #parcours .carte { bottom: calc(46vh + 12px); }
@@ -563,7 +608,7 @@
   /* Au bureau le libellé du menu se lit ; sur un écran étroit il se tronquait en « Un élémen… »,
      et une icône prend sa place, le menu natif invisible par-dessus. */
   .menu { display: contents; }
-  .menu .icone { display: none; }
+  .menu .icone, .menu .nom, #vol .icone { display: none; }
 
   /* ---- plan ---- */
   #minicarte {
@@ -577,6 +622,10 @@
   }
   #minicarte .disque:hover { border-color: var(--or); }
   #minicarte svg { display: block; width: 100%; height: 100%; }
+  #minicarte .legende {
+    display: block; margin-top: 3px; text-align: center; font-size: 11px; letter-spacing: .04em; color: #f3efe6;
+    text-shadow: 0 0 3px rgba(13,12,11,.95), 0 0 1px rgba(13,12,11,.95); pointer-events: none;
+  }
   #minicarte :is(.entrees, .etiquettes) { display: none; }
   /* Le plan ne tourne pas avec le visiteur : nord en haut, est à droite, quelle que soit la langue. */
   #minicarte .rose { position: absolute; inset: 0; pointer-events: none; direction: ltr; }
@@ -588,25 +637,26 @@
   #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%); }
   #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%); }
   #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%); }
-  #plan {
+  #plan, #recherche {
     position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
     padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))
              calc(16px + var(--marge-bas)) calc(16px + var(--marge-gauche));
     color: #e8e0d0; background: rgba(13,12,11,.93); backdrop-filter: blur(4px);
   }
   #plan .tete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  #plan h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  :is(#plan, #recherche, #qualite-choix) h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  #plan .consigne { margin: 0; font-size: 13px; color: #a9a094; }
   /* Cinq zones ne tiennent pas sur un téléphone debout : la rangée défile plutôt que de passer à la ligne. */
   #plan .cadrages { display: flex; gap: 6px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
-  #plan button {
+  #plan button, :is(#recherche, #qualite-choix) .fermer {
     flex: 0 0 auto; height: 34px; padding: 0 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;
     font: inherit; font-size: 13px; line-height: 1;
     border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.82); color: #e8e0d0;
     transition: border-color .15s ease, transform .12s ease;
   }
-  #plan button:hover, #plan [aria-pressed="true"] { border-color: var(--or); color: #f3efe6; }
+  #plan button:hover, #plan [aria-pressed="true"], :is(#recherche, #qualite-choix) .fermer:hover { border-color: var(--or); color: #f3efe6; }
   #plan button:active { transform: scale(.96); }
-  #plan .fermer { width: 34px; padding: 0; font-size: 18px; }
+  :is(#plan, #recherche, #qualite-choix) .fermer { width: 34px; padding: 0; font-size: 18px; }
   #plan svg { flex: 1; min-height: 0; width: 100%; }
   /* La barre a la longueur qu'elle dit, au pixel près du plan affiché : il est à l'échelle du Temple. */
   #plan .echelle {
@@ -626,14 +676,34 @@
   .lieux rect { fill: transparent; stroke: transparent; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
   #plan .lieux rect { cursor: pointer; transition: fill .12s ease, stroke .12s ease; }
   #plan .lieux rect:hover { fill: rgba(217,164,65,.22); stroke: rgba(217,164,65,.9); }
+  /* Sans survol, rien ne dirait qu'un lieu se touche. */
+  @media (hover: none) { #plan .lieux rect { stroke: rgba(217,164,65,.5); } }
   .entrees circle { fill: #f3efe6; stroke: #1b1815; stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
   .entrees circle:hover { fill: var(--or); }
   .etiquettes text {
     fill: #f3efe6; text-anchor: middle; dominant-baseline: central; pointer-events: none;
-    font-family: "Frank Ruehl", "Times New Roman", serif;
     paint-order: stroke; stroke: rgba(13,12,11,.85); stroke-width: 3px; vector-effect: non-scaling-stroke;
   }
   .etiquettes .tue { display: none; }
+  /* ---- recherche ---- */
+  #recherche .tete { display: flex; align-items: center; }
+  #recherche input, #recherche .resultats { width: 100%; max-width: 520px; }
+  #recherche input {
+    flex: 0 0 auto; height: 44px; padding: 0 12px; border-radius: 4px; font: inherit; font-size: 16px;
+    color: #f3efe6; border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.82);
+    user-select: text; -webkit-user-select: text;
+  }
+  #recherche input:focus { outline: none; border-color: var(--or); }
+  #recherche .resultats { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; }
+  #recherche h3 { margin: 16px 0 4px; color: #a9a094; }
+  #recherche .resultats button {
+    display: block; width: 100%; min-height: 44px; padding: 8px 4px; text-align: start; cursor: pointer;
+    font: inherit; font-size: 15px; color: #e8e0d0; background: none; border: 0;
+    border-bottom: 1px solid rgba(203,192,170,.14);
+  }
+  #recherche .resultats button:hover { color: #d9a441; }
+  #recherche .rien { margin: 16px 0 0; color: #a9a094; }
+
   .visiteur path { fill: #d9a441; stroke: #1b1815; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 
   /* ---- au doigt ---- */
@@ -648,37 +718,59 @@
     .en-portrait { display: revert; }
   }
 
+  /* ---- au doigt, rien de ce qui se touche sous 44 px ---- */
+  @media (pointer: coarse) {
+    #barre { --commande: 44px; }
+    #plan button, :is(#recherche, #qualite-choix) .fermer { height: 44px; }
+    :is(#plan, #recherche, #qualite-choix) .fermer { width: 44px; }
+    #parcours .pied button, #initiation .pied button { min-height: 40px; min-width: 40px; }
+  }
+
   /* ---- barre compacte : téléphone debout, et couché, où c'est la hauteur qui manque ---- */
   @media (max-width: 720px), (max-height: 520px) {
-    #barre { --commande: 36px; gap: 6px; padding-top: calc(8px + var(--marge-haut)); padding-bottom: 8px; }
+    #barre { --commande: 40px; gap: 6px; padding-top: calc(8px + var(--marge-haut)); padding-bottom: 8px; }
     #barre select, #barre button { font-size: 12.5px; }
+    /* Ce qui se devine à son icône n'a qu'elle ; les visites guidées, qu'aucune icône ne dit, n'ont que leur nom. */
     #barre .menu {
-      position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: var(--commande);
+      position: relative; display: grid; place-items: center; flex: 0 0 auto; min-width: var(--commande); height: var(--commande);
+      padding: 0 10px; font-size: 12.5px; white-space: nowrap;
       color: #e8e0d0; border: 1px solid rgba(203,192,170,.28); border-radius: 4px; background: rgba(20,18,16,.82);
       transition: border-color .15s ease, transform .12s ease;
     }
-    .menu .icone { display: block; width: 19px; height: 19px; }
+    #barre #chercher, #barre #vol { width: var(--commande); padding: 0; justify-content: center; }
+    .menu .icone, #chercher .icone, #vol .icone { display: block; width: 19px; height: 19px; }
+    .menu .nom { display: block; }
+    #chercher span, #vol span { display: none; }
     /* Le menu natif, invisible, couvre l'icône et rien de plus : sa largeur minimale volerait sinon les touches voisines. */
     #barre .menu select { position: absolute; inset: 0; width: 100%; min-width: 0; height: 100%; opacity: 0; }
     #mode { display: none; }
-    #minicarte { width: 92px; top: calc(62px + var(--marge-haut)); }
+    #minicarte { width: 92px; top: calc(64px + var(--marge-haut)); }
   }
 
-  /* ---- barre étroite : ce qu'on règle une fois se range sous « ⋯ » ---- */
-  @media (max-width: 720px) {
-    #barre #reglages-ouvrir { display: inline-grid; }
+  /* ---- barre étroite, debout comme couché : ce qu'on règle une fois se range sous « ⋯ » ---- */
+  @media (max-width: 720px), (max-height: 520px) {
+    #barre #reglages-ouvrir { display: inline-grid; margin-inline-start: auto; }
     #reglages {
       position: absolute; top: 100%; inset-inline-end: calc(12px + max(var(--marge-gauche), var(--marge-droite)));
       display: flex; flex-direction: column; gap: 2px; min-width: 200px; padding: 4px; border-radius: 5px;
       border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.94);
     }
     #reglages:not(.ouverts) { display: none; }
+    #reglages { z-index: 1; }
     #barre #reglages > button, #barre #langue-courante, #barre #qualite-courante {
       display: grid; grid-template-columns: 21px auto; justify-content: start; column-gap: 10px;
       width: 100%; padding: 0 10px; font-weight: 400; border-color: transparent; background: none;
     }
     #reglages > button::after, #langue-courante::after, #qualite-courante::after { content: attr(title); }
-    #langue-menu, #qualite-menu { position: static; min-width: 0; padding: 2px 0 0; border: 0; background: none; }
+    #rejouer span { display: none; }
+    #rejouer::before { content: "?"; text-align: center; font-weight: 600; }
+    /* Ce qu'on ne règle qu'en cas de gêne passe en dernier. */
+    #qualite-courante { order: 2; }
+    #position {
+      position: absolute; top: 100%; inset-inline-start: calc(12px + var(--marge-gauche)); max-width: 55vw; margin: 0;
+      color: #e8e0d0; text-shadow: 0 0 3px rgba(13,12,11,.95), 0 1px 6px rgba(13,12,11,.8);
+    }
+    #langue-menu { position: static; min-width: 0; padding: 2px 0 0; border: 0; background: none; }
   }
 
   /* ---- petit écran : la fiche devient un tiroir ---- */
@@ -705,13 +797,13 @@
       padding-bottom: calc(var(--hauteur-tiroir) - var(--apercu) + 30px + var(--marge-bas));
     }
     #fiche.ouverte.pleine { transform: translateY(0); padding-bottom: calc(30px + var(--marge-bas)); }
-    #poignee { margin: 0 -18px; padding: 12px 18px 8px; cursor: grab; touch-action: none; }
+    #poignee { margin: 0 -18px; padding: 12px 18px 16px; cursor: grab; touch-action: none; }
     #poignee::before {
       content: ""; display: block; width: 42px; height: 4px; margin: 0 auto 6px;
       border-radius: 2px; background: var(--trait);
     }
-    #fermer { top: 10px; inset-inline-end: 18px; width: 34px; height: 34px; line-height: 32px; font-size: 19px; }
-    #copier { top: 10px; inset-inline-end: 58px; width: 34px; height: 34px; padding: 9px; }
+    #fermer { top: 8px; inset-inline-end: 14px; width: 44px; height: 44px; line-height: 42px; font-size: 21px; }
+    #copier { top: 8px; inset-inline-end: 64px; width: 44px; height: 44px; padding: 13px; }
   }
 
   /* ---- téléphone couché : large et bas ---- */
@@ -733,7 +825,7 @@
     #poignee { margin: 0; padding: 16px 0 4px; cursor: default; touch-action: auto; }
     #poignee::before { content: none; }
     #fermer { top: 12px; inset-inline-end: 0; }
-    #copier { top: 12px; inset-inline-end: 40px; }
+    #copier { top: 12px; inset-inline-end: 50px; }
   }
 </style>
 
@@ -755,8 +847,12 @@
     <path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/>
     <path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6"/>
   </symbol>
-  <symbol id="icone-porte" viewBox="0 0 24 24">
-    <path d="M5 21V10a7 7 0 0 1 14 0v11M3 21h18M12 3.2V21" fill="none" stroke="currentColor" stroke-width="1.7"/>
+  <symbol id="icone-lieu" viewBox="0 0 24 24">
+    <path d="M12 21.5s-6.5-6.4-6.5-11.3a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11.3-6.5 11.3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+    <circle cx="12" cy="10.2" r="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/>
+  </symbol>
+  <symbol id="icone-vol" viewBox="0 0 24 24">
+    <path d="M23 11.5L19.95 10.37C19.69 9.22 19.04 8.56 19.04 8.56C17.4 6.92 14.75 6.92 13.11 8.56L11.63 10.04L5 3C4 7 5 11 7.45 14.22L2 19.5C2 19.5 10.89 21.5 16.07 17.45C18.83 15.29 19.45 14.03 19.84 12.7L23 11.5M17.71 11.72C17.32 12.11 16.68 12.11 16.29 11.72C15.9 11.33 15.9 10.7 16.29 10.31C16.68 9.92 17.32 9.92 17.71 10.31C18.1 10.7 18.1 11.33 17.71 11.72Z" fill="currentColor"/>
   </symbol>
   <symbol id="icone-pas" viewBox="0 0 24 24">
     <path d="M7.5 3.5c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4H6.1c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM6.2 13h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4ZM16.5 9c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4h-2.8c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM15.2 18.5h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4Z" fill="currentColor"/>
@@ -794,29 +890,27 @@
   <div class="jauge"><i></i></div>
   <p id="etat" data-texte="chargement">chargement de la scène…</p>
   <p id="restant"></p>
+  <p class="gestes"><span class="au-clavier" data-texte-html="aide_clavier"></span><span class="au-doigt" data-texte-html="aide_doigt"></span></p>
 </div>
 
 <div id="barre">
-  <label class="menu" title="Aller à…" data-titre="aller"><svg class="icone" aria-hidden="true"><use href="#icone-porte"></use></svg><select id="aller"><option value="" data-texte="aller">Aller à…</option></select></label>
-  <label class="menu" title="Un élément…" data-titre="chercher"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><select id="chercher"><option value="" data-texte="chercher">Un élément…</option></select></label>
-  <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre" data-texte="vol">Vol libre</button>
+  <label class="menu" title="Aller à…" data-titre="aller"><svg class="icone" aria-hidden="true"><use href="#icone-lieu"></use></svg><select id="aller"><option value="" data-texte="aller">Aller à…</option></select></label>
+  <button id="chercher" type="button" aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><span data-texte="chercher">Chercher</span></button>
+  <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre"><svg class="icone" aria-hidden="true"><use href="#icone-vol"></use></svg><span data-texte="vol">Vol libre</span></button>
   <div id="reglages">
     <div id="langue">
       <button id="langue-courante" type="button" title="Langue" aria-label="Langue" data-titre="langue"
               aria-haspopup="true" aria-expanded="false"><svg class="drapeau" aria-hidden="true"><use href="#drapeau-fr"></use></svg></button>
       <div id="langue-menu" hidden></div>
     </div>
-    <div id="qualite">
-      <button id="qualite-courante" type="button" title="Qualité du rendu" aria-label="Qualité du rendu" data-titre="qualite"
-              aria-haspopup="true" aria-expanded="false"><svg aria-hidden="true"><use href="#icone-jauge"></use></svg></button>
-      <div id="qualite-menu" hidden></div>
-    </div>
+    <button id="qualite-courante" type="button" title="Qualité de l'image" aria-label="Qualité de l'image" data-titre="qualite"
+            aria-haspopup="dialog"><svg aria-hidden="true"><use href="#icone-jauge"></use></svg></button>
     <button id="moment" type="button" title="Passer à la nuit" aria-label="Passer à la nuit" aria-pressed="false"
             data-titre="moment_nuit"><svg aria-hidden="true"><use href="#icone-lune"></use></svg></button>
     <button id="rejouer" type="button" title="Revoir les premiers pas" aria-label="Revoir les premiers pas"
-            data-titre="initiation_titre">?</button>
+            data-titre="initiation_titre"><span data-texte="aide">Aide</span></button>
   </div>
-  <label class="menu" title="Suivre un service, station par station" data-titre="parcours_titre"><svg class="icone" aria-hidden="true"><use href="#icone-pas"></use></svg><select id="parcours-choix"><option value="" data-texte="parcours_menu">Parcours…</option></select></label>
+  <label class="menu" title="Suivre un service, station par station" data-titre="parcours_titre"><span class="nom" data-texte="menu_parcours">Visites guidées</span><select id="parcours-choix"><option value="" data-texte="parcours_menu">Parcours…</option></select></label>
   <span id="mode" data-texte="a_pied">à pied</span>
   <span id="position"></span>
   <button id="reglages-ouvrir" type="button" title="Réglages" aria-label="Réglages" data-titre="reglages"
@@ -827,6 +921,7 @@
 
 <div id="minicarte">
 <button class="disque" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg><span class="rose" aria-hidden="true"><span class="nord" data-texte="nord">N</span><span class="sud" data-texte="sud">S</span><span class="est" data-texte="est">E</span><span class="ouest" data-texte="ouest">O</span></span></button>
+<span class="legende" data-texte="plan_court" aria-hidden="true">Plan</span>
 </div>
 
 <div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>
@@ -835,8 +930,29 @@
     <div class="cadrages"></div>
     <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
   </div>
+  <p class="consigne" data-texte="plan_consigne">Choisissez un lieu pour vous y rendre.</p>
   <svg></svg>
   <div class="echelle"><i></i><p><span class="amot"></span><span class="metres"></span></p></div>
+</div>
+
+<div id="recherche" role="dialog" aria-labelledby="recherche-titre" hidden>
+  <div class="tete">
+    <h2 id="recherche-titre" data-texte="chercher">Chercher</h2>
+    <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
+  </div>
+  <input type="search" autocomplete="off" enterkeyhint="search" aria-labelledby="recherche-titre">
+  <div class="resultats"></div>
+</div>
+
+<div id="qualite-choix" role="dialog" aria-labelledby="qualite-titre" hidden>
+  <div class="cadre">
+    <div class="tete">
+      <h2 id="qualite-titre" data-texte="qualite">Qualité de l'image</h2>
+      <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
+    </div>
+    <div class="niveaux"></div>
+    <p class="consigne" data-texte="qualite_recharge"></p>
+  </div>
 </div>
 
 <div id="manche"><i></i></div>
@@ -860,7 +976,7 @@
     <div class="au-doigt"><i class="sillage"></i><i class="doigt"></i></div>
   </div>
   <div class="geste" data-geste="avancer" hidden>
-    <div class="au-clavier"><div class="touches" data-texte-html="initiation_touches"><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd></div></div>
+    <div class="au-clavier"><div class="touches"><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div></div>
     <div class="au-doigt"><div class="manche-fantome"><i class="doigt"></i></div></div>
   </div>
   <div class="geste" data-geste="interroger" hidden>
@@ -907,6 +1023,7 @@
     </section>
     <div class="pied">
       <div class="progres"><i></i></div>
+      <button class="guidee" type="button" data-texte="initiation_guidee" hidden>Suivre une visite guidée</button>
       <button class="passer" type="button" data-texte="initiation_passer">Passer</button>
     </div>
   </div>
@@ -920,7 +1037,7 @@
     <button class="fiche" type="button" data-texte="parcours_fiche">Lire la fiche</button>
     <div class="pied">
       <button class="precedent" type="button" title="Précédent" data-titre="parcours_precedent"><i><svg viewBox="0 0 12 16" aria-hidden="true"><path/></svg></i><span data-texte="parcours_precedent">Précédent</span></button>
-      <button class="allure" type="button" title="Vitesse de la marche" data-titre="parcours_allure">×1</button>
+      <button class="allure" type="button" title="Vitesse de la marche" data-titre="parcours_allure"><span data-texte="parcours_vitesse">Vitesse</span> <b>×1</b></button>
       <button class="quitter" type="button" title="Quitter" data-titre="parcours_quitter"><i>✕</i><span data-texte="parcours_quitter">Quitter</span></button>
       <button class="suivant" type="button" title="Suivant" data-titre="parcours_suivant"><i><svg viewBox="0 0 12 16" aria-hidden="true"><path/></svg></i><span data-texte="parcours_suivant">Suivant</span></button>
     </div>

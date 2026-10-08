@@ -14,12 +14,13 @@ import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from
 import { NIVEAU, PROFIL, brancherChoix, seRelever, seReplier } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
-import { nomDeZone, panneau } from "./fiche.js";
+import { panneau } from "./fiche.js";
 import { initiation } from "./initiation.js";
 import { enBoite, unirEmprises } from "./cadrage.js";
 import { lieuxSouterrains, plan } from "./plan.js";
 import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
+import { recherche } from "./recherche.js";
 import { AMA, OEIL, marcheur } from "./marche.js";
 import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte, titrer } from "./langue.js";
 import { veillerAuxPannes } from "./pannes.js";
@@ -232,8 +233,6 @@ async function viderLaJauge() {
   jauge.style.transition = "";
 }
 const restant = $("#restant");
-const enMegaoctets = (octets) =>
-  new Intl.NumberFormat(langue(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(octets / 1e6);
 // Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
 // attendre ensuite doublerait l'attente d'un visiteur en 4G.
 const chargeur = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -241,7 +240,7 @@ const [gltf, jeux, occlusions, lumieres] = await Promise.all([
   chargeur.loadAsync("./temple.glb", (e) => {
       if (!e.lengthComputable) return;
       remplir(jauge, e.loaded / e.total);
-      restant.textContent = e.loaded < e.total ? texte("restant").replace("{mo}", enMegaoctets(e.total - e.loaded)) : "";
+      restant.textContent = e.loaded < e.total ? texte("restant").replace("{pc}", Math.floor(100 * e.loaded / e.total)) : "";
     }),
   nappes(),
   cartesOcclusion(reperes.occlusion),
@@ -383,7 +382,6 @@ if (PROFIL.paysage) chargeur.loadAsync("./pays.glb").then(poserPays);
 // ---------------------------------------------------------------------------
 // interrogation
 // ---------------------------------------------------------------------------
-const PORTEE_DU_PILOTE = 120;
 const survol = $("#survol");
 const { montrer, fermer, rafraichir } = panneau(CONCEPTS);
 const designe = designation({ camera, obstacles, concepts: CONCEPTS });
@@ -399,19 +397,16 @@ function interroger(clientX, clientY) {
   noterInterrogation();
 }
 
-function seRendreA(clientX, clientY) {
-  const point = designe.pointTouche(murs, PORTEE_DU_PILOTE, [clientX, clientY]);
-  if (point) marche.seRendreVers(point);
-}
-
 // ---------------------------------------------------------------------------
 // commandes
 // ---------------------------------------------------------------------------
 const mode = $("#mode"), boutonVol = $("#vol");
+const nomDuVol = boutonVol.querySelector("span"), iconeDuVol = boutonVol.querySelector("use");
 function afficherMode() {
   ecrire(mode, marche.vol ? "en_vol" : "a_pied");
   mode.classList.toggle("vole", marche.vol);
-  ecrire(boutonVol, marche.vol ? "pied" : "vol");
+  ecrire(nomDuVol, marche.vol ? "pied" : "vol");
+  iconeDuVol.setAttribute("href", marche.vol ? "#icone-pas" : "#icone-vol");
   manette.modeVol(marche.vol);
 }
 
@@ -430,6 +425,7 @@ function tenirLaVue(enVol) {
 const { lancerInitiation, initiationSuivie, noterRegard, noterDeplacement, noterInterrogation,
         noterEnvol, noterAtterrissage, noterAltitude } = initiation({
   elementAMontrer: designe.elementAMontrer, estEnVol: () => marche.vol,
+  suivreVisiteGuidee: () => suivreParcours(PARCOURS_DE_DECOUVERTE),
 });
 
 const manette = commandes(renderer.domElement, {
@@ -437,7 +433,7 @@ const manette = commandes(renderer.domElement, {
     marche.tourner(dLacet, dTangage);
     noterRegard(Math.abs(dLacet) + Math.abs(dTangage));
   },
-  interroger, allerAu: seRendreA, basculerVol,
+  interroger, basculerVol,
 });
 afficherMode();
 
@@ -501,7 +497,7 @@ async function passerAuMoment(voulu) {
 }
 boutonMoment.onclick = (e) => { passerAuMoment(eclairage.moment === "jour" ? "nuit" : "jour"); e.currentTarget.blur(); };
 
-const aller = $("#aller"), chercher = $("#chercher"), position = $("#position");
+const aller = $("#aller"), position = $("#position");
 
 function remplirAller() {
   aller.replaceChildren(aller.options[0]);
@@ -522,27 +518,13 @@ function remplirParcours() {
   for (const p of PARCOURS) choixParcours.append(new Option(p.titre[langue()] ?? p.titre.fr, p.id));
 }
 
-function remplirChercher() {
-  const parZone = [...CONCEPTS.values()].sort((a, b) =>
-    nomDeZone(a.zone).localeCompare(nomDeZone(b.zone), langue()) || a.nom.localeCompare(b.nom, langue()));
-  chercher.replaceChildren(chercher.options[0]);
-  let zoneCourante = null;
-  for (const c of parZone) {
-    if (c.zone !== zoneCourante) {
-      zoneCourante = c.zone;
-      chercher.append(Object.assign(document.createElement("optgroup"), { label: nomDeZone(c.zone) }));
-    }
-    chercher.lastElementChild.append(new Option(c.nom, c.id));
-  }
-}
-chercher.onchange = () => {
-  const id = chercher.value;
-  if (!id) return;
-  montrer(id);
-  fondu(() => vues.allerElement(id));
-  chercher.value = "";
-  chercher.blur();
-};
+const elements = recherche({
+  concepts: CONCEPTS,
+  choisir: (id) => {
+    montrer(id);
+    fondu(() => vues.allerElement(id));
+  },
+});
 
 const vues = vuesDuTemple({ camera, marche, emprises: EMPRISES, reperes, obstacles, tenirLeVol: tenirLaVue });
 
@@ -570,7 +552,7 @@ async function accorderLangue(code) {
   if (code !== langue()) return;                // un choix plus récent est passé pendant le chargement
   for (const [id, concept] of traduits) CONCEPTS.set(id, concept);
   remplirAller();
-  remplirChercher();
+  elements.rafraichir();
   remplirParcours();
   rafraichir();
   planMiddot.rafraichir();
@@ -680,14 +662,18 @@ const guides = parcours({
   ouvrirFiche: montrer,
   fermerFiche: fermer,
 });
+// Du dehors vers le dedans, sans figurants à charger : le parcours que les premiers pas proposent.
+const PARCOURS_DE_DECOUVERTE = "esser_kedushot";
 // La carte du parcours prend la place du rappel des commandes, comme l'initiation.
+function suivreParcours(id, rang) {
+  aide.classList.add("parti");
+  guides.ouvrir(id, rang);
+}
 choixParcours.onchange = () => {
   const id = choixParcours.value;
   choixParcours.value = "";
   choixParcours.blur();
-  if (!id) return;
-  aide.classList.add("parti");
-  guides.ouvrir(id);
+  if (id) suivreParcours(id);
 };
 
 // Un figurant n'est dans la scène qu'avec sa troupe, à l'heure de son service : on le montre à la station qui l'appelle.
@@ -700,8 +686,7 @@ function stationQuiMontre(id) {
 function montrerDemande(id) {
   const trouvee = !REPERES_DU_TEMPLE.has(id) && stationQuiMontre(id);
   if (!trouvee) return vues.allerVers(id);
-  aide.classList.add("parti");
-  guides.ouvrir(trouvee.parcours, trouvee.rang);
+  suivreParcours(trouvee.parcours, trouvee.rang);
 }
 // Changer de qualité recharge la visite : le visiteur y retrouve sa place et son heure.
 const REPRISE = "visite-reprise";
@@ -783,7 +768,7 @@ async function reprendre() {
   if (!brut) refleterLeHeikhal();
 }
 
-// Au premier passage l'initiation remplace le rappel des commandes ; le « ? » la rejoue.
+// Au premier passage l'initiation remplace le rappel des commandes ; « Aide » la rejoue.
 function commencerInitiation() {
   aide.classList.add("parti");
   lancerInitiation();
@@ -797,7 +782,7 @@ function montrerReglages(ouverts) {
 }
 boutonReglages.onclick = (e) => { e.currentTarget.blur(); montrerReglages(!reglages.classList.contains("ouverts")); };
 // La langue déplie sa liste dans le menu : seul un réglage fait le referme.
-reglages.addEventListener("click", (e) => { if (!e.target.closest("#langue-courante, #qualite-courante")) montrerReglages(false); });
+reglages.addEventListener("click", (e) => { if (!e.target.closest("#langue-courante")) montrerReglages(false); });
 addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#reglages, #reglages-ouvrir")) montrerReglages(false); });
 addEventListener("keydown", (e) => { if (e.key === "Escape") montrerReglages(false); });
 brancherChoix({ recharger: () => {

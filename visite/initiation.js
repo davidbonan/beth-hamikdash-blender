@@ -21,7 +21,7 @@ const PREMIERS_PAS = {
   ],
 };
 const VOL = {
-  clef: "visite.initiation.vol", fin: "fin_vol",
+  clef: "visite.initiation.vol", fin: "fin_vol", boutonFin: "#vol",
   etapes: [
     { nom: "voler", seuil: 1, bouton: "#vol" },
     { nom: "monter", seuil: 2 * DENIVELE, bouton: "#vertical" },
@@ -33,14 +33,14 @@ const REPRISE_MS = 1400;       // un geste interrompu : la démonstration revien
 // geste commencé avant qu'elle ne paraisse.
 const LECTURE_MS = 1500;
 
-export function initiation({ elementAMontrer, estEnVol }) {
+export function initiation({ elementAMontrer, estEnVol, suivreVisiteGuidee }) {
   const racine = document.querySelector("#initiation");
   const carte = racine.querySelector(".carte");
   const sections = racine.querySelectorAll("[data-etape]");
   const gestes = racine.querySelectorAll("[data-geste]");
   const points = racine.querySelector(".points");
   const jauge = racine.querySelector(".progres i");
-  const bouton = racine.querySelector(".passer");
+  const bouton = racine.querySelector(".passer"), boutonGuidee = racine.querySelector(".guidee");
   const cible = racine.querySelector(".cible");
   const nomCible = cible.querySelector(".nom");
 
@@ -99,8 +99,9 @@ export function initiation({ elementAMontrer, estEnVol }) {
     finieDepuis = performance.now();
     carte.classList.add("finie");
     afficher(parcours.fin);
-    designer(null);
+    designer(parcours.boutonFin);
     ecrire(bouton, "initiation_visiter");
+    boutonGuidee.hidden = parcours !== PREMIERS_PAS;
     retenir(parcours.clef, "suivie");
   }
 
@@ -152,6 +153,7 @@ export function initiation({ elementAMontrer, estEnVol }) {
     carte.classList.remove("reussie", "finie");
     racine.classList.remove("parti", "agit");
     ecrire(bouton, "initiation_passer");
+    boutonGuidee.hidden = true;
     racine.hidden = false;
     commencerEtape(0);
   }
@@ -167,6 +169,7 @@ export function initiation({ elementAMontrer, estEnVol }) {
   }
 
   bouton.onclick = (e) => { e.currentTarget.blur(); terminer(); };
+  boutonGuidee.onclick = (e) => { e.currentTarget.blur(); terminer(); suivreVisiteGuidee(); };
 
   return {
     lancerInitiation: () => lancer(PREMIERS_PAS),

@@ -10,7 +10,7 @@
  * Un appareil tactile ne dit rien de lui : au premier passage, un banc lie un vrai
  * programme de matière dans un contexte jetable — 10 ms sur un iPhone, 60 ms et bien
  * plus sur l'iPad qui perdrait son contexte au cinquantième — et le lent part en sobre.
- * Le visiteur peut aussi choisir son profil dans la barre, hors ceux qui sont tombés.
+ * Le visiteur peut aussi choisir son profil dans la barre.
  *
  * `?qualite=basse` force le profil léger depuis un bureau, `?qualite=minimale` le très
  * léger, `?qualite=sobre` le sobre : c'est ainsi qu'on les vérifie sans téléphone sous la main.
@@ -24,7 +24,7 @@ const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const coeurs = navigator.hardwareConcurrency || 8;
 // Seul Chrome d'Android dit sa mémoire : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
 const faible = tactile && (navigator.deviceMemory <= 4 || coeurs <= 4);
-const RETENU = "visite-profil-retenu", REPLIS = "visite-profil-replis", CHOISI = "visite-profil-choisi", TOMBE = "visite-profil-tombe";
+const RETENU = "visite-profil-retenu", REPLIS = "visite-profil-replis", CHOISI = "visite-profil-choisi";
 // Du plus riche au plus pauvre.
 export const NIVEAUX = ["haute", "basse", "minimale", "sobre"];
 // Un téléphone descend et remonte d'un cran à la fois, jamais jusqu'au profil lourd.
@@ -35,10 +35,12 @@ const REPLIS_MAX = 2;
 const LIAISON_LENTE_MS = 40;
 const VERSION = new URL(import.meta.url).search;
 
+const bureau = !tactile && coeurs > 4;
+const niveauRetenu = () => REPLIABLES.find((niveau) => niveau === lireRetenu(RETENU));
+
 async function niveauDeLaMachine() {
-  if (!tactile && coeurs > 4) return "haute";
-  const retenu = lireRetenu(RETENU);
-  if (REPLIABLES.includes(retenu)) return retenu;
+  if (bureau) return "haute";
+  if (niveauRetenu()) return niveauRetenu();
   if (await liaisonLente()) {
     retenir(RETENU, "sobre");
     return "sobre";
@@ -138,17 +140,11 @@ export function seRelever() {
   basculerVers(REPLIABLES[rang - 1]);
 }
 
-// Le contexte perdu condamne le profil et ceux au-dessus : la barre ne les offre plus. Un choix manuel qui tombe rend la main.
+// Le contexte perdu sous un profil choisi le ramène au cran du dessous ; sous le dernier, la main revient à l'automatique.
 export function tomber() {
-  if (NIVEAUX.indexOf(NIVEAU) > NIVEAUX.indexOf(lireRetenu(TOMBE))) retenir(TOMBE, NIVEAU);
-  if (manuel) {
-    manuel = false;
-    oublier(CHOISI);
-  }
-  seReplier();
+  if (!manuel) return seReplier();
+  choisir(NIVEAUX[NIVEAUX.indexOf(NIVEAU) + 1]);
 }
-
-const estTombe = (niveau) => NIVEAUX.indexOf(niveau) <= NIVEAUX.indexOf(lireRetenu(TOMBE));
 
 // "" : l'automatique.
 function choisir(niveau) {
@@ -156,48 +152,61 @@ function choisir(niveau) {
   else oublier(CHOISI);
 }
 
-function boutonsDeNiveau() {
-  const courant = manuel ? NIVEAU : "";
-  return ["", ...NIVEAUX].map((niveau) => {
-    const bouton = document.createElement("button");
-    bouton.type = "button";
-    bouton.dataset.niveau = niveau;
-    bouton.setAttribute("aria-pressed", String(niveau === courant));
-    bouton.textContent = niveau ? texte(`qualite_${niveau}`)
-      : manuel ? texte("qualite_auto") : `${texte("qualite_auto")} (${texte(`qualite_${NIVEAU}`).toLowerCase()})`;
-    if (niveau && estTombe(niveau)) {
-      bouton.disabled = true;
-      bouton.append(` — ${texte("qualite_tombee")}`);
-    }
-    return bouton;
+// Ce que l'automatique prendrait : sous un profil choisi ou forcé, le banc ne se rejoue pas pour le dire.
+const niveauTenu = () => (!manuel && !force ? NIVEAU : bureau ? "haute" : niveauRetenu() ?? (faible ? "minimale" : "basse"));
+
+// Un cran au-dessus de ce que la machine tient risque de saccader, deux y sont trop lourds.
+const CHARGES = ["fluide", "risque", "lourd"];
+function chargeDe(niveau) {
+  const crans = NIVEAUX.indexOf(niveauTenu()) - NIVEAUX.indexOf(niveau);
+  return CHARGES[Math.min(Math.max(crans, 0), CHARGES.length - 1)];
+}
+
+const element = (nom, proprietes) => Object.assign(document.createElement(nom), proprietes);
+
+function boutonDeNiveau(niveau, ...contenu) {
+  const bouton = element("button", { type: "button" });
+  bouton.dataset.niveau = niveau;
+  bouton.setAttribute("aria-pressed", String(niveau === (manuel ? NIVEAU : "")));
+  bouton.append(...contenu);
+  return bouton;
+}
+
+// L'automatique à part, avec le profil qu'il prend sur cette machine ; dessous, les profils à choisir soi-même.
+function choixDeNiveau() {
+  const auto = boutonDeNiveau("",
+    element("span", { textContent: texte("qualite_auto") }),
+    element("small", { textContent: texte("qualite_auto_note").replace("{niveau}", texte(`qualite_${niveauTenu()}`).toLowerCase()) }));
+  auto.className = "auto";
+  const manuels = NIVEAUX.map((niveau) => {
+    const charge = element("span", { className: "charge", textContent: texte(`qualite_${chargeDe(niveau)}`) });
+    charge.dataset.charge = chargeDe(niveau);
+    return boutonDeNiveau(niveau, element("span", { textContent: texte(`qualite_${niveau}`) }), charge);
   });
+  return [auto, element("h3", { textContent: texte("qualite_manuel") }), ...manuels];
 }
 
 // Le profil est figé au chargement, lu par toute la visite : en changer, c'est la recharger.
 export function brancherChoix({ recharger }) {
-  const bouton = document.querySelector("#qualite-courante");
-  const menu = document.querySelector("#qualite-menu");
-  const ouvrirMenu = () => { menu.hidden = false; bouton.setAttribute("aria-expanded", "true"); };
-  const fermerMenu = () => { menu.hidden = true; bouton.setAttribute("aria-expanded", "false"); };
-  const remplir = () => {
-    const note = document.createElement("small");
-    note.textContent = texte("qualite_recharge");
-    menu.replaceChildren(...boutonsDeNiveau(), note);
-  };
+  const fenetre = document.querySelector("#qualite-choix");
+  const niveaux = fenetre.querySelector(".niveaux");
+  const fermer = () => { fenetre.hidden = true; };
+  const remplir = () => niveaux.replaceChildren(...choixDeNiveau());
 
   remplir();
   suivreLangue(remplir);
-  bouton.onclick = () => (menu.hidden ? ouvrirMenu() : fermerMenu());
-  menu.onclick = (e) => {
+  document.querySelector("#qualite-courante").onclick = (e) => { e.currentTarget.blur(); fenetre.hidden = false; };
+  fenetre.querySelector(".fermer").onclick = fermer;
+  fenetre.onclick = (e) => { if (e.target === fenetre) fermer(); };
+  niveaux.onclick = (e) => {
     const choix = e.target.closest("[data-niveau]");
     if (!choix) return;
-    fermerMenu();
+    fermer();
     if (choix.getAttribute("aria-pressed") === "true") return;
     choisir(choix.dataset.niveau);
     recharger();
   };
-  addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#qualite")) fermerMenu(); });
-  addEventListener("keydown", (e) => { if (e.key === "Escape") fermerMenu(); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") fermer(); });
 }
 
 // La mémoire GPU est ce qui fait perdre son contexte WebGL à un iPhone : au-delà de `cote`, une texture pèse sans rien montrer de plus sur un petit écran.

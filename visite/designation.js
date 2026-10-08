@@ -26,13 +26,6 @@ export function designation({ camera, obstacles, concepts }) {
     return conceptSous(x, y);
   }
 
-  function pointTouche(cibles, portee, [clientX, clientY]) {
-    viseur.setFromCamera(normaliser(clientX, clientY), camera);
-    viseur.far = portee;
-    const [touche] = viseur.intersectObjects(cibles, false);
-    return touche?.point ?? null;
-  }
-
   // L'initiation désigne un élément réellement à l'écran : « touchez un élément » ne dit
   // rien à qui ne sait pas encore ce qui s'interroge. La marque reste accrochée à son
   // point du monde, et on en cherche une autre quand il sort du cadre ou passe derrière
@@ -77,5 +70,5 @@ export function designation({ camera, obstacles, concepts }) {
              clientX: ((projete.x + 1) / 2) * innerWidth, clientY: ((1 - projete.y) / 2) * innerHeight };
   }
 
-  return { conceptSous, conceptTouche, pointTouche, elementAMontrer };
+  return { conceptSous, conceptTouche, elementAMontrer };
 }
