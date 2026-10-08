@@ -127,5 +127,5 @@ export function panneau(concepts) {
   poignee.addEventListener("pointerup", lacher);
   poignee.addEventListener("pointercancel", lacher);
 
-  return { montrer, fermer, rafraichir };
+  return { montrer, fermer, rafraichir, ouverte: () => cadre.classList.contains("ouverte") };
 }

@@ -174,6 +174,7 @@ export function initiation({ elementAMontrer, estEnVol, suivreVisiteGuidee }) {
   return {
     lancerInitiation: () => lancer(PREMIERS_PAS),
     initiationSuivie: () => appris(PREMIERS_PAS),
+    initiationEnCours: enCours,
     noterRegard: (angle) => progresser("regarder", angle),
     noterDeplacement: (metres) => progresser("avancer", metres),
     noterInterrogation: () => progresser("interroger", 1),

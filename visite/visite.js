@@ -29,6 +29,7 @@ import { laisserPeindre, parTranches } from "./fil.js";
 import { TROUPES, TROUPE_LIBRE, troupesDeFigurants } from "./figurants.js";
 import { eclairerLeTemple } from "./eclairage.js";
 import { designation } from "./designation.js";
+import { annonce } from "./annonce.js";
 import { vuesDuTemple } from "./vues.js";
 import { conceptsEn, contenusSources, json } from "./encyclopedie.js";
 
@@ -383,9 +384,13 @@ if (PROFIL.paysage) chargeur.loadAsync("./pays.glb").then(poserPays);
 // interrogation
 // ---------------------------------------------------------------------------
 const survol = $("#survol");
-const { montrer, fermer, rafraichir } = panneau(CONCEPTS);
+const { montrer, fermer, rafraichir, ouverte: ficheOuverte } = panneau(CONCEPTS);
 const designe = designation({ camera, obstacles, concepts: CONCEPTS });
 let survole = null;
+const annonces = matchMedia("(hover: none) and (pointer: coarse)").matches
+  ? annonce({ objetsRegardes: designe.objetsRegardes, placeALEcran: designe.placeALEcran,
+              nomDe: (id) => CONCEPTS.get(id).nom })
+  : null;
 
 function interroger(clientX, clientY) {
   const id = designe.conceptTouche(clientX, clientY);
@@ -394,6 +399,7 @@ function interroger(clientX, clientY) {
     return;
   }
   montrer(id);
+  annonces?.tenirPourConnu(id);
   noterInterrogation();
 }
 
@@ -422,7 +428,7 @@ function tenirLaVue(enVol) {
   if (marche.tenirLeVol(enVol)) afficherMode();
 }
 
-const { lancerInitiation, initiationSuivie, noterRegard, noterDeplacement, noterInterrogation,
+const { lancerInitiation, initiationSuivie, initiationEnCours, noterRegard, noterDeplacement, noterInterrogation,
         noterEnvol, noterAtterrissage, noterAltitude } = initiation({
   elementAMontrer: designe.elementAMontrer, estEnVol: () => marche.vol,
   suivreVisiteGuidee: () => suivreParcours(PARCOURS_DE_DECOUVERTE),
@@ -709,11 +715,20 @@ function afficherSurvol() {
   survol.style.top = `${p.clientY + 20}px`;
 }
 
+const enMarche = () => marche.elan > 0.01;
+
+function guetterLeRegard() {
+  if (!annonces) return;
+  if (ficheOuverte() || initiationEnCours() || guides.ouvert()) annonces.taire();
+  else if (enMarche()) annonces.patienter();
+  else annonces.guetter();
+}
+
 function afficherPosition() {
   position.textContent = brut
     ? `${(camera.position.x / AMA).toFixed(0)} · ` +
       `${(-camera.position.z / AMA).toFixed(0)} · ${(marche.piedsY / AMA).toFixed(0)} ${texte("amot")}`
-    : (lieuPresent ? CONCEPTS.get(lieuPresent).nom : "");
+    : (lieuPresent ? CONCEPTS.get(lieuPresent).nom : texte("plan_court"));
   planMiddot.suivre(camera.position, camera.getWorldDirection(direction), lieuPresent);
 }
 
@@ -728,7 +743,7 @@ function conduire(dt) {
   marche.avancer(dt, manette);
   noterDeplacement(camera.position.distanceTo(avantLePas));
   if (marche.vol) noterAltitude(camera.position.y - avantLePas.y);
-  if (entame || marche.elan <= 0.01) return;
+  if (entame || !enMarche()) return;
   entame = true;                                  // le rappel a servi, il s'efface
   aide.classList.add("parti");
 }
@@ -748,8 +763,10 @@ renderer.setAnimationLoop(() => {
     else {
       afficherSurvol();
       afficherPosition();
+      guetterLeRegard();
     }
   }
+  annonces?.suivre();
   accorderExposition(dt);
   dessiner(dt);
 });

@@ -70,12 +70,13 @@
   #chargement.parti { opacity: 0; pointer-events: none; }
   /* Sans contexte, la scène ne reviendra pas : le voile reste, quoi que le chargement fasse ensuite. */
   html.perdu #chargement { opacity: 1; pointer-events: auto; cursor: pointer; }
-  html.perdu #chargement .jauge, html.perdu #restant, html.perdu #chargement .gestes { visibility: hidden; }
+  html.perdu #chargement .jauge, html.perdu #restant, html.perdu #chargement .gestes, html.perdu #chargement .mention { visibility: hidden; }
   html.perdu #etat { max-width: min(34ch, calc(100vw - 48px)); margin: 0 auto; line-height: 1.5; }
   #chargement h1 { margin: 0; font-size: 26px; font-weight: 500; letter-spacing: .04em; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
   #chargement p { margin: 0; color: #d6cebf; font-size: 13px; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
   #restant { min-height: 1.4em; font-variant-numeric: tabular-nums; }
   #chargement .gestes { margin-top: 10px; padding-inline: 16px; line-height: 1.8; }
+  #chargement .mention { max-width: 46ch; padding-inline: 16px; font-size: 11px; line-height: 1.5; opacity: .75; }
   .jauge { width: 260px; max-width: 70vw; height: 2px; background: #2a2724; overflow: hidden; }
   /* En transform et non en largeur : le compositeur la fait glisser même quand la page se fige. */
   .jauge i { display: block; height: 100%; background: var(--or); transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
@@ -96,7 +97,7 @@
 
   /* ---- cinéma : la scène seule, encadrée par l'accueil ---- */
   html.cinema #accueil, html.cinema #chargement, html.cinema #barre, html.cinema #aide, html.cinema #manche,
-  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #fiche, html.cinema #plan, html.cinema #recherche, html.cinema #qualite-choix,
+  html.cinema #vertical, html.cinema #minicarte, html.cinema #survol, html.cinema #annonce, html.cinema #fiche, html.cinema #plan, html.cinema #recherche, html.cinema #qualite-choix,
   html.cinema #parcours { display: none !important; }
   html.cinema canvas { pointer-events: none; }
 
@@ -172,6 +173,24 @@
   }
   #survol.vu { opacity: 1; }
 
+  /* ---- au doigt, l'objet regardé de près s'annonce une fois ---- */
+  #annonce {
+    position: fixed; left: 0; top: 0; z-index: 10; pointer-events: none; will-change: transform;
+    opacity: 0; transition: opacity .5s ease;
+  }
+  #annonce.vue { opacity: 1; transition-duration: .35s; }
+  #annonce::before {
+    content: ""; position: absolute; left: -22px; top: -22px; width: 44px; height: 44px;
+    border: 1px solid rgba(240,233,218,.85); border-radius: 50%; opacity: 0;
+  }
+  #annonce.vue::before { animation: onde 1.1s ease-out; }
+  #annonce .nom {
+    position: absolute; top: 30px; left: 0; transform: translate(-50%, 6px); padding: 4px 11px;
+    border-radius: 3px; background: rgba(13,12,11,.78); color: #f0e9da; font-size: 13px;
+    letter-spacing: .02em; white-space: nowrap; transition: transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  #annonce.vue .nom { transform: translateX(-50%); }
+
   /* ---- barre du haut ---- */
   #barre {
     position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex;
@@ -197,8 +216,6 @@
   #chercher .icone { width: 15px; height: 15px; }
   #mode { font-size: 12px; letter-spacing: .04em; color: #9a9182; white-space: nowrap; }
   #mode.vole { color: var(--or); }
-  #position { margin-inline-start: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
-              white-space: nowrap; font-size: 12px; color: #9a9182; font-variant-numeric: tabular-nums; }
   #barre #langue-courante, #barre #qualite-courante, #barre #moment, #barre #reglages-ouvrir {
     width: var(--commande); padding: 0; font-weight: 600;
   }
@@ -622,8 +639,9 @@
   }
   #minicarte .disque:hover { border-color: var(--or); }
   #minicarte svg { display: block; width: 100%; height: 100%; }
-  #minicarte .legende {
-    display: block; margin-top: 3px; text-align: center; font-size: 11px; letter-spacing: .04em; color: #f3efe6;
+  #position {
+    display: block; margin-top: 3px; text-align: center; text-wrap: balance; font-size: 11px; line-height: 1.25;
+    letter-spacing: .04em; color: #f3efe6; font-variant-numeric: tabular-nums;
     text-shadow: 0 0 3px rgba(13,12,11,.95), 0 0 1px rgba(13,12,11,.95); pointer-events: none;
   }
   #minicarte :is(.entrees, .etiquettes) { display: none; }
@@ -766,10 +784,6 @@
     #rejouer::before { content: "?"; text-align: center; font-weight: 600; }
     /* Ce qu'on ne règle qu'en cas de gêne passe en dernier. */
     #qualite-courante { order: 2; }
-    #position {
-      position: absolute; top: 100%; inset-inline-start: calc(12px + var(--marge-gauche)); max-width: 55vw; margin: 0;
-      color: #e8e0d0; text-shadow: 0 0 3px rgba(13,12,11,.95), 0 1px 6px rgba(13,12,11,.8);
-    }
     #langue-menu { position: static; min-width: 0; padding: 2px 0 0; border: 0; background: none; }
   }
 
@@ -891,6 +905,7 @@
   <p id="etat" data-texte="chargement">chargement de la scène…</p>
   <p id="restant"></p>
   <p class="gestes"><span class="au-clavier" data-texte-html="aide_clavier"></span><span class="au-doigt" data-texte-html="aide_doigt"></span></p>
+  <p class="mention" data-texte="mention_ia">Fiches rédigées avec des frontier models d'IA, puis vérifiées avec soin. Une erreur peut malgré tout subsister.</p>
 </div>
 
 <div id="barre">
@@ -912,16 +927,16 @@
   </div>
   <label class="menu" title="Suivre un service, station par station" data-titre="parcours_titre"><span class="nom" data-texte="menu_parcours">Visites guidées</span><select id="parcours-choix"><option value="" data-texte="parcours_menu">Parcours…</option></select></label>
   <span id="mode" data-texte="a_pied">à pied</span>
-  <span id="position"></span>
   <button id="reglages-ouvrir" type="button" title="Réglages" aria-label="Réglages" data-titre="reglages"
           aria-haspopup="true" aria-expanded="false">⋯</button>
 </div>
 
 <div id="survol"></div>
+<div id="annonce"><span class="nom"></span></div>
 
 <div id="minicarte">
 <button class="disque" type="button" title="Ouvrir le plan" aria-label="Ouvrir le plan" data-titre="plan_ouvrir"><svg aria-hidden="true"></svg><span class="rose" aria-hidden="true"><span class="nord" data-texte="nord">N</span><span class="sud" data-texte="sud">S</span><span class="est" data-texte="est">E</span><span class="ouest" data-texte="ouest">O</span></span></button>
-<span class="legende" data-texte="plan_court" aria-hidden="true">Plan</span>
+<span id="position">Plan</span>
 </div>
 
 <div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>

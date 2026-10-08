@@ -1,0 +1,49 @@
+# Modim deRabanan — Sota 40a, texte du siddour Edot HaMizrach
+# [nom de section | durée en s | ton du passage | arrangement], puis chaque ligne chantée et, dessous, son hébreu
+# le Nom écrit Adonai / אֲדֹנָי, comme il se chante
+
+titre: Modim DeRabanan
+artiste: David Bonan
+source: Modim deRabanan — Sota 40a
+
+[Verse 1 | 28 | humble gratitude, bowing before the Creator of all flesh, tender and intimate | gentle opening, piano and voice with light strings, soft dynamics]
+Modim anachnu lach
+מוֹדִים אֲנַחְנוּ לָךְ
+She'ata hu Adonai Eloheinu
+שֶׁאַתָּה הוּא אֲדֹנָי אֱלֹהֵינוּ
+Velohei avoteinu
+וֵאלֹהֵי אֲבוֹתֵינוּ
+Elohei chol basar
+אֱלֹהֵי כָל בָּשָׂר
+Yotsrenu yotser bereshit
+יוֹצְרֵנוּ יוֹצֵר בְּרֵאשִׁית
+
+[Verse 2 | 18 | warm thankfulness for the gift of life, blessings rising to the great and holy Name | steady pulse, plucked oud joins the piano, strings a little fuller, moderate dynamics]
+Berachot vehoda'ot
+בְּרָכוֹת וְהוֹדָאוֹת
+Leshimcha hagadol vehakadosh
+לְשִׁמְךָ הַגָּדוֹל וְהַקָּדוֹשׁ
+Al shehecheyitanu vekiyamtanu
+עַל שֶׁהֶחֱיִיתָנוּ וְקִיַּמְתָּנוּ
+
+[Bridge | 18 | a pleading prayer, longing for the exiles to be gathered home to the holy courts of the Temple | sparser arrangement at the same tempo, no percussion, ney and strings, soft dynamics]
+Ken techayenu utchonenu
+כֵּן תְּחַיֵּנוּ וּתְחָנֵּנוּ
+Vete'esof galuyoteinu
+וְתֶאֱסוֹף גָּלֻיּוֹתֵינוּ
+Lechatsrot kodshecha
+לְחַצְרוֹת קָדְשֶׁךָ
+
+[Verse 3 | 18 | rising devotion, a vow to serve with a whole heart, each promise firmer than the last | light frame drum joins softly, fuller strings, stronger dynamics]
+Lishmor chukecha
+לִשְׁמֹר חֻקֶּיךָ
+Vela'asot retsoncha
+וְלַעֲשׂוֹת רְצוֹנְךָ
+Ul'ovdecha velevav shalem
+וּלְעָבְדְךָ בְלֵבָב שָׁלֵם
+
+[Final | 15 | radiant and grateful, the closing blessing sung with full strength | full ensemble, strongest dynamics, broad sustained final notes]
+Al she'anachnu modim lach
+עַל שֶׁאֲנַחְנוּ מוֹדִים לָךְ
+Baruch El hahoda'ot
+בָּרוּךְ אֵל הַהוֹדָאוֹת
