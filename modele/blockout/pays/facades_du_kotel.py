@@ -6,12 +6,12 @@ from ..primitives.parametres import AMA, Z_HAR
 from ..primitives.matieres import (MAT_ACIER_BLANC, MAT_CHENE, MAT_DALLAGE_KOTEL, MAT_FER, MAT_FER_BRUN, MAT_MEHITSA, MAT_MURAILLE, MAT_OR, MAT_PIERRE,
                                    MAT_PIERRE_DE_JERUSALEM, MAT_PLASTIQUE, MAT_SOL, MAT_TERRE, MAT_TOILE, MAT_TOLE,
                                    MAT_VERRE_DE_LAMPE, MAT_VITRE)
-from ..primitives.volumes import FACES_BOITE, alea, plage
+from ..primitives.volumes import FACES_BOITE, alea, arc, plage
 from .calage import (CUVETTE_KOTEL, PARAPET_HAR, PAYS_DONNEES, Z_PLACE_HAUTE, Z_PLACE_KOTEL, _abscisses, _dans, _direct,
                      _plus_proche_sur_l_anneau, _point_a_l_abscisse, vers_scene, volumes)
 from .place_du_kotel import (BORD_NORD, SOUS_LE_PONT, WILSON, _baie, _cap, _coupole, _devant, _extrusion, _fut, _pave, _point_de_wilson,
                              _poser, _poutre)
-from .second_oeuvre import (Percements, _a_droite, _arc, _bandeau, _decale, _plaque, _unitaire, applique, climatiseur,
+from .second_oeuvre import (Percements, _a_droite, _bandeau, _decale, _plaque, _unitaire, applique, climatiseur,
                             descente_d_eau, parabole, projecteur, repere_de_projecteur, verre_de_projecteur)
 
 
@@ -42,7 +42,7 @@ def _mur_a_arcades(p, q, z0, z1, epaisseur, arches=(), avance=0.0):
     d'arches (abscisse du centre, portée, hauteur à la clé, flèche)."""
     bas = [(0, z0)]
     for centre, portee, cle, fleche in sorted(arches):
-        bas += [(centre - portee / 2, z0)] + _arc(centre, portee / 2, z0 + cle - fleche, fleche) + [(centre + portee / 2, z0)]
+        bas += [(centre - portee / 2, z0)] + arc(centre, portee / 2, z0 + cle - fleche, fleche) + [(centre + portee / 2, z0)]
     long_ = math.dist(p, q)
     profil = bas + [(long_, z0), (long_, z1), (0, z1)]
     return _extrusion(profil, _decale(p, _a_droite(p, q, -avance)), _a_droite(p, q, 1), _unitaire(p, q), epaisseur + avance)
@@ -406,7 +406,7 @@ def _plus_proches(anneau, metres):
 
 def _voute(centre, cap, portee, longueur, naissance, fleche, epaisseur=0.12 / AMA, segments=8):
     """Un voile de béton en berceau surbaissé, `longueur` le long du cap, `portee` en travers."""
-    dessus = _arc(0, portee / 2, naissance, fleche, segments)
+    dessus = arc(0, portee / 2, naissance, fleche, segments)
     dessous = [(x * (1 - 2 * epaisseur / portee), z - epaisseur) for x, z in dessus]
     travers = (-math.sin(cap), math.cos(cap))
     return _extrusion(dessous + dessus[::-1], _devant(centre, cap, -longueur / 2), (math.cos(cap), math.sin(cap)), travers, longueur)

@@ -20,14 +20,14 @@
       "ref": "1:1-2"
      },
      "point": [
-      -12,
-      -46
+      -17,
+      -60
      ],
      "sol": 0,
      "cible": [
-      -12,
-      8,
-      -62
+      -17,
+      3,
+      -76
      ],
      "titre": {
       "fr": "Au Beit HaMoked, avant l'aube",
@@ -35,9 +35,9 @@
       "he": "בבית המוקד, לפני עלות השחר"
      },
      "texte": {
-      "fr": "Les anciens de la maison paternelle dorment ici, les clés de l'Azara en main, et les jeunes cohanim à terre, chacun sur sa couche. Le préposé frappe à la porte avant l'aube ; celui qui s'est immergé vient tirer au sort le retrait des cendres.",
-      "en": "The elders of the patrilineal family sleep here, the keys of the Azara in their hands, and the young kohanim on the ground, each on his bedding. The appointed priest knocks at the gate before dawn; whoever has immersed comes to draw lots for the removal of the ashes.",
-      "he": "זקני בית האב ישנים כאן ומפתחות העזרה בידם, ופרחי כהונה איש כסתו בארץ. הממונה בא ודופק עליהם לפני עלות השחר; מי שטבל בא ומפיס על תרומת הדשן."
+      "fr": "Les anciens de la maison paternelle dorment ici sur les gradins de pierre, les clés de l'Azara en main, et les jeunes cohanim à terre, chacun sur sa couche, près des feux qui brûlent toute la nuit. Le préposé frappe à la porte avant l'aube ; celui qui s'est immergé vient tirer au sort le retrait des cendres, et l'on entre dans l'Azara par le guichet du grand vantail.",
+      "en": "The elders of the patrilineal family sleep here on the stone tiers, the keys of the Azara in their hands, and the young kohanim on the ground, each on his bedding, beside the fires that burn all night. The appointed priest knocks at the gate before dawn; whoever has immersed comes to draw lots for the removal of the ashes, and they enter the Azara through the wicket in the great door.",
+      "he": "זקני בית האב ישנים כאן על רובדי האבן ומפתחות העזרה בידם, ופרחי כהונה איש כסתו בארץ, ליד המדורות הדולקות כל הלילה. הממונה בא ודופק עליהם לפני עלות השחר; מי שטבל בא ומפיס על תרומת הדשן, ונכנסים לעזרה דרך הפשפש שבשער הגדול."
      }
     },
     {

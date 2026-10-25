@@ -2,7 +2,7 @@ from .primitives.parametres import Z_AZ, Z_EZI, Z_EZN
 from .primitives.ouvrages import (BANDEAU, CORNICHE, ENCADREMENT_SHAAR, LISHKA_DEBORD, SAILLIE_BANDEAU, SOCLE,
                                   moulure, ordre_de_pilastres)
 from .azara import (AX0, AX1, AY0, AY1, CADRE_LISHKA_EZI, GAZIT_X0, GAZIT_X1, GOLA_X0, GOLA_X1, H_MUR,
-                    LISHKOT_EZI, OUVERTURES, PISHPESHIM, PORTE_MOKED, SOUS_CORNICHE, T, X_DOUKHAN)
+                    LISHKOT_EZI, MOKED_X0, MOKED_X1, OUVERTURES, PISHPESHIM, SOUS_CORNICHE, T, X_DOUKHAN)
 from .lishkot import LISHKOT_NIKANOR, MEDICHIN_X, MELACH_X, NZ_X0, NZ_X1, PARVA_X, SM_X0, SM_X1
 
 
@@ -13,7 +13,7 @@ moulure("Azara_couronnement_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ + H_MUR, 
         mitres=("deborde", "deborde"))
 moulure("Azara_couronnement_ouest", AX0 - T, AX0, AY0, AY1, Z_AZ + H_MUR, CORNICHE, "20_Azara",
         mitres=("bute", "bute"))
-CORPS_NORD = [(PORTE_MOKED - 10.5, PORTE_MOKED + 10.5),
+CORPS_NORD = [(MOKED_X0 - LISHKA_DEBORD, MOKED_X1 + LISHKA_DEBORD),
               (GAZIT_X0 - LISHKA_DEBORD, GAZIT_X1 + LISHKA_DEBORD),
               (GOLA_X0 - LISHKA_DEBORD, GOLA_X1 + LISHKA_DEBORD),
               (NZ_X0 - LISHKA_DEBORD, NZ_X1 + LISHKA_DEBORD)]

@@ -25,7 +25,10 @@ SALLES_CLOSES = ("lishkat_hagazit", "lishkat_hagola", "beit_hahalifot", "lishkat
                  "lishkat_hamelach", "lishkat_haetz", "beit_hatevila")
 TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03} | dict.fromkeys(SALLES_CLOSES, 0.08)
 # Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
-MALGRE_AIRE = {"yessod"}
+# Les éléments du Beit HaMoked, fiche à part : sans carte, le ciel les éclairerait dans la salle close comme au-dehors.
+MALGRE_AIRE = {"yessod", "kippa_beit_hamoked", "shaarei_beit_hamoked", "medurat_beit_hamoked", "lishkat_hatlaim",
+               "lishkat_lechem_hapanim", "lishkat_hachotamot", "lishkat_beit_hamoked", "rovadim_beit_hamoked",
+               "rashei_pispasin", "tavla_hamaftechot", "kesatot_beit_hamoked"}
 TAILLE = (128, 2048)
 ECHANTILLONS = 256
 PORTEE = 8.0
@@ -61,7 +64,8 @@ LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 150.0, "hauteur": 0.35},
           "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0},
           "lueurs": {"couleur": 0xFFD8A0, "intensite": 4.0, "hauteur": 0.0, "une_par_point": True}}
 # Les lampes d'une salle, sous le concept dont elles signent la carte : les régler ne recuit que lui et ses voisins.
-LAMPES_DE_SALLE = {"arche_wilson": {"couleur": 0xFFE2B8, "intensite": 24.0, "hauteur": 0.0, "une_par_point": True}}
+LAMPES_DE_SALLE = {"arche_wilson": {"couleur": 0xFFE2B8, "intensite": 24.0, "hauteur": 0.0, "une_par_point": True},
+                   "beit_hamoked": {"couleur": 0xFF9A50, "intensite": 16.0, "hauteur": 0.0, "une_par_point": True}}
 # Albédo de la visite rapporté à celui de Cycles, mesuré en rendant les deux depuis la même caméra ; les autres matières sont à 3 % près.
 ALBEDO_VISITE = {"Marbre_Herode": (1.12, 1.07, 1.07), "Sol": (1.11, 1.10, 1.09)}
 ECHANTILLONS_REBONDS = 1024

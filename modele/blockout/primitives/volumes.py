@@ -153,6 +153,26 @@ def prism(name, poly, z0, z1, col, mat=None):
         faces.append([i, j, n + j, n + i])
     return mesh_from_pydata(name, verts, faces, col, mat)
 
+def prism_x(name, profil, x0, x1, col, mat=None):
+    """Extrusion le long de x d'un polygone convexe de (y, z) en amot, parcouru dans le sens
+    direct vu de +x : un pignon, un tympan."""
+    n = len(profil)
+    verts = [(x0, y, z) for y, z in profil] + [(x1, y, z) for y, z in profil]
+    faces = [list(range(n))[::-1], list(range(n, 2 * n))]
+    for i in range(n):
+        j = (i + 1) % n
+        faces.append([i, j, n + j, n + i])
+    return mesh_from_pydata(name, verts, faces, col, mat)
+
+def arc(centre, demi, naissance, fleche, segments=8):
+    """Un arc de cercle de gauche à droite, (u, z) : plein cintre si la flèche vaut la
+    demi-portée, surbaissé en dessous."""
+    rayon = (demi ** 2 + fleche ** 2) / (2 * fleche)
+    ouverture = math.asin(min(1, demi / rayon))
+    return [(centre + rayon * math.sin(-ouverture + 2 * ouverture * k / segments),
+             naissance + fleche - rayon + rayon * math.cos(-ouverture + 2 * ouverture * k / segments))
+            for k in range(segments + 1)]
+
 def cyl(name, x, y, z0, z1, r, col="20_Azara", mat=None, verts=32):
     return _lisser(prism(name, _cercle(x, y, r, verts), min(z0, z1), max(z0, z1), col, mat), verts)
 
@@ -553,6 +573,40 @@ def alea(cle, k=0):
     """
     return (zlib.crc32(f"{cle}#{k}".encode()) % 10007) / 10007
 
+def braises(nom, x0, x1, y0, y1, z, col, mat, maille=0.42, relief=0.22, profondeur=0.35):
+    """Bassin de gehalim : une nappe de charbons empilés, en un seul maillage.
+
+    Une boîte n'a pas de silhouette de braise, et aucune matière ne la lui rend : la
+    hauteur est donc dans la géométrie, tirée du nom pour que le tas soit le même à
+    chaque construction. Le bord garde la maille exacte — lui aussi déformé, le bassin
+    débordait sur les gzirin. `profondeur` : ce que le tas descend sous `z`.
+    """
+    nx, ny = max(2, round((x1 - x0) / maille)), max(2, round((y1 - y0) / maille))
+    rang = nx + 1
+    place = lambda i, j: j * rang + i
+    haut, bas = [], []
+    for j in range(ny + 1):
+        for i in range(nx + 1):
+            cle = f"{nom}_{i}_{j}"
+            bord = i in (0, nx) or j in (0, ny)
+            derive = 0.0 if bord else maille * 0.45
+            x = x0 + (x1 - x0) * i / nx + (alea(cle, 1) - 0.5) * derive
+            y = y0 + (y1 - y0) * j / ny + (alea(cle, 2) - 0.5) * derive
+            haut.append((x, y, z + (0.0 if bord else relief * (0.2 + alea(cle, 3)))))
+            bas.append((x, y, z - profondeur))
+    n = len(haut)
+    faces = []
+    for j in range(ny):
+        for i in range(nx):
+            a, b, c, d = place(i, j), place(i + 1, j), place(i + 1, j + 1), place(i, j + 1)
+            faces += [[a, b, c, d], [n + d, n + c, n + b, n + a]]
+    for i in range(nx):
+        faces.append([place(i + 1, 0), place(i, 0), n + place(i, 0), n + place(i + 1, 0)])
+        faces.append([place(i, ny), place(i + 1, ny), n + place(i + 1, ny), n + place(i, ny)])
+    for j in range(ny):
+        faces.append([place(0, j), place(0, j + 1), n + place(0, j + 1), n + place(0, j)])
+        faces.append([place(nx, j + 1), place(nx, j), n + place(nx, j), n + place(nx, j + 1)])
+    return mesh_from_pydata(nom, haut + bas, faces, col, mat)
 
 def empty(name, x, y, z, col="90_Cameras"):
     o = bpy.data.objects.new(name, None)

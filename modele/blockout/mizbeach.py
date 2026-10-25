@@ -7,7 +7,7 @@ from .primitives.parametres import MODELE, Z_AZ, m
 from .primitives.matieres import (MAT_ARGENT, MAT_BOIS_CHARBON, MAT_BOIS_MAARAKHA, MAT_BOIS_ROUSSI,
                                   MAT_BRONZE, MAT_CEDRE, MAT_CENDRE, MAT_CHAUX, MAT_CHAUX_FEU, MAT_EAU,
                                   MAT_FER, MAT_MARBRE, MAT_SEL, MAT_SIKRA, braise, nuee)
-from .primitives.volumes import (_objet, _poser, alea, box, cone, crochet, cyl, cyl_between, lampe, link_to,
+from .primitives.volumes import (_objet, _poser, alea, box, braises, cone, crochet, cyl, cyl_between, lampe, link_to,
                                  massif_en_pente, mesh_from_pydata, revolution, sphere, tore, wedge_ramp,
                                  wedge_ramp_oblique)
 
@@ -162,41 +162,6 @@ MAARAKHOT = (("gedola", -36, -28, -13, -5), ("ketoret", -48, -45, -19, -16),
 # lire un bûcher — deux lits jointifs sous une dalle donnaient une palette sous un
 # matelas, ce que la visite montrait de près.
 R_GZIR, REWACH, PAS_LIT, LITS = 0.18, 0.15, 0.30, 3
-
-def braises(nom, x0, x1, y0, y1, z, col, mat, maille=0.42, relief=0.22, profondeur=0.35):
-    """Bassin de gehalim : une nappe de charbons empilés, en un seul maillage.
-
-    Une boîte n'a pas de silhouette de braise, et aucune matière ne la lui rend : la
-    hauteur est donc dans la géométrie, tirée du nom pour que le tas soit le même à
-    chaque construction. Le bord garde la maille exacte — lui aussi déformé, le bassin
-    débordait sur les gzirin. `profondeur` : ce que le tas descend sous `z`.
-    """
-    nx, ny = max(2, round((x1 - x0) / maille)), max(2, round((y1 - y0) / maille))
-    rang = nx + 1
-    place = lambda i, j: j * rang + i
-    haut, bas = [], []
-    for j in range(ny + 1):
-        for i in range(nx + 1):
-            cle = f"{nom}_{i}_{j}"
-            bord = i in (0, nx) or j in (0, ny)
-            derive = 0.0 if bord else maille * 0.45
-            x = x0 + (x1 - x0) * i / nx + (alea(cle, 1) - 0.5) * derive
-            y = y0 + (y1 - y0) * j / ny + (alea(cle, 2) - 0.5) * derive
-            haut.append((x, y, z + (0.0 if bord else relief * (0.2 + alea(cle, 3)))))
-            bas.append((x, y, z - profondeur))
-    n = len(haut)
-    faces = []
-    for j in range(ny):
-        for i in range(nx):
-            a, b, c, d = place(i, j), place(i + 1, j), place(i + 1, j + 1), place(i, j + 1)
-            faces += [[a, b, c, d], [n + d, n + c, n + b, n + a]]
-    for i in range(nx):
-        faces.append([place(i + 1, 0), place(i, 0), n + place(i, 0), n + place(i + 1, 0)])
-        faces.append([place(i, ny), place(i + 1, ny), n + place(i + 1, ny), n + place(i, ny)])
-    for j in range(ny):
-        faces.append([place(0, j), place(0, j + 1), n + place(0, j + 1), n + place(0, j)])
-        faces.append([place(nx, j + 1), place(nx, j), n + place(nx, j), n + place(nx, j + 1)])
-    return mesh_from_pydata(nom, haut + bas, faces, col, mat)
 
 def maarakha(nm, xa, xb, ya, yb):
     """Trois lits de gzirin croisés, espacés, et le bassin de braises posé dedans."""

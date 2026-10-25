@@ -134,7 +134,19 @@ VUES = [
     dict(id="vue_lishkat_hamedichin", position=(-104.4, -57.5, Z_AZ), cap=270, tangage=-10),
     dict(id="vue_lishkat_parhedrin", position=(-33.5, -75.0, Z_EZN), cap=270),
     dict(id="vue_lishkat_osei_chavitin", position=(-20.8, -12.5, Z_AZ), cap=0, tangage=12),
-    dict(id="vue_beit_hamoked", position=(-12.1, 58.75, Z_AZ), cap=90),
+    dict(id="vue_beit_hamoked", position=(-17.1, 60.0, Z_AZ), cap=90),
+    # Ses éléments se regardent depuis la nef : une chambre par sa porte, la limite par le passage entre deux chambres.
+    dict(id="vue_kippa_beit_hamoked", position=(-22.5, 70.75, Z_AZ), cap=0, tangage=30),
+    dict(id="vue_shaarei_beit_hamoked", position=(-17.0, 68.0, Z_AZ), cap=270, tangage=5),
+    dict(id="vue_medurat_beit_hamoked", position=(-17.0, 70.5, Z_AZ), cap=90, tangage=-12),
+    dict(id="vue_lishkat_hatlaim", position=(-20.0, 64.5, Z_AZ), cap=180, tangage=-8),
+    dict(id="vue_lishkat_lechem_hapanim", position=(-14.0, 64.0, Z_AZ), cap=0, tangage=-8),
+    dict(id="vue_lishkat_hachotamot", position=(-14.0, 77.25, Z_AZ), cap=0, tangage=-8),
+    dict(id="vue_lishkat_beit_hamoked", position=(-20.0, 77.75, Z_AZ), cap=180, tangage=-10),
+    dict(id="vue_rovadim_beit_hamoked", position=(-14.0, 68.0, Z_AZ), cap=150, tangage=-5),
+    dict(id="vue_rashei_pispasin", position=(-22.5, 70.9, Z_AZ), cap=180, tangage=12),
+    dict(id="vue_tavla_hamaftechot", position=(-17.0, 71.5, Z_AZ), cap=90, tangage=-20),
+    dict(id="vue_kesatot_beit_hamoked", position=(-13.0, 71.0, Z_AZ), cap=120, tangage=-10),
     dict(id="vue_shaar_hamayim", position=(-12.1, -61.5, Z_AZ), cap=270, tangage=-8),
     dict(id="vue_shaar_hanitzotz", position=(-121.5, 65.6, Z_AZ), cap=90, tangage=-8),
     # Le Beit Avtinas et le Beit HaNitzotz sont à l'étage de leur porte : ils se montrent depuis la cour.
@@ -309,7 +321,7 @@ def en_metres(vue, emprises):
 
 
 # Le concept d'une salle à lueurs → le préfixe de ses lampes (`_lueur`) et de son vide CUBE (`_salle`) dans le blockout.
-SALLES_A_LUEURS = {"lishkat_hagazit": "Lishkat_HaGazit", "arche_wilson": "Wilson"}
+SALLES_A_LUEURS = {"lishkat_hagazit": "Lishkat_HaGazit", "arche_wilson": "Wilson", "beit_hamoked": "Beit_HaMoked"}
 
 
 # À lire avant le tri des objets : ce sont des lampes, pas des maillages.

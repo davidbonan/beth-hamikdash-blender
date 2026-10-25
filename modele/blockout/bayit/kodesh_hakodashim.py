@@ -4,9 +4,8 @@ from mathutils import Vector, noise
 
 from ..primitives.parametres import AMA, MODELE, Z_BAT, m
 from ..primitives.matieres import MAT_CEDRE, MAT_CHENE, MAT_OR, MAT_PIERRE, MAT_ROCHE, MAT_TERRE_CUITE, braise
-from ..primitives.volumes import (_lisser, _objet, _poser, box, cyl_between, lampe, mesh_from_pydata,
+from ..primitives.volumes import (_lisser, _objet, _poser, box, braises, cyl_between, lampe, mesh_from_pydata,
                                   revolution, sphere, tore)
-from ..mizbeach import braises
 from .heikhal import ARON_X_MACHTA, ARON_Y_BAD, ARON_Z_BAD, KK0, KK1, TR0
 
 

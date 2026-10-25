@@ -755,6 +755,98 @@
       "lieu": true
     },
     {
+      "id": "kippa_beit_hamoked",
+      "nom": "Kippa du Beit HaMoked",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_kippa"
+      ]
+    },
+    {
+      "id": "shaarei_beit_hamoked",
+      "nom": "Portes du Beit HaMoked",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_S_cadre",
+        "Beit_HaMoked_N_cadre",
+        "Beit_HaMoked_S_vantail",
+        "Beit_HaMoked_S_pishpash"
+      ]
+    },
+    {
+      "id": "medurat_beit_hamoked",
+      "nom": "Feux du Beit HaMoked",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_medura"
+      ]
+    },
+    {
+      "id": "lishkat_hatlaim",
+      "nom": "Lishkat HaTla'im",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_kiton_SO"
+      ]
+    },
+    {
+      "id": "lishkat_lechem_hapanim",
+      "nom": "Lishkat Osei Le'hem HaPanim",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_kiton_SE"
+      ]
+    },
+    {
+      "id": "lishkat_hachotamot",
+      "nom": "Lishkat HaChotamot",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_kiton_NE"
+      ]
+    },
+    {
+      "id": "lishkat_beit_hamoked",
+      "nom": "Lishkat Beit HaMoked",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_kiton_NO"
+      ]
+    },
+    {
+      "id": "rovadim_beit_hamoked",
+      "nom": "Rovadim du Beit HaMoked",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_rovad"
+      ]
+    },
+    {
+      "id": "rashei_pispasin",
+      "nom": "Rashei pispasin",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_rashei_pispasin"
+      ]
+    },
+    {
+      "id": "tavla_hamaftechot",
+      "nom": "Tavla des clés",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_tavla"
+      ]
+    },
+    {
+      "id": "kesatot_beit_hamoked",
+      "nom": "Couches des cohanim",
+      "zone": "lishkot",
+      "prefixes": [
+        "Beit_HaMoked_keset",
+        "Beit_HaMoked_kar"
+      ]
+    },
+    {
       "id": "mesiba_bira",
       "nom": "Mesiba sous la bira",
       "zone": "lishkot",

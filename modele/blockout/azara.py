@@ -196,7 +196,11 @@ box("Azara_mur_ouest", AX0 - T, AX0, AY0 - T, AY1 + T, Z_AZ, Z_AZ + H_MUR, "20_A
 # vers l'est). La liste des sept portes (Middot 1:4-5) donne les mêmes trois portes
 # du sud dans le même ordre : Sha'ar HaMayim est donc la plus ORIENTALE.
 PORTE_DELEK, PORTE_BEKHOROT, PORTE_MAYIM = -120, -66, -12       # sud, ouest -> est
-PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -12       # nord, ouest -> est
+# Le Beit HaMoked est « בַּיִת גָּדוֹל » (Middot 1:8), « בית גדול בשיעורו » (Rambam sur Middot 1:6), ses quatre
+# chambres « לְאַרְבַּע פִּנּוֹתָיו » (Bartenura sur Middot 1:5) : deux de chaque côté d'un שער de dix amot, il lui
+# faut trente amot de façade. Son mur est garde ses deux amot avant l'angle de l'Azara ; il gagne donc
+# vers l'ouest, et sa porte, au milieu de la façade, avec lui. CHOIX, comme les deux autres x.
+PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -17       # nord, ouest -> est
 # La Lishkat HaGazit est à cheval sur la limite du sacré, avec deux ouvertures —
 # « חֶצְיָהּ בַּקֹּדֶשׁ וְחֶצְיָהּ בַּחוֹל… שְׁנֵי פְתָחִים הָיוּ לָהּ, אֶחָד פָּתוּחַ בַּקֹּדֶשׁ וְאֶחָד
 # פָּתוּחַ בַּחוֹל » (Yoma 25a ; Rambam, Beit HaBe'hira 5:17). Elle enjambe
@@ -208,7 +212,7 @@ PORTE_NITZOTZ, PORTE_KORBAN, PORTE_MOKED = -120, -66, -12       # nord, ouest ->
 # סְמוּכִין לַמַּעֲרָב… שְׁמַעִינַן דְּהָכָא מִמִּזְרָח לְמַעֲרָב קָא חָשֵׁיב דֶּרֶךְ כְּנִיסַת הָעֲזָרָה »).
 GAZIT_X0, GAZIT_X1 = -158, -138
 GOLA_X0, GOLA_X1 = -182, -162
-MOKED_X0, MOKED_X1 = PORTE_MOKED - 10, PORTE_MOKED + 10
+MOKED_X0, MOKED_X1 = PORTE_MOKED - 15, PORTE_MOKED + 15
 # Le Beit HaMoked et la Lishkat HaGazit enjambent le mur : il s'interrompt sur leur
 # largeur, et leurs baies sont dans leurs propres faces. Un mur qui les traverserait en
 # ferait deux culs-de-sac de dix amot.

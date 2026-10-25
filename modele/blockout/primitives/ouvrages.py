@@ -2,8 +2,8 @@ import bpy
 import math
 from typing import NamedTuple
 
-from .matieres import MAT_CEDRE, MAT_MARBRE_HERODE
-from .volumes import box, cyl, plage, prism
+from .matieres import MAT_CEDRE, MAT_MARBRE_HERODE, braise
+from .volumes import arc, box, braises, cyl, mesh_from_pydata, plage, prism, prism_x
 from .gravures import largeur_gravure, timora
 
 
@@ -301,10 +301,9 @@ def aliyah(name, x0, x1, y0, y1, z0, h, col, fenetre, porte, mat=None):
 
 def maake(name, x0, x1, y0, y1, z, col, mat=None):
     """Garde-corps de toit — « ועשית מעקה לגגך » (Deut. 22:8). Rambam, Rotzea'h 11:2 :
-    « גגך » exclut ce qui n'est pas fait pour l'habitation. Ces deux-là le sont — les
-    anciens de la maison paternelle dorment au Beit HaMoked (Middot 1:8) et le Cohen
-    Gadol habite sept jours la Lishkat Parhedrin (Yoma 1:1), au point qu'elle est
-    tenue à la mezouza (Yoma 11a). Hauteur minimale 10 tefa'him (Rotzea'h 11:3) ;
+    « גגך » exclut ce qui n'est pas fait pour l'habitation. La Lishkat Parhedrin l'est —
+    le Cohen Gadol y habite sept jours (Yoma 1:1), au point qu'elle est tenue à la
+    mezouza (Yoma 11a). Hauteur minimale 10 tefa'him (Rotzea'h 11:3) ;
     3 amot est un CHOIX de lisibilité : c'est le décrochement qui, au-dessus de la
     corniche en saillie, donne au toit sa silhouette en gradin.
     """
@@ -314,6 +313,42 @@ def maake(name, x0, x1, y0, y1, z, col, mat=None):
                                 ("E", x1 - MAAKE_EP, x1, y0 + MAAKE_EP, y1 - MAAKE_EP)):
         box(f"{name}_maake_{suffixe}", a, b, c, e, z, z + MAAKE_H, col, mat)
 
+
+
+def kippa(name, x0, x1, y0, y1, z, fleche, col, mat=None, epaisseur=LISHKA_PAREMENT, cle=1.5, segments=16):
+    """Berceau surbaissé d'axe est-ouest posé à `z` sur les murs d'une lishka dont la
+    corniche laisse l'intérieur ouvert, et ses deux tympans. « כִּפָּה » (Middot 1:8) :
+    « כִּפָּה ארקוול"ט בְּלַעַ"ז עֲשׂוּיָה בָּאָרֶץ » (Bartenura), « שגגה דומה למקצת עגולה » (Rambam
+    sur Tamid 1:1) — une voûte qui est son propre toit, une portion de cercle et non une
+    coupole. `fleche` : celle de l'intrados ; l'extrados en a `cle` de plus, l'épaisseur
+    à la clé, et naît au nu extérieur des murs, à `epaisseur` de l'intrados."""
+    milieu, demi = (y0 + y1) / 2, (y1 - y0) / 2
+    intrados = arc(milieu, demi - epaisseur, z, fleche, segments)
+    extrados = arc(milieu, demi, z, fleche + cle, segments)
+    n = segments + 1
+    verts = ([(x0, y, h) for y, h in intrados] + [(x1, y, h) for y, h in intrados]
+             + [(x0, y, h) for y, h in extrados] + [(x1, y, h) for y, h in extrados])
+    i_a, i_b, e_a, e_b = (lambda k: k), (lambda k: n + k), (lambda k: 2 * n + k), (lambda k: 3 * n + k)
+    faces = []
+    for k in range(segments):
+        faces += [[e_a(k), e_b(k), e_b(k + 1), e_a(k + 1)],
+                  [i_a(k), i_a(k + 1), i_b(k + 1), i_b(k)],
+                  [i_a(k), e_a(k), e_a(k + 1), i_a(k + 1)],
+                  [i_b(k), i_b(k + 1), e_b(k + 1), e_b(k)]]
+    faces += [[i_a(0), i_b(0), e_b(0), e_a(0)], [i_a(segments), e_a(segments), e_b(segments), i_b(segments)]]
+    mesh_from_pydata(f"{name}_berceau", verts, faces, col, mat)
+    tympan = [intrados[0], intrados[-1]] + intrados[-2:0:-1]
+    prism_x(f"{name}_tympan_O", tympan, x0, x0 + epaisseur, col, mat)
+    prism_x(f"{name}_tympan_E", tympan, x1 - epaisseur, x1, col, mat)
+
+
+def medura(name, x0, x1, y0, y1, z, col, mat=None):
+    """Foyer à même le sol : une bordure de pierre d'une demi-ama, et le lit de braises dedans."""
+    lx, ly, bord, h = x1 - x0, y1 - y0, 0.5, 0.6
+    for face, a, b, c, d in (("S", 0, lx, 0, bord), ("N", 0, lx, ly - bord, ly),
+                             ("O", 0, bord, bord, ly - bord), ("E", lx - bord, lx, bord, ly - bord)):
+        box(f"{name}_{face}", x0 + a, x0 + b, y0 + c, y0 + d, z, z + h, col, mat)
+    braises(f"{name}_braises", x0 + bord, x1 - bord, y0 + bord, y1 - bord, z + 0.35, col, braise("Braise"))
 
 def bandes_rovad(z0, z1):
     """Découpe une hauteur de mur en bandeaux (zb, zh) : 1 ama de nu, 3 de saillie.

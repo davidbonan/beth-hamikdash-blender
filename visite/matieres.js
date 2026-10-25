@@ -56,7 +56,7 @@ export function assombrir(boite) {
 // Les lueurs d'une salle close : des lampes sans carte d'ombre, qui n'éclairent que ce qui est dans sa
 // boîte, tournée comme elle. Une lampe de three à ombre prend une unité de texture à tous les nuanceurs,
 // et la nuit en est déjà au bord des seize ; sans ombre, elle passerait les murs. `w` : les candela.
-const SALLES_MAX = 2;
+const SALLES_MAX = 3;
 const LUEURS_MAX = 4;
 const PORTEE_LUEUR = 14.0;
 const LUEURS = { value: Array.from({ length: SALLES_MAX * LUEURS_MAX }, () => new THREE.Vector4()) };

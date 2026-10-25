@@ -1,11 +1,11 @@
 from .primitives.parametres import Z_AZ, Z_EZN, Z_HAR
-from .primitives.matieres import MAT_CEDRE, MAT_CHAUX, MAT_EAU, MAT_FER, MAT_MARBRE, MAT_SOL, braise
+from .primitives.matieres import MAT_CEDRE, MAT_CHAUX, MAT_EAU, MAT_FER, MAT_MARBRE, MAT_SOL
 from .primitives.volumes import box, cyl, cyl_between, ner_sur_tablette, plage, tore
-from .primitives.ouvrages import dalle_percee, escalier, escalier_a_vis, massif_evide
+from .primitives.ouvrages import dalle_percee, escalier, escalier_a_vis, massif_evide, medura
 from .ezrat_nashim import EX1, MIKVE
 from .azara import AX0, AY0, AY1, T, X_DOUKHAN
 from .lishkot import BOR, PUITS_MESIBA
-from .mizbeach import MX0, MY0, braises
+from .mizbeach import MX0, MY0
 
 
 # ----------------------------------------------------------------------------
@@ -32,6 +32,9 @@ MESIBA_Y1 = MESIBA_Y0 + (PX1 - PX0)
 # écrites : sous l'angle nord-ouest de l'Azara, au bout de la branche ouest, sept degrés
 # au-dessus du tunnel pour que le mikvé touche le sol du Har HaBayit sans le percer (CHOIX).
 # Le mikvé passe les quarante séa, « אַמָּה עַל אַמָּה בְּרוּם שָׁלֹשׁ אַמּוֹת » (Rambam, Mikvaot 4:1).
+# Le feu est ici selon Beit HaBe'hira 5:11, où « וּמְדוּרָה הָיְתָה שָׁם » suit le Beit HaTevila. Le Rambam
+# sur Middot 1:6 met « מדורת האש ששם מתחמם מי שטבל » dans le kiton nord-ouest du Beit HaMoked, qui
+# a aussi le sien (lishkot) : la scène montre les deux lectures.
 TEVILA = (AX0 + 2, AX0 + 27, 36, 56)
 Z_TEVILA_SOL, Z_TEVILA_VOUTE = Z_MESIBA_SOL + 3.5, Z_AZ - 4
 BAIN = (TEVILA[0] + 3, TEVILA[0] + 9, TEVILA[2] + 3, TEVILA[2] + 11)
@@ -88,11 +91,7 @@ escalier("Beit_HaTevila_mikve_marches", BAIN[0], BAIN[1], BAIN[3] - 4, BAIN[3], 
          "-y", "80_Lishkot")
 box("Beit_HaTevila_mikve_eau", *BAIN, Z_HAR, Z_TEVILA_SOL - 1, "80_Lishkot", MAT_EAU())
 MEDURA = (TEVILA[0] + 13, TEVILA[0] + 16, TEVILA[3] - 6, TEVILA[3] - 3)
-for nm, a, b, c, d in (("S", 0, 3, 0, 0.5), ("N", 0, 3, 2.5, 3), ("O", 0, 0.5, 0.5, 2.5), ("E", 2.5, 3, 0.5, 2.5)):
-    box(f"Beit_HaTevila_medura_{nm}", MEDURA[0] + a, MEDURA[0] + b, MEDURA[2] + c, MEDURA[2] + d,
-        Z_TEVILA_SOL, Z_TEVILA_SOL + 0.6, "80_Lishkot")
-braises("Beit_HaTevila_medura_braises", MEDURA[0] + 0.5, MEDURA[1] - 0.5, MEDURA[2] + 0.5,
-        MEDURA[3] - 0.5, Z_TEVILA_SOL + 0.35, "80_Lishkot", braise("Braise"))
+medura("Beit_HaTevila_medura", *MEDURA, Z_TEVILA_SOL, "80_Lishkot")
 KISSE = (TEVILA[1] - 5, TEVILA[1], TEVILA[3] - 5, TEVILA[3])
 PORTE_KISSE = (KISSE[0] + 1.5, KISSE[0] + 3)
 Z_KISSE, H_PORTE_KISSE = Z_TEVILA_SOL + 5, 4

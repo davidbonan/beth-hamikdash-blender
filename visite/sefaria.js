@@ -10,7 +10,7 @@ const TRAITES = {
   "baba batra": "Bava Batra", "bava batra": "Bava Batra",
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
   sanhedrin: "Sanhedrin", negaim: "Negaim", ketoubot: "Ketubot", ketubot: "Ketubot", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
-  pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim",
+  pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim", shabbat: "Shabbat",
 };
 const OUVRAGES = {
   "rambam beit habehira": "Mishneh Torah, The Chosen Temple",
@@ -31,11 +31,13 @@ const OUVRAGES = {
   "rambam tefila": "Mishneh Torah, Prayer and the Priestly Blessing",
   "rashi exode": "Rashi on Exodus", "rashi shemot": "Rashi on Exodus",
   "rashi sur yoma": "Rashi on Yoma",
+  "rashi sur shabbat": "Rashi on Shabbat",
   "rashi sur pesachim": "Rashi on Pesachim",
   "rashi sur zevahim": "Rashi on Zevachim",
   "rashi sur soucca": "Rashi on Sukkah",
   "rosh sur tamid": "Commentary of the Rosh on Tamid",
   "rambam sur middot": "Rambam on Mishnah Middot",
+  "rambam sur tamid": "Rambam on Mishnah Tamid",
   "bartenura sur middot": "Bartenura on Mishnah Middot",
   "bartenura sur soucca": "Bartenura on Mishnah Sukkah",
   "divrei hayamim i": "I Chronicles",
@@ -65,6 +67,7 @@ const COMMENTAIRES = {
   bartenura: "Bartenura on Mishnah", "tosfot yom tov": "Tosafot Yom Tov on Mishnah",
   "tiferet israel": "Yachin on Mishnah", rashash: "Rashash on Mishnah", boaz: "Boaz on Mishnah",
   radak: "Radak on", "metsoudat david": "Metzudat David on", "melekhet shelomoh": "Melekhet Shelomoh on Mishnah",
+  "lechem shamayim": "Lechem Shamayim on Mishnah",
 };
 
 const pele = (s) => (s || "").toLowerCase().normalize("NFD")

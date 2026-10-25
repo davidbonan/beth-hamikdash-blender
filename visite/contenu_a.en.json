@@ -721,7 +721,7 @@
         "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב. וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"
       }
     ],
-    "note": "Adopted: seven gates, following Middot 1:4–5. Set aside: the thirteen gates of Abba Yossi ben Chanan (Middot 2:6, Shekalim 6:3); yet it is his list that gives the direction of counting, « סְמוּכִים לַמַּעֲרָב », which the Rambam (Beit HaBechirah 5:4) repeats without the names, while Middot 1:4–5 gives none. The southern names are in Middot 1:4, the northern ones in Middot 1:5; Yoma 19a reads Sha'ar HaDelaka and Sha'ar HaKorban in the south, without changing the place of Sha'ar HaMayim, and Sha'ar Beit HaMoked in the north. Tour's choice: the spacing of the gates, which no source gives, and the 20 × 12 amot gate structure with its twenty steps, which have no source."
+    "note": "Adopted: seven gates, following Middot 1:4–5. Set aside: the thirteen gates of Abba Yossi ben Chanan (Middot 2:6, Shekalim 6:3); yet it is his list that gives the direction of counting, « סְמוּכִים לַמַּעֲרָב », which the Rambam (Beit HaBechirah 5:4) repeats without the names, while Middot 1:4–5 gives none. The southern names are in Middot 1:4, the northern ones in Middot 1:5; Yoma 19a reads Sha'ar HaDelaka and Sha'ar HaKorban in the south, without changing the place of Sha'ar HaMayim, and Sha'ar Beit HaMoked in the north. Tour's choice: the spacing of the gates, which no source gives — the Beit HaMoked, wider, is moved back five amot to the west —, and the 20 × 12 amot gate structure with its twenty steps, which have no source."
   },
   "doukhan": {
     "nom": "Dukhan",
@@ -1524,7 +1524,7 @@
         "citation": "אבל במקום שפתוחה היא לחול היו מעלות שעליה עולין וממנה יורדין לחול"
       }
     ],
-    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Set aside: the orientation of the baraita in Yoma 25a, “the lottery in its east, and the elder sitting in its west,” from which Abaye infers that the sacred half is to the east and the non-sacred half to the west; straddling the north wall, the tour's room has its sacred half to the south and its non-sacred half to the north. Also set aside: R. Yehuda, for whom the scribes are three (Sanhedrin 4:3). Tour's choice: the opening onto the non-sacred area to the east, and its twenty steps — Tosafot Yom Tov (Middot 5:4) says one went up to it by steps, without giving their number; the decoration, which the Gemara only calls \"like a great basilica\", taken from the Tanakh and not from Roman architecture: courses of cedar beams in the stone as in the walls of Solomon's court, a cedar floor like his hall of judgment, a far wall of framed cedar panels whose rails carry the gourds and flowers of the Bayit, a ceiling of cedar beams; the three tiers and the Nasi's dais; seats modelled on Solomon's throne, with a rounded back and armrests but without its lions, the Nasi's overlaid with gold; the scribes' lecterns and the students' benches; the boundary marked on the floor, by analogy with the Beit HaMoked, of which Middot 1:6 says it. The room shows the layout of the court, not its numbers: seventy-one judges and three rows of students do not fit in it."
+    "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. Set aside: the orientation of the baraita in Yoma 25a, “the lottery in its east, and the elder sitting in its west,” from which Abaye infers that the sacred half is to the east and the non-sacred half to the west; straddling the north wall, the tour's room has its sacred half to the south and its non-sacred half to the north. Also set aside: R. Yehuda, for whom the scribes are three (Sanhedrin 4:3). Tour's choice: the opening onto the non-sacred area to the east, and its twenty steps — Tosafot Yom Tov (Middot 5:4) says one went up to it by steps, without giving their number; the decoration, which the Gemara only calls \"like a great basilica\", taken from the Tanakh and not from Roman architecture: courses of cedar beams in the stone as in the walls of Solomon's court, a cedar floor like his hall of judgment, a far wall of framed cedar panels whose rails carry the gourds and flowers of the Bayit, a ceiling of cedar beams; the three tiers and the Nasi's dais; seats modelled on Solomon's throne, with a rounded back and armrests but without its lions, the Nasi's overlaid with gold; the scribes' lecterns and the students' benches; the boundary marked by beam ends jutting from the walls, by analogy with the rashei pispasin of the Beit HaMoked (Middot 1:6, Bartenura). The room shows the layout of the court, not its numbers: seventy-one judges and three rows of students do not fit in it."
   },
   "lishkat_hagola": {
     "nom": "Lishkat HaGola",
@@ -1699,13 +1699,15 @@
   "beit_hamoked": {
     "nom": "Beit HaMoked",
     "translit": "Beit HaMoked",
-    "resume": "The large house where the Kohanim on duty sleep, on the north wall of the Azara: it is the third gate of the north counted by Middot 1:5, the easternmost in the tour. It straddles the wall, which breaks off across its width: a large hall at the level of the Azara, its door to the sacred area in the south, the one to the Cheil in the north, at the top of twenty steps. Four small chambers open onto the hall, two in the sacred area, two outside, a marble strip (rashei pispasin) marking the boundary: the lambs for the korban, the showbread, the altar stones hidden by the Hasmoneans, and the descent to the ritual bath. Along the walls, the stone tiers where the elders sleep.",
+    "resume": "The great vaulted hall where the Kohanim on watch sleep, straddling the north wall of the Azara: it is the third northern gate counted in Middot 1:5. It takes its name from its fire: two hearths burn there day and night, for the kohanim who walk barefoot on the marble, and on the eve of Shabbat the fire is lit from them. One enters from the Azara through a wicket cut into the great golden leaf; the gate to the 'Heil is at the top of twenty steps. At the four corners open four small chambers, two in the sacred area and two outside, and beam ends jutting from the walls mark the division: south-west, the lambs of the korban; south-east, the showbread; north-east, the altar stones hidden by the Hasmoneans and the seals for the libations; north-west, a fire and the way down to the ritual bath. All around, the stone tiers where the elders sleep; the young kohanim sleep on the ground.",
     "cotes": [
-      "straddling the north wall",
-      "two sha'arim: to the south onto the Azara, to the north onto the Cheil",
-      "four chambers opening onto the hall, two in the sacred area, two outside",
-      "stone tiers along the walls, marble slab with a ring",
-      "third gate of the north counted from the west"
+      "straddling the north wall, 30 × 29 amot",
+      "barrel vault: springing at 28 amot, rise 6",
+      "two sha'arim: south onto the Azara, with its wicket, north onto the 'Heil",
+      "four chambers at the corners, two in the sacred area, two outside",
+      "two hearths lit day and night in the 'hol half",
+      "two stone tiers all around, marble slab with its ring",
+      "third northern gate counted from the west"
     ],
     "sources": [
       {
@@ -1721,12 +1723,22 @@
       {
         "oeuvre": "Middot",
         "ref": "1:7",
-        "citation": ""
+        "citation": "שְׁנַיִם שְׁעָרִים הָיוּ לְבֵית הַמּוֹקֵד, אֶחָד פָּתוּחַ לַחֵיל וְאֶחָד פָּתוּחַ לָעֲזָרָה. אָמַר רַבִּי יְהוּדָה, זֶה שֶׁהָיָה פָתוּחַ לָעֲזָרָה, פִּשְׁפָּשׁ קָטָן הָיָה לוֹ"
       },
       {
         "oeuvre": "Middot",
         "ref": "1:8",
         "citation": "בֵּית הַמּוֹקֵד, כִּפָּה, וּבַיִת גָּדוֹל הָיָה, מֻקָּף רוֹבָדִין שֶׁל אֶבֶן, וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:8",
+        "citation": "לֹא הָיָה עֲלִיָּה, אֶלָּא כִּפָּה ארקוול\"ט בְּלַעַ\"ז עֲשׂוּיָה בָּאָרֶץ"
+      },
+      {
+        "oeuvre": "Rambam sur Tamid",
+        "ref": "1:1",
+        "citation": "וכיפה היא ידועה שגגה דומה למקצת עגולה"
       },
       {
         "oeuvre": "Bartenura",
@@ -1739,9 +1751,54 @@
         "citation": "וְטַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ"
       },
       {
+        "oeuvre": "Lechem Shamayim",
+        "ref": "Middot 1:9",
+        "citation": "מקום הטבלא בחלק החול"
+      },
+      {
         "oeuvre": "Tamid",
         "ref": "1:1",
-        "citation": ""
+        "citation": "וּפִרְחֵי כְהֻנָּה אִישׁ כִּסְתּוֹ בָאָרֶץ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:3",
+        "citation": "נָטַל אֶת הַמַּפְתֵּחַ וּפָתַח אֶת הַפִּשְׁפָּשׁ, וְנִכְנַס מִבֵּית הַמּוֹקֵד לָעֲזָרָה"
+      },
+      {
+        "oeuvre": "Shabbat",
+        "ref": "1:11",
+        "citation": "וּמַאֲחִיזִין אֶת הָאוּר בִּמְדוּרַת בֵּית הַמּוֹקֵד"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:5",
+        "citation": "מְדוּרוֹת דּוֹלְקִים בָּהּ תָּמִיד"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "15b",
+        "citation": "שהיה טרקלין גדול והיו מסיקין בו מדורות גדולות"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:3",
+        "citation": "וְאַרְבַּע לְשָׁכוֹת הָיוּ שָׁם, אַחַת לִשְׁכַּת הַטְּלָאִים, וְאַחַת לִשְׁכַּת הַחוֹתָמוֹת, וְאַחַת לִשְׁכַּת בֵּית הַמּוֹקֵד, וְאַחַת לִשְׁכָּה שֶׁהָיוּ עוֹשִׂין בָּהּ לֶחֶם הַפָּנִים"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "17a",
+        "citation": "שארוכה היא ועומדת במערב ומארכת לצד הצפון ודרום"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Tamid 3:3",
+        "citation": "לשכת בית המוקד ושם היתה מדורה תמידית"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:6",
+        "citation": "רָאשֵׁי קוֹרוֹת יוֹצְאִים מִן הַכֹּתֶל עַד הַמָּקוֹם שֶׁהוּא קֹדֶשׁ"
       },
       {
         "oeuvre": "Bartenura",
@@ -1754,6 +1811,11 @@
         "citation": "וּבַיִת גָּדוֹל הָיָה בְּצַד הָעֲזָרָה בִּצְפוֹנָהּ מִבַּחוּץ בֵּין הָעֲזָרָה וְהַחֵיל וְהָיָה בָּנוּי כִּפָּה"
       },
       {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Middot 1:6",
+        "citation": "בית המוקד היה כלו בחול… אלא הלשכות שלו חציין בקודש וחציין בחול"
+      },
+      {
         "oeuvre": "Middot",
         "ref": "2:6",
         "citation": "וּלְעֻמָּתָן בַּצָּפוֹן סְמוּכִים לַמַּעֲרָב"
@@ -1764,7 +1826,445 @@
         "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב"
       }
     ],
-    "note": "Adopted: straddling the boundary of the sacred area — two of its chambers “in the sacred area” and two “outside” (Middot 1:6), the building “partly within the Azara” according to Bartenura. Set aside: the Rambam (Beit HaBechirah 5:9), who puts it “on the north of the Azara, outside, between the Azara and the Cheil”; and the kippa of Middot 1:8, a vault for Bartenura (“כִּפָּה ארקוול\"ט”) as for the Rambam (“וְהָיָה בָּנוּי כִּפָּה”) — the tour shows none. Tour's choice: the order of the gates counted from the west, the view of Abba Yossi ben Chanan (Middot 2:6) taken up by the Rambam (5:4), and their even spacing, which puts the Beit HaMoked near the north-east corner; the hall at the level of the Azara, the size of the four small chambers, the placement of the twenty steps and the furnishings."
+    "note": "Adopted: straddling the boundary of the sacred area — two of its chambers “in the sacred area” and two “outside” (Middot 1:6), the building “partly within the Azara” according to Bartenura, as Rashi reads it (Yoma 15b). Set aside: the Rambam (Beit HaBechirah 5:9), who puts it “on the north of the Azara, outside, between the Azara and the 'Heil”, and R. Shemaya (quoted by Melekhet Shlomo), for whom the hall is entirely outside the sacred area and only its chambers straddle it. Tamid 3:3 names the same four chambers: the chamber of the seals is that of the stones (Bartenura), and the lambs' chamber, long against the west wall, looks south-western or north-western depending on where one comes from (Yoma 17a, Rashi). Two readings of the fire where the one who immersed warms himself: at the Beit HaTevila (Rambam 5:11), or in the north-west chamber of the Moked (Bartenura, Melekhet Shlomo in the name of the Rosh) — the tour lights both. The rashei pispasin are beam ends on the 'hol side (Bartenura, Tosafot Yom Tov), not the Rambam's lattice on the floor. Lechem Shamayim puts the slab of the keys in the 'hol half, where one sleeps on it. Tour's choice: the easternmost northern gate moved back five amot for the width of the hall, the hall at the level of the Azara, all the dimensions, the place of the twenty steps and the furnishings."
+  },
+  "kippa_beit_hamoked": {
+    "translit": "Kippat Beit HaMoked",
+    "nom": "Vault of the Beit HaMoked",
+    "resume": "The Beit HaMoked has no upper storey: it is covered by a vault resting on its walls. Bartenura calls it “arcuolto”, a vault, and the Rambam describes it as a roof “like part of a circle”. This is why, at night, the kohen guards inside and the Levite sleeps outside: elsewhere the kohanim watch above and the Levites below, but here there is no above.",
+    "cotes": [
+      "barrel vault running east–west, over 30 amot",
+      "springing at 28 amot from the floor, rise 6",
+      "solid end walls at both ends, without windows"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:8",
+        "citation": "בֵּית הַמּוֹקֵד, כִּפָּה, וּבַיִת גָּדוֹל הָיָה, מֻקָּף רוֹבָדִין שֶׁל אֶבֶן, וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:8",
+        "citation": "בִּנְיָן שֶׁל בֵּית הַמּוֹקֵד לֹא הָיָה עֲלִיָּה, אֶלָּא כִּפָּה ארקוול\"ט בְּלַעַ\"ז עֲשׂוּיָה בָּאָרֶץ"
+      },
+      {
+        "oeuvre": "Rambam sur Tamid",
+        "ref": "1:1",
+        "citation": "וכיפה היא ידועה שגגה דומה למקצת עגולה"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Tamid 1:1",
+        "citation": "כיפה. לשון הר\"ב ארקוולט\"ו בלע\"ז ובל' אשכנז (גיוועלב)"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:9",
+        "citation": "וּבֵית הַמּוֹקֵד שֶׁלֹּא הָיְתָה אֶלָּא כִּפָּה עַל הָאָרֶץ, הָיָה כֹּהֵן מִבִּפְנִים וּבֶן לֵוִי מִבַּחוּץ"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "5:9",
+        "citation": "וְהָיָה בָּנוּי כִּפָּה"
+      }
+    ],
+    "note": "Adopted: part of a circle, hence a low barrel vault and not a dome (Rambam on Tamid 1:1). Tour's choice: the east–west axis, the springing height, the rise, the thickness and the solid end walls; no source gives them."
+  },
+  "shaarei_beit_hamoked": {
+    "translit": "Sha'arei Beit HaMoked",
+    "nom": "Gates of the Beit HaMoked",
+    "resume": "The Beit HaMoked has two gates facing each other: one onto the Azara, to the south, the other onto the 'Heil, to the north. One guard suffices for both, says Abaye, because each can be seen from the other. In the golden leaf of the south gate a wicket is cut, the pishpash: every morning, before dawn, the officer opens it and enters the Azara with two torches, to make sure every vessel is in its place. Opening the great gate at night would have been too heavy.",
+    "cotes": [
+      "south gate of 10 × 20 amot, two golden leaves swung into the hall",
+      "wicket of 2 × 4.5 amot in the west leaf, with its iron ring",
+      "north gate onto the 'Heil, at the top of twenty steps"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:7",
+        "citation": "שְׁנַיִם שְׁעָרִים הָיוּ לְבֵית הַמּוֹקֵד, אֶחָד פָּתוּחַ לַחֵיל וְאֶחָד פָּתוּחַ לָעֲזָרָה. אָמַר רַבִּי יְהוּדָה, זֶה שֶׁהָיָה פָתוּחַ לָעֲזָרָה, פִּשְׁפָּשׁ קָטָן הָיָה לוֹ, שֶׁבּוֹ נִכְנָסִין לִבְלֹשׁ אֶת הָעֲזָרָה"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:3",
+        "citation": "נָטַל אֶת הַמַּפְתֵּחַ וּפָתַח אֶת הַפִּשְׁפָּשׁ, וְנִכְנַס מִבֵּית הַמּוֹקֵד לָעֲזָרָה, וְנִכְנְסוּ אַחֲרָיו וּשְׁתֵּי אֲבוּקוֹת שֶׁל אוּר בְּיָדָם"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:7",
+        "citation": "פִּשְׁפָּשׁ קָטָן. שַׁעַר קָטָן בְּתוֹךְ הַשַּׁעַר הַגָּדוֹל"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "26b",
+        "citation": "אָמַר אַבָּיֵי: כֵּיוָן דְּגַבֵּי הֲדָדֵי הֲווֹ קָיְימִי – סַגִּי לְהוּ בְּחַד שׁוֹמֵר, דָּוֵי לְהָכָא וְדָוֵי לְהָכָא"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Middot 1:7",
+        "citation": "שקשה היה להם לפתוח פתח גדול בלילה"
+      },
+      {
+        "oeuvre": "Lechem Shamayim",
+        "ref": "Tamid 1:3",
+        "citation": "אבל זה מפתח קטן של פשפש. לא היו מצניעין אותו שם. אלא היה מזומן בידיהם"
+      }
+    ],
+    "note": "Adopted: the pishpash is a small door cut into the large one (Bartenura, Melekhet Shlomo), as the Rambam explains on Tamid 1:3; on Middot 1:6 he also gives the word the sense of a lattice. Lechem Shamayim infers from the text that its key was not under the slab with those of the Azara, but kept at hand. Not followed: another reading, reported by Melekhet Shlomo on Tamid 1:1 with the Rosh, puts the Azara gate near the north-east corner and the other in the middle of the east wall. Tour's choice: the wicket in the west leaf, its dimensions, and the twenty steps."
+  },
+  "medurat_beit_hamoked": {
+    "translit": "Medurat Beit HaMoked",
+    "nom": "Fires of the Beit HaMoked",
+    "resume": "The Beit HaMoked, “the house of the hearth”, takes its name from its fire. It burns day and night, to warm the kohanim who walk barefoot on the marble of the Azara. On the eve of Shabbat the fire may still be left to catch there at dusk: the kohanim are diligent, and this fire serves only them. According to R. Chananel it never went out, because from it was taken the “ordinary” fire that must be brought to the altar even when fire comes down from heaven.",
+    "cotes": [
+      "two stone hearths of 2.5 × 2.5 amot",
+      "in the middle of the 'hol half of the hall",
+      "embers lit day and night"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shabbat",
+        "ref": "1:11",
+        "citation": "וּמַאֲחִיזִין אֶת הָאוּר בִּמְדוּרַת בֵּית הַמּוֹקֵד"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:5",
+        "citation": "מְדוּרוֹת דּוֹלְקִים בָּהּ תָּמִיד"
+      },
+      {
+        "oeuvre": "Rashi sur Shabbat",
+        "ref": "20a",
+        "citation": "מדורת בית המוקד שאינה צורך גבוה אלא צורך כהנים… משום דכהנים זריזין הם"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "15b",
+        "citation": "שהיה טרקלין גדול והיו מסיקין בו מדורות גדולות להתחמם שם הכהנים שהולכים יחפים על רצפת עזרה שהיא של שיש"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Tamid 1:1",
+        "citation": "ובבית המוקד. פר\"ח בפ\"ק דיומא… על שם שלא היה האש כבה משם לעולם מפני שהיו נוטלין האש לצורך המזבח"
+      }
+    ],
+    "note": "Adopted: a fire in the hall itself (Shabbat 1:11, Bartenura, Rashi). Another fire burns in the north-west chamber (Lishkat Beit HaMoked), and another at the Beit HaTevila: see their entries. Tour's choice: the number of hearths, their place, their shape, their dimensions."
+  },
+  "lishkat_hatlaim": {
+    "translit": "Lishkat HaTla'im",
+    "nom": "Lishkat HaTla'im",
+    "resume": "The chamber where the lambs of the korban tamid wait, already examined and found without blemish. No fewer than six are kept, enough for a Shabbat and the two days of Rosh HaShanah. In the morning the officer sends for the lamb of the day here. Middot places the chamber in the south-west, Tamid in the north-west; the Gemara reconciles them: it is long, along the west wall, and almost reaches both corners.",
+    "cotes": [
+      "south-west corner, in the sacred half",
+      "6 × 11.5 amot, from the south wall to the boundary of the sacred area",
+      "manger, straw, barrier in the doorway"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:6",
+        "citation": "מַעֲרָבִית דְּרוֹמִית, הִיא הָיְתָה לִשְׁכַּת טְלָאֵי קָרְבָּן"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:3",
+        "citation": "וַהֲרֵי לִשְׁכַּת הַטְּלָאִים הָיְתָה בְמִקְצוֹעַ צְפוֹנִית מַעֲרָבִית"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "17a",
+        "citation": "הַאי לִשְׁכָּה אַקְצוֹיֵי מַקְצְיָא, וּדְאָתֵי מִצָּפוֹן מִתְחַזְיָא לֵיהּ בְּדָרוֹם, וּדְאָתֵי מִדָּרוֹם מִתְחַזְיָא לֵיהּ בְּצָפוֹן"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "17a",
+        "citation": "בשתי המקצועות נראית שארוכה היא ועומדת במערב ומארכת לצד הצפון ודרום עד קרוב למקצועות שמכאן ומכאן"
+      },
+      {
+        "oeuvre": "Arakhin",
+        "ref": "2:5",
+        "citation": "אֵין פּוֹחֲתִין מִשִּׁשָּׁה טְלָאִים הַמְבֻקָּרִין בְּלִשְׁכַּת הַטְּלָאִים, כְּדַי לַשַּׁבָּת וְלִשְׁנֵי יָמִים טוֹבִים שֶׁל רֹאשׁ הַשָּׁנָה"
+      }
+    ],
+    "note": "Adopted: Rav Adda bar Yitzchak's answer (Yoma 17a), an elongated chamber that looks south-western or north-western depending on the side one comes from (Rashi). The Gemara adds that “it stood mostly in the south-west”. Tour's choice: the length, which stops at the boundary of the sacred area, and the furnishings."
+  },
+  "lishkat_lechem_hapanim": {
+    "translit": "Lishkat Osei Le'hem HaPanim",
+    "nom": "Lishkat Osei Lechem HaPanim",
+    "resume": "The chamber where the house of Garmu bakes the twelve loaves of showbread, which stay all week on the Table in the Heikhal. They are kneaded and shaped outside, but baked within the sacred area: so the chamber lies in the sacred half of the Beit HaMoked. Each loaf bakes in a mould, and is put back into a mould when taken from the oven so that it is not spoiled.",
+    "cotes": [
+      "south-east corner, in the sacred half",
+      "6 × 8 amot",
+      "oven, two moulds the size of the loaf (10 × 5 tefachim), table, peel"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:6",
+        "citation": "דְּרוֹמִית מִזְרָחִית, הִיא הָיְתָה לִשְׁכַּת עוֹשֵׂי לֶחֶם הַפָּנִים"
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "11:2",
+        "citation": "אֶחָד שְׁתֵּי הַלֶּחֶם וְאֶחָד לֶחֶם הַפָּנִים, לִישָׁתָן וַעֲרִיכָתָן בַּחוּץ, וַאֲפִיָּתָן בִּפְנִים"
+      },
+      {
+        "oeuvre": "Mena'hot",
+        "ref": "11:1",
+        "citation": "וּבִטְפוּס הָיָה עוֹשֶׂה אוֹתָן. וּכְשֶׁהוּא רָדָן, נוֹתְנָן בִּטְפוּס, כְּדֵי שֶׁלֹּא יִתְקַלְקְלוּ"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 1:6",
+        "citation": "דרומית מזרחית. היא היתה לשכת לחם הפנים וסמוכה לעזרה ונמצאת שהיתה מקודשת אתיא כמ\"ד אפייתן בפנים"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:6",
+        "citation": "בֵּית גַּרְמוּ הָיוּ עוֹשִׂים לֶחֶם הַפָּנִים שָׁם"
+      }
+    ],
+    "note": "Adopted: baking within the sacred area, according to the first opinion in Menachot 11:2 (Tosafot Yom Tov). R. Yehudah puts all the work of the bread there. Tour's choice: the dimensions of the chamber, the shape of the oven and the placing of the furniture."
+  },
+  "lishkat_hachotamot": {
+    "translit": "Lishkat HaChotamot",
+    "nom": "Lishkat HaChotamot",
+    "resume": "Here the Hasmoneans hid the altar stones that the Greek kings had defiled by sacrificing on them to idols: they could no longer be used, so they were stored away. Tamid and Shekalim call the same chamber the chamber of the seals. Whoever wanted libations paid Yochanan, the officer over the seals, and received a seal marked “calf”, “ram”, “kid” or “sinner”; he exchanged it for the libations with Achiyah, and in the evening the two accounts were matched.",
+    "cotes": [
+      "north-east corner, in the 'hol half",
+      "6 × 10 amot",
+      "the altar stones piled up, a table and its four seals"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:6",
+        "citation": "מִזְרָחִית צְפוֹנִית, בָּהּ גָּנְזוּ בְנֵי חַשְׁמוֹנַאי אֶת אַבְנֵי הַמִּזְבֵּחַ שֶׁשִּׁקְּצוּם מַלְכֵי יָוָן"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:6",
+        "citation": "שֶׁהִקְטִירוּ עָלָיו לַעֲבוֹדָה זָרָה. וּבְמַסֶּכֶת שְׁקָלִים וּבְמַסֶּכֶת תָּמִיד קוֹרֵא לָהּ לִשְׁכַּת הַחוֹתָמוֹת"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:3",
+        "citation": "וְאַרְבַּע לְשָׁכוֹת הָיוּ שָׁם, אַחַת לִשְׁכַּת הַטְּלָאִים, וְאַחַת לִשְׁכַּת הַחוֹתָמוֹת"
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "5:3",
+        "citation": "אַרְבָּעָה חוֹתָמוֹת הָיוּ בַּמִּקְדָּשׁ, וְכָתוּב עֲלֵיהֶן, עֵגֶל, זָכָר, גְּדִי, חוֹטֵא"
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "5:4",
+        "citation": "מִי שֶׁהוּא מְבַקֵּשׁ נְסָכִים הוֹלֵךְ לוֹ אֵצֶל יוֹחָנָן שֶׁהוּא מְמֻנֶּה עַל הַחוֹתָמוֹת, נוֹתֵן לוֹ מָעוֹת וּמְקַבֵּל מִמֶּנּוּ חוֹתָם"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Middot 1:6",
+        "citation": "דעל כרחין לשכת החותמות ולשכת בית המוקד השנויות בתמיד פ\"ג הם היו אותם שתי לשכות דקחשיב הכא"
+      }
+    ],
+    "note": "Adopted: one chamber under two names (Bartenura, Tosafot Yom Tov; Tosafot on Yoma 17a, quoted by Melekhet Shlomo): the Beit HaMoked had only four chambers. Ben Azzai counts five seals, inscribed in Aramaic (Shekalim 5:3); the tour shows four. Tour's choice: the number of stones, the table, the shape of the seals."
+  },
+  "lishkat_beit_hamoked": {
+    "translit": "Lishkat Beit HaMoked",
+    "nom": "Lishkat Beit HaMoked",
+    "resume": "The small chamber that bears the name of the great one, and opens onto it. The kohen who became impure during the night goes down here to the ritual bath, through the mesiba, the passage that runs beneath the Mikdash. A fire burns here constantly: if the fire of the great hall goes out, it is rekindled from here, according to the Rosh.",
+    "cotes": [
+      "north-west corner, in the 'hol half",
+      "6 × 10 amot",
+      "a stone hearth and the shaft of the mesiba"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:6",
+        "citation": "צְפוֹנִית מַעֲרָבִית, בָּהּ יוֹרְדִים לְבֵית הַטְּבִילָה"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:3",
+        "citation": "וְאַחַת לִשְׁכַּת בֵּית הַמּוֹקֵד"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "15b",
+        "citation": "לשכת בית המוקד - לשכה קטנה שקרויה בית המוקד ופתוחה לבית המוקד הגדול"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Tamid 3:3",
+        "citation": "לשכת בית המוקד ושם היתה מדורה תמידית שאם יכבה האש בבית המוקד הגדול לוקחים משם אש"
+      },
+      {
+        "oeuvre": "Rambam sur Tamid",
+        "ref": "3:3",
+        "citation": "שבאחת מהן היתה אש בוערת והיא הנקראת מדורה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:6",
+        "citation": "בְּאוֹתָהּ לִשְׁכָּה הָיָה יוֹרֵד הַכֹּהֵן שֶׁרָאָה קֶרִי וְהוֹלֵךְ בַּמְּחִלָּה שֶׁתַּחַת בֵּית הַמִּקְדָּשׁ לְבֵית הַטְּבִילָה"
+      }
+    ],
+    "note": "Adopted: the chamber of the descent is the “Lishkat Beit HaMoked” of Tamid 3:3 (Rashi, Bartenura). Two readings of the fire where the kohen warms himself after immersing: here, according to the Rosh and Bartenura — the Rambam on Tamid 3:3 puts a fire in one of the four chambers without saying which —, or at the Beit HaTevila, according to the Rambam (Beit HaBechirah 5:11). The tour lights both. Tour's choice: the place of the hearth and of the shaft."
+  },
+  "rovadim_beit_hamoked": {
+    "translit": "Rovdin shel even",
+    "nom": "Rovadim of the Beit HaMoked",
+    "resume": "Stone tiers run around the hall: the elders of the father's house on duty sleep on them, for one does not bring beds into the Mikdash. They are not steps set against the wall: according to Abaye, the wall was built of stones ten amot and eight amot long, and the two amot that jutted out formed the bench. Stone could not be cut with iron once in the Mikdash, so the projection was prepared at the quarry.",
+    "cotes": [
+      "two tiers: 2 amot of projection, then 1 amah, each one amah high",
+      "along the nave, the walls of the chambers and the east wall",
+      "interrupted at the doorways"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:8",
+        "citation": "בֵּית הַמּוֹקֵד, כִּפָּה, וּבַיִת גָּדוֹל הָיָה, מֻקָּף רוֹבָדִין שֶׁל אֶבֶן, וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:8",
+        "citation": "אִצְטַבָּאוֹת סָבִיב שֶׁל אַבְנֵי גָּזִית הָיוּ מְשֻׁקָּעוֹת בַּכֹּתֶל… וְעַל גַּבֵּיהֶן אֲבָנִים אֲחֵרוֹת קְצָרוֹת מֵהֶן… וְהָיוּ כְּעֵין מַעֲלוֹת זוֹ עַל זוֹ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "26b",
+        "citation": "רוֹבְדִין מַאי נִיהוּ? גִּזְרָתָא דְאִצְטְבָתָא דְּסָלְקִי בְּהוּ לְאִצְטְבָתָא"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "26b",
+        "citation": "אָמַר אַבָּיֵי: דִּמְתַקְּנִי וּמַיְיתִי מֵעִיקָּרָא אַבְנֵי זוּטְרָתָא וְאַבְנֵי רַבְרְבָתָא, כְּדִכְתִיב: ״אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה אַמּוֹת״"
+      },
+      {
+        "oeuvre": "Melekhet Shelomoh",
+        "ref": "Tamid 1:1",
+        "citation": "אותן שתי אמות שבולטות לצורך איצטוואות הן בולטות וחוץ לעזרה מותר לחותכן ולהשוותם בברזל אבל משבאו לעזרה אסור להניף עליהם ברזל"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "26b",
+        "citation": "זִקְנֵי בֵּית אָב יְשֵׁנִים שָׁם. וְאַמַּאי? לְעַיְּילִי מִטּוֹת! אָמַר אַבָּיֵי: לָאו אוֹרַח אַרְעָא לְעַיּוֹלֵי מִטּוֹת לְבֵית הַמִּקְדָּשׁ"
+      }
+    ],
+    "note": "Adopted: Abaye's reading (Tamid 26b), and two tiers one above the other, narrower at the top (Bartenura). Lechem Shamayim (on Tamid 1:1) wants them on all four sides, from the word “surrounded”. Tour's choice: the height of the tiers, and their course around the chambers."
+  },
+  "rashei_pispasin": {
+    "translit": "Rashei pispasin",
+    "nom": "Rashei pispasin",
+    "resume": "The Beit HaMoked straddles the boundary of the sacred area: two of its chambers lie within it, two outside. Beam ends jut from the walls where the sacred area begins, so that one knows on which side one stands: holy offerings are eaten within the sacred area, and an impure kohen has no business beyond it. The wood stays on the 'hol side, for one plants “no tree” near the altar.",
+    "cotes": [
+      "three rows of cedar beam ends, on each side",
+      "on the axis of the Azara wall, on the 'hol side",
+      "one amah of projection"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:6",
+        "citation": "וְאַרְבַּע לְשָׁכוֹת הָיוּ בְּבֵית הַמּוֹקֵד, כְּקִיטוֹנוֹת פְּתוּחוֹת לִטְרַקְלִין, שְׁתַּיִם בַּקֹּדֶשׁ וּשְׁתַּיִם בַּחֹל, וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:6",
+        "citation": "רָאשֵׁי קוֹרוֹת יוֹצְאִים מִן הַכֹּתֶל עַד הַמָּקוֹם שֶׁהוּא קֹדֶשׁ, כְּדֵי לָדַעַת אֵיזֶה קֹדֶשׁ וְאֵיזֶה חֹל וְלֶאֱכֹל קָדָשִׁים בַּקֹּדֶשׁ"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Middot 1:6",
+        "citation": "ראשי קורות היו במקום שהוא חול והיו מגיעים עד המקום הקדש ולא במקום הקדש. משום איסור דלא תטע וגו' כל עץ אצל מזבח"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "15b",
+        "citation": "וראשי פספסין - חתיכות עצים מבדילין לסימן במקום המפסיק בין קודש לחול"
+      },
+      {
+        "oeuvre": "Rambam sur Middot",
+        "ref": "1:6",
+        "citation": "עשו בקרקעיתם ממעל שבכות להבדיל קרקע השתים של הקדש מקרקע שתים של חול"
+      }
+    ],
+    "note": "Adopted: beam ends (Bartenura, Rashi), kept outside the sacred area (Tosafot Yom Tov). Set aside: the Rambam, who sees in them “lattices”, a grille laid on the floor to separate the two halves. Tour's choice: the number of rows, their heights, the section of the beams, the cedar. The Lishkat HaGazit, straddling the same wall, received the same beams by analogy."
+  },
+  "tavla_hamaftechot": {
+    "translit": "Tavla shel shayish",
+    "nom": "Slab of the keys",
+    "resume": "The keys of the Azara sleep under a marble slab one amah by one amah, set in the floor, with a ring to lift it; they hang on a chain in the cavity. At closing time the kohen lifts the slab, takes the keys, locks up from inside while the Levite sleeps outside, then puts back the keys and the slab, spreads his cover over it and sleeps on it. So no one can take the keys without his knowing.",
+    "cotes": [
+      "marble slab of 1 × 1 amah",
+      "fixed iron ring",
+      "in the nave, on the 'hol side, between the two hearths"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Middot",
+        "ref": "1:9",
+        "citation": "וּמָקוֹם הָיָה שָׁם, אַמָּה עַל אַמָּה, וְטַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ, וְשַׁלְשֶׁלֶת שֶׁהַמַּפְתְּחוֹת הָיוּ תְלוּיוֹת בָּהּ"
+      },
+      {
+        "oeuvre": "Middot",
+        "ref": "1:9",
+        "citation": "גָּמַר מִלִּנְעֹל, הֶחֱזִיר אֶת הַמַּפְתְּחוֹת לַשַּׁלְשֶׁלֶת וְאֶת הַטַּבְלָא לִמְקוֹמָהּ, נָתַן כְּסוּתוֹ עָלֶיהָ, יָשֵׁן לוֹ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:1",
+        "citation": "וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם, וּמַפְתְּחוֹת הָעֲזָרָה בְּיָדָם"
+      },
+      {
+        "oeuvre": "Lechem Shamayim",
+        "ref": "Middot 1:9",
+        "citation": "וזה כדי שלא יגביה אחד הטבלא. ויקח השלשלת ויפתח השער שלא מדעתו. וצ\"ל שמקום הטבלא בחלק החול שבבית המוקד"
+      }
+    ],
+    "note": "Adopted: the slab is on the 'hol side, since one sleeps on it, and lying down counts as sitting, which is forbidden in the Azara (Lechem Shamayim). Not modelled: the chain and the keys, under the slab. Tour's choice: the exact place of the slab."
+  },
+  "kesatot_beit_hamoked": {
+    "translit": "Kesatot haKohanim",
+    "nom": "Bedding of the kohanim",
+    "resume": "The elders of the father's house sleep on the tiers, the young kohanim on the ground, each on his own cover, like the guards in the courts of kings. These young men are old enough to serve; younger ones are called “rovim” and keep watch elsewhere. No one sleeps in his priestly garments: they are folded and laid by the head, and each covers himself with his own cloak.",
+    "cotes": [
+      "four elders' beds on the tiers, on the 'hol side",
+      "four young kohanim's beds on the ground, near the fires",
+      "woollen cover and cushion"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:1",
+        "citation": "וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם, וּמַפְתְּחוֹת הָעֲזָרָה בְּיָדָם. וּפִרְחֵי כְהֻנָּה אִישׁ כִּסְתּוֹ בָאָרֶץ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "1:1",
+        "citation": "לֹא הָיוּ יְשֵׁנִים בְּבִגְדֵי קֹדֶשׁ, אֶלָּא פוֹשְׁטִין וּמְקַפְּלִין וּמַנִּיחִים אוֹתָן תַּחַת רָאשֵׁיהֶן, וּמִתְכַּסִּין בִּכְסוּת עַצְמָן"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Middot 1:8",
+        "citation": "שֶׁלֹּא הָיוּ רַשָּׁאִים לִשְׁכַּב שָׁם עַל גַּבֵּי מִטּוֹת אֶלָּא בָּאָרֶץ, כְּדֶרֶךְ שֶׁשּׁוֹמְרֵי חַצְרוֹת הַמְּלָכִים עוֹשִׂים"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "27a",
+        "citation": "הָכָא, דְּמָטוּ לְהוּ לְמֶעְבַּד עֲבוֹדָה – קָרֵי לְהוּ ״פִּרְחֵי״"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Tamid 1:1",
+        "citation": "וזקני בית אב ישנים שם. בחציה שבחול"
+      }
+    ],
+    "note": "Adopted: the elders in the 'hol half (Tosafot Yom Tov), and the young men too, whom night-time impurity befalls more often (Lechem Shamayim on Tamid 1:1). Not modelled: the folded garments, which are worn by day. Tour's choice: the number of beds and their places."
   },
   "mesiba_bira": {
     "nom": "Mesiba beneath the bira",
@@ -1842,7 +2342,7 @@
         "citation": "אַמָּה עַל אַמָּה בְּרוּם שָׁלֹשׁ אַמּוֹת"
       }
     ],
-    "note": "Tour's choice: no source locates or measures this room. Its place, its size and the shape of the bath, the hearth and the toilet are designed for the tour."
+    "note": "Tour's choice: no source locates or measures this room. Its place, its size and the shape of the bath, the hearth and the toilet are designed for the tour. The Rambam (Beit HaBechirah 5:11) puts here the fire where one warms oneself; Bartenura and the Rosh put it in the north-west chamber of the Beit HaMoked: the tour lights both."
   },
   "shaar_hamayim": {
     "nom": "Sha'ar HaMayim",
@@ -2025,7 +2525,7 @@
         "citation": "כָּל שַׁעַר מֵהֶן הָיָה רָחְבּוֹ עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים אַמָּה"
       }
     ],
-    "note": "Tour's choice: the gate structure of 20 × 12 amot and its twenty steps have no source — nothing says where one climbs from the terrace of the Cheil to the level of the Azara. Middot 2:6, where Abba Yossi ben Chanan calls the north gates “near the west,” does not name Sha'ar HaNitzotz: the tour makes it the westernmost by reading the order of Middot 1:5 (Nitzotz, Korban, Beit HaMoked) from west to east. The sources give this order, not the spacing: the gates are spread evenly."
+    "note": "Tour's choice: the gate structure of 20 × 12 amot and its twenty steps have no source — nothing says where one climbs from the terrace of the Cheil to the level of the Azara. Middot 2:6, where Abba Yossi ben Chanan calls the north gates “near the west,” does not name Sha'ar HaNitzotz: the tour makes it the westernmost by reading the order of Middot 1:5 (Nitzotz, Korban, Beit HaMoked) from west to east. The sources give this order, not the spacing: the gates are spread evenly, except the Beit HaMoked, which its width moves back five amot."
   },
   "beit_hanitzotz": {
     "nom": "Chamber of the Beit HaNitzotz",

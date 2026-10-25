@@ -2,7 +2,7 @@ import math
 
 from ..primitives.parametres import AMA
 from ..primitives.matieres import MAT_CHENE, MAT_FER_BRUN, MAT_VITRE
-from ..primitives.volumes import FACES_BOITE, empty, plage
+from ..primitives.volumes import FACES_BOITE, arc, empty, plage
 from .place_du_kotel import _baie, _cap, _devant, _extrusion, _fut, _pave, _poser, _poutre
 
 
@@ -28,16 +28,6 @@ def _decale(p, v):
     return (p[0] + v[0], p[1] + v[1])
 
 
-def _arc(centre, demi, naissance, fleche, segments=8):
-    """L'intrados d'une arche de gauche à droite : plein cintre si la flèche vaut la demi-portée,
-    surbaissé en dessous."""
-    rayon = (demi ** 2 + fleche ** 2) / (2 * fleche)
-    ouverture = math.asin(min(1, demi / rayon))
-    return [(centre + rayon * math.sin(-ouverture + 2 * ouverture * k / segments),
-             naissance + fleche - rayon + rayon * math.cos(-ouverture + 2 * ouverture * k / segments))
-            for k in range(segments + 1)]
-
-
 def _plaque(p, q, s, z0, largeur, hauteur, saillie):
     """Un panneau droit plaqué sur le mur p→q, à gauche, centré à `s` de p."""
     t = _unitaire(p, q)
@@ -60,7 +50,7 @@ def _contour(demi, hauteur, cintre, segments=6):
     """Le tour d'une baie depuis son pied gauche jusqu'à son pied droit."""
     if not cintre:
         return [(-demi, 0), (-demi, hauteur), (demi, hauteur), (demi, 0)]
-    return [(-demi, 0)] + _arc(0, demi, hauteur - demi, demi, segments) + [(demi, 0)]
+    return [(-demi, 0)] + arc(0, demi, hauteur - demi, demi, segments) + [(demi, 0)]
 
 
 def _chambranle(p, q, s, seuil, largeur, hauteur, cintre):
@@ -70,8 +60,8 @@ def _chambranle(p, q, s, seuil, largeur, hauteur, cintre):
 def _archivolte(p, q, s, z0, arche, bande=0.3 / AMA, saillie=0.07 / AMA):
     """Les claveaux d'une arche (portée, hauteur à la clé, flèche) et ses piédroits, en léger relief."""
     portee, cle, fleche = arche
-    dedans = [(-portee / 2, 0)] + _arc(0, portee / 2, cle - fleche, fleche) + [(portee / 2, 0)]
-    dehors = [(-portee / 2 - bande, 0)] + _arc(0, portee / 2 + bande, cle - fleche, fleche + bande) + [(portee / 2 + bande, 0)]
+    dedans = [(-portee / 2, 0)] + arc(0, portee / 2, cle - fleche, fleche) + [(portee / 2, 0)]
+    dehors = [(-portee / 2 - bande, 0)] + arc(0, portee / 2 + bande, cle - fleche, fleche + bande) + [(portee / 2 + bande, 0)]
     return _encadrement(p, q, s, z0, dehors, dedans, saillie)
 
 

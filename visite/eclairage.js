@@ -26,10 +26,12 @@ const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteu
 const MENORA = { couleur: 0xffe1aa, intensite: 150, portee: 18, carte: 512 };
 // Les lueurs d'une salle, par concept. Les lampes de terre de la Lishkat HaGazit, une par mèche : sans elles,
 // la salle n'avait que sa lumière cuite, qui n'a pas de direction, et la pierre comme les gradins y rendaient à plat.
-// Les suspensions de l'arche de Wilson sont électriques : elles ne vacillent pas.
+// Les suspensions de l'arche de Wilson sont électriques : elles ne vacillent pas. Les deux foyers du Beit HaMoked
+// brûlent jour et nuit, « מדורות דולקים בה תמיד » (Bartenura sur Middot 1:5).
 const LUEURS_DE = {
   lishkat_hagazit: { couleur: 0xffd8a0, intensite: 4, vacille: true },
   arche_wilson: { couleur: 0xffe2b8, intensite: 24 },
+  beit_hamoked: { couleur: 0xff9a50, intensite: 16, vacille: true },
 };
 // Les mâts d'or de l'Ezrat Nashim, qui ne brûlent que la nuit de Sim'hat Beit HaSho'éva (Soucca 5:2).
 const SHOEVA = { couleur: 0xffc58a, intensite: 600, portee: 200, carte: 1024 };
