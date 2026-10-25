@@ -9,7 +9,7 @@ matières) puis quitte. Ne jamais y appeler `wm.save_mainfile`.
 
 Il produit deux fichiers :
     visite/temple.glb    la géométrie, un maillage par concept
-    visite/reperes.json  l'emprise de chaque concept, les points d'entrée et les cartes d'occlusion
+    visite/reperes.json  l'emprise de chaque concept, les points d'entrée, les vis de degrés et les cartes d'occlusion
     visite/occlusion/    l'occlusion du ciel cuite par Cycles (`beit_hamikdash_occlusion.py`)
     visite/lumiere/      la lumière indirecte cuite par Cycles, pour les concepts de `--lumiere`
 
@@ -335,6 +335,18 @@ def vides(prefixe):
             for o in sorted(bpy.data.objects, key=lambda o: o.name) if o.type == "EMPTY" and o.name.startswith(prefixe)]
 
 
+def vis():
+    """Les vis de degrés que `escalier_a_vis` a marquées sur leur noyau, centre en repère glTF, en mètres."""
+    sortie = []
+    for o in sorted(bpy.data.objects, key=lambda o: o.name):
+        if "vis" not in o:
+            continue
+        v = o["vis"]
+        x, y = v["centre"]
+        sortie.append({"centre": [x, -y], "rayon": v["rayon"], "noyau": v["noyau"], "haut": v["haut"], "bas": v["bas"]})
+    return sortie
+
+
 VISITE_VERS_BLENDER = Matrix(((1, 0, 0, 0), (0, 0, -1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))
 
 
@@ -410,6 +422,7 @@ def exporter(chantier):
     lueurs = {salle: {"points": lampes(f"{prefixe}_lueur"), "salle": repere_de(f"{prefixe}_salle")}
               for salle, prefixe in SALLES_A_LUEURS.items()}
     projecteurs = vides("Kotel_projecteur_")
+    vis_de_degres = vis()
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
               for o in c.objects if o.type == "MESH"}
@@ -487,6 +500,7 @@ def exporter(chantier):
         "braises": braises,
         "lueurs": lueurs,
         "projecteurs": projecteurs,
+        "vis": vis_de_degres,
         "occlusion": occlusion,
         "lumiere": lumiere,
         "empreintes": empreintes,

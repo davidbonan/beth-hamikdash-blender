@@ -19,6 +19,10 @@ const FENTE = 0.25;        // un pied : le vide plus étroit que lui s'enjambe s
 const APLOMB = 1.5;
 const COURSE = 2.4;       // multiplicateur
 const GARDE = 0.06;       // peau du rayon de garde, devant le marcheur
+const GLISSE_MIN = 0.25;  // part du pas qui longe le mur : en deçà, on le prend de face et l'on s'arrête
+// Dans une vis, le regard tourne avec le pas : à 3,4 m/s autour d'un noyau, il faisait 400°/s.
+const VIS_PAS = 1.2;      // m/s
+const VIS_MARGE = 0.2;    // m : l'épaule ne frotte ni le noyau ni la paroi
 const VOL = 9.0;          // m/s en vol libre
 // Le pas ne s'établit ni ne s'éteint d'un coup : une vitesse qui bascule de 0 à 3,4
 // m/s à l'image près se lit en saccade, et c'est elle qu'on prend pour un manque de
@@ -26,12 +30,13 @@ const VOL = 9.0;          // m/s en vol libre
 const REPONSE = 0.09;
 const LISSAGE_REGARD = 0.045;
 
-export function marcheur(camera, murs) {
+export function marcheur(camera, murs, vis) {
   const BAS = new THREE.Vector3(0, -1, 0);
   const versLeBas = new THREE.Raycaster();
   const versLAvant = new THREE.Raycaster();
 
   const sonde = new THREE.Vector3();
+  const normale = new THREE.Vector3(), glisse = new THREE.Vector3(), ecart = new THREE.Vector3();
 
   function solSous(origine, portee) {
     versLeBas.set(origine, BAS);
@@ -65,9 +70,10 @@ export function marcheur(camera, murs) {
     versLAvant.far = distance + GARDE;
     for (const hauteur of [MONTEE + 0.02, 1.55]) {
       versLAvant.set(new THREE.Vector3(depuis.x, piedsY + hauteur, depuis.z), direction);
-      if (versLAvant.intersectObjects(murs, false).length) return true;
+      const [touche] = versLAvant.intersectObjects(murs, false);
+      if (touche) return touche;
     }
-    return false;
+    return null;
   }
 
   let piedsY = 0;
@@ -109,24 +115,106 @@ export function marcheur(camera, murs) {
     return force < 1e-3 ? voulu.set(0, 0, 0) : voulu.normalize().multiplyScalar(vitesse * force);
   }
 
+  function poserLePas(direction, distance) {
+    const x = camera.position.x + direction.x * distance, z = camera.position.z + direction.z * distance;
+    const sol = solEnjambe(x, z, piedsY, direction);
+    if (sol === null) return false;
+    piedsY = sol;
+    camera.position.set(x, sol + OEIL, z);
+    return true;
+  }
+
+  function pasLibre(direction, distance) {
+    return !murDevant(camera.position, piedsY, direction, distance) && poserLePas(direction, distance);
+  }
+
+  // Un mur pris de biais se longe : seule la part du pas qui pousse dedans est perdue.
+  function avancerOuGlisser(direction, distance) {
+    const mur = murDevant(camera.position, piedsY, direction, distance);
+    if (!mur) return poserLePas(direction, distance) || longerLeBord(direction, distance);
+    if (!mur.face) return false;
+    normale.copy(mur.face.normal).transformDirection(mur.object.matrixWorld).setY(0);
+    if (normale.lengthSq() < 1e-4) return false;
+    normale.normalize();
+    glisse.copy(direction).addScaledVector(normale, -direction.dot(normale));
+    const part = glisse.length();
+    if (part < GLISSE_MIN) return false;
+    glisse.divideScalar(part);
+    return pasLibre(glisse, distance * part);
+  }
+
+  // Le bord d'un vide n'a pas de face à longer, mais ceux du Temple suivent ses axes : le
+  // pas garde celle de ses deux composantes qui reste sur le sol.
+  function longerLeBord(direction, distance) {
+    const composantes = [[direction.x, 0], [0, direction.z]]
+      .sort(([ax, az], [bx, bz]) => Math.abs(bx + bz) - Math.abs(ax + az));
+    for (const [x, z] of composantes) {
+      const part = Math.abs(x + z);
+      if (part < GLISSE_MIN) continue;
+      glisse.set(Math.sign(x), 0, Math.sign(z));
+      if (pasLibre(glisse, distance * part)) return true;
+    }
+    return false;
+  }
+
+  const rayonDans = (v) => Math.hypot(camera.position.x - v.centre[0], camera.position.z - v.centre[1]);
+  const angleDans = (v) => Math.atan2(camera.position.z - v.centre[1], camera.position.x - v.centre[0]);
+
+  // Sur un degré de vis, le sol d'en bas comme le palier d'en haut exclus.
+  function visSous() {
+    return vis.find((v) => rayonDans(v) < v.rayon && piedsY > v.bas + 0.05 && piedsY < v.haut - 0.05);
+  }
+
+  // Au palier d'en haut, la fente laisse le pied au-dessus du puits, face au trou : un pas
+  // bloqué l'en écarte vers le dallage plein.
+  function sortirDuPuits(distance) {
+    const v = vis.find((w) => Math.abs(piedsY - w.haut) < 0.05 && rayonDans(w) < w.rayon + FENTE);
+    return v !== undefined && allerEn(v, angleDans(v), rayonDans(v) + distance);
+  }
+
+  function allerEn(v, angle, rayon) {
+    ecart.set(v.centre[0] + Math.cos(angle) * rayon - camera.position.x, 0,
+      v.centre[1] + Math.sin(angle) * rayon - camera.position.z);
+    const distance = ecart.length();
+    if (distance < 1e-6) return true;
+    return pasLibre(ecart.divideScalar(distance), distance);
+  }
+
+  // Ce qu'on pousse le long du degré fait le tour du noyau, ce qu'on pousse vers la paroi
+  // ou le noyau s'en rapproche, et le regard tourne d'autant : ce qui était devant le reste.
+  function tournerDansLaVis(v, distance) {
+    const r = rayonDans(v), angle = angleDans(v);
+    const tour = (pas.z * Math.cos(angle) - pas.x * Math.sin(angle)) * distance / r;
+    const voulu = r + (pas.x * Math.cos(angle) + pas.z * Math.sin(angle)) * distance;
+    const exterieur = v.rayon - VIS_MARGE;
+    // Vers la paroi, le pas est d'abord tenté tel quel : au dernier degré, il sort sur le dallage.
+    const rayons = voulu > exterieur ? [voulu, exterieur] : [Math.max(voulu, v.noyau + VIS_MARGE)];
+    // Passé le dernier degré, il n'y a plus de degré où tourner : le pas sort droit vers le palier.
+    if (!rayons.some((rayon) => allerEn(v, angle + tour, rayon))) return allerEn(v, angle, r + distance);
+    regard.y -= tour;
+    capVise.lacet -= tour;
+    lisse.applyAxisAngle(HAUT, -tour);
+    pas.applyAxisAngle(HAUT, -tour);
+    return true;
+  }
+
   function marcher(dt) {
     pas.set(lisse.x, 0, lisse.z);
     const vitesse = pas.length();
     if (vitesse < 0.02) return;
     pas.divideScalar(vitesse);
     // Le pas se découpe : à bas framerate un seul bond franchirait la garde.
-    let reste = Math.min(vitesse * dt, 1.2);
+    let reste = Math.min((visSous() ? Math.min(vitesse, VIS_PAS) : vitesse) * dt, 1.2);
     while (reste > 1e-4) {
       const distance = Math.min(reste, SOUS_PAS);
       reste -= distance;
-      const x = camera.position.x + pas.x * distance, z = camera.position.z + pas.z * distance;
-      const sol = murDevant(camera.position, piedsY, pas, distance) ? null : solEnjambe(x, z, piedsY, pas);
-      if (sol === null) {                            // un mur, ou le vide : le pas est refusé
-        lisse.set(0, 0, 0);                          // et l'élan avec, sinon il pousse contre
-        return;
+      const dansLaVis = visSous();
+      const avance = dansLaVis ? tournerDansLaVis(dansLaVis, distance)
+        : avancerOuGlisser(pas, distance) || sortirDuPuits(distance);
+      if (!avance) {
+        lisse.set(0, 0, 0);                          // un mur de face, ou le vide : le pas est refusé,
+        return;                                      // et l'élan avec, sinon il pousse contre
       }
-      piedsY = sol;
-      camera.position.set(x, sol + OEIL, z);
     }
   }
 

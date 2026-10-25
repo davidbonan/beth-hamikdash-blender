@@ -256,7 +256,7 @@ scene.add(gltf.scene);
 gltf.scene.updateMatrixWorld(true);
 
 const murs = [];                        // collision : les étoffes en sont exclues
-const marche = marcheur(camera, murs);
+const marche = marcheur(camera, murs, reperes.vis);
 const horloges = [];                    // uniformes de temps à faire avancer
 const brut = new URLSearchParams(location.search).has("brut");
 const IDS = new Set(CONCEPTS.keys());

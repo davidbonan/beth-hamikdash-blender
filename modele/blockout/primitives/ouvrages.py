@@ -3,6 +3,7 @@ import math
 from typing import NamedTuple
 
 from .matieres import MAT_CEDRE, MAT_MARBRE_HERODE, braise
+from .parametres import m
 from .volumes import arc, box, braises, cyl, mesh_from_pydata, plage, prism, prism_x
 from .gravures import largeur_gravure, timora
 
@@ -241,7 +242,9 @@ def escalier_a_vis(name, cx, cy, rayon, z_haut, z_bas, sortie, col, mat=None):
     pas = 2 * math.pi / par_tour
     n = round((z_haut - z_bas) / DEGRE) - 1
     depart = math.radians(sortie) - pas * (n + 0.5)
-    cyl(f"{name}_noyau", cx, cy, z_bas, z_haut, noyau, col, mat, verts=12)
+    axe = cyl(f"{name}_noyau", cx, cy, z_bas, z_haut, noyau, col, mat, verts=12)
+    # La visite y fait tourner le pas autour du noyau : à 0,26 m de giron, marcher droit ne la gravit pas.
+    axe["vis"] = {"centre": [m(cx), m(cy)], "rayon": m(rayon), "noyau": m(noyau), "haut": m(z_haut), "bas": m(z_bas)}
     for k in range(n):
         a0, a1 = depart + pas * k, depart + pas * (k + 1)
         rayons = [(noyau, a0)] + [(rayon, a0 + (a1 - a0) * t / 2) for t in range(3)] + [(noyau, a1)]
