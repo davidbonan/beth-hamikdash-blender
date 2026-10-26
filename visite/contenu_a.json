@@ -1146,13 +1146,15 @@
       "20 amot de haut × 10 de large",
       "corps de porte de 20 amot de large, débordant de 12 amot du mur",
       "vingt degrés dans le corps de porte, du 'Heil à l'Azara",
-      "la plus orientale des portes du sud"
+      "la plus orientale des portes du sud",
+      "sur la terrasse, la cuve de la première tevila du Cohen Gadol : fond à 20 amot, eau à 23"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:6", "citation": "שְׁעָרִים דְּרוֹמִיִּים סְמוּכִים לַמַּעֲרָב, שַׁעַר הָעֶלְיוֹן, שַׁעַר הַדֶּלֶק, שַׁעַר הַבְּכוֹרוֹת, שַׁעַר הַמָּיִם"},
       {"oeuvre": "Middot", "ref": "1:4", "citation": "שֶׁבַּדָּרוֹם, שַׁעַר הַדֶּלֶק. שֵׁנִי לוֹ, שַׁעַר הַבְּכוֹרוֹת. שְׁלִישִׁי לוֹ, שַׁעַר הַמָּיִם"},
       {"oeuvre": "Shekalim", "ref": "6:3", "citation": "שְׁעָרִים דְּרוֹמִיִּים סְמוּכִין לַמַּעֲרָב"},
       {"oeuvre": "Yoma", "ref": "19a", "citation": "חוּץ מִזּוֹ שֶׁהָיְתָה בַּחוֹל, עַל גַּבֵּי שַׁעַר הַמַּיִם, וּבְצַד לִשְׁכָּתוֹ הָיְתָה"},
+      {"oeuvre": "Yoma", "ref": "31a", "citation": "אָמַר אַבָּיֵי: שְׁמַע מִינַּיהּ עֵין עֵיטָם גָּבוֹהַּ מִקַּרְקַע עֲזָרָה עֶשְׂרִים וְשָׁלֹשׁ אַמּוֹת"},
       {"oeuvre": "Yerushalmi Yoma", "ref": "1:5", "citation": "עַל גַּבֵּי שַׁעַר הַמַּיִם הָיְיתָה וְסָמוּךְ לְלִישְׁכָּתוֹ הָיְתָה"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:4", "citation": "וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:5", "citation": "כָּל שַׁעַר מֵהֶן הָיָה רָחְבּוֹ עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים אַמָּה"}

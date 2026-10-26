@@ -286,16 +286,17 @@ def terrasse_de_porte(name, x0, x1, y0, y1, z, chambre, col, mat=None, tremies=(
         box(f"{name}_garde_{suffixe}", a, b, c, e, z + 1, z + 3, col, mat)
 
 
-def aliyah(name, x0, x1, y0, y1, z0, h, col, fenetre, porte, mat=None):
+def aliyah(name, x0, x1, y0, y1, z0, h, col, fenetre, portes, mat=None):
     """Chambre haute posée sur un corps de porte, murs d'une ama, une fenêtre et une porte.
 
     « בֵּית אַבְטִינָס וּבֵית הַנִּיצוֹץ הָיוּ עֲלִיּוֹת » (Middot 1:1 ; Tamid 1:1) : ce sont
-    des étages, et un étage a un rez-de-chaussée. `fenetre` et `porte` : (face, u0, u1) —
+    des étages, et un étage a un rez-de-chaussée. `fenetre` et chacune des `portes` : (face, u0, u1) —
     la face percée et l'intervalle de la baie le long d'elle. La fenêtre va de 3 à 7 amot
-    du sol, la porte du sol à 8 ; elle ouvre sur la terrasse, où débouche la mesiba.
+    du sol, les portes du sol à 8 ; elles ouvrent sur la terrasse, où débouche la mesiba.
     """
-    baies = {fenetre[0]: [(fenetre[1], fenetre[2], z0 + 3, z0 + 7)],
-             porte[0]: [(porte[1], porte[2], z0, z0 + 8)]}
+    baies = {fenetre[0]: [(fenetre[1], fenetre[2], z0 + 3, z0 + 7)]}
+    for face, u0, u1 in portes:
+        baies.setdefault(face, []).append((u0, u1, z0, z0 + 8))
     box(f"{name}_toit", x0, x1, y0, y1, z0 + h - 1, z0 + h, col, mat)
     for cote, bornes in (("ouest", (x0, x0 + 1, y0, y1)), ("est", (x1 - 1, x1, y0, y1)),
                          ("sud", (x0, x1, y0, y0 + 1)), ("nord", (x0, x1, y1 - 1, y1))):

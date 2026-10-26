@@ -2352,7 +2352,8 @@
       "20 amot high × 10 wide",
       "gate structure 20 amot wide, projecting 12 amot from the wall",
       "twenty steps within the gate structure, from the Cheil to the Azara",
-      "the easternmost of the south gates"
+      "the easternmost of the south gates",
+      "on the terrace, the pool of the Kohen Gadol's first immersion: floor at 20 amot, water at 23"
     ],
     "sources": [
       {
@@ -2374,6 +2375,11 @@
         "oeuvre": "Yoma",
         "ref": "19a",
         "citation": "חוּץ מִזּוֹ שֶׁהָיְתָה בַּחוֹל, עַל גַּבֵּי שַׁעַר הַמַּיִם, וּבְצַד לִשְׁכָּתוֹ הָיְתָה"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "31a",
+        "citation": "אָמַר אַבָּיֵי: שְׁמַע מִינַּיהּ עֵין עֵיטָם גָּבוֹהַּ מִקַּרְקַע עֲזָרָה עֶשְׂרִים וְשָׁלֹשׁ אַמּוֹת"
       },
       {
         "oeuvre": "Yerushalmi Yoma",

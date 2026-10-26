@@ -712,7 +712,7 @@ terrasse_de_porte("ShaarHaNitzotz", NZ_X0, NZ_X1, NZ_Y0, NZ_Y1, NZ_Z0,
 # La porte de la chambre est à côté du puits, non en face : en face, elle ouvrirait sur le vide.
 aliyah("BeitHaNitzotz", PORTE_NITZOTZ - 5, PORTE_NITZOTZ + 5, NZ_Y0, NZ_Y1, NZ_Z0, 12,
        "80_Lishkot", ("sud", PORTE_NITZOTZ - 1.5, PORTE_NITZOTZ + 1.5),
-       ("est", NZ_VIS[3], NZ_VIS[3] + MESIBA_PORTE))
+       [("est", NZ_VIS[3], NZ_VIS[3] + MESIBA_PORTE)])
 
 # Beit Avtinas : l'aliyah du corps de porte de Sha'ar HaMayim — la plus ORIENTALE des
 # trois portes du sud —, creuse, murs d'une ama, fenêtre 3 x 4 au nord sur l'Azara.
@@ -729,8 +729,14 @@ BA_X0, BA_X1 = PORTE_MAYIM - 5, PORTE_MAYIM + 5
 BA_Y0, BA_Y1, BA_Z0 = AY0 - T - SAILLIE, AY0 - T, Z_AZ + 25
 SM_X0, SM_X1 = PORTE_MAYIM - 10, PORTE_MAYIM + 10
 SM_VIS = puits_de_mesiba(SM_X1 - LISHKA_PAREMENT, BA_Y0 + LISHKA_PAREMENT, BA_Y1)
+# La première tevila de Kippour, « בַּחוֹל עַל גַּבֵּי שַׁעַר הַמַּיִם » (Yoma 31a) : Abaye en tire que
+# l'eau d'Ein Eitam monte à 23 amot au-dessus de l'Azara, la porte de 20 et « כלי של שלש אמות
+# מלמעלה » (Rashi). La cuve est donc encastrée dans le toit du corps de porte, fond à 20, eau à 23.
+# Sa place à l'ouest de l'aliyah, ses cotes et ses degrés : CHOIX.
+SM_MIKVE = (SM_X0 + 2.5, BA_X0 - 0.5, BA_Y0 + 3.5, BA_Y1 - 1)
+Z_MIKVE_FOND = Z_AZ + PORTE_SHAAR[1]
 lishka("Beit_ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, Z_EZN, BA_Z0, "80_Lishkot",
-       [Porte("S", *PORTE_SHAAR, Z_EZN)], adossee="N", tremies=[SM_VIS])
+       [Porte("S", *PORTE_SHAAR, Z_EZN)], adossee="N", tremies=[SM_MIKVE, SM_VIS])
 escalier("Beit_ShaarHaMayim_escalier", SM_X0 + LISHKA_PAREMENT, SM_VIS[0],
          BA_Y0 + LISHKA_PAREMENT, BA_Y1, Z_EZN, Z_AZ, "-y", "80_Lishkot")
 box("Beit_ShaarHaMayim_mesiba_palier", SM_VIS[0], SM_VIS[1], BA_Y0 + LISHKA_PAREMENT, BA_Y1,
@@ -741,24 +747,34 @@ escalier_a_vis("Beit_ShaarHaMayim_mesiba", (SM_VIS[0] + SM_VIS[1]) / 2, (SM_VIS[
 box("Beit_ShaarHaMayim_seuil", X_DOUKHAN, PORTE_MAYIM + 5, AY0 - T, AY0, Z_EZI - 1, Z_AZ,
     "80_Lishkot", MAT_SOL())
 terrasse_de_porte("ShaarHaMayim", SM_X0, SM_X1, BA_Y0, BA_Y1, BA_Z0,
-                  (BA_X0, BA_X1), "80_Lishkot", tremies=[SM_VIS])
+                  (BA_X0, BA_X1), "80_Lishkot", tremies=[SM_MIKVE, SM_VIS])
+dalle_trouee("ShaarHaMayim_mikve_cuve", SM_MIKVE[0] - 0.5, SM_MIKVE[1] + 0.5, SM_MIKVE[2] - 0.5,
+             SM_MIKVE[3] + 0.5, Z_MIKVE_FOND, BA_Z0 - LISHKA_CORNICHE, SM_MIKVE, "80_Lishkot")
+box("ShaarHaMayim_mikve_fond", SM_MIKVE[0] - 0.5, SM_MIKVE[1] + 0.5, SM_MIKVE[2] - 0.5, SM_MIKVE[3] + 0.5,
+    Z_MIKVE_FOND - 1, Z_MIKVE_FOND, "80_Lishkot")
+escalier("ShaarHaMayim_mikve_marches", SM_MIKVE[0], SM_MIKVE[1], SM_MIKVE[2], SM_MIKVE[2] + 4.5,
+         Z_MIKVE_FOND, BA_Z0 + 1, "+y", "80_Lishkot")
+box("ShaarHaMayim_mikve_eau", *SM_MIKVE, Z_MIKVE_FOND, Z_MIKVE_FOND + 3, "80_Lishkot", MAT_EAU())
+# Le Cohen Gadol passe la veille au Beit Avtinas (Yoma 1:5) et se baigne « וסמוך ללשכתו » : une porte
+# à l'ouest le mène au haut des degrés du mikvé, au sud de la table. CHOIX.
+PORTE_MIKVE = (BA_Y0 + 1.5, BA_Y0 + 3.8)
 aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
        "80_Lishkot", ("nord", PORTE_MAYIM - 1.5, PORTE_MAYIM + 1.5),
-       ("est", SM_VIS[2] - MESIBA_PORTE, SM_VIS[2]))
+       [("est", SM_VIS[2] - MESIBA_PORTE, SM_VIS[2]), ("ouest", *PORTE_MIKVE)])
 # « היו מחזירין אותה למכתשת… וכשהוא שוחק אומר הדק היטב » (Keritot 6b), « מכתשת של בית אבטינס »
 # (Avot deRabbi Natan 41:12) ; les sammanim pesés « במשקל מכוון », chacun pilé à part (Rambam
 # Klei HaMikdash 2:2, 2:5). Table, balance, bols, formes et matières : CHOIX.
 AV_X0, AV_X1, AV_Y0, AV_Z = BA_X0 + 1, BA_X1 - 1, BA_Y0 + 1, BA_Z0 + 1
-box("BeitAvtinas_table", AV_X0 + 0.2, AV_X0 + 2.2, AV_Y0 + 2, AV_Y0 + 8, AV_Z, AV_Z + 1.5,
+box("BeitAvtinas_table", AV_X0 + 0.2, AV_X0 + 2.2, AV_Y0 + 3, AV_Y0 + 9, AV_Z, AV_Z + 1.5,
     "80_Lishkot", MAT_MARBRE())
 for k in range(11):
-    x, y = AV_X0 + 0.7, AV_Y0 + 2.5 + 0.5 * k
+    x, y = AV_X0 + 0.7, AV_Y0 + 3.5 + 0.5 * k
     revolution(f"BeitAvtinas_sam_{k:02d}", x, y, AV_Z + 1.5,
                [(0.0, 0.0), (0.16, 0.0), (0.21, 0.2), (0.17, 0.2), (0.0, 0.07)],
                "80_Lishkot", MAT_TERRE_CUITE(), verts=16)
     cone(f"BeitAvtinas_sam_{k:02d}_poudre", x, y, AV_Z + 1.64, AV_Z + 1.78, 0.12, 0.03,
          "80_Lishkot", MAT_KETORET(), verts=16)
-BAL_X, BAL_Y, BAL_Z = AV_X0 + 1.6, AV_Y0 + 7, AV_Z + 2.8
+BAL_X, BAL_Y, BAL_Z = AV_X0 + 1.6, AV_Y0 + 8, AV_Z + 2.8
 cyl("BeitAvtinas_moznayim_pied", BAL_X, BAL_Y, AV_Z + 1.5, BAL_Z, 0.05, "80_Lishkot",
     MAT_BRONZE(), verts=12)
 cyl_between("BeitAvtinas_moznayim_fleau", (BAL_X, BAL_Y - 0.6, BAL_Z), (BAL_X, BAL_Y + 0.6, BAL_Z),
