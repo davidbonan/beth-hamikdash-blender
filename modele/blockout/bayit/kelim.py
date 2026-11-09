@@ -2,8 +2,9 @@ import math
 from mathutils import Vector
 
 from ..primitives.parametres import GEVIIM_RENVERSES, MENORA_DROITE, TEFAH, Z_BAT, m
-from ..primitives.matieres import MAT_LECHEM, MAT_OR, MAT_OR_MIKSHE, MAT_PETILA, MAT_SHEMEN
-from ..primitives.volumes import box, cyl, cyl_between, lampe, link_to, revolution_axe, sphere, tore
+from ..primitives.matieres import MAT_BOIS_CHARBON, MAT_CENDRE, MAT_LECHEM, MAT_OR, MAT_OR_MIKSHE, MAT_PETILA, MAT_SHEMEN
+from ..primitives.volumes import (alea, box, cyl, cyl_between, ellipsoide, lampe, limbe, link_to, mesh_from_pydata,
+                                 revolution_axe, sphere, tore)
 
 
 # --- Ustensiles du Heikhal (Yoma 33b ; Menachot 98b) : dans la moitié ouest,
@@ -50,11 +51,153 @@ def shulchan(nom, x, avec_pain):
 
 
 shulchan("Shulchan", XU, avec_pain=True)
-# Mizbea'h HaZahav 1 × 1 × 2, au centre, légèrement vers l'est, quatre cornes (Ex 30:2)
-box("Mizbeach_Zahav", -119.5, -118.5, -0.5, 0.5, Z_BAT, Z_BAT + 2, "70_Kelim", MAT_OR())
-for ns, cy in (("S", -0.5), ("N", 0.5 - 0.15)):
-    for eo, cx in (("O", -119.5), ("E", -118.5 - 0.15)):
-        box(f"Mizbeach_Zahav_keren_{ns}{eo}", cx, cx + 0.15, cy, cy + 0.15, Z_BAT + 2, Z_BAT + 2.15, "70_Kelim", MAT_OR())
+# Mizbea'h HaZahav, « מְכֻוָּן בֵּין הַצָּפוֹן לַדָּרוֹם מָשׁוּךְ בֵּין הַשֻּׁלְחָן וְהַמְּנוֹרָה לַחוּץ » (Rambam Beit HaBe'hira 3:17).
+# Ses 2 amot comptent la corne, comme les 10 de l'autel extérieur (fiche §6) : CHOIX, comme la corne et le zer.
+XZ, YZ, DEMI_Z = -119.0, 0.0, 0.5
+H_KEREN_Z, COTE_KEREN_Z = 1.5 * TEFAH, TEFAH
+Z_GAG = Z_BAT + 2 - H_KEREN_Z
+SAILLIE_ZER, REBORD_ZER = 0.25 * TEFAH, 0.2 * TEFAH
+BAS_ZER, HAUT_ZER = Z_GAG - 0.6 * TEFAH, Z_GAG + 0.35 * TEFAH
+R_PERLE_ZER = 0.15 * TEFAH
+FLEURONS_ZER = 5
+R_TABAAT, R_FIL_TABAAT = 0.38 * TEFAH, 0.07 * TEFAH
+Z_TABAAT = BAS_ZER - 2 * R_PERLE_ZER - 0.15 * TEFAH - R_TABAAT
+
+
+def pilier_carre(nom, x, y, z0, profil, col, mat):
+    """Carrés empilés autour de (x, y) : `profil` en (demi-côté, hauteur au-dessus de z0)."""
+    coins = ((-1, -1), (1, -1), (1, 1), (-1, 1))
+    verts = [(x + sx * a, y + sy * a, z0 + dz) for a, dz in profil for sx, sy in coins]
+    dernier = 4 * (len(profil) - 1)
+    faces = [[3, 2, 1, 0], [dernier, dernier + 1, dernier + 2, dernier + 3]]
+    for i in range(0, dernier, 4):
+        for k in range(4):
+            a, b = i + k, i + (k + 1) % 4
+            faces.append([a, b, b + 4, a + 4])
+    return mesh_from_pydata(nom, verts, faces, col, mat)
+
+
+def cadre_carre(nom, x, y, dedans, dehors, z0, z1, col, mat):
+    """Bandeau carré d'un seul tenant, sans joint aux angles : demi-côtés `dedans` et `dehors` autour de (x, y)."""
+    coins = ((-1, -1), (1, -1), (1, 1), (-1, 1))
+    verts = [(x + sx * d, y + sy * d, z) for z in (z0, z1) for d in (dehors, dedans) for sx, sy in coins]
+    ext_bas, int_bas, ext_haut, int_haut = 0, 4, 8, 12
+    faces = []
+    for k in range(4):
+        j = (k + 1) % 4
+        faces += [[ext_bas + k, ext_bas + j, ext_haut + j, ext_haut + k],
+                  [int_bas + j, int_bas + k, int_haut + k, int_haut + j],
+                  [ext_haut + k, ext_haut + j, int_haut + j, int_haut + k],
+                  [ext_bas + j, ext_bas + k, int_bas + k, int_bas + j]]
+    return mesh_from_pydata(nom, verts, faces, col, mat)
+
+
+def zer_du_mizbeach(nom):
+    """« וְעָשִׂיתָ לּוֹ זֵר זָהָב סָבִיב » (Shemot 30:3), « סִימָן לְכֶתֶר כְּהֻנָּה » (Rashi) : une couronne qui monte
+    au-dessus du gag comme celle de l'Arche, « לְמַעְלָה מִשְּׂפָתוֹ » (Rashi sur 25:11). Profil, perles, fleurons : CHOIX."""
+    dedans, dehors = DEMI_Z - REBORD_ZER, DEMI_Z + SAILLIE_ZER
+    cadre_carre(nom, XZ, YZ, dedans, dehors, BAS_ZER, HAUT_ZER, "70_Kelim", MAT_OR())
+    z_perle = BAS_ZER - R_PERLE_ZER
+    face = DEMI_Z + 0.4 * R_PERLE_ZER
+    bout = DEMI_Z + R_PERLE_ZER
+    for cote, p0, p1 in (("N", (XZ - bout, YZ + face), (XZ + bout, YZ + face)),
+                         ("S", (XZ - bout, YZ - face), (XZ + bout, YZ - face)),
+                         ("E", (XZ + face, YZ - bout), (XZ + face, YZ + bout)),
+                         ("O", (XZ - face, YZ - bout), (XZ - face, YZ + bout))):
+        cyl_between(f"{nom}_perle_{cote}", (*p0, z_perle), (*p1, z_perle), R_PERLE_ZER, "70_Kelim", MAT_OR(), 12)
+    # Des fleurons de lys, « וּפֶרַח צוּרַת שׁוֹשָׁן » comme les fleurs de la Menora (Rambam sur Mena'hot 3:7), entre les cornes : CHOIX.
+    lys = [(0.0, 0.14), (0.12, 0.24), (0.26, 0.40), (0.36, 0.42), (0.44, 0.30), (0.50, 0.16), (0.62, 0.19),
+           (0.80, 0.15), (0.92, 0.08), (1.0, 0.0)]
+    libre = 2 * (DEMI_Z - COTE_KEREN_Z)
+    milieu = DEMI_Z + (SAILLIE_ZER - REBORD_ZER) / 2
+    for cote, normale in (("N", (0, 1, 0)), ("S", (0, -1, 0)), ("E", (1, 0, 0)), ("O", (-1, 0, 0))):
+        nx, ny, _ = normale
+        for i in range(FLEURONS_ZER):
+            le_long = -libre / 2 + libre * (i + 0.5) / FLEURONS_ZER
+            x = XZ + nx * milieu + (le_long if ny else 0)
+            y = YZ + ny * milieu + (le_long if nx else 0)
+            fleuron = limbe(f"{nom}_fleuron_{cote}{i}", lys, (x, y, HAUT_ZER - 0.05 * TEFAH), (0, 0, 1), normale,
+                            0.85 * TEFAH, 0.07 * TEFAH, "70_Kelim", MAT_OR(), courbure=0.2)
+            fleuron["sans_biseau"] = True
+
+
+def mizbeach_hazahav(nom):
+    """Mizbea'h HaZahav 1 × 1 × 2 (Shemot 30:1-5), plaqué « אֶת גַּגּוֹ וְאֶת קִירֹתָיו סָבִיב וְאֶת קַרְנֹתָיו » (30:3) ;
+    le gag est plein, « זֶה הָיָה לוֹ גַּג » (Rashi). Balayé à l'aube (Tamid 3:9), il reste d'or nu : le feu n'y a
+    pas prise, « כַּמָּה שָׁנִים אֵין הָאוּר שׁוֹלֶטֶת בּוֹ » ('Haguiga 27a)."""
+    box(nom, XZ - DEMI_Z, XZ + DEMI_Z, YZ - DEMI_Z, YZ + DEMI_Z, Z_BAT, Z_GAG, "70_Kelim", MAT_OR())
+    # « מִמֶּנּוּ קַרְנֹתָיו » (30:2) : d'un bloc avec lui, carrées comme celles de l'autel extérieur, s'affinant
+    # jusqu'à une tête arrondie : CHOIX.
+    a = COTE_KEREN_Z / 2
+    profil = [(a, 0), (0.86 * a, 0.62 * H_KEREN_Z), (0.80 * a, 0.78 * H_KEREN_Z), (0.68 * a, 0.89 * H_KEREN_Z),
+              (0.48 * a, 0.96 * H_KEREN_Z), (0.2 * a, H_KEREN_Z)]
+    for ns, sy in (("N", 1), ("S", -1)):
+        for eo, sx in (("E", 1), ("O", -1)):
+            keren = pilier_carre(f"{nom}_keren_{ns}{eo}", XZ + sx * (DEMI_Z - a), YZ + sy * (DEMI_Z - a), Z_GAG, profil,
+                         "70_Kelim", MAT_OR())
+            keren["sans_biseau"] = True
+            keren.data.shade_smooth()
+            keren.data.set_sharp_from_angle(angle=math.radians(50))
+    zer_du_mizbeach(f"{nom}_zer")
+    # « שְׁתֵּי טַבְּעֹת … עַל שְׁתֵּי זָוִיּוֹת שֶׁבִּשְׁנֵי צִדָּיו » (30:4, Rashi) : « בחוד שבין מזרח לצפון … בין מערב לדרום » (Haamek Davar)
+    for ns, sy, eo, sx in (("N", 1, "E", 1), ("S", -1, "O", -1)):
+        x, y = XZ + sx * (DEMI_Z - a), YZ + sy * (DEMI_Z + R_TABAAT - 0.5 * R_FIL_TABAAT)
+        or_cisele(tore(f"{nom}_tabaat_{ns}{eo}", x, y, Z_TABAAT, R_TABAAT, R_FIL_TABAAT, "70_Kelim", MAT_OR(),
+                       rotation=(0, math.pi / 2, 0), majeur=32, mineur=10))
+        y0, y1 = sorted((YZ + sy * DEMI_Z, YZ + sy * (DEMI_Z + 0.1 * TEFAH)))
+        box(f"{nom}_tabaat_{ns}{eo}_attache", x - 0.15 * TEFAH, x + 0.15 * TEFAH, y0, y1,
+            Z_TABAAT - 0.2 * TEFAH, Z_TABAAT + 0.2 * TEFAH, "70_Kelim", MAT_OR())
+
+
+def tas_bossele(nom, x, y, z_bord, rayon, bosse, col, mat, anneaux=6, secteurs=36):
+    """Un tas rond et bosselé posé dans un vase, de `z_bord` au bord à `z_bord + bosse` au milieu ; rend sa hauteur au rayon r."""
+    hauteur = lambda r: z_bord + bosse * (1 - (r / rayon) ** 2)
+    verts, faces = [(x, y, hauteur(0))], []
+    for i in range(1, anneaux + 1):
+        r = rayon * i / anneaux
+        for k in range(secteurs):
+            th = math.tau * k / secteurs
+            grain = 0.0 if i == anneaux else 0.45 * bosse * (alea(f"{nom}_{i}_{k}") - 0.5)
+            verts.append((x + r * math.cos(th), y + r * math.sin(th), hauteur(r) + grain))
+    anneau = lambda i, k: 1 + (i - 1) * secteurs + k % secteurs
+    faces += [[0, anneau(1, k), anneau(1, k + 1)] for k in range(secteurs)]
+    faces += [[anneau(i, k), anneau(i + 1, k), anneau(i + 1, k + 1), anneau(i, k + 1)]
+              for i in range(1, anneaux) for k in range(secteurs)]
+    fond = len(verts)
+    verts.append((x, y, z_bord - 0.03))
+    faces += [[fond, anneau(anneaux, k + 1), anneau(anneaux, k)] for k in range(secteurs)]
+    o = mesh_from_pydata(nom, verts, faces, col, mat)
+    o["sans_biseau"] = True
+    o.data.shade_smooth()
+    return hauteur
+
+
+def teni(nom, x, y):
+    """Le teni, « דּוֹמֶה לְתַרְקָב גָּדוֹל שֶׁל זָהָב, מַחֲזִיק קַבַּיִן וָחֵצִי » (Tamid 3:6), « דּוֹמֶה לְסַל וּפִיו רָחָב »
+    (Bartenura) : 3,5 l à la mesure du kaf. Posé « בָּאָרֶץ לְפָנָיו » (Rambam Temidin 3:4), plein de « הָאֵפֶר וְהַפֶּחָם »,
+    il attend la zerika du tamid (Bartenura sur Tamid 3:9), comme le kuz sur sa marche. Côtes, cerceaux, anses : CHOIX."""
+    profil = [(0, 0), (0.15, 0), (0.155, 0.01), (0.20, 0.14), (0.225, 0.25), (0.235, 0.27), (0.245, 0.278),
+              (0.24, 0.29), (0.225, 0.29), (0.215, 0.275), (0.19, 0.15), (0.14, 0.03), (0, 0.03)]
+    cotes = lambda th, t: 1 + 0.03 * math.cos(24 * th) if 0.05 < t < 0.8 else 1
+    or_cisele(revolution_axe(nom, (x, y, Z_BAT), (0, 0, 1), profil, "70_Kelim", MAT_OR(), 96, forme=cotes))
+    paroi = lambda z: next(r0 + (r1 - r0) * (z - z0) / (z1 - z0) for (r0, z0), (r1, z1) in zip(profil, profil[1:])
+                           if z0 <= z <= z1 and r1 >= r0)
+    for k, z in enumerate((0.10, 0.20)):
+        or_cisele(tore(f"{nom}_cerceau_{k}", x, y, Z_BAT + z, paroi(z) * 1.01 + 0.002, 0.008, "70_Kelim", MAT_OR(),
+                       majeur=96, mineur=8))
+    for k, s in enumerate((1, -1)):
+        or_cisele(tore(f"{nom}_anse_{k}", x + s * 0.25, y, Z_BAT + 0.22, 0.045, 0.01, "70_Kelim", MAT_OR(),
+                       rotation=(math.pi / 2, 0, 0), majeur=24, mineur=8))
+    hauteur = tas_bossele(f"{nom}_efer", x, y, Z_BAT + 0.235, 0.205, 0.05, "70_Kelim", MAT_CENDRE())
+    for k in range(22):
+        cle = f"{nom}_pecham_{k}"
+        r, th = 0.16 * math.sqrt(alea(cle, 1)), 2 * math.pi * alea(cle, 2)
+        px, py = x + r * math.cos(th), y + r * math.sin(th)
+        pecham = ellipsoide(f"{nom}_pecham_{k}", px, py, hauteur(r) - 0.004,
+                            (0.016 + 0.016 * alea(cle, 3), 0.012 + 0.008 * alea(cle, 4), 0.01), "70_Kelim",
+                            MAT_BOIS_CHARBON(), 5)
+        pecham["sans_biseau"] = True
+
 # Menora : 18 tefa'him, 7 branches dans le plan N-S, trois marches devant
 YM = -7.5
 for i in range(3):
@@ -285,3 +428,5 @@ def kuz(nom, x, y, z):
 
 menora("Menora", XU, YM, allumee=True)
 kuz("Menora_kuz", XU + 1.8, YM + 0.9, Z_BAT + 0.6)
+mizbeach_hazahav("Mizbeach_Zahav")
+teni("Mizbeach_Zahav_teni", XZ + DEMI_Z + 0.55, YZ - 0.15)

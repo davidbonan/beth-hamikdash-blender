@@ -879,14 +879,14 @@
     },
     "mizbeach_hazahav": {
       "min": [
-        -57.36000061035156,
+        -57.380001068115234,
         2.880000114440918,
-        -0.23999999463558197
+        -0.303600013256073
       ],
       "max": [
-        -56.880001068115234,
-        3.9119999408721924,
-        0.23999999463558197
+        -56.46959686279297,
+        3.8399999141693115,
+        0.303600013256073
       ]
     },
     "mukhni": {
@@ -2411,12 +2411,6 @@
       "echelle": 2.25,
       "secondes": 29
     },
-    "heikhal": {
-      "carte": "lumiere/heikhal.webp",
-      "canal": 0,
-      "echelle": 4.0,
-      "secondes": 18
-    },
     "kevashim_ketanim": {
       "carte": "lumiere/kevashim_ketanim.webp",
       "canal": 0,
@@ -2806,6 +2800,12 @@
       "canal": 1,
       "echelle": 2.25,
       "secondes": 5
+    },
+    "heikhal": {
+      "carte": "lumiere/heikhal.webp",
+      "canal": 0,
+      "echelle": 4.0,
+      "secondes": 19
     }
   },
   "empreintes": {
@@ -2882,7 +2882,7 @@
     "mesiba": "c87d7abecec979bf62cf28b72e06e35f53a8c7db",
     "mesiba_bira": "e664c3e21c65fe6efeb7c414a1d2e1615e704a3d",
     "mizbeach": "23fcfb62885347b9d290193abaddd6fe2e05c3c5",
-    "mizbeach_hazahav": "c739c5a6df7d5ee457cb7ce3721ce18572510798",
+    "mizbeach_hazahav": "2e5d33c98a25aa1503cfcf3c3cf871cdcd1edf32",
     "mukhni": "3917b768516268879eb8533d41d54eda33209b18",
     "mur_har_habayit": "79db018e9721147af0325de622fad3bcc73ce582",
     "mur_herode": "52e4116326bccee833806474742a16f8817b9ba8",

@@ -399,7 +399,7 @@ def _mizrak_en_main(nom, geste, ou, cap, duree):
 
 # « מַתְחִיל … מִקֶּרֶן מִזְרָחִית צְפוֹנִית » (Yoma 5:5) ; il fait le tour de l'autel et donne sur les cornes « מִבַּחוּץ …
 # מִלְּמַטָּן לְמַעְלָן » (Rambam Avodat Yom HaKippourim 4:2) : à l'angle nord-est, le doigt monte le long de la corne.
-KEREN_MIZRAHIT_TZEFONIT = (-118.55, 0.40, 8.05)
+KEREN_MIZRAHIT_TZEFONIT = (-118.48, 0.42, 7.84)
 MIZBEACH_HAZAHAV_OU = (-117.6, 1.5, Z_BAT)
 MIZBEACH_HAZAHAV_CAP = 215.0
 
