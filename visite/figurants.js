@@ -24,7 +24,7 @@ export const TROUPE_LIBRE = "figures";
 const MARGE_GESTE = 0.35;
 const HAUTEUR_FLAMME_TORCHE = 0.3;
 
-export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, alleger, obstacles, horsGeometrie,
+export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir, obstacles, horsGeometrie,
   distributions, conceptDe, lampesPosees }) {
   const troupes = {};
   const chargements = {};
@@ -185,7 +185,7 @@ export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, d
       scene.add(troupe.scene);
       troupe.scene.updateMatrixWorld(true);
       troupes[nom] = troupe;
-      alleger(troupe.scene);
+      accueillir(troupe.scene);
       suivreTorches(troupe);
       montrerTroupes();
     });

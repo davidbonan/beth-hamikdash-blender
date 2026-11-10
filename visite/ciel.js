@@ -19,6 +19,8 @@
  * réfléchir pour en être un : une arête.
  */
 import * as THREE from "three";
+import { FullScreenQuad } from "three/addons/postprocessing/Pass.js";
+import { PROFIL } from "./qualite.js";
 
 // Vingt degrés au-dessus de l'horizon, à l'est : l'axe de l'avoda, et l'heure du
 // tamid du matin. L'angle n'est pas un détail d'ambiance — c'est lui qui décide si la
@@ -55,8 +57,11 @@ const AIR = { densite: 4e-3, epaisseur: 110, effacement: [3800, 5600], pres: 150
               froid: [0.90, 0.94, 1.06], chaud: [1.20, 1.08, 0.92] };
 
 const HALO_DU_SOLEIL = [1.00, 0.84, 0.58];
+// Les nuages n'existent que sur le dôme VU : `couverture` 0..1, `lumiere` la face tournée vers l'astre, `ombre` l'autre, `argent` le liseré.
+const SANS_NUAGE = { couverture: 0, lumiere: 0x000000, ombre: 0x000000, argent: 0x000000 };
 const VU = { haut: 0x2f5fa6, bas: 0xa8c6e6, sol: 0xa89c86, ambiance: 1.0,
-             soleil: 2.2, etendue: 7e-5, horizon: 6.0, halo: HALO_DU_SOLEIL, etoiles: 0, rayons: 1 };
+             soleil: 2.2, etendue: 7e-5, horizon: 6.0, halo: HALO_DU_SOLEIL, etoiles: 0, rayons: 1,
+             nuages: { couverture: 0.62, lumiere: 0xfff3e2, ombre: 0x8aa2c4, argent: 0xffe2b0 } };
 // Le dôme ÉCLAIRANT tient trois réglages que la scène ne sait pas calculer seule.
 //
 // `ambiance` pèse sur le dégradé et jamais sur le disque : c'est le rapport du soleil à
@@ -83,17 +88,19 @@ const ECLAIRANT = { haut: 0xb2aa9c, bas: 0xe0d9c9, sol: 0xcdc0a8, ambiance: 0.45
 // La nuit après le premier jour de Souccot (Soucca 5:2) : le 16 Tishri, la lune est pleine et
 // se lève à l'est au coucher du soleil. Elle prend donc la place du soleil du matin, disque compris.
 const VU_NUIT = { haut: 0x0a1222, bas: 0x1a2436, sol: 0x121212, ambiance: 1.0,
-                  soleil: 1.4, etendue: 7e-5, horizon: 6.0, halo: [0.05, 0.06, 0.08], etoiles: 0.8, rayons: 0.25 };
+                  soleil: 1.4, etendue: 7e-5, horizon: 6.0, halo: [0.05, 0.06, 0.08], etoiles: 0.8, rayons: 0.25,
+                  nuages: { couverture: 0.35, lumiere: 0x1a2440, ombre: 0x060b16, argent: 0x6a7ca0 } };
 const ECLAIRANT_NUIT = { haut: 0x1e2636, bas: 0x262e3c, sol: 0x2a2620, ambiance: 0.45,
                          soleil: 0.25, etendue: 1.6e-3, horizon: 26.0, halo: [0.02, 0.02, 0.03], etoiles: 0 };
 // Avant l'aube d'un jour quelconque : sans lune, la phase n'en étant pas connue.
 const VU_AVANT_L_AUBE = { haut: 0x04070e, bas: 0x0a101c, sol: 0x0a0a0a, ambiance: 1.0,
-                          soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0, 0, 0], etoiles: 1.0, rayons: 0 };
+                          soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0, 0, 0], etoiles: 1.0, rayons: 0, nuages: SANS_NUAGE };
 const ECLAIRANT_AVANT_L_AUBE = { haut: 0x0e121a, bas: 0x12161e, sol: 0x14120e, ambiance: 0.45,
                                  soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0, 0, 0], etoiles: 0 };
 // « הֵאִיר פְּנֵי כָל הַמִּזְרָח » (Tamid 3:2) : l'est s'éclaire, le soleil n'est pas levé.
 const VU_AUBE = { haut: 0x1c2a44, bas: 0x6e7688, sol: 0x2a2826, ambiance: 1.0,
-                  soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0.55, 0.36, 0.20], etoiles: 0.15, rayons: 0 };
+                  soleil: 0, etendue: 7e-5, horizon: 6.0, halo: [0.55, 0.36, 0.20], etoiles: 0.15, rayons: 0,
+                  nuages: { couverture: 0.55, lumiere: 0x9a7c82, ombre: 0x2c3450, argent: 0xc88c68 } };
 const ECLAIRANT_AUBE = { haut: 0x3a4152, bas: 0x565c68, sol: 0x4a463e, ambiance: 0.45,
                          soleil: 0, etendue: 1.6e-3, horizon: 26.0, halo: [0.30, 0.20, 0.12], etoiles: 0 };
 // Au chant du coq du 16 Tishri (Soucca 5:4), la même lune pleine se couche à l'ouest.
@@ -126,15 +133,82 @@ const DEGRADE = /* glsl */`
     return c + halo * (0.10 * pow(s, 4.0) + 0.45 * pow(s, 160.0));
   }`;
 
+// Le plan haut où le dôme projette ses nuages : la perspective y resserre le motif vers l'horizon.
+const PLAN_DES_NUAGES = { hauteur: 0.10, echelle: 0.55 };
+const DEMI_CHAMP = PLAN_DES_NUAGES.echelle / PLAN_DES_NUAGES.hauteur;
+
+// Les deux bruits des nuages, le voile et les cirrus, cuits une fois sur ce plan : quarante bruits par pixel de ciel, que le dôme ne paie plus à chaque image.
+const CHAMP_DES_NUAGES = /* glsl */`
+  varying vec2 vUv;
+  float hash2(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float bruit2(vec2 p){
+    vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash2(i), hash2(i + vec2(1.0, 0.0)), f.x),
+               mix(hash2(i + vec2(0.0, 1.0)), hash2(i + vec2(1.0, 1.0)), f.x), f.y);
+  }
+  float fractal(vec2 p){
+    float a = 0.5, t = 0.0;
+    for (int k = 0; k < 5; k++) { t += a * bruit2(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p; a *= 0.5; }
+    return t;
+  }
+  void main(){
+    vec2 p = (vUv * 2.0 - 1.0) * ${DEMI_CHAMP.toFixed(3)};
+    vec2 q = p + 1.7 * vec2(fractal(p * 0.6 + 5.3), fractal(p * 0.6 + 1.9));
+    gl_FragColor = vec4(fractal(q * 0.9), fractal(vec2(q.x * 0.28, q.y * 1.9) + 11.0), 0.0, 1.0);
+  }`;
+
+// Le nuage se lit dans le champ cuit, et s'éclaire en relisant ce champ un cran vers l'astre.
+const NUAGES = /* glsl */`
+  uniform sampler2D champNuages;
+  uniform vec3 nuageLumiere, nuageOmbre, nuageArgent;
+  uniform float couverture;
+  float epaisseurNuage(vec2 p){
+    vec2 champ = texture2D(champNuages, p / ${(2 * DEMI_CHAMP).toFixed(3)} + 0.5).rg;
+    float seuil = 0.78 - 0.5 * couverture;
+    return clamp(smoothstep(seuil, seuil + 0.30, champ.r)
+               + 0.55 * smoothstep(seuil + 0.02, seuil + 0.32, champ.g) * (1.0 - couverture * 0.4), 0.0, 1.0);
+  }
+  vec3 nuager(vec3 ciel, vec3 d, vec3 astre){
+    float h = max(d.y, 0.0);
+    vec2 p = d.xz / (h + ${PLAN_DES_NUAGES.hauteur.toFixed(3)}) * ${PLAN_DES_NUAGES.echelle.toFixed(3)};
+    float epais = epaisseurNuage(p);
+    float derriere = epaisseurNuage(p + normalize(astre.xz + 1e-4) * 0.12);
+    float eclaire = clamp(0.55 + 2.2 * (epais - derriere), 0.0, 1.0);
+    vec3 corps = mix(nuageOmbre, nuageLumiere, eclaire)
+               + nuageArgent * pow(max(dot(d, astre), 0.0), 10.0) * (1.0 - epais * 0.6) * 0.6;
+    float opacite = epais * (0.55 + 0.45 * smoothstep(0.0, 0.5, h)) * smoothstep(0.0, 0.07, h) * step(1e-3, couverture);
+    return mix(ciel, corps, opacite);
+  }`;
+
+let champCuit = null;
+// À refaire après une perte de contexte, qui vide la cible.
+export function cuireLesNuages(renderer) {
+  champCuit ??= new THREE.WebGLRenderTarget(PROFIL.textures.nuages, PROFIL.textures.nuages, {
+    type: THREE.HalfFloatType, depthBuffer: false, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
+  const plan = new FullScreenQuad(new THREE.ShaderMaterial({
+    vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }",
+    fragmentShader: CHAMP_DES_NUAGES,
+  }));
+  const cible = renderer.getRenderTarget();
+  renderer.setRenderTarget(champCuit);
+  plan.render(renderer);
+  renderer.setRenderTarget(cible);
+  plan.material.dispose();
+  plan.dispose();
+  return champCuit.texture;
+}
+
 export const astreDu = (moment) => CIELS[moment].astre ?? SOLEIL;
 export const lumieresDu = (moment) => CIELS[moment].lumieres;
 export const rayonsDu = (moment) => CIELS[moment].vu.rayons;
 
 function dome(rayon, teintes, astre = SOLEIL) {
+  const { nuages } = teintes;
   return new THREE.Mesh(
     new THREE.SphereGeometry(rayon, 64, 32),
     new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false, fog: false,
+      defines: nuages ? { NUAGES: "" } : {},
       uniforms: { hautCiel: { value: new THREE.Color(teintes.haut) },
                   basCiel: { value: new THREE.Color(teintes.bas) },
                   solCiel: { value: new THREE.Color(teintes.sol) },
@@ -144,7 +218,12 @@ function dome(rayon, teintes, astre = SOLEIL) {
                   etendue: { value: teintes.etendue },
                   horizon: { value: teintes.horizon },
                   halo: { value: new THREE.Vector3(...teintes.halo) },
-                  etoiles: { value: teintes.etoiles } },
+                  etoiles: { value: teintes.etoiles },
+                  ...(nuages && { champNuages: { value: null },
+                                  couverture: { value: nuages.couverture },
+                                  nuageLumiere: { value: new THREE.Color(nuages.lumiere) },
+                                  nuageOmbre: { value: new THREE.Color(nuages.ombre) },
+                                  nuageArgent: { value: new THREE.Color(nuages.argent) } }) },
       vertexShader: /* glsl */`
         varying vec3 vD;
         void main(){ vD = position;
@@ -155,10 +234,16 @@ function dome(rayon, teintes, astre = SOLEIL) {
         uniform float ambiance, soleil, etendue, horizon, etoiles;
         varying vec3 vD;
         ${DEGRADE}
+        #ifdef NUAGES
+        ${NUAGES}
+        #endif
         void main(){
           vec3 d = normalize(vD);
           float s = max(dot(d, dirSoleil), 0.0);
           vec3 c = degradeCiel(d.y, s, hautCiel, basCiel, solCiel, ambiance, horizon, halo);
+          #ifdef NUAGES
+            c = nuager(c, d, dirSoleil);
+          #endif
           c += vec3(1.00, 0.95, 0.86) * soleil
              * smoothstep(1.0 - etendue, 1.0 - 0.3 * etendue, s);
           vec3 q = d * 420.0;
@@ -170,8 +255,9 @@ function dome(rayon, teintes, astre = SOLEIL) {
     }));
 }
 
-export function domeVu(rayon) {
+export function domeVu(renderer, rayon) {
   const m = dome(rayon, VU);
+  m.material.uniforms.champNuages.value = cuireLesNuages(renderer);
   m.frustumCulled = false;
   return m;
 }
@@ -201,6 +287,11 @@ export function peindreDome(domeVu, moment) {
   for (const cle of ["ambiance", "soleil", "etendue", "horizon", "etoiles"]) uniforms[cle].value = teintes[cle];
   uniforms.halo.value.set(...teintes.halo);
   uniforms.dirSoleil.value = astreDu(moment);
+  const { nuages } = teintes;
+  uniforms.couverture.value = nuages.couverture;
+  uniforms.nuageLumiere.value.set(nuages.lumiere);
+  uniforms.nuageOmbre.value.set(nuages.ombre);
+  uniforms.nuageArgent.value.set(nuages.argent);
 }
 
 // Le voile est tiré du ciel de jour ; la couleur de la brume le ramène à celui du moment.
