@@ -7,7 +7,7 @@ from ..primitives.matieres import (MAT_BRONZE, MAT_CEDRE, MAT_CHENE_SCULPTE, MAT
 from ..primitives.volumes import (alea, box, chaine, cone, courbe, cyl, cyl_between, limbe, plage, plaque,
                                   revolution, sphere, tore)
 from ..primitives.ouvrages import (EPAISSEUR_PLACAGE, MAAKE_H, ROVAD_SAILLIE, couches_middot, escalier,
-                                   massif_evide, paroi_percee, rovadim)
+                                   massif_evide, paroi_percee, rovadim, table_de_service)
 from ..azara import H_PISHPESH
 
 
@@ -187,8 +187,8 @@ for k, y in enumerate((-24, -13, 13, 24)):
     chaine(f"Ulam_sharsheret_{k}", (BX_E - 10.5, y, Z_BAT + 39.4), (BX_E - 10.5, y, Z_BAT + 3.5),
            0.24, "40_Ulam", MAT_OR(), tube=0.075, majeur=8, mineur=5)
 # Deux tables de l'Oulam (marbre au nord... CHOIX : marbre à droite en entrant = nord ; or au sud)
-box("Ulam_table_marbre", -90, -88, 5.5, 6.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_MARBRE())
-box("Ulam_table_or", -90, -88, -6.5, -5.5, Z_BAT, Z_BAT + 1.5, "40_Ulam", MAT_OR())
+table_de_service("Ulam_table_marbre", (-90, -88, 5.5, 6.5), Z_BAT, 1.5, "40_Ulam", MAT_MARBRE())
+table_de_service("Ulam_table_or", (-90, -88, -6.5, -5.5), Z_BAT, 1.5, "40_Ulam", MAT_OR())
 # Ya'hin et Boaz (Melakhim I 7:15-22 ; Yirmiyahou 52:21-23 ; Divrei HaYamim II 3:15-17).
 # Fût : 18 amot, donné trois fois et sans divergence — Melakhim I 7:15, Yirmiyahou 52:21,
 # Melakhim II 25:17. Les 35 amot de Divrei HaYamim II 3:15 ne sont pas la hauteur d'une

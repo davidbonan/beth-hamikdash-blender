@@ -10,6 +10,7 @@ from .primitives.matieres import (MAT_ARGENT, MAT_BOIS_CHARBON, MAT_BOIS_MAARAKH
 from .primitives.volumes import (_objet, _poser, alea, box, braises, cone, crochet, cyl, cyl_between, lampe, link_to,
                                  massif_en_pente, mesh_from_pydata, revolution, sphere, tore, wedge_ramp,
                                  wedge_ramp_oblique)
+from .primitives.ouvrages import table_de_service
 
 
 # ----------------------------------------------------------------------------
@@ -260,8 +261,8 @@ wedge_ramp_oblique("Kevesh_katan_yessod", KX0 - 2, MX0, 2, KY0, MY0 - NIMA - BOS
 # « וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף; עַל שֶׁל שַׁיִשׁ הָיוּ נוֹתְנִים אֶת הָאֵבָרִים, עַל
 # שֶׁל כֶּסֶף כְּלֵי שָׁרֵת » (Shekalim 6:4 ; Rambam 2:15). Cotes, celles des tables du Beit
 # HaMitba'haïm ; place, à l'ouest de la rampe du yessod : CHOIX.
-box("Kevesh_shulchan_shaish", KX0 - 8.5, KX0 - 7.5, MY0 - 20, MY0 - 18, Z_AZ, Z_AZ + 1.5, "30_Mizbeach", MAT_MARBRE())
-box("Kevesh_shulchan_kessef", KX0 - 8.5, KX0 - 7.5, MY0 - 15, MY0 - 13, Z_AZ, Z_AZ + 1.5, "30_Mizbeach", MAT_ARGENT())
+table_de_service("Kevesh_shulchan_shaish", (KX0 - 8.5, KX0 - 7.5, MY0 - 20, MY0 - 18), Z_AZ, 1.5, "30_Mizbeach", MAT_MARBRE())
+table_de_service("Kevesh_shulchan_kessef", (KX0 - 8.5, KX0 - 7.5, MY0 - 15, MY0 - 13), Z_AZ, 1.5, "30_Mizbeach", MAT_ARGENT())
 # « הָפַךְ פָּנָיו לַצָּפוֹן, הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת. צָבַר אֶת הַגֶּחָלִים עַל גַּבֵּי הָרִצְפָה רָחוֹק
 # מִן הַכֶּבֶשׁ שְׁלשָׁה טְפָחִים » (Tamid 1:4) : trois tefa'him, une demi-ama. Taille du tas : CHOIX.
 cone("Kevesh_makom_deshen", KX1 + 1.5, KY0 + 10, Z_AZ, Z_AZ + 0.5, 1.0, 0.2, "30_Mizbeach", MAT_CENDRE(), verts=16)
@@ -420,7 +421,7 @@ for i in range(8):
     for sens, face in ((-1, "O"), (1, "E")):
         for rang, z in enumerate((Z_AZ + 3.25, Z_AZ + 3.6, Z_AZ + 3.95)):
             crochet(f"Pilier_{i}_crochet_{face}{rang}", x + sens * 0.7, 53.2 + (rang - 1) * 0.35, z, sens, "30_Mizbeach")
-    box(f"Table_marbre_{i}", x - 0.5, x + 0.5, 42, 44, Z_AZ, Z_AZ + 1.5, "30_Mizbeach", MAT_MARBRE())
+    table_de_service(f"Table_marbre_{i}", (x - 0.5, x + 0.5, 42, 44), Z_AZ, 1.5, "30_Mizbeach", MAT_MARBRE())
 for r in range(4):
     for c in range(6):
         x = MX1 - 4 - c * 4.8

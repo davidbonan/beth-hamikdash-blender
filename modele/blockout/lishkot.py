@@ -14,7 +14,7 @@ from .primitives.gravures import petur_tzitz
 from .primitives.ouvrages import (ECART_LISHKA, LISHKA_CORNICHE, LISHKA_DEBORD, LISHKA_PAREMENT, LISHKA_SOCLE,
                                   MESIBA_PORTE, PORTE_LISHKA, PORTE_SHAAR, Porte, aliyah, dalle_percee,
                                   dalle_trouee, escalier, escalier_a_vis, kippa, lishka, maake, medura,
-                                  moulure, paroi_percee, puits_de_mesiba, terrasse_de_porte)
+                                  moulure, paroi_percee, puits_de_mesiba, table_de_service, terrasse_de_porte)
 from .azara import (AX1, AXE_MUR_N, AY0, AY1, GAZIT_X0, GAZIT_X1, GOLA_X0, GOLA_X1, H_PISHPESH, MOKED_X0,
                     MOKED_X1, NORD_INT, NORD_Y0, NORD_Y1, PISHPESHIM, PORTE_MAYIM, PORTE_MOKED, PORTE_NITZOTZ,
                     POURTOUR_Y1, SAILLIE, SAILLIE_INT, T, X_DOUKHAN)
@@ -142,8 +142,8 @@ for n, z in enumerate((0.5, 1.1, 1.7)):
 # table, au format du pain, « אָרְכָּן עֲשָׂרָה וְרָחְבָּן חֲמִשָּׁה, וְקַרְנוֹתָיו שֶׁבַע אֶצְבָּעוֹת » (11:4), et la pelle
 # qui le retire. Four, pelle, fer des moules : CHOIX.
 SE = KITONOT["SE"]
-box("Beit_HaMoked_kiton_SE_table", SE.x1 - 1.5, SE.x1, SE.y0 + 0.3, SE.y0 + 4.1,
-    Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
+table_de_service("Beit_HaMoked_kiton_SE_table", (SE.x1 - 1.5, SE.x1, SE.y0 + 0.3, SE.y0 + 4.1),
+                 Z_AZ, 1.5, "80_Lishkot", MAT_MARBRE())
 TFUS_L, TFUS_P, TFUS_H, TFUS_EP = 10 * TEFAH, 5 * TEFAH, 7 / 4 * TEFAH, 0.04
 TFUS_X = SE.x1 - 0.75
 for n in range(2):
@@ -765,8 +765,8 @@ aliyah("BeitAvtinas", BA_X0, BA_X1, BA_Y0, BA_Y1, BA_Z0, 12,
 # (Avot deRabbi Natan 41:12) ; les sammanim pesés « במשקל מכוון », chacun pilé à part (Rambam
 # Klei HaMikdash 2:2, 2:5). Table, balance, bols, formes et matières : CHOIX.
 AV_X0, AV_X1, AV_Y0, AV_Z = BA_X0 + 1, BA_X1 - 1, BA_Y0 + 1, BA_Z0 + 1
-box("BeitAvtinas_table", AV_X0 + 0.2, AV_X0 + 2.2, AV_Y0 + 3, AV_Y0 + 9, AV_Z, AV_Z + 1.5,
-    "80_Lishkot", MAT_MARBRE())
+table_de_service("BeitAvtinas_table", (AV_X0 + 0.2, AV_X0 + 2.2, AV_Y0 + 3, AV_Y0 + 9), AV_Z, 1.5,
+                 "80_Lishkot", MAT_MARBRE())
 for k in range(11):
     x, y = AV_X0 + 0.7, AV_Y0 + 3.5 + 0.5 * k
     revolution(f"BeitAvtinas_sam_{k:02d}", x, y, AV_Z + 1.5,
@@ -925,8 +925,8 @@ revolution("Lishkat_Osei_Chavitin_machvat", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.25
 # « מְחַלֵּק הַשְּׁלֹשָׁה לוֹגִין בִּרְבִיעִית שֶׁבַּמִּקְדָּשׁ », « נִמְצְאוּ שְׁתֵּים עֶשְׂרֵה חַלּוֹת », puis « קוֹלֶה אוֹתָהּ עַל
 # הַמַּחֲבַת ». Sur la table : les douze galettes, les deux mesures, la jarre des trois log ; une galette
 # sur la ma'havat. Formes, bronze des mesures, places : CHOIX.
-box("Lishkat_Osei_Chavitin_table", AX1 - 1.6, AX1 - 0.2, OC_Y0 + 3.4, OC_Y0 + 7,
-    Z_EZI, Z_EZI + 1.5, "80_Lishkot", MAT_MARBRE())
+table_de_service("Lishkat_Osei_Chavitin_table", (AX1 - 1.6, AX1 - 0.2, OC_Y0 + 3.4, OC_Y0 + 7),
+                 Z_EZI, 1.5, "80_Lishkot", MAT_MARBRE())
 cyl("Lishkat_Osei_Chavitin_machvat_halla", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.29, Z_EZI + 1.36, 0.3,
     "80_Lishkot", MAT_LECHEM(), verts=16)
 Z_TABLE_CHAVITIN = Z_EZI + 1.5
@@ -1032,8 +1032,8 @@ dalle_trouee("Lishkat_HaMedichin_auge", MD_X0 + 1.5, MD_X1 - 1.5, SUD_INT[0], SU
              Z_AZ, Z_AZ + 1.2, AUGE, "80_Lishkot")
 box("Lishkat_HaMedichin_auge_eau", *AUGE, Z_AZ, Z_AZ + 0.9, "80_Lishkot", MAT_EAU())
 for cote, xa in (("O", MD_X0), ("E", MD_X1 - 1.5)):
-    box(f"Lishkat_HaMedichin_table_{cote}", xa, xa + 1.5, SUD_INT[0] + 3.5, SUD_INT[0] + 7,
-        Z_AZ, Z_AZ + 1.5, "80_Lishkot", MAT_MARBRE())
+    table_de_service(f"Lishkat_HaMedichin_table_{cote}", (xa, xa + 1.5, SUD_INT[0] + 3.5, SUD_INT[0] + 7),
+                     Z_AZ, 1.5, "80_Lishkot", MAT_MARBRE())
     for k in range(2):
         revolution(f"Lishkat_HaMedichin_table_{cote}_keara_{k}", xa + 0.75, SUD_INT[0] + 4.3 + 1.9 * k, Z_AZ + 1.5,
                    [(0.0, 0.0), (0.3, 0.0), (0.55, 0.3), (0.5, 0.3), (0.27, 0.05), (0.0, 0.05)],

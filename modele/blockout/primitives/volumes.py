@@ -248,6 +248,15 @@ def revolution(name, x, y, z0, profil, col="20_Azara", mat=None, verts=32, capot
                                 debut[a + 1] + (k + 1) % n1, debut[a + 1] + k % n1]))
     return _lisser(mesh_from_pydata(name, sommets, faces, col, mat), verts)
 
+PLI_TOURNE = math.radians(31)
+
+def piece_tournee(name, x, y, z0, profil, col, mat=None, verts=64):
+    """`revolution` d'une pièce de tour ou de fonte : lisse le long du profil aussi, seuls ses plis de plus de trente degrés restent vifs."""
+    o = revolution(name, x, y, z0, profil, col, mat, verts)
+    o.data.set_sharp_from_angle(angle=PLI_TOURNE)
+    o["pli_vif"] = PLI_TOURNE
+    return o
+
 def revolution_axe(name, base, axe, profil, col, mat=None, verts=32, depart=None, forme=None):
     """`revolution` le long d'un axe quelconque partant de `base` (amot), même profil.
 

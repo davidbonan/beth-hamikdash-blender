@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 from .matieres import MAT_CEDRE, MAT_MARBRE_HERODE, braise
 from .parametres import m
-from .volumes import arc, box, braises, cyl, mesh_from_pydata, plage, prism, prism_x
+from .volumes import arc, box, braises, cyl, mesh_from_pydata, piece_tournee, plage, prism, prism_x
 from .gravures import largeur_gravure, timora
 
 
@@ -757,3 +757,28 @@ def ordre_de_pilastres(nom, paroi, travee, hauteur, col, reserve=(), mat=None,
         if any(u + demi > r0 and u - demi < r1 for r0, r1 in reserve):
             continue
         pilastre(f"{nom}_{i:03d}", paroi, u, *hauteur, col, mat, largeur=largeur, saillie=saillie)
+
+
+# Le pied d'une table de service, en (rayon, part de sa hauteur) : tore d'assise, panse, col, tailloir.
+PIED_DE_TABLE = ((0.25, 0.0), (0.27, 0.025), (0.25, 0.05), (0.18, 0.075), (0.155, 0.12), (0.175, 0.20), (0.21, 0.30),
+                 (0.215, 0.38), (0.19, 0.50), (0.14, 0.64), (0.115, 0.74), (0.115, 0.79), (0.16, 0.82), (0.17, 0.85),
+                 (0.13, 0.88), (0.15, 0.93), (0.22, 0.975), (0.24, 1.0))
+PLATEAU_DE_TABLE, CEINTURE_DE_TABLE, SOCLE_DE_TABLE = 0.16, 0.36, 0.10
+
+
+def table_de_service(name, emprise, z0, h, col, mat):
+    """Une table des cours, `emprise` (x0, x1, y0, y1) : plateau débordant, ceinture, deux pieds tournés sur leur socle. Forme : CHOIX.
+
+    La ceinture descend sous la hauteur où la visite tire son rayon de garde : sans elle on passerait entre les pieds.
+    """
+    x0, x1, y0, y1 = emprise
+    sous_plateau = z0 + h - PLATEAU_DE_TABLE
+    box(f"{name}_plateau", x0, x1, y0, y1, sous_plateau, z0 + h, col, mat)
+    box(f"{name}_ceinture", x0 + 0.07, x1 - 0.07, y0 + 0.07, y1 - 0.07, sous_plateau - CEINTURE_DE_TABLE, sous_plateau, col, mat)
+    en_long = y1 - y0 >= x1 - x0
+    centre, demi = ((x0 + x1) / 2, (y0 + y1) / 2), (max(x1 - x0, y1 - y0) / 2 - 0.45)
+    hauteur = h - PLATEAU_DE_TABLE - CEINTURE_DE_TABLE - SOCLE_DE_TABLE
+    for k, sens in enumerate((-1, 1)):
+        px, py = (centre[0], centre[1] + sens * demi) if en_long else (centre[0] + sens * demi, centre[1])
+        box(f"{name}_socle_{k}", px - 0.3, px + 0.3, py - 0.3, py + 0.3, z0, z0 + SOCLE_DE_TABLE, col, mat)
+        piece_tournee(f"{name}_pied_{k}", px, py, z0 + SOCLE_DE_TABLE, [(r, t * hauteur) for r, t in PIED_DE_TABLE], col, mat, verts=24)
