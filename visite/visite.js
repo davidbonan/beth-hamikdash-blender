@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, patinerLesMurs, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
+import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
@@ -151,7 +151,6 @@ scene.add(camera);
 // tout entière. Les flammes de la Menora non plus : elles ne sont pas une surface à ombrer.
 const horsGeometrie = [ciel];
 const rendu = chaine(renderer, scene, camera, horsGeometrie);
-patinerLesMurs(EMPRISES.get("azara"));
 const SALLES_DE_L_AZARA = ["heikhal", "oulam", "kodesh_hakodashim"];
 // Le Heikhal et le Kodesh HaKodashim en deçà du mur de façade, dont la cour voit les portes par l'Oulam.
 const sanctuaireClos = unirEmprises(EMPRISES, ["heikhal", "kodesh_hakodashim"]);
