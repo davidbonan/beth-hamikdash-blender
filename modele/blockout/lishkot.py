@@ -12,9 +12,10 @@ from .primitives.volumes import (alea, box, cone, cyl, cyl_between, empty, grave
                                  ner_sur_tablette, plaque, prism, revolution, sphere, tore)
 from .primitives.gravures import petur_tzitz
 from .primitives.ouvrages import (ECART_LISHKA, LISHKA_CORNICHE, LISHKA_DEBORD, LISHKA_PAREMENT, LISHKA_SOCLE,
-                                  MESIBA_PORTE, PORTE_LISHKA, PORTE_SHAAR, Porte, aliyah, dalle_percee,
+                                  MESIBA_PORTE, PORTE_LISHKA, PORTE_SHAAR, VANTAIL_EP, Porte, aliyah, dalle_percee,
                                   dalle_trouee, escalier, escalier_a_vis, kippa, lishka, maake, medura,
-                                  moulure, paroi_percee, puits_de_mesiba, table_de_service, terrasse_de_porte)
+                                  moulure, paroi_percee, puits_de_mesiba, table_de_service, terrasse_de_porte,
+                                  vantail)
 from .azara import (AX1, AXE_MUR_N, AY0, AY1, GAZIT_X0, GAZIT_X1, GOLA_X0, GOLA_X1, H_PISHPESH, MOKED_X0,
                     MOKED_X1, NORD_INT, NORD_Y0, NORD_Y1, PISHPESHIM, PORTE_MAYIM, PORTE_MOKED, PORTE_NITZOTZ,
                     POURTOUR_Y1, SAILLIE, SAILLIE_INT, T, X_DOUKHAN)
@@ -52,14 +53,14 @@ kippa("Beit_HaMoked_kippa", MOKED_X0, MOKED_X1, NORD_Y0, NORD_Y1, KIPPA_NAISSANC
 # הַמּוֹקֵד וּבֵין הָעֲזָרָה ») : « פֶּתַח קָטָן שֶׁבְּתוֹךְ גּוּפוֹ שֶׁל פֶּתַח גָּדוֹל » (Bartenura sur Tamid 1:3).
 # De jour le שער est ouvert (Tamid 3:7), ses deux vantaux d'or rabattus dans la salle ; le
 # guichet est dans le vantail ouest, fermé. Cotes du guichet, sens d'ouverture : CHOIX.
-VANTAIL_L, VANTAIL_EP = PORTE_SHAAR[0] / 2, 0.3
+VANTAIL_L = PORTE_SHAAR[0] / 2
 VANTAUX_Y = (MK_Y0, MK_Y0 + VANTAIL_L)
 PISHPASH = (MK_Y0 + 1.5, MK_Y0 + 3.5, Z_AZ + 0.3, Z_AZ + 4.8)
 VANTAIL_O = (PORTE_MOKED - VANTAIL_L - VANTAIL_EP, PORTE_MOKED - VANTAIL_L)
-paroi_percee("Beit_HaMoked_S_vantail_O", *VANTAIL_O, *VANTAUX_Y, Z_AZ, Z_AZ + PORTE_SHAAR[1], "80_Lishkot",
-             MAT_OR(), [PISHPASH])
-box("Beit_HaMoked_S_vantail_E", PORTE_MOKED + VANTAIL_L, PORTE_MOKED + VANTAIL_L + VANTAIL_EP, *VANTAUX_Y,
-    Z_AZ, Z_AZ + PORTE_SHAAR[1], "80_Lishkot", MAT_OR())
+vantail("Beit_HaMoked_S_vantail_O", ("y", VANTAIL_O[0], 1), *VANTAUX_Y, Z_AZ, PORTE_SHAAR[1], "80_Lishkot",
+        MAT_OR(), gond=VANTAUX_Y[0], guichet=PISHPASH)
+vantail("Beit_HaMoked_S_vantail_E", ("y", PORTE_MOKED + VANTAIL_L + VANTAIL_EP, -1), *VANTAUX_Y, Z_AZ,
+        PORTE_SHAAR[1], "80_Lishkot", MAT_OR(), gond=VANTAUX_Y[0])
 box("Beit_HaMoked_S_pishpash", VANTAIL_O[0] + 0.05, VANTAIL_O[1] - 0.05, PISHPASH[0] + 0.02, PISHPASH[1] - 0.02,
     PISHPASH[2] + 0.02, PISHPASH[3] - 0.02, "80_Lishkot", MAT_OR())
 tore("Beit_HaMoked_S_pishpash_tabaat", VANTAIL_O[1] + 0.02, PISHPASH[1] - 0.4, Z_AZ + 2.4, 0.18, 0.035,
@@ -925,21 +926,22 @@ revolution("Lishkat_Osei_Chavitin_machvat", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.25
 # « מְחַלֵּק הַשְּׁלֹשָׁה לוֹגִין בִּרְבִיעִית שֶׁבַּמִּקְדָּשׁ », « נִמְצְאוּ שְׁתֵּים עֶשְׂרֵה חַלּוֹת », puis « קוֹלֶה אוֹתָהּ עַל
 # הַמַּחֲבַת ». Sur la table : les douze galettes, les deux mesures, la jarre des trois log ; une galette
 # sur la ma'havat. Formes, bronze des mesures, places : CHOIX.
-table_de_service("Lishkat_Osei_Chavitin_table", (AX1 - 1.6, AX1 - 0.2, OC_Y0 + 3.4, OC_Y0 + 7),
+OC_TABLE = AX1 - 0.5    # la table se tient à une demi-ama du mur, devant le pishpesh nord de Nikanor et son vantail
+table_de_service("Lishkat_Osei_Chavitin_table", (OC_TABLE - 1.6, OC_TABLE - 0.2, OC_Y0 + 3.4, OC_Y0 + 7),
                  Z_EZI, 1.5, "80_Lishkot", MAT_MARBRE())
 cyl("Lishkat_Osei_Chavitin_machvat_halla", AX1 - 1.3, OC_Y0 + 1.5, Z_EZI + 1.29, Z_EZI + 1.36, 0.3,
     "80_Lishkot", MAT_LECHEM(), verts=16)
 Z_TABLE_CHAVITIN = Z_EZI + 1.5
 for k in range(12):
-    cyl(f"Lishkat_Osei_Chavitin_halla_{k:02d}", AX1 - 1.45 + 0.33 * (k % 4), OC_Y0 + 3.7 + 0.35 * (k // 4),
+    cyl(f"Lishkat_Osei_Chavitin_halla_{k:02d}", OC_TABLE - 1.45 + 0.33 * (k % 4), OC_Y0 + 3.7 + 0.35 * (k // 4),
         Z_TABLE_CHAVITIN, Z_TABLE_CHAVITIN + 0.06, 0.15, "80_Lishkot", MAT_LECHEM(), verts=12)
 for nom, y, r, h in (("chatzi_isaron", OC_Y0 + 5.6, 0.2, 0.3), ("reviit", OC_Y0 + 6.3, 0.07, 0.1)):
-    revolution(f"Lishkat_Osei_Chavitin_{nom}", AX1 - 0.6, y, Z_TABLE_CHAVITIN,
+    revolution(f"Lishkat_Osei_Chavitin_{nom}", OC_TABLE - 0.6, y, Z_TABLE_CHAVITIN,
                [(0.0, 0.0), (r, 0.0), (r, h), (0.88 * r, h), (0.88 * r, 0.03), (0.0, 0.03)],
                "80_Lishkot", MAT_BRONZE(), verts=16)
-cone("Lishkat_Osei_Chavitin_chatzi_isaron_solet", AX1 - 0.6, OC_Y0 + 5.6, Z_TABLE_CHAVITIN + 0.03,
+cone("Lishkat_Osei_Chavitin_chatzi_isaron_solet", OC_TABLE - 0.6, OC_Y0 + 5.6, Z_TABLE_CHAVITIN + 0.03,
      Z_TABLE_CHAVITIN + 0.36, 0.17, 0.05, "80_Lishkot", MAT_SOLET(), verts=12)
-revolution("Lishkat_Osei_Chavitin_kad_shemen", AX1 - 1.2, OC_Y0 + 6.0, Z_TABLE_CHAVITIN,
+revolution("Lishkat_Osei_Chavitin_kad_shemen", OC_TABLE - 1.2, OC_Y0 + 6.0, Z_TABLE_CHAVITIN,
            [(0.0, 0.0), (0.18, 0.02), (0.3, 0.3), (0.27, 0.55), (0.11, 0.7), (0.13, 0.78), (0.0, 0.76)],
            "80_Lishkot", MAT_TERRE_CUITE(), verts=14)
 box("Lishkat_Osei_Chavitin_foyer_rotchin", AX1 - 2.4, AX1 - 0.2, OC_Y1 - 2.6, OC_Y1 - 0.4,

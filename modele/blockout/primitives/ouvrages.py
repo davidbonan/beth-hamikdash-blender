@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 from .matieres import MAT_CEDRE, MAT_MARBRE_HERODE, braise
 from .parametres import m
-from .volumes import arc, box, braises, cyl, mesh_from_pydata, piece_tournee, plage, prism, prism_x
+from .volumes import arc, box, braises, cyl, mesh_from_pydata, piece_tournee, plage, prism, prism_x, tore
 from .gravures import largeur_gravure, timora
 
 
@@ -594,23 +594,97 @@ def massif_evide(name, x0, x1, y0, y1, z0, z1, vides, col, mat=None):
         box(f"{name}_{k:02d}", *bloc, col, mat)["sans_biseau"] = True
 
 
-def battants(name, x0, x1, y0, y1, z0, h, col, mat, largeur=10):
-    """Deux vantaux rabattus dans l'embrasure d'une porte percée dans un mur — ouverts,
-    comme ceux de Nikanor et du Heikhal. `x0..x1, y0..y1` : l'emprise de la baie dans
-    l'épaisseur du mur ; le vantail court le long du jambage, sur les trois quarts
-    de l'épaisseur, épais de 0,3 ama."""
-    large_en_x = (x1 - x0) >= (y1 - y0)   # baie d'un mur nord-sud : les jambages sont en x
-    if large_en_x:
-        u0, u1 = y0 + (y1 - y0) * 0.15, y1 - (y1 - y0) * 0.15
-        box(f"{name}_O", x0, x0 + 0.3, u0, u1, z0, z0 + h, col, mat)
-        box(f"{name}_E", x1 - 0.3, x1, u0, u1, z0, z0 + h, col, mat)
-    else:
-        u0, u1 = x0 + (x1 - x0) * 0.15, x1 - (x1 - x0) * 0.15
-        box(f"{name}_S", u0, u1, y0, y0 + 0.3, z0, z0 + h, col, mat)
-        box(f"{name}_N", u0, u1, y1 - 0.3, y1, z0, z0 + h, col, mat)
-
-
 EPAISSEUR_PLACAGE = 0.1   # amot : l'or est une feuille, la boîte doit rester visible
+
+# Un שער a ses vantaux — « כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם » (Middot 2:3) — sur un pivot (Rambam sur Middot 2:3, « ציר השער »).
+# Cadre, panneaux, clous et anneau : CHOIX (Beit HaBe'hira 1:11), sans figure, que le corpus réserve aux portes du Bayit.
+VANTAIL_EP = 0.3
+VANTAIL_CADRE = 0.55
+VANTAIL_PANNEAU = 3.6     # hauteur visée d'un panneau
+VANTAIL_RELIEF = 0.12     # saillie du cadre sur l'âme ; le panneau en prend la moitié
+VANTAIL_CLOU = 0.15
+VANTAIL_PIVOT = 0.2
+
+
+def _hors_trou(rect, trou):
+    """Ce qui reste du rectangle `(u0, u1, zb, zh)` une fois retiré `trou`, en quatre morceaux au plus."""
+    u0, u1, zb, zh = rect
+    if trou is None or trou[0] >= u1 or trou[1] <= u0 or trou[2] >= zh or trou[3] <= zb:
+        return [rect]
+    t0, t1, tb, th = max(trou[0], u0), min(trou[1], u1), max(trou[2], zb), min(trou[3], zh)
+    morceaux = [(u0, u1, zb, tb), (u0, u1, th, zh), (u0, t0, tb, th), (t1, u1, tb, th)]
+    return [r for r in morceaux if r[1] - r[0] > 1e-6 and r[3] - r[2] > 1e-6]
+
+
+def vantail(nom, paroi, a0, a1, z0, h, col, mat, garniture=None, gond=None, guichet=None):
+    """Un vantail de `a0` à `a1` le long de `paroi` = (axe, cote de son dos, sens de sa face ouvragée).
+
+    Âme, cadre de montants et de traverses, panneaux en table saillante, clous de `garniture` aux
+    croisées, pivot sur le chant `gond`, anneau près du chant libre. `guichet` = (u0, u1, zb, zh) : la
+    baie d'un פִּשְׁפָּשׁ que l'âme laisse ouverte et que le décor contourne.
+    """
+    axe, cote, sens = paroi
+    garniture = garniture or mat
+
+    def pose(suffixe, rect, d0, d1, matiere):
+        for k, (u0, u1, zb, zh) in enumerate(_hors_trou(rect, guichet)):
+            ds = sorted((cote + sens * d0, cote + sens * d1))
+            bornes = (u0, u1, *ds) if axe == "x" else (*ds, u0, u1)
+            box(f"{nom}_{suffixe}{'' if k == 0 else f'_{k}'}", *bornes, zb, zh, col, matiere)
+
+    ep, c, r = VANTAIL_EP, VANTAIL_CADRE, VANTAIL_RELIEF
+    ds = sorted((cote, cote + sens * ep))
+    ame = (a0, a1, *ds) if axe == "x" else (*ds, a0, a1)
+    if guichet is None:
+        box(f"{nom}_ame", *ame, z0, z0 + h, col, mat)
+    else:
+        paroi_percee(f"{nom}_ame", *ame, z0, z0 + h, col, mat, [guichet])
+    colonnes = 2 if a1 - a0 >= 3.5 else 1
+    rangs = max(1, round((h - c) / VANTAIL_PANNEAU))
+    montants = [a0 + c / 2 + (a1 - a0 - c) * k / colonnes for k in range(colonnes + 1)]
+    traverses = [z0 + c / 2 + (h - c) * k / rangs for k in range(rangs + 1)]
+    for k, u in enumerate(montants):
+        pose(f"montant_{k}", (u - c / 2, u + c / 2, z0, z0 + h), ep, ep + r, mat)
+    for k, z in enumerate(traverses):
+        pose(f"traverse_{k}", (a0 + c, a1 - c, z - c / 2, z + c / 2), ep, ep + r, mat)
+    retrait = 0.25
+    for i, (ua, ub) in enumerate(zip(montants, montants[1:])):
+        for j, (za, zb) in enumerate(zip(traverses, traverses[1:])):
+            pose(f"panneau_{i}{j}", (ua + c / 2 + retrait, ub - c / 2 - retrait, za + c / 2 + retrait,
+                                     zb - c / 2 - retrait), ep, ep + r / 2, mat)
+    e = VANTAIL_CLOU
+    for i, u in enumerate(montants):
+        for j, z in enumerate(traverses):
+            tete = (u - e, u + e, z - e, z + e)
+            if _hors_trou(tete, guichet) == [tete]:
+                pose(f"clou_{i}{j}", tete, ep + r, ep + r + 0.08, garniture)
+    if gond is not None:
+        x, y = (gond, cote + sens * ep / 2) if axe == "x" else (cote + sens * ep / 2, gond)
+        cyl(f"{nom}_pivot", x, y, z0, z0 + h, VANTAIL_PIVOT, col, garniture, verts=12)
+    if guichet is not None or gond is None:
+        return
+    libre = a1 if abs(gond - a0) < abs(gond - a1) else a0
+    u = libre - math.copysign(1.0, libre - gond)
+    z = z0 + min(2.6, h / 3)
+    pose("anneau_platine", (u - 0.3, u + 0.3, z - 0.3, z + 0.3), ep + r, ep + r + 0.06, garniture)
+    d = cote + sens * (ep + r + 0.1)
+    x, y = (u, d) if axe == "x" else (d, u)
+    tore(f"{nom}_anneau", x, y, z - 0.35, 0.35, 0.06, col, garniture,
+         rotation=(math.pi / 2, 0, 0) if axe == "x" else (0, math.pi / 2, 0), majeur=24, mineur=8)
+
+
+def battants(nom, axe, centre, d0, d1, z0, h, col, mat, garniture=None, largeur=10):
+    """Les deux vantaux d'un שער ouvert, rabattus contre ses jambages, la face ouvragée vers le passage.
+
+    `axe` : celui le long duquel court le mur. `d0` : la face où ils pivotent ; ils courent jusqu'à `d1`,
+    dans l'épaisseur du mur et au-delà quand elle est plus mince qu'eux.
+    """
+    autre = "y" if axe == "x" else "x"
+    a0, a1 = sorted((d0, d1))
+    for cote, sens, cote_nom in ((centre - largeur / 2 + EPAISSEUR_PLACAGE, 1, "O" if axe == "x" else "S"),
+                                 (centre + largeur / 2 - EPAISSEUR_PLACAGE, -1, "E" if axe == "x" else "N")):
+        vantail(f"{nom}_{cote_nom}", (autre, cote, sens), a0, a1, z0, h, col, mat, garniture, gond=d0)
+
 
 # Encadrement d'un שער. Ce que les sources donnent à une porte du Temple, et rien de
 # plus : un LINTEAU — « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם הָיוּ לָהֶן שְׁקוֹפוֹת » (Middot 2:3), et c'est
@@ -634,6 +708,7 @@ CHAMBRANLE = 3.0          # largeur du jambage bâti, en amot
 # disputeraient le même plan sur toute la hauteur du jambage.
 CHAMBRANLE_NU = SAILLIE_MOULURE + 0.3
 CHAMBRANLE_LISERE = 0.5   # le filet qui le borde, et sa seconde ligne d'ombre
+CHAMBRANLE_FILET = 0.15   # largeur du filet de métal sur ses arêtes
 # La corniche qui couronne le chambranle sort plus que lui, comme le larmier d'un mur
 # sort de son nu et pour la même raison : c'est le ressaut le plus fort qui porte
 # l'ombre, et une porte qui n'en jette pas ne se voit pas du fond de la cour.
@@ -644,13 +719,16 @@ CHAMBRANLE_CORNICHE = 1.7        # sa hauteur, quand la place au-dessus de la ba
 # et se lisait posé sur le mur ; sur le cadre étroit d'un corps de porte, une timora à
 # cote fixe faisait de même.
 TIMORA_SUR_CADRE = 0.7
-# L'emprise d'un cadre de porte de part et d'autre de sa baie, corniche comprise.
-ENCADREMENT_SHAAR = CHAMBRANLE + CHAMBRANLE_LISERE + 0.4
+# « הָאַיִל מְזוּזוֹת חֲמִשִׁית » (Melakhim I 6:31) : « חמש צלעות זו לפנים מזו » (Radak), des ressauts emboîtés entre le chambranle et la baie.
+# Leur nombre croît avec la sainteté — « החמשית לדביר והרביעית להיכל… והראשונה לעזרה » (Ralbag) : un aux cours extérieures, deux à l'Azara.
+RESSAUT, RESSAUT_HAUT, RESSAUTS_MAX = 0.6, 0.4, 2
+# L'emprise d'un cadre de porte de part et d'autre de sa baie, ressauts et corniche compris.
+ENCADREMENT_SHAAR = RESSAUTS_MAX * RESSAUT + CHAMBRANLE + CHAMBRANLE_LISERE + 0.4
 
 
 def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
-          largeur=10, hauteur=20, cadre=CHAMBRANLE):
-    """L'encadrement bâti d'une porte : chambranle, corniche, timorim, or de la baie.
+          largeur=10, hauteur=20, cadre=CHAMBRANLE, ressauts=0, pied=None):
+    """L'encadrement bâti d'une porte : ressauts, chambranle, corniche, timorim, or de la baie.
 
     `paroi` : (axe, cote de la face, sens de la saillie) — la face EXTÉRIEURE, celle
     qu'on regarde en arrivant, dans le repère de `_repere`. Tout le bâti SORT du nu :
@@ -662,12 +740,16 @@ def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
     baie ; une porte cadrée des deux côtés en donne la moitié à chacune, et les deux
     plaques s'aboutent au milieu du mur au lieu de se recouvrir. `metal` : ce dont ce
     שער « a été changé » (Middot 2:3) — l'or partout, le bronze à Nikanor, rien pour un
-    פתח de chambre, qui n'est pas un שער.
+    פתח de chambre, qui n'est pas un שער. `ressauts` : de la baie au chambranle, de plus en plus saillants,
+    du métal de la baie. `pied` : où descendent les jambages quand le sol devant la face est plus bas que le seuil.
     """
     axe, cote, sens = paroi
     demi, haut = largeur / 2, z0 + hauteur
+    pied = z0 if pied is None else pied
     corniche = min(CHAMBRANLE_CORNICHE, (sommet - haut) * 0.55)
     tete = sommet - corniche
+    interieur, dessus = demi + ressauts * RESSAUT, haut + ressauts * RESSAUT_HAUT
+    assert dessus < tete, f"{nom} : {ressauts} ressauts ne tiennent pas sous la corniche"
     # La saillie suit la largeur du chambranle : un cadre étroit qui sortirait autant
     # qu'un large serait un boudin, et c'est celui d'un corps de porte qui le montrait.
     nu = CHAMBRANLE_NU * cadre / CHAMBRANLE
@@ -684,16 +766,23 @@ def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
     # cadre, ce sont ses DEUX lignes d'ombre — la même règle qu'aux corniches de
     # l'enceinte, et la même raison : sous un demi-pied de ressaut, un soleil rasant
     # n'écrit plus rien.
+    for k in range(1, ressauts + 1):
+        a, saillie = demi + k * RESSAUT, nu * k / (ressauts + 1)
+        for face, sortie in (("O", -1), ("E", 1)):
+            pose(f"ressaut_{k}_jambage_{face}", centre + sortie * (a - RESSAUT), centre + sortie * a,
+                 pied, haut + k * RESSAUT_HAUT, 0.0, saillie, metal)
+        pose(f"ressaut_{k}_traverse", centre - a, centre + a, haut + (k - 1) * RESSAUT_HAUT,
+             haut + k * RESSAUT_HAUT, 0.0, saillie, metal)
     for nommage, large, saillie in (("cadre", cadre, nu),
                                     ("lisere", cadre + CHAMBRANLE_LISERE, nu * 0.45)):
         for face, sortie in (("O", -1), ("E", 1)):
-            pose(f"{nommage}_jambage_{face}", centre + sortie * demi,
-                 centre + sortie * (demi + large), z0, tete, 0.0, saillie)
-        pose(f"{nommage}_traverse", centre - demi, centre + demi, haut, tete, 0.0, saillie)
+            pose(f"{nommage}_jambage_{face}", centre + sortie * interieur,
+                 centre + sortie * (interieur + large), pied, tete, 0.0, saillie)
+        pose(f"{nommage}_traverse", centre - interieur, centre + interieur, dessus, tete, 0.0, saillie)
     # Le larmier puis la couvertine qui se retire : les deux mêmes lignes d'ombre qu'aux
     # corniches de l'enceinte, et tout tient SOUS `sommet` — au-dessus commence le
     # couronnement du mur, qui sort davantage et avalerait ce qui monterait dedans.
-    debord = cadre + CHAMBRANLE_LISERE + 0.4
+    debord = interieur - demi + cadre + CHAMBRANLE_LISERE + 0.4
     pose("corniche_larmier", centre - demi - debord, centre + demi + debord,
          tete, sommet - 0.35, 0.0, nu * 1.5)
     pose("corniche_couvertine", centre - demi - debord + 0.3, centre + demi + debord - 0.3,
@@ -704,7 +793,7 @@ def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
     jambage = (axe, cote + sens * nu, sens)
     palmier = min(cadre * TIMORA_SUR_CADRE / largeur_gravure("timora"), hauteur * 0.4)
     for face, sortie in (("O", -1), ("E", 1)):
-        timora(f"{nom}_timora_{face}", jambage, centre + sortie * (demi + cadre / 2),
+        timora(f"{nom}_timora_{face}", jambage, centre + sortie * (interieur + cadre / 2),
                z0 + (hauteur - palmier) / 2, palmier, col, metal or mat)
     if metal is None:
         return
@@ -717,6 +806,17 @@ def shaar(nom, paroi, centre, z0, sommet, ebrasement, col, mat=None, metal=None,
         pose(f"or_jambage_{face}", centre + sortie * demi, centre + sortie * (demi - e),
              z0, haut, 0.0, -ebrasement, metal)
     pose("or_shkufa", centre - demi, centre + demi, haut - e, haut, 0.0, -ebrasement, metal)
+    # Filets du métal de la baie sur les arêtes du chambranle et au larmier, comme `FILET_OR` aux corniches : CHOIX (Beit HaBe'hira 1:11).
+    f, d = CHAMBRANLE_FILET, (nu - FILET_EPAISSEUR, nu + FILET_EPAISSEUR)
+    for face, sortie in (("O", -1), ("E", 1)):
+        pose(f"filet_baie_{face}", centre + sortie * interieur, centre + sortie * (interieur + f), pied, dessus + f,
+             *d, metal)
+        pose(f"filet_bord_{face}", centre + sortie * (interieur + cadre - f), centre + sortie * (interieur + cadre),
+             pied, tete, *d, metal)
+    pose("filet_shkufa", centre - interieur - f, centre + interieur + f, dessus, dessus + f, *d, metal)
+    milieu, moitie = (tete + sommet - 0.35) / 2, (sommet - 0.35 - tete) * FILET_PART / 2
+    pose("filet_larmier", centre - demi - debord - FILET_EPAISSEUR, centre + demi + debord + FILET_EPAISSEUR,
+         milieu - moitie, milieu + moitie, nu * 1.5 - FILET_EPAISSEUR, nu * 1.5 + FILET_EPAISSEUR, metal)
 
 
 # Pilastre engagé : fût, astragale, chapiteau. CHOIX (Rambam, Beit HaBe'hira 1:11). Sous

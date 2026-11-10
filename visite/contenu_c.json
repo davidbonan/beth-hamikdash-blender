@@ -173,15 +173,15 @@
   "shaar_shushan": {
     "he": "שער המזרחי — שושן הבירה",
     "translit": "Sha'ar HaMizrahi — Shushan HaBira",
-    "resume": "La porte orientale du Har HaBayit. Au-dessus d'elle est figurée Suse la capitale, tournée vers le mont des Oliviers. La visite en fait un bas-relief dans la pierre du mur : un rempart et trois tours crénelées.",
+    "resume": "La porte orientale du Har HaBayit. Au-dessus d'elle est figurée Suse la capitale, tournée vers le mont des Oliviers. La visite en fait un bas-relief dans la pierre du mur : un rempart à six tours crénelées, sa porte et la bira au milieu.",
     "cotes": [
       "au-dessus de la porte est du Har HaBayit, tournée vers le mont des Oliviers",
-      "un rempart et trois tours crénelées (choix de la visite)"
+      "un rempart à six tours crénelées, sa porte et la bira au milieu (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה"}
     ],
-    "note": "Choix de la visite : la Mishna dit que Suse était figurée au-dessus de la porte (Middot 1:3), sans dire comment. Le bas-relief — un rempart et trois tours — est dessiné pour la visite, comme la place de la porte sur l'axe du Temple : Middot ne situe pas les portes dans le mur."
+    "note": "Choix de la visite : la Mishna dit que Suse était figurée au-dessus de la porte (Middot 1:3), sans dire comment. Le bas-relief — le rempart, ses tours et la bira — est dessiné pour la visite, comme la place de la porte sur l'axe du Temple : Middot ne situe pas les portes dans le mur."
   },
 
   "tavla_helene": {

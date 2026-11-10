@@ -186,6 +186,8 @@
   "porte_est_ezrat_nashim": {
     "nom": "Eastern Gate of the Ezrat Nashim",
     "resume": "The Ezrat Nashim is entered from the east: one comes in through the eastern gate of the Har HaBayit, crosses the Cheil and climbs its twelve steps. Sukkah 5:4 calls this gate “the gate that goes out to the east”. To the west, the Gate of Nikanor opens onto the Ezrat Israel; the gates of the Har HaBayit, the Ezrat Nashim and the Azara, and the entrance of the Heikhal, are aligned.",
+    "cotes": ["two open gold leaves; gold fillets on the gate's frame and cornice (the tour's choice)",
+      "one recessed order between the opening and the frame; on the east side the frame runs down to the Har HaBayit (the tour's choice)"],
     "translit": "Sha'ar hayotze mizrach",
     "note": "Adopted: the Gate of Nikanor is the eastern gate of the Azara, which the Rambam (Beit HaBechirah 5:5) also calls Sha'ar HaElyon. Middot 2:6, however, lists a Sha'ar HaElyon among the southern gates; Tosfot Yom Tov (Middot 2:6) reports that the Yerushalmi applies the name to the eastern gate, but holds that the one in Middot 2:6 is in the south.",
     "sources": [
@@ -601,7 +603,10 @@
     "cotes": [
       "20 amot high × 10 wide (standard dimension of the gates of the Azara)",
       "two side pishpeshin, according to Abba Yossi ben Chanan (Middot 2:6)",
-      "bronze, against the gold of the other gates"
+      "bronze, against the gold of the other gates",
+      "open bronze leaves, folded back into the gateway; the pishpeshin, closed, are bronze too (form: the tour's choice)",
+      "two pillars of 60 amot on either side, rising from the floor of the Ezrat Nashim, with a bronze palm capital (after Ye'hezkel 40:14 and 40:16; the tour's choice)",
+      "two bronze recessed orders between the opening and the frame; on the east side the frame runs down to the floor of the Ezrat Nashim (the tour's choice)"
     ],
     "sources": [
       {
@@ -635,7 +640,7 @@
         "citation": "שָׁלשׁ לִפְתִיחַת שְׁעָרִים"
       }
     ],
-    "note": "Tour's choice: the gate is shown open, its leaves folded back into the gateway, as during the service; Sukkah 5:5 speaks only of trumpet blasts “for the opening of the gates”, without saying how long they stayed open. Closed, it would cut the line of sight that the low east wall is there to allow. The pishpeshin come from the list of thirteen gates of Abba Yossi ben Chanan (Middot 2:6); Middot 1:4 gives Nikanor two lishkot, those of Pinchas HaMalbish and of the Osei Chavitin. Set aside: R. Eliezer ben Yaakov (Yoma 38a), for whom it was a polished bronze, « נְחֹשֶׁת קְלוֹנִיתָא », that shone like gold."
+    "note": "Tour's choice: the gate is shown open, its leaves folded back into the gateway, as during the service; Sukkah 5:5 speaks only of trumpet blasts “for the opening of the gates”, without saying how long they stayed open. Closed, it would cut the line of sight that the low east wall is there to allow. The pishpeshin come from the list of thirteen gates of Abba Yossi ben Chanan (Middot 2:6); Middot 1:4 gives Nikanor two lishkot, those of Pinchas HaMalbish and of the Osei Chavitin. The pillars: « וַיַּעַשׂ אֶת אֵילִים שִׁשִּׁים אַמָּה » (Ye'hezkel 40:14), and Ye'hezkel 40:32 gives the inner gates the same measures; Ye'hezkel describes the future Temple, so raising them at Nikanor is a choice. The recessed orders follow the stepped jambs that Radak and Ralbag read in Melakhim I 6:31. Set aside: R. Eliezer ben Yaakov (Yoma 38a), for whom it was a polished bronze, « נְחֹשֶׁת קְלוֹנִיתָא », that shone like gold."
   },
   "azara": {
     "nom": "Azara",
@@ -678,11 +683,13 @@
   "portes_azara": {
     "nom": "North and South Gates of the Azara",
     "translit": "Sha'arei HaAzara",
-    "resume": "Seven gates pierce the wall of the Azara: three in the south, three in the north, and Nikanor in the east. They measure twenty amot high by ten wide. They are counted starting from the westernmost: in the south, Sha'ar HaDelek, Sha'ar HaBekhorot, then Sha'ar HaMayim, the easternmost; in the north, Sha'ar HaNitzotz, Sha'ar HaKorban, then Beit HaMoked.",
+    "resume": "Seven gates pierce the wall of the Azara: three in the south, three in the north, and Nikanor in the east. They measure twenty amot high by ten wide. They are counted starting from the westernmost: in the south, Sha'ar HaDelek, Sha'ar HaBekhorot, then Sha'ar HaMayim, the easternmost; in the north, Sha'ar HaNitzotz, Sha'ar HaKorban, then Beit HaMoked. All but Nikanor were changed to gold; the Rambam says it of the gates of the Azara: they are plated with gold if the means allow.",
     "cotes": [
       "7 gates: 3 in the south, 1 in the east, 3 in the north",
       "20 amot high × 10 wide",
-      "three gate structures 20 amot wide, projecting 12 amot beyond the wall (tour's choice, without source)"
+      "three gate structures 20 amot wide, projecting 12 amot beyond the wall (tour's choice, without source)",
+      "two gold leaves per gate, open and folded back into the thickness of the wall; stiles, panels, studs, pivot and ring (form: the tour's choice)",
+      "two gilded recessed orders between the opening and the frame, like the stepped jambs Radak and Ralbag read in Melakhim I 6:31 (the tour's choice)"
     ],
     "sources": [
       {
@@ -719,7 +726,8 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:4",
         "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב. וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"
-      }
+      },
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 2:3", "citation": "וזה שדקדק הרמב\"ם בספ\"א מהל' ב\"ה וכתב אפילו שערי העזרה מצפין אותן זהב אם מצאה ידם"}
     ],
     "note": "Adopted: seven gates, following Middot 1:4–5. Set aside: the thirteen gates of Abba Yossi ben Chanan (Middot 2:6, Shekalim 6:3); yet it is his list that gives the direction of counting, « סְמוּכִים לַמַּעֲרָב », which the Rambam (Beit HaBechirah 5:4) repeats without the names, while Middot 1:4–5 gives none. The southern names are in Middot 1:4, the northern ones in Middot 1:5; Yoma 19a reads Sha'ar HaDelaka and Sha'ar HaKorban in the south, without changing the place of Sha'ar HaMayim, and Sha'ar Beit HaMoked in the north. Tour's choice: the spacing of the gates, which no source gives — the Beit HaMoked, wider, is moved back five amot to the west —, and the 20 × 12 amot gate structure with its twenty steps, which have no source."
   },
@@ -2685,7 +2693,8 @@
     "cotes": [
       "two gates, in the south",
       "20 amot high × 10 wide (Middot 2:3); their position along the wall: the tour's choice",
-      "one palm tree per jamb (the tour's choice, after Ye'hezkel 40:26)"
+      "one palm tree per jamb (the tour's choice, after Ye'hezkel 40:26)",
+      "two bronze leaves, open toward the esplanade; a stone frame with a recessed order on each face of the wall (the tour's choice)"
     ],
     "sources": [
       {
@@ -2707,18 +2716,20 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:2",
         "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"
-      }
+      },
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
-    "note": "Tour's choice: the timorot on the jambs come from Ezekiel 40:26, which describes the future Temple; Middot says nothing of them."
+    "note": "Tour's choice: the timorot on the jambs come from Ezekiel 40:26, which describes the future Temple; Middot says nothing of them. The leaves: “all the openings had doors, except that of the Oulam” (Middot 2:3). Their bronze is a choice: gold, the Rambam states only of the gates of the Azara (cited by Tosfot Yom Tov on Middot 2:3)."
   },
   "shaar_tadi": {
     "nom": "Sha'ar Tadi",
     "translit": "Sha'ar Tadi",
-    "resume": "The gate of the north, “which served no purpose.” According to R. Eliezer ben Yaakov (Middot 1:9), it was nonetheless through it that the kohen who became impure during the night went out. It is also the only gate in the whole Temple whose head is not a lintel: instead of a shkufa laid across it, two stones leaning against each other rest at the top and leave a triangle open. The Mishna counts it among the five gates of the Har HaBayit (Middot 1:3), and notes this exception in Middot 2:3.",
+    "resume": "The gate of the north, “which served no purpose.” According to R. Eliezer ben Yaakov (Middot 1:9), it was nonetheless through it that the kohen who became impure during the night went out. It is also the only gate in the whole Temple whose head is not a lintel: instead of a shkufa laid across it, two stones leaning against each other rest at the top and leave a triangle open. The Mishna counts it among the five gates of the Har HaBayit (Middot 1:3), and notes this exception in Middot 2:3. Since it was not in use, the tour shows its bronze leaves closed: cut to the opening, they rise to a point beneath the two stones.",
     "cotes": [
       "in the north, out of service",
       "two leaning stones instead of a lintel",
-      "10 × 20 amot; its slope and its span at the top are the tour's choice"
+      "10 × 20 amot; its slope and its span at the top are the tour's choice",
+      "bronze leaves, closed, cut to the triangle (the tour's choice)"
     ],
     "sources": [
       {
@@ -2735,7 +2746,8 @@
         "oeuvre": "Middot",
         "ref": "1:9",
         "citation": "רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, בַּמְּסִבָּה הַהוֹלֶכֶת תַּחַת הַחֵיל יוֹצֵא וְהוֹלֵךְ לוֹ בְּטָדִי"
-      }
+      },
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
     "note": "Adopted: two leaning stones meeting in a point, as the mishna says (Middot 2:3) — not an arch. Tour's choice: their slope and span."
   },
@@ -2746,7 +2758,8 @@
     "cotes": [
       "in the west, entry and exit",
       "10 × 20 amot (Middot 2:3)",
-      "one palm tree per jamb (the tour's choice, after Ye'hezkel 40:26)"
+      "one palm tree per jamb (the tour's choice, after Ye'hezkel 40:26)",
+      "two bronze leaves, open toward the esplanade; a stone frame with a recessed order on each face of the wall (the tour's choice)"
     ],
     "sources": [
       {
@@ -2768,8 +2781,9 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:2",
         "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"
-      }
+      },
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
-    "note": "Tour's choice: the timorot on the jambs come from Ezekiel 40:26, which describes the future Temple; Middot says nothing of them."
+    "note": "Tour's choice: the timorot on the jambs come from Ezekiel 40:26, which describes the future Temple; Middot says nothing of them. The leaves: “all the openings had doors, except that of the Oulam” (Middot 2:3). Their bronze is a choice: gold, the Rambam states only of the gates of the Azara (cited by Tosfot Yom Tov on Middot 2:3)."
   }
 }

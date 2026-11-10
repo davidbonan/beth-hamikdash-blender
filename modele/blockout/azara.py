@@ -1,8 +1,11 @@
+import math
+
 from .primitives.parametres import Z_AZ, Z_EZI, Z_EZN
 from .primitives.matieres import (MAT_ARGENT, MAT_BRONZE, MAT_CEDRE, MAT_CHENE, MAT_NEHOSHET, MAT_OR,
                                   MAT_PIERRE, MAT_SOL)
-from .primitives.volumes import alea, box, cone, crochet, cyl, mur_perce, revolution
-from .primitives.ouvrages import CORNICHE, LISHKA_DEBORD, battants, massif_evide, shaar
+from .primitives.volumes import alea, box, cone, crochet, cyl, mesh_from_pydata, mur_perce, revolution
+from .primitives.gravures import largeur_gravure, timora
+from .primitives.ouvrages import CORNICHE, LISHKA_DEBORD, battants, massif_evide, shaar, vantail
 
 
 # ----------------------------------------------------------------------------
@@ -47,8 +50,8 @@ H_PORTE_EZI = 6
 # entrait dans la plus basse marche et chevauchait celui de HaKelim.
 CADRE_LISHKA_EZI = 0.6
 # Nom, emprise en y murs compris, centre de la porte.
-LISHKOT_EZI = (("Leviim_N", 13.5, 20.5, 16.5), ("HaKelim", 20.5, 32.5, 23.0),
-               ("Leviim_S", -20.5, -13.5, -16.5), ("Chashaim", -32.5, -20.5, -23.0))
+LISHKOT_EZI = (("Leviim_N", 13.5, 20.5, 17.75), ("HaKelim", 20.5, 32.5, 24.0),
+               ("Leviim_S", -20.5, -13.5, -17.75), ("Chashaim", -32.5, -20.5, -24.0))
 massif_evide("Podium_ezrat_israel", X_DOUKHAN, AX1, AY0 - T, AY1 + T, Z_EZN, Z_EZI - 1,
              [(X_EZI, AX1, y0, y1, Z_EZN, Z_EZI - 1) for _, y0, y1, _ in LISHKOT_EZI], "00_HarHabayit")
 # Le seuil de Nikanor : le sol de l'Ezrat Israël continue dans l'épaisseur du mur, sinon la
@@ -72,9 +75,57 @@ box("Nikanor_linteau", AX1, AX1 + T, -5, 5, Z_EZI + 20, Z_AZ + H_MUR, "20_Azara"
 # est son métal — « חוּץ מִשַּׁעֲרֵי נִיקָנוֹר… מִפְּנֵי שֶׁנְּחֻשְׁתָּן מַצְהִיב » (Middot 2:3).
 for _cote, _nu, _sens in (("est", AX1 + T, 1), ("ouest", AX1, -1)):
     shaar(f"Nikanor_{_cote}", ("y", _nu, _sens), 0, Z_EZI, SOUS_CORNICHE, T / 2,
-          "20_Azara", metal=MAT_NEHOSHET())
-box("Nikanor_porte_S", AX1 + 1, AX1 + 4.5, -5, -4.7, Z_EZI, Z_EZI + 20, "20_Azara", MAT_NEHOSHET())
-box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara", MAT_NEHOSHET())
+          "20_Azara", metal=MAT_NEHOSHET(), ressauts=2, pied=Z_EZN if _cote == "est" else None)
+battants("Nikanor_porte", "y", 0, AX1 + T, AX1, Z_EZI, 20, "20_Azara", MAT_NEHOSHET())
+# « וַיַּעַשׂ אֶת־אֵילִים שִׁשִּׁים אַמָּה » (Ye'hezkel 40:14), « גָּבְהָן שֶׁל אֵילִים… שִׁשִּׁים אַמָּה » (Rashi), et le שער intérieur est « כַּמִּדּוֹת הָאֵלֶּה » (40:32).
+# Deux piliers de soixante amot depuis l'Ezrat Nashim, de part et d'autre du cadre, hors de l'axe de Middot 2:4 ;
+# « וְתִמֹרִים אֶל־אֵילָיו » (40:34), et la timora est « כּוֹתֶרֶת דּוֹמֶה לְדֶקֶל » (Rashi sur 40:16) : leur chapiteau est une palme de bronze.
+# Section, palme et bronze : CHOIX ; entre le cadre de Nikanor (10,1) et celui des lishkot des Léviim (14,75).
+AMUD_Y, AMUD_L, AMUD_SAILLIE = 12.5, 4.2, 3.6
+AMUD_SOMMET = Z_EZN + 60
+AMUD_CHAPITEAU, AMUD_TAILLOIR = 3.4, 0.6
+
+
+def chapiteau_en_palme(nom, x, y, z0, h, r0, r1, col, mat, palmes=12):
+    """Corbeille tournée et couronne de palmes qui s'en écartent, la pointe retombant : la כּוֹתֶרֶת de Rashi sur Ye'hezkel 40:16."""
+    revolution(f"{nom}_corbeille", x, y, z0, [(r0, 0), (r0 * 1.08, 0.08 * h), (r0 + (r1 - r0) * 0.3, 0.45 * h),
+                                             (r1 * 0.97, 0.85 * h), (r1, h), (0, h)], col, mat, verts=24)
+    trace = [(r0 * 1.02, 0.05), (r0 + (r1 - r0) * 0.45, 0.45), (r1 * 1.05, 0.8), (r1 * 1.22, 0.98), (r1 * 1.32, 0.86)]
+    for k in range(palmes):
+        a = 2 * math.pi * (k + 0.5) / palmes
+        dehors, travers = (math.cos(a), math.sin(a)), (-math.sin(a), math.cos(a))
+        verts = []
+        for i, (r, t) in enumerate(trace):
+            demi = math.pi * r / palmes * 0.85 * (1 - 0.75 * i / (len(trace) - 1))
+            for e in (0.0, 0.08):
+                for c in (-1, 1):
+                    verts.append((x + dehors[0] * (r + e) + travers[0] * c * demi,
+                                  y + dehors[1] * (r + e) + travers[1] * c * demi, z0 + t * h))
+        faces = []
+        for i in range(len(trace) - 1):
+            a0, b0 = 4 * i, 4 * (i + 1)
+            faces += [[a0, b0, b0 + 1, a0 + 1], [a0 + 2, a0 + 3, b0 + 3, b0 + 2],
+                      [a0, a0 + 2, b0 + 2, b0], [a0 + 1, b0 + 1, b0 + 3, a0 + 3]]
+        n = 4 * (len(trace) - 1)
+        faces += [[0, 1, 3, 2], [n, n + 2, n + 3, n + 1]]
+        mesh_from_pydata(f"{nom}_palme_{k:02d}", verts, faces, col, mat)
+
+
+for _cote, _s in (("S", -1), ("N", 1)):
+    _nom, _y0, _y1 = f"Nikanor_amud_{_cote}", *sorted((_s * (AMUD_Y - AMUD_L / 2), _s * (AMUD_Y + AMUD_L / 2)))
+    _fut = AMUD_SOMMET - AMUD_TAILLOIR - AMUD_CHAPITEAU - 0.6
+    box(f"{_nom}_fut", AX1 + T, AX1 + T + AMUD_SAILLIE, _y0, _y1, Z_EZN, _fut, "20_Azara")
+    box(f"{_nom}_astragale", AX1 + T - 0.15, AX1 + T + AMUD_SAILLIE + 0.15, _y0 - 0.15, _y1 + 0.15, _fut, _fut + 0.6,
+        "20_Azara", MAT_NEHOSHET())
+    _cx, _cy = AX1 + T + AMUD_SAILLIE / 2, _s * AMUD_Y
+    chapiteau_en_palme(f"{_nom}_chapiteau", _cx, _cy, _fut + 0.6, AMUD_CHAPITEAU, AMUD_L / 2, AMUD_L * 0.85,
+                       "20_Azara", MAT_NEHOSHET())
+    _t = AMUD_SOMMET - AMUD_TAILLOIR
+    box(f"{_nom}_tailloir", _cx - AMUD_L * 0.95, _cx + AMUD_L * 0.95, _cy - AMUD_L * 0.95, _cy + AMUD_L * 0.95, _t,
+        AMUD_SOMMET, "20_Azara")
+    _palmier = AMUD_L * 0.8 / largeur_gravure("timora")
+    for _face, _paroi in (("est", ("y", AX1 + T + AMUD_SAILLIE, 1)), ("ouest", ("y", AX1 + T, -1))):
+        timora(f"{_nom}_timora_{_face}", _paroi, _cy, _fut - 4 - _palmier, _palmier, "20_Azara", MAT_NEHOSHET())
 # « שְׁנֵי פִשְׁפְּשִׁין הָיוּ לוֹ לְשַׁעַר נִיקָנוֹר, אֶחָד בִּימִינוֹ וְאֶחָד בִּשְׂמֹאלוֹ » (Middot 2:6) : deux
 # guichets de bronze de part et d'autre de la grande porte, côté Azara. Cote (3 × 8) :
 # CHOIX. Les vantaux sont posés sur le nu du mur — la baie n'est pas percée, et la face
@@ -82,8 +133,8 @@ box("Nikanor_porte_N", AX1 + 1, AX1 + 4.5, 4.7, 5, Z_EZI, Z_EZI + 20, "20_Azara"
 PISHPESHIM = (("S", -14.5, -11.5), ("N", 11.5, 14.5))
 H_PISHPESH = 8
 for cote, y0, y1 in PISHPESHIM:
-    box(f"Nikanor_pishpesh_{cote}", AX1 - 0.25, AX1, y0, y1, Z_EZI, Z_EZI + H_PISHPESH, "20_Azara", MAT_NEHOSHET())
-    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.25, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + H_PISHPESH, Z_EZI + H_PISHPESH + 0.4, "20_Azara", MAT_NEHOSHET())
+    vantail(f"Nikanor_pishpesh_{cote}", ("y", AX1, -1), y0, y1, Z_EZI, H_PISHPESH, "20_Azara", MAT_NEHOSHET(), gond=y0)
+    box(f"Nikanor_pishpesh_{cote}_linteau", AX1 - 0.6, AX1, y0 - 0.3, y1 + 0.3, Z_EZI + H_PISHPESH, Z_EZI + H_PISHPESH + 0.4, "20_Azara", MAT_NEHOSHET())
 # Les chambres sous l'Ezrat Israël : leurs murs, et un cadre de pierre sur chaque porte,
 # comme aux chambres d'angle — un פתח de chambre n'est pas un שער.
 for _nom, _y0, _y1, _porte in LISHKOT_EZI:
@@ -236,9 +287,9 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
         # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
         # ouverts dès l'aube (Tamid 3:7).
         shaar(f"Azara_porte_{nm}_{p:+.0f}", ("x", *face), p, Z_AZ, SOUS_CORNICHE, T,
-              "20_Azara", metal=MAT_OR())
-        battants(f"Azara_porte_{nm}_{p:+.0f}_battants", p - 5, p + 5, y0, y1,
-                 Z_AZ, 20, "20_Azara", MAT_OR())
+              "20_Azara", metal=MAT_OR(), ressauts=2)
+        dehors, dedans = (y1, y0) if nm == "nord" else (y0, y1)
+        battants(f"Azara_porte_{nm}_{p:+.0f}_battants", "x", p, dehors, dedans, Z_AZ, 20, "20_Azara", MAT_OR())
 SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du Beit Avtinas
 SAILLIE_INT = 10      # profondeur des corps bâtis DANS la cour, contre le mur. Au-delà, au sud,
                       # le débord du socle mordrait sur le pied du kevesh : Rambam, Beit HaBe'hira

@@ -346,7 +346,7 @@ for _ouvrage, _profil, _z, _s, _dehors in (("socle", SOCLE, Z_EZN, SAILLIE_MOULU
     moulure(f"EzratNashim_{_ouvrage}_est", EX1, EX1 + 5, -72.5, 72.5, _z, _profil, "10_EzratNashim",
             saillie=_s, mitres=("deborde", "deborde"), reserve=_baie, filet=_filet,
             cotes=(not _dehors, True))
-battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashim", MAT_OR())
+battants("EzratNashim_porte_est", "y", 0, EX1 + 5, EX1, Z_EZN, 20, "10_EzratNashim", MAT_OR())
 # « כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב » (Middot 2:3) : la michna dit le
 # ŠAʿAR, pas ses vantaux — et elle dit deux michnayot plus haut que chaque שער avait sa
 # שְׁקוֹפָה. L'or déborde donc des battants sur les jambages et sur elle. ARBITRAGE : lire
@@ -356,7 +356,7 @@ battants("EzratNashim_porte_est", EX1, EX1 + 5, -5, 5, Z_EZN, 20, "10_EzratNashi
 for _cote, _nu, _sens in (("est", EX1 + 5, 1), ("ouest", EX1, -1)):
     shaar(f"EzratNashim_porte_{_cote}", ("y", _nu, _sens), 0, Z_EZN,
           Z_EZN + H_MUR_EN + min(zb for zb, _, _ in CORNICHE), 2.5,
-          "10_EzratNashim", metal=MAT_OR())
+          "10_EzratNashim", metal=MAT_OR(), ressauts=1, pied=Z_HAR if _cote == "est" else None)
 # Treize shofarot (Shekalim 6:5) : les troncs « en forme de shofar » — étroits en haut,
 # larges en bas, pour qu'on n'y glisse pas la main (Bartenura) — le long du mur est, de
 # part et d'autre de la porte. Bronze : CHOIX, la Mishna n'en dit pas la matière.
@@ -367,7 +367,7 @@ SHOFAR = [(0.62, 0.0), (0.60, 0.12), (0.40, 0.60), (0.24, 1.35), (0.20, 1.55), (
 SHOFAROT = ["תקלין חדתין", "תקלין עתיקין", "קנין", "גוזלי עולה", "עצים", "לבונה",
             "זהב לכפרת"] + ["לנדבה"] * 6
 _gravures = []
-for k, y in enumerate([-26.5 + 3.4 * i for i in range(7)] + [6.1 + 3.4 * i for i in range(6)]):
+for k, y in enumerate([-26.15 + 3.3 * i for i in range(7)] + [6.35 + 3.3 * i for i in range(6)]):
     revolution(f"Shofar_{k:02d}", EX1 - 1.4, y, Z_EZN, SHOFAR, "10_EzratNashim", MAT_BRONZE(), verts=20)
     _gravures.append((f"Shofar_{k:02d}_gravure", SHOFAROT[k], EX1 - 1.894, y, Z_EZN + 0.35))
 graver(_gravures, "10_EzratNashim", MAT_OR(), taille=0.11, saillie=0.04, courbure=0.494)

@@ -1,9 +1,10 @@
 from .primitives.parametres import Z_HAR, Z_ROCHE
-from .primitives.matieres import MAT_CEDRE, MAT_MURAILLE, MAT_SOL
-from .primitives.volumes import box, colonne, mur_perce, plage
+from .primitives.matieres import MAT_BRONZE, MAT_CEDRE, MAT_MURAILLE, MAT_SOL
+from .primitives.volumes import box, colonne, cyl, mur_perce, plage
 from .primitives.gravures import _relief_profil
-from .primitives.ouvrages import (BANDEAU, ENCADREMENT_SHAAR, SAILLIE_BANDEAU, creneaux, moulure,
-                                  ordre_de_pilastres, shaar)
+from .primitives.ouvrages import (BANDEAU, ENCADREMENT_SHAAR, EPAISSEUR_PLACAGE, SAILLIE_BANDEAU, VANTAIL_CADRE,
+                                  VANTAIL_CLOU, VANTAIL_EP, VANTAIL_PIVOT, VANTAIL_RELIEF, battants, creneaux,
+                                  moulure, ordre_de_pilastres, shaar)
 
 
 # ----------------------------------------------------------------------------
@@ -49,11 +50,21 @@ for _nm, _bornes, _paroi, _h, _portes in PORTES_HAR:
               "00_HarHabayit", [(c, l) for _, c, l in _portes], 20, MAT_MURAILLE())
     for _porte, _c, _l in _portes:
         shaar(f"HarHabayit_porte_{_porte}", _paroi, _c, Z_HAR, Z_HAR + _h - 3, MUR_HAR,
-              "00_HarHabayit", MAT_MURAILLE(), largeur=_l)
+              "00_HarHabayit", MAT_MURAILLE(), largeur=_l, ressauts=1)
+        _axe, _nu, _sens = _paroi
+        _dehors = _nu - _sens * MUR_HAR
+        # Le même cadre de pierre sur la face qu'on aborde du dehors : les pilastres lui réservent déjà sa place.
+        shaar(f"HarHabayit_porte_{_porte}_dehors", (_axe, _dehors, -_sens), _c, Z_HAR, Z_HAR + _h - 3, MUR_HAR,
+              "00_HarHabayit", MAT_MURAILLE(), largeur=_l, ressauts=1)
+        if _porte == "Tadi":
+            continue
+        # Plus épais que le mur, les vantaux pivotent à sa face extérieure et débordent sur l'esplanade.
+        battants(f"HarHabayit_porte_{_porte}_battants", _axe, _c, _dehors,
+                 _dehors + _sens * _l / 2, Z_HAR, 20, "00_HarHabayit", MAT_BRONZE(), largeur=_l)
 # « חוּץ מִשַּׁעַר טָדִי, שֶׁהָיוּ שָׁם שְׁתֵּי אֲבָנִים מֻטּוֹת זוֹ עַל גַּב זוֹ » (Middot 2:3) : la seule
 # tête de baie du Temple qui ne soit pas une שְׁקוֹפָה. Deux dalles penchées l'une contre
 # l'autre, et non un arc — la michna les compte, et elles se rejoignent sur l'axe. Elles
-# se posent DANS la baie, sous le plein du mur : ce qu'on voit en passant est le triangle
+# se posent DANS la baie, sous le plein du mur, et ses vantaux fermés épousent le triangle
 # qu'elles laissent. La pente et la portée du sommet sont un CHOIX ; le nombre et
 # l'appui l'un sur l'autre ne le sont pas.
 TADI_NAISSANCE, TADI_APPUI = 12, 0.3
@@ -65,21 +76,72 @@ for _sens in (-1, 1):
                     (TADI_X + _sens * TADI_APPUI, Z_HAR + 20),
                     (TADI_X + _sens * TADI_APPUI, Z_HAR + 20 - 0.6)],
                    -MUR_HAR, 0.0, "00_HarHabayit", MAT_MURAILLE())
-# « שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה » (Middot 1:3) : le dessin de Suse au-dessus
-# de la porte est, tourné vers le mont des Oliviers. Un bas-relief : rempart et trois
-# tours crénelées, dans la pierre du mur.
-SHUSHAN_Z = Z_HAR + 20.4
-box("Shushan_plaque", HX1, HX1 + 0.15, -4.5, 4.5, SHUSHAN_Z, SHUSHAN_Z + 3.2,
-    "00_HarHabayit", MAT_MURAILLE())
-box("Shushan_rempart", HX1 + 0.15, HX1 + 0.35, -3.8, 3.8, SHUSHAN_Z + 0.3, SHUSHAN_Z + 1.3,
-    "00_HarHabayit", MAT_MURAILLE())
-for k, y in enumerate((-3.0, 0.0, 3.0)):
-    h = 2.6 if y == 0 else 2.0
-    box(f"Shushan_tour_{k}", HX1 + 0.15, HX1 + 0.4, y - 0.6, y + 0.6, SHUSHAN_Z + 0.3,
-        SHUSHAN_Z + h, "00_HarHabayit", MAT_MURAILLE())
-    for j, yc in enumerate((y - 0.45, y, y + 0.45)):
-        box(f"Shushan_tour_{k}_merlon_{j}", HX1 + 0.15, HX1 + 0.4, yc - 0.12, yc + 0.12,
-            SHUSHAN_Z + h, SHUSHAN_Z + h + 0.25, "00_HarHabayit", MAT_MURAILLE())
+# « טָדִי מִן הַצָּפוֹן, לֹא הָיָה מְשַׁמֵּשׁ כְּלוּם » (Middot 1:3) : ses vantaux sont fermés, taillés à la baie sous les deux pierres.
+TADI_Y, TADI_JEU = HY1 - MUR_HAR / 2, 0.1
+TADI_SOMMET = 20 - 0.6 - TADI_JEU
+
+
+def _tadi_hauteur(u):
+    """La hauteur libre de la baie de Tadi à `u` amot de son axe, sous les pierres penchées."""
+    pente = (TADI_SOMMET + TADI_JEU - TADI_NAISSANCE) / (5 - TADI_APPUI)
+    return min(TADI_SOMMET, TADI_NAISSANCE - TADI_JEU + pente * (5 - abs(u)))
+
+
+for _sens in (-1, 1):
+    _cote = "O" if _sens < 0 else "E"
+    _nom = f"HarHabayit_porte_Tadi_vantail_{_cote}"
+    _jambage, _milieu = TADI_X + _sens * (5 - EPAISSEUR_PLACAGE), TADI_X + _sens * 0.02
+    _relief_profil(_nom, ("x", TADI_Y, 1),
+                   [(_jambage, Z_HAR), (_milieu, Z_HAR), (_milieu, Z_HAR + TADI_SOMMET),
+                    (TADI_X + _sens * TADI_APPUI, Z_HAR + TADI_SOMMET),
+                    (_jambage, Z_HAR + _tadi_hauteur(5))],
+                   -VANTAIL_EP / 2, VANTAIL_EP / 2, "00_HarHabayit", MAT_BRONZE())
+    cyl(f"{_nom}_pivot", _jambage, TADI_Y, Z_HAR, Z_HAR + _tadi_hauteur(5), VANTAIL_PIVOT, "00_HarHabayit",
+        MAT_BRONZE(), verts=12)
+    _u0, _u1 = sorted((_jambage, _milieu))
+    for _face, _f in (("S", -1), ("N", 1)):
+        _nu = TADI_Y + _f * (VANTAIL_EP / 2 + VANTAIL_RELIEF)
+        for _k, _z in enumerate((1.0, 5.5, 10.0)):
+            box(f"{_nom}_{_face}_bande_{_k}", _u0, _u1, *sorted((TADI_Y + _f * VANTAIL_EP / 2, _nu)),
+                Z_HAR + _z, Z_HAR + _z + VANTAIL_CADRE, "00_HarHabayit", MAT_BRONZE())
+            for _j in range(4):
+                _u = _u0 + 0.6 + (_u1 - _u0 - 1.2) * _j / 3
+                box(f"{_nom}_{_face}_clou_{_k}{_j}", _u - VANTAIL_CLOU, _u + VANTAIL_CLOU, *sorted((_nu, _nu + _f * 0.08)),
+                    Z_HAR + _z + VANTAIL_CADRE / 2 - VANTAIL_CLOU, Z_HAR + _z + VANTAIL_CADRE / 2 + VANTAIL_CLOU,
+                    "00_HarHabayit", MAT_BRONZE())
+# « שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה » (Middot 1:3) : Suse au-dessus de la porte est, vers le mont des Oliviers.
+# Un bas-relief dans la pierre, entre le cadre de la porte et les merlons : rempart, six tours, porte, et la בירה au milieu. Tout : CHOIX.
+SHUSHAN_Z, SHUSHAN_H, SHUSHAN_L = Z_HAR + 21.05, 2.9, 8.5
+
+
+def _shushan(nom, y0, y1, zb, zh, saillie):
+    box(f"Shushan_{nom}", HX1, HX1 + saillie, y0, y1, SHUSHAN_Z + zb, SHUSHAN_Z + zh, "00_HarHabayit", MAT_MURAILLE())
+
+
+def _merlons(nom, y0, y1, z, saillie, pas=0.6):
+    n = max(1, round((y1 - y0) / pas))
+    for k in range(n):
+        yc = y0 + (y1 - y0) * (k + 0.5) / n
+        _shushan(f"{nom}_merlon_{k}", yc - pas / 4, yc + pas / 4, z, z + 0.22, saillie)
+
+
+_shushan("plaque", -SHUSHAN_L, SHUSHAN_L, 0, SHUSHAN_H, 0.15)
+for _nom, _zb, _zh in (("cadre_bas", 0, 0.15), ("cadre_haut", SHUSHAN_H - 0.15, SHUSHAN_H)):
+    _shushan(_nom, -SHUSHAN_L, SHUSHAN_L, _zb, _zh, 0.3)
+for _nom, _y in (("cadre_S", -SHUSHAN_L), ("cadre_N", SHUSHAN_L - 0.15)):
+    _shushan(_nom, _y, _y + 0.15, 0.15, SHUSHAN_H - 0.15, 0.3)
+_shushan("rempart", -7.6, 7.6, 0.3, 1.2, 0.35)
+_merlons("rempart", -7.6, 7.6, 1.2, 0.35)
+for _k, _y in enumerate((-7.0, -4.6, -2.2, 2.2, 4.6, 7.0)):
+    _shushan(f"tour_{_k}", _y - 0.5, _y + 0.5, 0.3, 1.7, 0.45)
+    _merlons(f"tour_{_k}", _y - 0.5, _y + 0.5, 1.7, 0.45, pas=0.5)
+for _cote, _y in (("S", -1.3), ("N", 1.3)):
+    _shushan(f"porte_tour_{_cote}", _y - 0.4, _y + 0.4, 0.3, 1.9, 0.5)
+    _merlons(f"porte_tour_{_cote}", _y - 0.4, _y + 0.4, 1.9, 0.5, pas=0.4)
+_shushan("porte_linteau", -0.9, 0.9, 1.0, 1.15, 0.45)
+_shushan("bira", -2.0, 2.0, 1.2, 2.2, 0.3)
+_merlons("bira", -2.0, 2.0, 2.2, 0.3, pas=0.5)
+_shushan("bira_etage", -1.0, 1.0, 2.2, 2.6, 0.3)
 # Crête des murs : merlons (CHOIX, appareil hérodien — les stylisations des plans 1 et
 # 14b crénelaient d'elles-mêmes cette enceinte, autant que le blockout le fixe).
 for nm, xa, xb, ya, yb, h in (("sud", HX0, HX1, HY0, HY0 + 3, H_HAR),

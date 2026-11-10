@@ -100,7 +100,8 @@
     "he": "השער היוצא מזרח",
     "translit": "Sha'ar hayotze mizra'h",
     "resume": "On accède à l'Ezrat Nashim par l'est : on entre par la porte orientale du Har HaBayit, on traverse le 'Heil et l'on monte ses douze marches. Soucca 5:4 appelle cette porte « la porte qui sort vers l'est ». À l'ouest, la porte de Nikanor donne sur l'Ezrat Israël ; les portes du Har HaBayit, de l'Ezrat Nashim, de l'Azara et l'entrée du Heikhal sont alignées.",
-    "cotes": [],
+    "cotes": ["deux vantaux d'or ouverts ; filets d'or sur le cadre de la porte et sa corniche (choix de la visite)",
+      "un ressaut entre la baie et le cadre ; côté est, le cadre descend jusqu'au Har HaBayit (choix de la visite)"],
     "sources": [
       {"oeuvre": "Soucca", "ref": "5:4", "citation": "עַד שֶׁמַּגִּיעִין לַשַּׁעַר הַיּוֹצֵא מִזְרָח"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "6:1", "citation": "כְּשֶׁאָדָם נִכְנָס מִשַּׁעַר מִזְרָחִי שֶׁל הַר הַבַּיִת מְהַלֵּךְ עַד סוֹף הַחֵיל בְּשָׁוֶה. וְעוֹלֶה מִן הַחֵיל לְעֶזְרַת הַנָּשִׁים בִּשְׁתֵּים עֶשְׂרֵה מַעֲלוֹת"},
@@ -309,7 +310,10 @@
     "cotes": [
       "20 amot de haut × 10 de large (dimension standard des portes de l'Azara)",
       "deux pishpeshin latéraux, selon Abba Yossi ben 'Hanan (Middot 2:6)",
-      "bronze, contre l'or des autres portes"
+      "bronze, contre l'or des autres portes",
+      "vantaux de bronze ouverts, rabattus dans l'embrasure ; les pishpeshin, fermés, sont de bronze aussi (forme : choix de la visite)",
+      "deux piliers de 60 amot de part et d'autre, du sol de l'Ezrat Nashim, chapiteau en palmes de bronze (d'après Ye'hezkel 40:14 et 40:16 ; choix de la visite)",
+      "deux ressauts de bronze entre la baie et le cadre ; côté est, le cadre descend jusqu'au sol de l'Ezrat Nashim (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם, נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעַר נִקָּנוֹר, מִפְּנֵי שֶׁנַּעֲשָׂה בָהֶן נֵס. וְיֵשׁ אוֹמְרִים, מִפְּנֵי שֶׁנְּחֻשְׁתָּן מַצְהִיב"},
@@ -319,7 +323,7 @@
       {"oeuvre": "Middot", "ref": "2:6", "citation": "שֶׁבַּמִּזְרָח, שַׁעַר נִקָּנוֹר. וּשְׁנֵי פִשְׁפָּשִׁים הָיוּ לוֹ, אֶחָד מִימִינוֹ וְאֶחָד מִשְּׂמֹאלוֹ"},
       {"oeuvre": "Soucca", "ref": "5:5", "citation": "שָׁלשׁ לִפְתִיחַת שְׁעָרִים"}
     ],
-    "note": "Choix de la visite : la porte est montrée ouverte, battants rabattus dans l'embrasure, comme pendant le service ; Soucca 5:5 ne parle que de sonneries « à l'ouverture des portes », sans dire combien de temps elles restent ouvertes. Fermée, elle couperait la ligne de mire que le mur est bas doit laisser passer. Les pishpeshin viennent de la liste des treize portes d'Abba Yossi ben 'Hanan (Middot 2:6) ; Middot 1:4 donne à Nikanor deux lishkot, celles de Pin'has HaMalbish et des Osei 'Havitin. Écarté : R. Eliézer ben Yaakov (Yoma 38a), pour qui c'était un bronze poli, « נְחֹשֶׁת קְלוֹנִיתָא », qui brillait comme l'or."
+    "note": "Choix de la visite : la porte est montrée ouverte, battants rabattus dans l'embrasure, comme pendant le service ; Soucca 5:5 ne parle que de sonneries « à l'ouverture des portes », sans dire combien de temps elles restent ouvertes. Fermée, elle couperait la ligne de mire que le mur est bas doit laisser passer. Les pishpeshin viennent de la liste des treize portes d'Abba Yossi ben 'Hanan (Middot 2:6) ; Middot 1:4 donne à Nikanor deux lishkot, celles de Pin'has HaMalbish et des Osei 'Havitin. Les piliers : « וַיַּעַשׂ אֶת אֵילִים שִׁשִּׁים אַמָּה » (Ye'hezkel 40:14), et Ye'hezkel 40:32 donne aux portes intérieures les mêmes mesures ; Ye'hezkel décrit le Temple futur, les dresser à Nikanor est un choix. Les ressauts suivent les jambages à degrés que le Radak et le Ralbag lisent en Melakhim I 6:31. Écarté : R. Eliézer ben Yaakov (Yoma 38a), pour qui c'était un bronze poli, « נְחֹשֶׁת קְלוֹנִיתָא », qui brillait comme l'or."
   },
 
   "azara": {
@@ -344,11 +348,13 @@
   "portes_azara": {
     "he": "שערי העזרה",
     "translit": "Sha'arei HaAzara",
-    "resume": "Sept portes percent le mur de l'Azara : trois au sud, trois au nord, et Nikanor à l'est. Elles mesurent vingt amot de haut sur dix de large. On les compte en partant de la plus occidentale : au sud Sha'ar HaDelek, Sha'ar HaBekhorot, puis Sha'ar HaMayim, la plus orientale ; au nord Sha'ar HaNitzotz, Sha'ar HaKorban, puis Beit HaMoked.",
+    "resume": "Sept portes percent le mur de l'Azara : trois au sud, trois au nord, et Nikanor à l'est. Elles mesurent vingt amot de haut sur dix de large. On les compte en partant de la plus occidentale : au sud Sha'ar HaDelek, Sha'ar HaBekhorot, puis Sha'ar HaMayim, la plus orientale ; au nord Sha'ar HaNitzotz, Sha'ar HaKorban, puis Beit HaMoked. Toutes, sauf Nikanor, ont été changées en or ; le Rambam le dit des portes de l'Azara : on les plaque d'or si l'on en a les moyens.",
     "cotes": [
       "7 portes : 3 au sud, 1 à l'est, 3 au nord",
       "20 amot de haut × 10 de large",
-      "trois corps de porte de 20 amot de large, débordant de 12 amot du mur (choix de la visite, sans source)"
+      "trois corps de porte de 20 amot de large, débordant de 12 amot du mur (choix de la visite, sans source)",
+      "deux vantaux d'or par porte, ouverts et rabattus dans l'épaisseur du mur ; montants, panneaux, clous, pivot et anneau (forme : choix de la visite)",
+      "deux ressauts dorés entre la baie et le cadre, comme les jambages à degrés que le Radak et le Ralbag lisent en Melakhim I 6:31 (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:4", "citation": "שֶׁבַּדָּרוֹם, שַׁעַר הַדֶּלֶק. שֵׁנִי לוֹ, שַׁעַר הַבְּכוֹרוֹת. שְׁלִישִׁי לוֹ, שַׁעַר הַמָּיִם"},
@@ -357,7 +363,8 @@
       {"oeuvre": "Middot", "ref": "2:6", "citation": "שְׁעָרִים דְּרוֹמִיִּים סְמוּכִים לַמַּעֲרָב, שַׁעַר הָעֶלְיוֹן, שַׁעַר הַדֶּלֶק, שַׁעַר הַבְּכוֹרוֹת, שַׁעַר הַמָּיִם"},
       {"oeuvre": "Shekalim", "ref": "6:3", "citation": ""},
       {"oeuvre": "Yoma", "ref": "19a", "citation": ""},
-      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:4", "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב. וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"}
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:4", "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב. וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 2:3", "citation": "וזה שדקדק הרמב\"ם בספ\"א מהל' ב\"ה וכתב אפילו שערי העזרה מצפין אותן זהב אם מצאה ידם"}
     ],
     "note": "Retenu : sept portes, selon Middot 1:4–5. Écarté : les treize portes d'Abba Yossi ben 'Hanan (Middot 2:6, Shekalim 6:3) ; c'est pourtant sa liste qui donne le sens du comptage, « סְמוּכִים לַמַּעֲרָב », que le Rambam (Beit HaBe'hira 5:4) reprend sans les noms, et Middot 1:4–5 n'en indique aucun. Les noms du sud sont en Middot 1:4, ceux du nord en Middot 1:5 ; Yoma 19a lit au sud Sha'ar HaDelaka et Sha'ar HaKorban, sans changer la place de Sha'ar HaMayim, et au nord Sha'ar Beit HaMoked. Choix de la visite : l'écartement des portes, qu'aucune source ne donne — le Beit HaMoked, plus large, recule de cinq amot vers l'ouest —, et le corps de porte de 20 × 12 amot et ses vingt degrés, qui n'ont pas de source."
   },
@@ -1288,30 +1295,34 @@
     "cotes": [
       "deux portes, au sud",
       "20 amot de haut × 10 de large (Middot 2:3) ; leur place le long du mur : choix de la visite",
-      "un palmier par jambage (choix de la visite, d'après Ye'hezkel 40:26)"
+      "un palmier par jambage (choix de la visite, d'après Ye'hezkel 40:26)",
+      "deux vantaux de bronze, ouverts vers l'esplanade ; un cadre de pierre à ressaut sur chaque face du mur (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "les deux portes de 'Houlda au sud, qui servaient à l'entrée et à la sortie."},
       {"oeuvre": "Middot", "ref": "2:3", "citation": "toutes les portes qui étaient là avaient des linteaux."},
       {"oeuvre": "Ye'hezkel", "ref": "40:26", "citation": "et des palmiers, un d'un côté et un de l'autre, sur ses jambages."},
-      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:2", "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"}
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:2", "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
-    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien."
+    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien. Les vantaux : « toutes les ouvertures avaient des portes, sauf celle de l'Oulam » (Middot 2:3). Leur bronze est un choix : l'or, le Rambam ne le dit que des portes de l'Azara (cité par Tosfot Yom Tov sur Middot 2:3)."
   },
 
   "shaar_tadi": {
     "he": "שער טדי",
     "translit": "Sha'ar Tadi",
-    "resume": "La porte du nord, « qui ne servait à rien ». Selon R. Eliézer ben Yaakov (Middot 1:9), c'est pourtant par elle que sortait le cohen devenu impur pendant la nuit. C'est aussi la seule porte de tout le Temple dont la tête ne soit pas un linteau : au lieu d'une shkoufa posée en travers, deux pierres penchées l'une sur l'autre s'appuient au sommet et laissent passer un triangle. La michna la compte parmi les cinq portes du Har HaBayit (Middot 1:3), et relève cette exception en Middot 2:3.",
+    "resume": "La porte du nord, « qui ne servait à rien ». Selon R. Eliézer ben Yaakov (Middot 1:9), c'est pourtant par elle que sortait le cohen devenu impur pendant la nuit. C'est aussi la seule porte de tout le Temple dont la tête ne soit pas un linteau : au lieu d'une shkoufa posée en travers, deux pierres penchées l'une sur l'autre s'appuient au sommet et laissent passer un triangle. La michna la compte parmi les cinq portes du Har HaBayit (Middot 1:3), et relève cette exception en Middot 2:3. Puisqu'elle ne servait pas, la visite montre ses vantaux de bronze fermés : taillés à la baie, ils montent en pointe sous les deux pierres.",
     "cotes": [
       "au nord, hors service",
       "deux pierres penchées au lieu d'un linteau",
-      "10 × 20 amot ; sa pente et sa portée au sommet sont un choix de la visite"
+      "10 × 20 amot ; sa pente et sa portée au sommet sont un choix de la visite",
+      "vantaux de bronze fermés, taillés au triangle (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "Tadi au nord ne servait à rien."},
       {"oeuvre": "Middot", "ref": "2:3", "citation": "sauf la porte de Tadi, où il y avait deux pierres penchées l'une sur l'autre."},
-      {"oeuvre": "Middot", "ref": "1:9", "citation": "רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, בַּמְּסִבָּה הַהוֹלֶכֶת תַּחַת הַחֵיל יוֹצֵא וְהוֹלֵךְ לוֹ בְּטָדִי"}
+      {"oeuvre": "Middot", "ref": "1:9", "citation": "רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, בַּמְּסִבָּה הַהוֹלֶכֶת תַּחַת הַחֵיל יוֹצֵא וְהוֹלֵךְ לוֹ בְּטָדִי"},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
     "note": "Retenu : deux pierres penchées qui se rejoignent en pointe, comme le dit la michna (Middot 2:3) — pas un arc. Choix de la visite : leur pente et leur portée."
   },
@@ -1323,14 +1334,16 @@
     "cotes": [
       "à l'ouest, entrée et sortie",
       "10 × 20 amot (Middot 2:3)",
-      "un palmier par jambage (choix de la visite, d'après Ye'hezkel 40:26)"
+      "un palmier par jambage (choix de la visite, d'après Ye'hezkel 40:26)",
+      "deux vantaux de bronze, ouverts vers l'esplanade ; un cadre de pierre à ressaut sur chaque face du mur (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:3", "citation": "Kiponus à l'ouest servait à l'entrée et à la sortie."},
       {"oeuvre": "Ye'hezkel", "ref": "40:26", "citation": ""},
       {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים וְהַשְּׁעָרִים שֶׁהָיוּ שָׁם, גָּבְהָן עֶשְׂרִים אַמָּה, וְרָחְבָּן עֶשֶׂר אַמּוֹת"},
-      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:2", "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"}
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:2", "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
-    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien."
+    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien. Les vantaux : « toutes les ouvertures avaient des portes, sauf celle de l'Oulam » (Middot 2:3). Leur bronze est un choix : l'or, le Rambam ne le dit que des portes de l'Azara (cité par Tosfot Yom Tov sur Middot 2:3)."
   }
 }
