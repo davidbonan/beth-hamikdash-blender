@@ -2,14 +2,15 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
+import { habiller, patinerLesMurs, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
+import { refleterLeDallage } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
-import { brumer, domeVu, lumieresDu } from "./ciel.js";
+import { brumer, cuireLesNuages, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
 import { NIVEAU, PROFIL, brancherChoix, seRelever, seReplier } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
@@ -126,7 +127,7 @@ const appoint = new THREE.DirectionalLight(0xb9c6d4, lumieresDu("jour").appoint)
 appoint.position.set(-140, 70, -40);
 scene.add(appoint);
 
-const ciel = domeVu(5700);
+const ciel = domeVu(renderer, 5700);
 scene.add(ciel);
 
 // Le champ est fixé à l'HORIZONTALE, pas à la verticale. Un champ vertical constant
@@ -150,6 +151,17 @@ scene.add(camera);
 // tout entière. Les flammes de la Menora non plus : elles ne sont pas une surface à ombrer.
 const horsGeometrie = [ciel];
 const rendu = chaine(renderer, scene, camera, horsGeometrie);
+patinerLesMurs(EMPRISES.get("azara"));
+const SALLES_DE_L_AZARA = ["heikhal", "oulam", "kodesh_hakodashim"];
+// Le Heikhal et le Kodesh HaKodashim en deçà du mur de façade, dont la cour voit les portes par l'Oulam.
+const sanctuaireClos = unirEmprises(EMPRISES, ["heikhal", "kodesh_hakodashim"]);
+sanctuaireClos.max.x -= AMA;
+const dallage = refleterLeDallage(renderer, scene, camera, {
+  cour: EMPRISES.get("azara"),
+  salles: [...EMPRISES].filter(([id]) => SALLES_DE_L_AZARA.includes(id) || id.startsWith("lishkat_")).map(([, boite]) => boite),
+  clos: sanctuaireClos,
+  caches: [ciel],
+});
 const detail = niveauxDeDetail(scene, camera);
 // Le film veut chaque image au plein détail, sans qu'un allègement arrivé en cours de prise ne la change.
 function maillagesDe(racine) {
@@ -163,8 +175,10 @@ function alleger(racine) {
 }
 
 // Une torche tenue bouge par sa matrice : figée à sa première image, sa tuile restait en arrière de la main et de sa flamme.
-function allegerTroupe(troupe) {
-  if (!CINEMA) detail.confierMobiles(maillagesDe(troupe));
+function accueillirTroupe(troupe) {
+  const maillages = maillagesDe(troupe);
+  dallage.confierMobiles(maillages);
+  if (!CINEMA) detail.confierMobiles(maillages);
 }
 
 // La résolution suit ce que la machine tient. Baisser la définition d'un tiers coûte
@@ -184,6 +198,7 @@ function dimensionner() {
   const definition = Math.min(DPR, PROFIL.definitionMax) * echelle;
   HAUTEUR_IMAGE.value = Math.round(innerHeight * definition);
   rendu.redimensionner(innerWidth, innerHeight, definition);
+  dallage.redimensionner(innerWidth * definition, innerHeight * definition);
 }
 dimensionner();
 addEventListener("resize", dimensionner);
@@ -306,7 +321,9 @@ gltf.scene.traverse((o) => {
     const occlusion = occlusions.get(o.userData.groupeCuit);
     const lumiere = lumieres.get(o.userData.groupeCuit);
     // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
-    if (occlusion || lumiere || sousSonde.has(o)) o.material = o.material.clone();
+    const refletDuDallage = PROFIL.reflets && o.userData.groupeCuit === "azara" && o.material.name === "Sol";
+    if (occlusion || lumiere || sousSonde.has(o) || refletDuDallage) o.material = o.material.clone();
+    if (refletDuDallage) o.material.userData.refletDuDallage = true;
     if (occlusion) o.material.aoMap = occlusion;
     if (lumiere) Object.assign(o.material, { lightMap: lumiere.texture, lightMapIntensity: lumiere.echelle });
     if (sousSonde.has(o)) materiauxHeikhal.push(o.material);
@@ -335,6 +352,7 @@ async function envoyerLesTextures() {
 
 // Dès ses arbres construits, pendant que les nuanceurs se compilent : confié après la première image, le décor se traçait entier vingt secondes, à une image toutes les deux secondes sur un vieil iPad.
 const allegerLeTemple = () => alleger(gltf.scene);
+dallage.confier(maillagesDe(gltf.scene));
 
 // Les nuanceurs se compilent hors du fil de la page pendant que les arbres s'y construisent.
 await Promise.all([
@@ -354,7 +372,7 @@ if (!brut) {
 }
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
-const troupes = troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, alleger: allegerTroupe, obstacles, horsGeometrie,
+const troupes = troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir: accueillirTroupe, obstacles, horsGeometrie,
   distributions: figurants, conceptDe, lampesPosees: () => eclairage.lampesPosees });
 troupes.charger(TROUPE_LIBRE);
 
@@ -585,6 +603,7 @@ function dessiner(dt) {
   eclairage.suivreSoleil(camera.position, troupes.ombresPres);
   ciel.position.copy(camera.position);
   detail.choisir(HAUTEUR_IMAGE.value);
+  dallage.rendre();
   rendu.rendre();
 }
 
@@ -595,11 +614,16 @@ const avantLePas = new THREE.Vector3();
 // À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
-const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart, { quandABout: seReplier, quandALAise: seRelever });
+// Le miroir du dallage est un palier à lui seul, le premier lâché : il coûte un rendu de la cour, que baisser la définition n'allège pas.
+const PALIERS = [...(PROFIL.reflets ? [{ echelle: PROFIL.echelles[0], reflets: true }] : []),
+                 ...PROFIL.echelles.map((definition) => ({ echelle: definition, reflets: false }))];
+const regulateur = regulerEchelle(PALIERS, PALIERS.find((palier) => palier.echelle === PROFIL.echelleDepart),
+                                  { quandABout: seReplier, quandALAise: seRelever });
 function ajusterEchelle(dt) {
-  const voulue = regulateur.suivre(dt, performance.now() / 1000);
-  if (voulue === null) return;
-  echelle = voulue;
+  const palier = regulateur.suivre(dt, performance.now() / 1000);
+  if (palier === null) return;
+  echelle = palier.echelle;
+  dallage.allumer(palier.reflets);
   dimensionner();
 }
 
@@ -778,6 +802,7 @@ if (reprise?.moment === "nuit") passerAuMoment("nuit");
 
 // Three renvoie seul géométries et images ; les cartes relâchées, les environnements, les ombres figées et le reflet du Heikhal sont à refaire.
 async function reprendre() {
+  cuireLesNuages(renderer);
   eclairage.refaireLesReflets();
   scene.traverse((o) => { if (o.isLight && o.shadow) o.shadow.needsUpdate = true; });
   eclairage.retracerLOmbreLointaine();
@@ -838,6 +863,7 @@ window.__cam = (x, y, z, cx, cy, cz) => {
 };
 window.__rendre = () => dessiner(0);
 window.__echelle = (voulue) => { echelle = voulue; dimensionner(); dessiner(0); };
+window.__reflets = (voulus) => { dallage.allumer(voulus); dessiner(0); };
 window.__etat = () => {
   const e = new THREE.Euler(0, 0, 0, "YXZ").setFromQuaternion(camera.quaternion);
   const d = 180 / Math.PI;

@@ -81,24 +81,24 @@ async function liaisonLente() {
 
 const LOURD = { dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7], echelleDepart: 1, antiCrenelage: 4, grainLeger: false, preProfondeur: true,
   habillageEssentiel: false, paysage: true,
-  textures: { decor: Infinity, figurants: Infinity, nappes: true }, ecartDetail: 1, porteeDetail: Infinity,
+  textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024 }, ecartDetail: 1, porteeDetail: Infinity,
   ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12,
   halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.004, prises: 40 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { presents: true, ombre: true },
-  fumee: { pas: 48, octaves: 3 } };
+  fumee: { pas: 48, octaves: 3 }, reflets: { definition: 0.5 }, patine: true };
 
 // Un téléphone part à `echelleDepart` et ne monte au-dessus qu'en tenant ses 60 images : chaque iPhone trouve la sienne.
 // `preProfondeur` : à 390 × 844 elle coûte plus de géométrie qu'elle n'épargne de pixels (50 → 39 ms mesurés sans elle).
 const LEGER = { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.75], echelleDepart: 1, antiCrenelage: 4, grainLeger: true, preProfondeur: false,
   habillageEssentiel: false, paysage: true,
-  textures: { decor: 1024, figurants: 512, nappes: true }, ecartDetail: 1, porteeDetail: Infinity,
+  textures: { decor: 1024, figurants: 512, nappes: true, nuages: 512 }, ecartDetail: 1, porteeDetail: Infinity,
   ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: 6,
   halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.004, prises: 12 }, sanctuaire: { ombre: true, carte: 256 }, feux: { ombre: false, carte: 256 }, figurants: { presents: true, ombre: false },
-  fumee: { pas: 16, octaves: 2 } };
+  fumee: { pas: 16, octaves: 2 }, reflets: null, patine: false };
 
 // `halo` et `rayons` nuls = pas de passe du tout, et pas seulement une force nulle : leurs cibles sont allouées par leur constructeur, qu'elles servent ou non.
 // `occlusion` nulle épargne aussi la passe de géométrie qu'elle lisait, hors du Kodesh HaKodashim dont la fumée la lit encore.
 const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echelleDepart: 0.7,
-  textures: { decor: 512, figurants: 256, nappes: true }, ecartDetail: 2,
+  textures: { decor: 512, figurants: 256, nappes: true, nuages: 512 }, ecartDetail: 2,
   occlusion: 0, halo: null, rayons: null,
   fumee: { pas: 8, octaves: 1 } };
 
@@ -107,7 +107,7 @@ const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echell
 // `antiCrenelage` nul : la cible de la scène n'est plus multi-échantillonnée, le FXAA de la chaîne reste seul sur les arêtes.
 // `porteeDetail` : du parvis, le Kotel et ses abords, derrière les murs, faisaient encore un quart des triangles tracés.
 const SOBRE = { ...TRES_LEGER, antiCrenelage: 0, habillageEssentiel: true, paysage: false, figurants: { presents: false, ombre: false },
-  textures: { decor: 512, figurants: 256, nappes: false }, sanctuaire: { ombre: false, carte: 256 }, porteeDetail: 150 };
+  textures: { decor: 512, figurants: 256, nappes: false, nuages: 512 }, sanctuaire: { ombre: false, carte: 256 }, porteeDetail: 150 };
 
 const PROFILS = { haute: LOURD, basse: LEGER, minimale: TRES_LEGER, sobre: SOBRE };
 const force = demande in PROFILS;

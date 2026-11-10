@@ -18,6 +18,7 @@
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
 import { OMBRE_LOINTAINE, assemblage } from "./ombres.js";
+import { LECTURE_DU_REFLET, REFLET } from "./reflet_du_dallage.js";
 
 // Familles : le nom de la matière exportée décide du traitement.
 const LISSE = 0, PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
@@ -47,6 +48,12 @@ export const EXPOSITION = { value: EXPOSITION_DEHORS };
 const PENOMBRE_MIN = { value: new THREE.Vector3(1, 1, 1) };
 const PENOMBRE_MAX = { value: new THREE.Vector3(0, 0, 0) };
 const PENOMBRE_RESTE = 0.12;
+// Vide tant qu'aucune cour n'est donnée : rien ne tombe dedans.
+const COUR_PATINEE = { value: new THREE.Vector4(1, 1, 0, 0) };
+
+export function patinerLesMurs(cour) {
+  COUR_PATINEE.value.set(cour.min.x, cour.min.z, cour.max.x, cour.max.z);
+}
 
 export function assombrir(boite) {
   PENOMBRE_MIN.value.copy(boite.min);
@@ -437,6 +444,29 @@ float penteRampe(float d, vec2 rampe, float pixel){
   return d >= rampe.x && d < rampe.x + l ? 1.0 / l : 0.0;
 }
 
+#ifdef PATINE
+// La cour patinée : (x, z) de ses murs, min puis max. Un édifice en service, lavé et reblanchi (Middot 3:4) : une patine, pas une ruine.
+uniform vec4 uCourPatinee;
+const vec3 CRASSE = vec3(0.46, 0.41, 0.35);
+// Pied, coulure, épaufrure passent sur l'albédo, hors de la tempérance des minéraux, qui les effaçait à l'ombre comme au soleil.
+vec3 mSalissure = vec3(1.0);
+void salir(float force){ mSalissure *= mix(vec3(1.0), CRASSE, clamp(force, 0.0, 1.0)); }
+float presDeLaCour(vec3 P){
+  vec2 dehors = max(max(uCourPatinee.xy - P.xz, P.xz - uCourPatinee.zw), 0.0);
+  return 1.0 - smoothstep(0.0, 3.0, length(dehors));
+}
+// Le dedans des murs, épais d'une ama, d'arête nette : leur dehors donne sur le Har HaBayit, sept mètres plus bas, et n'a pas de sol à ces cotes.
+float dansLaCour(vec3 P){
+  return all(greaterThan(P.xz, uCourPatinee.xy + AMA)) && all(lessThan(P.xz, uCourPatinee.zw - AMA)) ? 1.0 : 0.0;
+}
+// Le pied éclaboussé, sur les deux sols de la cour : l'Azara, et l'Ezrat Israël deux amot et demie plus bas (Middot 2:6).
+const float SOL_ISRAEL = -2.5 * AMA;
+float auPied(vec3 P, float haut){
+  float y = min(P.y < -0.05 ? 1e3 : P.y, P.y - SOL_ISRAEL < -0.05 ? 1e3 : P.y - SOL_ISRAEL);
+  return (1.0 - smoothstep(0.0, haut, y)) * dansLaCour(P);
+}
+#endif
+
 // Appareil de gazit. Le Tanakh mesure ces pierres : « אַבְנֵי עֶשֶׂר אַמּוֹת וְאַבְנֵי שְׁמֹנֶה
 // אַמּוֹת » (Melakhim I 7:10) — deux longueurs, l'assise en tire une —, et les dit sciées
 // lisses dedans et dehors, « מְגֹרָרוֹת בַּמְּגֵרָה מִבַּיִת וּמִחוּץ » (7:9). Tout le relief tient
@@ -486,7 +516,7 @@ void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float ru
 struct Appareil { float assise; float courte; float longue; float debord; float joint; float lisere; };
 // Ce que tailler() lit en un point : les tirages du bloc, la pente de son joint et le masque du creux.
 struct Bloc { float num; float parite; float tireAssise; float tireBloc; float tireFini;
-              float u; vec3 axe; vec3 pente; float creux; };
+              float u; vec3 axe; vec3 pente; float creux; float joint; vec3 dir; };
 
 Bloc tailler(vec3 P, vec3 N, Appareil a){
   Bloc b;
@@ -526,12 +556,37 @@ Bloc tailler(vec3 P, vec3 N, Appareil a){
   float marche = dz < du ? 1.0 + (b.parite * 2.0 - 1.0) * a.debord : 1.0;
   vec3 dir = dz < du ? vec3(0.0, sensZ, 0.0) : b.axe * sensU;
   b.pente = dprofil * marche * dir * (CREUX_M / AMA);
+  b.joint = d;
+  b.dir = dir;
   // Le JOINT seul, sans le liseré : l'ombre s'arrête au fond de la rainure. Étalée sur
   // le liseré, elle cerne chaque bloc d'un cadre sombre que ne montre aucun mur ; le
   // liseré est de la pierre en plein soleil et ne doit rien perdre.
   b.creux = horsJoint(d, a.joint * 1.15 * marche, pixelJoint);
   return b;
 }
+
+#ifdef PATINE
+// Le parement : la coulure qui part sous chaque lit, le pied éclaboussé au niveau de la cour, l'épaufrure du liseré, le bloc plus las que son voisin.
+void patinerParement(vec3 P, Bloc b, Appareil a, inout vec3 teinte, inout vec3 pente, inout float rugo){
+  float zone = presDeLaCour(P);
+  if (zone <= 0.0) return;
+  float pixel = empreinteMax();
+  float hautCourse = a.assise * AMA;
+  float sousLeLit = (1.0 - fract(P.y / hautCourse)) * hautCourse;
+  float longueur = mix(0.25, 1.10, alea1(b.tireBloc * 53.0 + b.num));
+  float fil = grain(vec3(P.x * 4.0, P.y * 0.35, P.z * 4.0), pixel * 4.0);
+  float coulure = (1.0 - smoothstep(0.0, longueur, sousLeLit)) * smoothstep(0.40, 0.65, fil) * (0.55 + 0.45 * b.parite);
+  float pied = auPied(P, 0.30 + 0.35 * grain(P * 2.5 + 5.0, pixel * 2.5));
+  float nuage = smoothstep(0.48, 0.85, grain(P / 3.2, pixel / 3.2));
+  float eclat = smoothstep(0.62, 0.70, grain(P * 6.0 + 1.3, pixel * 6.0)) * (1.0 - smoothstep(a.joint, a.joint + a.lisere * 1.2, b.joint));
+  float las = step(0.72, alea3(vec3(b.tireBloc * 91.0, b.num, 5.0)));
+  float crasse = clamp(nuage * 0.25 + las * 0.15, 0.0, 1.0);
+  teinte *= mix(vec3(1.0), mix(vec3(1.0), CRASSE, crasse), zone);
+  salir((coulure * 0.70 + pied * 0.85 + eclat * 0.60) * zone);
+  pente += b.dir * eclat * 0.30 * zone;
+  rugo += crasse * 0.10 * zone;
+}
+#endif
 
 void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
   if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
@@ -577,6 +632,9 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   // une image répétée. Le saut tombe dans le joint, où la dérivée d'écran explose sur
   // un pixel — c'est le fond de la rainure, et il est déjà à l'ombre.
   photo = vec4(vec3(b.tireBloc, b.tireAssise, b.tireFini) * 13.0, taille.relief);
+#ifdef PATINE
+  patinerParement(P, b, a, teinte, pente, rugo);
+#endif
 }
 
 void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
@@ -978,6 +1036,9 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   }
 #endif
   teinte = mix(vec3(1.0), teinte, nettete);
+#ifdef PATINE
+  mSalissure = mix(vec3(1.0), mSalissure, nettete);
+#endif
   pente *= finesse;
   rugo *= nettete;
   // La nappe passe APRÈS ces trois fondus, et n'en subit aucun : son fondu à elle est
@@ -1087,7 +1148,7 @@ export function habiller(materiau, horloges, jeux) {
   const famille = FAMILLES[nom] ?? LISSE;
   const uniformes = { uTemps: { value: 0 },
                       uHauteurImage: HAUTEUR_IMAGE,
-                      uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX,
+                      uExposition: EXPOSITION, uPenombreMin: PENOMBRE_MIN, uPenombreMax: PENOMBRE_MAX, uCourPatinee: COUR_PATINEE,
                       uLueurs: LUEURS, uLueurCouleur: LUEUR_COULEUR, uVersSalle: VERS_SALLE,
                       ...OMBRE_LOINTAINE };
   if (famille === EAU || famille === BRAISE) horloges.push(uniformes.uTemps);
@@ -1118,6 +1179,8 @@ export function habiller(materiau, horloges, jeux) {
   const parokhet = materiau.name === "Parokhet_tissee";
   if (parokhet) uniformes.uParokhet = { value: jeux.get("parokhet").motif };
   if (gravure) uniformes.uGravure = { value: jeux.get("gravures").motif };
+  const refletDuDallage = materiau.userData.refletDuDallage === true;
+  if (refletDuDallage) Object.assign(uniformes, REFLET);
   const rayonFil = materiau.userData.rayon;
   if (rayonFil) {
     uniformes.uRayonFil = { value: rayonFil };
@@ -1126,11 +1189,13 @@ export function habiller(materiau, horloges, jeux) {
   const drapeaux = `#define FAMILLE ${rendue}\n`
     + (PROFIL.grainLeger ? "#define GRAIN_LEGER\n" : "")
     + (MINERAUX.has(rendue) ? "#define TEMPERE\n" : "")
+    + (PROFIL.patine && rendue === PIERRE ? "#define PATINE\n" : "")
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
     + (parokhet ? "#define PAROKHET\n" : "")
     + (gravure ? "#define GRAVURE\n" : "")
-    + (rayonFil ? "#define FIL\n" : "");
+    + (rayonFil ? "#define FIL\n" : "")
+    + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "");
 
   // La sonde du Heikhal pose son propre reflet, celui de la salle : ce n'est plus le ciel qu'il faut éteindre.
   const refletDuCiel = () => (materiau.envMap ? "" : "#define REFLET_DU_CIEL\n");
@@ -1149,7 +1214,7 @@ export function habiller(materiau, horloges, jeux) {
       .source;
 
     nuanceur.fragmentShader = greffable(nuanceur.fragmentShader)
-      .greffer("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
+      .greffer("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + LECTURE_DU_REFLET + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
       .greffer("#include <shadowmap_pars_fragment>", assemblage("vMonde", "normalize(vNMonde)"))
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
@@ -1168,7 +1233,7 @@ export function habiller(materiau, horloges, jeux) {
       // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.
       .greffer("#include <lights_fragment_begin>", soleilEnPenombre())
       .greffer("#include <color_fragment>",
-               "#include <color_fragment>\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
+               "#include <color_fragment>\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef PATINE\ndiffuseColor.rgb *= mSalissure;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
       // La teinte d'un minéral se pose APRÈS l'éclairage : son exposant dépend de la
       // clarté reçue. Le relief, lui, se tempère sur la lumière du ciel seule — celle
       // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
@@ -1218,6 +1283,10 @@ export function habiller(materiau, horloges, jeux) {
             vec3 mCuite = lightMapIrradiance * mRelief * mReliefCuit * mPenombre;
           #endif
         #endif
+        float mPlan = 0.0;
+        #ifdef REFLET_DU_DALLAGE
+          mPlan = refleterLaCour(radiance, vMonde, normalize(vNMonde), normal, material.roughness);
+        #endif
         irradiance *= mPenombre;
         iblIrradiance *= mPenombre;
         radiance *= mPenombre;
@@ -1226,7 +1295,7 @@ export function habiller(materiau, horloges, jeux) {
           reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
           // Sous un toit, pierre ou or reflète la salle, pas le ciel : son reflet suit la part de ciel que la carte a reçue.
           #ifdef REFLET_DU_CIEL
-            reflectedLight.indirectSpecular *= mPartDuCiel;
+            reflectedLight.indirectSpecular *= mix(mPartDuCiel, 1.0, mPlan);
           #endif
         #endif
         #ifdef TEMPERE
