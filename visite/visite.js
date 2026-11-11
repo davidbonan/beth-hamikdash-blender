@@ -161,8 +161,9 @@ const PLACAGE = 0.01;
 const salleDuHeikhal = EMPRISES.get("heikhal").clone();
 salleDuHeikhal.min.z = -10 * AMA;
 salleDuHeikhal.max.z = 10 * AMA;
-// `lobe` : l'étalement du reflet ; `force` : sa part dans ce que le sol renvoie. L'or poli du Heikhal reflète net ; la pierre des cours, sèche, n'en garde qu'une lueur.
-const REFLET_DE_LA_PIERRE = { lobe: 0.6, force: 0.3 }, REFLET_DE_L_OR = { lobe: 0.15, force: 0.6 };
+// `lobe` : l'étalement du reflet ; `force` : sa part dans ce que le sol renvoie. L'or poli du Heikhal reflète net ; la pierre des cours, sèche, n'en garde qu'une lueur,
+// assez floue pour que ce qui s'y reflète se trace d'une seule matière (`uni`).
+const REFLET_DE_LA_PIERRE = { lobe: 0.6, force: 0.3, uni: true }, REFLET_DE_L_OR = { lobe: 0.15, force: 0.6 };
 const DALLAGES_REFLETES = { azara: "Sol", ezrat_nashim: "Sol", heikhal: "Or_plaque" };
 const SOLS_DES_COURS = { azara: 0, ezrat_nashim: -10 * AMA };
 const dallage = refleterLesDallages(renderer, scene, camera, {
@@ -639,16 +640,12 @@ const avantLePas = new THREE.Vector3();
 // À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
-// La définition cède avant le miroir du dallage : sur un grand écran l'image coûte par pixel, et lâcher le miroir d'abord n'allégeait rien.
-const PALIERS = [...PROFIL.echelles.map((definition) => ({ echelle: definition, reflets: PROFIL.reflets !== null })),
-                 ...(PROFIL.reflets ? [{ echelle: PROFIL.echelles.at(-1), reflets: false }] : [])];
-const regulateur = regulerEchelle(PALIERS, PALIERS.find((palier) => palier.echelle === PROFIL.echelleDepart),
-                                  { quandABout: seReplier, quandALAise: seRelever });
+// Seule la définition cède : le miroir du dallage n'est pas un palier, lâché il manquait à l'œil sans que l'image y gagne assez.
+const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart, { quandABout: seReplier, quandALAise: seRelever });
 function ajusterEchelle(dt) {
-  const palier = regulateur.suivre(dt, performance.now() / 1000);
-  if (palier === null) return;
-  echelle = palier.echelle;
-  dallage.allumer(palier.reflets);
+  const voulue = regulateur.suivre(dt, performance.now() / 1000);
+  if (voulue === null) return;
+  echelle = voulue;
   dimensionner();
 }
 

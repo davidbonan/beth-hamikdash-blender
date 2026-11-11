@@ -70,10 +70,9 @@ function teintesMoyennes() {
 const SOUS_LE_CIEL = {};
 const salleDe = ({ envMap, envMapIntensity, lightMap, lightMapIntensity }) => (envMap ? { envMap, envMapIntensity, lightMap, lightMapIntensity } : SOUS_LE_CIEL);
 
-function matieresEpurees() {
+function matieresEpurees(teinteDe) {
   const epures = [];
   const epureDe = new WeakMap();
-  const teinteDe = teintesMoyennes();
 
   function epurer(maillage) {
     const vraie = maillage.material;
@@ -97,7 +96,42 @@ function matieresEpurees() {
   };
 }
 
+// Flou, le reflet d'une cour ne garde du décor que sa teinte et sa lumière : il se trace d'une seule matière, la teinte portée par les sommets.
+// C'est le nombre de matières qui coûtait ce tracé, pas ses pixels : passé une douzaine, une image manquée sur cinq en rétina dans l'Azara.
+const TEINTE = "color";
+
+function matieresUnies(teinteDe, epure) {
+  const unies = new Map();
+  const teintes = new WeakSet();
+  const unie = (side) => unies.get(side) ?? unies.set(side, new THREE.MeshStandardMaterial({ vertexColors: true, side })).get(side);
+  const luit = ({ emissive, emissiveIntensity }) => emissive.getHex() * emissiveIntensity > 0;
+  // Ce qui luit, ce qui bouge par ses os et ce qui n'a pas reçu ses sommets garde sa matière épurée.
+  const seTeint = ({ isSkinnedMesh, material, geometry }) => !isSkinnedMesh && material.isMeshStandardMaterial && !luit(material) && geometry.hasAttribute(TEINTE);
+
+  function teindre({ geometry, material }) {
+    const { r, g, b } = teinteDe(material);
+    const sommets = geometry.getAttribute(TEINTE);
+    for (let i = 0; i < sommets.count; i++) sommets.setXYZW(i, r, g, b, 1);
+    sommets.needsUpdate = true;
+    teintes.add(geometry);
+  }
+
+  return {
+    // Quatre octets par sommet : Metal n'aligne pas un attribut de trois.
+    preparer({ isSkinnedMesh, geometry }) {
+      if (isSkinnedMesh || geometry.hasAttribute(TEINTE)) return;
+      geometry.setAttribute(TEINTE, new THREE.BufferAttribute(new Uint8Array(geometry.getAttribute("position").count * 4), 4, true));
+    },
+    vetir(maillage) {
+      if (!seTeint(maillage)) return epure(maillage);
+      if (!teintes.has(maillage.geometry)) teindre(maillage);
+      return unie(maillage.material.side);
+    },
+  };
+}
+
 // `cour` : là où l'œil voit ce dallage, hors de ses `salles`. `clos` : le volume dont rien ne se voit de la cour. `lobe` : l'étalement du reflet ; `force` : sa part dans ce que le sol renvoie.
+// `uni` : le reflet est assez flou pour se tracer d'une seule matière.
 export function refleterLesDallages(renderer, scene, camera, { dallages, caches }) {
   if (!PROFIL.reflets) return SANS_REFLET;
   const { definition } = PROFIL.reflets;
@@ -106,9 +140,12 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
     depthTexture: new THREE.DepthTexture(1, 1),
   });
   const miroir = new THREE.PerspectiveCamera();
-  const epure = matieresEpurees();
-  const plans = dallages.map(({ cote, lobe, force, cour, salles = [], clos = new THREE.Box3() }, rang) => ({
-    cote, lobe, force, cour, salles, clos,
+  const teinteDe = teintesMoyennes();
+  const epure = matieresEpurees(teinteDe);
+  const unies = matieresUnies(teinteDe, epure);
+  const plans = dallages.map(({ cote, lobe, force, uni = false, cour, salles = [], clos = new THREE.Box3() }, rang) => ({
+    cote, lobe, force, uni, cour, salles, clos,
+    vetir: uni ? unies.vetir : epure,
     calque: PREMIER_CALQUE + rang,
     auDessus: new THREE.Box3(
       new THREE.Vector3(cour.min.x - ABORDS, cote, cour.min.z - ABORDS), new THREE.Vector3(cour.max.x + ABORDS, Infinity, cour.max.z + ABORDS)),
@@ -163,7 +200,7 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
   }
 
   function tracer(plan) {
-    const { calque, refletes } = plan;
+    const { calque, refletes, vetir } = plan;
     poserLeMiroir(plan);
     miroir.layers.set(calque);
     // Une lampe hors du calque manquerait au miroir, et chaque matière se recompilerait pour son compte de lampes.
@@ -177,7 +214,7 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
     const ombresSuivies = renderer.shadowMap.autoUpdate;
     const matieres = refletes.map((maillage) => maillage.material);
     try {
-      refletes.forEach((maillage) => { maillage.material = epure(maillage); });
+      refletes.forEach((maillage) => { maillage.material = vetir(maillage); });
       renderer.setClearColor(0x000000, 0);
       renderer.setRenderTarget(cible);
       renderer.clear();
@@ -209,8 +246,9 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
   REFLET.tProfondeurReflet.value = cible.depthTexture;
   // Cheveux et barbes sont des cartes découpées : épurées elles feraient des plaques, et le flou ne les montre pas.
   const decoupe = ({ material }) => material.isMeshStandardMaterial && (material.transparent || material.alphaTest > 0);
-  const refleterSur = ({ calque, refletes }) => (maillage) => {
+  const refleterSur = ({ calque, refletes, uni }) => (maillage) => {
     if (decoupe(maillage)) return;
+    if (uni) unies.preparer(maillage);
     maillage.layers.enable(calque);
     refletes.push(maillage);
   };
@@ -218,7 +256,7 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
   return {
     rendre, redimensionner,
     allumer(voulu) { allume = voulu; },
-    // À confier avant les niveaux de détail, dont les tuiles prennent les calques de leur maillage et lisent sa matière.
+    // À confier avant les niveaux de détail, dont les tuiles prennent les calques et les attributs de leur maillage et lisent sa matière.
     confier(maillages) {
       for (const plan of plans) maillages.filter(seVoitDe(plan)).forEach(refleterSur(plan));
     },
