@@ -2,11 +2,11 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { habiller, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
+import { habiller, refleteSaCour, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
-import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
+import { COURS, DANS_HEIKHAL, boitesDesSondes, courDe, separerDuHeikhal, sonderHeikhal, sonderLaCour } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { refleterLesDallages } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
@@ -164,10 +164,11 @@ salleDuHeikhal.max.z = 10 * AMA;
 // L'or poli du Heikhal reflète net ; la pierre des cours ne garde du reflet que ses masses claires et sombres.
 const LOBE_DE_LA_PIERRE = 0.6, LOBE_DE_L_OR = 0.15;
 const DALLAGES_REFLETES = { azara: "Sol", ezrat_nashim: "Sol", heikhal: "Or_plaque" };
+const SOLS_DES_COURS = { azara: 0, ezrat_nashim: -10 * AMA };
 const dallage = refleterLesDallages(renderer, scene, camera, {
   dallages: [
-    { cote: 0, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
-    { cote: -10 * AMA, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
+    { cote: SOLS_DES_COURS.azara, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
+    { cote: SOLS_DES_COURS.ezrat_nashim, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
     { cote: 6 * AMA + PLACAGE, lobe: LOBE_DE_L_OR, cour: salleDuHeikhal },
   ],
   caches: [ciel],
@@ -287,6 +288,8 @@ const brut = new URLSearchParams(location.search).has("brut");
 const IDS = new Set(CONCEPTS.keys());
 const habillees = new Set();
 const materiauxHeikhal = [];
+const materiauxDesCours = new Map(COURS.map((cour) => [cour, []]));
+const sondes = boitesDesSondes(EMPRISES, SOLS_DES_COURS);
 
 function conceptDe(objet) {
   for (let n = objet; n; n = n.parent) {
@@ -332,11 +335,16 @@ gltf.scene.traverse((o) => {
     const lumiere = lumieres.get(o.userData.groupeCuit);
     // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
     const refletDuDallage = PROFIL.reflets && DALLAGES_REFLETES[o.userData.groupeCuit] === o.material.name;
-    if (occlusion || lumiere || sousSonde.has(o) || refletDuDallage) o.material = o.material.clone();
+    const cour = !sousSonde.has(o) && refleteSaCour(o.material) ? courDe(o, sondes) : null;
+    if (occlusion || lumiere || sousSonde.has(o) || refletDuDallage || cour) o.material = o.material.clone();
     if (refletDuDallage) o.material.userData.refletDuDallage = true;
     if (occlusion) o.material.aoMap = occlusion;
     if (lumiere) Object.assign(o.material, { lightMap: lumiere.texture, lightMapIntensity: lumiere.echelle });
     if (sousSonde.has(o)) materiauxHeikhal.push(o.material);
+    if (cour) {
+      materiauxDesCours.get(cour).push(o.material);
+      o.material.userData.sonde = sondes.get(cour);
+    }
   }
   if (!brut && !habillees.has(o.material.uuid)) {
     habillees.add(o.material.uuid);
@@ -375,9 +383,13 @@ const refleterLeHeikhal = () => sonderHeikhal(renderer, scene, {
   lumieres: [soleil, appoint, lampe, cielAmbiant],
   caches: [ciel],
 });
+const refleterLesCours = () => {
+  for (const [cour, materiaux] of materiauxDesCours) sonderLaCour(renderer, scene, { cour, boite: sondes.get(cour), materiaux });
+};
 if (!brut) {
   await glisserPendantLeGel("reflet");
   refleterLeHeikhal();
+  refleterLesCours();
   await rendu.compiler();                 // le reflet de la salle change les nuanceurs de son or
 }
 
@@ -526,7 +538,10 @@ function afficherMoment() {
 
 async function passerAuMoment(voulu) {
   if (voulu === eclairage.moment) return;
-  await fondu(() => eclairage.passerAu(voulu));
+  await fondu(async () => {
+    await eclairage.passerAu(voulu);
+    if (!brut) refleterLesCours();
+  });
   afficherMoment();
 }
 boutonMoment.onclick = (e) => { passerAuMoment(eclairage.moment === "jour" ? "nuit" : "jour"); e.currentTarget.blur(); };
@@ -817,7 +832,10 @@ async function reprendre() {
   scene.traverse((o) => { if (o.isLight && o.shadow) o.shadow.needsUpdate = true; });
   eclairage.retracerLOmbreLointaine();
   await rechargerCartes();
-  if (!brut) refleterLeHeikhal();
+  if (!brut) {
+    refleterLeHeikhal();
+    refleterLesCours();
+  }
 }
 
 // Au premier passage l'initiation remplace le rappel des commandes ; « Aide » la rejoue.

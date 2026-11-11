@@ -37,6 +37,9 @@ const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE,
 const ESSENTIELLES = new Set([PIERRE, DALLE, METAL, ETOFFE]);
 // Le dôme éclairant est beige et désaturé : à 1, l'or au soleil n'en reflétait qu'un gris-vert.
 const REFLET_DU_METAL = 1.6;
+// Ce que reflète la sonde d'une cour : ses métaux. Le dallage s'en tient au miroir, ou au ciel : prise au centre, la sonde
+// ne sait pas ce qu'une dalle a vraiment en face d'elle, et le sol se tachait de l'or et du rouge vus par la porte.
+export const refleteSaCour = (materiau) => [METAL, MIKSHE].includes(FAMILLES[materiau.name.replace(/_grave$/, "")]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
@@ -132,10 +135,10 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pie
 // La COULEUR, elle, se règle à l'ombre et jamais au soleil, parce que la courbe de l'écran
 // ne la rend pas au même taux des deux côtés : un parement ensoleillé est à 1,3 de
 // linéaire, sur l'épaule, où un écart d'albédo ressort tassé ; le même parement à l'ombre
-// est à 0,20, sur la partie droite, où il ressort entier. Réglée à l'œil sur un mur au soleil, la nappe passait à 0,62 et
-// couvrait de salissures tout ce que le soleil ne touchait pas. Ce qui porte le
-// parement au soleil, ce n'est pas sa couleur mais son RELIEF : il monte d'autant que
-// la couleur descend. Ni l'un ni l'autre ne sort plus à l'ombre qu'au soleil : c'est
+// est à 0,20, sur la partie droite, où il ressort entier. Réglée à l'œil sur un mur au
+// soleil, la nappe passait à 0,62 et couvrait de salissures tout ce que le soleil ne
+// touchait pas. Ce qui porte le parement au soleil, ce n'est pas sa couleur mais son
+// RELIEF : il monte d'autant que la couleur descend. Ni l'un ni l'autre ne sort plus à l'ombre qu'au soleil : c'est
 // l'affaire de `temperance`, qui ne laisse pas la courbe les grossir.
 const CARREAU = {
   1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
@@ -1076,6 +1079,22 @@ const LUEURS_DE_LA_SALLE = /* glsl */`
 `;
 
 // Un morceau que three aurait renommé laissait la greffe sans effet, et la matière nue sans rien dire.
+// Le reflet d'une sonde de cour, lu au point et non au centre : le rayon réfléchi est recoupé avec la boîte de la cour.
+// Hors de la boîte, l'or d'une façade qui la dépasse, il garde sa direction.
+function environnementEnBoite() {
+  const repere = "reflectVec = inverseTransformDirection( reflectVec, viewMatrix );";
+  const morceau = THREE.ShaderChunk.envmap_physical_pars_fragment;
+  if (!morceau.includes(repere)) throw new Error(`three a changé ${repere} : sonde non projetée`);
+  return /* glsl */`
+    uniform vec3 uSondeMin, uSondeMax, uSondeCentre;
+    vec3 recouperLaBoite(vec3 d){
+      if (any(lessThan(vMonde, uSondeMin)) || any(greaterThan(vMonde, uSondeMax))) return d;
+      vec3 sortie = max((uSondeMax - vMonde) / d, (uSondeMin - vMonde) / d);
+      return normalize(vMonde + d * min(min(sortie.x, sortie.y), sortie.z) - uSondeCentre);
+    }
+` + morceau.replace(repere, repere + "\nreflectVec = recouperLaBoite(reflectVec);");
+}
+
 const greffable = (source) => ({
   source,
   greffer(repere, greffe) {
@@ -1131,6 +1150,8 @@ export function habiller(materiau, horloges, jeux) {
   if (gravure) uniformes.uGravure = { value: jeux.get("gravures").motif };
   const refletDuDallage = materiau.userData.refletDuDallage === true;
   if (refletDuDallage) Object.assign(uniformes, REFLET);
+  const { sonde } = materiau.userData;
+  if (sonde) Object.assign(uniformes, { uSondeMin: { value: sonde.min }, uSondeMax: { value: sonde.max }, uSondeCentre: { value: sonde.centre } });
   const rayonFil = materiau.userData.rayon;
   if (rayonFil) {
     uniformes.uRayonFil = { value: rayonFil };
@@ -1144,10 +1165,11 @@ export function habiller(materiau, horloges, jeux) {
     + (parokhet ? "#define PAROKHET\n" : "")
     + (gravure ? "#define GRAVURE\n" : "")
     + (rayonFil ? "#define FIL\n" : "")
-    + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "");
+    + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
+    + (sonde ? "#define SONDE_EN_BOITE\n" : "");
 
   // La sonde du Heikhal pose son propre reflet, celui de la salle : ce n'est plus le ciel qu'il faut éteindre.
-  const refletDuCiel = () => (materiau.envMap ? "" : "#define REFLET_DU_CIEL\n");
+  const refletDuCiel = () => (materiau.userData.refletVoitLeCiel === false ? "" : "#define REFLET_DU_CIEL\n");
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
     nuanceur.vertexShader = greffable(nuanceur.vertexShader)
@@ -1267,6 +1289,7 @@ export function habiller(materiau, horloges, jeux) {
       .greffer("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
         normal = normalize(normal - mat3(viewMatrix) * mPente);`)
+      .greffer("#include <envmap_physical_pars_fragment>", sonde ? environnementEnBoite() : "#include <envmap_physical_pars_fragment>")
       .source;
   };
   materiau.customProgramCacheKey = () => `mikdash-${drapeaux}${refletDuCiel()}`;
