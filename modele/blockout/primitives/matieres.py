@@ -377,6 +377,10 @@ MAT_BRONZE = lambda: metal("Bronze", (0.66, 0.44, 0.22), 0.45)
 # cuivre tirait déjà sur l'or. Il se tient donc entre le bronze et l'or, et plus poli
 # que le bronze : c'est de sa lumière que vient l'argument.
 MAT_NEHOSHET = lambda: metal("Nehoshet_matzhiv", (0.86, 0.63, 0.29), 0.34)
+# Le fond des frises des eilim de Nikanor : le même cuivre, battu au marteau, sous les palmes polies.
+MAT_NEHOSHET_MARTELE = lambda: metal("Nehoshet_martele", (0.66, 0.42, 0.20), 0.44)
+# « בְּמְחִיצָה בְּהִירָה וְזַכָּה » (Metzudat David sur Ye'hezkel 40:16) : vue du dehors en plein jour, plus sombre que le parement.
+MAT_MEHITZA = lambda: enduit("Mehitza_behira", (0.40, 0.31, 0.20))
 MAT_TERRE_CUITE = lambda: enduit("Terre_cuite", (0.46, 0.25, 0.16))
 MAT_ROCHE = lambda: roche("Roche_shetiya")
 MAT_SEL = lambda: enduit("Sel", (0.93, 0.93, 0.91))              # Lishkat HaMela'h (Middot 5:3)

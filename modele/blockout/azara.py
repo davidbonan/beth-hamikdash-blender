@@ -1,10 +1,8 @@
-import math
-
 from .primitives.parametres import Z_AZ, Z_EZI, Z_EZN
-from .primitives.matieres import (MAT_ARGENT, MAT_BRONZE, MAT_CEDRE, MAT_CHENE, MAT_NEHOSHET, MAT_OR,
-                                  MAT_PIERRE, MAT_SOL)
-from .primitives.volumes import alea, box, cone, crochet, cyl, mesh_from_pydata, mur_perce, revolution
-from .primitives.gravures import largeur_gravure, timora
+from .primitives.matieres import (MAT_ARGENT, MAT_BRONZE, MAT_CEDRE, MAT_CHENE, MAT_MEHITZA, MAT_NEHOSHET,
+                                  MAT_NEHOSHET_MARTELE, MAT_OR, MAT_PIERRE, MAT_SOL)
+from .primitives.volumes import alea, box, cone, crochet, cyl, mur_perce, revolution
+from .primitives.gravures import timora
 from .primitives.ouvrages import CORNICHE, LISHKA_DEBORD, battants, massif_evide, shaar, vantail
 
 
@@ -78,54 +76,92 @@ for _cote, _nu, _sens in (("est", AX1 + T, 1), ("ouest", AX1, -1)):
           "20_Azara", metal=MAT_NEHOSHET(), ressauts=2, pied=Z_EZN if _cote == "est" else None)
 battants("Nikanor_porte", "y", 0, AX1 + T, AX1, Z_EZI, 20, "20_Azara", MAT_NEHOSHET())
 # « וַיַּעַשׂ אֶת־אֵילִים שִׁשִּׁים אַמָּה » (Ye'hezkel 40:14), « גָּבְהָן שֶׁל אֵילִים… שִׁשִּׁים אַמָּה » (Rashi), et le שער intérieur est « כַּמִּדּוֹת הָאֵלֶּה » (40:32).
-# Deux piliers de soixante amot depuis l'Ezrat Nashim, de part et d'autre du cadre, hors de l'axe de Middot 2:4 ;
-# « וְתִמֹרִים אֶל־אֵילָיו » (40:34), et la timora est « כּוֹתֶרֶת דּוֹמֶה לְדֶקֶל » (Rashi sur 40:16) : leur chapiteau est une palme de bronze.
-# Section, palme et bronze : CHOIX ; entre le cadre de Nikanor (10,1) et celui des lishkot des Léviim (14,75).
-AMUD_Y, AMUD_L, AMUD_SAILLIE = 12.5, 4.2, 3.6
-AMUD_SOMMET = Z_EZN + 60
-AMUD_CHAPITEAU, AMUD_TAILLOIR = 3.4, 0.6
+# Deux tours de soixante amot depuis l'Ezrat Nashim, de part et d'autre du cadre, hors de l'axe de Middot 2:4 : rien
+# ne monte au-dessus de la porte. Section, retraits et place : CHOIX. Elles s'adossent à la face est du mur et ne
+# passent derrière qu'au-dessus de sa crête : les lishkot de Middot 1:4 restent dessous, intactes.
+EIL_Y0, EIL_Y1 = 10.6, 20.3          # du cadre de la porte à celui de la lishka de HaKelim
+EIL_FACE = AX1 + T + 6
+EIL_PLINTHE, EIL_RETRAIT = 0.6, 0.5
+EIL_SOMMET = Z_EZN + 60
+CRETE = Z_AZ + H_MUR + max(zh for _, zh, _ in CORNICHE)
+EIL_Z_RETRAIT, EIL_Z_COU, EIL_TETE = CRETE + 1.2, 38.5, EIL_SOMMET - 2
+EMPRISES_EILIM = [(-EIL_Y1 - EIL_PLINTHE, -EIL_Y0 + EIL_PLINTHE), (EIL_Y0 - EIL_PLINTHE, EIL_Y1 + EIL_PLINTHE)]
+# « חַלֹּנוֹת אֲטֻמוֹת » (40:16) : « רחבות מבחוץ וצרות מבפנים » (Radak), fermées « במחיצה בהירה וזכה לבוא האורה »
+# (Metzudat David). Deux ressauts de pierre, la cloison au fond, trois barreaux de bronze.
+EIL_FENETRE = (29.0, 35.8)
 
 
-def chapiteau_en_palme(nom, x, y, z0, h, r0, r1, col, mat, palmes=12):
-    """Corbeille tournée et couronne de palmes qui s'en écartent, la pointe retombant : la כּוֹתֶרֶת de Rashi sur Ye'hezkel 40:16."""
-    revolution(f"{nom}_corbeille", x, y, z0, [(r0, 0), (r0 * 1.08, 0.08 * h), (r0 + (r1 - r0) * 0.3, 0.45 * h),
-                                             (r1 * 0.97, 0.85 * h), (r1, h), (0, h)], col, mat, verts=24)
-    trace = [(r0 * 1.02, 0.05), (r0 + (r1 - r0) * 0.45, 0.45), (r1 * 1.05, 0.8), (r1 * 1.22, 0.98), (r1 * 1.32, 0.86)]
-    for k in range(palmes):
-        a = 2 * math.pi * (k + 0.5) / palmes
-        dehors, travers = (math.cos(a), math.sin(a)), (-math.sin(a), math.cos(a))
-        verts = []
-        for i, (r, t) in enumerate(trace):
-            demi = math.pi * r / palmes * 0.85 * (1 - 0.75 * i / (len(trace) - 1))
-            for e in (0.0, 0.08):
-                for c in (-1, 1):
-                    verts.append((x + dehors[0] * (r + e) + travers[0] * c * demi,
-                                  y + dehors[1] * (r + e) + travers[1] * c * demi, z0 + t * h))
-        faces = []
-        for i in range(len(trace) - 1):
-            a0, b0 = 4 * i, 4 * (i + 1)
-            faces += [[a0, b0, b0 + 1, a0 + 1], [a0 + 2, a0 + 3, b0 + 3, b0 + 2],
-                      [a0, a0 + 2, b0 + 2, b0], [a0 + 1, b0 + 1, b0 + 3, a0 + 3]]
-        n = 4 * (len(trace) - 1)
-        faces += [[0, 1, 3, 2], [n, n + 2, n + 3, n + 1]]
-        mesh_from_pydata(f"{nom}_palme_{k:02d}", verts, faces, col, mat)
+def fenetre_evasee(nom, paroi, u, z0, z1):
+    """Fenêtre de l'eil sur `paroi` = (axe, cote de la face, sens) — 'y' : face est ou ouest, 'x' : flanc."""
+    axe, nu, sens = paroi
+
+    def pose(suffixe, u0, u1, zb, zh, d0, d1, mat):
+        a, b = sorted((nu + sens * d0, nu + sens * d1))
+        bornes = (a, b, u0, u1) if axe == "y" else (u0, u1, a, b)
+        box(f"{nom}_{suffixe}", *bornes, zb, zh, "20_Azara", mat)
+
+    for k, (demi, marge, saillie) in enumerate(((1.35, 0.7, 0.6), (0.95, 0.35, 0.35))):
+        for cote, (a, b) in (("g", (u - demi, u - 0.55)), ("d", (u + 0.55, u + demi))):
+            pose(f"ressaut_{k}_{cote}", a, b, z0 - marge, z1 + marge, 0.0, saillie, MAT_PIERRE())
+        pose(f"ressaut_{k}_haut", u - demi, u + demi, z1, z1 + marge, 0.0, saillie, MAT_PIERRE())
+        pose(f"ressaut_{k}_bas", u - demi, u + demi, z0 - marge, z0, 0.0, saillie, MAT_PIERRE())
+    pose("cloison", u - 0.55, u + 0.55, z0, z1, 0.0, 0.05, MAT_MEHITZA())
+    for k in range(1, 4):
+        z = z0 + k * (z1 - z0) / 4
+        pose(f"barreau_{k}", u - 0.55, u + 0.55, z - 0.06, z + 0.06, 0.05, 0.14, MAT_NEHOSHET())
+    pose("appui", u - 1.6, u + 1.6, z0 - 1.1, z0 - 0.7, 0.0, 0.8, MAT_PIERRE())
+
+
+def palme_de_bronze(nom, paroi, u, z0, h):
+    """Timora de bronze appliquée sur `paroi` : `timora` taille dans la face, la plaque en sort ici d'un rien."""
+    axe, nu, sens = paroi
+    timora(nom, (axe, nu + sens * 0.08, sens), u, z0, h, "20_Azara", MAT_NEHOSHET())
 
 
 for _cote, _s in (("S", -1), ("N", 1)):
-    _nom, _y0, _y1 = f"Nikanor_amud_{_cote}", *sorted((_s * (AMUD_Y - AMUD_L / 2), _s * (AMUD_Y + AMUD_L / 2)))
-    _fut = AMUD_SOMMET - AMUD_TAILLOIR - AMUD_CHAPITEAU - 0.6
-    box(f"{_nom}_fut", AX1 + T, AX1 + T + AMUD_SAILLIE, _y0, _y1, Z_EZN, _fut, "20_Azara")
-    box(f"{_nom}_astragale", AX1 + T - 0.15, AX1 + T + AMUD_SAILLIE + 0.15, _y0 - 0.15, _y1 + 0.15, _fut, _fut + 0.6,
+    _nom = f"Nikanor_eil_{_cote}"
+    _y0, _y1 = sorted((_s * EIL_Y0, _s * EIL_Y1))
+    _ya, _yb = _y0 + EIL_RETRAIT, _y1 - EIL_RETRAIT
+    _xo, _xe = AX1 + EIL_RETRAIT, EIL_FACE - EIL_RETRAIT
+    _milieu = _s * (EIL_Y0 + EIL_Y1) / 2
+    # La chambre des Léviim garde sa porte (Middot 2:6) : un passage traverse le pied de la tour.
+    _porte = next(p for nm, _, _, p in LISHKOT_EZI if nm == f"Leviim_{_cote}")
+    _passage = (AX1 + T, EIL_FACE + EIL_PLINTHE, _porte - 1.5, _porte + 1.5, Z_EZN, Z_EZN + H_PORTE_EZI)
+    massif_evide(f"{_nom}_plinthe", AX1 + T, EIL_FACE + EIL_PLINTHE, _y0 - EIL_PLINTHE, _y1 + EIL_PLINTHE,
+                 Z_EZN, Z_EZN + 3, [_passage], "20_Azara")
+    massif_evide(f"{_nom}_fut", AX1 + T, EIL_FACE, _y0, _y1, Z_EZN + 3, CRETE, [_passage], "20_Azara")
+    box(f"{_nom}_sur_la_crete", AX1, AX1 + T, _y0, _y1, Z_AZ + H_MUR, CRETE, "20_Azara")
+    box(f"{_nom}_bandeau", AX1 - 0.4, EIL_FACE + 0.4, _y0 - 0.4, _y1 + 0.4, CRETE, EIL_Z_RETRAIT, "20_Azara")
+    box(f"{_nom}_bandeau_filet", EIL_FACE + 0.4, EIL_FACE + 0.48, _y0 - 0.4, _y1 + 0.4, CRETE + 0.35, CRETE + 0.85,
         "20_Azara", MAT_NEHOSHET())
-    _cx, _cy = AX1 + T + AMUD_SAILLIE / 2, _s * AMUD_Y
-    chapiteau_en_palme(f"{_nom}_chapiteau", _cx, _cy, _fut + 0.6, AMUD_CHAPITEAU, AMUD_L / 2, AMUD_L * 0.85,
-                       "20_Azara", MAT_NEHOSHET())
-    _t = AMUD_SOMMET - AMUD_TAILLOIR
-    box(f"{_nom}_tailloir", _cx - AMUD_L * 0.95, _cx + AMUD_L * 0.95, _cy - AMUD_L * 0.95, _cy + AMUD_L * 0.95, _t,
-        AMUD_SOMMET, "20_Azara")
-    _palmier = AMUD_L * 0.8 / largeur_gravure("timora")
-    for _face, _paroi in (("est", ("y", AX1 + T + AMUD_SAILLIE, 1)), ("ouest", ("y", AX1 + T, -1))):
-        timora(f"{_nom}_timora_{_face}", _paroi, _cy, _fut - 4 - _palmier, _palmier, "20_Azara", MAT_NEHOSHET())
+    box(f"{_nom}_etage", _xo, _xe, _ya, _yb, EIL_Z_RETRAIT, EIL_Z_COU, "20_Azara")
+    palme_de_bronze(f"{_nom}_timora", ("y", EIL_FACE, 1), _milieu, 5.0, 14.0)
+    for _k, _dy in enumerate((-2.6, 2.6)):
+        fenetre_evasee(f"{_nom}_fenetre_est_{_k}", ("y", _xe, 1), _milieu + _dy, *EIL_FENETRE)
+        fenetre_evasee(f"{_nom}_fenetre_ouest_{_k}", ("y", _xo, -1), _milieu + _dy, *EIL_FENETRE)
+    _flanc, _dedans = (_yb, _ya) if _s > 0 else (_ya, _yb)
+    fenetre_evasee(f"{_nom}_fenetre_flanc", ("x", _flanc, _s), (_xo + _xe) / 2, *EIL_FENETRE)
+    # « בְּרֹאשׁ הָאַיִל הָיָה עָשׂוּי כְּמִין כּוֹתֶרֶת, דּוֹמֶה לְדֶקֶל » (Rashi sur 40:16) : la tête est une frise de bronze
+    # martelé, une palme polie sur chacune de ses faces, sous une corniche en gorge. Dessin : CHOIX.
+    box(f"{_nom}_collier", _xo - 0.25, _xe + 0.25, _ya - 0.25, _yb + 0.25, EIL_Z_COU, EIL_Z_COU + 0.8, "20_Azara",
+        MAT_NEHOSHET())
+    _f, _gorge = 0.3, EIL_TETE - 2.4
+    box(f"{_nom}_frise", _xo - _f, _xe + _f, _ya - _f, _yb + _f, EIL_Z_COU + 0.8, _gorge, "20_Azara",
+        MAT_NEHOSHET_MARTELE())
+    _h = _gorge - EIL_Z_COU - 1.8
+    for _face, _paroi, _u in (("est", ("y", _xe + _f, 1), _milieu), ("ouest", ("y", _xo - _f, -1), _milieu),
+                              ("flanc", ("x", _flanc + _s * _f, _s), (_xo + _xe) / 2),
+                              ("dedans", ("x", _dedans - _s * _f, -_s), (_xo + _xe) / 2)):
+        palme_de_bronze(f"{_nom}_couronne_{_face}", _paroi, _u, EIL_Z_COU + 1.3, _h)
+    for _k, (_zb, _zh, _d) in enumerate(((_gorge, _gorge + 0.7, 0.55), (_gorge + 0.7, _gorge + 1.4, 1.0),
+                                        (_gorge + 1.4, EIL_TETE, 1.5))):
+        box(f"{_nom}_gorge_{_k}", _xo - _d, _xe + _d, _ya - _d, _yb + _d, _zb, _zh, "20_Azara")
+    box(f"{_nom}_gorge_filet", _xe + 1.0, _xe + 1.08, _ya - 1.0, _yb + 1.0, EIL_TETE - 1.5, EIL_TETE - 1.2, "20_Azara",
+        MAT_NEHOSHET())
+    box(f"{_nom}_tailloir", _xo - 1.7, _xe + 1.7, _ya - 1.7, _yb + 1.7, EIL_TETE, EIL_TETE + 1.0, "20_Azara")
+    box(f"{_nom}_tailloir_filet", _xe + 1.7, _xe + 1.78, _ya - 1.7, _yb + 1.7, EIL_TETE + 0.35, EIL_TETE + 0.65,
+        "20_Azara", MAT_NEHOSHET())
+    box(f"{_nom}_abaque", _xo - 1.1, _xe + 1.1, _ya - 1.1, _yb + 1.1, EIL_TETE + 1.0, EIL_SOMMET, "20_Azara")
 # « שְׁנֵי פִשְׁפְּשִׁין הָיוּ לוֹ לְשַׁעַר נִיקָנוֹר, אֶחָד בִּימִינוֹ וְאֶחָד בִּשְׂמֹאלוֹ » (Middot 2:6) : deux
 # guichets de bronze de part et d'autre de la grande porte, côté Azara. Cote (3 × 8) :
 # CHOIX. Les vantaux sont posés sur le nu du mur — la baie n'est pas percée, et la face
@@ -141,7 +177,9 @@ for _nom, _y0, _y1, _porte in LISHKOT_EZI:
     massif_evide(f"Lishkat_{_nom}_murs", X_EZI, AX1, _y0, _y1, Z_EZN, Z_EZI - 1,
                  [(X_EZI + MUR_LISHKA_EZI, AX1, _y0 + MUR_LISHKA_EZI, _y1 - MUR_LISHKA_EZI, Z_EZN, Z_EZI - 1)],
                  "10_EzratNashim")
-    shaar(f"Lishkat_{_nom}_cadre", ("y", AX1 + T, 1), _porte, Z_EZN, Z_EZI, T, "10_EzratNashim", MAT_PIERRE(),
+    # Celles des Léviim s'ouvrent au pied des eilim : leur cadre se pose sur la tour.
+    _face = EIL_FACE + EIL_PLINTHE if _nom.startswith("Leviim") else AX1 + T
+    shaar(f"Lishkat_{_nom}_cadre", ("y", _face, 1), _porte, Z_EZN, Z_EZI, T, "10_EzratNashim", MAT_PIERRE(),
           largeur=3, hauteur=H_PORTE_EZI, cadre=CADRE_LISHKA_EZI)
 
 
