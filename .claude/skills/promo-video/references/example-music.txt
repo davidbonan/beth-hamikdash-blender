@@ -1,0 +1,10 @@
+# Le service, 48 s : coup grave à l'accroche, attente sous le contexte, la montée quand l'histoire commence, résolution sur la carte de fin
+styles: sacred ancient Near Eastern score, documentary film music, 62 bpm, warm oud, breathy ney flute, low strings, soft frame drum, solemn and luminous
+avoid: EDM, trap, dubstep, cheesy corporate, epic trailer drums, electric guitar, synth arpeggio, lyrics
+voice: wordless distant vocalise, one low male voice
+
+[Hook | 5 | starts instantly with a deep frame drum hit and a sustained low string]
+[Context | 7 | sparse ney phrase over a held drone, quiet and expectant]
+[Story | 26 | the oud enters with a steady pulse, strings rise, the vocalise floats above, slow confident momentum]
+[Payoff | 6 | one full warm chord with the frame drum on the first beat]
+[End | 4 | the chord rings out on the drone to silence]

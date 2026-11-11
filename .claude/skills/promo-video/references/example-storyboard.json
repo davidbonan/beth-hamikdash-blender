@@ -1,0 +1,30 @@
+{
+  "format": "landscape",
+  "hook": "The Yom Kippur service in the Temple",
+  "hookSeconds": 4.5,
+  "shots": [
+    {
+      "kind": "full",
+      "source": "footage/aerien.mp4",
+      "duration": 8,
+      "transition": { "type": "fade", "duration": 1.2 }
+    },
+    {
+      "kind": "full",
+      "source": "footage/boucs.mp4",
+      "duration": 7,
+      "camera": [{ "t": 0, "x": 0.5, "y": 0.5, "zoom": 1 }, { "t": 7, "x": 0.5, "y": 0.55, "zoom": 1.04 }],
+      "label": "Two goats. Two lots.",
+      "cite": "Mishnah Yoma 4:1",
+      "transition": { "type": "fade", "duration": 1.2 }
+    },
+    {
+      "kind": "full",
+      "source": "footage/heikhal.mp4",
+      "duration": 9,
+      "cite": "Mishnah Yoma 5:1",
+      "transition": { "type": "fade", "duration": 1.5 }
+    },
+    { "kind": "end", "duration": 4 }
+  ]
+}
