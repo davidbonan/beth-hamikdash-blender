@@ -704,7 +704,7 @@
         -9.960000038146973
       ],
       "max": [
-        2.6447999477386475,
+        5.81279993057251,
         -1.2000000476837158,
         9.960000038146973
       ]
@@ -1193,12 +1193,12 @@
       "min": [
         -1.2480000257492065,
         -4.800000190734863,
-        -8.243167877197266
+        -10.319999694824219
       ],
       "max": [
-        5.507168292999268,
+        5.894400119781494,
         24.0,
-        8.243167877197266
+        10.319999694824219
       ]
     },
     "shaar_shushan": {
@@ -2351,12 +2351,6 @@
       "echelle": 1.75,
       "secondes": 13
     },
-    "azara": {
-      "carte": "lumiere/azara.webp",
-      "canal": 0,
-      "echelle": 2.25,
-      "secondes": 78
-    },
     "batiment": {
       "carte": "lumiere/batiment.webp",
       "canal": 0,
@@ -2609,12 +2603,6 @@
       "echelle": 2.0,
       "secondes": 29
     },
-    "lishkot_haleviim": {
-      "carte": "lumiere/lishkot_haleviim.webp",
-      "canal": 1,
-      "echelle": 1.75,
-      "secondes": 4
-    },
     "maarakhot": {
       "carte": "lumiere/maarakhot.webp",
       "canal": 0,
@@ -2741,12 +2729,6 @@
       "echelle": 0.75,
       "secondes": 5
     },
-    "shaar_nikanor": {
-      "carte": "lumiere/shaar_nikanor.webp",
-      "canal": 1,
-      "echelle": 2.5,
-      "secondes": 4
-    },
     "shaar_shushan": {
       "carte": "lumiere/shaar_shushan.webp",
       "canal": 1,
@@ -2813,7 +2795,7 @@
     "aliyah": "b46b5e7cb43d4ee79c286dfbbc8994d90145c849",
     "arche_wilson": "2c72cacb3b4004dbfe7de723c2aa98d7bb52b792",
     "aron": "aec0e8eeda366131f5a47d92a9bfcf586763ccdf",
-    "azara": "d3802c1709548fe860ed65688f8108829b48c30d",
+    "azara": "c1c08eec5649130afe9417e5ffc360d97f1e7ef8",
     "batiment": "7b6b983e67197256be65fc745184f0c5a71a1981",
     "beit_avtinas": "9a2fb33b063bae0a73db75595f75a4c340bedbec",
     "beit_din_haazara": "3ff9742e17c22482e19587656b8a6022bc7dc9c6",
@@ -2867,7 +2849,7 @@
     "lishkat_osei_chavitin": "655e4d4f4839ba5262cffa9c5a02a60cbfa803f4",
     "lishkat_parhedrin": "cad027988705ab6f77aa223c039ffd6fd79ae1be",
     "lishkat_pinchas": "42fada6693d278b5383b110115c608d6b2c2feea",
-    "lishkot_haleviim": "f6e33d26a630eb099b2c15af46316b1e30f2e7e0",
+    "lishkot_haleviim": "fa664ce3ed99eec73674a19f5c249de05562ceed",
     "maake": "86b380f9e6ec3347269e2138392c68e7bf0bc0d8",
     "maarakhot": "14d6e246097828fa9d8295740f599519ce825af2",
     "machta": "71aa5f668ffddca6c4a9c92221257acdd870cb4d",
@@ -2908,7 +2890,7 @@
     "shaar_hamayim": "8004d22b638830728f8422f9b1297b0468ec38e6",
     "shaar_hanitzotz": "952fcb8e34930fce202568b450a3bfd1b8265103",
     "shaar_kiponus": "4b1c8437462244e4ed60cfbb34afc0d9d7fe4d38",
-    "shaar_nikanor": "8d0e9dcf8d5089acc3e5983621d220291a0b4817",
+    "shaar_nikanor": "9f15a9e6295416b1f876bd663daff6ab487b33b7",
     "shaar_shushan": "7fd448aec6a3b692db6cb96345e14537aaad4b1d",
     "shaar_tadi": "4356c49df826cb1fdd9044ffe87d7f1ed132141d",
     "shaarei_beit_hamoked": "49135e692f60eb195fdf3e8d794a3634ea1a72d3",

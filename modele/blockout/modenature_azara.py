@@ -1,16 +1,16 @@
 from .primitives.parametres import Z_AZ, Z_EZI, Z_EZN
 from .primitives.ouvrages import (BANDEAU, CORNICHE, ENCADREMENT_SHAAR, LISHKA_DEBORD, SAILLIE_BANDEAU, SOCLE,
                                   moulure, ordre_de_pilastres)
-from .azara import (AX0, AX1, AY0, AY1, CADRE_LISHKA_EZI, GAZIT_X0, GAZIT_X1, GOLA_X0, GOLA_X1, H_MUR,
+from .azara import (AX0, AX1, AY0, AY1, CADRE_LISHKA_EZI, EMPRISES_EILIM, GAZIT_X0, GAZIT_X1, GOLA_X0, GOLA_X1, H_MUR,
                     LISHKOT_EZI, MOKED_X0, MOKED_X1, OUVERTURES, PISHPESHIM, SOUS_CORNICHE, T, X_DOUKHAN)
 from .lishkot import LISHKOT_NIKANOR, MEDICHIN_X, MELACH_X, NZ_X0, NZ_X1, PARVA_X, SM_X0, SM_X1
 
 
 # Couronnement des murs de l'Azara : une assise en débord sur la crête, qui saute
-# les corps passant les 25 amot (Beit HaMoked, HaGazit, HaGola, et les terrasses
-# de Sha'ar HaNitzotz et de Sha'ar HaMayim).
+# les corps passant les 25 amot (Beit HaMoked, HaGazit, HaGola, les terrasses
+# de Sha'ar HaNitzotz et de Sha'ar HaMayim, et les eilim de Nikanor).
 moulure("Azara_couronnement_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ + H_MUR, CORNICHE, "20_Azara",
-        mitres=("deborde", "deborde"))
+        mitres=("deborde", "deborde"), reserve=EMPRISES_EILIM)
 moulure("Azara_couronnement_ouest", AX0 - T, AX0, AY0, AY1, Z_AZ + H_MUR, CORNICHE, "20_Azara",
         mitres=("bute", "bute"))
 CORPS_NORD = [(MOKED_X0 - LISHKA_DEBORD, MOKED_X1 + LISHKA_DEBORD),
@@ -42,10 +42,10 @@ for _nm, _y0, _y1, _cotes, _corps in (("nord", AY1, AY1 + T, (True, False), CORP
 # dallage de l'Azara qui est derrière.
 moulure("Azara_socle_est_bas", AX1, AX1 + T, AY0 - T, AY1 + T, Z_EZN, SOCLE, "20_Azara",
         mitres=("deborde", "deborde"), cotes=(False, True),
-        reserve=[(-5, 5)] + [(p - 2 - CADRE_LISHKA_EZI, p + 2 + CADRE_LISHKA_EZI) for _, _, _, p in LISHKOT_EZI])
+        reserve=[(-5, 5)] + EMPRISES_EILIM + [(p - 2 - CADRE_LISHKA_EZI, p + 2 + CADRE_LISHKA_EZI) for _, _, _, p in LISHKOT_EZI])
 moulure("Azara_bandeau_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, BANDEAU, "20_Azara",
         saillie=SAILLIE_BANDEAU, mitres=("deborde", "deborde"), cotes=(False, True),
-        reserve=[(-5, 5)])
+        reserve=[(-5, 5)] + EMPRISES_EILIM)
 # Pilastres côté cour, dans le parti de l'Ezrat Nashim : CHOIX (Rambam, Beit HaBe'hira 1:11).
 # Ils sautent les portes avec leur cadre et les corps bâtis ; l'Ezrat Israël, deux amot et
 # demie plus bas, a les siens sur le mur est.
