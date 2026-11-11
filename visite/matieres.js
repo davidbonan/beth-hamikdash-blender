@@ -152,8 +152,9 @@ const CARREAU = {
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
-  // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
-  13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
+  // de deux amot que rien dans l'Azara ne justifie. Poli, il n'en garde que la moitié du
+  // relief et du lustre : le poli efface les creux de la pierre brute, qui s'allumaient en piqûres sur une dalle lisse.
+  13: [1.6, 0.35, 0.20, 0.30, 0.20], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
   22: [1.6, 0.35, 0.20, 0.60, 0.45], 23: [1.6, 0.35, 0.20, 0.60, 0.45],
   19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65], 21: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
@@ -464,9 +465,10 @@ float penteRampe(float d, vec2 rampe, float pixel){
 // la tache de vingt amot qui assombrit la dalle est le passage de la cour, et une dalle
 // foulée est aussi plus lustrée. Le dessus d'un mur prend la première et pas la seconde
 // — personne n'y marche.
-// rovad : la largeur d'une rangée ; longueurs : les deux longueurs de dalle ; nuance : l'écart de valeur d'une dalle à l'autre.
-struct Pavage { float rovad; vec2 longueurs; float nuance; };
-const Pavage PAVAGE_DES_COURS = Pavage(ROVAD_DALLE, vec2(8.0, 10.0), 0.03);
+// rovad : la largeur d'une rangée ; longueurs : les deux longueurs de dalle ; nuance : l'écart de valeur d'une dalle à l'autre ;
+// poli : l'écart de rugosité d'une dalle à l'autre — toutes n'ont pas été polies de la même main, et ce sont les plus lisses qui accrochent le soleil.
+struct Pavage { float rovad; vec2 longueurs; float nuance; float poli; };
+const Pavage PAVAGE_DES_COURS = Pavage(ROVAD_DALLE, vec2(8.0, 10.0), 0.03, 0.22);
 
 void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float rugo, out float usure,
             out vec4 photo){
@@ -492,7 +494,7 @@ void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float ru
          * mix(vec3(1.0), OMBRE_JOINT, 0.45 * usure);
   vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
   pente = penteRampe(d, vec2(0.0, JOINT_DALLE), dx < dz ? pixelX : pixelZ) * dir * (CREUX_DALLE / AMA);
-  rugo = (g - 0.5) * 0.10;
+  rugo = (g - 0.5) * 0.10 - pavage.poli * tireDalle;
   photo = vec4(vec3(tireDalle, tireRang, alea3(vec3(num, floor(colonne), 11.0))) * 13.0, 1.0);
 }
 
@@ -798,13 +800,14 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     dalles(P, PAVAGE_DES_COURS, teinte, pente, rugo, usure, photo);
     // Une dalle passée est plus sombre ET plus lisse. C'est ce lustre, et non la
     // teinte, qui sépare une cour lavée d'une esplanade de grès ; même lecture qu'au
-    // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
-    rugo -= usure * 0.18;
+    // blockout, où l'usure descend la rugosité de 0,60 à 0,42. Le dallage entier est
+    // poli d'un cran de plus : il reflète le ciel et les murs en lueur, pas en miroir.
+    rugo -= usure * 0.18 + 0.12;
   }
   else if (FAMILLE == 22 || FAMILLE == 23) {   // la place du Kotel : pavé en rangs étroits, grandes dalles devant le mur
     float usure;
-    Pavage pavage = Pavage(1.6, vec2(2.0, 3.2), 0.08);
-    if (FAMILLE == 22) pavage = Pavage(0.9, vec2(1.3, 2.2), 0.14);
+    Pavage pavage = Pavage(1.6, vec2(2.0, 3.2), 0.08, 0.0);
+    if (FAMILLE == 22) pavage = Pavage(0.9, vec2(1.3, 2.2), 0.14, 0.0);
     dalles(P, pavage, teinte, pente, rugo, usure, photo);
     rugo -= usure * 0.18;
   }
