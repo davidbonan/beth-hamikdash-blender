@@ -89,6 +89,9 @@ EMPRISES_EILIM = [(-EIL_Y1 - EIL_PLINTHE, -EIL_Y0 + EIL_PLINTHE), (EIL_Y0 - EIL_
 # « חַלֹּנוֹת אֲטֻמוֹת » (40:16) : « רחבות מבחוץ וצרות מבפנים » (Radak), fermées « במחיצה בהירה וזכה לבוא האורה »
 # (Metzudat David). Deux ressauts de pierre, la cloison au fond, trois barreaux de bronze.
 EIL_FENETRE = (29.0, 35.8)
+# Hauteur des timorot de bronze : sur la face, large de la moitié de la tour (à 14, elle débordait de ses arêtes) ;
+# à la tête, un peu plus de la moitié de la frise. CHOIX.
+EIL_TIMORA, EIL_TIMORA_COURONNE = 7.0, 3.6
 
 
 def fenetre_evasee(nom, paroi, u, z0, z1):
@@ -135,7 +138,8 @@ for _cote, _s in (("S", -1), ("N", 1)):
     box(f"{_nom}_bandeau_filet", EIL_FACE + 0.4, EIL_FACE + 0.48, _y0 - 0.4, _y1 + 0.4, CRETE + 0.35, CRETE + 0.85,
         "20_Azara", MAT_NEHOSHET())
     box(f"{_nom}_etage", _xo, _xe, _ya, _yb, EIL_Z_RETRAIT, EIL_Z_COU, "20_Azara")
-    palme_de_bronze(f"{_nom}_timora", ("y", EIL_FACE, 1), _milieu, 5.0, 14.0)
+    # Centrée à mi-hauteur de la baie, comme les timorot de son cadre.
+    palme_de_bronze(f"{_nom}_timora", ("y", EIL_FACE, 1), _milieu, Z_EZI + 10 - EIL_TIMORA / 2, EIL_TIMORA)
     for _k, _dy in enumerate((-2.6, 2.6)):
         fenetre_evasee(f"{_nom}_fenetre_est_{_k}", ("y", _xe, 1), _milieu + _dy, *EIL_FENETRE)
         fenetre_evasee(f"{_nom}_fenetre_ouest_{_k}", ("y", _xo, -1), _milieu + _dy, *EIL_FENETRE)
@@ -148,11 +152,11 @@ for _cote, _s in (("S", -1), ("N", 1)):
     _f, _gorge = 0.3, EIL_TETE - 2.4
     box(f"{_nom}_frise", _xo - _f, _xe + _f, _ya - _f, _yb + _f, EIL_Z_COU + 0.8, _gorge, "20_Azara",
         MAT_NEHOSHET_MARTELE())
-    _h = _gorge - EIL_Z_COU - 1.8
+    _z_palme = (EIL_Z_COU + 0.8 + _gorge - EIL_TIMORA_COURONNE) / 2
     for _face, _paroi, _u in (("est", ("y", _xe + _f, 1), _milieu), ("ouest", ("y", _xo - _f, -1), _milieu),
                               ("flanc", ("x", _flanc + _s * _f, _s), (_xo + _xe) / 2),
                               ("dedans", ("x", _dedans - _s * _f, -_s), (_xo + _xe) / 2)):
-        palme_de_bronze(f"{_nom}_couronne_{_face}", _paroi, _u, EIL_Z_COU + 1.3, _h)
+        palme_de_bronze(f"{_nom}_couronne_{_face}", _paroi, _u, _z_palme, EIL_TIMORA_COURONNE)
     for _k, (_zb, _zh, _d) in enumerate(((_gorge, _gorge + 0.7, 0.55), (_gorge + 0.7, _gorge + 1.4, 1.0),
                                         (_gorge + 1.4, EIL_TETE, 1.5))):
         box(f"{_nom}_gorge_{_k}", _xo - _d, _xe + _d, _ya - _d, _yb + _d, _zb, _zh, "20_Azara")
