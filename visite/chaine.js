@@ -412,7 +412,12 @@ const SORTIE = new THREE.ShaderMaterial({
     }`,
 });
 
-// L'ÉTALONNAGE, en toute fin : bascule de teinte, vignettage, grain.
+// L'ÉTALONNAGE, en toute fin : netteté, ombres relevées, bascule de teinte, vignettage, grain.
+//
+// La NETTETÉ est celle d'un téléphone, qui accentue toute photographie : adaptative (CAS
+// d'AMD), elle creuse les arêtes que le FXAA a fondues sans faire déborder ce qui a déjà
+// du contraste. Les OMBRES sont relevées comme il les relève, en gardant leur teinte :
+// une photo de cour au soleil montre la pierre à l'ombre, pas un aplat bleu-gris.
 //
 // Il travaille sur l'image AFFICHÉE, pas sur le linéaire : c'est le geste d'un
 // laboratoire, pas d'un moteur, et une bascule chaud/froid appliquée avant le
@@ -433,17 +438,27 @@ const ETALONNAGE = {
   uniforms: { tDiffuse: { value: null }, uTemps: { value: 0 },
               uFroid: { value: new THREE.Color(0.94, 0.97, 1.06) },
               uChaud: { value: new THREE.Color(1.01, 1.00, 0.96) },
-              uContraste: { value: 0.25 },
-              uVignette: { value: 0.30 }, uGrain: { value: 0.016 } },
+              uContraste: { value: 0.25 }, uNettete: { value: 0.5 }, uReleve: { value: 0.45 },
+              uPas: { value: new THREE.Vector2() },
+              uVignette: { value: 0.12 }, uGrain: { value: 0.010 } },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
     uniform vec3 uFroid, uChaud;
-    uniform float uTemps, uContraste, uVignette, uGrain;
+    uniform float uTemps, uContraste, uNettete, uReleve, uVignette, uGrain;
+    uniform vec2 uPas;
     varying vec2 vUv;
     void main(){
       vec3 c = texture2D(tDiffuse, vUv).rgb;
+      vec3 n = texture2D(tDiffuse, vUv + vec2(0.0, uPas.y)).rgb, s = texture2D(tDiffuse, vUv - vec2(0.0, uPas.y)).rgb;
+      vec3 e = texture2D(tDiffuse, vUv + vec2(uPas.x, 0.0)).rgb, o = texture2D(tDiffuse, vUv - vec2(uPas.x, 0.0)).rgb;
+      vec3 bas = min(c, min(min(n, s), min(e, o))), haut = max(c, max(max(n, s), max(e, o)));
+      vec3 marge = sqrt(clamp(min(bas, 1.0 - haut) / max(haut, 1e-4), 0.0, 1.0));
+      vec3 poids = marge * (-1.0 / mix(8.0, 5.0, uNettete));
+      c = clamp((c + (n + s + e + o) * poids) / (1.0 + 4.0 * poids), 0.0, 1.0);
       float clair = dot(c, vec3(0.2126, 0.7152, 0.0722));
+      c *= 1.0 + uReleve * (1.0 - smoothstep(0.04, 0.45, clair)) * smoothstep(0.0, 0.04, clair);
+      clair = dot(c, vec3(0.2126, 0.7152, 0.0722));
       // La courbe creuse le jour, pas le noir des salles, qu'elle assombrissait d'un tiers.
       c = mix(c, c * c * (3.0 - 2.0 * c), uContraste * smoothstep(0.15, 0.45, clair));
       clair = dot(c, vec3(0.2126, 0.7152, 0.0722));
@@ -682,6 +697,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     voile.uniforms.uPas.value.set(1 / cibleFumee.width, 1 / cibleFumee.height);
     halo?.setSize(composeur.renderTarget1.width, composeur.renderTarget1.height);
     arretes.material.uniforms.resolution.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
+    etalonnage.uniforms.uPas.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
     const tanFov = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
     if (passeAO) {
       passeComposition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
