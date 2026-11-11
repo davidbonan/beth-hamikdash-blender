@@ -18,6 +18,7 @@ export const REFLET = {
   uRefletActif: { value: 0 },
   uCoteReflet: { value: 0 },
   uLobeReflet: { value: 0 },
+  uForceReflet: { value: 0 },
 };
 
 // Pierre polie par les pas, pas glacée : le reflet s'étale avec la rugosité et la hauteur de ce qu'il montre, plus en long qu'en large.
@@ -26,7 +27,7 @@ export const LECTURE_DU_REFLET = /* glsl */`
 uniform sampler2D tReflet, tProfondeurReflet;
 uniform mat4 uVersReflet, uDeReflet;
 uniform vec2 uTexelReflet;
-uniform float uFocaleReflet, uRefletActif, uCoteReflet, uLobeReflet;
+uniform float uFocaleReflet, uRefletActif, uCoteReflet, uLobeReflet, uForceReflet;
 const float TORSION = 0.03, FLOU_MAX = 6.0, ETIREMENT = 1.4;
 // rgb : la cour vue d'en dessous du dallage ; a : 1 où il y a de la pierre, 0 où c'est le ciel, que l'environnement garde.
 float refleterLaCour(inout vec3 radiance, vec3 P, vec3 nPlan, vec3 nVue, float rugosite) {
@@ -43,7 +44,7 @@ float refleterLaCour(inout vec3 radiance, vec3 P, vec3 nPlan, vec3 nVue, float r
   for (int i = -3; i <= 3; i++) somme += exp(-0.18 * float(i * i)) * textureLod(tReflet, uv + vec2(0.0, float(i) * pas), flou);
   somme /= 4.17;
   vec2 bord = smoothstep(vec2(0.0), vec2(0.04), uv) * smoothstep(vec2(0.0), vec2(0.04), 1.0 - uv);
-  float couvert = clamp(somme.a, 0.0, 1.0) * bord.x * bord.y;
+  float couvert = clamp(somme.a, 0.0, 1.0) * bord.x * bord.y * uForceReflet;
   radiance = mix(radiance, somme.rgb / max(somme.a, 1e-3), couvert);
   return couvert;
 }
@@ -96,7 +97,7 @@ function matieresEpurees() {
   };
 }
 
-// `cour` : là où l'œil voit ce dallage, hors de ses `salles`. `clos` : le volume dont rien ne se voit de la cour. `lobe` : l'étalement du reflet, de l'or poli à la pierre.
+// `cour` : là où l'œil voit ce dallage, hors de ses `salles`. `clos` : le volume dont rien ne se voit de la cour. `lobe` : l'étalement du reflet ; `force` : sa part dans ce que le sol renvoie.
 export function refleterLesDallages(renderer, scene, camera, { dallages, caches }) {
   if (!PROFIL.reflets) return SANS_REFLET;
   const { definition } = PROFIL.reflets;
@@ -106,8 +107,8 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
   });
   const miroir = new THREE.PerspectiveCamera();
   const epure = matieresEpurees();
-  const plans = dallages.map(({ cote, lobe, cour, salles = [], clos = new THREE.Box3() }, rang) => ({
-    cote, lobe, cour, salles, clos,
+  const plans = dallages.map(({ cote, lobe, force, cour, salles = [], clos = new THREE.Box3() }, rang) => ({
+    cote, lobe, force, cour, salles, clos,
     calque: PREMIER_CALQUE + rang,
     auDessus: new THREE.Box3(
       new THREE.Vector3(cour.min.x - ABORDS, cote, cour.min.z - ABORDS), new THREE.Vector3(cour.max.x + ABORDS, Infinity, cour.max.z + ABORDS)),
@@ -131,7 +132,7 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
   const voitLOeil = ({ cote, cour, salles }) => camera.position.y > cote && cour.containsPoint(camera.position)
     && !salles.some((salle) => salle.containsPoint(camera.position));
 
-  function poserLeMiroir({ cote, lobe }) {
+  function poserLeMiroir({ cote, lobe, force }) {
     camera.getWorldPosition(oeil);
     rotation.extractRotation(camera.matrixWorld);
     vise.set(0, 0, -1).applyMatrix4(rotation).add(oeil);
@@ -158,6 +159,7 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
     REFLET.uDeReflet.value.copy(miroir.matrixWorld).multiply(miroir.projectionMatrixInverse);
     REFLET.uCoteReflet.value = cote;
     REFLET.uLobeReflet.value = lobe;
+    REFLET.uForceReflet.value = force;
   }
 
   function tracer(plan) {
