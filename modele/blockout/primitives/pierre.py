@@ -310,6 +310,54 @@ BANCS_CALCAIRE = ((0.86, 0.87, 0.88), (0.94, 0.94, 0.93),
 # ne sont lavées par personne et gardent la pleine coulure. `_exposer` fait la seconde.
 COULURE_ENTRETENUE, COULURE_EXPOSEE = 0.08, 0.16
 
+# Les stylolithes du meleke : des coutures sombres, fines et dentées, qui courent dans le
+# lit de la pierre et s'arrêtent à son bord — c'est elles, pas des veines de marbre, que
+# montre un calcaire de Jérusalem scié. Une pierre sur trois en porte, rarement deux.
+# Tout est CHOIX, en amot, et la même table que `stylolithes` dans visite/matieres.js.
+PART_STYLOLITHEE, DEUX_STYLOLITHES, LARGEUR_STYLOLITHE = 0.35, 0.12, 0.02
+ONDE_STYLOLITHE, DENTS_STYLOLITHE = (0.8, 0.25), (0.06, 0.04)   # pas, amplitude
+OMBRE_STYLOLITHE = (0.55, 0.51, 0.45)
+
+
+def _stylolithe(mat, dans, u, graine, assise):
+    """Le trait d'une couture : 0 sur elle, 1 hors d'elle. `dans` : la hauteur dans l'assise, en amot."""
+    liens = mat.node_tree.links
+    hauteur = _calc(mat, "MULTIPLY", _calc(mat, "MULTIPLY_ADD", _blanc(mat, _calc(mat, "MULTIPLY_ADD", graine, 97.0, 1.3)),
+                                           0.6, 0.2), assise)
+    onde = None
+    for pas, amplitude in (ONDE_STYLOLITHE, DENTS_STYLOLITHE):
+        lieu = _noeud(mat, "ShaderNodeCombineXYZ", -1560, -700)
+        liens.new(_calc(mat, "DIVIDE", u, m(pas)), lieu.inputs["X"])
+        liens.new(_calc(mat, "MULTIPLY", graine, 17.0), lieu.inputs["Y"])
+        bruit = _noeud(mat, "ShaderNodeTexNoise", -1400, -700)
+        bruit.inputs["Scale"].default_value = 1.0
+        bruit.inputs["Detail"].default_value = 2.0
+        liens.new(lieu.outputs["Vector"], bruit.inputs["Vector"])
+        ecart = _calc(mat, "MULTIPLY", _calc(mat, "SUBTRACT", bruit.outputs["Factor"], 0.5), 2.0 * amplitude)
+        onde = ecart if onde is None else _calc(mat, "ADD", onde, ecart)
+    distance = _calc(mat, "ABSOLUTE", _calc(mat, "SUBTRACT", _calc(mat, "SUBTRACT", dans, hauteur), onde))
+    return _calc(mat, "MINIMUM", _calc(mat, "DIVIDE", distance, LARGEUR_STYLOLITHE), 1.0)
+
+
+def _blanc(mat, graine):
+    tirage = _noeud(mat, "ShaderNodeTexWhiteNoise", -1700, -700)
+    tirage.noise_dimensions = '1D'
+    mat.node_tree.links.new(graine, tirage.inputs["W"])
+    return tirage.outputs["Value"]
+
+
+def _stylolithes(mat, appareil, tire_bloc):
+    """Ce que les coutures laissent du bloc : 1 sur la pierre saine, 0 sur un trait."""
+    z, u, _ = _parement(mat)
+    rang, _ = _module(mat, _calc(mat, "SUBTRACT", z, m(appareil.origine)), appareil.assise)
+    dans = _calc(mat, "MULTIPLY", _calc(mat, "FRACT", rang), appareil.assise)
+    tire = _blanc(mat, _calc(mat, "MULTIPLY_ADD", tire_bloc, 31.0, 5.0))
+    ligne = _stylolithe(mat, dans, u, tire, appareil.assise)
+    seconde = _calc(mat, "MINIMUM", ligne, _stylolithe(mat, dans, u, _calc(mat, "ADD", tire, 0.5), appareil.assise))
+    ligne = _calc(mat, "MULTIPLY_ADD", _calc(mat, "LESS_THAN", tire, DEUX_STYLOLITHES),
+                  _calc(mat, "SUBTRACT", seconde, ligne), ligne)
+    return _calc(mat, "MAXIMUM", ligne, _calc(mat, "GREATER_THAN", tire, PART_STYLOLITHEE))
+
 
 def pierre(name, rgb, appareil=APPAREIL_GAZIT):
     """Calcaire en assises de blocs sciés.
@@ -410,7 +458,12 @@ def pierre(name, rgb, appareil=APPAREIL_GAZIT):
                           _calc(mat, "MULTIPLY_ADD", _calc(mat, "SUBTRACT", scie, 0.5), strie,
                                 _calc(mat, "MULTIPLY_ADD", _grain(mat, 0.35), 0.16, 0.62)))),
               _bsdf(mat).inputs["Roughness"])
-    liens.new(_ombre_du_joint(mat, mouchete.outputs["Color"], creux),
+    couture = _noeud(mat, "ShaderNodeMixRGB", -40, 320)
+    couture.blend_type = "MULTIPLY"
+    couture.inputs["Color2"].default_value = (*OMBRE_STYLOLITHE, 1.0)
+    liens.new(mouchete.outputs["Color"], couture.inputs["Color1"])
+    liens.new(_calc(mat, "SUBTRACT", 1.0, _stylolithes(mat, appareil, bloc)), couture.inputs["Factor"])
+    liens.new(_ombre_du_joint(mat, couture.outputs["Color"], creux),
               _bsdf(mat).inputs["Base Color"])
     return mat
 

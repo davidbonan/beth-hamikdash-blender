@@ -549,6 +549,30 @@ Bloc tailler(vec3 P, vec3 N, Appareil a){
   return b;
 }
 
+// Les stylolithes du meleke : des coutures sombres, fines et dentées, qui courent dans le lit de la pierre et s'arrêtent à
+// son bord. Une pierre sur trois en porte, rarement deux — même table que les *_STYLOLITHE de pierre.py, en amot.
+const float PART_STYLOLITHEE = 0.35, DEUX_STYLOLITHES = 0.12, LARGEUR_STYLOLITHE = 0.02;
+const vec2 ONDE_STYLOLITHE = vec2(0.8, 0.25), DENTS_STYLOLITHE = vec2(0.06, 0.04);   // pas, amplitude
+const vec3 OMBRE_STYLOLITHE = vec3(0.55, 0.51, 0.45);
+
+float stylolithe(vec3 P, Bloc b, Appareil a, float graine){
+  float dans = (P.y / (a.assise * AMA) - b.num) * a.assise;
+  float hauteur = (0.2 + 0.6 * alea1(graine * 97.0 + 1.3)) * a.assise;
+  vec3 q = vec3(b.u / AMA, graine * 17.0, b.num * 3.1);
+  float onde = (grain(q / ONDE_STYLOLITHE.x, empreinte(b.axe) / (ONDE_STYLOLITHE.x * AMA)) - 0.44) * 2.0 * ONDE_STYLOLITHE.y;
+#ifndef GRAIN_LEGER
+  onde += (grain(q / DENTS_STYLOLITHE.x, empreinte(b.axe) / (DENTS_STYLOLITHE.x * AMA)) - 0.44) * 2.0 * DENTS_STYLOLITHE.y;
+#endif
+  return horsJoint(abs(dans - hauteur - onde), LARGEUR_STYLOLITHE, empreinte(vec3(0.0, 1.0, 0.0)) / AMA);
+}
+
+float stylolithes(vec3 P, Bloc b, Appareil a){
+  float tire = alea3(vec3(b.tireBloc * 31.0, b.num, 5.0));
+  if (tire > PART_STYLOLITHEE) return 1.0;
+  float ligne = stylolithe(P, b, a, tire);
+  return tire < DEUX_STYLOLITHES ? min(ligne, stylolithe(P, b, a, tire + 0.5)) : ligne;
+}
+
 void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
   if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
     float usure;
@@ -569,7 +593,8 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   float mouchete = 0.14 + ((grain(P * vec3(1.0, taille.lit, 1.0) / (taille.pas * AMA), empreinteMax() * taille.lit / (taille.pas * AMA)) - 0.5) * 0.22
                          + (grain(P / (taille.fin * AMA), empreinteMax() / (taille.fin * AMA)) - 0.5) * 0.10) * taille.force;
   float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
-  vec3 base = banc(f) * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0));
+  vec3 base = banc(f) * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0))
+            * mix(OMBRE_STYLOLITHE, vec3(1.0), stylolithes(P, b, a));
   teinte = mix(base * OMBRE_JOINT, base, b.creux);
   // La rugosité varie DANS le bloc, pas seulement d'un bloc à l'autre : sous un soleil
   // rasant c'est le lustre qui donne la surface, la teinte ne fait que la colorer.

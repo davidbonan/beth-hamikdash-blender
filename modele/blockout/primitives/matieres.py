@@ -359,13 +359,15 @@ def huile(name, rgb):
         _bsdf(mat).inputs["Roughness"].default_value = 0.06
     return mat
 
-# Le calcaire du pourtour, crème presque neutre : c'est la couleur d'un meleke scié
-# de frais, et l'ocre lui vient des bancs (BANCS_CALCAIRE), pas de sa base.
+# Le calcaire du pourtour, ivoire : c'est la couleur d'un meleke scié de frais, et
+# l'écart d'un bloc à l'autre lui vient des bancs (BANCS_CALCAIRE), pas de sa base.
+# CHOIX : depuis (0,75 0,73 0,70), presque neutre, le bleu descend et la clarté ne bouge
+# qu'à peine — plus chaud, la pierre irait à l'ocre, la patine d'une ruine.
 # Il reste SOUS les trois marbres du bâtiment (MARBRES_HERODE, 0,94 / 0,78 / 0,80) :
 # à 0,81, ses blocs les plus clairs montaient à 0,89 et le pourtour brillait autant
 # que le Bayit — l'échelle des blancs va de la chaux du Mizbea'h au dallage, et le
 # bâtiment ne doit jamais y perdre son rang.
-CALCAIRE = (0.75, 0.73, 0.70)
+CALCAIRE = (0.77, 0.74, 0.67)
 MAT_PIERRE = lambda: pierre("Pierre_claire", CALCAIRE)
 # La muraille des 500 amot et son soubassement : même pierre que l'Azara, mais
 # personne ne la lave — elle garde la coulure entière.
