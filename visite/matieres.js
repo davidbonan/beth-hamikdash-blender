@@ -40,8 +40,22 @@ const REFLET_DU_METAL = 1.6;
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
-export const EXPOSITION_DEHORS = 0.68;
+export const EXPOSITION_DEHORS = 0.80;
 export const EXPOSITION = { value: EXPOSITION_DEHORS };
+// La courbe de l'écran : PBR Neutral de Khronos. ACES rendait le ciel et le bronze gris et jaunissait les blancs ;
+// celle-ci garde la teinte de ce qu'elle reçoit jusqu'à 0,76 et ne tasse que les hautes lumières.
+export const COURBE_DE_L_ECRAN = /* glsl */`
+vec3 courbeDeLEcran(vec3 c){
+  float x = min(c.r, min(c.g, c.b));
+  c -= x < 0.08 ? x - 6.25 * x * x : 0.04;
+  float pic = max(c.r, max(c.g, c.b));
+  const float DEBUT = 0.76;
+  if (pic < DEBUT) return c;
+  const float D = 1.0 - DEBUT;
+  float nouveauPic = 1.0 - D * D / (pic + D - DEBUT);
+  c *= nouveauPic / pic;
+  return mix(c, vec3(nouveauPic), 1.0 - 1.0 / (0.15 * (pic - nouveauPic) + 1.0));
+}`;
 // La pièce sans lumière (Box3, mètres), et ce qui y reste du ciel : ambiance, rebond,
 // soleil et environnement réfléchi y sont ramenés à cette part. Le point qui l'éclaire
 // — les braises — est une lampe ordinaire, que la pénombre ne touche pas.
@@ -115,11 +129,10 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pie
 // MODELÉ, pas sa couleur. Le calcaire scanné porte ses lichens et ses mousses ; sans ce
 // frein, le dallage de l'Azara s'en couvrait de piqûres vertes et jaunes. La teinte
 // reste ce que Blender et les bancs du calcaire ont décidé.
-// La COULEUR, elle, se règle à l'ombre et jamais au soleil, parce que la courbe ACES ne
-// la rend pas au même taux des deux côtés : à 0,68 d'exposition, un parement ensoleillé
-// est à 1,3 de linéaire, sur l'épaule, où un écart d'albédo ressort à 0,16 de sa force ;
-// le même parement à l'ombre est à 0,20, sur la partie droite, où il ressort à 0,65 —
-// quatre fois plus. Réglée à l'œil sur un mur au soleil, la nappe passait à 0,62 et
+// La COULEUR, elle, se règle à l'ombre et jamais au soleil, parce que la courbe de l'écran
+// ne la rend pas au même taux des deux côtés : un parement ensoleillé est à 1,3 de
+// linéaire, sur l'épaule, où un écart d'albédo ressort tassé ; le même parement à l'ombre
+// est à 0,20, sur la partie droite, où il ressort entier. Réglée à l'œil sur un mur au soleil, la nappe passait à 0,62 et
 // couvrait de salissures tout ce que le soleil ne touchait pas. Ce qui porte le
 // parement au soleil, ce n'est pas sa couleur mais son RELIEF : il monte d'autant que
 // la couleur descend. Ni l'un ni l'autre ne sort plus à l'ombre qu'au soleil : c'est
@@ -226,7 +239,7 @@ float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03) + 0.125 * br
 float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
 
 #ifdef TEMPERE
-// Un écart de matière ne sort pas à l'écran au même taux partout sur la courbe ACES :
+// Un écart de matière ne sort pas à l'écran au même taux partout sur la courbe :
 // une paroi à l'ombre, vers 0,3 de linéaire, le rend deux fois plus fort qu'un
 // parement au soleil, vers 1,3. Réglés au soleil, veines et relief salissaient donc
 // tout ce qu'il ne touche pas. temperance() est l'exposant qui ramène un rapport de
@@ -234,12 +247,9 @@ float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
 // Le soleil se juge à l'exposition du dehors : à celle de l'œil adapté (×8) il saturait, et la pierre des salles perdait grain et relief.
 uniform float uExposition;
 const float CLARTE_SOLEIL = 1.3, EXPOSITION_SOLEIL = ${EXPOSITION_DEHORS.toFixed(2)};
-float ecranACES(float L, float exposition){
-  float v = L * exposition / 0.6;
-  v = (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081);
-  return pow(clamp(v, 0.0, 1.0), 1.0 / 2.2);
-}
-float contrasteEcran(float L, float exposition){ return ecranACES(L * 1.1, exposition) - ecranACES(L / 1.1, exposition); }
+${COURBE_DE_L_ECRAN}
+float ecran(float L, float exposition){ return pow(clamp(courbeDeLEcran(vec3(L * exposition)).r, 0.0, 1.0), 1.0 / 2.2); }
+float contrasteEcran(float L, float exposition){ return ecran(L * 1.1, exposition) - ecran(L / 1.1, exposition); }
 float temperance(float clarte){
   return clamp(contrasteEcran(CLARTE_SOLEIL, EXPOSITION_SOLEIL) / max(contrasteEcran(clarte, uExposition), 1e-4), 0.0, 1.0);
 }

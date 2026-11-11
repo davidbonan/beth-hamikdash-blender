@@ -95,7 +95,6 @@ const CONCEPTS = await conceptsEn(langue(), fiche, contenus);
 // Heikhal ombrait la cour entière derrière lui. Le tampon linéaire départage encore les
 // 4,8 cm du placage d'or à trois cents mètres.
 const renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance" });
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = EXPOSITION_DEHORS;
 renderer.shadowMap.enabled = true;
 // Le profil lourd ne s'en sert pas : `ombres.js` y remplace la lecture de la carte
