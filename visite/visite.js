@@ -8,7 +8,7 @@ import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js"
 import { adaptation } from "./adaptation.js";
 import { DANS_HEIKHAL, separerDuHeikhal, sonderHeikhal } from "./sonde.js";
 import { chaine } from "./chaine.js";
-import { refleterLeDallage } from "./reflet_du_dallage.js";
+import { refleterLesDallages } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, cuireLesNuages, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
@@ -155,10 +155,20 @@ const SALLES_DE_L_AZARA = ["heikhal", "oulam", "kodesh_hakodashim"];
 // Le Heikhal et le Kodesh HaKodashim en deçà du mur de façade, dont la cour voit les portes par l'Oulam.
 const sanctuaireClos = unirEmprises(EMPRISES, ["heikhal", "kodesh_hakodashim"]);
 sanctuaireClos.max.x -= AMA;
-const dallage = refleterLeDallage(renderer, scene, camera, {
-  cour: EMPRISES.get("azara"),
-  salles: [...EMPRISES].filter(([id]) => SALLES_DE_L_AZARA.includes(id) || id.startsWith("lishkat_")).map(([, boite]) => boite),
-  clos: sanctuaireClos,
+const lishkot = [...EMPRISES].filter(([id]) => id.startsWith("lishkat_")).map(([, boite]) => boite);
+// L'Ezrat Nashim est dix amot sous l'Azara (Middot 2:5-6), le Heikhal six au-dessus (Middot 3:6), sous un placage d'un centimètre.
+const PLACAGE = 0.01;
+// Le Heikhal a vingt amot de large (Middot 4:7) ; son emprise prend aussi les cellules qui le flanquent.
+const salleDuHeikhal = EMPRISES.get("heikhal").clone();
+salleDuHeikhal.min.z = -10 * AMA;
+salleDuHeikhal.max.z = 10 * AMA;
+const DALLAGES_REFLETES = { azara: "Sol", ezrat_nashim: "Sol", heikhal: "Or_plaque" };
+const dallage = refleterLesDallages(renderer, scene, camera, {
+  dallages: [
+    { cote: 0, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
+    { cote: -10 * AMA, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
+    { cote: 6 * AMA + PLACAGE, cour: salleDuHeikhal },
+  ],
   caches: [ciel],
 });
 const detail = niveauxDeDetail(scene, camera);
@@ -320,7 +330,7 @@ gltf.scene.traverse((o) => {
     const occlusion = occlusions.get(o.userData.groupeCuit);
     const lumiere = lumieres.get(o.userData.groupeCuit);
     // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
-    const refletDuDallage = PROFIL.reflets && o.userData.groupeCuit === "azara" && o.material.name === "Sol";
+    const refletDuDallage = PROFIL.reflets && DALLAGES_REFLETES[o.userData.groupeCuit] === o.material.name;
     if (occlusion || lumiere || sousSonde.has(o) || refletDuDallage) o.material = o.material.clone();
     if (refletDuDallage) o.material.userData.refletDuDallage = true;
     if (occlusion) o.material.aoMap = occlusion;

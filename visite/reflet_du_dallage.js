@@ -1,13 +1,12 @@
-// Le dallage de l'Azara reflète la cour, pas seulement le ciel : la scène rendue une seconde fois, en miroir sous le sol.
+// Un dallage reflète ce qui l'entoure, pas seulement le ciel : la scène rendue une seconde fois, en miroir sous le sol où l'œil se tient.
 import * as THREE from "three";
 import { PROFIL } from "./qualite.js";
 
-const COTE = 0;              // m : le dallage de l'Azara
 const AFFLEUREMENT = 0.01;   // m : le sol lui-même n'entre pas dans son reflet
 const FOND = 150;            // m : la cour et ce qui la borde, pas la ville
 const ABORDS = 2;            // m : les murs de la cour débordent de son emprise
-// Le miroir ne trace que ce qui porte ce calque : il coûte par dessin, pas par pixel.
-const CALQUE_REFLETE = 2;
+// Le miroir ne trace que ce qui porte le calque de son dallage : il coûte par dessin, pas par pixel.
+const PREMIER_CALQUE = 2;
 // Le reflet garde la matrice de l'image où il a été tracé : d'une image à l'autre il reste juste dans le monde, à la parallaxe d'un pas près.
 const UNE_IMAGE_SUR = 2;
 
@@ -19,6 +18,7 @@ export const REFLET = {
   uTexelReflet: { value: new THREE.Vector2(1, 1) },
   uFocaleReflet: { value: 1 },
   uRefletActif: { value: 0 },
+  uCoteReflet: { value: 0 },
 };
 
 // Pierre polie par les pas, pas glacée : le reflet s'étale avec la rugosité et la hauteur de ce qu'il montre, plus en long qu'en large.
@@ -27,11 +27,11 @@ export const LECTURE_DU_REFLET = /* glsl */`
 uniform sampler2D tReflet, tProfondeurReflet;
 uniform mat4 uVersReflet, uDeReflet;
 uniform vec2 uTexelReflet;
-uniform float uFocaleReflet, uRefletActif;
+uniform float uFocaleReflet, uRefletActif, uCoteReflet;
 const float LOBE = 0.15, TORSION = 0.03, FLOU_MAX = 6.0, ETIREMENT = 1.4;
 // rgb : la cour vue d'en dessous du dallage ; a : 1 où il y a de la pierre, 0 où c'est le ciel, que l'environnement garde.
 float refleterLaCour(inout vec3 radiance, vec3 P, vec3 nPlan, vec3 nVue, float rugosite) {
-  if (uRefletActif < 0.5 || nPlan.y < 0.95 || abs(P.y - ${COTE.toFixed(3)}) > 0.02) return 0.0;
+  if (uRefletActif < 0.5 || nPlan.y < 0.95 || abs(P.y - uCoteReflet) > 0.02) return 0.0;
   vec4 q = uVersReflet * vec4(P, 1.0);
   vec3 nMonde = inverseTransformDirection(nVue, viewMatrix);
   vec2 uv = q.xy / q.w + nMonde.xz * TORSION;
@@ -56,26 +56,36 @@ const SANS_REFLET = { confier() {}, confierMobiles() {}, rendre() {}, redimensio
 // Changer de matière à chaque dessin est ce que le miroir coûtait : flou, il n'en garde qu'une poignée, une par teinte voisine.
 const ECART_DE_TEINTE = 0.12;
 
+function teintesMoyennes() {
+  const pixel = Object.assign(document.createElement("canvas"), { width: 1, height: 1 }).getContext("2d", { willReadFrequently: true });
+  return ({ color, map }) => {
+    if (!map) return color.clone();
+    pixel.drawImage(map.image, 0, 0, 1, 1);
+    const [r, v, b] = pixel.getImageData(0, 0, 1, 1).data;
+    return new THREE.Color().setRGB(r / 255, v / 255, b / 255, THREE.SRGBColorSpace).multiply(color);
+  };
+}
+
+// Ce qui reflète sa salle et non le ciel garde ce reflet, que la sonde peut refaire, et sa lumière cuite : dehors le ciel éclaire, pas dedans.
+const SOUS_LE_CIEL = {};
+const salleDe = ({ envMap, envMapIntensity, lightMap, lightMapIntensity }) => (envMap ? { envMap, envMapIntensity, lightMap, lightMapIntensity } : SOUS_LE_CIEL);
+
 function matieresEpurees() {
   const epures = [];
   const epureDe = new WeakMap();
-  const pixel = Object.assign(document.createElement("canvas"), { width: 1, height: 1 }).getContext("2d", { willReadFrequently: true });
-
-  function teinteMoyenne(carte) {
-    pixel.drawImage(carte.image, 0, 0, 1, 1);
-    const [r, v, b] = pixel.getImageData(0, 0, 1, 1).data;
-    return new THREE.Color().setRGB(r / 255, v / 255, b / 255, THREE.SRGBColorSpace);
-  }
+  const teinteDe = teintesMoyennes();
 
   function epurer(maillage) {
-    const { color, map, roughness, metalness, emissive, emissiveIntensity, side } = maillage.material;
-    const teinte = map ? teinteMoyenne(map).multiply(color) : color.clone();
-    const trait = { os: maillage.isSkinnedMesh === true, metal: metalness > 0.5, side, lueur: emissive.getHex() * emissiveIntensity };
-    const voisine = epures.find((e) => e.os === trait.os && e.metal === trait.metal && e.side === side && e.lueur === trait.lueur
+    const vraie = maillage.material;
+    const { roughness, metalness, emissive, emissiveIntensity, side } = vraie;
+    const salle = salleDe(vraie);
+    const teinte = teinteDe(vraie);
+    const trait = { os: maillage.isSkinnedMesh === true, metal: metalness > 0.5, side, lueur: emissive.getHex() * emissiveIntensity, reflet: salle.envMap, cuite: salle.lightMap };
+    const voisine = epures.find((e) => Object.keys(trait).every((cle) => e.trait[cle] === trait[cle])
       && Math.hypot(e.teinte.r - teinte.r, e.teinte.g - teinte.g, e.teinte.b - teinte.b) < ECART_DE_TEINTE);
     if (voisine) return voisine.materiau;
-    const materiau = new THREE.MeshStandardMaterial({ color: teinte, roughness, metalness, emissive, emissiveIntensity, side });
-    epures.push({ ...trait, teinte, materiau });
+    const materiau = new THREE.MeshStandardMaterial({ color: teinte, roughness, metalness, emissive, emissiveIntensity, side, ...salle });
+    epures.push({ trait, teinte, materiau });
     return materiau;
   }
 
@@ -83,12 +93,12 @@ function matieresEpurees() {
     const vraie = maillage.material;
     if (!vraie.isMeshStandardMaterial) return vraie;
     if (!epureDe.has(vraie)) epureDe.set(vraie, epurer(maillage));
-    return epureDe.get(vraie);
+    return Object.assign(epureDe.get(vraie), salleDe(vraie));
   };
 }
 
-// `salles` : là où l'œil n'est plus dans la cour. `clos` : le volume dont rien ne se voit de la cour.
-export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos, caches }) {
+// `cour` : là où l'œil voit ce dallage, hors de ses `salles`. `clos` : le volume dont rien ne se voit de la cour.
+export function refleterLesDallages(renderer, scene, camera, { dallages, caches }) {
   if (!PROFIL.reflets) return SANS_REFLET;
   const { definition } = PROFIL.reflets;
   const cible = new THREE.WebGLRenderTarget(1, 1, {
@@ -96,16 +106,21 @@ export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos,
     depthTexture: new THREE.DepthTexture(1, 1),
   });
   const miroir = new THREE.PerspectiveCamera();
-  miroir.layers.set(CALQUE_REFLETE);
-  const auDessusDuDallage = new THREE.Box3(
-    new THREE.Vector3(cour.min.x - ABORDS, COTE, cour.min.z - ABORDS), new THREE.Vector3(cour.max.x + ABORDS, Infinity, cour.max.z + ABORDS));
+  const epure = matieresEpurees();
+  const plans = dallages.map(({ cote, cour, salles = [], clos = new THREE.Box3() }, rang) => ({
+    cote, cour, salles, clos,
+    calque: PREMIER_CALQUE + rang,
+    auDessus: new THREE.Box3(
+      new THREE.Vector3(cour.min.x - ABORDS, cote, cour.min.z - ABORDS), new THREE.Vector3(cour.max.x + ABORDS, Infinity, cour.max.z + ABORDS)),
+    refletes: [],
+  }));
   const volume = new THREE.Box3();
-  const seVoitDeLaCour = (maillage) => {
+  const seVoitDe = (plan) => (maillage) => {
     volume.setFromObject(maillage);
-    return auDessusDuDallage.intersectsBox(volume) && !clos.containsBox(volume);
+    return plan.auDessus.intersectsBox(volume) && !plan.clos.containsBox(volume);
   };
   const normale = new THREE.Vector3(0, 1, 0);
-  const plan = new THREE.Plane();
+  const planDuSol = new THREE.Plane();
   const rotation = new THREE.Matrix4();
   const oeil = new THREE.Vector3();
   const vise = new THREE.Vector3();
@@ -113,17 +128,16 @@ export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos,
   const q = new THREE.Vector4();
   const fond = new THREE.Color();
   const BIAIS = new THREE.Matrix4().set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
-  const refletes = [];
-  const epure = matieresEpurees();
 
-  const dansLaCour = (p) => p.y > COTE && cour.containsPoint(p) && !salles.some((s) => s.containsPoint(p));
+  const voitLOeil = ({ cote, cour, salles }) => camera.position.y > cote && cour.containsPoint(camera.position)
+    && !salles.some((salle) => salle.containsPoint(camera.position));
 
-  function poserLeMiroir() {
+  function poserLeMiroir(cote) {
     camera.getWorldPosition(oeil);
     rotation.extractRotation(camera.matrixWorld);
     vise.set(0, 0, -1).applyMatrix4(rotation).add(oeil);
-    miroir.position.set(oeil.x, 2 * COTE - oeil.y, oeil.z);
-    vise.y = 2 * COTE - vise.y;
+    miroir.position.set(oeil.x, 2 * cote - oeil.y, oeil.z);
+    vise.y = 2 * cote - vise.y;
     miroir.up.set(0, 1, 0).applyMatrix4(rotation).reflect(normale);
     miroir.lookAt(vise);
     miroir.near = camera.near;
@@ -135,20 +149,22 @@ export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos,
     REFLET.uVersReflet.value.copy(BIAIS).multiply(miroir.projectionMatrix).multiply(miroir.matrixWorldInverse);
 
     // Plan de coupe oblique (Lengyel) : ce qui est sous le dallage ne se reflète pas.
-    plan.setFromNormalAndCoplanarPoint(normale, vise.set(0, COTE + AFFLEUREMENT, 0)).applyMatrix4(miroir.matrixWorldInverse);
-    coupe.set(plan.normal.x, plan.normal.y, plan.normal.z, plan.constant);
+    planDuSol.setFromNormalAndCoplanarPoint(normale, vise.set(0, cote + AFFLEUREMENT, 0)).applyMatrix4(miroir.matrixWorldInverse);
+    coupe.set(planDuSol.normal.x, planDuSol.normal.y, planDuSol.normal.z, planDuSol.constant);
     const p = miroir.projectionMatrix.elements;
     q.set((Math.sign(coupe.x) + p[8]) / p[0], (Math.sign(coupe.y) + p[9]) / p[5], -1, (1 + p[10]) / p[14]);
     coupe.multiplyScalar(2 / coupe.dot(q));
     p[2] = coupe.x; p[6] = coupe.y; p[10] = coupe.z + 1; p[14] = coupe.w;
     miroir.projectionMatrixInverse.copy(miroir.projectionMatrix).invert();
     REFLET.uDeReflet.value.copy(miroir.matrixWorld).multiply(miroir.projectionMatrixInverse);
+    REFLET.uCoteReflet.value = cote;
   }
 
-  function tracer() {
-    poserLeMiroir();
+  function tracer({ cote, calque, refletes }) {
+    poserLeMiroir(cote);
+    miroir.layers.set(calque);
     // Une lampe hors du calque manquerait au miroir, et chaque matière se recompilerait pour son compte de lampes.
-    scene.traverse((o) => { if (o.isLight) o.layers.enable(CALQUE_REFLETE); });
+    scene.traverse((o) => { if (o.isLight) o.layers.enable(calque); });
     const visibles = caches.map((o) => o.visible);
     caches.forEach((o) => { o.visible = false; });
     renderer.getClearColor(fond);
@@ -173,12 +189,13 @@ export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos,
     }
   }
 
-  let allume = true, images = 0;
+  let allume = true, images = 0, trace = null;
   function rendre() {
-    const voulu = allume && dansLaCour(camera.position);
-    REFLET.uRefletActif.value = voulu ? 1 : 0;
-    if (!voulu) images = 0;
-    else if (images++ % UNE_IMAGE_SUR === 0) tracer();
+    const plan = allume ? plans.find(voitLOeil) ?? null : null;
+    REFLET.uRefletActif.value = plan ? 1 : 0;
+    if (plan !== trace) images = 0;
+    trace = plan;
+    if (plan && images++ % UNE_IMAGE_SUR === 0) tracer(plan);
   }
 
   function redimensionner(largeur, hauteur) {
@@ -192,9 +209,9 @@ export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos,
   REFLET.tProfondeurReflet.value = cible.depthTexture;
   // Cheveux et barbes sont des cartes découpées : épurées elles feraient des plaques, et le flou ne les montre pas.
   const decoupe = ({ material }) => material.isMeshStandardMaterial && (material.transparent || material.alphaTest > 0);
-  const refleter = (maillage) => {
+  const refleterSur = ({ calque, refletes }) => (maillage) => {
     if (decoupe(maillage)) return;
-    maillage.layers.enable(CALQUE_REFLETE);
+    maillage.layers.enable(calque);
     refletes.push(maillage);
   };
 
@@ -203,8 +220,10 @@ export function refleterLeDallage(renderer, scene, camera, { cour, salles, clos,
     allumer(voulu) { allume = voulu; },
     // À confier avant les niveaux de détail, dont les tuiles prennent les calques de leur maillage et lisent sa matière.
     confier(maillages) {
-      maillages.filter(seVoitDeLaCour).forEach(refleter);
+      for (const plan of plans) maillages.filter(seVoitDe(plan)).forEach(refleterSur(plan));
     },
-    confierMobiles(maillages) { maillages.forEach(refleter); },
+    confierMobiles(maillages) {
+      for (const plan of plans) maillages.forEach(refleterSur(plan));
+    },
   };
 }
