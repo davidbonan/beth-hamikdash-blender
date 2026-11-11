@@ -161,15 +161,15 @@ const PLACAGE = 0.01;
 const salleDuHeikhal = EMPRISES.get("heikhal").clone();
 salleDuHeikhal.min.z = -10 * AMA;
 salleDuHeikhal.max.z = 10 * AMA;
-// L'or poli du Heikhal reflète net ; la pierre des cours ne garde du reflet que ses masses claires et sombres.
-const LOBE_DE_LA_PIERRE = 0.6, LOBE_DE_L_OR = 0.15;
+// `lobe` : l'étalement du reflet ; `force` : sa part dans ce que le sol renvoie. L'or poli du Heikhal reflète net ; la pierre des cours, sèche, n'en garde qu'une lueur.
+const REFLET_DE_LA_PIERRE = { lobe: 0.6, force: 0.3 }, REFLET_DE_L_OR = { lobe: 0.15, force: 0.6 };
 const DALLAGES_REFLETES = { azara: "Sol", ezrat_nashim: "Sol", heikhal: "Or_plaque" };
 const SOLS_DES_COURS = { azara: 0, ezrat_nashim: -10 * AMA };
 const dallage = refleterLesDallages(renderer, scene, camera, {
   dallages: [
-    { cote: SOLS_DES_COURS.azara, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
-    { cote: SOLS_DES_COURS.ezrat_nashim, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
-    { cote: 6 * AMA + PLACAGE, lobe: LOBE_DE_L_OR, cour: salleDuHeikhal },
+    { cote: SOLS_DES_COURS.azara, ...REFLET_DE_LA_PIERRE, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
+    { cote: SOLS_DES_COURS.ezrat_nashim, ...REFLET_DE_LA_PIERRE, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
+    { cote: 6 * AMA + PLACAGE, ...REFLET_DE_L_OR, cour: salleDuHeikhal },
   ],
   caches: [ciel],
 });
