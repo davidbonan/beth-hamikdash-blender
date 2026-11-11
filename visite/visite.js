@@ -162,12 +162,14 @@ const PLACAGE = 0.01;
 const salleDuHeikhal = EMPRISES.get("heikhal").clone();
 salleDuHeikhal.min.z = -10 * AMA;
 salleDuHeikhal.max.z = 10 * AMA;
+// L'or poli du Heikhal reflète net ; la pierre des cours ne garde du reflet que ses masses claires et sombres.
+const LOBE_DE_LA_PIERRE = 0.6, LOBE_DE_L_OR = 0.15;
 const DALLAGES_REFLETES = { azara: "Sol", ezrat_nashim: "Sol", heikhal: "Or_plaque" };
 const dallage = refleterLesDallages(renderer, scene, camera, {
   dallages: [
-    { cote: 0, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
-    { cote: -10 * AMA, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
-    { cote: 6 * AMA + PLACAGE, cour: salleDuHeikhal },
+    { cote: 0, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("azara"), salles: [...SALLES_DE_L_AZARA.map((id) => EMPRISES.get(id)), ...lishkot], clos: sanctuaireClos },
+    { cote: -10 * AMA, lobe: LOBE_DE_LA_PIERRE, cour: EMPRISES.get("ezrat_nashim"), salles: [EMPRISES.get("azara"), ...lishkot], clos: sanctuaireClos },
+    { cote: 6 * AMA + PLACAGE, lobe: LOBE_DE_L_OR, cour: salleDuHeikhal },
   ],
   caches: [ciel],
 });
