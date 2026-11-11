@@ -79,7 +79,7 @@ async function liaisonLente() {
   return lente;
 }
 
-const LOURD = { dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7], echelleDepart: 1, antiCrenelage: 4, grainLeger: false, preProfondeur: true,
+const LOURD = { dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7, 0.6], echelleDepart: 1, antiCrenelage: 4, grainLeger: false, preProfondeur: true,
   habillageEssentiel: false, paysage: true,
   textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024 }, ecartDetail: 1, porteeDetail: Infinity,
   ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12,

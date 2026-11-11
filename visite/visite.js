@@ -623,9 +623,9 @@ const avantLePas = new THREE.Vector3();
 // À mi-corps : un lieu se juge sur celui qui s'y tient, pas sur la dalle qu'il foule.
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
-// Le miroir du dallage est un palier à lui seul, le premier lâché : il coûte un rendu de la cour, que baisser la définition n'allège pas.
-const PALIERS = [...(PROFIL.reflets ? [{ echelle: PROFIL.echelles[0], reflets: true }] : []),
-                 ...PROFIL.echelles.map((definition) => ({ echelle: definition, reflets: false }))];
+// La définition cède avant le miroir du dallage : sur un grand écran l'image coûte par pixel, et lâcher le miroir d'abord n'allégeait rien.
+const PALIERS = [...PROFIL.echelles.map((definition) => ({ echelle: definition, reflets: PROFIL.reflets !== null })),
+                 ...(PROFIL.reflets ? [{ echelle: PROFIL.echelles.at(-1), reflets: false }] : [])];
 const regulateur = regulerEchelle(PALIERS, PALIERS.find((palier) => palier.echelle === PROFIL.echelleDepart),
                                   { quandABout: seReplier, quandALAise: seRelever });
 function ajusterEchelle(dt) {
