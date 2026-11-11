@@ -37,23 +37,22 @@ export const SOLEIL = new THREE.Vector3(150, 58, 55).normalize();
 // une densité qui décroît en exponentielle avec la hauteur, intégrée le long du rayon —,
 // et ce qu'elle cache se remplace par le dôme VU dans la direction regardée.
 //
-// `densite` est celle du dallage de l'Azara (y = 0), par mètre : 0,004 laisse 80 % d'un mur
-// à soixante mètres et 40 % des portiques d'en face. À 0,0018 l'Oulam vu de l'Ezrat Nashim
-// gardait le contraste du premier plan : c'est cette perte de contraste, pas la teinte du
-// voile, qui sépare les plans d'une cour. `epaisseur` est la hauteur où l'air a perdu les
-// deux tiers de sa densité : vu d'en haut, le pied des portiques se voile plus que leur
-// faîte. `effacement` finit le travail avant que la caméra ne coupe à 6 km : un bord
-// tranché net sur le ciel se lirait en décor.
+// `densite` est celle du dallage de l'Azara (y = 0), par mètre : 0,0008 laisse 95 % d'un mur
+// à soixante mètres. À 0,004 — une brume, trente fois l'air d'un jour clair — la cour
+// tournait au laiteux dès qu'on regardait vers le soleil : une photographie prise par beau
+// temps garde la cour nette et ne voile que le lointain, que `lointain` épaissit.
+// `epaisseur` est la hauteur où l'air a perdu les deux tiers de sa densité : vu d'en haut,
+// le pied des portiques se voile plus que leur faîte. `effacement` finit le travail avant que
+// la caméra ne coupe à 6 km : un bord tranché net sur le ciel se lirait en décor.
 //
 // Le voile n'a pas la même couleur des deux côtés du ciel. La brume diffuse vers l'avant :
 // regardée dans l'axe du soleil elle est plus claire et ambrée, dos à lui plus froide que
 // le ciel qui la nourrit. Cet écart ne vaut que pour l'air proche et s'éteint au loin, où
 // le voile rejoint le dôme exactement : c'est ce qui fond l'horizon au lieu d'y tracer
 // une ligne.
-// `lointain` : passé `pres` mètres, l'épaisseur croît `lointain` fois moins vite. Réglée pour
-// les cours, la densité noyait tout au-delà de cinq cents mètres, la ville autour avec, et le
-// Heikhal vu de la place du Kotel, vingt-cinq mètres plus bas dans un air plus dense.
-const AIR = { densite: 4e-3, epaisseur: 110, effacement: [3800, 5600], pres: 150, lointain: 0.05,
+// `lointain` : passé `pres` mètres, l'épaisseur croît `lointain` fois moins vite. Le Heikhal
+// vu de la place du Kotel, vingt-cinq mètres plus bas dans un air plus dense, en garde son relief.
+const AIR = { densite: 8e-4, epaisseur: 110, effacement: [3800, 5600], pres: 150, lointain: 0.25,
               froid: [0.90, 0.94, 1.06], chaud: [1.20, 1.08, 0.92] };
 
 const HALO_DU_SOLEIL = [1.00, 0.84, 0.58];
