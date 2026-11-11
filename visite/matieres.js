@@ -37,11 +37,28 @@ const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE,
 const ESSENTIELLES = new Set([PIERRE, DALLE, METAL, ETOFFE]);
 // Le dôme éclairant est beige et désaturé : à 1, l'or au soleil n'en reflétait qu'un gris-vert.
 const REFLET_DU_METAL = 1.6;
+// Ce que reflète la sonde d'une cour : ses métaux. Le dallage s'en tient au miroir, ou au ciel : prise au centre, la sonde
+// ne sait pas ce qu'une dalle a vraiment en face d'elle, et le sol se tachait de l'or et du rouge vus par la porte.
+export const refleteSaCour = (materiau) => [METAL, MIKSHE].includes(FAMILLES[materiau.name.replace(/_grave$/, "")]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
 // Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
-export const EXPOSITION_DEHORS = 0.68;
+export const EXPOSITION_DEHORS = 0.80;
 export const EXPOSITION = { value: EXPOSITION_DEHORS };
+// La courbe de l'écran : PBR Neutral de Khronos. ACES rendait le ciel et le bronze gris et jaunissait les blancs ;
+// celle-ci garde la teinte de ce qu'elle reçoit jusqu'à 0,76 et ne tasse que les hautes lumières.
+export const COURBE_DE_L_ECRAN = /* glsl */`
+vec3 courbeDeLEcran(vec3 c){
+  float x = min(c.r, min(c.g, c.b));
+  c -= x < 0.08 ? x - 6.25 * x * x : 0.04;
+  float pic = max(c.r, max(c.g, c.b));
+  const float DEBUT = 0.76;
+  if (pic < DEBUT) return c;
+  const float D = 1.0 - DEBUT;
+  float nouveauPic = 1.0 - D * D / (pic + D - DEBUT);
+  c *= nouveauPic / pic;
+  return mix(c, vec3(nouveauPic), 1.0 - 1.0 / (0.15 * (pic - nouveauPic) + 1.0));
+}`;
 // La pièce sans lumière (Box3, mètres), et ce qui y reste du ciel : ambiance, rebond,
 // soleil et environnement réfléchi y sont ramenés à cette part. Le point qui l'éclaire
 // — les braises — est une lampe ordinaire, que la pénombre ne touche pas.
@@ -115,14 +132,13 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pie
 // MODELÉ, pas sa couleur. Le calcaire scanné porte ses lichens et ses mousses ; sans ce
 // frein, le dallage de l'Azara s'en couvrait de piqûres vertes et jaunes. La teinte
 // reste ce que Blender et les bancs du calcaire ont décidé.
-// La COULEUR, elle, se règle à l'ombre et jamais au soleil, parce que la courbe ACES ne
-// la rend pas au même taux des deux côtés : à 0,68 d'exposition, un parement ensoleillé
-// est à 1,3 de linéaire, sur l'épaule, où un écart d'albédo ressort à 0,16 de sa force ;
-// le même parement à l'ombre est à 0,20, sur la partie droite, où il ressort à 0,65 —
-// quatre fois plus. Réglée à l'œil sur un mur au soleil, la nappe passait à 0,62 et
-// couvrait de salissures tout ce que le soleil ne touchait pas. Ce qui porte le
-// parement au soleil, ce n'est pas sa couleur mais son RELIEF : il monte d'autant que
-// la couleur descend. Ni l'un ni l'autre ne sort plus à l'ombre qu'au soleil : c'est
+// La COULEUR, elle, se règle à l'ombre et jamais au soleil, parce que la courbe de l'écran
+// ne la rend pas au même taux des deux côtés : un parement ensoleillé est à 1,3 de
+// linéaire, sur l'épaule, où un écart d'albédo ressort tassé ; le même parement à l'ombre
+// est à 0,20, sur la partie droite, où il ressort entier. Réglée à l'œil sur un mur au
+// soleil, la nappe passait à 0,62 et couvrait de salissures tout ce que le soleil ne
+// touchait pas. Ce qui porte le parement au soleil, ce n'est pas sa couleur mais son
+// RELIEF : il monte d'autant que la couleur descend. Ni l'un ni l'autre ne sort plus à l'ombre qu'au soleil : c'est
 // l'affaire de `temperance`, qui ne laisse pas la courbe les grossir.
 const CARREAU = {
   1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
@@ -136,8 +152,9 @@ const CARREAU = {
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
-  // de deux amot que rien dans l'Azara ne justifie. Il en garde le relief.
-  13: [1.6, 0.35, 0.20, 0.60, 0.45], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
+  // de deux amot que rien dans l'Azara ne justifie. Poli, il n'en garde que la moitié du
+  // relief et du lustre : le poli efface les creux de la pierre brute, qui s'allumaient en piqûres sur une dalle lisse.
+  13: [1.6, 0.35, 0.20, 0.30, 0.20], 14: [2.4, 0.28, 0.28, 1.20, 0.65],
   22: [1.6, 0.35, 0.20, 0.60, 0.45], 23: [1.6, 0.35, 0.20, 0.60, 0.45],
   19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65], 21: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
@@ -226,7 +243,7 @@ float grain(vec3 p){ return 0.5 * bruit(p) + 0.25 * bruit(p * 2.03) + 0.125 * br
 float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
 
 #ifdef TEMPERE
-// Un écart de matière ne sort pas à l'écran au même taux partout sur la courbe ACES :
+// Un écart de matière ne sort pas à l'écran au même taux partout sur la courbe :
 // une paroi à l'ombre, vers 0,3 de linéaire, le rend deux fois plus fort qu'un
 // parement au soleil, vers 1,3. Réglés au soleil, veines et relief salissaient donc
 // tout ce qu'il ne touche pas. temperance() est l'exposant qui ramène un rapport de
@@ -234,12 +251,9 @@ float grainNorme(vec3 p){ return grain(p) / GRAIN_PLEIN; }
 // Le soleil se juge à l'exposition du dehors : à celle de l'œil adapté (×8) il saturait, et la pierre des salles perdait grain et relief.
 uniform float uExposition;
 const float CLARTE_SOLEIL = 1.3, EXPOSITION_SOLEIL = ${EXPOSITION_DEHORS.toFixed(2)};
-float ecranACES(float L, float exposition){
-  float v = L * exposition / 0.6;
-  v = (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081);
-  return pow(clamp(v, 0.0, 1.0), 1.0 / 2.2);
-}
-float contrasteEcran(float L, float exposition){ return ecranACES(L * 1.1, exposition) - ecranACES(L / 1.1, exposition); }
+${COURBE_DE_L_ECRAN}
+float ecran(float L, float exposition){ return pow(clamp(courbeDeLEcran(vec3(L * exposition)).r, 0.0, 1.0), 1.0 / 2.2); }
+float contrasteEcran(float L, float exposition){ return ecran(L * 1.1, exposition) - ecran(L / 1.1, exposition); }
 float temperance(float clarte){
   return clamp(contrasteEcran(CLARTE_SOLEIL, EXPOSITION_SOLEIL) / max(contrasteEcran(clarte, uExposition), 1e-4), 0.0, 1.0);
 }
@@ -451,9 +465,10 @@ float penteRampe(float d, vec2 rampe, float pixel){
 // la tache de vingt amot qui assombrit la dalle est le passage de la cour, et une dalle
 // foulée est aussi plus lustrée. Le dessus d'un mur prend la première et pas la seconde
 // — personne n'y marche.
-// rovad : la largeur d'une rangée ; longueurs : les deux longueurs de dalle ; nuance : l'écart de valeur d'une dalle à l'autre.
-struct Pavage { float rovad; vec2 longueurs; float nuance; };
-const Pavage PAVAGE_DES_COURS = Pavage(ROVAD_DALLE, vec2(8.0, 10.0), 0.03);
+// rovad : la largeur d'une rangée ; longueurs : les deux longueurs de dalle ; nuance : l'écart de valeur d'une dalle à l'autre ;
+// poli : l'écart de rugosité d'une dalle à l'autre — toutes n'ont pas été polies de la même main, et ce sont les plus lisses qui accrochent le soleil.
+struct Pavage { float rovad; vec2 longueurs; float nuance; float poli; };
+const Pavage PAVAGE_DES_COURS = Pavage(ROVAD_DALLE, vec2(8.0, 10.0), 0.03, 0.22);
 
 void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float rugo, out float usure,
             out vec4 photo){
@@ -479,7 +494,7 @@ void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float ru
          * mix(vec3(1.0), OMBRE_JOINT, 0.45 * usure);
   vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
   pente = penteRampe(d, vec2(0.0, JOINT_DALLE), dx < dz ? pixelX : pixelZ) * dir * (CREUX_DALLE / AMA);
-  rugo = (g - 0.5) * 0.10;
+  rugo = (g - 0.5) * 0.10 - pavage.poli * tireDalle;
   photo = vec4(vec3(tireDalle, tireRang, alea3(vec3(num, floor(colonne), 11.0))) * 13.0, 1.0);
 }
 
@@ -534,6 +549,30 @@ Bloc tailler(vec3 P, vec3 N, Appareil a){
   return b;
 }
 
+// Les stylolithes du meleke : des coutures sombres, fines et dentées, qui courent dans le lit de la pierre et s'arrêtent à
+// son bord. Une pierre sur trois en porte, rarement deux — même table que les *_STYLOLITHE de pierre.py, en amot.
+const float PART_STYLOLITHEE = 0.35, DEUX_STYLOLITHES = 0.12, LARGEUR_STYLOLITHE = 0.02;
+const vec2 ONDE_STYLOLITHE = vec2(0.8, 0.25), DENTS_STYLOLITHE = vec2(0.06, 0.04);   // pas, amplitude
+const vec3 OMBRE_STYLOLITHE = vec3(0.55, 0.51, 0.45);
+
+float stylolithe(vec3 P, Bloc b, Appareil a, float graine){
+  float dans = (P.y / (a.assise * AMA) - b.num) * a.assise;
+  float hauteur = (0.2 + 0.6 * alea1(graine * 97.0 + 1.3)) * a.assise;
+  vec3 q = vec3(b.u / AMA, graine * 17.0, b.num * 3.1);
+  float onde = (grain(q / ONDE_STYLOLITHE.x, empreinte(b.axe) / (ONDE_STYLOLITHE.x * AMA)) - 0.44) * 2.0 * ONDE_STYLOLITHE.y;
+#ifndef GRAIN_LEGER
+  onde += (grain(q / DENTS_STYLOLITHE.x, empreinte(b.axe) / (DENTS_STYLOLITHE.x * AMA)) - 0.44) * 2.0 * DENTS_STYLOLITHE.y;
+#endif
+  return horsJoint(abs(dans - hauteur - onde), LARGEUR_STYLOLITHE, empreinte(vec3(0.0, 1.0, 0.0)) / AMA);
+}
+
+float stylolithes(vec3 P, Bloc b, Appareil a){
+  float tire = alea3(vec3(b.tireBloc * 31.0, b.num, 5.0));
+  if (tire > PART_STYLOLITHEE) return 1.0;
+  float ligne = stylolithe(P, b, a, tire);
+  return tire < DEUX_STYLOLITHES ? min(ligne, stylolithe(P, b, a, tire + 0.5)) : ligne;
+}
+
 void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out float rugo, out vec4 photo){
   if (abs(N.y) > 0.7) {                 // à plat : des dalles, une assise n'y a pas de sens
     float usure;
@@ -554,7 +593,8 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   float mouchete = 0.14 + ((grain(P * vec3(1.0, taille.lit, 1.0) / (taille.pas * AMA), empreinteMax() * taille.lit / (taille.pas * AMA)) - 0.5) * 0.22
                          + (grain(P / (taille.fin * AMA), empreinteMax() / (taille.fin * AMA)) - 0.5) * 0.10) * taille.force;
   float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
-  vec3 base = banc(f) * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0));
+  vec3 base = banc(f) * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0))
+            * mix(OMBRE_STYLOLITHE, vec3(1.0), stylolithes(P, b, a));
   teinte = mix(base * OMBRE_JOINT, base, b.creux);
   // La rugosité varie DANS le bloc, pas seulement d'un bloc à l'autre : sous un soleil
   // rasant c'est le lustre qui donne la surface, la teinte ne fait que la colorer.
@@ -785,13 +825,14 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     dalles(P, PAVAGE_DES_COURS, teinte, pente, rugo, usure, photo);
     // Une dalle passée est plus sombre ET plus lisse. C'est ce lustre, et non la
     // teinte, qui sépare une cour lavée d'une esplanade de grès ; même lecture qu'au
-    // blockout, où l'usure descend la rugosité de 0,60 à 0,42.
-    rugo -= usure * 0.18;
+    // blockout, où l'usure descend la rugosité de 0,60 à 0,42. Le dallage entier est
+    // poli d'un cran de plus : il reflète le ciel et les murs en lueur, pas en miroir.
+    rugo -= usure * 0.18 + 0.12;
   }
   else if (FAMILLE == 22 || FAMILLE == 23) {   // la place du Kotel : pavé en rangs étroits, grandes dalles devant le mur
     float usure;
-    Pavage pavage = Pavage(1.6, vec2(2.0, 3.2), 0.08);
-    if (FAMILLE == 22) pavage = Pavage(0.9, vec2(1.3, 2.2), 0.14);
+    Pavage pavage = Pavage(1.6, vec2(2.0, 3.2), 0.08, 0.0);
+    if (FAMILLE == 22) pavage = Pavage(0.9, vec2(1.3, 2.2), 0.14, 0.0);
     dalles(P, pavage, teinte, pente, rugo, usure, photo);
     rugo -= usure * 0.18;
   }
@@ -1066,6 +1107,22 @@ const LUEURS_DE_LA_SALLE = /* glsl */`
 `;
 
 // Un morceau que three aurait renommé laissait la greffe sans effet, et la matière nue sans rien dire.
+// Le reflet d'une sonde de cour, lu au point et non au centre : le rayon réfléchi est recoupé avec la boîte de la cour.
+// Hors de la boîte, l'or d'une façade qui la dépasse, il garde sa direction.
+function environnementEnBoite() {
+  const repere = "reflectVec = inverseTransformDirection( reflectVec, viewMatrix );";
+  const morceau = THREE.ShaderChunk.envmap_physical_pars_fragment;
+  if (!morceau.includes(repere)) throw new Error(`three a changé ${repere} : sonde non projetée`);
+  return /* glsl */`
+    uniform vec3 uSondeMin, uSondeMax, uSondeCentre;
+    vec3 recouperLaBoite(vec3 d){
+      if (any(lessThan(vMonde, uSondeMin)) || any(greaterThan(vMonde, uSondeMax))) return d;
+      vec3 sortie = max((uSondeMax - vMonde) / d, (uSondeMin - vMonde) / d);
+      return normalize(vMonde + d * min(min(sortie.x, sortie.y), sortie.z) - uSondeCentre);
+    }
+` + morceau.replace(repere, repere + "\nreflectVec = recouperLaBoite(reflectVec);");
+}
+
 const greffable = (source) => ({
   source,
   greffer(repere, greffe) {
@@ -1121,6 +1178,8 @@ export function habiller(materiau, horloges, jeux) {
   if (gravure) uniformes.uGravure = { value: jeux.get("gravures").motif };
   const refletDuDallage = materiau.userData.refletDuDallage === true;
   if (refletDuDallage) Object.assign(uniformes, REFLET);
+  const { sonde } = materiau.userData;
+  if (sonde) Object.assign(uniformes, { uSondeMin: { value: sonde.min }, uSondeMax: { value: sonde.max }, uSondeCentre: { value: sonde.centre } });
   const rayonFil = materiau.userData.rayon;
   if (rayonFil) {
     uniformes.uRayonFil = { value: rayonFil };
@@ -1134,10 +1193,11 @@ export function habiller(materiau, horloges, jeux) {
     + (parokhet ? "#define PAROKHET\n" : "")
     + (gravure ? "#define GRAVURE\n" : "")
     + (rayonFil ? "#define FIL\n" : "")
-    + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "");
+    + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
+    + (sonde ? "#define SONDE_EN_BOITE\n" : "");
 
   // La sonde du Heikhal pose son propre reflet, celui de la salle : ce n'est plus le ciel qu'il faut éteindre.
-  const refletDuCiel = () => (materiau.envMap ? "" : "#define REFLET_DU_CIEL\n");
+  const refletDuCiel = () => (materiau.userData.refletVoitLeCiel === false ? "" : "#define REFLET_DU_CIEL\n");
   materiau.onBeforeCompile = (nuanceur) => {
     Object.assign(nuanceur.uniforms, uniformes);
     nuanceur.vertexShader = greffable(nuanceur.vertexShader)
@@ -1257,6 +1317,7 @@ export function habiller(materiau, horloges, jeux) {
       .greffer("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
         normal = normalize(normal - mat3(viewMatrix) * mPente);`)
+      .greffer("#include <envmap_physical_pars_fragment>", sonde ? environnementEnBoite() : "#include <envmap_physical_pars_fragment>")
       .source;
   };
   materiau.customProgramCacheKey = () => `mikdash-${drapeaux}${refletDuCiel()}`;
