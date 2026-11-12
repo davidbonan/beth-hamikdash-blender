@@ -316,8 +316,6 @@
   #barre button { display: inline-grid; place-items: center; }
   #barre select:hover, #barre button:hover { border-color: var(--or); }
   #barre button:active, #barre .menu:active { transform: scale(.96); }
-  /* Un select prend la largeur de sa plus longue option : borné, il cède sa place au lieu de pousser la barre à la ligne. */
-  #aller { flex: 0 1 12em; min-width: 7em; text-overflow: ellipsis; }
   #barre #chercher { display: inline-flex; align-items: center; gap: 7px; }
   #chercher .icone { width: 15px; height: 15px; }
   #mode { font-size: 12px; letter-spacing: .04em; color: #9a9182; white-space: nowrap; }
@@ -740,8 +738,8 @@
   }
   #minicarte .disque {
     position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; overflow: hidden; cursor: pointer;
-    border: 1px solid rgba(203,192,170,.35); border-radius: 50%;
-    background: rgba(13,12,11,.55); backdrop-filter: blur(3px);
+    border: 2px solid #fff; border-radius: 50%;
+    background: var(--plan-sol); box-shadow: 0 2px 8px rgba(0,0,0,.4);
   }
   #minicarte .disque:hover { border-color: var(--or); }
   #minicarte svg { display: block; width: 100%; height: 100%; }
@@ -750,7 +748,7 @@
     letter-spacing: .04em; color: #f3efe6; font-variant-numeric: tabular-nums;
     text-shadow: 0 0 3px rgba(13,12,11,.95), 0 0 1px rgba(13,12,11,.95); pointer-events: none;
   }
-  #minicarte :is(.entrees, .etiquettes) { display: none; }
+  #minicarte .etiquettes { display: none; }
   /* Le plan ne tourne pas avec le visiteur : nord en haut, est à droite, quelle que soit la langue. */
   #minicarte .rose { position: absolute; inset: 0; pointer-events: none; direction: ltr; }
   #minicarte .rose span {
@@ -761,52 +759,150 @@
   #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%); }
   #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%); }
   #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%); }
-  #plan, #recherche {
+  #recherche {
     position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
     padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))
              calc(16px + var(--marge-bas)) calc(16px + var(--marge-gauche));
     color: #e8e0d0; background: rgba(13,12,11,.93); backdrop-filter: blur(4px);
   }
-  #plan .tete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  :is(#plan, #recherche, #qualite-choix) h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
-  #plan .consigne { margin: 0; font-size: 13px; color: #a9a094; }
-  /* Cinq zones ne tiennent pas sur un téléphone debout : la rangée défile plutôt que de passer à la ligne. */
-  #plan .cadrages { display: flex; gap: 6px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
-  #plan button, :is(#recherche, #qualite-choix) .fermer {
+  :is(#recherche, #qualite-choix) h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  :is(#recherche, #qualite-choix) .fermer {
     flex: 0 0 auto; height: 34px; padding: 0 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;
     font: inherit; font-size: 13px; line-height: 1;
     border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.82); color: #e8e0d0;
     transition: border-color .15s ease, transform .12s ease;
   }
-  #plan button:hover, #plan [aria-pressed="true"], :is(#recherche, #qualite-choix) .fermer:hover { border-color: var(--or); color: #f3efe6; }
+  :is(#recherche, #qualite-choix) .fermer:hover { border-color: var(--or); color: #f3efe6; }
+  :is(#recherche, #qualite-choix) .fermer { width: 34px; padding: 0; font-size: 18px; }
+
+  /* Le plan se lit comme une carte de ville, à aplats clairs ; ses commandes gardent l'habit de la visite et flottent dessus. */
+  :root {
+    --plan-sol: #f2efe9; --plan-panneau: rgba(20,18,16,.88); --plan-bord: rgba(203,192,170,.3);
+    --plan-texte: #e8e0d0; --plan-discret: #a9a094; --plan-accent: #d9a441;
+    --plan-ombre: 0 2px 10px rgba(13,12,11,.35);
+  }
+  #plan { position: fixed; inset: 0; z-index: 28; overflow: hidden; color: var(--plan-texte); background: var(--plan-sol); }
+  #plan h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  #plan .tete {
+    position: absolute; z-index: 3; top: calc(12px + var(--marge-haut));
+    inset-inline: calc(12px + var(--marge-gauche)) calc(12px + var(--marge-droite));
+    display: flex; align-items: flex-start; gap: 8px; pointer-events: none;
+  }
+  #plan .tete > * { pointer-events: auto; }
+  #plan .consigne {
+    position: absolute; z-index: 2; top: calc(58px + var(--marge-haut)); inset-inline-start: calc(12px + var(--marge-gauche));
+    margin: 0; padding: 4px 10px; border-radius: 4px; font-size: 13px; color: var(--plan-discret);
+    background: var(--plan-panneau); backdrop-filter: blur(4px); pointer-events: none;
+  }
+  #plan button {
+    flex: 0 0 auto; height: 38px; padding: 0 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;
+    font: inherit; font-size: 13px; line-height: 1; color: var(--plan-texte);
+    border: 1px solid var(--plan-bord); background: var(--plan-panneau); backdrop-filter: blur(4px); box-shadow: var(--plan-ombre);
+    transition: border-color .15s ease, color .15s ease, transform .12s ease;
+  }
+  #plan button:hover { border-color: var(--or); color: #f3efe6; }
+  #plan [aria-pressed="true"] { color: var(--plan-accent); border-color: var(--or); }
   #plan button:active { transform: scale(.96); }
-  :is(#plan, #recherche, #qualite-choix) .fermer { width: 34px; padding: 0; font-size: 18px; }
-  #plan svg { flex: 1; min-height: 0; width: 100%; }
+  #plan button:disabled { opacity: .45; cursor: default; border-color: var(--plan-bord); transform: none; }
+  #plan .tete .fermer { margin-inline-start: auto; width: 40px; height: 40px; padding: 0; font-size: 20px; }
+  /* « Aller à un lieu » : le champ de la carte, et sous lui la liste le temps du choix. */
+  #plan .aller { position: relative; flex: 0 1 380px; min-width: 0; }
+  #plan .aller .icone {
+    position: absolute; z-index: 1; inset-inline-start: 12px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%);
+    color: var(--plan-discret); pointer-events: none;
+  }
+  #plan .aller input {
+    box-sizing: border-box; width: 100%; height: 40px; padding: 0 12px; padding-inline-start: 38px; border-radius: 4px;
+    font: inherit; font-size: 16px; color: #f3efe6; border: 1px solid var(--plan-bord);
+    background: var(--plan-panneau); backdrop-filter: blur(4px); box-shadow: var(--plan-ombre);
+    user-select: text; -webkit-user-select: text;
+  }
+  #plan .aller input::placeholder { color: var(--plan-discret); }
+  #plan .aller input:focus { outline: none; border-color: var(--or); }
+  #plan .trouves {
+    position: absolute; top: calc(100% + 4px); inset-inline: 0; z-index: 3; max-height: min(60vh, 460px);
+    overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 2px 10px 8px; border-radius: 5px;
+    border: 1px solid var(--plan-bord); background: rgba(20,18,16,.97); box-shadow: 0 12px 30px rgba(0,0,0,.45);
+  }
+  #plan .trouves h3 { margin: 12px 0 2px; font-size: 12px; font-weight: 500; letter-spacing: .04em; color: var(--plan-discret); }
+  #plan .trouves button {
+    display: block; width: 100%; height: auto; min-height: 40px; padding: 8px 4px; text-align: start; white-space: normal;
+    font-size: 15px; border: 0; border-bottom: 1px solid rgba(203,192,170,.14); border-radius: 0;
+    background: none; backdrop-filter: none; box-shadow: none;
+  }
+  #plan .trouves button:hover { color: var(--plan-accent); }
+  #plan .trouves .rien { margin: 12px 0 4px; color: var(--plan-discret); font-size: 14px; }
+  /* La carte se manie au doigt comme à la souris : le navigateur ne doit ni défiler ni zoomer la page à sa place. */
+  #plan .carte { position: absolute; inset: 0; overflow: hidden; touch-action: none; direction: ltr; }
+  #plan .carte > svg { display: block; width: 100%; height: 100%; cursor: grab; outline: none; }
+  #plan .carte > svg:active { cursor: grabbing; }
+  #plan .commandes {
+    position: absolute; bottom: calc(20px + var(--marge-bas)); right: calc(12px + var(--marge-droite));
+    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  }
+  #plan .niveaux, #plan .zoom { display: flex; flex-direction: column; gap: 4px; }
+  #plan .niveaux button { min-width: 7.5em; text-align: center; }
+  #plan .zoom button, #plan .recentrer { width: 38px; padding: 0; font-size: 18px; display: grid; place-items: center; }
+  #plan .recentrer svg { width: 18px; height: 18px; }
+  .bulle {
+    position: absolute; top: 0; left: 0; z-index: 2; display: flex; flex-direction: column; gap: 6px;
+    max-width: min(280px, calc(100% - 16px)); padding: 10px 38px 10px 12px; border-radius: 6px;
+    color: var(--plan-texte); border: 1px solid rgba(217,164,65,.55); background: rgba(20,18,16,.96); box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  }
+  [dir="rtl"] .bulle { direction: rtl; }
+  .bulle[hidden] { display: none; }
+  .bulle .nom { margin: 0; font-size: 15px; font-weight: 500; color: #f3efe6; }
+  .bulle .inaccessible { margin: 0; font-size: 13px; color: #e0a46a; }
+  .bulle .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  #plan .bulle .actions button { height: 34px; box-shadow: none; backdrop-filter: none; }
+  #plan .bulle .aller-ici { border-color: var(--or); color: #f3efe6; background: rgba(217,164,65,.18); }
+  #plan .bulle .fermer { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; padding: 0; font-size: 16px; border-color: transparent; background: none; box-shadow: none; backdrop-filter: none; }
   /* La barre a la longueur qu'elle dit, au pixel près du plan affiché : il est à l'échelle du Temple. */
   #plan .echelle {
-    position: absolute; bottom: calc(16px + var(--marge-bas)); left: calc(16px + var(--marge-gauche));
+    position: absolute; bottom: calc(20px + var(--marge-bas)); left: calc(12px + var(--marge-gauche));
     display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 10px 4px;
     pointer-events: none; font-size: 12px; line-height: 1.2; color: #f3efe6; font-variant-numeric: tabular-nums;
-    border: 1px solid rgba(203,192,170,.35); border-radius: 6px;
-    background: rgba(13,12,11,.7); backdrop-filter: blur(3px);
+    border: 1px solid var(--plan-bord); border-radius: 6px; background: var(--plan-panneau); backdrop-filter: blur(4px);
   }
   #plan .echelle i { display: block; height: 5px; border: 1.5px solid #f3efe6; border-top: 0; }
   #plan .echelle p { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 5px; margin: 0; }
   #plan .echelle span { white-space: nowrap; }
   #plan .echelle .amot { font-weight: 600; }
-  #plan .echelle .metres { color: #cbc0aa; }
-  image.dessous { opacity: .3; filter: grayscale(1); }
-  /* L'image dit le lieu : la zone qui se touche reste invisible jusqu'au survol. */
-  .lieux rect { fill: transparent; stroke: transparent; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-  #plan .lieux rect { cursor: pointer; transition: fill .12s ease, stroke .12s ease; }
-  #plan .lieux rect:hover { fill: rgba(217,164,65,.22); stroke: rgba(217,164,65,.9); }
-  /* Sans survol, rien ne dirait qu'un lieu se touche. */
-  @media (hover: none) { #plan .lieux rect { stroke: rgba(217,164,65,.5); } }
-  .entrees circle { fill: #f3efe6; stroke: #1b1815; stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
-  .entrees circle:hover { fill: var(--or); }
+  #plan .echelle .metres { color: var(--trait); }
+  /* Les teintes du plan, par catégorie : `modele/beit_hamikdash_plan.py` les nomme. */
+  .ville .batiments { fill: #e4e1da; stroke: #d6d2c9; stroke-width: .5px; vector-effect: non-scaling-stroke; }
+  .ville .murailles { fill: none; stroke: #cdbfa3; stroke-width: 3; stroke-linejoin: round; }
+  .surface .esplanade { fill: #efe7d5; }
+  .surface .place { fill: #e8e6e1; }
+  .surface .cour { fill: #ead9b2; }
+  .surface .jardin { fill: #c3e3b5; }
+  .surface .eau { fill: #a3d0f0; }
+  .surface .autel { fill: #cf9f80; }
+  .surface .bati { fill: #ddd2ba; stroke: #c8ba9b; stroke-width: .6px; vector-effect: non-scaling-stroke; }
+  .surface .moderne { fill: #e0ddd6; stroke: #cfcbc2; stroke-width: .6px; vector-effect: non-scaling-stroke; }
+  .surface .sanctuaire { fill: #e9c472; stroke: #c49b45; stroke-width: .8px; vector-effect: non-scaling-stroke; }
+  .surface .mur { fill: #a69679; }
+  .coupe .sol { fill: #f8efd8; }
+  .coupe .mur { fill: #7c6b4e; }
+  .coupe.souterraine .sol { fill: #ead9b2; stroke: #7c6b4e; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+  .pale { opacity: .35; filter: grayscale(1); }
+  .visiteur.ailleurs { opacity: .35; }
+  .visiteur .faisceau { fill: rgba(154,107,31,.3); }
+  .visiteur .point { fill: #d9a441; stroke: var(--encre); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  #minicarte .visiteur .point { stroke-width: 1.5; }
+  .epingle .tete { fill: #d9a441; stroke: var(--encre); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .epingle.perdue .tete { fill: #8a8174; }
+  .epingle .pied { fill: rgba(27,24,21,.75); stroke: #d9a441; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .epingle .apercu { fill: #f3efe6; }
+  /* Sur un téléphone debout, la consigne cède la place au champ. */
+  @media (max-width: 560px) {
+    #plan .aller { flex: 1 1 auto; }
+    #plan .consigne { display: none; }
+    #plan .niveaux button { min-width: 0; }
+  }
   .etiquettes text {
-    fill: #f3efe6; text-anchor: middle; dominant-baseline: central; pointer-events: none;
-    paint-order: stroke; stroke: rgba(13,12,11,.85); stroke-width: 3px; vector-effect: non-scaling-stroke;
+    fill: #5c4b2e; font-weight: 500; text-anchor: middle; dominant-baseline: central; pointer-events: none;
+    paint-order: stroke; stroke: rgba(255,255,255,.92); stroke-width: 3px; stroke-linejoin: round; vector-effect: non-scaling-stroke;
   }
   .etiquettes .tue { display: none; }
   /* ---- recherche ---- */
@@ -828,7 +924,6 @@
   #recherche .resultats button:hover { color: #d9a441; }
   #recherche .rien { margin: 16px 0 0; color: #a9a094; }
 
-  .visiteur path { fill: #d9a441; stroke: #1b1815; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 
   /* ---- au doigt ---- */
   @media (hover: none) and (pointer: coarse) {
@@ -846,7 +941,11 @@
   @media (pointer: coarse) {
     #barre { --commande: 44px; }
     #plan button, :is(#recherche, #qualite-choix) .fermer { height: 44px; }
-    :is(#plan, #recherche, #qualite-choix) .fermer { width: 44px; }
+    :is(#recherche, #qualite-choix) .fermer, #plan .zoom button, #plan .recentrer { width: 44px; }
+    #plan .bulle .actions button { height: 40px; }
+    #plan .aller input, #plan .tete .fermer { height: 44px; }
+    #plan .tete .fermer { width: 44px; }
+    #plan .bulle .fermer { width: 36px; height: 36px; }
     #parcours .pied button, #initiation .pied button { min-height: 40px; min-width: 40px; }
   }
 
@@ -1073,7 +1172,6 @@
 </div>
 
 <div id="barre">
-  <label class="menu" title="Aller à…" data-titre="aller"><svg class="icone" aria-hidden="true"><use href="#icone-lieu"></use></svg><select id="aller"><option value="" data-texte="aller">Aller à…</option></select></label>
   <button id="chercher" type="button" aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><span data-texte="chercher">Chercher</span></button>
   <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre"><svg class="icone" aria-hidden="true"><use href="#icone-vol"></use></svg><span data-texte="vol">Vol libre</span></button>
   <div id="reglages">
@@ -1106,12 +1204,35 @@
 <div id="plan" role="dialog" aria-labelledby="plan-titre" hidden>
   <div class="tete">
     <h2 id="plan-titre" data-texte="plan">Plan du Temple</h2>
-    <div class="cadrages"></div>
+    <div class="aller">
+      <svg class="icone" aria-hidden="true"><use href="#icone-lieu"></use></svg>
+      <input type="search" autocomplete="off" enterkeyhint="go" placeholder="Aller à un lieu…" aria-label="Aller à un lieu…" data-titre="aller">
+      <div class="trouves" hidden></div>
+    </div>
     <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
   </div>
-  <p class="consigne" data-texte="plan_consigne">Choisissez un lieu pour vous y rendre.</p>
-  <svg></svg>
-  <div class="echelle"><i></i><p><span class="amot"></span><span class="metres"></span></p></div>
+  <p class="consigne" data-texte="plan_consigne">Choisissez un point de la carte pour vous y rendre.</p>
+  <div class="carte">
+    <svg tabindex="0"></svg>
+    <div class="commandes">
+      <div class="niveaux" role="group" aria-label="Niveau" data-titre="niveau"></div>
+      <div class="zoom">
+        <button class="zoomer" type="button" title="Zoomer" aria-label="Zoomer" data-titre="zoomer">+</button>
+        <button class="dezoomer" type="button" title="Dézoomer" aria-label="Dézoomer" data-titre="dezoomer">−</button>
+      </div>
+      <button class="recentrer" type="button" title="Me recentrer" aria-label="Me recentrer" data-titre="recentrer"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="bulle" role="status" hidden>
+      <p class="nom"></p>
+      <p class="inaccessible" data-texte="inaccessible">Inaccessible à pied</p>
+      <div class="actions">
+        <button class="aller-ici" type="button" data-texte="aller_ici">Aller ici</button>
+        <button class="vue-du-lieu" type="button" data-texte="vue_du_lieu">Vue du lieu</button>
+      </div>
+      <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
+    </div>
+    <div class="echelle"><i></i><p><span class="amot"></span><span class="metres"></span></p></div>
+  </div>
 </div>
 
 <div id="recherche" role="dialog" aria-labelledby="recherche-titre" hidden>

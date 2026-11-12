@@ -23,7 +23,7 @@ import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
 import { recherche } from "./recherche.js";
 import { AMA, OEIL, marcheur } from "./marche.js";
-import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, texte, titrer } from "./langue.js";
+import { ecrire, installerLangue, langue, langueChoisie, suivreLangue, texte, titrer } from "./langue.js";
 import { veillerAuxPannes } from "./pannes.js";
 import { confier, lireConfie, oublierConfie } from "./memoire.js";
 import { laisserPeindre, parTranches } from "./fil.js";
@@ -69,7 +69,7 @@ installerLangue(textes);
 // Encadrée par l'accueil, la scène marche seule et se tait : ni barre, ni fiche, ni initiation.
 const CINEMA = new URLSearchParams(location.search).has("cinema");
 document.documentElement.classList.toggle("cinema", CINEMA);
-const [reperes, { cadrages: CADRAGES_DU_PLAN }, haltesCinema, { parcours: PARCOURS }, ...distributions] =
+const [reperes, DESSIN_DU_PLAN, haltesCinema, { parcours: PARCOURS }, ...distributions] =
   await Promise.all([json("./reperes.json"), json("./plan.json"), CINEMA ? json("./cinema.json") : null,
     json("./parcours.json"), ...Object.values(TROUPES).map((t) => json(t.json))]);
 const figurants = Object.fromEntries(Object.keys(TROUPES).map((nom, i) => [nom, distributions[i]]));
@@ -141,8 +141,8 @@ const camera = new THREE.PerspectiveCamera(62, innerWidth / innerHeight, 0.12, 6
 const LAMPE_TETE = 6;
 // HaGola et les chambres sous l'Ezrat Israël ne voient le jour que par leur porte, et HaKelim, fermée, par la baie du don.
 const LAMPE_PAR_LIEU = { heikhal: 0.6, kodesh_hakodashim: 0.5, taim: LAMPE_TETE, lishkat_hagola: LAMPE_TETE,
-  lishkat_hakelim: LAMPE_TETE, lishkot_haleviim: LAMPE_TETE, lishkat_chashaim: LAMPE_TETE,
-  ...Object.fromEntries([...lieuxSouterrains(CADRAGES_DU_PLAN)].map((lieu) => [lieu, LAMPE_TETE])) };
+  lishkat_hakelim: LAMPE_TETE, lishkot_haleviim: LAMPE_TETE, lishkat_chashaim: LAMPE_TETE, beit_hamoked: LAMPE_TETE,
+  ...Object.fromEntries([...lieuxSouterrains(DESSIN_DU_PLAN)].map((lieu) => [lieu, LAMPE_TETE])) };
 const lampe = new THREE.PointLight(0xffe9c4, 0, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
@@ -502,20 +502,7 @@ async function passerAuMoment(voulu) {
 }
 boutonMoment.onclick = (e) => { passerAuMoment(eclairage.moment === "jour" ? "nuit" : "jour"); e.currentTarget.blur(); };
 
-const aller = $("#aller"), position = $("#position");
-
-function remplirAller() {
-  aller.replaceChildren(aller.options[0]);
-  for (const e of reperes.entrees) {
-    aller.append(new Option(libelle("entrees", e.id) ?? e.nom, e.id));
-  }
-}
-aller.onchange = () => {
-  const id = aller.value;
-  fondu(() => vues.allerVers(id));
-  aller.value = "";
-  aller.blur();
-};
+const position = $("#position");
 
 const choixParcours = $("#parcours-choix");
 function remplirParcours() {
@@ -545,18 +532,25 @@ const LIEUX = fiche.concepts.filter((c) => c.lieu && EMPRISES.has(c.id)).map((c)
   .sort((a, b) => volume(EMPRISES.get(a)) - volume(EMPRISES.get(b)));
 const lieuEn = (point) => LIEUX.find((id) => EMPRISES.get(id).containsPoint(point)) ?? null;
 
+// Partir du plan quitte la visite guidée : on ne la suit plus d'où elle nous a laissés.
+function partir(action) {
+  if (guides.ouvert()) guides.fermer();
+  return fondu(action);
+}
+
 const planMiddot = plan({
-  cadrages: CADRAGES_DU_PLAN, emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS, ama: AMA,
+  dessin: DESSIN_DU_PLAN, emprises: EMPRISES, lieux: LIEUX, concepts: CONCEPTS, ama: AMA,
   entrees: reperes.entrees.map((e) => ({ ...e, position: vues.piedsDe(e) })),
-  allerLieu: (id) => fondu(() => vues.allerElement(id)),
-  allerEntree: (id) => fondu(() => vues.allerVers(id)),
+  piedsAuPoint: vues.piedsAuPoint, piedsDeLElement: vues.piedsDeLElement, capDuTrajet: vues.capDuTrajet,
+  allerAuPoint: (pieds) => partir(() => vues.allerAuPoint(pieds)),
+  allerVers: (id) => partir(() => vues.allerVers(id)),
+  allerElement: (id) => partir(() => vues.allerElement(id)),
 });
 
 async function accorderLangue(code) {
   const traduits = await conceptsEn(code, fiche, contenus);
   if (code !== langue()) return;                // un choix plus récent est passé pendant le chargement
   for (const [id, concept] of traduits) CONCEPTS.set(id, concept);
-  remplirAller();
   elements.rafraichir();
   remplirParcours();
   rafraichir();
@@ -770,6 +764,11 @@ function uneImage(dt) {
 }
 renderer.setAnimationLoop(() => {
   if (pannes.enReprise || pannes.contextePerdu || imageSuspendue) return;
+  // Le plan couvre la scène : elle ne se dessine pas dessous, et ne rattrape pas le temps passé à le lire.
+  if (planMiddot.ouvert()) {
+    horloge.getDelta();
+    return;
+  }
   const dt = Math.min(horloge.getDelta(), 0.1);
   // Avant le tracé : retailler la toile efface l'image qu'elle porte.
   ajusterEchelle(dt);
@@ -876,12 +875,14 @@ window.__ombres = (actives) => {
 Object.defineProperty(window, "__figurants", { get: troupes.chargements });
 window.__moteur = { renderer, scene, rendu };
 window.__sol = marche.solEn;
+window.__sols = marche.solsLibres;
 window.__mur = (origine, direction, portee) => {
   const rayon = new THREE.Raycaster(new THREE.Vector3(...origine), new THREE.Vector3(...direction).normalize(), 0, portee);
   const [touche] = rayon.intersectObjects(murs, false);
   return touche ? { distance: touche.distance, concept: touche.object.userData.concept ?? touche.object.name } : null;
 };
 window.__parcours = guides;
+window.__plan = planMiddot;
 window.__moment = (voulu) => eclairage.passerAu(voulu);
 window.__figurantsVus = troupes.figurantsVus;
 window.__temps = (t) => { troupes.reglerLeTemps(t); dessiner(0); };

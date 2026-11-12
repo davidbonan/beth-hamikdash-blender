@@ -29,11 +29,14 @@ const VOL = 9.0;          // m/s en vol libre
 // framerate. 0,09 s, c'est trente centimètres de glissé à l'arrêt — le pied qui se pose.
 const REPONSE = 0.09;
 const LISSAGE_REGARD = 0.045;
+const HAUT_DU_MONDE = 400;   // m : au-dessus du plus haut toit
+const BAS_DU_MONDE = -200;   // m : sous le fond de la ville basse
 
 export function marcheur(camera, murs, vis) {
   const BAS = new THREE.Vector3(0, -1, 0);
   const versLeBas = new THREE.Raycaster();
   const versLAvant = new THREE.Raycaster();
+  const versLaVerticale = new THREE.Raycaster();
 
   const sonde = new THREE.Vector3();
   const normale = new THREE.Vector3(), glisse = new THREE.Vector3(), ecart = new THREE.Vector3();
@@ -47,6 +50,34 @@ export function marcheur(camera, murs, vis) {
       if (!t.face || t.face.normal.y > 0.25) return t.point.y;
     }
     return null;
+  }
+
+  // Volumes fermés : un dessus franchi en descendant y fait entrer, un dessous en fait sortir ; un sol enfoui n'en est pas un.
+  function solsLibres(x, z) {
+    const dessus = traversees(sonde.set(x, HAUT_DU_MONDE, z), BAS, 1);
+    const dessous = traversees(sonde.set(x, BAS_DU_MONDE, z), HAUT, -1);
+    const faces = [...dessus, ...dessous].sort((a, b) => b.y - a.y);
+    const sols = [];
+    let profondeur = 0, plafond = Infinity;
+    for (const { y, sens } of faces) {
+      if (sens < 0) {
+        profondeur = Math.max(0, profondeur - 1);
+        if (profondeur === 0) plafond = y;
+        continue;
+      }
+      if (profondeur === 0) sols.push({ y, libre: plafond - y });
+      profondeur++;
+    }
+    return sols;
+  }
+
+  // `sens` 1 : les faces tournées vers le haut, rencontrées en descendant ; -1 : vers le bas, en montant.
+  function traversees(origine, direction, sens) {
+    versLaVerticale.set(origine, direction);
+    versLaVerticale.far = Infinity;
+    return versLaVerticale.intersectObjects(murs, false)
+      .filter((t) => t.face && normale.copy(t.face.normal).transformDirection(t.object.matrixWorld).y * sens > 0.25)
+      .map((t) => ({ y: t.point.y, sens }));
   }
 
   function solEn(x, z, piedsY) {
@@ -292,7 +323,7 @@ export function marcheur(camera, murs, vis) {
   }
 
   return {
-    solSous, solEn, avancer, poser, orienterCap, orienterVers, tourner, accorderRegard, lisserRegard,
+    solSous, solEn, solsLibres, avancer, poser, orienterCap, orienterVers, tourner, accorderRegard, lisserRegard,
     basculerVol, tenirLeVol,
     suivreLaCamera() { piedsY = camera.position.y - OEIL; },
     get piedsY() { return piedsY; },

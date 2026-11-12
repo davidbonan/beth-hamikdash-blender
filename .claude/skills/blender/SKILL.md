@@ -40,7 +40,7 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `modele/beit_hamikdash_keruvim.py` | les deux keruvim de la kaporet, corps MakeHuman agenouillés et ailes plumées, que le blockout lit | `modele/keruvim.blend` |
 | `modele/beit_hamikdash_parokhet.py` | le motif tissé des Parokhot en carte (R = bombé, G/B = face du tissage, alpha = figure), composé des figures de `modele/tissages/` (guides + gpt-image-2, comme les gravures), que la matière du blockout et la visite lisent | `visite/matieres/parokhet_2048.webp`, `parokhet.json` |
 | `modele/beit_hamikdash_gravures.py` | les figures des parois (keruv, palmette, timora, fleuron, bouton) : atlas de modelé et silhouettes composés des tuiles taillées de `modele/gravures/`, que le blockout lit pour poser chaque figure sur sa paroi | `visite/matieres/gravures_3072.webp`, `gravures.json` |
-| `modele/beit_hamikdash_plan.py` | rend le plan de la visite vu du dessus, une image par cadrage | `visite/plans/*.webp`, `visite/plan.json` |
+| `modele/beit_hamikdash_plan.py` | dessine le plan de la visite à plat : polygones par catégorie, coupes, vieille ville | `visite/plan.json` |
 
 Les trois du milieu sont pilotés par le skill **camera**, qui les chaîne dans une
 seule commande. Ce qui suit sert quand on veut les lancer soi-même.
@@ -202,16 +202,15 @@ que l'architecture : 9 178 objets contre 18 913.
 
 ```bash
 $BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py
-$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_plan.py [-- heikhal sous_terrain]
+$BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_plan.py
 open visite/index.html
 ```
 
-Le plan se rend à part, ~20 s pour les cinq cadrages : une caméra orthographique au-dessus
-de chacun, tranchée à la hauteur `coupe` pour le Heikhal et les souterrains. Les caméras
-du film sont liées aux repères de la timeline ; le script les en détache, sinon le rendu
-prendrait le plan du film au lieu du plan du dessus. Pour les souterrains, `caches` retire
-sol, podium, Heil et relief, `plancher` coupe tout sous le fond des tunnels : ils sortent
-sur fond transparent, et la visite pose dessous le plan `dessous` (l'Azara) pâli.
+Le plan se dessine à part, ~40 s : un rayon vertical par tiers de mètre donne la catégorie de ce qu'il touche
+(`categorie()` : concept, zone, motifs de nom), un filtre de majorité efface le mobilier, chaque catégorie devient des
+polygones simplifiés. Coupes (`NIVEAUX`) : rayons partis de la hauteur `coupe`, montant et descendant, pour dire mur
+tranché ou sol libre ; les souterrains ne gardent que le sol couvert dans l'emprise de leurs lieux. Un objet mal classé
+sur le plan se corrige dans `PAR_CONCEPT` ou les motifs de nom.
 
 Ce script **lit** le .blend sauvegardé : il fusionne les volumes par concept — les
 milliers de volumes de dix collections deviennent 68 maillages — et écrit `visite/temple.glb`
