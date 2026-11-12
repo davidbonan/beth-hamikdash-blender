@@ -27,6 +27,7 @@ import { ecrire, installerLangue, langue, langueChoisie, libelle, suivreLangue, 
 import { veillerAuxPannes } from "./pannes.js";
 import { confier, lireConfie, oublierConfie } from "./memoire.js";
 import { laisserPeindre, parTranches } from "./fil.js";
+import { ecranDeChargement, glisser, remplir } from "./chargement.js";
 import { TROUPES, TROUPE_LIBRE, troupesDeFigurants } from "./figurants.js";
 import { eclairerLeTemple } from "./eclairage.js";
 import { designation } from "./designation.js";
@@ -56,8 +57,8 @@ THREE.Mesh.prototype.raycast = acceleratedRaycast;
 // données
 // ---------------------------------------------------------------------------
 const $ = (s) => document.querySelector(s);
-const etat = $("#etat"), jauge = $("#chargement .jauge i");
-const pannes = veillerAuxPannes({ etat, chargement: $("#chargement") });
+const chargement = ecranDeChargement($("#chargement"));
+const pannes = veillerAuxPannes({ etat: $("#etat"), chargement: $("#chargement") });
 
 const [textes, fiche, ...contenus] = await Promise.all([
   json("./textes.json"),
@@ -223,59 +224,18 @@ const obstacles = [];
 const construireArbre = (maillage) => maillage.geometry.computeBoundsTree({ maxLeafTris: 24 });
 const construireArbres = (maillages) => parTranches(maillages, construireArbre);
 
-const remplir = (trait, part) => { trait.style.transform = `scaleX(${part})`; };
-// Lancée avant un gel de la page, la glissade se poursuit pendant lui, sur le compositeur.
-async function glisser(trait, part, duree) {
-  trait.style.transition = `transform ${duree}ms linear`;
-  remplir(trait, part);
-  await laisserPeindre();
-}
-// La jauge de « préparation… » avance au poids de chaque étape : sa part de l'attente dans Safari d'iPhone, où elle dure.
-const POIDS = { arbres: 1, textures: 1, nuanceurs: 10, reflet: 3, detail: 3, image: 4 };
-// Le reflet et la première image figent la page : leur durée s'estime en parts de celle de la compilation.
-const GELS = { reflet: 0.3, image: 0.35 };
-let dureeCompilation = 0;
-const POIDS_TOTAL = Object.values(POIDS).reduce((somme, poids) => somme + poids);
-const avancement = Object.fromEntries(Object.keys(POIDS).map((etape) => [etape, 0]));
-const partPreparee = () => Object.entries(POIDS).reduce((somme, [nom, poids]) => somme + poids * avancement[nom], 0) / POIDS_TOTAL;
-function avancer(etape, part = 1) {
-  avancement[etape] = part;
-  remplir(jauge, partPreparee());
-}
-function glisserPendantLeGel(etape) {
-  avancement[etape] = 1;
-  return glisser(jauge, partPreparee(), GELS[etape] * dureeCompilation);
-}
-function enJaugeant(etape, nombre, traiter) {
-  let faits = 0;
-  return (element) => {
-    traiter(element);
-    avancer(etape, ++faits / nombre);
-  };
-}
-// La jauge du téléchargement, pleine, repart de zéro sans refluer sous les yeux.
-async function viderLaJauge() {
-  jauge.style.transition = "none";
-  remplir(jauge, 0);
-  await laisserPeindre();
-  jauge.style.transition = "";
-}
-const restant = $("#restant");
 // Les nappes descendent PENDANT le .glb : elles pèsent la moitié de son poids, et les
 // attendre ensuite doublerait l'attente d'un visiteur en 4G.
 const chargeur = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 const [gltf, jeux, occlusions, lumieres] = await Promise.all([
   chargeur.loadAsync("./temple.glb", (e) => {
-      if (!e.lengthComputable) return;
-      remplir(jauge, e.loaded / e.total);
-      restant.textContent = e.loaded < e.total ? texte("restant").replace("{pc}", Math.floor(100 * e.loaded / e.total)) : "";
+      if (e.lengthComputable) chargement.telecharger(e.loaded, e.total);
     }),
   nappes(),
   cartesOcclusion(reperes.occlusion),
   cartesLumiere(reperes.lumiere),
 ]);
-ecrire(etat, "preparation");
-await viderLaJauge();
+await chargement.preparer();
 scene.add(gltf.scene);
 // Three ne calcule les matrices monde qu'au premier rendu, et un rayon ne les calcule
 // pas : sans ça le tout premier `poser` sonde une scène encore à l'origine, ne trouve
@@ -356,17 +316,11 @@ gltf.scene.traverse((o) => {
 });
 const oeilAdapte = adaptation(obstacles);
 
-async function compilerEnJaugeant() {
-  const debut = performance.now();
-  await rendu.compiler(scene, (part) => avancer("nuanceurs", part));
-  dureeCompilation = performance.now() - debut;
-}
-
 // Le premier rendu envoyait toutes les cartes au GPU d'un seul bloc, page figée : elles partent avant lui, par tranches.
 async function envoyerLesTextures() {
   const portees = [...obstacles.map((o) => o.material), ...jeux.values()].flatMap(Object.values);
   const textures = new Set(portees.filter((valeur) => valeur?.isTexture));
-  await parTranches(textures, enJaugeant("textures", textures.size, (texture) => renderer.initTexture(texture)));
+  await parTranches(textures, chargement.enJaugeant("textures", textures.size, (texture) => renderer.initTexture(texture)));
 }
 
 // Dès ses arbres construits, pendant que les nuanceurs se compilent : confié après la première image, le décor se traçait entier vingt secondes, à une image toutes les deux secondes sur un vieil iPad.
@@ -375,8 +329,8 @@ dallage.confier(maillagesDe(gltf.scene));
 
 // Les nuanceurs se compilent hors du fil de la page pendant que les arbres s'y construisent.
 await Promise.all([
-  compilerEnJaugeant(),
-  parTranches(obstacles, enJaugeant("arbres", obstacles.length, construireArbre)).then(allegerLeTemple).then(envoyerLesTextures),
+  chargement.compiler((suivre) => rendu.compiler(scene, suivre)),
+  parTranches(obstacles, chargement.enJaugeant("arbres", obstacles.length, construireArbre)).then(allegerLeTemple).then(envoyerLesTextures),
 ]);
 const refleterLeHeikhal = () => sonderHeikhal(renderer, scene, {
   kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
@@ -388,10 +342,11 @@ const refleterLesCours = () => {
   for (const [cour, materiaux] of materiauxDesCours) sonderLaCour(renderer, scene, { cour, boite: sondes.get(cour), materiaux });
 };
 if (!brut) {
-  await glisserPendantLeGel("reflet");
+  await chargement.glisserPendantLeGel("reflet");
   refleterLeHeikhal();
   refleterLesCours();
   await rendu.compiler();                 // le reflet de la salle change les nuanceurs de son or
+  chargement.avancer("reflet");
 }
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
@@ -794,8 +749,8 @@ function conduire(dt) {
   aide.classList.add("parti");
 }
 
-await detail.acheve((part) => avancer("detail", part));
-await glisserPendantLeGel("image");
+await detail.acheve((part) => chargement.avancer("detail", part));
+await chargement.glisserPendantLeGel("image");
 renderer.setAnimationLoop(() => {
   if (pannes.enReprise || pannes.contextePerdu || imageSuspendue) return;
   const dt = Math.min(horloge.getDelta(), 0.1);
@@ -818,7 +773,7 @@ renderer.setAnimationLoop(() => {
 });
 
 // La première image fige Safari plusieurs secondes : le voile ne part qu'une fois qu'elle est rendue.
-laisserPeindre().then(() => $("#chargement").classList.add("parti"));
+laisserPeindre().then(chargement.lever);
 pannes.lancer();
 if (reprise?.moment === "nuit") passerAuMoment("nuit");
 
