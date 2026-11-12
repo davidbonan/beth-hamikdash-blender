@@ -410,14 +410,14 @@
   "mizbeach": {
     "he": "מזבח החיצון",
     "translit": "Mizbea'h Ha'Hitzon",
-    "resume": "L'autel extérieur, bâti de pierres non taillées par le fer, jointes au plâtre et blanchies à la chaux deux fois l'an. Sa base, le yessod, fait 32 amot de côté sur une ama de haut ; un retrait d'une ama donne 30 × 30 jusqu'au sovev, le pourtour praticable à six amot ; un second retrait donne 28 × 28 jusqu'à la surface du feu. Quatre cornes creuses d'une ama sur une ama en occupent les angles. Il n'est pas centré sur l'axe du Heikhal : il est décalé de neuf amot vers le sud.",
+    "resume": "L'autel extérieur, bâti de pierres non taillées par le fer, jointes au plâtre et blanchies à la chaux deux fois l'an. Sa base, le yessod, fait 32 amot de côté sur cinq tefa'him de haut ; un retrait de cinq tefa'him donne 30 amot et deux tefa'him jusqu'au sovev, le pourtour praticable, trente tefa'him plus haut ; un second retrait donne 28 amot et quatre tefa'him jusqu'à la surface du feu. Quatre cornes creuses d'une ama sur une ama en occupent les angles. Il n'est pas centré sur l'axe du Heikhal : il est décalé de neuf amot vers le sud.",
     "cotes": [
-      "yessod : 32 × 32 amot, 1 ama de haut",
-      "30 × 30 jusqu'au sovev, à 6 amot de haut (1 yessod + 5)",
-      "28 × 28 jusqu'à la surface (ma'arakha)",
-      "keranot : quatre cornes creuses d'une ama sur une ama aux angles ; une ama de haut dans le modèle, cinq tefa'him selon le Rambam (Beit HaBe'hira 2:8)",
-      "1 ama de passage (makom hilukh haregel), puis zone du feu de 24 × 24",
-      "hauteur totale 10 amot (≈ 4,8 m) dans le modèle : 9 à la surface + 1 de corne (choix de la visite) ; selon le Rambam, 58 tefa'him en tout, dont 9 amot moins un tefa'h jusqu'à la ma'arakha (Beit HaBe'hira 2:6, 2:9)",
+      "yessod : 32 × 32 amot, 5 tefa'him de haut",
+      "30 amot et 2 tefa'him de côté jusqu'au sovev, à 35 tefa'him du sol (5 de yessod + 30)",
+      "28 amot et 4 tefa'him de côté jusqu'à la surface (ma'arakha), 18 tefa'him plus haut",
+      "keranot : quatre cornes creuses d'une ama sur une ama aux angles, hautes de 5 tefa'him (Rambam, Beit HaBe'hira 2:8)",
+      "1 ama de passage (makom hilukh haregel), puis zone du feu de 24 amot et 4 tefa'him de côté",
+      "hauteur totale 58 tefa'him (≈ 4,64 m), dont 9 amot moins un tefa'h jusqu'à la ma'arakha (Rambam, Beit HaBe'hira 2:6, 2:9)",
       "32 amot dans le découpage est-ouest comme dans le découpage nord-sud de l'Azara",
       "bord nord à 60,5 amot du mur nord : centre à 9 amot au sud de l'axe du Heikhal"
     ],
@@ -429,18 +429,19 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:7", "citation": "עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:8", "citation": "גֹּבַהּ כָּל קֶרֶן וְקֶרֶן חֲמִשָּׁה טְפָחִים. וְרִבּוּעַ כָּל קֶרֶן אַמָּה עַל אַמָּה"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:9", "citation": "וְנִמְצָא גָּבְהוֹ מִן הָאָרֶץ עַד מְקוֹם הַמַּעֲרָכָה תֵּשַׁע אַמּוֹת פָּחוֹת טֶפַח"},
+      {"oeuvre": "Mena'hot", "ref": "97b", "citation": "״חֵיק הָאַמָּה״ – זֶה יְסוֹד, ״אַמָּה רֹחַב״ – זֶה סוֹבֵב, ״וּגְבוּלָהּ אֶל שְׂפָתָהּ סָבִיב זֶרֶת הָאֶחָד״ – אֵלּוּ קְרָנוֹת"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:15", "citation": "מכותל צפוני של עזרה עד כותל המזבח שהוא רוחב ששים ומחצה"},
       {"oeuvre": "Zeva'him", "ref": "58b", "citation": "מִשּׁוּם דְּרַבִּי יְהוּדָה שְׁמַעְנָא לֵיהּ מְמוּצָּע בְּהֶדְיָא"},
       {"oeuvre": "Zeva'him", "ref": "59a", "citation": "צפונה"}
     ],
-    "note": "Retenu : l'autel décalé vers le sud, son centre à neuf amot au sud de l'axe du Heikhal. C'est ce que donnent les cotes de Middot 5:2 lues par le Rambam, et l'avis de R. Eliézer ben Yaakov, qui veut le « nord » — où l'on abat les offrandes les plus saintes — libre de tout, même de l'autel (Zeva'him 59a). Écartés : l'autel centré face au Heikhal de R. Yehouda (Zeva'him 58b), que suivent beaucoup de maquettes, et l'autel entier au nord de R. Yossé HaGelili (Zeva'him 59a). Les cotes rondes sont celles du premier avis de Middot 3:1, où R. Yossé décrit un autel d'origine de 28 × 28 que les revenus d'exil élargirent de quatre amot au sud et à l'ouest ; le Rambam compte en tefa'him (Beit HaBe'hira 2:7) : yessod de cinq tefa'him, surface de 28 amot et quatre tefa'him, ma'arakha de 24 amot et quatre tefa'him. Choix de la visite : la hauteur de dix amot, en neuf jusqu'à la surface plus une de corne, que le Rambam ne donne pas ainsi."
+    "note": "Retenu : l'autel décalé vers le sud, son centre à neuf amot au sud de l'axe du Heikhal. C'est ce que donnent les cotes de Middot 5:2 lues par le Rambam, et l'avis de R. Eliézer ben Yaakov, qui veut le « nord » — où l'on abat les offrandes les plus saintes — libre de tout, même de l'autel (Zeva'him 59a). Écartés : l'autel centré face au Heikhal de R. Yehouda (Zeva'him 58b), que suivent beaucoup de maquettes, et l'autel entier au nord de R. Yossé HaGelili (Zeva'him 59a). Les cotes rondes sont celles du premier avis de Middot 3:1, où R. Yossé décrit un autel d'origine de 28 × 28 que les revenus d'exil élargirent de quatre amot au sud et à l'ouest. La visite compte comme le Rambam (Beit HaBe'hira 2:7–8), pour qui le yessod, le sovev et les cornes se mesurent avec une ama de cinq tefa'him (Mena'hot 97b) : yessod de cinq tefa'him, retraits de cinq, cornes de cinq, 58 tefa'him en tout. Écartés : le Raavad, qui propose de rentrer les cornes des parois de l'autel (sur 2:7) ; la leçon du Semag que rapporte le Kessef Mishné (sur 2:7), où chaque corne monte d'une ama pour un autel de dix."
   },
 
   "hout_hasikra": {
     "he": "חוט הסיקרא",
     "translit": "'Hout HaSikra",
     "resume": "Une ligne rouge fait le tour de l'autel à mi-hauteur. Elle sépare les sangs qui s'appliquent au-dessus d'elle de ceux qui s'appliquent au-dessous.",
-    "cotes": ["au milieu de la hauteur de l'autel (10 amot au total selon le Rambam, Beit HaBe'hira 2:5)"],
+    "cotes": ["au milieu de la hauteur de l'autel : à 29 tefa'him du sol, six sous le sovev (Rambam, Beit HaBe'hira 2:8–9)"],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:1", "citation": "וְחוּט שֶׁל סִקְרָא חוֹגְרוֹ בָאֶמְצַע, לְהַבְדִּיל בֵּין הַדָּמִים הָעֶלְיוֹנִים לַדָּמִים הַתַּחְתּוֹנִים"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:5", "citation": "כֻּלָּן עֶשֶׂר אַמּוֹת גֹּבַהּ כָּל אֶחָד מֵהֶן"},
@@ -452,9 +453,9 @@
   "yessod": {
     "he": "יסוד",
     "translit": "Yessod",
-    "resume": "La base de l'autel : une marche d'une ama de haut et d'une ama de large. Elle ne fait pas le tour. Elle court le long de tout le nord et de tout l'ouest, et n'avance que d'une ama sur le sud, à l'angle sud-ouest, et d'une ama sur l'est, à l'angle nord-est. L'angle sud-est n'en a pas. On y verse le reste du sang des offrandes.",
+    "resume": "La base de l'autel : une marche de cinq tefa'him de haut et de cinq de large. Elle ne fait pas le tour. Elle court le long de tout le nord et de tout l'ouest, et n'avance que d'une ama sur le sud, à l'angle sud-ouest, et d'une ama sur l'est, à l'angle nord-est. L'angle sud-est n'en a pas. On y verse le reste du sang des offrandes.",
     "cotes": [
-      "1 ama de haut, 1 ama de large (Middot 3:1) ; cinq tefa'him sur cinq selon le Rambam (Beit HaBe'hira 2:7)",
+      "5 tefa'him de haut, 5 de large (Rambam, Beit HaBe'hira 2:7) ; « une ama » dans Middot 3:1, que le Rambam compte à cinq tefa'him",
       "tout le nord et tout l'ouest : 32 amot chacun",
       "une ama sur le sud, à l'angle sud-ouest ; une ama sur l'est, à l'angle nord-est",
       "l'angle sud-est sans yessod"
@@ -466,7 +467,7 @@
       {"oeuvre": "Zeva'him", "ref": "5:3", "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:7", "citation": "עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד"}
     ],
-    "note": "Retenu : l'ama de haut et de large de Middot 3:1. Le Rambam donne au yessod cinq tefa'him de haut et cinq de retrait (Beit HaBe'hira 2:7). Non modélisés : les deux trous de l'angle sud-ouest où descend le sang versé sur le yessod, et l'amah qui l'emporte vers le Kidron (Middot 3:2)."
+    "note": "Retenu : les cinq tefa'him de haut et de retrait du Rambam (Beit HaBe'hira 2:7), qui compte l'ama de Middot 3:1 à cinq tefa'him (Kessef Mishné ad loc., d'après Mena'hot 97b). Choix de la visite : l'ama que le yessod prend sur le sud et sur l'est, comptée à six tefa'him. Non modélisés : les deux trous de l'angle sud-ouest où descend le sang versé sur le yessod, et l'amah qui l'emporte vers le Kidron (Middot 3:2)."
   },
 
   "keranot": {
@@ -476,7 +477,7 @@
     "cotes": [
       "une ama sur une ama, aux quatre angles de la surface",
       "creuses",
-      "hauteur : une ama dans le modèle ; cinq tefa'him selon le Rambam",
+      "hauteur : cinq tefa'him (Rambam, Beit HaBe'hira 2:8)",
       "parois d'un quart d'ama (choix)"
     ],
     "sources": [
@@ -485,18 +486,19 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:16", "citation": "וְיִשָּׁאֲרוּ הַקְּרָנוֹת חֲלוּלִין"},
       {"oeuvre": "Zeva'him", "ref": "5:3", "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"}
     ],
-    "note": "Choix de la visite : les cornes montent d'une ama et leurs parois font un quart d'ama. Le Rambam leur donne cinq tefa'him de haut (Beit HaBe'hira 2:8) ; la visite n'a pas encore tranché entre cette cote et l'ama du modèle."
+    "note": "Retenu : cinq tefa'him de haut, selon le Rambam (Beit HaBe'hira 2:8), et des cornes au nu des parois de l'autel. Écartés : la corne d'une ama de la leçon du Semag, que rapporte le Kessef Mishné (sur 2:7) ; le retrait des cornes que propose le Raavad (sur 2:7). Choix de la visite : des parois d'un quart d'ama."
   },
 
   "kevesh": {
     "he": "כבש",
     "translit": "Kevesh",
-    "resume": "La rampe qui monte à l'autel, au sud, dans son prolongement. Longue de 32 amot et large de 16, elle part du sol et atteint la surface, ses deux dernières amot en porte-à-faux au-dessus du yessod et du sovev, un peu d'air la séparant de l'autel. Deux petites rampes en partent : à l'est vers le sovev, à l'ouest vers le yessod. Dans sa face ouest, la revouva, une niche d'une ama où l'on posait les oiseaux de 'hatat invalidés ; à l'ouest, deux tables, de marbre pour les membres et d'argent pour les ustensiles ; à l'est, au sol, le tas où l'on dépose la terumat hadeshen. L'autel n'a pas d'escalier : la Torah l'interdit.",
+    "resume": "La rampe qui monte à l'autel, au sud, dans son prolongement. Longue de 32 amot et large de 16, elle part du sol et atteint la surface, sa tête en porte-à-faux au-dessus du yessod et du sovev, un peu d'air la séparant de l'autel. Deux petites rampes en partent : à l'est vers le sovev, à l'ouest vers le yessod. Dans sa face ouest, la revouva, une niche d'une ama où l'on posait les oiseaux de 'hatat invalidés ; à l'ouest, deux tables, de marbre pour les membres et d'argent pour les ustensiles ; à l'est, au sol, le tas où l'on dépose la terumat hadeshen. L'autel n'a pas d'escalier : la Torah l'interdit.",
     "cotes": [
       "32 amot de long × 16 de large",
       "au sud du Mizbea'h, dans son prolongement",
       "bande « Kevesh » du découpage nord-sud de l'Azara : 30 amot",
-      "30 amot au sol, 2 en porte-à-faux au-dessus du yessod et du sovev",
+      "30 amot au sol ; la tête en porte-à-faux couvre les retraits du yessod et du sovev, de 5 tefa'him chacun",
+      "hauteur : 9 amot moins un tefa'h, celle de la ma'arakha (Rambam, Beit HaBe'hira 2:13)",
       "revouva : niche d'une ama sur une ama dans la face ouest",
       "lieu du deshen : à dix amot du pied, trois tefa'him de la face est"
     ],
@@ -511,7 +513,7 @@
       {"oeuvre": "Shekalim", "ref": "6:4", "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף"},
       {"oeuvre": "Tamid", "ref": "1:4", "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת"}
     ],
-    "note": "Retenu : les côtés des deux petites rampes selon Rashi (Zeva'him 62b), le sovev à l'est, le yessod à l'ouest. Écarté sur un point : Rashi fait partir la rampe du sovev du pied du kevesh ; la visite la fait partir à 18 amot de l'autel pour laisser libre le lieu du deshen. Choix de la visite : l'épaisseur de la tête, la largeur de l'air, la place de la revouva et des deux tables."
+    "note": "Retenu : les côtés des deux petites rampes selon Rashi (Zeva'him 62b), le sovev à l'est, le yessod à l'ouest. Écarté sur un point : Rashi fait partir la rampe du sovev du pied du kevesh ; la visite la fait partir à 18 amot de l'autel pour laisser libre le lieu du deshen. Choix de la visite : l'épaisseur de la tête, la largeur de l'air, la place de la revouva et des deux tables ; la tête ne couvre que les deux retraits de cinq tefa'him, si bien que la rampe mesure 31 amot et 4 tefa'him moins l'air, là où la michna dit 32."
   },
 
   "kevashim_ketanim": {
@@ -519,8 +521,8 @@
     "translit": "Kevashim ketanim",
     "resume": "Deux petites rampes partent du kevesh, séparées de l'autel de l'épaisseur d'un cheveu. Celle de l'est monte en biais jusqu'au sovev. Celle de l'ouest part du pied du kevesh et rejoint en biais le yessod, à l'angle sud-ouest.",
     "cotes": [
-      "rampe du sovev : à l'est du kevesh, jusqu'à 6 amot de haut",
-      "rampe du yessod : à l'ouest, jusqu'à une ama, à l'angle sud-ouest",
+      "rampe du sovev : à l'est du kevesh, jusqu'à 35 tefa'him de haut",
+      "rampe du yessod : à l'ouest, jusqu'à 5 tefa'him, à l'angle sud-ouest",
       "écart avec l'autel : un cheveu (מלא נימא)"
     ],
     "sources": [

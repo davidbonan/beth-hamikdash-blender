@@ -9,7 +9,7 @@ mkdir -p "$dist/visite"
 rsync -a --delete --delete-excluded --exclude='visite/' --exclude='*.py' --exclude='*.mjs' --exclude='.DS_Store' "$racine/site/" "$dist/"
 rsync -a --delete \
   --include='index.html' --include='apercu.jpg' --include='temple.glb' --include='figures*.glb' --include='pays.glb' \
-  --include='*.js' --include='*.json' --include='mini_*.png' \
+  --include='*.js' --include='*.json' --include='mini_*.png' --include='mode_emploi_*.webp' \
   --include='matieres/' --include='matieres/*.webp' \
   --include='occlusion/' --include='occlusion/*.webp' \
   --include='lumiere/' --include='lumiere/*.webp' --exclude='*' \

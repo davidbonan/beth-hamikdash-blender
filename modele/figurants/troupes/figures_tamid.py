@@ -1,4 +1,5 @@
 from beit_hamikdash_visite import Z_AZ, Z_BAT
+from blockout.primitives.parametres import Z_MAARAKHA
 
 from ..corps import Gabarit, _alea
 from ..ustensiles import ever, gizra, mizrak
@@ -42,7 +43,7 @@ def roles_du_tamid():
         _cohen("kiddoush_yadayim", lavage, (-59.0, -17.4, Z_AZ), 90.0, Gabarit(1.74, age=0.55), duree=12.0),
         # Le kevesh au sud de l'autel (Middot 3:3) : on monte par la droite, on descend par la gauche (Zeva'him 6:3).
         Role("aliyat_hakevesh", "aliyat_hakevesh", lambda: cohen("aliyat_hakevesh", Gabarit(1.77, age=0.62)),
-             trajet=Stade((-38.0, -52.0), (-38.0, -28.0), 2.0, sens=-1), vitesse=1.0, sol_haut=9.0, famille="cohanim"),
+             trajet=Stade((-38.0, -52.0), (-38.0, -28.0), 2.0, sens=-1), vitesse=1.0, sol_haut=Z_MAARAKHA, famille="cohanim"),
         # Le sang du tamid au coin nord-est (Tamid 4:1).
         _cohen("zerika", zerika, (-20.5, 4.6, Z_AZ), 142.0, Gabarit(1.72, age=0.82, peau="old_caucasian_male"),
                tenu=("mizrak", mizrak, repere_mizrak), gris=True),
@@ -50,7 +51,7 @@ def roles_du_tamid():
         _cohen("melihat_haevarim", saler, (-41.5, -46.5, 3.0), 180.0, Gabarit(1.73, age=0.50),
                tenu=("ever", ever, repere_ever), duree=6.0),
         # Le bois monté sur l'autel pour la ma'arakha, dressée à l'est (Tamid 2:3-4).
-        _cohen("siddour_hamaarakha", charger, (-26.0, -9.0, 9.0), 180.0, Gabarit(1.76, age=0.42),
+        _cohen("siddour_hamaarakha", charger, (-26.0, -9.0, Z_MAARAKHA), 180.0, Gabarit(1.76, age=0.42),
                tenu=("gizra", gizra, repere_gizra), duree=8.0),
         # Sur la marche haute de la pierre de la Menora (Tamid 3:9).
         _cohen("hatavat_hanerot", hatava, (-123.6, -7.5, Z_BAT + 0.9), 180.0, Gabarit(1.70, age=0.58), duree=10.0),

@@ -1130,6 +1130,14 @@ palettes, sans flamme ni fumée.
 - **Les keranot sont coulées avec l'autel** (Rambam 2:7, 2:16) : leurs flancs continuent ceux du
   sommet, dont l'arête ne tourne pas sous elles (`socles`). Posées en blocs à part, elles laissaient
   un trait sombre à leur pied.
+- **L'autel se compte en tefa'him, comme le Rambam.** « עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד… עָלָה שְׁלֹשִׁים טְפָחִים
+  וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ סוֹבֵב » (*Beit HaBe'hira* 2:7), « גֹּבַהּ כָּל קֶרֶן וְקֶרֶן חֲמִשָּׁה טְפָחִים » (2:8) : yessod, sovev et
+  keranot se mesurent « בְּאַמָּה בַּת חֲמִשָּׁה » (*Mena'hot* 97b). Yessod à 5 tefa'him, sovev à 35, ma'arakha à 53
+  (`Z_YESSOD`, `Z_SOVEV`, `Z_MAARAKHA` dans `primitives/parametres.py`), keranot de 5, retraits de 5, sikra à 29 (2:9) ;
+  le script comptait dix amot rondes, et la fiche notait la corne « non tranché ». La tête du kevesh ne couvre
+  plus que ces deux retraits : la rampe fait 31 amot et 4 tefa'him moins l'air, là où la michna dit 32 (**CHOIX**).
+  **Écartés** : le retrait des keranot que propose le Raavad, et la corne d'une ama du Semag (Kessef Mishné sur 2:7).
+  Les nuanceurs (`visite/matieres.js`) et les figurants posés sur l'autel lisent les mêmes cotes.
 - **Les gzirin sont du bois fendu.** Rondins, moitiés et quartiers de 2,6 amot posés bout à bout
   sur quatre lits croisés, le feu ayant mangé ceux du haut (**CHOIX** des longueurs et du nombre de
   lits) ; écorce, charbon en écailles et cendre viennent du nuanceur, selon le lit. Le bassin de

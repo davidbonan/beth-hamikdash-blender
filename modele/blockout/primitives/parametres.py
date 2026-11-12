@@ -26,6 +26,10 @@ Z_EZN = -10.0   # Ezrat Nashim : 15 marches sous l'Ezrat Israël (Middot 2:5), e
 Z_EZI = -2.5    # Ezrat Israël : « מַעֲלָה גְבוֹהָה אַמָּה וְהַדּוּכָן נָתוּן עָלֶיהָ וּבוֹ שָׁלֹשׁ מַעֲלוֹת » (Middot 2:6)
 Z_AZ = 0.0      # Azara
 Z_BAT = 6.0     # sol de l'Oulam / Heikhal (12 marches de 0.5)
+# Mizbea'h : yessod de 5 tefa'him, 30 jusqu'au sovev, 18 jusqu'à la ma'arakha (Rambam Beit HaBe'hira 2:7 ; Mena'hot 97b-98a)
+Z_YESSOD = Z_AZ + 5 * TEFAH
+Z_SOVEV = Z_YESSOD + 30 * TEFAH
+Z_MAARAKHA = Z_SOVEV + 18 * TEFAH
 
 MODELE = pathlib.Path(__file__).resolve().parents[2]
 RACINE = MODELE.parent

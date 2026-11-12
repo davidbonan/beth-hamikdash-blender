@@ -5,6 +5,7 @@ from mathutils import Matrix, Vector
 
 import beit_hamikdash_gestes as G
 from beit_hamikdash_visite import AMA, Z_AZ, Z_BAT, Z_EZN
+from blockout.primitives.parametres import Z_MAARAKHA
 
 from ..matieres import CHENE, LIN, OR, bois, lin, metal
 from ..corps import Gabarit, _alea
@@ -471,7 +472,7 @@ def roles_kippour():
         _viduy_rishon("bigdei_lavan_2", (-61.0, 15.2, Z_AZ)),
         _goral("bigdei_lavan_3", (-15.5, 38.0, Z_AZ)),
         _aupres_du_goral(0, (-14.0, 39.5, Z_AZ)), _aupres_du_goral(1, (-14.0, 36.5, Z_AZ)),
-        _machta("bigdei_lavan_4", (-27.0, -10.5, 9.0)),
+        _machta("bigdei_lavan_4", (-27.0, -10.5, Z_MAARAKHA)),
         _mizrak_en_main("bigdei_lavan_5", asperger, (-136.2, 0.0, Z_BAT), 180.0, 16.0),
         _mizrak_en_main("bigdei_lavan_6", matan_keranot, MIZBEACH_HAZAHAV_OU, MIZBEACH_HAZAHAV_CAP, 12.0),
         _sair_hamishtaleach(),
