@@ -1,5 +1,6 @@
 // Un dallage reflète ce qui l'entoure, pas seulement le ciel : la scène rendue une seconde fois, en miroir sous le sol où l'œil se tient.
 import * as THREE from "three";
+import { FullScreenQuad } from "three/addons/postprocessing/Pass.js";
 import { PROFIL } from "./qualite.js";
 
 const AFFLEUREMENT = 0.01;   // m : le sol lui-même n'entre pas dans son reflet
@@ -7,6 +8,7 @@ const FOND = 150;            // m : la cour et ce qui la borde, pas la ville
 const ABORDS = 2;            // m : les murs de la cour débordent de son emprise
 // Le miroir ne trace que ce qui porte le calque de son dallage : il coûte par dessin, pas par pixel.
 const PREMIER_CALQUE = 2;
+const NIVEAUX_DE_FLOU = 6;
 
 export const REFLET = {
   tReflet: { value: null },
@@ -28,7 +30,7 @@ uniform sampler2D tReflet, tProfondeurReflet;
 uniform mat4 uVersReflet, uDeReflet;
 uniform vec2 uTexelReflet;
 uniform float uFocaleReflet, uRefletActif, uCoteReflet, uLobeReflet, uForceReflet;
-const float TORSION = 0.03, FLOU_MAX = 6.0, ETIREMENT = 1.4;
+const float TORSION = 0.03, FLOU_MAX = ${NIVEAUX_DE_FLOU.toFixed(1)}, ETIREMENT = 1.4;
 // rgb : la cour vue d'en dessous du dallage ; a : 1 où il y a de la pierre, 0 où c'est le ciel, que l'environnement garde.
 float refleterLaCour(inout vec3 radiance, vec3 P, vec3 nPlan, vec3 nVue, float rugosite) {
   if (uRefletActif < 0.5 || nPlan.y < 0.95 || abs(P.y - uCoteReflet) > 0.02) return 0.0;
@@ -130,15 +132,69 @@ function matieresUnies(teinteDe, epure) {
   };
 }
 
+// Quatre prises bilinéaires à 0,75 texel, un noyau 1-3-3-1 : sous les mipmaps du GPU, réduits en boîte, un reflet flou avançait par crans quand le décor glissait.
+const PRISE = 0.75;
+
+// Une texture ne se lit pas pendant qu'elle se trace : chaque niveau de la pyramide lue se réduit depuis celle de relais, et inversement.
+function pyramideDeFlou(renderer) {
+  const etage = () => new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType, depthBuffer: false, minFilter: THREE.LinearMipmapLinearFilter });
+  const lue = etage(), relais = etage();
+  const reduction = new FullScreenQuad(new THREE.ShaderMaterial({
+    uniforms: { tSource: { value: null }, uNiveau: { value: 0 }, uPrise: { value: new THREE.Vector2() } },
+    vertexShader: /* glsl */`
+      varying vec2 vUv;
+      void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+    fragmentShader: /* glsl */`
+      uniform sampler2D tSource;
+      uniform float uNiveau;
+      uniform vec2 uPrise;
+      varying vec2 vUv;
+      void main() {
+        vec2 croix = vec2(uPrise.x, -uPrise.y);
+        gl_FragColor = 0.25 * (textureLod(tSource, vUv + uPrise, uNiveau) + textureLod(tSource, vUv - uPrise, uNiveau)
+          + textureLod(tSource, vUv + croix, uNiveau) + textureLod(tSource, vUv - croix, uNiveau));
+      }`,
+    depthTest: false, depthWrite: false,
+  }));
+
+  function tracer({ cible, niveau, source, lu, prise }) {
+    const { tSource, uNiveau, uPrise } = reduction.material.uniforms;
+    tSource.value = source.texture;
+    uNiveau.value = lu;
+    uPrise.value.set(prise / Math.max(1, source.width >> lu), prise / Math.max(1, source.height >> lu));
+    cible.viewport.set(0, 0, Math.max(1, cible.width >> niveau), Math.max(1, cible.height >> niveau));
+    renderer.setRenderTarget(cible, 0, niveau);
+    reduction.render(renderer);
+  }
+
+  return {
+    texture: lue.texture,
+    redimensionner(largeur, hauteur) {
+      for (const cible of [lue, relais]) {
+        cible.setSize(largeur, hauteur);
+        // three trace dans un niveau dès que `mipmaps` les compte, et la texture ne se lit que si toute la chaîne existe.
+        cible.texture.mipmaps = Array(Math.floor(Math.log2(Math.max(largeur, hauteur))) + 1).fill({});
+      }
+    },
+    flouter(miroir) {
+      tracer({ cible: lue, niveau: 0, source: miroir, lu: 0, prise: 0 });
+      for (const cible of [lue, relais]) tracer({ cible, niveau: 1, source: miroir, lu: 0, prise: PRISE });
+      for (let niveau = 2; niveau <= NIVEAUX_DE_FLOU; niveau++) {
+        tracer({ cible: lue, niveau, source: relais, lu: niveau - 1, prise: PRISE });
+        if (niveau < NIVEAUX_DE_FLOU) tracer({ cible: relais, niveau, source: lue, lu: niveau - 1, prise: PRISE });
+      }
+    },
+  };
+}
+
 // `cour` : là où l'œil voit ce dallage, hors de ses `salles`. `clos` : le volume dont rien ne se voit de la cour. `lobe` : l'étalement du reflet ; `force` : sa part dans ce que le sol renvoie.
 // `uni` : le reflet est assez flou pour se tracer d'une seule matière.
 export function refleterLesDallages(renderer, scene, camera, { dallages, caches }) {
   if (!PROFIL.reflets) return SANS_REFLET;
   const { definition } = PROFIL.reflets;
-  const cible = new THREE.WebGLRenderTarget(1, 1, {
-    type: THREE.HalfFloatType, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter,
-    depthTexture: new THREE.DepthTexture(1, 1),
-  });
+  const cible = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture(1, 1) });
+  const flou = pyramideDeFlou(renderer);
   const miroir = new THREE.PerspectiveCamera();
   const teinteDe = teintesMoyennes();
   const epure = matieresEpurees(teinteDe);
@@ -220,6 +276,7 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
       renderer.clear();
       renderer.shadowMap.autoUpdate = false;
       renderer.render(scene, miroir);
+      flou.flouter(cible);
     } finally {
       renderer.shadowMap.autoUpdate = ombresSuivies;
       renderer.setRenderTarget(avant);
@@ -238,11 +295,14 @@ export function refleterLesDallages(renderer, scene, camera, { dallages, caches 
 
   function redimensionner(largeur, hauteur) {
     cible.setSize(Math.max(1, Math.round(largeur * definition)), Math.max(1, Math.round(hauteur * definition)));
+    // three ne retaille la profondeur qu'au tracé du miroir : lue d'abord par le sol, miroir éteint, elle naissait à l'ancienne taille et la cible restait incomplète.
+    Object.assign(cible.depthTexture.image, { width: cible.width, height: cible.height });
+    flou.redimensionner(cible.width, cible.height);
     REFLET.uTexelReflet.value.set(1 / cible.width, 1 / cible.height);
     REFLET.uFocaleReflet.value = cible.height / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
   }
 
-  REFLET.tReflet.value = cible.texture;
+  REFLET.tReflet.value = flou.texture;
   REFLET.tProfondeurReflet.value = cible.depthTexture;
   // Cheveux et barbes sont des cartes découpées : épurées elles feraient des plaques, et le flou ne les montre pas.
   const decoupe = ({ material }) => material.isMeshStandardMaterial && (material.transparent || material.alphaTest > 0);
