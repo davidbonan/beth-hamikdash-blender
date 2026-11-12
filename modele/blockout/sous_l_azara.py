@@ -1,11 +1,11 @@
-from .primitives.parametres import Z_AZ, Z_EZN, Z_HAR
+from .primitives.parametres import Z_AZ, Z_EZN, Z_HAR, Z_MAARAKHA
 from .primitives.matieres import MAT_CEDRE, MAT_CHAUX, MAT_EAU, MAT_FER, MAT_MARBRE, MAT_SOL
 from .primitives.volumes import box, cyl, cyl_between, ner_sur_tablette, plage, tore
 from .primitives.ouvrages import dalle_percee, escalier, escalier_a_vis, massif_evide, medura
 from .ezrat_nashim import EX1, MIKVE
 from .azara import AX0, AY0, AY1, T, X_DOUKHAN
 from .lishkot import BOR, PUITS_MESIBA
-from .mizbeach import MX0, MY0
+from .mizbeach import HAUT, MX0, MY0
 
 
 # ----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ MONTEE_TEVILA = (TEVILA[1] - 4, TEVILA[1], MESIBA_Y0, MESIBA_Y1)
 SHIT_TAVLA = (MX0 - 1, MX0, MY0 - 1, MY0)
 SHIT = (MX0 - 2, MX0 + 7, MY0 - 2, MY0 + 7)
 Z_SHIT_FOND, Z_SHIT_VOUTE = Z_EZN + 1, Z_AZ - 3
-NESEKH_X, NESEKH_Y = MX0 + 3, MY0 + 3
+NESEKH_X, NESEKH_Y = HAUT[0] + 1, HAUT[2] + 1
 
 VIDES_SOUS_AZARA = [
     (PX0, PX1, MESIBA_Y0, PY0, Z_HAR, Z_MESIBA_VOUTE),
@@ -124,4 +124,4 @@ for k, z in enumerate(plage(Z_SHIT_FOND + 0.6, Z_AZ - 0.6, 0.6)):
 for nm, a, b, c, d in (("O", -0.3, -0.2, -0.3, 0.3), ("E", 0.2, 0.3, -0.3, 0.3),
                        ("S", -0.2, 0.2, -0.3, -0.2), ("N", -0.2, 0.2, 0.2, 0.3)):
     box(f"Shit_shitin_{nm}", NESEKH_X + a, NESEKH_X + b, NESEKH_Y + c, NESEKH_Y + d,
-        Z_SHIT_VOUTE - 0.5, Z_AZ + 8.9, "30_Mizbeach", MAT_CHAUX())
+        Z_SHIT_VOUTE - 0.5, Z_MAARAKHA - 0.1, "30_Mizbeach", MAT_CHAUX())

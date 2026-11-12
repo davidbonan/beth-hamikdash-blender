@@ -802,14 +802,14 @@
   "mizbeach": {
     "nom": "Mizbeach HaChitzon",
     "translit": "Mizbeach HaChitzon",
-    "resume": "The outer altar, built of stones untouched by iron, joined with plaster and whitewashed with lime twice a year. Its base, the yessod, is 32 amot on each side and one ama high; a one-ama setback gives 30 × 30 up to the sovev, the walkable ledge at six amot; a second setback gives 28 × 28 up to the surface of the fire. Four hollow horns, one ama by one ama, occupy the corners. It is not centered on the axis of the Heikhal: it is offset nine amot to the south.",
+    "resume": "The outer altar, built of stones untouched by iron, joined with plaster and whitewashed with lime twice a year. Its base, the yessod, is 32 amot on each side and five tefachim high; a setback of five tefachim gives 30 amot and two tefachim up to the sovev, the walkable ledge, thirty tefachim higher; a second setback gives 28 amot and four tefachim up to the surface of the fire. Four hollow horns, one ama by one ama, occupy the corners. It is not centered on the axis of the Heikhal: it is offset nine amot to the south.",
     "cotes": [
-      "yessod: 32 × 32 amot, 1 ama high",
-      "30 × 30 up to the sovev, at 6 amot high (1 yessod + 5)",
-      "28 × 28 up to the surface (ma'arakha)",
-      "keranot: four hollow horns, one ama by one ama, at the corners; one ama high in the model, five tefachim according to the Rambam (Beit HaBe'hira 2:8)",
-      "1 ama of walkway (makom hilukh haregel), then a 24 × 24 fire zone",
-      "total height 10 amot (≈ 4.8 m) in the model: 9 to the surface + 1 for the horn (choice of the tour); according to the Rambam, 58 tefachim in all, of which 9 amot less one tefach up to the ma'arakha (Beit HaBe'hira 2:6, 2:9)",
+      "yessod: 32 × 32 amot, 5 tefachim high",
+      "30 amot and 2 tefachim per side up to the sovev, 35 tefachim above the floor (5 of yessod + 30)",
+      "28 amot and 4 tefachim per side up to the surface (ma'arakha), 18 tefachim higher",
+      "keranot: four hollow horns, one ama by one ama, at the corners, 5 tefachim high (Rambam, Beit HaBe'hira 2:8)",
+      "1 ama of walkway (makom hilukh haregel), then a fire zone of 24 amot and 4 tefachim per side",
+      "total height 58 tefachim (≈ 4.64 m), of which 9 amot less one tefach up to the ma'arakha (Rambam, Beit HaBe'hira 2:6, 2:9)",
       "32 amot in both the east-west and north-south division of the Azara",
       "north edge at 60.5 amot from the north wall: center 9 amot south of the axis of the Heikhal"
     ],
@@ -850,6 +850,11 @@
         "citation": "וְנִמְצָא גָּבְהוֹ מִן הָאָרֶץ עַד מְקוֹם הַמַּעֲרָכָה תֵּשַׁע אַמּוֹת פָּחוֹת טֶפַח"
       },
       {
+        "oeuvre": "Mena'hot",
+        "ref": "97b",
+        "citation": "״חֵיק הָאַמָּה״ – זֶה יְסוֹד, ״אַמָּה רֹחַב״ – זֶה סוֹבֵב, ״וּגְבוּלָהּ אֶל שְׂפָתָהּ סָבִיב זֶרֶת הָאֶחָד״ – אֵלּוּ קְרָנוֹת"
+      },
+      {
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:15",
         "citation": "מכותל צפוני של עזרה עד כותל המזבח שהוא רוחב ששים ומחצה"
@@ -865,14 +870,14 @@
         "citation": "צפונה"
       }
     ],
-    "note": "Adopted: the altar shifted to the south, its center nine amot south of the axis of the Heikhal. This is what the measurements of Middot 5:2 give as the Rambam reads them, and the view of R. Eliezer ben Yaakov, who wants the “north” — where the most holy offerings are slaughtered — free of everything, even of the altar (Zevachim 59a). Set aside: R. Yehuda's altar centered in front of the Heikhal (Zevachim 58b), which many models follow, and R. Yosei HaGelili's altar lying entirely in the north (Zevachim 59a). The round figures are those of the first opinion in Middot 3:1, where R. Yosei describes an original altar of 28 × 28 that the returning exiles enlarged by four amot to the south and west; the Rambam counts in tefachim (Beit HaBe'hira 2:7): a yessod of five tefachim, a surface of 28 amot and four tefachim, a ma'arakha of 24 amot and four tefachim. Choice of the tour: the height of ten amot, as nine to the surface plus one for the horn, which the Rambam does not give in this way."
+    "note": "Adopted: the altar shifted to the south, its center nine amot south of the axis of the Heikhal. This is what the measurements of Middot 5:2 give as the Rambam reads them, and the view of R. Eliezer ben Yaakov, who wants the “north” — where the most holy offerings are slaughtered — free of everything, even of the altar (Zevachim 59a). Set aside: R. Yehuda's altar centered in front of the Heikhal (Zevachim 58b), which many models follow, and R. Yosei HaGelili's altar lying entirely in the north (Zevachim 59a). The round figures are those of the first opinion in Middot 3:1, where R. Yosei describes an original altar of 28 × 28 that the returning exiles enlarged by four amot to the south and west. The tour counts as the Rambam does (Beit HaBe'hira 2:7–8), for whom the yessod, the sovev and the horns are measured with an ama of five tefachim (Menachot 97b): a yessod of five tefachim, setbacks of five, horns of five, 58 tefachim in all. Set aside: the Raavad, who suggests setting the horns in from the walls of the altar (on 2:7); the reading of the Semag reported by the Kessef Mishneh (on 2:7), in which each horn rises one ama for an altar of ten."
   },
   "hout_hasikra": {
     "nom": "Chut HaSikra",
     "translit": "Chut HaSikra",
     "resume": "A red line runs around the altar at mid-height. It separates the bloods applied above it from those applied below it.",
     "cotes": [
-      "at the midpoint of the altar's height (10 amot in all according to the Rambam, Beit HaBe'hira 2:5)"
+      "at the midpoint of the altar's height: 29 tefachim above the floor, six below the sovev (Rambam, Beit HaBe'hira 2:8–9)"
     ],
     "sources": [
       {
@@ -896,9 +901,9 @@
   "yessod": {
     "nom": "Yesod",
     "translit": "Yesod",
-    "resume": "The base of the altar: a step one amah high and one amah wide. It does not go all the way around. It runs along the whole north and the whole west, and extends only one amah onto the south, at the southwest corner, and one amah onto the east, at the northeast corner. The southeast corner has none. The remaining blood of the offerings is poured onto it.",
+    "resume": "The base of the altar: a step five tefachim high and five wide. It does not go all the way around. It runs along the whole north and the whole west, and extends only one amah onto the south, at the southwest corner, and one amah onto the east, at the northeast corner. The southeast corner has none. The remaining blood of the offerings is poured onto it.",
     "cotes": [
-      "1 amah high, 1 amah wide (Middot 3:1); five tefachim by five according to the Rambam (Beit HaBechirah 2:7)",
+      "5 tefachim high, 5 wide (Rambam, Beit HaBechirah 2:7); “one amah” in Middot 3:1, which the Rambam counts as five tefachim",
       "the whole north and the whole west: 32 amot each",
       "one amah on the south, at the southwest corner; one amah on the east, at the northeast corner",
       "the southeast corner has no yesod"
@@ -930,7 +935,7 @@
         "citation": "עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד"
       }
     ],
-    "note": "Adopted: the one amah of height and width of Middot 3:1. The Rambam gives the yesod five tefachim of height and five of setback (Beit HaBechirah 2:7). Not modelled: the two holes at the southwest corner through which the blood poured on the yesod runs down, and the amah channel that carries it to the Kidron (Middot 3:2)."
+    "note": "Adopted: the five tefachim of height and of setback of the Rambam (Beit HaBechirah 2:7), who counts the amah of Middot 3:1 as five tefachim (Kessef Mishneh ad loc., following Menachot 97b). Choice of the tour: the amah that the yesod takes on the south and on the east, counted as six tefachim. Not modelled: the two holes at the southwest corner through which the blood poured on the yesod runs down, and the amah channel that carries it to the Kidron (Middot 3:2)."
   },
   "keranot": {
     "nom": "Keranot",
@@ -939,7 +944,7 @@
     "cotes": [
       "one amah by one amah, at the four corners of the top",
       "hollow",
-      "height: one amah in the model; five tefachim according to the Rambam",
+      "height: five tefachim (Rambam, Beit HaBechirah 2:8)",
       "walls a quarter amah thick (choice)"
     ],
     "sources": [
@@ -964,17 +969,18 @@
         "citation": "וְדָמָן טָעוּן אַרְבַּע מַתָּנוֹת עַל אַרְבַּע קְרָנוֹת… שְׁיָרֵי הַדָּם הָיָה שׁוֹפֵךְ עַל יְסוֹד דְּרוֹמִי"
       }
     ],
-    "note": "Choices of the tour: the horns rise one amah and their walls are a quarter amah thick. The Rambam gives them five tefachim of height (Beit HaBechirah 2:8); the tour has not yet decided between that figure and the model's amah."
+    "note": "Adopted: five tefachim of height, following the Rambam (Beit HaBechirah 2:8), and horns flush with the walls of the altar. Set aside: the one-amah horn of the Semag's reading, reported by the Kessef Mishneh (on 2:7); the setting-in of the horns suggested by the Raavad (on 2:7). Choice of the tour: walls a quarter amah thick."
   },
   "kevesh": {
     "nom": "Kevesh (the Ramp)",
     "translit": "Kevesh",
-    "resume": "The ramp that rises to the altar, to the south, in its extension. 32 amot long and 16 wide, it starts from the ground and reaches the surface, its last two amot overhanging the yessod and the sovev, with a little air between it and the altar. Two small ramps branch off from it: to the east toward the sovev, to the west toward the yessod. In its west face is the revuva, a one-ama niche where disqualified bird chatat offerings were placed; to the west stand two tables, of marble for the limbs and of silver for the vessels; to the east, on the floor, the heap where the terumat hadeshen is set down. The altar has no staircase: the Torah forbids it.",
+    "resume": "The ramp that rises to the altar, to the south, in its extension. 32 amot long and 16 wide, it starts from the ground and reaches the surface, its head overhanging the yessod and the sovev, with a little air between it and the altar. Two small ramps branch off from it: to the east toward the sovev, to the west toward the yessod. In its west face is the revuva, a one-ama niche where disqualified bird chatat offerings were placed; to the west stand two tables, of marble for the limbs and of silver for the vessels; to the east, on the floor, the heap where the terumat hadeshen is set down. The altar has no staircase: the Torah forbids it.",
     "cotes": [
       "32 amot long × 16 wide",
       "south of the Mizbeach, in its extension",
       "“Kevesh” strip in the north-south division of the Azara: 30 amot",
-      "30 amot on the ground, 2 overhanging the yessod and the sovev",
+      "30 amot on the ground; the overhanging head covers the setbacks of the yessod and the sovev, 5 tefachim each",
+      "height: 9 amot less one tefach, that of the ma'arakha (Rambam, Beit HaBe'hira 2:13)",
       "revuva: a niche of one ama by one ama in the west face",
       "place of the deshen: ten amot from the foot, three tefachim from the east face"
     ],
@@ -1025,15 +1031,15 @@
         "citation": "הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת"
       }
     ],
-    "note": "Adopted: the sides of the two small ramps according to Rashi (Zevachim 62b), the sovev to the east, the yessod to the west. Set aside on one point: Rashi starts the sovev ramp at the foot of the kevesh; the tour starts it 18 amot from the altar to leave the place of the deshen free. Choices of the tour: the thickness of the head, the width of the air gap, the placement of the revuva and of the two tables."
+    "note": "Adopted: the sides of the two small ramps according to Rashi (Zevachim 62b), the sovev to the east, the yessod to the west. Set aside on one point: Rashi starts the sovev ramp at the foot of the kevesh; the tour starts it 18 amot from the altar to leave the place of the deshen free. Choices of the tour: the thickness of the head, the width of the air gap, the placement of the revuva and of the two tables; the head covers only the two setbacks of five tefachim, so the ramp measures 31 amot and 4 tefachim less the air gap, where the Mishnah says 32."
   },
   "kevashim_ketanim": {
     "nom": "Kevashim ketanim",
     "translit": "Kevashim ketanim",
     "resume": "Two small ramps branch off the kevesh, separated from the altar by a hair's breadth. The eastern one climbs diagonally to the sovev. The western one starts at the foot of the kevesh and runs diagonally to the yesod, at the southwest corner.",
     "cotes": [
-      "sovev ramp: east of the kevesh, up to 6 amot high",
-      "yesod ramp: to the west, up to one amah, at the southwest corner",
+      "sovev ramp: east of the kevesh, up to 35 tefachim high",
+      "yesod ramp: to the west, up to 5 tefachim, at the southwest corner",
       "gap from the altar: a hair (מלא נימא)"
     ],
     "sources": [

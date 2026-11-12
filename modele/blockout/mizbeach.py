@@ -4,7 +4,7 @@ import math
 from mathutils import Vector, noise
 
 from .primitives import tissage
-from .primitives.parametres import MODELE, Z_AZ, m
+from .primitives.parametres import MODELE, TEFAH, Z_AZ, Z_MAARAKHA, Z_SOVEV, Z_YESSOD, m
 from .primitives.matieres import (MAT_ARGENT, MAT_BOIS_CHARBON, MAT_BOIS_MAARAKHA, MAT_BOIS_ROUSSI,
                                   MAT_BRONZE, MAT_CEDRE, MAT_CENDRE, MAT_CHAUX, MAT_CHAUX_FEU, MAT_EAU,
                                   MAT_FER, MAT_MARBRE, MAT_SEL, MAT_SIKRA, braise, nuee)
@@ -24,6 +24,9 @@ MY0, MY1 = -25, 7            # CHOIX : centre 9 amot au sud de l'axe, bord nord 
 # הַמַּעֲרָב, וְאוֹכֵל בַּדָּרוֹם אַמָּה אַחַת וּבַמִּזְרָח אַמָּה אַחַת » (Middot 3:1 ; fiche §6). Tout le
 # nord et tout l'ouest, une ama à l'angle sud-ouest sur le sud, une ama à l'angle
 # nord-est sur l'est ; le corps descend donc jusqu'au sol sur les faces est et sud.
+# « עָלָה חֲמִשָּׁה טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ יְסוֹד… עָלָה שְׁלֹשִׁים טְפָחִים וְכָנַס חֲמִשָּׁה טְפָחִים זֶהוּ סוֹבֵב » (Rambam Beit HaBe'hira 2:7) :
+# yessod, sovev et keranot se comptent « בְּאַמָּה בַּת חֲמִשָּׁה » (Mena'hot 97b), en hauteur comme en retrait.
+RETRAIT_MIZBEACH = 5 * TEFAH
 # « מֵבִיא אֲבָנִים שְׁלֵמוֹת גְּדוֹלוֹת וּקְטַנּוֹת וּמֵבִיא סִיד וְזֶפֶת וְקוּנְיָא וּמְמַחֶה וְשׁוֹפֵךְ לְתוֹךְ מַלְבֵּן גָּדוֹל כְּמִדָּתוֹ »
 # (Rambam Beit HaBe'hira 2:16) : l'autel est coulé dans un moule à sa mesure — faces planes, arêtes droites,
 # que la chaux repassée deux fois l'an (Middot 3:4) n'a fait qu'adoucir. Rayon de l'arête : CHOIX.
@@ -88,7 +91,8 @@ def bloc_de_chaux(name, x0, x1, y0, y1, z0, z1, col, mat, r=ARETE_CHAUX, ouvert=
                  *(c for sx0, sx1, _, _, paroi in socles for c in (*_cotes_chaux(sx0, sx1, r, r), sx0 + paroi, sx1 - paroi))})
     ys = sorted({*_cotes_chaux(y0, y1, rayon["y0"], rayon["y1"]), *(trou[2:] if creux else ()), *(couvert[2:] if couvert else ()),
                  *(baie[:2] if baie else ()), *(c for _, _, sy0, sy1, paroi in socles for c in (*_cotes_chaux(sy0, sy1, r, r), sy0 + paroi, sy1 - paroi))})
-    zs = sorted({*_cotes_chaux(z0 - reprise, z1, 0.0, r), *paliers, *(baie[2:] if baie else ())})
+    # La bande enfouie a ses faces à elle : collée à une coupe du dallage, elle seule tombe à l'export, pas le flanc entier.
+    zs = sorted({*_cotes_chaux(z0 - reprise, z1, 0.0, r), round(z0, 6), *paliers, *(baie[2:] if baie else ())})
     dedans_sous_un_socle = (dedans[0], (*dedans[1][:2], z1))
     index, verts, faces = {}, [], []
 
@@ -99,10 +103,12 @@ def bloc_de_chaux(name, x0, x1, y0, y1, z0, z1, col, mat, r=ARETE_CHAUX, ouvert=
         return any(couvre(p[0], sx0, sx1, x0, x1) and couvre(p[1], sy0, sy1, y0, y1) for sx0, sx1, sy0, sy1, _ in socles)
 
     def sommet(p):
-        if p not in index:
-            index[p] = len(verts)
+        # Les lignes du maillage sont arrondies, les bornes du bloc non : sans cet arrondi, une cote en tefa'him ne se soude pas.
+        cle = tuple(round(c, 6) for c in p)
+        if cle not in index:
+            index[cle] = len(verts)
             verts.append(tuple(_sur_la_chaux(p, dedans_sous_un_socle if sous_un_socle(p) else dedans, r, forme=forme)))
-        return index[p]
+        return index[cle]
 
     def grille(us, vs, point, sauf=None):
         for i in range(len(us) - 1):
@@ -180,34 +186,37 @@ def ceinture_de_chaux(name, bloc, z0, z1, col, mat, r=ARETE_CHAUX):
     o["sans_biseau"] = True
     return o
 
+CORPS = (MX0 + RETRAIT_MIZBEACH, MX1 - RETRAIT_MIZBEACH, MY0 + RETRAIT_MIZBEACH, MY1 - RETRAIT_MIZBEACH, Z_AZ, Z_SOVEV)
+HAUT = (CORPS[0] + RETRAIT_MIZBEACH, CORPS[1] - RETRAIT_MIZBEACH, CORPS[2] + RETRAIT_MIZBEACH, CORPS[3] - RETRAIT_MIZBEACH)
 # Le yessod est une seule bande de chaux : ses tronçons se continuent par leurs côtés ouverts, et mordent dans le corps.
 souder_la_chaux("Mizbeach_yessod", [
-    bloc_de_chaux("Mizbeach_yessod_N", MX0 + 1 + REPRISE_CHAUX, MX1, MY1 - 1 - REPRISE_CHAUX, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+    bloc_de_chaux("Mizbeach_yessod_N", CORPS[0] + REPRISE_CHAUX, MX1, CORPS[3] - REPRISE_CHAUX, MY1, Z_AZ, Z_YESSOD, "30_Mizbeach", MAT_CHAUX(),
                   ouvert=("x0", "y0")),
-    bloc_de_chaux("Mizbeach_yessod_O", MX0, MX0 + 1 + REPRISE_CHAUX, MY0, MY1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+    bloc_de_chaux("Mizbeach_yessod_O", MX0, CORPS[0] + REPRISE_CHAUX, MY0, MY1, Z_AZ, Z_YESSOD, "30_Mizbeach", MAT_CHAUX(),
                   ouvert=("x1",)),
-    bloc_de_chaux("Mizbeach_yessod_S", MX0 + 1 + REPRISE_CHAUX, MX0 + 2, MY0, MY0 + 1 + REPRISE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+    bloc_de_chaux("Mizbeach_yessod_S", CORPS[0] + REPRISE_CHAUX, CORPS[0] + 1, MY0, CORPS[2] + REPRISE_CHAUX, Z_AZ, Z_YESSOD, "30_Mizbeach", MAT_CHAUX(),
                   ouvert=("x0", "y1")),
-    bloc_de_chaux("Mizbeach_yessod_E", MX1 - 1 - REPRISE_CHAUX, MX1, MY1 - 2, MY1 - 1 - REPRISE_CHAUX, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+    bloc_de_chaux("Mizbeach_yessod_E", CORPS[1] - REPRISE_CHAUX, MX1, CORPS[3] - 1, CORPS[3] - REPRISE_CHAUX, Z_AZ, Z_YESSOD, "30_Mizbeach", MAT_CHAUX(),
                   ouvert=("x0", "y1")),
 ])
-CORPS = (MX0 + 1, MX1 - 1, MY0 + 1, MY1 - 1, Z_AZ, Z_AZ + 6)
-HAUT = (MX0 + 2, MX1 - 2, MY0 + 2, MY1 - 2)
 bloc_de_chaux("Mizbeach_corps", *CORPS, "30_Mizbeach", MAT_CHAUX(),
               couvert=(HAUT[0] + REPRISE_CHAUX, HAUT[1] - REPRISE_CHAUX, HAUT[2] + REPRISE_CHAUX, HAUT[3] - REPRISE_CHAUX))
 # « וְאַרְבַּע הַקְּרָנוֹת חֲלוּלוֹת הָיוּ מִתּוֹכָן » (Rambam Beit HaBe'hira 2:8), « בִּנְיָן חָלוּל מְרֻבָּע לְכָל אַרְבַּע קְרָנוֹת » (2:7),
-# coulées avec l'autel autour d'un noyau qu'on retire (2:16) : quatre murets d'une ama cube autour d'un vide, dont
-# les flancs continuent ceux de l'autel. Épaisseur des murets : CHOIX.
-PAROI_KEREN = 0.25
-KERANOT = {"SE": (MX1 - 3, MY0 + 2), "NE": (MX1 - 3, MY1 - 3), "NO": (MX0 + 2, MY1 - 3), "SO": (MX0 + 2, MY0 + 2)}
-bloc_de_chaux("Mizbeach_haut", *HAUT, Z_AZ + 6, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX_FEU(),
+# coulées avec l'autel autour d'un noyau qu'on retire (2:16) : quatre murets autour d'un vide, dont les flancs continuent
+# ceux de l'autel. « גֹּבַהּ כָּל קֶרֶן וְקֶרֶן חֲמִשָּׁה טְפָחִים. וְרִבּוּעַ כָּל קֶרֶן אַמָּה עַל אַמָּה » (2:8). Épaisseur des murets : CHOIX.
+# Écarté : le Raavad sur 2:7, qui rentre les keranot des parois de l'autel.
+PAROI_KEREN, HAUT_KEREN = 0.25, 5 * TEFAH
+KERANOT = {"SE": (HAUT[1] - 1, HAUT[2]), "NE": (HAUT[1] - 1, HAUT[3] - 1), "NO": (HAUT[0], HAUT[3] - 1), "SO": (HAUT[0], HAUT[2])}
+bloc_de_chaux("Mizbeach_haut", *HAUT, Z_SOVEV, Z_MAARAKHA, "30_Mizbeach", MAT_CHAUX_FEU(),
               socles=[(x, x + 1, y, y + 1, PAROI_KEREN) for x, y in KERANOT.values()])
 for nm, (x, y) in KERANOT.items():
-    bloc_de_chaux(f"Keren_{nm}", x, x + 1, y, y + 1, Z_AZ + 9, Z_AZ + 10, "30_Mizbeach", MAT_CHAUX_FEU(),
+    bloc_de_chaux(f"Keren_{nm}", x, x + 1, y, y + 1, Z_MAARAKHA, Z_MAARAKHA + HAUT_KEREN, "30_Mizbeach", MAT_CHAUX_FEU(),
                   creux=PAROI_KEREN, reprise=0.0)
 # « וְחוּט שֶׁל סִקְרָא חוֹגְרוֹ בָאֶמְצַע » (Middot 3:1) : la ligne rouge à mi-hauteur, qui sépare
-# les sangs d'en haut des sangs d'en bas — le seul trait de couleur sur la chaux.
-ceinture_de_chaux("Mizbeach_sikra", CORPS, Z_AZ + 4.95, Z_AZ + 5.05, "30_Mizbeach", MAT_SIKRA())
+# les sangs d'en haut des sangs d'en bas — le seul trait de couleur sur la chaux. La moitié des 58 tefa'him,
+# « כְּשִׁשָּׁה טְפָחִים מִסּוֹף הַסּוֹבֵב וּלְמַטָּה » (Rambam 2:8-9). Largeur du trait : CHOIX.
+Z_SIKRA = Z_SOVEV - 6 * TEFAH
+ceinture_de_chaux("Mizbeach_sikra", CORPS, Z_SIKRA - 0.05, Z_SIKRA + 0.05, "30_Mizbeach", MAT_SIKRA())
 # Trois ma'arakhot chaque jour et quatre à Kippour, l'avis de R. Yossi (Yoma 4:6 ; Rambam
 # Temidin ouMousafin 2:4-5) : la grande à l'est, celle de la ketoret à l'angle sud-ouest
 # (Tamid 2:4-5), celle du kiyoum haesh, et à Kippour celle des braises de la ketoret du
@@ -268,7 +277,7 @@ RETRAIT_GEHALIM = RETRAIT_LIT * (LITS - 1) + 0.15
 
 def lit_de_gzirin(nm, lit, xa, xb, ya, yb):
     """Un lit de bûches posées bout à bout, en rangs espacés ; les lits se croisent, et le feu a mangé ceux du haut."""
-    z = Z_AZ + 9.0 + R_GZIR + lit * PAS_LIT
+    z = Z_MAARAKHA + R_GZIR + lit * PAS_LIT
     mat = (MAT_BOIS_MAARAKHA(), MAT_BOIS_ROUSSI(), MAT_BOIS_CHARBON(), MAT_BOIS_CHARBON())[lit]
     le_long_de_x = lit % 2 == 0
     (a0, a1), (b0, b1) = ((ya, yb), (xa, xb)) if le_long_de_x else ((xa, xb), (ya, yb))
@@ -297,7 +306,7 @@ def maarakha(nm, xa, xb, ya, yb):
     for lit in range(LITS):
         lit_de_gzirin(nm, lit, xa, xb, ya, yb)
     braises(f"Maarakha_{nm}_gehalim", xa + RETRAIT_GEHALIM, xb - RETRAIT_GEHALIM, ya + RETRAIT_GEHALIM, yb - RETRAIT_GEHALIM,
-            Z_AZ + 9.0 + 1.5 * R_GZIR + (LITS - 2) * PAS_LIT, "30_Mizbeach", braise("Braise"), profondeur=0.05)
+            Z_MAARAKHA + 1.5 * R_GZIR + (LITS - 2) * PAS_LIT, "30_Mizbeach", braise("Braise"), profondeur=0.05)
 
 for nm, xa, xb, ya, yb in MAARAKHOT:
     maarakha(nm, xa, xb, ya, yb)
@@ -305,7 +314,7 @@ for nm, xa, xb, ya, yb in MAARAKHOT:
 # montait d'un autel éteint, et la rampe du plan 7b n'avait que la lumière du ciel — la
 # raison pour laquelle elle ne se détachait ni de l'autel ni du dallage.
 _, GX0, GX1, GY0, GY1 = MAARAKHOT[0]
-feu = lampe("Maarakha_feu", 'AREA', (m((GX0 + GX1) / 2), m((GY0 + GY1) / 2), m(Z_AZ + 10.2)))
+feu = lampe("Maarakha_feu", 'AREA', (m((GX0 + GX1) / 2), m((GY0 + GY1) / 2), m(Z_MAARAKHA + 1.2)))
 feu.data.shape = 'RECTANGLE'
 feu.data.size = m(GX1 - GX0)
 feu.data.size_y = m(GY1 - GY0)
@@ -334,30 +343,31 @@ for i in range(40):
     volute = sphere(f"Colonne_fumee_{i:02d}",
                     FUMEE_X + (alea("fumee", 3 * i) - 0.5) * 2 * ecart,
                     FUMEE_Y - 2.5 * t * t + (alea("fumee", 3 * i + 1) - 0.5) * 2 * ecart,
-                    Z_AZ + 9.5 + 42 * t, (1.6 + 2.6 * t) * (0.7 + 0.6 * alea("fumee", 3 * i + 2)),
+                    Z_MAARAKHA + 0.5 + 42 * t, (1.6 + 2.6 * t) * (0.7 + 0.6 * alea("fumee", 3 * i + 2)),
                     "77_Fumee", MAT_FUMEE, segs=12)
     volute.visible_shadow = False
 
 # Kevesh : 32 × 16 au sud (Middot 3:3), « אוֹכֵל בָּאָרֶץ שְׁלֹשִׁים אַמָּה… וּפוֹרֵחַ מִמֶּנָּה אַמָּה עַל הַיְסוֹד
 # וְאַמָּה עַל הַסּוֹבֵב. וַאֲוִיר מְעַט הָיָה מַפְסִיק בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ » (Rambam Beit HaBe'hira 2:13 ;
-# Zeva'him 62b). Les deux dernières amot sont une tête en porte-à-faux, qui s'arrête avant
-# la face de l'autel. Épaisseur de la tête et largeur de l'air : CHOIX.
+# Zeva'him 62b), « וְגֹבַהּ הַכֶּבֶשׁ תֵּשַׁע אַמּוֹת פָּחוֹת שְׁתוּת עַד כְּנֶגֶד הַמַּעֲרָכָה » (2:13). La tête en porte-à-faux couvre les deux
+# retraits, de cinq tefa'him chacun, et s'arrête avant la face de l'autel : la rampe fait 31 amot et 4 tefa'him moins
+# l'air, pas 32 (CHOIX, comme les 28 × 28 de Middot 3:1 arrondissent 28 et 4 tefa'him). Épaisseur de la tête et largeur de l'air : CHOIX.
 xc = (MX0 + MX1) / 2
 KX0, KX1, KY0 = xc - 8, xc + 8, MY0 - 30
 AVIR_KEVESH, NIMA = 0.25, 0.02
 # Piège : ce NIMA écrase celui de la parokhet tissée, qui est câblée plus tard (Bayit).
 tissage.NIMA = NIMA
-z_kevesh = lambda y: Z_AZ + 9 * (y - KY0) / 30
+z_kevesh = lambda y: Z_AZ + (Z_MAARAKHA - Z_AZ) * (y - KY0) / (MY0 - KY0)
 # « וְחַלּוֹן הָיְתָה בְּמַעֲרָבוֹ שֶׁל כֶּבֶשׁ אַמָּה עַל אַמָּה, וּרְבוּבָה הָיְתָה נִקְרֵאת » (Rambam 2:14 ; Middot 3:3) :
 # la niche où l'on posait les pesoulei 'hatat haof. Place, hauteur et profondeur : CHOIX.
 REVOUVA_Y, REVOUVA_Z = MY0 - 12, Z_AZ + 2
-PENTE_KEVESH = en_pente(Z_AZ, Z_AZ + 9, z_kevesh)
+PENTE_KEVESH = en_pente(Z_AZ, Z_MAARAKHA, z_kevesh)
 REVOUVA_YS, REVOUVA_ZS = (REVOUVA_Y, REVOUVA_Y + 1), (REVOUVA_Z, REVOUVA_Z + 1)
 # Le coin est coupé net au nord, sous la tête en porte-à-faux qui s'y soude ; la niche s'ouvre dans son flanc ouest.
 souder_la_chaux("Kevesh", [
-    bloc_de_chaux("Kevesh", KX0, KX1, KY0, MY0, Z_AZ, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX(), ouvert=("y0",), franc=("y1",),
-                  forme=PENTE_KEVESH, baie=(*REVOUVA_YS, *REVOUVA_ZS), paliers=(Z_AZ + 8,)),
-    bloc_de_chaux("Kevesh_rosh", KX0, KX1, MY0, MY0 + 2 - AVIR_KEVESH, Z_AZ + 8, Z_AZ + 9, "30_Mizbeach", MAT_CHAUX(),
+    bloc_de_chaux("Kevesh", KX0, KX1, KY0, MY0, Z_AZ, Z_MAARAKHA, "30_Mizbeach", MAT_CHAUX(), ouvert=("y0",), franc=("y1",),
+                  forme=PENTE_KEVESH, baie=(*REVOUVA_YS, *REVOUVA_ZS), paliers=(Z_MAARAKHA - 1,)),
+    bloc_de_chaux("Kevesh_rosh", KX0, KX1, MY0, HAUT[2] - AVIR_KEVESH, Z_MAARAKHA - 1, Z_MAARAKHA, "30_Mizbeach", MAT_CHAUX(),
                   ouvert=("y0",), reprise=0.0),
 ])
 FOND_REVOUVA = KX0 + 0.9
@@ -373,9 +383,10 @@ mesh_from_pydata("Kevesh_revouva",
 # descend en biais jusqu'à l'angle, sur le yessod de l'ouest et celui du sud. Le sovev part à 18 amot
 # de l'autel et non du pied, pour laisser au sol la place du deshen à dix amot du pied
 # (Tamid 1:4). Largeurs et départ : CHOIX.
-SOVEV_Y0, SOVEV_Y1 = MY0 - 18, MY0 + 1 - NIMA
-bloc_de_chaux("Kevesh_katan_sovev", KX1 - REPRISE_CHAUX, KX1 + 2.5, SOVEV_Y0, SOVEV_Y1, Z_AZ, Z_AZ + 6, "30_Mizbeach", MAT_CHAUX(),
-              ouvert=("x0", "y0"), forme=en_pente(Z_AZ, Z_AZ + 6, lambda y: Z_AZ + 6 * (y - SOVEV_Y0) / (SOVEV_Y1 - SOVEV_Y0)))
+SOVEV_Y0, SOVEV_Y1 = MY0 - 18, CORPS[2] - NIMA
+bloc_de_chaux("Kevesh_katan_sovev", KX1 - REPRISE_CHAUX, KX1 + 2.5, SOVEV_Y0, SOVEV_Y1, Z_AZ, Z_SOVEV, "30_Mizbeach", MAT_CHAUX(),
+              ouvert=("x0", "y0"),
+              forme=en_pente(Z_AZ, Z_SOVEV, lambda y: Z_AZ + (Z_SOVEV - Z_AZ) * (y - SOVEV_Y0) / (SOVEV_Y1 - SOVEV_Y0)))
 YESSOD_Y1 = MY0 - NIMA
 YESSOD_X_BAS, YESSOD_X_HAUT = KX0 - 2, MX0
 
@@ -384,7 +395,7 @@ def biais_du_yessod(v):
     part = (v.y - KY0) / (YESSOD_Y1 - KY0)
     return Vector((v.x + part * (YESSOD_X_HAUT - YESSOD_X_BAS), v.y, Z_AZ + max(v.z - Z_AZ, 0.0) * min(max(part, 0.0), 1.0) + min(v.z - Z_AZ, 0.0)))
 
-bloc_de_chaux("Kevesh_katan_yessod", YESSOD_X_BAS, YESSOD_X_BAS + 2, KY0, YESSOD_Y1, Z_AZ, Z_AZ + 1, "30_Mizbeach", MAT_CHAUX(),
+bloc_de_chaux("Kevesh_katan_yessod", YESSOD_X_BAS, YESSOD_X_BAS + 2, KY0, YESSOD_Y1, Z_AZ, Z_YESSOD, "30_Mizbeach", MAT_CHAUX(),
               ouvert=("y0",), forme=biais_du_yessod)
 TOURS_TAS, RAYONS_TAS = 28, 7
 
@@ -419,7 +430,7 @@ table_de_service("Kevesh_shulchan_kessef", (KX0 - 8.5, KX0 - 7.5, MY0 - 15, MY0 
 tas("Kevesh_makom_deshen", (KX1 + 1.5, KY0 + 10), Z_AZ, 0.5, 1.0, MAT_CENDRE())
 # « וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ » (Tamid 2:2), que touchent les bouts intérieurs des
 # gzirin de la grande ma'arakha (Tamid 2:4 ; Rambam Temidin ouMousafin 2:7). Taille : CHOIX.
-tas("Maarakha_tapuach", (xc, (MY0 + MY1) / 2), Z_AZ + 9, 1.5, 2.0, MAT_CENDRE())
+tas("Maarakha_tapuach", (xc, (MY0 + MY1) / 2), Z_MAARAKHA, 1.5, 2.0, MAT_CENDRE())
 # « בִּשְׁלֹשָׁה מְקוֹמוֹת הַמֶּלַח נְתוּנָה… וְעַל גַּבֵּי הַכֶּבֶשׁ » (Mena'hot 21b), là où l'on sale les membres,
 # posés « מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ, וּמְלָחוּם » (Tamid 4:3). Un tas, sa taille et sa place dans
 # cette moitié : CHOIX. Son fond plat s'enfonce dans la pente côté haut.
@@ -428,17 +439,17 @@ tas("Kevesh_melach", (MELACH_X, MELACH_Y), z_kevesh(MELACH_Y - MELACH_R) - 0.05,
     MELACH_R, MAT_SEL())
 # « בְּרֹאשׁוֹ שֶׁל מִזְבֵּחַ – שֶׁשָּׁם מוֹלְחִין הַקּוֹמֶץ וְהַלְּבוֹנָה וְהַקְּטוֹרֶת » (Mena'hot 21b). Sa place sur le sommet : CHOIX,
 # dans l'ama de passage du sud, à l'est de l'arrivée du kevesh, hors du feu.
-tas("Mizbeach_melach", (xc + 4, MY0 + 3.5), Z_AZ + 9, 0.4, 0.4, MAT_SEL())
+tas("Mizbeach_melach", (xc + 4, HAUT[2] + 1.5), Z_MAARAKHA, 0.4, 0.4, MAT_SEL())
 # « עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ, שְׁנֵי סְפָלִים שֶׁל כֶּסֶף הָיוּ שָׁם… מַעֲרָבִי שֶׁל מַיִם, מִזְרָחִי שֶׁל יָיִן »
 # (Soucca 4:9 ; Rambam Temidin ouMousafin 10:7), « נתונים אצל הקרן… סמוכין זה לזה » (Rashi Soucca 48b),
 # la corne sud-ouest. Le bec de l'eau plus fin que celui du vin, « כְּדֵי שֶׁיִּכְלֶה הַמַּיִם עִם הַיַּיִן
 # כְּאֶחָד » (Rambam ibid.). Taille, profil et sens des becs : CHOIX. Avis écarté : de chaux noircie
 # par le vin, selon R. Yehouda (même michna).
 SEFEL = [(0.14, 0.0), (0.18, 0.03), (0.30, 0.22), (0.32, 0.32), (0.29, 0.32), (0.27, 0.24), (0.0, 0.07)]
-for nm, x, r_bec in (("mayim", MX0 + 3.5, 0.03), ("yayin", MX0 + 4.3, 0.05)):
-    y = MY0 + 2.5
-    revolution(f"Sefel_{nm}", x, y, Z_AZ + 9, SEFEL, "30_Mizbeach", MAT_ARGENT(), verts=24)
-    cyl_between(f"Sefel_{nm}_hotem", (x, y + 0.2, Z_AZ + 9.08), (x, y + 0.42, Z_AZ + 9.02), r_bec,
+for nm, x, r_bec in (("mayim", HAUT[0] + 1.5, 0.03), ("yayin", HAUT[0] + 2.3, 0.05)):
+    y = HAUT[2] + 0.5
+    revolution(f"Sefel_{nm}", x, y, Z_MAARAKHA, SEFEL, "30_Mizbeach", MAT_ARGENT(), verts=24)
+    cyl_between(f"Sefel_{nm}_hotem", (x, y + 0.2, Z_MAARAKHA + 0.08), (x, y + 0.42, Z_MAARAKHA + 0.02), r_bec,
                 "30_Mizbeach", MAT_ARGENT(), verts=8)
 # Kiyor : entre l'Oulam et le Mizbea'h, « וּמָשׁוּךְ כְּלַפֵּי הַדָּרוֹם » (Middot 3:6). La même
 # michna donne les 22 amot et les douze marches ; avec leurs rovadim elles en prennent 19

@@ -3,6 +3,7 @@ from mathutils import Matrix, Vector
 
 import beit_hamikdash_gestes as G
 from beit_hamikdash_visite import AMA, Z_AZ, Z_EZN
+from blockout.primitives.parametres import Z_MAARAKHA
 
 from ..matieres import ARGENT, CHENE, OR
 from ..corps import _alea
@@ -238,7 +239,7 @@ def _magis():
         h = _un_cohen(nom, (0.45, 0.30))
         tenir(h, "magis", magis, "spine_03", repere_mizrak(h))
         return h
-    return Role(nom, nom, batir, incliner_la_coupe(RAYON_DU_MAGIS - 0.01), (-32.0, -15.2, 9.0), 90.0, famille="cohanim")
+    return Role(nom, nom, batir, incliner_la_coupe(RAYON_DU_MAGIS - 0.01), (-32.0, -15.2, Z_MAARAKHA), 90.0, famille="cohanim")
 
 
 # Le deuxième groupe sur la dernière marche du 'Heil, chacun son pessa'h près de lui, dans sa peau (Pesa'him 65b).

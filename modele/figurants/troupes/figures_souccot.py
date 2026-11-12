@@ -3,6 +3,7 @@ from mathutils import Matrix, Vector
 
 import beit_hamikdash_gestes as G
 from beit_hamikdash_visite import AMA, Z_AZ, Z_EZN
+from blockout.primitives.parametres import Z_MAARAKHA, Z_YESSOD
 
 from ..maillage import Maillage, pave, tube
 from ..habillage import porter
@@ -30,8 +31,8 @@ def _shaar_hamayim():
 
 # « עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ … וְלַמְנַסֵּךְ אוֹמְרִים לוֹ, הַגְבַּהּ יָדֶךָ » (Soucca 4:9) : face à l'ouest, derrière le sefel du
 # vin, la main levée au-dessus de celui de l'eau, « מַעֲרָבִי שֶׁל מַיִם » ; la hauteur du geste : CHOIX.
-SEFEL_HAMAYIM = (-50.5, -22.5, 9.3)
-MENASEKH_OU = (-48.9, -22.5, 9.0)
+SEFEL_HAMAYIM = (-50.83, -22.83, Z_MAARAKHA + 0.3)
+MENASEKH_OU = (-49.23, -22.83, Z_MAARAKHA)
 
 
 def _nissoukh_hamayim():
@@ -61,15 +62,16 @@ def _nissoukh_hamayim():
 # כְּדֵי שֶׁיְּהוּ גּוֹחוֹת עַל הַמִּזְבֵּחַ אַמָּה », « עַל הַיְּסוֹד מַנַּח לְהוּ » (Soucca 45a) — le long du yessod nord et ouest ;
 # leur nombre, leur écart et le feuillage : CHOIX.
 SAULE, BOIS_DE_SAULE = (0.32, 0.40, 0.20), (0.36, 0.22, 0.13)
-ARAVOT_NORD = [(x, 6.4) for x in np.arange(-51.5, -23.0, 1.25)]
-ARAVOT_OUEST = [(-53.35, y) for y in np.arange(4.5, -21.0, -1.25)]
+ARAVOT_NORD_Y = 6.57
+ARAVOT_NORD = [(x, ARAVOT_NORD_Y) for x in np.arange(-51.5, -23.0, 1.25)]
+ARAVOT_OUEST = [(-53.52, y) for y in np.arange(4.5, -21.0, -1.25)]
 
 
 # `vers` : d'un point du Temple, en amot, au repère de la figure qui les porte.
 def arava(mm, vers, pied, dedans):
     x, y = pied
     d = Vector((*dedans, 0.0))
-    base = Vector((x, y, Z_AZ + 1.0))
+    base = Vector((x, y, Z_YESSOD))
     chemin = [vers(base + d * dx + Vector((0.0, 0.0, dz))) for dx, dz in
               ((0.0, 0.0), (1.0, 8.5), (1.35, 10.0), (2.0, 10.7), (2.6, 10.3))]
     mm.nappe(tube(chemin, [0.020, 0.013, 0.010, 0.007, 0.003], 6), BOIS_DE_SAULE, "objet")
@@ -108,7 +110,7 @@ def _aravot():
         return h
 
     def geste(h, a, horloge, t):
-        tige = vers_la_figure(DRESSEUR_OU, -90.0, (DRESSEUR_OU[0], 6.4, Z_AZ + 1.0), a.sol)
+        tige = vers_la_figure(DRESSEUR_OU, -90.0, (DRESSEUR_OU[0], ARAVOT_NORD_Y, Z_YESSOD), a.sol)
         vers = Vector((0.0, -1.0, 8.5)).normalized()
         return G.composer(G.debout(a, horloge, t, 0.2, regard=0.02), G.tete(flexion=-0.25), G.buste(flexion=0.08),
                           G.bras(a, "l", tige + vers * 1.30 + Vector((0.04, 0.04, 0.0))),

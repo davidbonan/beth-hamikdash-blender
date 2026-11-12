@@ -737,7 +737,10 @@ void facettesAmande(vec3 P, vec3 N, inout vec3 pente, inout float rugo){
 // Les quatre ma'arakhot : leur centre en mètres de three (x, z), leur demi-côté en amot. Mêmes cotes que MAARAKHOT du blockout.
 const vec3 MAARAKHOT[4] = vec3[4](vec3(-32.0 * AMA, 9.0 * AMA, 4.0), vec3(-46.5 * AMA, 17.5 * AMA, 1.5),
                                   vec3(-46.5 * AMA, 2.5 * AMA, 1.5), vec3(-40.5 * AMA, 17.5 * AMA, 1.5));
-const float HAUT_MIZBEACH = 9.0 * AMA;
+// Les cotes de l'autel, en amot, celles du blockout (Rambam, Beit HaBe'hira 2:7-9) ; ses angles en (x, z) de three.
+const float Z_YESSOD = 5.0 / 6.0, Z_SIKRA = 29.0 / 6.0, Z_MAARAKHA = 53.0 / 6.0, RETRAIT_MIZBEACH = 5.0 / 6.0;
+const vec2 MIZBEACH_NE = vec2(-22.0, -7.0), MIZBEACH_SO = vec2(-54.0, 25.0), VERS_LE_SO = vec2(-RETRAIT_MIZBEACH, RETRAIT_MIZBEACH);
+const float HAUT_MIZBEACH = Z_MAARAKHA * AMA;
 
 // Chaux coulée au moule (Rambam, Beit HaBe'hira 2:16) et reblanchie au linge (Middot 3:4) : une face plane et mate, où ne se
 // lisent que le grain, le geste du linge, la coulure du lait de chaux et le pied sali par la cour. Ni bosse, ni fissure, ni écaille.
@@ -781,8 +784,8 @@ void chaux(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo){
 // Le sang d'une semaine sur la chaux : « כָּל עֶרֶב שַׁבָּת מְלַבְּנִים אוֹתוֹ בְמַפָּה מִפְּנֵי הַדָּמִים » (Middot 3:4).
 // Séché, il brunit ; mince, il ne laisse qu'un lavis rosé. Coins et cotes du blockout, en mètres de three (x, z).
 const vec3 SANG = vec3(0.40, 0.09, 0.07), LAVIS_SANG = vec3(0.80, 0.58, 0.52);
-const vec2 ZERIQA_NE = vec2(-23.0 * AMA, -6.0 * AMA), ZERIQA_SO = vec2(-53.0 * AMA, 24.0 * AMA);
-const vec2 YESSOD_SO = vec2(-54.0 * AMA, 25.0 * AMA);
+const vec2 ZERIQA_NE = (MIZBEACH_NE + VERS_LE_SO) * AMA, ZERIQA_SO = (MIZBEACH_SO - VERS_LE_SO) * AMA;
+const vec2 YESSOD_SO = MIZBEACH_SO * AMA;
 
 // Deux jets en diagonale, sous la ligne rouge, qui prennent le coin « כְּמִין גַּ״ם » (Rambam, Ma'asse HaKorbanot 5:6).
 // Lancé du bassin, le sang s'écrase en éventail : plein au point d'impact, en doigts puis en gouttes autour, et il file vers le yessod.
@@ -804,13 +807,13 @@ float zeriqa(vec3 P, vec2 coin, float pixel){
   float longueur = 0.6 + 2.2 * octave(vec3(rang, coin.x, 5.0), 0.0);
   float filet = file * (1.0 - smoothstep(0.2, 1.3, le_long)) * step(hauteur, IMPACT_ZERIQA)
               * smoothstep(IMPACT_ZERIQA - longueur - 0.3, IMPACT_ZERIQA - longueur, hauteur);
-  return clamp(max(eventail, max(gouttes, filet * 0.85)), 0.0, 1.0) * step(1.02, hauteur) * step(hauteur, 4.95);
+  return clamp(max(eventail, max(gouttes, filet * 0.85)), 0.0, 1.0) * step(Z_YESSOD + 0.02, hauteur) * step(hauteur, Z_SIKRA - 0.05);
 }
 
 // Le sang des 'hatatot, au doigt sur l'arête de chaque keren, « וְיוֹרֵד כְּנֶגֶד חֻדָּהּ שֶׁל קֶרֶן » (ibid. 5:7).
 float arete(vec3 P, vec2 coin, float pixel){
   float loin = length(P.xz - coin) / AMA;
-  float fin = 8.6 + 1.0 * grainOblique(vec3(coin * 3.0, 1.0), 0.0) + (grainOblique(P * 5.0, pixel * 5.0) - 0.5) * 0.6;
+  float fin = Z_MAARAKHA - 0.4 + 1.0 * grainOblique(vec3(coin * 3.0, 1.0), 0.0) + (grainOblique(P * 5.0, pixel * 5.0) - 0.5) * 0.6;
   return (1.0 - smoothstep(0.12, 0.40, loin + (grainOblique(P * 9.0, pixel * 9.0) - 0.5) * 0.25))
        * smoothstep(fin, fin + 0.4, P.y / AMA);
 }
@@ -824,11 +827,12 @@ void sang(vec3 P, vec3 N, inout vec3 teinte, inout float rugo){
     float versant = length(P.xz - YESSOD_SO) / AMA + (grainOblique(P * 1.6 + 9.0, pixel * 1.6) - 0.5) * 3.0;
     // Sur le yessod seulement : la petite rampe qui y mène, à un cheveu de lui, n'en reçoit rien.
     float flaque = (1.0 - smoothstep(2.0, 7.0, versant)) * step(YESSOD_SO.x, P.x) * step(P.z, YESSOD_SO.y)
-                 * smoothstep(0.7, 0.9, N.y) * (1.0 - smoothstep(1.05, 1.25, P.y / AMA)) * step(0.9, P.y / AMA);
+                 * smoothstep(0.7, 0.9, N.y) * (1.0 - smoothstep(Z_YESSOD + 0.05, Z_YESSOD + 0.25, P.y / AMA)) * step(Z_YESSOD - 0.1, P.y / AMA);
     tache = max(tache, flaque * 0.9);
   } else {
     for (int k = 0; k < 4; k++) {
-      vec2 coin = vec2(k < 2 ? -24.0 : -52.0, k % 2 == 0 ? -5.0 : 23.0) * AMA;
+      vec2 nord_est = MIZBEACH_NE + 2.0 * VERS_LE_SO, sud_ouest = MIZBEACH_SO - 2.0 * VERS_LE_SO;
+      vec2 coin = vec2(k < 2 ? nord_est.x : sud_ouest.x, k % 2 == 0 ? nord_est.y : sud_ouest.y) * AMA;
       tache = max(tache, arete(P, coin, pixel) * 0.85);
     }
   }
