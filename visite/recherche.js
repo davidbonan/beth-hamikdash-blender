@@ -2,7 +2,7 @@
 import { nomDeZone } from "./fiche.js";
 import { langue, texte } from "./langue.js";
 
-const sansAccent = (s) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+export const sansAccent = (s) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 // Au doigt, le clavier qui monte cacherait la liste : on ne le lève que si le visiteur touche le champ.
 const CLAVIER_PHYSIQUE = matchMedia("(hover: hover) and (pointer: fine)");
 
