@@ -751,12 +751,9 @@ function conduire(dt) {
 
 await detail.acheve((part) => chargement.avancer("detail", part));
 await chargement.glisserPendantLeGel("image");
-renderer.setAnimationLoop(() => {
-  if (pannes.enReprise || pannes.contextePerdu || imageSuspendue) return;
-  const dt = Math.min(horloge.getDelta(), 0.1);
+function uneImage(dt) {
   const filme = film !== null;
   if (filme) suivreLeFilm(dt); else conduire(dt);
-  ajusterEchelle(dt);
   depuisLeReleve += dt;
   if (++image % IMAGES_ENTRE_RELEVES === 0) {
     releverLeLieu();
@@ -770,7 +767,15 @@ renderer.setAnimationLoop(() => {
   annonces?.suivre();
   accorderExposition(dt);
   dessiner(dt);
+}
+renderer.setAnimationLoop(() => {
+  if (pannes.enReprise || pannes.contextePerdu || imageSuspendue) return;
+  const dt = Math.min(horloge.getDelta(), 0.1);
+  // Avant le tracé : retailler la toile efface l'image qu'elle porte.
+  ajusterEchelle(dt);
+  uneImage(dt);
 });
+const figer = () => renderer.setAnimationLoop(null);
 
 // La première image fige Safari plusieurs secondes : le voile ne part qu'une fois qu'elle est rendue.
 laisserPeindre().then(chargement.lever);
@@ -820,7 +825,7 @@ if (CINEMA) {
   film.avancer(0);
   dessiner(0);
   parent.postMessage({ type: "cinema", pret: true }, location.origin);
-  window.__cinema = { ...film, figer: () => renderer.setAnimationLoop(null) };
+  window.__cinema = { ...film, figer };
 } else if (!initiationSuivie() && !guides.ouvert()) {
   // Ouverte sur une station, la carte du parcours tient la place de celle de l'initiation : elle attendra une autre visite.
   aide.classList.add("parti");
@@ -842,6 +847,14 @@ window.__cam = (x, y, z, cx, cy, cz) => {
   dessiner(0);
 };
 window.__rendre = () => dessiner(0);
+// Une capture fige la boucle et la fait tourner elle-même, à pas fixe : la marche, les flammes et les figurants avancent d'autant.
+window.__figer = figer;
+window.__image = uneImage;
+// Focale en mm sur un 24 × 36 : le champ horizontal qu'elle donne, rapporté au cadre de la page.
+window.__focale = (mm) => {
+  camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(18 / mm / camera.aspect));
+  camera.updateProjectionMatrix();
+};
 window.__echelle = (voulue) => { echelle = voulue; dimensionner(); dessiner(0); };
 window.__reflets = (voulus) => { dallage.allumer(voulus); dessiner(0); };
 window.__etat = () => {
