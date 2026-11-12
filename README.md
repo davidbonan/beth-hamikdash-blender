@@ -116,6 +116,7 @@ Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `vi
 | `visite/matieres/` | Les scans eux-mêmes, en 1024, la carte tissée des Parokhot et l'atlas des gravures avec ses silhouettes. Artefacts — `modele/beit_hamikdash_nappes.py`, `modele/beit_hamikdash_parokhet.py` et `modele/beit_hamikdash_gravures.py` les refabriquent. |
 | `visite/ciel.js` | Le ciel : d'où vient la lumière, ce que le métal réfléchit, ce qui éloigne les plans. Le dôme vu porte un voile et des cirrus à chaque moment sauf avant l'aube : leurs deux bruits sont cuits une fois dans une texture (1024 au profil élevé, 512 ailleurs), refaite après une perte de contexte, et le dôme ne fait que la lire. Les reflets du métal ne les montrent pas. |
 | `visite/reflet_du_dallage.js` | Trois dallages reflètent ce qui les entoure : la pierre de l'Azara et de l'Ezrat Nashim, l'or du Heikhal. Un seul miroir, posé sous le sol où l'œil se tient : ce qui s'y voit est rendu une seconde fois, à demi-définition, et le sol le lit d'autant plus flou que la chose est haute. Ce flou se lit dans une pyramide réduite niveau par niveau sous un noyau 1-3-3-1, deux textures se réduisant l'une depuis l'autre : sous les mipmaps du GPU, réduits en boîte, un reflet flou avançait par crans pendant que le décor glissait — en tournant par pas de 0,6° dans l'Ezrat Nashim sous Safari, de 4,2 à 16,4 px par pas pour un décor à 10,4–11,2, contre 6,8 à 10,9 avec la pyramide. Elle coûte 2 ms par image dans l'Ezrat Nashim sous Chromium (18,8 → 20,8), une à deux images par seconde en marche sous Safari. Chaque dallage a son lobe, l'étalement du reflet, et sa force, la part du reflet dans ce que le sol renvoie : l'or poli du Heikhal reflète net (0,15 et 0,6), la pierre des cours, sèche et polie par les pas, n'en garde qu'une lueur (0,6 et 0,3) — net ou entier, il faisait un sol mouillé de pluie. Au profil élevé seulement. Il coûte par dessin et non par pixel, et surtout par changement de matière : il se trace donc avec une poignée de matières épurées, une par teinte voisine, au lieu d'une par maillage — ce que la sonde du Heikhal éclaire y garde son reflet de salle et sa lumière cuite. Tracé une image sur deux il coûtait moins (en rétina, 59 images par seconde dans l'Azara contre 62 sans miroir) mais gardait une image de retard sur l'œil ; tracé à chaque image, 53 dans l'Azara, 40 à 55 dans l'Ezrat Nashim, 48 à 59 dans le Heikhal. Dans les cours, où le reflet est flou, le décor fixe se trace d'une seule matière, sa teinte portée par les sommets (`uni`, quatre octets par sommet) : c'est le nombre de matières qui coûtait, pas les pixels ni les dessins — en rétina dans l'Azara, à la définition 0,6 sous synchro, 57 images par seconde et une image manquée sur cinq avec 64 matières, 70 et une sur seize avec 12, contre 77 sans miroir. Le régulateur ne lâche plus le miroir : seule la définition cède, jusqu'à 0,6 au profil élevé. |
+| `visite/feu_de_l_autel.js` | Le feu de l'autel : les flammes de chaque ma'arakha et la colonne de fumée de la grande, parcourues en volume à demi-définition par une passe de `chaine.js`, que la passe de géométrie coupe derrière les murs. Nul aux profils très léger et sobre, qui n'ont pas cette passe. |
 | `visite/chaine.js` | La chaîne d'image : occlusion ambiante aux deux échelles, halo, rayons de l'astre dans l'air des cours (marchés dans la carte d'ombre lointaine), anti-crénelage, étalonnage. |
 | `visite/ombres.js` | La carte d'ombre et sa pénombre, qui s'élargit avec la distance au bloqueur ; la carte lointaine du Har HaBayit, tracée une fois. |
 | `visite/occlusion.js` | Charge les cartes cuites : la lumière indirecte, posée en `lightMap`, et l'occlusion, en `aoMap`. |
@@ -358,8 +359,10 @@ reporte dans les miroirs `.en` et `.he`**. `python3 modele/beit_hamikdash_traduc
 qui manque ou a dérivé — un concept nouveau, une cote ajoutée, une source changée — et
 sort en erreur tant qu'il en reste. Une langue non traduite retombe sur le français.
 
-**Ce que la visite ne prend pas.** Les lumières de rendu, le pays, les caméras et la fumée —
-mise en scène, pas architecture.
+**Ce que la visite ne prend pas.** Les lumières de rendu, le pays, les caméras et le proxy de
+fumée du film — mise en scène, pas architecture. Le feu de l'autel, lui, y brûle : flammes et
+colonne de fumée sont tracées par `visite/feu_de_l_autel.js`, au-dessus des lits de braises que
+l'export relève sous `foyers` dans `reperes.json`.
 
 **Les matières.** L'export n'emporte de chaque matière Blender que sa couleur de base :
 glTF ne transporte pas de nœuds, et les maillages n'ont aucune UV. `matieres.js` refait
@@ -1096,6 +1099,42 @@ et places restent des CHOIX, la présence de chaque objet ne l'est pas (fiche §
   Israël) : l'un sous le portique, derrière Sha'ar Shushan, l'autre dans l'Ezrat Nashim, dos à la
   galerie. En demi-cercle, le chef au milieu, deux greffiers, trois bancs d'élèves — la
   disposition, pas le nombre. Code propre : rien n'est pris à la Lishkat HaGazit, qui reste à reprendre.
+
+### Le Mizbea'h en chaux et en feu (12/11)
+
+Dans la visite, l'autel se lisait en volumes de CAO sous une matière nuageuse, ses bûchers en
+palettes, sans flamme ni fumée.
+
+- **Le feu brûle.** « אֵשׁ תָּמִיד תּוּקַד עַל הַמִּזְבֵּחַ » (*Vayikra* 6:6) : des flammes sur les quatre
+  ma'arakhot, et sur la grande une colonne de fumée qui monte droit, « וְלֹא נָצְחָה הָרוּחַ אֶת עַמּוּד
+  הֶעָשָׁן » (*Avot* 5:5). Hauteur des flammes, hauteur et évasement de la colonne : **CHOIX**. La décision
+  du 8/09 — pas de fumée dans la visite — est levée ; le proxy `Colonne_fumee_NN` reste celui du film.
+- **L'autel est coulé, donc plan.** « מֵבִיא אֲבָנִים שְׁלֵמוֹת… וְסִיד וְזֶפֶת וְקוּנְיָא וּמְמַחֶה וְשׁוֹפֵךְ לְתוֹךְ מַלְבֵּן גָּדוֹל
+  כְּמִדָּתוֹ » (Rambam, *Beit HaBe'hira* 2:16) : un moule à sa mesure donne des faces planes et des arêtes
+  droites. Une première version le bossuait de 0,16 ama en lisant *Middot* 3:4 (« pas de truelle de
+  fer ») comme une chaux posée à la main : il se lisait ondulé, fondu. Faces planes, arête adoucie
+  de 0,06 ama (**CHOIX**), ligne de sikra droite.
+- **Le kevesh et les petites rampes sont de la même chaux** que l'autel : ils étaient des coins gris.
+  La revouva n'est plus une bande grise : une niche ouverte dans le flanc (`baie`), ses parois en
+  concept à part, cuit comme le reste.
+- **Ce qui se continue est un seul maillage.** Le yessod, et le kevesh avec sa tête, sont soudés
+  (`souder_la_chaux`) : deux blocs voisins, même à sommets confondus, gardaient chacun leur lissé
+  et leur île de lumière cuite, et le joint se lisait en trait sombre.
+- **La chaux est passée au linge.** « מְלַבְּנִים אוֹתוֹ בְמַפָּה » (*Middot* 3:4) : deux passes croisées à peine
+  lisibles, de rares coulures de lait de chaux, le pied sali par la cour. Ni fissure ni écaille : un enduit refait
+  chaque semaine (**CHOIX**). Le sommet ne noircit plus par bande : la chaux cuit au pied de
+  chaque bûcher, la cendre retombe en semis de grain — serré près du feu, clairsemé au loin, sans
+  plaque ni zone droite —, et la pluie la descend sur les parois en traînées.
+- **Les keranot sont coulées avec l'autel** (Rambam 2:7, 2:16) : leurs flancs continuent ceux du
+  sommet, dont l'arête ne tourne pas sous elles (`socles`). Posées en blocs à part, elles laissaient
+  un trait sombre à leur pied.
+- **Les gzirin sont du bois fendu.** Rondins, moitiés et quartiers de 2,6 amot posés bout à bout
+  sur quatre lits croisés, le feu ayant mangé ceux du haut (**CHOIX** des longueurs et du nombre de
+  lits) ; écorce, charbon en écailles et cendre viennent du nuanceur, selon le lit. Le bassin de
+  braises tient sous le lit du haut, qui le déborde : on n'en voit que la nappe, entre les bûches.
+- **Tapoua'h, deshen et sel sont des tas versés**, plus des cônes.
+- **Le sang de la zeriqa** s'écrase en éventail sur ses deux coins et file vers le yessod en filets. Les shirayim
+  restent sur le yessod : la petite rampe, à une nima de lui, n'en reçoit pas.
 
 ## Licence
 

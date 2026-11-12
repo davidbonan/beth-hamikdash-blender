@@ -23,10 +23,11 @@ TEXEL = 0.2
 # Une salle se voit à un mètre : à 20 cm, les gradins de la Lishkat HaGazit n'avaient que deux texels par marche.
 SALLES_CLOSES = ("lishkat_hagazit", "lishkat_hagola", "beit_hahalifot", "lishkat_hamedichin", "lishkat_haparva",
                  "lishkat_hamelach", "lishkat_haetz", "beit_hatevila")
-TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03} | dict.fromkeys(SALLES_CLOSES, 0.08)
+# Le rebord d'une keren fait un quart d'ama : à moins de quatre texels, l'ombre de son puits bave dessus.
+TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03, "keranot": 0.012} | dict.fromkeys(SALLES_CLOSES, 0.08)
 # Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
 # Les éléments du Beit HaMoked, fiche à part : sans carte, le ciel les éclairerait dans la salle close comme au-dehors.
-MALGRE_AIRE = {"yessod", "kippa_beit_hamoked", "shaarei_beit_hamoked", "medurat_beit_hamoked", "lishkat_hatlaim",
+MALGRE_AIRE = {"yessod", "keranot", "revouva", "kippa_beit_hamoked", "shaarei_beit_hamoked", "medurat_beit_hamoked", "lishkat_hatlaim",
                "lishkat_lechem_hapanim", "lishkat_hachotamot", "lishkat_beit_hamoked", "rovadim_beit_hamoked",
                "rashei_pispasin", "tavla_hamaftechot", "kesatot_beit_hamoked"}
 TAILLE = (128, 2048)

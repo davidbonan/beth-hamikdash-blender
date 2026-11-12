@@ -330,6 +330,12 @@ def lampes(prefixe):
             for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
+def foyers():
+    """Le lit de braises de chaque ma'arakha, en mètres de la visite, le plus étendu d'abord."""
+    lits = [bornes(o) for o in bpy.data.objects if o.type == "MESH" and re.fullmatch(r"Maarakha_.+_gehalim", o.name)]
+    return sorted(lits, key=lambda lit: (lit["min"][0] - lit["max"][0]) * (lit["max"][2] - lit["min"][2]))
+
+
 def vides(prefixe):
     return [[o.matrix_world.translation.x, o.matrix_world.translation.z, -o.matrix_world.translation.y]
             for o in sorted(bpy.data.objects, key=lambda o: o.name) if o.type == "EMPTY" and o.name.startswith(prefixe)]
@@ -422,6 +428,7 @@ def exporter(chantier):
     lueurs = {salle: {"points": lampes(f"{prefixe}_lueur"), "salle": repere_de(f"{prefixe}_salle")}
               for salle, prefixe in SALLES_A_LUEURS.items()}
     projecteurs = vides("Kotel_projecteur_")
+    lits_de_braises = foyers()
     vis_de_degres = vis()
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
@@ -498,6 +505,7 @@ def exporter(chantier):
         "flammes": flammes,
         "arche": arche,
         "braises": braises,
+        "foyers": lits_de_braises,
         "lueurs": lueurs,
         "projecteurs": projecteurs,
         "vis": vis_de_degres,

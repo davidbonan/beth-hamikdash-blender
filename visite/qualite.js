@@ -84,7 +84,7 @@ const LOURD = { dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7, 0.6], ec
   textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024 }, ecartDetail: 1, porteeDetail: Infinity,
   ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12,
   halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 40 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { presents: true, ombre: true },
-  fumee: { pas: 48, octaves: 3 }, reflets: { definition: 0.5 } };
+  fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 } };
 
 // Un téléphone part à `echelleDepart` et ne monte au-dessus qu'en tenant ses 60 images : chaque iPhone trouve la sienne.
 // `preProfondeur` : à 390 × 844 elle coûte plus de géométrie qu'elle n'épargne de pixels (50 → 39 ms mesurés sans elle).
@@ -93,14 +93,14 @@ const LEGER = { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.
   textures: { decor: 1024, figurants: 512, nappes: true, nuages: 512 }, ecartDetail: 1, porteeDetail: Infinity,
   ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: 6,
   halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 12 }, sanctuaire: { ombre: true, carte: 256 }, feux: { ombre: false, carte: 256 }, figurants: { presents: true, ombre: false },
-  fumee: { pas: 16, octaves: 2 }, reflets: null };
+  fumee: { pas: 16, octaves: 2 }, feuDeLAutel: { flammes: 12, fumee: 18, octaves: 2 }, reflets: null };
 
 // `halo` et `rayons` nuls = pas de passe du tout, et pas seulement une force nulle : leurs cibles sont allouées par leur constructeur, qu'elles servent ou non.
 // `occlusion` nulle épargne aussi la passe de géométrie qu'elle lisait, hors du Kodesh HaKodashim dont la fumée la lit encore.
 const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echelleDepart: 0.7,
   textures: { decor: 512, figurants: 256, nappes: true, nuages: 512 }, ecartDetail: 2,
   occlusion: 0, halo: null, rayons: null,
-  fumee: { pas: 8, octaves: 1 } };
+  fumee: { pas: 8, octaves: 1 }, feuDeLAutel: null };
 
 // Un vieil iPad perd son contexte en compilant les nuanceurs de matière, passé la quarantaine : seules les familles qui couvrent l'écran gardent leur appareil, sans pays ni figurants, qui ont les leurs.
 // Sans nappes ni ombre des lampes : sur son GPU l'image passait de 80-106 ms à 52-57, les nappes pour moitié.
