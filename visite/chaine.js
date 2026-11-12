@@ -26,6 +26,7 @@
  * cible flottante : ce qu'on y lit ne dépend d'aucun réglage du moteur.
  */
 import * as THREE from "three";
+import { FEU_DE_L_AUTEL, empriseDuFeu, foyersDuFeu } from "./feu_de_l_autel.js";
 import { parTranches } from "./fil.js";
 import { COURBE_DE_L_ECRAN, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { OMBRE_LOINTAINE, profondeurLointaine } from "./ombres.js";
@@ -187,6 +188,8 @@ const COMPOSITION = {
 // traverse ; `VOILE` pose ça sur l'image.
 // En mètres. De plus loin la pièce est close — ses murs, sa parokhet extérieure à 1,3 m — et la fumée coupée partout : dans le champ, elle coûtait pourtant sa passe, et au profil très léger celle de géométrie.
 const RECUL_FUMEE = 2;
+// En mètres. La colonne de l'autel se voit de tout le Har HaBayit ; de plus loin, la couper demanderait la géométrie du pays entier.
+const RECUL_FEU = 300;
 const FUMEE = {
   uniforms: { tGeo: { value: null },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
@@ -650,6 +653,15 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   voile.uniforms.tFumee.value = cibleFumee.texture;
   voile.enabled = false;
   composeur.addPass(voile);
+  const cibleFeu = FEU_DE_L_AUTEL && new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
+  const feu = FEU_DE_L_AUTEL && new ShaderPass({ ...FEU_DE_L_AUTEL, vertexShader: OCCLUSION.vertexShader });
+  const voileDuFeu = feu && new ShaderPass(VOILE);
+  if (feu) {
+    feu.uniforms.tGeo.value = cibleGeo.texture;
+    voileDuFeu.uniforms.tFumee.value = cibleFeu.texture;
+    voileDuFeu.enabled = false;
+    composeur.addPass(voileDuFeu);
+  }
   // Avant le halo : c'est la lumière de la scène qu'on mesure, pas son débordement.
   const photometre = new Photometre();
   composeur.addPass(photometre);
@@ -706,6 +718,12 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     }
     fumee.uniforms.uTanFov.value = tanFov;
     fumee.uniforms.uAspect.value = camera.aspect;
+    if (feu) {
+      cibleFeu.setSize(cibleGeo.width, cibleGeo.height);
+      voileDuFeu.uniforms.uPas.value.set(1 / cibleFeu.width, 1 / cibleFeu.height);
+      feu.uniforms.uTanFov.value = tanFov;
+      feu.uniforms.uAspect.value = camera.aspect;
+    }
     if (!rayons) return;
     cibleRayons.setSize(cibleGeo.width, cibleGeo.height);
     airEclaire.uniforms.uPas.value.set(1 / cibleRayons.width, 1 / cibleRayons.height);
@@ -743,19 +761,37 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uArche.value.copy(arche);
   }
 
+  /** Les lits de braises de l'autel (Box3, en mètres), le plus étendu d'abord : c'est lui qui porte la colonne de fumée. */
+  let empriseDuFeuDeLAutel = null;
+  function embraser(lits) {
+    if (!feu || !lits.length) return;
+    feu.uniforms.uFoyers.value = foyersDuFeu(lits);
+    empriseDuFeuDeLAutel = empriseDuFeu(lits);
+  }
+
+  /** `astre` : sa couleur et son intensité ; `partDuCiel` : ce que le moment garde du ciel de jour. */
+  function eclairerLeFeu(versLAstre, astre, partDuCiel) {
+    if (!feu) return;
+    feu.uniforms.uVersLAstre.value.copy(versLAstre);
+    feu.uniforms.uAstre.value.set(astre.couleur).multiplyScalar(astre.intensite / Math.PI);
+    feu.uniforms.uPartDuCiel.value = partDuCiel;
+  }
+
   const coin = new THREE.Vector3();
-  function fondDeLaPiece() {
+  function fondDe(boite) {
     let fond = 0;
     for (let i = 0; i < 8; i++) {
-      coin.set(i & 1 ? pieceEnfumee.max.x : pieceEnfumee.min.x, i & 2 ? pieceEnfumee.max.y : pieceEnfumee.min.y,
-               i & 4 ? pieceEnfumee.max.z : pieceEnfumee.min.z);
+      coin.set(i & 1 ? boite.max.x : boite.min.x, i & 2 ? boite.max.y : boite.min.y, i & 4 ? boite.max.z : boite.min.z);
       fond = Math.max(fond, coin.distanceTo(camera.position));
     }
     return fond;
   }
 
-  const pieceEnfumeeVue = () => pieceEnfumee !== null && pieceEnfumee.distanceToPoint(camera.position) < RECUL_FUMEE && champ.setFromProjectionMatrix(
-    vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(pieceEnfumee);
+  const dansLeChamp = (boite) => champ.setFromProjectionMatrix(
+    vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(boite);
+  const pieceEnfumeeVue = () => pieceEnfumee !== null && pieceEnfumee.distanceToPoint(camera.position) < RECUL_FUMEE && dansLeChamp(pieceEnfumee);
+  const feuDeLAutelVu = () => empriseDuFeuDeLAutel !== null && empriseDuFeuDeLAutel.distanceToPoint(camera.position) < RECUL_FEU
+    && dansLeChamp(empriseDuFeuDeLAutel);
 
   function rendreGeometrie() {
     const caches = horsGeo.filter((o) => o.visible);
@@ -770,8 +806,8 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
       renderer.setClearColor(0x000000, 0);
       renderer.setRenderTarget(cibleGeo);
       renderer.clear();
-      // La fumée y lit ce qui coupe ses rayons : sans le fond de sa pièce, elle se voyait à travers les murs.
-      camera.far = voile.enabled ? Math.max(FOND_GEOMETRIE, fondDeLaPiece()) : FOND_GEOMETRIE;
+      // Fumée et feu y lisent ce qui coupe leurs rayons : sans le fond de leur volume, ils se voyaient à travers les murs.
+      camera.far = Math.max(FOND_GEOMETRIE, voile.enabled ? fondDe(pieceEnfumee) : 0, voileDuFeu?.enabled ? fondDe(empriseDuFeuDeLAutel) : 0);
       camera.updateProjectionMatrix();
       renderer.render(scene, camera);
     } finally {
@@ -785,9 +821,10 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function rendre() {
     voile.enabled = pieceEnfumeeVue();
+    if (feu) voileDuFeu.enabled = feuDeLAutelVu();
     const eclaire = rayons && airEclaire.enabled;
     // Les matrices de la scène se refont à la passe de géométrie, que la suite fige : sans elle, on les refait ici.
-    if (passeAO || voile.enabled || eclaire) rendreGeometrie();
+    if (passeAO || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
     else scene.updateMatrixWorld();
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
@@ -795,6 +832,11 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
     if (passeAO) passeAO.render(renderer, cibleAO, null, 0, false);
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
+    if (voileDuFeu?.enabled) {
+      feu.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
+      feu.uniforms.uMonde.value.copy(camera.matrixWorld);
+      feu.render(renderer, cibleFeu, null, 0, false);
+    }
     if (eclaire) rendreLesRayons();
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
@@ -828,7 +870,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function passesEnTampon() {
     const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
-    return [passeAO, passeComposition, fumee, voile, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
+    return [passeAO, passeComposition, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.
@@ -852,5 +894,5 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     }
   }
 
-  return { rendre, redimensionner, enfumer, eclairerLAir, compiler, get luminance() { return photometre.luminance; } };
+  return { rendre, redimensionner, enfumer, embraser, eclairerLeFeu, eclairerLAir, compiler, get luminance() { return photometre.luminance; } };
 }

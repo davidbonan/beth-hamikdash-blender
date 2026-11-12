@@ -240,7 +240,9 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
   }
 
   function eclairerLAirAu(voulu) {
-    rendu.eclairerLAir(astreDu(voulu), lumieresDu(voulu).astre.couleur, rayonsDu(voulu));
+    const lumieres = lumieresDu(voulu);
+    rendu.eclairerLAir(astreDu(voulu), lumieres.astre.couleur, rayonsDu(voulu));
+    rendu.eclairerLeFeu(astreDu(voulu), lumieres.astre, lumieres.cuite);
   }
 
   function eclairerAu(voulu) {
@@ -333,6 +335,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
   }
 
   eclairerLAirAu(moment);
+  rendu.embraser((reperes.foyers ?? []).map(({ min, max }) => new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max))));
   allumerMenora(reperes.flammes);
   allumerLesSalles(reperes.lueurs);
   eclairerKodeshHakodashim(reperes.arche, reperes.braises);

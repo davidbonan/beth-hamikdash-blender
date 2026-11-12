@@ -7,6 +7,7 @@ from mathutils import Matrix, Vector
 
 import beit_hamikdash_gestes as G
 from beit_hamikdash_visite import AMA
+from blockout.primitives.parametres import Z_AZ, Z_MAARAKHA
 
 from .maillage import TOUR, Maillage
 from .habillage import lier, materiau_de
@@ -236,7 +237,7 @@ def charger(h, a, horloge, t):
                   {"l": -axe, "r": axe}, poles={"l": None, "r": None})
 
 
-PENTE_KEVESH = 9.0 / 30.0
+PENTE_KEVESH = (Z_MAARAKHA - Z_AZ) / 30.0
 
 
 def repere_ever(h):

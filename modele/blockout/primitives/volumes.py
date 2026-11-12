@@ -396,34 +396,10 @@ def tore(name, x, y, z, R, r, col, mat=None, rotation=(0, 0, 0), majeur=48, mine
     o.rotation_euler = rotation
     return o
 
-def wedge_ramp(name, x0, x1, y_bas, y_haut, z0, z1, col, mat=None):
-    """Rampe montant de y_bas (z0) vers y_haut (z1), largeur x0..x1."""
-    verts = [(x0, y_bas, z0), (x1, y_bas, z0), (x1, y_haut, z0), (x0, y_haut, z0),
-             (x1, y_haut, z1), (x0, y_haut, z1)]
-    faces = [[0, 1, 2, 3][::-1], [0, 1, 4, 5], [1, 2, 4], [3, 0, 5], [2, 3, 5, 4]]
-    return mesh_from_pydata(name, verts, faces, col, mat)
-
-def wedge_ramp_oblique(name, x_bas, x_haut, largeur, y_bas, y_haut, z0, z1, col, mat=None):
-    """Rampe comme `wedge_ramp`, dont le bord gauche glisse de x_bas (en y_bas) à x_haut (en y_haut)."""
-    verts = [(x_bas, y_bas, z0), (x_bas + largeur, y_bas, z0), (x_haut + largeur, y_haut, z0), (x_haut, y_haut, z0),
-             (x_haut + largeur, y_haut, z1), (x_haut, y_haut, z1)]
-    faces = [[0, 1, 2, 3][::-1], [0, 1, 4, 5], [1, 2, 4], [3, 0, 5], [2, 3, 5, 4]]
-    return mesh_from_pydata(name, verts, faces, col, mat)
-
-def massif_en_pente(name, x0, x1, y0, y1, z_bas, z_haut_y0, z_haut_y1, col, mat=None):
-    """Massif à fond plat dont le dessus monte de z_haut_y0 (en y0) à z_haut_y1 (en y1)."""
-    verts = [(x0, y0, z_bas), (x1, y0, z_bas), (x1, y1, z_bas), (x0, y1, z_bas),
-             (x0, y0, z_haut_y0), (x1, y0, z_haut_y0), (x1, y1, z_haut_y1), (x0, y1, z_haut_y1)]
-    faces = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4],
-             [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]
-    return mesh_from_pydata(name, verts, faces, col, mat)
-
 def rampe(name, x0, x1, y0, y1, z0, z1, montee, col, mat=None, epaisseur=1.0):
     """Dalle inclinée d'épaisseur constante. `montee` : '+x', '-x', '+y' ou '-y'.
 
-    `wedge_ramp` fait un coin plein qui monte selon y — bon pour le kevesh, qui est un
-    remblai. La messiba est un plancher qui tourne : il lui faut une dalle, et les quatre
-    sens.
+    La messiba est un plancher qui tourne : il lui faut une dalle, et les quatre sens.
     """
     axe, sens = montee[1], 1 if montee[0] == "+" else -1
     a0, a1 = (x0, x1) if axe == "x" else (y0, y1)
