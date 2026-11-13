@@ -45,6 +45,6 @@ Tester un format nouveau par lot ; garder ce qui retient l'attention (journal, `
 
 ## Son
 
-- **Musique** : sacrée et retenue — oud, ney, cordes chaudes, tambour sur cadre, vocalise sans paroles ; une montée nette quand l'histoire commence, pas de « drop » électronique. `example-music.txt`. Sections aux durées de la trame, puis alignement par `sound.py energy`, jamais par le fichier de piste (le modèle dérive de 1–2 s).
+- **Musique** : un chant hébreu, voix de garçon et piano (`SKILL.md`, étape 5) ; un instrumental seulement sur demande. La voix entre quand l'histoire commence. Alignement par `sound.py energy`, jamais par le fichier de piste (le modèle dérive de 1–2 s).
 - **Voix** (facultative) : première personne, calme, en anglais. "I rebuilt the Temple to the measurements of the Mishnah." Une phrase par fichier, ≤ 12 mots. Choisir la voix par format dans la bibliothèque ElevenLabs (`--voice <id>`) ; par défaut un narrateur britannique.
 - **Bruitages** : pas sur la pierre, crépitement du feu de l'autel, vent sur l'esplanade, rumeur lointaine d'une foule. Mesurer chacun (`ffmpeg -i <f> -af ebur128 -f null -`) : sous -35 LUFS il est inaudible, le remonter par `loudnorm=I=-20` ou le regénérer.
