@@ -113,6 +113,7 @@ VUES = [
     dict(id="vue_oulam", position=(-45.8, 25.0, Z_AZ), cap=205, tangage=20),
     dict(id="vue_douze_marches_oulam", position=(-45.8, 18.75, Z_AZ), cap=219, tangage=2),
     dict(id="vue_beit_hahalifot", position=(-84.0, 37.0, Z_BAT), cap=90, tangage=12),
+    dict(id="vue_niche_bilga", position=(-84.0, -37.0, Z_BAT), cap=270, tangage=4),
     dict(id="vue_quinze_marches", cadre=["quinze_marches", "shaar_nikanor"], cap=180,
          sol=Z_EZN, recul_max=40.0),
     # Les lishkot de l'Ezrat Nashim sont à ciel ouvert : depuis leur seuil, on voit ce qu'elles gardent.
