@@ -246,11 +246,14 @@ for _nom, _s in (("Leviim_N", 1), ("Leviim_S", -1)):
         instrument_range(f"Lishkat_{_nom}_fond_kinor_{i}", "kinor", X_EZI + MUR_LISHKA_EZI + 0.2, _s * y, -7.4,
                          "y", "10_EzratNashim")
 # Lishkat HaKelim : « כָּל מִי שֶׁהוּא מִתְנַדֵּב כְּלִי, זוֹרְקוֹ לְתוֹכָהּ. וְאַחַת לִשְׁלשִׁים יוֹם, גִּזְבָּרִין
-# פּוֹתְחִין אוֹתָהּ » (Shekalim 5:6). Fermée : deux vantaux de bronze sous une traverse, et
-# au-dessus une baie où l'on jette le don ; dedans, ce qui y est tombé. Tout : CHOIX.
+# פּוֹתְחִין אוֹתָהּ » (Shekalim 5:6). Fermée : deux vantaux de bronze, et au-dessus, dans le même
+# plan, une imposte percée d'une baie où l'on jette le don ; dedans, ce qui y est tombé. Tout : CHOIX.
 _porte = next(p for n, _, _, p in LISHKOT_EZI if n == "HaKelim")
-box("Lishkat_HaKelim_traverse", AX1, AX1 + T, _porte - 1.5, _porte + 1.5, Z_EZN + 4.5, Z_EZN + 5,
-    "10_EzratNashim")
+_plan = (AX1 + T / 2 - 0.15, AX1 + T / 2 + 0.15)
+for _part, (_ya, _yb, _za, _zb) in (("bas", (-1.5, 1.5, 4.5, 5.0)), ("haut", (-1.5, 1.5, 5.6, H_PORTE_EZI)),
+                                    ("S", (-1.5, -1.0, 5.0, 5.6)), ("N", (1.0, 1.5, 5.0, 5.6))):
+    box(f"Lishkat_HaKelim_imposte_{_part}", *_plan, _porte + _ya, _porte + _yb, Z_EZN + _za, Z_EZN + _zb,
+        "10_EzratNashim", MAT_BRONZE())
 for _cote, (_ya, _yb) in (("S", (_porte - 1.5, _porte - 0.01)), ("N", (_porte + 0.01, _porte + 1.5))):
     box(f"Lishkat_HaKelim_vantail_{_cote}", AX1 + T / 2 - 0.15, AX1 + T / 2 + 0.15, _ya, _yb,
         Z_EZN, Z_EZN + 4.5, "10_EzratNashim", MAT_BRONZE())
@@ -317,8 +320,10 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
     coupures = sorted([(p - 5, p + 5) for p in ouvertures] + TRAVERSEES[nm])
     bornes = [AX0] + [u for coupure in coupures for u in coupure] + [AX1]
     for k in range(0, len(bornes) - 1, 2):
+        # Au-dessus de l'Ezrat Israël, le mur descend jusqu'au podium : posé à Z_AZ, il laissait un vide dessous.
+        pied = Z_EZI - 1 if bornes[k] >= X_DOUKHAN else Z_AZ
         box(f"Azara_mur_{nm}_{k // 2}", bornes[k], bornes[k + 1], y0, y1,
-            Z_AZ, Z_AZ + H_MUR, "20_Azara")
+            pied, Z_AZ + H_MUR, "20_Azara")
     # Le cadre se pose du côté de la COUR : dehors, ces murs soutiennent dix amot de
     # remblai et leur pied est sur la terrasse du 'Heil — c'est aussi de ce côté-là que
     # le mur porte son socle et son couronnement.
@@ -328,8 +333,9 @@ for (y0, y1, nm) in [(AY1, AY1 + T, "nord"), (AY0 - T, AY0, "sud")]:
             Z_AZ + 20, Z_AZ + H_MUR, "20_Azara")
         # Six שערים aux battants d'or, Nikanor seule en bronze (Middot 2:3 ; Yoma 3:10) ;
         # ouverts dès l'aube (Tamid 3:7).
+        # Sha'ar HaMayim déborde sur l'Ezrat Israël, deux amot et demie plus bas : ses jambages descendent à son sol.
         shaar(f"Azara_porte_{nm}_{p:+.0f}", ("x", *face), p, Z_AZ, SOUS_CORNICHE, T,
-              "20_Azara", metal=MAT_OR(), ressauts=2)
+              "20_Azara", metal=MAT_OR(), ressauts=2, pied=Z_EZI if p + 5 > X_DOUKHAN else None)
         dehors, dedans = (y1, y0) if nm == "nord" else (y0, y1)
         battants(f"Azara_porte_{nm}_{p:+.0f}_battants", "x", p, dehors, dedans, Z_AZ, 20, "20_Azara", MAT_OR())
 SAILLIE = 12          # ce que les corps débordent du mur ; = la profondeur du Beit Avtinas

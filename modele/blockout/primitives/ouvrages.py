@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 from .matieres import MAT_CEDRE, MAT_MARBRE_HERODE, braise
 from .parametres import m
-from .volumes import arc, box, braises, cyl, mesh_from_pydata, piece_tournee, plage, prism, prism_x, tore
+from .volumes import _lisser, box, braises, cyl, mesh_from_pydata, piece_tournee, plage, prism, tore
 from .gravures import largeur_gravure, timora
 
 
@@ -319,31 +319,52 @@ def maake(name, x0, x1, y0, y1, z, col, mat=None):
 
 
 
-def kippa(name, x0, x1, y0, y1, z, fleche, col, mat=None, epaisseur=LISHKA_PAREMENT, cle=1.5, segments=16):
-    """Berceau surbaissé d'axe est-ouest posé à `z` sur les murs d'une lishka dont la
-    corniche laisse l'intérieur ouvert, et ses deux tympans. « כִּפָּה » (Middot 1:8) :
-    « כִּפָּה ארקוול"ט בְּלַעַ"ז עֲשׂוּיָה בָּאָרֶץ » (Bartenura), « שגגה דומה למקצת עגולה » (Rambam
-    sur Tamid 1:1) — une voûte qui est son propre toit, une portion de cercle et non une
-    coupole. `fleche` : celle de l'intrados ; l'extrados en a `cle` de plus, l'épaisseur
-    à la clé, et naît au nu extérieur des murs, à `epaisseur` de l'intrados."""
-    milieu, demi = (y0 + y1) / 2, (y1 - y0) / 2
-    intrados = arc(milieu, demi - epaisseur, z, fleche, segments)
-    extrados = arc(milieu, demi, z, fleche + cle, segments)
-    n = segments + 1
-    verts = ([(x0, y, h) for y, h in intrados] + [(x1, y, h) for y, h in intrados]
-             + [(x0, y, h) for y, h in extrados] + [(x1, y, h) for y, h in extrados])
-    i_a, i_b, e_a, e_b = (lambda k: k), (lambda k: n + k), (lambda k: 2 * n + k), (lambda k: 3 * n + k)
-    faces = []
-    for k in range(segments):
-        faces += [[e_a(k), e_b(k), e_b(k + 1), e_a(k + 1)],
-                  [i_a(k), i_a(k + 1), i_b(k + 1), i_b(k)],
-                  [i_a(k), e_a(k), e_a(k + 1), i_a(k + 1)],
-                  [i_b(k), i_b(k + 1), e_b(k + 1), e_b(k)]]
-    faces += [[i_a(0), i_b(0), e_b(0), e_a(0)], [i_a(segments), e_a(segments), e_b(segments), i_b(segments)]]
-    mesh_from_pydata(f"{name}_berceau", verts, faces, col, mat)
-    tympan = [intrados[0], intrados[-1]] + intrados[-2:0:-1]
-    prism_x(f"{name}_tympan_O", tympan, x0, x0 + epaisseur, col, mat)
-    prism_x(f"{name}_tympan_E", tympan, x1 - epaisseur, x1, col, mat)
+def kippa(name, x0, x1, y0, y1, z0, z1, rayon, col, mat=None, epaisseur=1.5, segments=48):
+    """Toit plat de z0 à z1 sur l'ouverture (x0..x1, y0..y1) que laisse la corniche d'une lishka,
+    percé en son milieu d'un oculus de `rayon` que coiffe une demi-sphère d'`epaisseur`.
+    « כִּפָּה » (Middot 1:8), « שגגה דומה למקצת עגולה » (Rambam sur Tamid 1:1)."""
+    cx, cy, hx, hy = (x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0) / 2, (y1 - y0) / 2
+    exterieur = rayon + epaisseur
+    index, verts, faces = {}, [], []
+
+    def sommet(p):
+        cle = tuple(round(c, 6) for c in p)
+        if cle not in index:
+            index[cle] = len(verts)
+            verts.append(p)
+        return index[cle]
+
+    def face(*ids):
+        ids = [i for k, i in enumerate(ids) if i != ids[k - 1]]
+        if len(set(ids)) >= 3:
+            faces.append(ids)
+
+    coins = [math.atan2(sy * hy, sx * hx) % math.tau for sx, sy in ((1, 1), (-1, 1), (-1, -1), (1, -1))]
+    angles = sorted(set(round(a, 9) for a in [math.tau * k / segments for k in range(segments)] + coins))
+
+    def bord(a, z):
+        c, s_ = math.cos(a), math.sin(a)
+        t = min(hx / abs(c) if abs(c) > 1e-9 else math.inf, hy / abs(s_) if abs(s_) > 1e-9 else math.inf)
+        return sommet((cx + t * c, cy + t * s_, z))
+
+    def cercle(a, r, z):
+        return sommet((cx + r * math.cos(a), cy + r * math.sin(a), z))
+
+    latitudes = max(2, segments // 4)
+    meridien = lambda r, i: (r * math.cos(math.pi / 2 * i / latitudes), r * math.sin(math.pi / 2 * i / latitudes))
+    n = len(angles)
+    for k in range(n):
+        a, b = angles[k], angles[(k + 1) % n]
+        face(bord(a, z1), bord(b, z1), cercle(b, exterieur, z1), cercle(a, exterieur, z1))
+        face(bord(b, z0), bord(a, z0), cercle(a, rayon, z0), cercle(b, rayon, z0))
+        face(bord(a, z0), bord(b, z0), bord(b, z1), bord(a, z1))
+        face(cercle(b, rayon, z0), cercle(a, rayon, z0), cercle(a, rayon, z1), cercle(b, rayon, z1))
+        for i in range(latitudes):
+            (ro0, zo0), (ro1, zo1) = meridien(exterieur, i), meridien(exterieur, i + 1)
+            (ri0, zi0), (ri1, zi1) = meridien(rayon, i), meridien(rayon, i + 1)
+            face(cercle(a, ro0, z1 + zo0), cercle(b, ro0, z1 + zo0), cercle(b, ro1, z1 + zo1), cercle(a, ro1, z1 + zo1))
+            face(cercle(b, ri0, z1 + zi0), cercle(a, ri0, z1 + zi0), cercle(a, ri1, z1 + zi1), cercle(b, ri1, z1 + zi1))
+    return _lisser(mesh_from_pydata(name, verts, faces, col, mat), segments)
 
 
 def medura(name, x0, x1, y0, y1, z, col, mat=None):

@@ -732,6 +732,49 @@
     ],
     "note": "The two rings follow the verse and Rashi, who places them at the corners, as the Haamek Davar reads him: one at the north-east corner, the other at the south-west, one pole through each. Set aside: Abarbanel and the Malbim read four rings in Rashi, two on each side, at its corners; Shadal also counts four, two per side; the Bekhor Shor and Rav Hirsch put one in the middle of each side. Also set aside: Kelim 17:10 measures this altar with a smaller ama of five tefachim — R. Meir and R. Yehuda agree on this (Menachot 97b) — about 0.40 × 0.40 m at the base; the texts do not say whether its two amot of height use the same ama. The tour keeps the ordinary ama of six tefachim: 0.48 × 0.48 × 0.96 m. The tour's choices, where the texts are silent: the two amot include the horns, as the ten of the outer altar do; the horns are square and taper to a rounded head; the zer rises above the top like the Ark's (Rashi on Exodus 25:11) and carries lily finials, the flower of the Menora; the poles are not shown, since nothing moves the altar out of the Bayit. The teni is a ribbed golden basket with two handles; the scene shows it in the morning, like the kuz on the Menora's step."
   },
+  "tavla_hasota": {
+    "nom": "Slab of the sota",
+    "translit": "Tavla shel shayish",
+    "resume": "A marble slab one amah by one amah, in the floor of the Heikhal, on the right as one enters, with a ring to lift it. It serves the rite of the sota, the woman whose husband suspects her of adultery: the Torah has the Kohen put into the water she will drink some dust “from the floor of the Mishkan”. The floor of the Heikhal is covered; this slab keeps a square of earth in it. The Kohen draws half a log of water from the Kiyor in a new earthenware cup, enters the Heikhal, turns to his right, lifts the slab by its ring, takes earth from beneath it and puts in enough for it to be seen on the surface of the water. The parasha of the sota itself is written on Queen Helena's golden tablet, in the Ulam.",
+    "cotes": [
+      "marble slab of 1 × 1 amah",
+      "fixed iron ring",
+      "on the right as one enters, north of the door"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Sota",
+        "ref": "2:2",
+        "citation": "הָיָה מֵבִיא פְיָלִי שֶׁל חֶרֶס חֲדָשָׁה, וְנוֹתֵן לְתוֹכָהּ חֲצִי לֹג מַיִם מִן הַכִּיּוֹר"
+      },
+      {
+        "oeuvre": "Sota",
+        "ref": "2:2",
+        "citation": "נִכְנַס לַהֵיכָל וּפָנָה לִימִינוֹ, וּמָקוֹם הָיָה שָׁם אַמָּה עַל אַמָּה, וְטַבְלָא שֶׁל שַׁיִשׁ, וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ"
+      },
+      {
+        "oeuvre": "Sota",
+        "ref": "2:2",
+        "citation": "וּכְשֶׁהוּא מַגְבִּיהָהּ, נוֹטֵל עָפָר מִתַּחְתֶּיהָ וְנוֹתֵן כְּדֵי שֶׁיֵּרָאֶה עַל הַמַּיִם"
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "5:17",
+        "citation": "וּמִן הֶעָפָר אֲשֶׁר יִהְיֶה בְּקַרְקַע הַמִּשְׁכָּן יִקַּח הַכֹּהֵן וְנָתַן אֶל הַמָּיִם"
+      },
+      {
+        "oeuvre": "Rambam Sota",
+        "ref": "3:10",
+        "citation": "וּמָקוֹם הָיָה שָׁם אַמָּה עַל אַמָּה לִימִין הַנִּכְנָס וּבוֹ טַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת קְבוּעָה בָּהּ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Sota 2:2",
+        "citation": "לְאוֹחֲזָהּ בְּטַבַּעְתָּהּ וּלְהַגְבִּיהָהּ מִשְּׁאָר הָרִצְפָּה שֶׁהִיא כֻּלָּהּ בְּאַבְנֵי שַׁיִשׁ"
+      }
+    ],
+    "note": "Adopted: on the right as one enters, hence on the north, since the Heikhal opens to the east. Set aside: Bartenura, for whom the whole floor of the Heikhal is of marble slabs, this one differing only by its ring; the tour keeps the gold-plated floor of the First Temple (I Kings 6:30), against which the marble stands out. Tour's choice: the exact place of the slab, two amot from the east wall, and the iron of the ring, as on the slab of the keys in the Beit HaMoked (Middot 1:9). Not modelled: the earth beneath the slab."
+  },
   "parokhet": {
     "nom": "The Two Parokhot",
     "translit": "Parokhet",

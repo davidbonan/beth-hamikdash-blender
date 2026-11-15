@@ -176,6 +176,14 @@
       "lieu": true
     },
     {
+      "id": "ritzpa_meshuna",
+      "nom": "La dalle de l'Arche cachée",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Lishkat_Etzim_NE_ritzpa_meshuna"
+      ]
+    },
+    {
       "id": "lishkat_hametzoraim",
       "nom": "Lishkat HaMetzoraïm",
       "zone": "ezrat_nashim",
@@ -623,6 +631,14 @@
       "zone": "heikhal",
       "prefixes": [
         "Mizbeach_Zahav"
+      ]
+    },
+    {
+      "id": "tavla_hasota",
+      "nom": "Tavla de la sota",
+      "zone": "heikhal",
+      "prefixes": [
+        "Heikhal_tavla_sota"
       ]
     },
     {

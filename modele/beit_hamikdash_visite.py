@@ -106,6 +106,7 @@ VUES = [
     dict(id="vue_arche_wilson", position=(-382.1, -281.2, Z_PLACE_KOTEL), cap=83, tangage=8),
     dict(id="vue_heikhal", cadre=["menora", "shulchan", "mizbeach_hazahav"], cap=180, sol=Z_BAT,
          recul_max=24.0),
+    dict(id="vue_tavla_hasota", position=(-105.0, 3.0, Z_BAT), cap=42, tangage=-24),
     dict(id="vue_kiyor", cadre=["kiyor"], cap=135, sol=Z_AZ, recul_max=8.0),
     dict(id="vue_kodesh_hakodashim", cadre=["aron", "kaporet", "even_hashetiya"], cap=90, sol=Z_BAT,
          recul_max=9.0),
@@ -118,6 +119,7 @@ VUES = [
          sol=Z_EZN, recul_max=40.0),
     # Les lishkot de l'Ezrat Nashim sont à ciel ouvert : depuis leur seuil, on voit ce qu'elles gardent.
     dict(id="vue_lishkat_haetzim", position=(120.0, 31.8, Z_EZN), cap=90, tangage=-6),
+    dict(id="vue_ritzpa_meshuna", position=(121.0, 34.0, Z_EZN), cap=85, tangage=-16),
     dict(id="vue_lishkat_hanezirim", position=(120.0, -31.8, Z_EZN), cap=270, tangage=-6),
     dict(id="vue_lishkat_hametzoraim", position=(25.0, 31.8, Z_EZN), cap=90, tangage=-6),
     dict(id="vue_lishkat_beit_shemanya", position=(25.0, -31.8, Z_EZN), cap=270, tangage=-6),
@@ -137,7 +139,7 @@ VUES = [
     dict(id="vue_lishkat_osei_chavitin", position=(-20.8, -12.5, Z_AZ), cap=0, tangage=12),
     dict(id="vue_beit_hamoked", position=(-17.1, 60.0, Z_AZ), cap=90),
     # Ses éléments se regardent depuis la nef : une chambre par sa porte, la limite par le passage entre deux chambres.
-    dict(id="vue_kippa_beit_hamoked", position=(-22.5, 70.75, Z_AZ), cap=0, tangage=30),
+    dict(id="vue_kippa_beit_hamoked", position=(-22.5, 70.75, Z_AZ), cap=0, tangage=60),
     dict(id="vue_shaarei_beit_hamoked", position=(-17.0, 68.0, Z_AZ), cap=270, tangage=5),
     dict(id="vue_medurat_beit_hamoked", position=(-17.0, 70.5, Z_AZ), cap=90, tangage=-12),
     dict(id="vue_lishkat_hatlaim", position=(-20.0, 64.5, Z_AZ), cap=180, tangage=-8),

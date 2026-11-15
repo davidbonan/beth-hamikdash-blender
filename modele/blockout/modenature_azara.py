@@ -25,16 +25,17 @@ moulure("Azara_couronnement_sud", AX0 - T, AX1, AY0 - T, AY0, Z_AZ + H_MUR, CORN
 # Le socle ne se pose que du côté de la cour : dehors, ces murs soutiennent dix amot de
 # remblai et leur pied est sur la terrasse du 'Heil, pas sur le dallage de l'Azara. Il
 # saute les baies — une porte n'a pas de pied de mur en travers — et les corps bâtis.
+# Ses angles sont rentrants : il court d'un nu intérieur à l'autre, sinon il ressort dehors en moignon.
 LISHKOT_NIKANOR_EMPRISES = [(y0 - LISHKA_DEBORD, y1 + LISHKA_DEBORD) for y0, y1 in LISHKOT_NIKANOR.values()]
-moulure("Azara_socle_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, SOCLE, "20_Azara",
-        mitres=("deborde", "deborde"), cotes=(True, False), reserve=[(-5, 5)] + LISHKOT_NIKANOR_EMPRISES)
+moulure("Azara_socle_est", AX1, AX1 + T, AY0, AY1, Z_AZ, SOCLE, "20_Azara",
+        mitres=("libre", "libre"), cotes=(True, False), reserve=[(-5, 5)] + LISHKOT_NIKANOR_EMPRISES)
 moulure("Azara_socle_ouest", AX0 - T, AX0, AY0, AY1, Z_AZ, SOCLE, "20_Azara",
         mitres=("bute", "bute"), cotes=(False, True))
 LISHKOT_COUR_SUD = [(x0 - LISHKA_DEBORD, x1 + LISHKA_DEBORD) for x0, x1 in (MELACH_X, PARVA_X, MEDICHIN_X)]
 for _nm, _y0, _y1, _cotes, _corps in (("nord", AY1, AY1 + T, (True, False), CORPS_NORD),
                                       ("sud", AY0 - T, AY0, (False, True), CORPS_SUD + LISHKOT_COUR_SUD)):
-    moulure(f"Azara_socle_{_nm}", AX0 - T, AX1, _y0, _y1, Z_AZ, SOCLE, "20_Azara",
-            mitres=("deborde", "bute"), cotes=_cotes,
+    moulure(f"Azara_socle_{_nm}", AX0, AX1, _y0, _y1, Z_AZ, SOCLE, "20_Azara",
+            mitres=("libre", "bute"), cotes=_cotes,
             reserve=_corps + [(p - 5, p + 5) for p in OUVERTURES[_nm]])
 # Face est, celle que l'Ezrat Nashim regarde : ce mur-là descend jusqu'à la terrasse du
 # 'Heil, et c'est là que son pied se pose. Trente-cinq amot de parement d'un seul tenant
@@ -43,8 +44,9 @@ for _nm, _y0, _y1, _cotes, _corps in (("nord", AY1, AY1 + T, (True, False), CORP
 moulure("Azara_socle_est_bas", AX1, AX1 + T, AY0 - T, AY1 + T, Z_EZN, SOCLE, "20_Azara",
         mitres=("deborde", "deborde"), cotes=(False, True),
         reserve=[(-5, 5)] + EMPRISES_EILIM + [(p - 2 - CADRE_LISHKA_EZI, p + 2 + CADRE_LISHKA_EZI) for _, _, _, p in LISHKOT_EZI])
+# Le bandeau s'arrête aux angles : les faces nord et sud, côté 'Heil, n'en portent pas, et son retour y finissait en moignon.
 moulure("Azara_bandeau_est", AX1, AX1 + T, AY0 - T, AY1 + T, Z_AZ, BANDEAU, "20_Azara",
-        saillie=SAILLIE_BANDEAU, mitres=("deborde", "deborde"), cotes=(False, True),
+        saillie=SAILLIE_BANDEAU, mitres=("libre", "libre"), cotes=(False, True),
         reserve=[(-5, 5)] + EMPRISES_EILIM)
 # Pilastres côté cour, dans le parti de l'Ezrat Nashim : CHOIX (Rambam, Beit HaBe'hira 1:11).
 # Ils sautent les portes avec leur cadre et les corps bâtis ; l'Ezrat Israël, deux amot et

@@ -11,6 +11,7 @@ const TRAITES = {
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
   sanhedrin: "Sanhedrin", negaim: "Negaim", ketoubot: "Ketubot", ketubot: "Ketubot", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
   pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim", shabbat: "Shabbat",
+  sota: "Sotah",
 };
 const OUVRAGES = {
   "rambam beit habehira": "Mishneh Torah, The Chosen Temple",
@@ -50,6 +51,7 @@ const OUVRAGES = {
   "sifrei devarim": "Sifrei Devarim",
   "hagahot yaavetz sur sanhedrin": "Haggahot Ya'avetz on Sanhedrin",
   "rambam mikvaot": "Mishneh Torah, Immersion Pools",
+  "rambam sota": "Mishneh Torah, Woman Suspected of Infidelity",
   "rambam avodat yom hakippurim": "Mishneh Torah, Service on the Day of Atonement",
   "yerushalmi yoma": "Jerusalem Talmud Yoma",
   "tosefta sanhedrin": "Tosefta Sanhedrin",

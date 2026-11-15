@@ -35,19 +35,21 @@ from .azara import (AX1, AXE_MUR_N, AY0, AY1, GAZIT_X0, GAZIT_X1, GOLA_X0, GOLA_
 # הָעֲזָרָה וְהַחֵיל » (Beit HaBe'hira 5:9), et R. Shemaya, pour qui la salle est toute en 'hol et
 # seules ses chambres à cheval. D'où deux שערים opposés (Middot 1:7), « דגבי הדדי הוו קיימי »
 # (Tamid 26b), et le mur de l'Azara s'interrompt sur sa largeur.
-# Pas d'étage, et pas de toit plat : la kippa de Middot 1:8 le couvre, un berceau surbaissé (kippa,
-# ouvrages) qui est son propre toit ; sans terrasse où monter, pas de מעקה. Naissance et flèche :
-# CHOIX, la naissance au-dessus des vingt amot du שער.
+# Pas d'étage : un toit plat au niveau de la corniche, et au milieu la kippa de Middot 1:8, une
+# demi-sphère ouverte sur la salle (kippa, ouvrages) ; sans terrasse où monter, pas de מעקה.
+# Hauteur du toit, au-dessus des vingt amot du שער, et diamètre de la kippa : CHOIX.
 # La salle est au niveau de l'Azara, où ouvre le שער que Middot 2:3 change en or ; celui du
 # 'Heil est en haut de vingt degrés, comme Sha'ar HaKorban. CHOIX : pris dedans, ces degrés
 # couperaient la salle.
-KIPPA_NAISSANCE, KIPPA_FLECHE = Z_AZ + 28, 6
+KIPPA_NAISSANCE, KIPPA_RAYON = Z_AZ + 28, 10.5
 MK_X0, MK_X1 = MOKED_X0 + LISHKA_PAREMENT, MOKED_X1 - LISHKA_PAREMENT
 MK_Y0, MK_Y1 = NORD_Y0 + LISHKA_PAREMENT, NORD_Y1 - LISHKA_PAREMENT
+KIPPA_CLE = KIPPA_NAISSANCE + KIPPA_RAYON
 lishka("Beit_HaMoked", MOKED_X0, MOKED_X1, NORD_Y0, NORD_Y1, Z_EZN, KIPPA_NAISSANCE, "80_Lishkot",
        [Porte("N", *PORTE_SHAAR, Z_AZ), Porte("S", *PORTE_SHAAR, Z_AZ, metal=MAT_OR())],
        tremies=[(MK_X0, MK_X1, MK_Y0, MK_Y1)])
-kippa("Beit_HaMoked_kippa", MOKED_X0, MOKED_X1, NORD_Y0, NORD_Y1, KIPPA_NAISSANCE, KIPPA_FLECHE, "80_Lishkot")
+kippa("Beit_HaMoked_kippa", MK_X0, MK_X1, MK_Y0, MK_Y1, KIPPA_NAISSANCE - LISHKA_CORNICHE, KIPPA_NAISSANCE,
+      KIPPA_RAYON, "80_Lishkot")
 # « נָטַל אֶת הַמַּפְתֵּחַ וּפָתַח אֶת הַפִּשְׁפָּשׁ, וְנִכְנַס מִבֵּית הַמּוֹקֵד לָעֲזָרָה » (Tamid 1:3, michna
 # anonyme ; R. Yehouda en Middot 1:7 ; Rambam, Beit HaBe'hira 8:11, « הַשַּׁעַר הַקָּטָן שֶׁבֵּין בֵּית
 # הַמּוֹקֵד וּבֵין הָעֲזָרָה ») : « פֶּתַח קָטָן שֶׁבְּתוֹךְ גּוּפוֹ שֶׁל פֶּתַח גָּדוֹל » (Bartenura sur Tamid 1:3).
@@ -264,11 +266,11 @@ rashei_pispasin("Beit_HaMoked_rashei_pispasin", MK_X0, MK_X1, AXE_MUR_N, (Z_AZ +
                 "80_Lishkot")
 # La boîte que les lueurs des foyers éclairent dans la visite, faces intérieures des murs et kippa comprises.
 salle = empty("Beit_HaMoked_salle", (MK_X0 + MK_X1) / 2, (MK_Y0 + MK_Y1) / 2,
-              (Z_AZ + KIPPA_NAISSANCE + KIPPA_FLECHE) / 2, "80_Lishkot")
+              (Z_AZ + KIPPA_CLE) / 2, "80_Lishkot")
 salle.empty_display_type = 'CUBE'
 salle.empty_display_size = 1.0
 salle.scale = (m((MK_X1 - MK_X0) / 2 + 0.3), m((MK_Y1 - MK_Y0) / 2 + 0.3),
-               m((KIPPA_NAISSANCE + KIPPA_FLECHE - Z_AZ) / 2 + 0.3))
+               m((KIPPA_CLE - Z_AZ) / 2 + 0.3))
 # --- Les trois lishkot du nord (Middot 5:3-4 ; Rambam, Beit HaBe'hira 5:17) : HaGazit,
 #     HaGola, HaEtz, « וְגַג שְׁלָשְׁתָּן שָׁוֶה » — un seul niveau de toit pour les trois, à 30
 #     au-dessus de l'Azara. Leur disposition est celle que Tosfot Yom Tov (Middot 5:4,

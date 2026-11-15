@@ -1,8 +1,8 @@
 import math
 
 from ..primitives.parametres import Z_BAT
-from ..primitives.matieres import MAT_OR, MAT_OR_PLAQUE
-from ..primitives.volumes import box, cyl_between
+from ..primitives.matieres import MAT_FER, MAT_MARBRE, MAT_OR, MAT_OR_PLAQUE
+from ..primitives.volumes import box, cyl_between, tore
 from ..primitives.gravures import (BANDEAU_KIR, PAS_KIR, RAYON_ROSETTE, SAILLIE_KIR, _bande_saillante,
                                    bandeau_guirlande, emboitement, figure_du_registre, keruv, largeur_gravure,
                                    palmette)
@@ -23,6 +23,11 @@ lambris_or("KhK", KK1, KK0, "60_KodeshHakodashim", [("O", KK1 + EPAISSEUR_PLACAG
 # Heikhal et dans le Devir. Deux centièmes d'ama : les kelim s'y posent sans flotter.
 box("Heikhal_or_sol", HK1, HK0, -10, 10, Z_BAT, Z_BAT + 0.02, "50_Heikhal", MAT_OR_PLAQUE())
 box("KhK_or_sol", KK1, KK0, -10, 10, Z_BAT, Z_BAT + 0.02, "60_KodeshHakodashim", MAT_OR_PLAQUE())
+# « נִכְנַס לַהֵיכָל וּפָנָה לִימִינוֹ, וּמָקוֹם הָיָה שָׁם אַמָּה עַל אַמָּה, וְטַבְלָא שֶׁל שַׁיִשׁ, וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ » (Sotah 2:2) : à droite en entrant, au nord. CHOIX : sa place le long du mur est, le fer de l'anneau.
+TAVLA_SOTA_X, TAVLA_SOTA_Y = HK0 - 2, 7.5
+box("Heikhal_tavla_sota", TAVLA_SOTA_X - 0.5, TAVLA_SOTA_X + 0.5, TAVLA_SOTA_Y - 0.5, TAVLA_SOTA_Y + 0.5,
+    Z_BAT, Z_BAT + 0.07, "50_Heikhal", MAT_MARBRE())
+tore("Heikhal_tavla_sota_tabaat", TAVLA_SOTA_X, TAVLA_SOTA_Y, Z_BAT + 0.11, 0.2, 0.04, "50_Heikhal", MAT_FER())
 
 
 # --- Le champ sculpté d'une paroi du Bayit. Son ÉTENDUE est Ye'hezkel 41:20 —

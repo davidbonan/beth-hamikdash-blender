@@ -282,6 +282,69 @@
       }
     ]
   },
+  "ritzpa_meshuna": {
+    "nom": "The slab of the hidden Ark",
+    "translit": "Ritzpa meshuna",
+    "resume": "A paving slab unlike the others. A Kohen unfit for service was sorting the altar's wood in this chamber; he notices a slab different from its neighbours, goes to tell another Kohen, and dies before finishing his sentence. They then knew for certain that the Ark was hidden there, underneath. Two families already held this from their fathers, that of Rabban Gamliel and that of Rabbi Chananya, the segan of the Kohanim: they prostrated themselves fourteen times in the Temple instead of thirteen, the fourteenth facing this chamber. The Gemara gives another version: two Kohanim were sorting the wood, the axe of one of them fell on that spot, and fire came out and consumed him.",
+    "cotes": [
+      "one paving slab: 4 × 8 amot",
+      "raised by a tenth of an amah",
+      "in the Lishkat HaEtzim, facing the door"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Shekalim",
+        "ref": "6:1",
+        "citation": "וְהֵיכָן הָיְתָה יְתֵרָה, כְּנֶגֶד דִּיר הָעֵצִים, שֶׁכֵּן מָסֹרֶת בְּיָדָם מֵאֲבוֹתֵיהֶם שֶׁשָּׁם הָאָרוֹן נִגְנַז"
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "6:2",
+        "citation": "מַעֲשֶׂה בְּכֹהֵן אֶחָד שֶׁהָיָה מִתְעַסֵּק, וְרָאָה הָרִצְפָּה שֶׁהִיא מְשֻׁנָּה מֵחֲבֵרוֹתֶיהָ. בָּא וְאָמַר לַחֲבֵרוֹ. לֹא הִסְפִּיק לִגְמֹר אֶת הַדָּבָר עַד שֶׁיָּצְתָה נִשְׁמָתוֹ, וְיָדְעוּ בְיִחוּד שֶׁשָּׁם הָאָרוֹן נִגְנַז"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Shekalim 6:1",
+        "citation": "לִשְׁכָּה שֶׁשָּׁם הָיוּ אוֹצְרִים כָּל עֲצֵי הַמַּעֲרָכָה, וְהִיא הָיְתָה בְּמִקְצוֹעַ מִזְרָחִית צְפוֹנִית שֶׁל עֶזְרַת נָשִׁים"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Shekalim 6:2",
+        "citation": "לֹא הָיְתָה הָאֶבֶן שָׁוָה לִשְׁאַר אַבְנֵי הָרִצְפָּה, וְהֵבִין שֶׁנִּסְתַּלְּקָה מִשָּׁם וְהֻחְזְרָה"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "54a",
+        "citation": "וַחֲכָמִים אוֹמְרִים: אָרוֹן בְּלִשְׁכַּת דִּיר הָעֵצִים הָיָה גָּנוּז"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "54a",
+        "citation": "שְׁנֵי כֹהֲנִים בַּעֲלֵי מוּמִין הָיוּ מַתְלִיעִין בְּעֵצִים, וְנִשְׁמְטָה קַרְדּוּמּוֹ שֶׁל אֶחָד מֵהֶם וְנָפְלָה שָׁם, וְיָצְתָה אֵשׁ וַאֲכָלַתּוּ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "53b",
+        "citation": "רַבִּי אֱלִיעֶזֶר אוֹמֵר: אָרוֹן גָּלָה לְבָבֶל"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "53b",
+        "citation": "רַבִּי יְהוּדָה (בֶּן לָקִישׁ) אוֹמֵר: אָרוֹן בִּמְקוֹמוֹ נִגְנַז"
+      },
+      {
+        "oeuvre": "Rambam Beit HaBe'hira",
+        "ref": "4:1",
+        "citation": "בָּנָה בּוֹ מָקוֹם לִגְנֹז בּוֹ הָאָרוֹן לְמַטָּה בְּמַטְמוֹנִיּוֹת עֲמֻקוֹת וַעֲקַלְקַלּוֹת וְיֹאשִׁיָּהוּ הַמֶּלֶךְ צִוָּה וּגְנָזוֹ בַּמָּקוֹם שֶׁבָּנָה שְׁלֹמֹה"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Shekalim 6:2",
+        "citation": "וכפי' רש\"י ביומא פרק ה' דף נ\"ד ומוקים התם דבבית שני היה"
+      }
+    ],
+    "note": "Adopted: the “dir ha'etzim” is the Lishkat HaEtzim, at the northeast corner of the Ezrat Nashim (Bartenura on Shekalim 6:1), and the view of the Sages, for whom the Ark is hidden there (Yoma 54a); the slab was not level with the others, a sign that it had been removed and put back (Bartenura on Shekalim 6:2). Set aside: the Ark exiled to Babylonia, according to R. Eliezer, or hidden in its place, in the Kodesh HaKodashim, according to R. Yehuda ben Lakish (Yoma 53b). The Rambam says only that Shlomo built deep and winding hiding places beneath the Temple, where Yoshiyahu had it hidden (Beit HaBechirah 4:1). The story takes place in the Second Temple (Tosfot Yom Tov). The tour shows the Temple to come, with the Ark back in its place: the slab marks the spot where this tradition says it was hidden. Tour's choice: the slab's place in the chamber, its size — that of one paving slab — and its height."
+  },
   "lishkat_hametzoraim": {
     "nom": "Lishkat HaMetzora'im",
     "translit": "Lishkat HaMetzora'im",
@@ -1845,11 +1908,11 @@
   "kippa_beit_hamoked": {
     "translit": "Kippat Beit HaMoked",
     "nom": "Vault of the Beit HaMoked",
-    "resume": "The Beit HaMoked has no upper storey: it is covered by a vault resting on its walls. Bartenura calls it “arcuolto”, a vault, and the Rambam describes it as a roof “like part of a circle”. This is why, at night, the kohen guards inside and the Levite sleeps outside: elsewhere the kohanim watch above and the Levites below, but here there is no above.",
+    "resume": "The Beit HaMoked has no upper storey: its flat roof carries a dome at its centre, open to the hall. The Rambam describes the kippa as a roof “like part of a circle”, and Bartenura calls it “arcuolto”, a vault. This is why, at night, the kohen guards inside and the Levite sleeps outside: elsewhere the kohanim watch above and the Levites below, but here there is no above.",
     "cotes": [
-      "barrel vault running east–west, over 30 amot",
-      "springing at 28 amot from the floor, rise 6",
-      "solid end walls at both ends, without windows"
+      "flat roof 28 amot above the floor, level with the cornice",
+      "at its centre, a hemisphere 21 amot across, open to the hall",
+      "crown 38.5 amot above the floor"
     ],
     "sources": [
       {
@@ -1883,7 +1946,7 @@
         "citation": "וְהָיָה בָּנוּי כִּפָּה"
       }
     ],
-    "note": "Adopted: part of a circle, hence a low barrel vault and not a dome (Rambam on Tamid 1:1). Tour's choice: the east–west axis, the springing height, the rise, the thickness and the solid end walls; no source gives them."
+    "note": "Adopted: a dome, the Rambam's “part of a circle” (on Tamid 1:1) read as part of a sphere. Rejected: the barrel vault, the other reading of the same phrase; “arcuolto” (Bartenura) and “Gewölbe” (Tosfot Yom Tov) name a vault without giving its shape. Tour's choice: the flat roof that carries it, its diameter, the roof height and the oculus open to the hall; no source gives them."
   },
   "shaarei_beit_hamoked": {
     "translit": "Sha'arei Beit HaMoked",

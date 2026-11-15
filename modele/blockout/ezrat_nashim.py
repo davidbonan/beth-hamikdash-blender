@@ -2,9 +2,9 @@ import math
 
 from .primitives.parametres import CANDELABRES_SHOEVA, Z_EZN, Z_HAR
 from .primitives.matieres import (MAT_BOIS_MAARAKHA, MAT_BRONZE, MAT_CEDRE, MAT_CHENE, MAT_EAU, MAT_ECHELLE,
-                                  MAT_LECHEM, MAT_OR, MAT_PIERRE, MAT_TERRE_CUITE, braise)
+                                  MAT_LECHEM, MAT_OR, MAT_PIERRE, MAT_SOL, MAT_TERRE_CUITE, braise)
 from .primitives.volumes import (BALUSTRE, alea, box, colonne_cannelee, cone, cyl, cyl_between, graver,
-                                 mur_perce, plage, prism, revolution, tube_between)
+                                 mur_perce, piece_tournee, plage, prism, revolution, tube_between)
 from .primitives.gravures import bandeau_fleurons
 from .primitives.ouvrages import (BANDEAU, CORNICHE, ENCADREMENT_SHAAR, FILET_OR, PILASTRE_CHAPITEAU,
                                   SAILLIE_BANDEAU, SAILLIE_MOULURE, SOCLE, battants, ceinture, moulure,
@@ -123,6 +123,9 @@ for _k in range(3):
     _a = math.radians(200 + 70 * _k)
     cyl(f"Lishkat_Etzim_NE_billot_{_k}", 112 + 6.5 * math.cos(_a), 42 + 6.5 * math.sin(_a),
         Z_EZN, Z_EZN + 1.2, 0.7, "10_EzratNashim", MAT_CHENE(), verts=12)
+# « רָאָה הָרִצְפָּה שֶׁהִיא מְשֻׁנָּה מֵחֲבֵרוֹתֶיהָ » (Shekalim 6:2), « לֹא הָיְתָה הָאֶבֶן שָׁוָה לִשְׁאַר אַבְנֵי הָרִצְפָּה » (Bartenura). CHOIX : une dalle entière du pavage tracé par la visite, face à la porte, relevée d'un dixième d'ama.
+RITZPA_MESHUNA = (120, 124, 41.316, 49.316)
+box("Lishkat_Etzim_NE_ritzpa_meshuna", *RITZPA_MESHUNA, Z_EZN, Z_EZN + 0.1, "10_EzratNashim", MAT_SOL())
 # SUD-EST, Lishkat HaNezirim : « מְבַשְּׁלִין אֶת שַׁלְמֵיהֶן, וּמְגַלְּחִין אֶת שְׂעָרָן,
 # וּמְשַׁלְּחִים תַּחַת הַדּוּד » — le chaudron et son foyer. C'est le seul feu de l'Ezrat
 # Nashim en dehors de Simhat Beit HaShoeva.
@@ -379,12 +382,15 @@ graver(_gravures, "10_EzratNashim", MAT_OR(), taille=0.11, saillie=0.04, courbur
 # d'écart on n'y monte pas, et une échelle qu'on ne peut pas gravir se lit en étai
 # d'échafaudage — or la guemara y fait justement monter des enfants avec trente log
 # d'huile, en opposant l'échelle raide au kevesh qui ne l'est pas (Soucca 52b).
+# Socle mouluré : un disque d'or plat face au ciel n'en reflétait que le bleu, et virait au gris-vert. Profil : CHOIX.
+SOCLE_CANDELABRE = [(1.6, 0.0), (1.6, 0.25), (1.68, 0.32), (1.7, 0.4), (1.66, 0.48), (1.55, 0.54), (1.3, 0.58),
+                    (1.0, 0.64), (0.8, 0.72), (0.66, 0.82), (0.58, 0.92), (0.55, 1.0)]
 if CANDELABRES_SHOEVA:
     H_CANDELABRE = 50
     R_MONTANT, R_BARREAU = 0.07, 0.04
     for k, (x, y) in enumerate(((EX0 + 30, -20), (EX0 + 30, 20), (EX1 - 30, -20), (EX1 - 30, 20))):
         nom = f"Candelabre_Shoeva_{k}"
-        cyl(f"{nom}_socle", x, y, Z_EZN, Z_EZN + 1.0, 1.6, "10_EzratNashim", MAT_OR(), verts=24)
+        piece_tournee(f"{nom}_socle", x, y, Z_EZN, SOCLE_CANDELABRE, "10_EzratNashim", MAT_OR(), verts=48)
         cone(f"{nom}_mat", x, y, Z_EZN + 1.0, Z_EZN + H_CANDELABRE, 0.55, 0.35, "10_EzratNashim", MAT_OR(), verts=16)
         for j in range(4):
             a = math.pi / 2 * j

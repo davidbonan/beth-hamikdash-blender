@@ -146,6 +146,30 @@
     ]
   },
 
+  "ritzpa_meshuna": {
+    "he": "רִצְפָּה מְשֻׁנָּה מֵחֲבֵרוֹתֶיהָ",
+    "translit": "Ritzpa meshouna",
+    "resume": "Une dalle du pavage qui ne ressemble pas aux autres. Un cohen inapte au service triait le bois de l'autel dans cette chambre ; il remarque une dalle différente de ses voisines, va le dire à un autre cohen, et meurt avant d'avoir fini sa phrase. On sut alors avec certitude que l'Arche était cachée là, dessous. Deux familles le tenaient déjà de leurs pères, celle de Rabban Gamliel et celle de Rabbi 'Hanania, le segan des cohanim : elles se prosternaient quatorze fois dans le Temple au lieu de treize, la quatorzième face à cette chambre. La guemara rapporte une autre version : deux cohanim triaient le bois, la hache de l'un d'eux tomba à cet endroit, un feu en sortit et le consuma.",
+    "cotes": [
+      "une dalle du pavage : 4 × 8 amot",
+      "relevée d'un dixième d'ama",
+      "dans la Lishkat HaEtzim, face à la porte"
+    ],
+    "sources": [
+      {"oeuvre": "Shekalim", "ref": "6:1", "citation": "וְהֵיכָן הָיְתָה יְתֵרָה, כְּנֶגֶד דִּיר הָעֵצִים, שֶׁכֵּן מָסֹרֶת בְּיָדָם מֵאֲבוֹתֵיהֶם שֶׁשָּׁם הָאָרוֹן נִגְנַז"},
+      {"oeuvre": "Shekalim", "ref": "6:2", "citation": "מַעֲשֶׂה בְּכֹהֵן אֶחָד שֶׁהָיָה מִתְעַסֵּק, וְרָאָה הָרִצְפָּה שֶׁהִיא מְשֻׁנָּה מֵחֲבֵרוֹתֶיהָ. בָּא וְאָמַר לַחֲבֵרוֹ. לֹא הִסְפִּיק לִגְמֹר אֶת הַדָּבָר עַד שֶׁיָּצְתָה נִשְׁמָתוֹ, וְיָדְעוּ בְיִחוּד שֶׁשָּׁם הָאָרוֹן נִגְנַז"},
+      {"oeuvre": "Bartenura", "ref": "Shekalim 6:1", "citation": "לִשְׁכָּה שֶׁשָּׁם הָיוּ אוֹצְרִים כָּל עֲצֵי הַמַּעֲרָכָה, וְהִיא הָיְתָה בְּמִקְצוֹעַ מִזְרָחִית צְפוֹנִית שֶׁל עֶזְרַת נָשִׁים"},
+      {"oeuvre": "Bartenura", "ref": "Shekalim 6:2", "citation": "לֹא הָיְתָה הָאֶבֶן שָׁוָה לִשְׁאַר אַבְנֵי הָרִצְפָּה, וְהֵבִין שֶׁנִּסְתַּלְּקָה מִשָּׁם וְהֻחְזְרָה"},
+      {"oeuvre": "Yoma", "ref": "54a", "citation": "וַחֲכָמִים אוֹמְרִים: אָרוֹן בְּלִשְׁכַּת דִּיר הָעֵצִים הָיָה גָּנוּז"},
+      {"oeuvre": "Yoma", "ref": "54a", "citation": "שְׁנֵי כֹהֲנִים בַּעֲלֵי מוּמִין הָיוּ מַתְלִיעִין בְּעֵצִים, וְנִשְׁמְטָה קַרְדּוּמּוֹ שֶׁל אֶחָד מֵהֶם וְנָפְלָה שָׁם, וְיָצְתָה אֵשׁ וַאֲכָלַתּוּ"},
+      {"oeuvre": "Yoma", "ref": "53b", "citation": "רַבִּי אֱלִיעֶזֶר אוֹמֵר: אָרוֹן גָּלָה לְבָבֶל"},
+      {"oeuvre": "Yoma", "ref": "53b", "citation": "רַבִּי יְהוּדָה (בֶּן לָקִישׁ) אוֹמֵר: אָרוֹן בִּמְקוֹמוֹ נִגְנַז"},
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "4:1", "citation": "בָּנָה בּוֹ מָקוֹם לִגְנֹז בּוֹ הָאָרוֹן לְמַטָּה בְּמַטְמוֹנִיּוֹת עֲמֻקוֹת וַעֲקַלְקַלּוֹת וְיֹאשִׁיָּהוּ הַמֶּלֶךְ צִוָּה וּגְנָזוֹ בַּמָּקוֹם שֶׁבָּנָה שְׁלֹמֹה"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Shekalim 6:2", "citation": "וכפי' רש\"י ביומא פרק ה' דף נ\"ד ומוקים התם דבבית שני היה"}
+    ],
+    "note": "Retenu : le « dir ha'etzim » est la Lishkat HaEtzim, à l'angle nord-est de l'Ezrat Nashim (Bartenura sur Shekalim 6:1), et l'avis des Sages, pour qui l'Arche y est cachée (Yoma 54a) ; la dalle n'était pas de niveau avec les autres, signe qu'on l'avait ôtée puis remise (Bartenura sur Shekalim 6:2). Écarté : l'Arche exilée à Babylone, selon R. Eliezer, ou cachée à sa place, dans le Kodesh HaKodashim, selon R. Yehouda ben Lakish (Yoma 53b). Le Rambam dit seulement que Shlomo bâtit sous le Temple des caches profondes et sinueuses, où Yoshiyahou la fit cacher (Beit HaBe'hira 4:1). L'histoire se passe au Second Temple (Tosfot Yom Tov). La visite montre le Temple à venir, l'Arche revenue à sa place : la dalle marque l'endroit où cette tradition la dit cachée. Choix de la visite : la place de la dalle dans la chambre, sa taille — celle d'une dalle du pavage — et sa hauteur."
+  },
+
   "lishkat_hametzoraim": {
     "he": "לשכת המצורעים",
     "translit": "Lishkat HaMetzoraïm",
@@ -907,11 +931,11 @@
   "kippa_beit_hamoked": {
     "he": "כִּפַּת בֵּית הַמּוֹקֵד",
     "translit": "Kippat Beit HaMoked",
-    "resume": "Le Beit HaMoked n'a pas d'étage : il est couvert d'une voûte posée sur ses murs. Bartenura la dit « arcuolto », une voûte, et le Rambam la décrit comme un toit « semblable à une part de cercle ». C'est pourquoi, la nuit, le cohen garde l'intérieur et le Lévi dort dehors : ailleurs, les cohanim veillent en haut et les Léviim en bas, mais ici il n'y a pas de haut.",
+    "resume": "Le Beit HaMoked n'a pas d'étage : son toit plat porte en son milieu une coupole, ouverte sur la salle. Le Rambam décrit la kippa comme un toit « semblable à une part de cercle », et Bartenura l'appelle « arcuolto », une voûte. C'est pourquoi, la nuit, le cohen garde l'intérieur et le Lévi dort dehors : ailleurs, les cohanim veillent en haut et les Léviim en bas, mais ici il n'y a pas de haut.",
     "cotes": [
-      "voûte en berceau d'est en ouest, sur 30 amot",
-      "naissance à 28 amot du sol, flèche 6",
-      "tympans pleins aux deux bouts, sans fenêtre"
+      "toit plat à 28 amot du sol, au niveau de la corniche",
+      "au milieu, une demi-sphère de 21 amot de diamètre, ouverte sur la salle",
+      "clé à 38,5 amot du sol"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:8", "citation": "בֵּית הַמּוֹקֵד, כִּפָּה, וּבַיִת גָּדוֹל הָיָה, מֻקָּף רוֹבָדִין שֶׁל אֶבֶן, וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם"},
@@ -921,7 +945,7 @@
       {"oeuvre": "Bartenura", "ref": "Middot 1:9", "citation": "וּבֵית הַמּוֹקֵד שֶׁלֹּא הָיְתָה אֶלָּא כִּפָּה עַל הָאָרֶץ, הָיָה כֹּהֵן מִבִּפְנִים וּבֶן לֵוִי מִבַּחוּץ"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:9", "citation": "וְהָיָה בָּנוּי כִּפָּה"}
     ],
-    "note": "Retenu : une part de cercle, donc un berceau surbaissé et non une coupole (Rambam sur Tamid 1:1). Choix de la visite : l'axe est-ouest, la hauteur de la naissance, la flèche, l'épaisseur et les tympans pleins ; aucune source ne les donne."
+    "note": "Retenu : une coupole, la « part de cercle » du Rambam (sur Tamid 1:1) lue comme une part de sphère. Écartée : la voûte en berceau, l'autre lecture de la même phrase ; « arcuolto » (Bartenura) et « Gewölbe » (Tosfot Yom Tov) disent une voûte sans en dire la forme. Choix de la visite : le toit plat qui la porte, son diamètre, la hauteur du toit et l'oculus ouvert sur la salle ; aucune source ne les donne."
   },
   "shaarei_beit_hamoked": {
     "he": "שַׁעֲרֵי בֵּית הַמּוֹקֵד",

@@ -27,9 +27,10 @@ SALLES_CLOSES = ("lishkat_hagazit", "lishkat_hagola", "beit_hahalifot", "lishkat
 TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03, "keranot": 0.012} | dict.fromkeys(SALLES_CLOSES, 0.08)
 # Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
 # Les éléments du Beit HaMoked, fiche à part : sans carte, le ciel les éclairerait dans la salle close comme au-dehors.
+# La dalle de l'Arche aussi : sans carte, elle se détachait en blanc sur le pavage cuit de la Lishkat HaEtzim.
 MALGRE_AIRE = {"yessod", "keranot", "revouva", "kippa_beit_hamoked", "shaarei_beit_hamoked", "medurat_beit_hamoked", "lishkat_hatlaim",
                "lishkat_lechem_hapanim", "lishkat_hachotamot", "lishkat_beit_hamoked", "rovadim_beit_hamoked",
-               "rashei_pispasin", "tavla_hamaftechot", "kesatot_beit_hamoked"}
+               "rashei_pispasin", "tavla_hamaftechot", "kesatot_beit_hamoked", "ritzpa_meshuna"}
 TAILLE = (128, 2048)
 ECHANTILLONS = 256
 PORTEE = 8.0

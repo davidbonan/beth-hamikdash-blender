@@ -735,6 +735,49 @@
     ],
     "note": "Les deux anneaux suivent le verset et Rashi, qui les met aux angles, lu par le Haamek Davar : l'un à l'angle nord-est, l'autre au sud-ouest, une barre dans chacun. Écartés : Abarbanel et le Malbim lisent dans Rashi quatre anneaux, deux de chaque côté, à ses angles ; Shadal aussi en compte quatre, deux par côté ; le Bekhor Shor et Rav Hirsch en mettent un au milieu de chaque côté. Écarté aussi : Kelim 17:10 mesure cet autel avec une ama plus petite, de cinq tefa'him — R. Meir et R. Yehouda s'accordent sur ce point (Mena'hot 97b) —, soit environ 0,40 × 0,40 m au sol ; les textes ne disent pas si ses deux amot de haut suivent la même ama. La visite garde l'ama ordinaire de six tefa'him : 0,48 × 0,48 × 0,96 m. Choix de la visite, là où les textes se taisent : les deux amot comptent les cornes, comme les dix de l'autel extérieur ; les cornes sont carrées et s'affinent jusqu'à une tête arrondie ; le zer monte au-dessus du dessus comme celui de l'Arche (Rashi sur Exode 25:11) et porte des fleurons de lys, la fleur de la Menora ; les barres ne sont pas posées, rien ne déplace l'autel hors du Bayit. Le teni est un panier d'or à côtes, avec deux anses ; la scène le montre au matin, comme le kuz sur la marche de la Menora."
   },
+  "tavla_hasota": {
+    "he": "טַבְלָא שֶׁל שַׁיִשׁ",
+    "translit": "Tavla shel shayish",
+    "resume": "Une dalle de marbre d'une ama sur une ama, dans le sol du Heikhal, à droite en entrant, avec un anneau pour la soulever. Elle sert au rite de la sota, la femme que son mari soupçonne d'adultère : la Torah demande au cohen de mettre dans l'eau qu'elle boira de la poussière « du sol du Mishkan ». Le sol du Heikhal est revêtu ; cette dalle y garde un carré de terre. Le cohen puise un demi-log d'eau au Kiyor dans une coupe de terre cuite neuve, entre au Heikhal, tourne à droite, soulève la dalle par son anneau, prend de la terre dessous et en met assez pour qu'elle se voie à la surface de l'eau. La parasha de la sota, elle, est écrite sur la tavla d'or de la reine Hélène, dans l'Oulam.",
+    "cotes": [
+      "dalle de marbre d'1 × 1 ama",
+      "anneau de fer scellé",
+      "à droite en entrant, au nord de la porte"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Sota",
+        "ref": "2:2",
+        "citation": "הָיָה מֵבִיא פְיָלִי שֶׁל חֶרֶס חֲדָשָׁה, וְנוֹתֵן לְתוֹכָהּ חֲצִי לֹג מַיִם מִן הַכִּיּוֹר"
+      },
+      {
+        "oeuvre": "Sota",
+        "ref": "2:2",
+        "citation": "נִכְנַס לַהֵיכָל וּפָנָה לִימִינוֹ, וּמָקוֹם הָיָה שָׁם אַמָּה עַל אַמָּה, וְטַבְלָא שֶׁל שַׁיִשׁ, וְטַבַּעַת הָיְתָה קְבוּעָה בָהּ"
+      },
+      {
+        "oeuvre": "Sota",
+        "ref": "2:2",
+        "citation": "וּכְשֶׁהוּא מַגְבִּיהָהּ, נוֹטֵל עָפָר מִתַּחְתֶּיהָ וְנוֹתֵן כְּדֵי שֶׁיֵּרָאֶה עַל הַמַּיִם"
+      },
+      {
+        "oeuvre": "Nombres",
+        "ref": "5:17",
+        "citation": "וּמִן הֶעָפָר אֲשֶׁר יִהְיֶה בְּקַרְקַע הַמִּשְׁכָּן יִקַּח הַכֹּהֵן וְנָתַן אֶל הַמָּיִם"
+      },
+      {
+        "oeuvre": "Rambam Sota",
+        "ref": "3:10",
+        "citation": "וּמָקוֹם הָיָה שָׁם אַמָּה עַל אַמָּה לִימִין הַנִּכְנָס וּבוֹ טַבְלָא שֶׁל שַׁיִשׁ וְטַבַּעַת קְבוּעָה בָּהּ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Sota 2:2",
+        "citation": "לְאוֹחֲזָהּ בְּטַבַּעְתָּהּ וּלְהַגְבִּיהָהּ מִשְּׁאָר הָרִצְפָּה שֶׁהִיא כֻּלָּהּ בְּאַבְנֵי שַׁיִשׁ"
+      }
+    ],
+    "note": "Retenu : à droite en entrant, donc au nord, le Heikhal s'ouvrant à l'est. Écarté : Bartenura, pour qui tout le sol du Heikhal est de dalles de marbre, celle-ci ne s'en distinguant que par son anneau ; la visite garde le sol plaqué d'or du Premier Temple (Melakhim I 6:30), sur lequel le marbre tranche. Choix de la visite : la place exacte de la dalle, à deux amot du mur est, et le fer de l'anneau, comme à la tavla des clés du Beit HaMoked (Middot 1:9). Non modélisée : la terre sous la dalle."
+  },
   "parokhet": {
     "he": "פרוכת",
     "translit": "Parokhet",
