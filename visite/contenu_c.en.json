@@ -1325,5 +1325,94 @@
       {"oeuvre": "Rambam Me'houssrei Kappara", "ref": "4:2", "citation": "נוֹטֵל הַכֹּהֵן מִלּוֹג הַשֶּׁמֶן וְיוֹצֵק לְתוֹךְ כַפּוֹ שֶׁל חֲבֵרוֹ הַשְּׂמָאלִית… וְאִם הִזָּה וְלֹא כִּוֵּן כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳדָשִׁים כְּשֵׁרוֹת… וּשְׁאָר הַלּוֹג מִתְחַלֵּק לַכֹּהֲנִים"}
     ],
     "note": "Tour's choice: the one who sprinkles is the one with the oil in his palm, as the verse says; the two kohanim in the Ezrat Israel, near Nikanor, facing west; the shape and metal of the vessel."
+  },
+
+  "mehilat_parva": {
+    "nom": "Parva's tunnel",
+    "translit": "Mechilat Parva",
+    "resume": "“What is Parva? A magus,” says Rav Yosef, and the chamber where the hides are salted bears his name. What he did, each commentator tells in his own way. For Rashi, he built the chamber. For the Rambam, he broke through the wall of the Azara in this chamber to watch the service, and was killed there. For the Arukh, quoted by Tosafot, he dug a tunnel under the ground of the sanctuary to watch the Kohen Gadol at his service; the kohanim heard him digging, found him, and the chamber took his name. This is where the Kohen Gadol is brought on Yom Kippur for his second immersion, and the chamber is within the sacred area; a non-Jew did not even pass the Cheil. So the tour starts the tunnel from the esplanade, beyond the Soreg, and leads it under the Cheil to the foot of the south wall, where a shaft climbs to the breach. From the chamber, all one sees is a few stones that do not match the wall.",
+    "cotes": [
+      "start: the esplanade, three amot beyond the Soreg, under a slab unlike the others",
+      "a tunnel 2 amot wide and 4 high, 2 amot below the paving, 30 amot long",
+      "a shaft of 22 amot under the south wall of the Lishkat HaParva, with footholds",
+      "the breach, 2 amot by 2.5, at the foot of the wall, walled up"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "35a", "citation": "מַאי ״פַּרְוָה״? אָמַר רַב יוֹסֵף: פַּרְוָה אַמְגּוּשָׁא"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "35a", "citation": "מכשף אחד בנאה ושמו פרווה"},
+      {"oeuvre": "Tosafot sur Yoma", "ref": "35a", "citation": "פי' בערוך וזה לשונו יש מן החכמים שאומרים כי חפר מחילה תחת הקרקע בקדש עד שיראה עבודת כהן גדול והרגישו הכהנים בחפירה ומצאוהו וקרא אותה הלשכה על שמו"},
+      {"oeuvre": "Rambam sur Middot", "ref": "5:3", "citation": "שם איש אמגושי שחתר בקיר העזרה בלשכה זו כדי לראות העבודה ונהרג על כן נקראת הלשכה על שמו"},
+      {"oeuvre": "Bartenura", "ref": "Middot 5:3", "citation": "אָדָם מְכַשֵּׁף שֶׁשְּׁמוֹ פַּרְוָה בָּנָה אוֹתָהּ לִשְׁכָּה עַל יְדֵי מְכַשֵּׁפוּת, וְנִקְרֵאת עַל שְׁמוֹ. כָּךְ מָצָאתִי. וְרַמְבַּ\"ם כָּתַב, שֶׁהָיָה חוֹתֵר בַּקִּיר כְּדֵי לִרְאוֹת מִשָּׁם הֵיאַךְ הָיָה כֹּהֵן עוֹבֵד הָעֲבוֹדָה וְנֶהֱרַג שָׁם"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": "ואני תמה שיקיימו בקדש בנין הנעשה ע\"י כשוף"},
+      {"oeuvre": "Yoma", "ref": "3:6", "citation": "הֱבִיאוּהוּ לְבֵית הַפַּרְוָה, וּבַקֹּדֶשׁ הָיְתָה"},
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "הַחֵיל מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם"}
+    ],
+    "note": "Adopted: the Arukh and the Rambam together — the tunnel under the ground, and the breach in the wall of the Azara, in this chamber. Set aside: Rashi and Bartenura, for whom Parva built the chamber; Tosafot Yom Tov wonders that a building made by sorcery would be kept in the sacred area. Tour's choice: the whole course — the start beyond the Soreg, the depth, the section, the shaft and its footholds, the place of the breach between the bench of hides and the east wall, its plugging stones and the slab on the esplanade. No source says where he started from, nor that the tunnel was left open: it is there to be seen."
+  },
+
+  "course_kevesh": {
+    "nom": "The race on the kevesh",
+    "translit": "Ratzin ve'olin bakevesh",
+    "resume": "At first, whoever wished to clear the altar in the morning cleared it. When they were many, the kohanim would run up the kevesh, and whoever got ahead of the other into the top four amot, against the altar, won; if they were level, the officer had them hold up a finger, and they were counted. Once, two arrived together; one pushed the other, who fell and broke his leg. Seeing that it came to danger, the Beit Din decreed that the altar would be cleared only by lot. The Gemara tells worse. One, beaten into the four amot, took a knife and drove it into the other's heart. Rabbi Tzadok stood on the steps of the Ulam: “Hear us, our brothers, house of Israel! It is said: if one be found slain in the land… For whom shall we bring the heifer: for the city, or for the courtyards?” All the people burst into tears. The young man's father came, found him still writhing, and said: “Let him be your atonement. My son is still writhing, and the knife has not become impure.” The purity of the vessels weighed more on them than the shedding of blood.",
+    "cotes": [
+      "the kevesh: 32 amot by 16, south of the altar",
+      "the top four amot, against the altar",
+      "Rabbi Tzadok on the steps of the Ulam"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "2:1", "citation": "וּבִזְמַן שֶׁהֵן מְרֻבִּין, רָצִין וְעוֹלִין בַּכֶּבֶשׁ, וְכָל הַקּוֹדֵם אֶת חֲבֵרוֹ בְאַרְבַּע אַמּוֹת זָכָה"},
+      {"oeuvre": "Bartenura", "ref": "Yoma 2:1", "citation": "לִיכָּנֵס לְתוֹךְ אַרְבַּע אַמּוֹת עֶלְיוֹנוֹת שֶׁל כֶּבֶשׁ הַסְּמוּכוֹת לְרֹאשׁ הַמִּזְבֵּחַ, זָכָה לִתְרֹם"},
+      {"oeuvre": "Yoma", "ref": "2:2", "citation": "וְדָחַף אֶחָד מֵהֶן אֶת חֲבֵרוֹ, וְנָפַל וְנִשְׁבְּרָה רַגְלוֹ. וְכֵיוָן שֶׁרָאוּ בֵית דִּין שֶׁבָּאִין לִידֵי סַכָּנָה, הִתְקִינוּ שֶׁלֹּא יְהוּ תוֹרְמִין אֶת הַמִּזְבֵּחַ אֶלָּא בְפַיִס"},
+      {"oeuvre": "Yoma", "ref": "23a", "citation": "קָדַם אֶחָד מֵהֶן לְתוֹךְ אַרְבַּע אַמּוֹת שֶׁל חֲבֵירוֹ, נָטַל סַכִּין וְתָקַע לוֹ בְּלִבּוֹ"},
+      {"oeuvre": "Yoma", "ref": "23a", "citation": "עָמַד רַבִּי צָדוֹק עַל מַעֲלוֹת הָאוּלָם… אָנוּ, עַל מִי לְהָבִיא עֶגְלָה עֲרוּפָה? עַל הָעִיר, אוֹ עַל הָעֲזָרוֹת? גָּעוּ כׇּל הָעָם בִּבְכִיָּה"},
+      {"oeuvre": "Yoma", "ref": "23a", "citation": "הֲרֵי הוּא כַּפָּרַתְכֶם, וַעֲדַיִין בְּנִי מְפַרְפֵּר, וְלֹא נִטְמְאָה סַכִּין. לְלַמֶּדְךָ שֶׁקָּשָׁה עֲלֵיהֶם טׇהֳרַת כֵּלִים יוֹתֵר מִשְּׁפִיכוּת דָּמִים"},
+      {"oeuvre": "Deutéronome", "ref": "21:1", "citation": "כִּי יִמָּצֵא חָלָל בָּאֲדָמָה"},
+      {"oeuvre": "Melakhim II", "ref": "21:16", "citation": "וְגַם דָּם נָקִי שָׁפַךְ מְנַשֶּׁה הַרְבֵּה מְאֹד עַד אֲשֶׁר מִלֵּא אֶת יְרוּשָׁלִַם פֶּה לָפֶה"},
+      {"oeuvre": "Middot", "ref": "3:3", "citation": "וְכֶבֶשׁ הָיָה לִדְרוֹמוֹ שֶׁל מִזְבֵּחַ, שְׁלֹשִׁים וּשְׁתַּיִם עַל רֹחַב שֵׁשׁ עֶשְׂרֵה"}
+    ],
+    "note": "The Gemara asks which of the two accounts comes first: if the murder had come first, a broken leg would have added nothing. Its answer: the murder came first, but it had been taken for an isolated misfortune; the broken leg showed that the race led to danger of itself (Yoma 23a). Nothing of the race is modelled: its entry is read from the kevesh."
+  },
+
+  "shimon_hatsadik": {
+    "nom": "Shimon HaTzaddik",
+    "translit": "Shimon HaTzaddik",
+    "resume": "For forty years Shimon HaTzaddik served as Kohen Gadol, and for forty years the signs went with him. The lot “for HaShem” always came up in his right hand. The strip of scarlet turned white. The western lamp of the Menorah kept burning. The fire of the altar grew strong of itself, and the kohanim brought only two logs to it, for the mitzvah. Blessing lay in the omer, the two loaves and the showbread: a kohen who received an olive's bulk of it ate his fill, and left some over. After him, sometimes yes, sometimes no. In the year of his death, he announced it: every Yom Kippur, an old man dressed and wrapped in white went in with him and came out with him; this time the old man was dressed and wrapped in black, went in with him and did not come out. After the festival he was ill seven days and died, and his brothers the kohanim ceased to bless with the Name. Forty years before the destruction, no sign returned, and the doors of the Heikhal opened by themselves, until Rabban Yochanan ben Zakkai rebuked them: “Heikhal, Heikhal, why do you frighten yourself? I know that your end is to be destroyed.”",
+    "cotes": [
+      "forty years Kohen Gadol",
+      "five signs: the lot, the scarlet, the western lamp, the altar fire, the bread"
+    ],
+    "sources": [
+      {"oeuvre": "Avot", "ref": "1:2", "citation": "שִׁמְעוֹן הַצַּדִּיק הָיָה מִשְּׁיָרֵי כְנֶסֶת הַגְּדוֹלָה"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "אַרְבָּעִים שָׁנָה שֶׁשִּׁמֵּשׁ שִׁמְעוֹן הַצַּדִּיק, הָיָה גּוֹרָל עוֹלֶה בְּיָמִין… וְהָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין… וְהָיָה נֵר מַעֲרָבִי דּוֹלֵק"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "וְהָיָה אֵשׁ שֶׁל מַעֲרָכָה מִתְגַּבֵּר, וְלֹא הָיוּ כֹּהֲנִים צְרִיכִין לְהָבִיא עֵצִים לְמַעֲרָכָה, חוּץ מִשְּׁנֵי גְּזִירֵי עֵצִים כְּדֵי לְקַיֵּים מִצְוַת עֵצִים"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "וְנִשְׁתַּלְּחָה בְּרָכָה בָּעוֹמֶר, וּבִשְׁתֵּי הַלֶּחֶם, וּבְלֶחֶם הַפָּנִים. וְכׇל כֹּהֵן שֶׁמַּגִּיעוֹ כְּזַיִת, יֵשׁ אוֹכְלוֹ וְשָׂבֵעַ, וְיֵשׁ אוֹכְלוֹ וּמוֹתִיר"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "בְּכׇל יוֹם הַכִּפּוּרִים הָיָה מִזְדַּמֵּן לִי זָקֵן אֶחָד לָבוּשׁ לְבָנִים וְעָטוּף לְבָנִים, נִכְנַס עִמִּי וְיָצָא עִמִּי, וְהַיּוֹם נִזְדַּמֵּן לִי זָקֵן אֶחָד לָבוּשׁ שְׁחוֹרִים וְעָטוּף שְׁחוֹרִים, נִכְנַס עִמִּי וְלֹא יָצָא עִמִּי"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "אַחַר הָרֶגֶל חָלָה שִׁבְעָה יָמִים וָמֵת. וְנִמְנְעוּ אֶחָיו הַכֹּהֲנִים מִלְּבָרֵךְ בַּשֵּׁם"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "אַרְבָּעִים שָׁנָה קוֹדֶם חוּרְבַּן הַבַּיִת לֹא הָיָה גּוֹרָל עוֹלֶה בְּיָמִין, וְלֹא הָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין, וְלֹא הָיָה נֵר מַעֲרָבִי דּוֹלֵק. וְהָיוּ דַּלְתוֹת הַהֵיכָל נִפְתְּחוֹת מֵאֲלֵיהֶן"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "הֵיכָל הֵיכָל! מִפְּנֵי מָה אַתָּה מַבְעִית עַצְמְךָ? יוֹדֵעַ אֲנִי בְּךָ שֶׁסּוֹפְךָ עָתִיד לֵיחָרֵב"}
+    ],
+    "note": "Nothing of him is modelled. His entry is read from the Menorah, whose western lamp is one of the signs; the strip of scarlet can be seen on the Yom Kippur tour, at the opening of the Ulam."
+  },
+
+  "lashon_zehorit": {
+    "nom": "The strip of scarlet",
+    "translit": "Lashon shel zehorit",
+    "resume": "On Yom Kippur a strip of scarlet wool was tied on the head of the scapegoat before it was sent away. Rabbi Yishmael speaks of another, tied at the entrance of the sanctuary: when the goat reached the wilderness, it turned white, as it is written: “Though your sins be as scarlet, they shall be as white as snow.” According to the baraita, it was first tied at the opening of the Ulam, on the outside. If it turned white, they rejoiced; if not, they were sad and ashamed. It was moved inside, but people still came to peek; so it was divided, one half tied to the rock, the other between the goat's horns. During the forty years of Shimon HaTzaddik it turned white every year; during the forty years before the destruction, never.",
+    "cotes": [
+      "at the opening of the Ulam, on the outside, on the south jamb",
+      "tied to a ring, four and a half amot above the threshold",
+      "red when the goat leaves, white when it reaches the wilderness"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "4:2", "citation": "קָשַׁר לָשׁוֹן שֶׁל זְהוֹרִית בְּרֹאשׁ שָׂעִיר הַמִּשְׁתַּלֵּחַ"},
+      {"oeuvre": "Yoma", "ref": "6:8", "citation": "רַבִּי יִשְׁמָעֵאל אוֹמֵר, וַהֲלֹא סִימָן אַחֵר הָיָה לָהֶם, לָשׁוֹן שֶׁל זְהוֹרִית הָיָה קָשׁוּר עַל פִּתְחוֹ שֶׁל הֵיכָל, וּכְשֶׁהִגִּיעַ שָׂעִיר לַמִּדְבָּר הָיָה הַלָּשׁוֹן מַלְבִּין"},
+      {"oeuvre": "Yeshayahou", "ref": "1:18", "citation": "אִם יִהְיוּ חֲטָאֵיכֶם כַּשָּׁנִים כַּשֶּׁלֶג יַלְבִּינוּ"},
+      {"oeuvre": "Yoma", "ref": "67a", "citation": "בָּרִאשׁוֹנָה הָיוּ קוֹשְׁרִין לָשׁוֹן שֶׁל זְהוֹרִית עַל פֶּתַח הָאוּלָם מִבַּחוּץ, הִלְבִּין — הָיוּ שְׂמֵחִין, לֹא הִלְבִּין — הָיוּ עֲצֵבִין וּמִתְבַּיְּישִׁין. הִתְקִינוּ שֶׁיִּהְיוּ קוֹשְׁרִין עַל פֶּתַח אוּלָם מִבִּפְנִים… הִתְקִינוּ שֶׁיִּהְיוּ קוֹשְׁרִין אוֹתוֹ חֶצְיוֹ בְּסֶלַע וְחֶצְיוֹ בֵּין קַרְנָיו"},
+      {"oeuvre": "Yoma", "ref": "6:6", "citation": "חוֹלֵק לָשׁוֹן שֶׁל זְהוֹרִית, חֶצְיוֹ קָשַׁר בַּסֶּלַע וְחֶצְיוֹ קָשַׁר בֵּין שְׁתֵּי קַרְנָיו"},
+      {"oeuvre": "Rambam Avodat Yom HaKippurim", "ref": "3:7", "citation": "חוֹלֵק לָשׁוֹן שֶׁל זְהוֹרִית שֶׁבְּקַרְנָיו. חֶצְיוֹ קוֹשֵׁר בַּסֶּלַע וְחֶצְיוֹ קוֹשֵׁר בֵּין שְׁתֵּי קַרְנָיו"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "אַרְבָּעִים שָׁנָה שֶׁשִּׁמֵּשׁ שִׁמְעוֹן הַצַּדִּיק… וְהָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "אַרְבָּעִים שָׁנָה קוֹדֶם חוּרְבַּן הַבַּיִת… וְלֹא הָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין"}
+    ],
+    "note": "Adopted: the baraita's first practice, at the opening of the Ulam, on the outside (Yoma 67a), the one seen from the Azara. The Mishna says “the entrance of the Heikhal” (Yoma 6:8). The Rambam knows only the strip divided between the rock and the horns (Service on the Day of Atonement 3:7): the one at the Ulam is an abolished practice, which the tour shows only on the Yom Kippur tour, red when the goat leaves, white once it has arrived. Tour's choice: the jamb, the height, the ring, the size of the strip."
   }
 }

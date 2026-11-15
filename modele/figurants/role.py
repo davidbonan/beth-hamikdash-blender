@@ -28,6 +28,15 @@ class Role(NamedTuple):
     sol_porte: bool = False
 
 
+# Un objet que personne ne tient, posé une fois pour toutes : `batir` rend son objet Blender, `ou` en amot.
+class Objet(NamedTuple):
+    nom: str
+    concept: str
+    batir: object
+    ou: tuple
+    cap: float = 0.0
+
+
 LEVIIM_Y = (-23.5, -20.0, -16.5, -13.0, -9.5, -6.0, 6.0, 9.5, 13.0, 16.5, 20.0, 23.5)
 # Neuf kinorot, deux nevalim, un tziltzal : les douze qu'on ne descend jamais au-dessous (Arakhin 2:3-6).
 LEVIIM_INSTRUMENTS = ("kinor",) * 4 + ("nevel", "kinor", "tziltzal", "nevel") + ("kinor",) * 4

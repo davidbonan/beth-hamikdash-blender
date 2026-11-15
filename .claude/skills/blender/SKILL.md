@@ -56,14 +56,14 @@ modele/blockout/
   primitives/   parametres (AMA, Z_*, FOULE, RACINE, m) · noeuds · pierre · tissage · matieres (MAT_*)
                 volumes (box, cyl, revolution…) · gravures · ouvrages (lishka, shaar, moulure, escalier…)
   nettoyage · har_habayit · ezrat_nashim · azara · lishkot · heil · modenature_azara
-  mizbeach · sous_l_azara
+  mizbeach · sous_l_azara · mehilat_parva
   bayit/        oulam · heikhal · kelim · parokhot · parois_d_or · kodesh_hakodashim
   pays/         calage · herode · place_du_kotel · second_oeuvre · facades_du_kotel · parc_de_police · mobilier_du_kotel · ville · jerusalem (celui qui bâtit le pays)
   foule · finitions (dessus foulés, biseau, tailles) · eclairage
 modele/figurants/
   matieres · etoffes (MPFB) · corps (Gabarit, Humain) · maillage · habillage · ustensiles
   mise_en_scene (gestes, reperes, Accessoire) · bigdei_kehouna · tenues (levi, fidele)
-  danse · role (Role et les rôles partagés) · betes (seir, par, seh) · animation
+  danse · role (Role, Objet et les rôles partagés) · betes (seir, par, seh) · animation
   troupes/      figures · figures_tamid · figures_kippour · … · figures_nazir
 ```
 
@@ -262,7 +262,7 @@ Neuf troupes (`TROUPES`) ; la visite libre charge `figures`, chaque parcours la 
 |---|---|---|
 | `figures` | `roles_de_la_visite()`, 5 | la zerika, deux Léviim, un anshei ma'amad, le Lévi de garde à Nikanor |
 | `figures_tamid` | `roles_du_tamid()`, 22 | les gestes du tamid du matin, douze Léviim, deux enfants, deux anshei ma'amad |
-| `figures_kippour` | `roles_kippour()`, 39 | le Cohen Gadol une fois par étape du seder ha'avoda — habits d'or (`bigdei_zahav_*`) ou de lin (`bigdei_lavan_*`), taureau (`modele/shor.blend`), boucs (`modele/seir.blend`), kalpi, ma'hta, mizrak, sefer —, les anciens du Beit Din et ceux de la kehouna, les tenants du drap, le segan et le chef de maison, ceux qui passent le rouleau, cinq cohanim et sept Israélites prosternés |
+| `figures_kippour` | `roles_kippour()`, 41 | le Cohen Gadol une fois par étape du seder ha'avoda — habits d'or (`bigdei_zahav_*`) ou de lin (`bigdei_lavan_*`), taureau (`modele/shor.blend`), boucs (`modele/seir.blend`), kalpi, ma'hta, mizrak, sefer —, les anciens du Beit Din et ceux de la kehouna, les tenants du drap, le segan et le chef de maison, ceux qui passent le rouleau, cinq cohanim et sept Israélites prosternés, la langue d'écarlate de l'Oulam, rouge puis blanche (deux `Objet`) |
 | `figures_shoeva` | `roles_shoeva()`, 26 | la nuit de l'Ezrat Nashim : Léviim des quinze marches, trompettes, ronde aux torches |
 | `figures_pessah` | `roles_pessah()`, 37 | le korban Pessa'h : le deuxième groupe et ses agneaux, les rangées de bazikhin d'or et d'argent, la she'hita et le sang de main en main, le Hallel des Léviim, les crochets et la baguette, le magis, le troisième groupe assis sur le 'Heil |
 | `figures_bikkourim` | `roles_bikkourim()`, 26 | les porteurs et le taureau aux cornes dorées, les Léviim d'« Aromimkha », la lecture et la tenoufa, les corbeilles et les tourterelles |

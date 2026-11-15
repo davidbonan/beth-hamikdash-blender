@@ -856,6 +856,15 @@
       "lieu": true
     },
     {
+      "id": "mehilat_parva",
+      "nom": "La galerie de Parva",
+      "zone": "lishkot",
+      "prefixes": [
+        "Mehilat_Parva"
+      ],
+      "lieu": true
+    },
+    {
       "id": "beit_hatevila",
       "nom": "Beit HaTevila",
       "zone": "lishkot",
@@ -1011,6 +1020,24 @@
       "prefixes": [
         "Ulam_halifot_niche_Bilga"
       ]
+    },
+    {
+      "id": "lashon_zehorit",
+      "nom": "La langue d'écarlate",
+      "zone": "oulam",
+      "prefixes": []
+    },
+    {
+      "id": "shimon_hatsadik",
+      "nom": "Shimon HaTsadik",
+      "zone": "heikhal",
+      "prefixes": []
+    },
+    {
+      "id": "course_kevesh",
+      "nom": "La course sur le kevesh",
+      "zone": "mizbeach",
+      "prefixes": []
     },
     {
       "id": "candelabres_shoeva",

@@ -1,3 +1,5 @@
+import math
+
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
@@ -133,6 +135,20 @@ def emprise(h, places):
     bas, haut = poses.min(axis=0) - 0.15, poses.max(axis=0) + 0.15
     coins = [Vector((x, y, z)) for x in (bas[0], haut[0]) for y in (bas[1], haut[1]) for z in (bas[2], haut[2])]
     points = [place @ c for place in places for c in coins]
+    return ([min(p.x for p in points), min(p.z for p in points), -max(p.y for p in points)],
+            [max(p.x for p in points), max(p.z for p in points), -min(p.y for p in points)])
+
+
+def poser_objet(objet):
+    pose = objet.batir()
+    bpy.context.scene.collection.objects.link(pose)
+    pose.matrix_world = Matrix.Translation(Vector(objet.ou) * AMA) @ Matrix.Rotation(math.radians(objet.cap), 4, "Z")
+    bpy.context.view_layer.update()
+    return pose
+
+
+def emprise_posee(pose):
+    points = [pose.matrix_world @ Vector(c) for c in pose.bound_box]
     return ([min(p.x for p in points), min(p.z for p in points), -max(p.y for p in points)],
             [max(p.x for p in points), max(p.z for p in points), -min(p.y for p in points)])
 

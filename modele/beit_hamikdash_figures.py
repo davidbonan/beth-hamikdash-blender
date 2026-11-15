@@ -12,9 +12,11 @@ for _module in [nom for nom in sys.modules if nom.split(".")[0] == "figurants"]:
     del sys.modules[_module]
 
 from beit_hamikdash_visite import AMA, DOSSIER, comprimer, en_metres  # noqa: E402
-from figurants.animation import animer_en_danse, animer_en_marche, animer_sur_place, emprise, unir  # noqa: E402
+from figurants.animation import (animer_en_danse, animer_en_marche, animer_sur_place, emprise, emprise_posee,  # noqa: E402
+                                 poser_objet, unir)
 from figurants.danse import Hora  # noqa: E402
 from figurants.mise_en_scene import IMAGES, Terrain, _rayon_sol  # noqa: E402
+from figurants.role import Objet  # noqa: E402
 from figurants.troupes.figures import roles_de_la_visite  # noqa: E402
 from figurants.troupes.figures_bikkourim import roles_bikkourim  # noqa: E402
 from figurants.troupes.figures_hakhel import roles_hakhel  # noqa: E402
@@ -51,6 +53,8 @@ def main():
     lot = [r for r in troupe.roles() if not arguments or r.nom in arguments]
     terrains, sols, releves = {}, {}, {}
     for role in lot:
+        if isinstance(role, Objet):
+            continue
         if role.trajet:
             # Les danseurs d'une même ronde foulent le même sol : un relevé pour tous.
             cle = (*role.trajet.bornes(0.8), role.sol_haut * AMA)
@@ -59,8 +63,14 @@ def main():
         else:
             sols[role.nom] = role.ou[2] * AMA if role.sol_porte else _rayon_sol(role.ou[0] * AMA, role.ou[1] * AMA, role.ou[2] * AMA)
 
-    boites, figures = {}, []
+    boites, racines = {}, []
     for role in lot:
+        if isinstance(role, Objet):
+            pose = poser_objet(role)
+            boites.setdefault(role.concept, []).append(emprise_posee(pose))
+            racines.append(pose)
+            print(f"  {role.nom:12s} posé")
+            continue
         h = role.batir()
         if isinstance(role.trajet, Hora):
             places = animer_en_danse(h, role, terrains[role.nom])
@@ -71,13 +81,13 @@ def main():
         # Les cohanim ont aussi leur emprise commune : « Un élément… » y mène. Les Léviim sont déjà un concept.
         for concept in {role.concept, role.famille} - {None}:
             boites.setdefault(concept, []).append(emprise(h, places))
-        figures.append(h)
+        racines.append(h.rig)
         print(f"  {role.nom:12s} {len(places):4d} places")
 
     bpy.ops.object.select_all(action="DESELECT")
-    for h in figures:
-        h.rig.select_set(True)
-        for enfant in h.rig.children:
+    for racine in racines:
+        racine.select_set(True)
+        for enfant in racine.children:
             enfant.select_set(True)
     glb = DOSSIER / f"{nom_troupe}.glb"
     bpy.ops.export_scene.gltf(
@@ -94,7 +104,7 @@ def main():
         "emprises": emprises,
         "vues": [en_metres(v, emprises) for v in troupe.vues if v["id"].removeprefix("vue_") in emprises],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n{len(figures)} figures · {glb.name} {glb.stat().st_size / 1e6:.1f} Mo")
+    print(f"\n{len(racines)} figures · {glb.name} {glb.stat().st_size / 1e6:.1f} Mo")
 
 
 if __name__ == "__main__":

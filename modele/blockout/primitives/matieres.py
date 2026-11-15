@@ -385,6 +385,7 @@ MAT_NEHOSHET_MARTELE = lambda: metal("Nehoshet_martele", (0.66, 0.42, 0.20), 0.4
 MAT_MEHITZA = lambda: enduit("Mehitza_behira", (0.40, 0.31, 0.20))
 MAT_TERRE_CUITE = lambda: enduit("Terre_cuite", (0.46, 0.25, 0.16))
 MAT_ROCHE = lambda: roche("Roche_shetiya")
+MAT_ROC_TAILLE = lambda: roche("Roche_taillee")      # la galerie de Parva
 MAT_SEL = lambda: enduit("Sel", (0.93, 0.93, 0.91))              # Lishkat HaMela'h (Middot 5:3)
 MAT_PEAU = lambda: etoffe("Peau", (0.40, 0.26, 0.16))            # peaux salées de la Parva (Middot 5:3)
 MAT_KETORET = lambda: enduit("Ketoret", (0.52, 0.38, 0.26))      # sammanim pilés (Keritot 6b)

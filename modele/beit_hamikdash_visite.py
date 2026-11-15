@@ -157,6 +157,13 @@ VUES = [
     dict(id="vue_mesiba_bira", position=(-18.25, 70.0, -15.5), cap=270),
     dict(id="vue_beit_hatevila", position=(-162.0, 38.0, -12.0), cap=146),
     dict(id="vue_shit", position=(-48.0, -19.0, -9.0), cap=225, tangage=10),
+    # Dans la galerie, vers le puits qui monte à la brèche.
+    dict(id="vue_mehilat_parva", position=(-77.6, -95.0, Z_HAR - 6), cap=90),
+    # Les fiches sans géométrie se lisent depuis ce dont elles parlent.
+    dict(id="vue_course_kevesh", position=(-58.0, -50.0, Z_AZ), cap=40, tangage=8),
+    dict(id="vue_shimon_hatsadik", cadre=["menora", "shulchan"], cap=180, sol=Z_BAT, recul_max=24.0),
+    # Le jambage nord de l'Oulam, où le parcours de Yom Kippour noue la langue.
+    dict(id="vue_lashon_zehorit", position=(-74.0, -3.0, Z_BAT), cap=96, tangage=6),
 ]
 
 
