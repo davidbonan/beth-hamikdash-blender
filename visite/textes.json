@@ -140,7 +140,8 @@
       "heikhal": "Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
       "lishkot": "Lishkot",
-      "sous_terrain": "Souterrains"
+      "sous_terrain": "Souterrains",
+      "mehilat_parva": "Galerie de Parva"
     }
   },
   "he": {
@@ -284,7 +285,8 @@
       "heikhal": "ההיכל",
       "kodesh_hakodashim": "קודש הקודשים",
       "lishkot": "הלשכות",
-      "sous_terrain": "המחילות"
+      "sous_terrain": "המחילות",
+      "mehilat_parva": "מחילת פרוה"
     },
     "entrees": {
       "har_habayit": "הר הבית, על הציר המזרחי",
@@ -373,10 +375,12 @@
       "Tamid": "תמיד",
       "Tiferet Israël": "תפארת ישראל",
       "Tosefta Sanhedrin": "תוספתא סנהדרין",
+      "Tosafot sur Yoma": "תוספות על יומא",
       "Tosfot Yom Tov": "תוספות יום טוב",
       "Ye'hezkel": "יחזקאל",
       "Yerushalmi Soucca": "ירושלמי סוכה",
       "Yerushalmi Yoma": "ירושלמי יומא",
+      "Yeshayahou": "ישעיהו",
       "Yirmeyahou": "ירמיהו",
       "Yoma": "יומא",
       "'Haguiga": "חגיגה",
@@ -546,7 +550,8 @@
       "heikhal": "Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
       "lishkot": "Lishkot",
-      "sous_terrain": "Underground"
+      "sous_terrain": "Underground",
+      "mehilat_parva": "Parva's tunnel"
     },
     "entrees": {
       "har_habayit": "Har HaBayit, on the east axis",
@@ -635,10 +640,12 @@
       "Tamid": "Tamid",
       "Tiferet Israël": "Tiferet Yisrael",
       "Tosefta Sanhedrin": "Tosefta Sanhedrin",
+      "Tosafot sur Yoma": "Tosafot on Yoma",
       "Tosfot Yom Tov": "Tosafot Yom Tov",
       "Ye'hezkel": "Ezekiel",
       "Yerushalmi Soucca": "Yerushalmi Sukkah",
       "Yerushalmi Yoma": "Jerusalem Talmud Yoma",
+      "Yeshayahou": "Isaiah",
       "Yirmeyahou": "Jeremiah",
       "Yoma": "Yoma",
       "'Haguiga": "Chagigah",

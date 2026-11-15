@@ -1705,11 +1705,12 @@
   "lishkat_haparva": {
     "nom": "Lishkat HaParva",
     "translit": "Lishkat HaParva",
-    "resume": "The chamber where the hides of the korbanot are salted. On its roof is the ritual bath of the Kohen Gadol: four of the five immersions of Yom Kippur take place there, a linen sheet stretched between him and the people.",
+    "resume": "The chamber where the hides of the korbanot are salted. On its roof is the ritual bath of the Kohen Gadol: four of the five immersions of Yom Kippur take place there, a linen sheet stretched between him and the people. Its name is that of a magus, Parva, says Rav Yosef. Rashi makes him the builder of the chamber; the Rambam and the Arukh tell that he wanted to watch the Kohen Gadol at his service, that he dug his way here and was caught. At the foot of the south wall, between the bench and the corner, stones that do not match the wall plug his breach.",
     "cotes": [
       "in the south, within the Azara, against the inner face of the wall",
       "the ritual bath on the roof, with its ma'ake",
-      "the mesiba of the Lishkat HaMedichin comes up there"
+      "the mesiba of the Lishkat HaMedichin comes up there",
+      "Parva's breach, walled up, at the foot of the south wall"
     ],
     "sources": [
       {
@@ -1741,6 +1742,16 @@
         "oeuvre": "Rambam Beit HaBe'hira",
         "ref": "5:17",
         "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "35a",
+        "citation": "מַאי ״פַּרְוָה״? אָמַר רַב יוֹסֵף: פַּרְוָה אַמְגּוּשָׁא"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "35a",
+        "citation": "מכשף אחד בנאה ושמו פרווה"
       }
     ],
     "note": "Adopted: the distribution of Yoma 19a and the Rambam (Beit HaBechirah 5:17) — Melach, Parva and Medichin in the south, Etz, Gola and Gazit in the north. The standard text of Middot 5:3–4 reverses the two sides; Tosafot Yom Tov (Middot 5:3) notes the variant. The Rambam also places these chambers “in the Ezrat Israel”; the tour sets them against the wall of the Azara. The three southern chambers are inside the Azara, not on the terrace of the Cheil, because the Mishna places the immersions of the Kohen Gadol “in the sacred area, on the Parva” (Yoma 3:3); the roof of a building raised outside the precinct is not sanctified (Tosafot Yom Tov on Middot 5:3). Tour's choice: the ma'ake of the bath, the hides stacked on a bench and the heap of salt. Not shown: the linen sheet and the steps of the bath."
@@ -2070,7 +2081,7 @@
   "lishkat_lechem_hapanim": {
     "translit": "Lishkat Osei Le'hem HaPanim",
     "nom": "Lishkat Osei Lechem HaPanim",
-    "resume": "The chamber where the house of Garmu bakes the twelve loaves of showbread, which stay all week on the Table in the Heikhal. They are kneaded and shaped outside, but baked within the sacred area: so the chamber lies in the sacred half of the Beit HaMoked. Each loaf bakes in a mould, and is put back into a mould when taken from the oven so that it is not spoiled.",
+    "resume": "The chamber where the house of Garmu bakes the twelve loaves of showbread, which stay all week on the Table in the Heikhal. They are kneaded and shaped outside, but baked within the sacred area: so the chamber lies in the sacred half of the Beit HaMoked. Each loaf bakes in a mould, and is put back into a mould when taken from the oven so that it is not spoiled. The house of Garmu kept their craft to themselves, and the Mishna counts it to their shame. The Sages brought bakers from Alexandria: they knew how to bake as well, but not how to take the bread out as they did. The loaf is made like an open box, like a boat, explains Rashi; afraid of breaking it by sticking it to the wall of the oven, the Alexandrians heated outside and baked outside, and their bread went mouldy. That of the Garmu, heated and baked inside, did not. Called back, the family returned only for a doubled wage: twenty-four maneh a day instead of twelve. Their reason was that of the Avtinas: they knew the Temple was destined to be destroyed, and feared that an unworthy man would learn the craft and use it for idolatry. They are praised too: fine bread was never found in their children's hands, so that no one would say they fed on the showbread.",
     "cotes": [
       "south-east corner, in the sacred half",
       "6 × 8 amot",
@@ -2101,9 +2112,44 @@
         "oeuvre": "Bartenura",
         "ref": "Middot 1:6",
         "citation": "בֵּית גַּרְמוּ הָיוּ עוֹשִׂים לֶחֶם הַפָּנִים שָׁם"
+      },
+      {
+        "oeuvre": "Shekalim",
+        "ref": "5:1",
+        "citation": "בֵּית גַּרְמוּ עַל מַעֲשֵׂה לֶחֶם הַפָּנִים"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "3:11",
+        "citation": "שֶׁל בֵּית גַּרְמוּ לֹא רָצוּ לְלַמֵּד עַל מַעֲשֵׂה לֶחֶם הַפָּנִים"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "וְהָיוּ יוֹדְעִין לֶאֱפוֹת כְּמוֹתָן, וְלֹא הָיוּ יוֹדְעִין לִרְדּוֹת כְּמוֹתָן. שֶׁהַלָּלוּ מַסִּיקִין מִבַּחוּץ וְאוֹפִין מִבַּחוּץ, וְהַלָּלוּ מַסִּיקִין מִבִּפְנִים וְאוֹפִין מִבִּפְנִים. הַלָּלוּ פִּיתָּן מִתְעַפֶּשֶׁת, וְהַלָּלוּ אֵין פִּיתָּן מִתְעַפֶּשֶׁת"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "38a",
+        "citation": "לפי שהוא עשוי כמין תיבה פרוצה כמין ספינה היו יראים לדבקם מבפנים לתנור ואופין אותן מבחוץ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "כָּפְלוּ לָהֶם שְׂכָרָן וּבָאוּ. בְּכׇל יוֹם הָיוּ נוֹטְלִין שְׁנֵים עָשָׂר מָנֶה, וְהַיּוֹם עֶשְׂרִים וְאַרְבָּעָה"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "יוֹדְעִין הָיוּ שֶׁל בֵּית אַבָּא שֶׁבַּיִת זֶה עָתִיד לֵיחָרֵב, שֶׁמָּא יִלְמוֹד אָדָם שֶׁאֵינוֹ מְהוּגָּן וְיֵלֵךְ וְיַעֲבוֹד עֲבוֹדָה זָרָה בְּכָךְ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "38a",
+        "citation": "מֵעוֹלָם לֹא נִמְצֵאת פַּת נְקִיָּה בְּיַד בְּנֵיהֶם, שֶׁלֹּא יֹאמְרוּ מִמַּעֲשֵׂה לֶחֶם הַפָּנִים זֶה נִיזּוֹנִין"
       }
     ],
-    "note": "Adopted: baking within the sacred area, according to the first opinion in Menachot 11:2 (Tosafot Yom Tov). R. Yehudah puts all the work of the bread there. Tour's choice: the dimensions of the chamber, the shape of the oven and the placing of the furniture."
+    "note": "Adopted: baking within the sacred area, according to the first opinion in Menachot 11:2 (Tosafot Yom Tov). R. Yehudah puts all the work of the bread there. Yoma 38a does not locate the workshop of the Garmu; it is Bartenura who puts them in this chamber. Set aside: R. Yehudah's twenty-four and forty-eight maneh, for the wage before and after. Tour's choice: the dimensions of the chamber, the shape of the oven and the placing of the furniture."
   },
   "lishkat_hachotamot": {
     "translit": "Lishkat HaChotamot",

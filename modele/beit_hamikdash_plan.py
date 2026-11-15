@@ -71,6 +71,9 @@ NIVEAUX = [
          lieux=["mesiba_bira", "beit_hatevila", "shit"],
          # Bâti en surface, il descend aux tunnels : vu du plan de surface, il commence au-dessus d'eux.
          acces=["beit_hamoked"]),
+    # Plus bas que les tunnels du Beit HaMoked, et sans accès : sa brèche est rebouchée.
+    dict(id="mehilat_parva", coupe=-9.6, plancher=-11.0, x=(-40.0, -34.0), z=(30.0, 50.0), pas=4.0, souterraine=True,
+         lieux=["mehilat_parva"], acces=[]),
 ]
 
 

@@ -22,6 +22,7 @@ export const TROUPES = {
 export const TROUPE_LIBRE = "figures";
 
 const MARGE_GESTE = 0.35;
+const MARGE_OBJET = 0.12;
 const HAUTEUR_FLAMME_TORCHE = 0.3;
 
 export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir, obstacles, horsGeometrie,
@@ -50,6 +51,11 @@ export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, d
       o.computeBoundingBox();
       emprise.union(o.boundingBox.clone().applyMatrix4(o.matrix));
     });
+    // Un objet posé sans personne pour le tenir n'a pas de corps : sa forme est sa prise.
+    if (emprise.isEmpty() && figurant.isMesh) {
+      figurant.geometry.computeBoundingBox();
+      emprise.copy(figurant.geometry.boundingBox).expandByScalar(MARGE_OBJET);
+    }
     const prise = new THREE.Mesh(new THREE.BoxGeometry(...emprise.getSize(new THREE.Vector3()).toArray()), PRISE);
     emprise.getCenter(prise.position);
     prise.visible = false;

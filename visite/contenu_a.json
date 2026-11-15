@@ -854,11 +854,12 @@
   "lishkat_haparva": {
     "he": "לשכת הפרוה",
     "translit": "Lishkat HaParva",
-    "resume": "La chambre où l'on sale les peaux des korbanot. Sur son toit se trouve le bain rituel du Cohen Gadol : quatre des cinq immersions de Yom Kippour s'y font, un drap de lin tendu entre lui et le peuple.",
+    "resume": "La chambre où l'on sale les peaux des korbanot. Sur son toit se trouve le bain rituel du Cohen Gadol : quatre des cinq immersions de Yom Kippour s'y font, un drap de lin tendu entre lui et le peuple. Son nom est celui d'un mage, Parva, dit Rav Yosef. Rashi en fait le bâtisseur de la chambre ; le Rambam et le Arukh racontent qu'il voulut voir le Cohen Gadol à son service, qu'il creusa jusqu'ici et qu'il y fut pris. Au pied du mur sud, entre la banquette et l'angle, des pierres qui ne ressemblent pas au mur bouchent sa brèche.",
     "cotes": [
       "au sud, dans l'Azara, contre la face intérieure du mur",
       "le bain rituel sur le toit, avec son maake",
-      "la mesiba de la Lishkat HaMedi'hin y débouche"
+      "la mesiba de la Lishkat HaMedi'hin y débouche",
+      "la brèche de Parva, rebouchée, au pied du mur sud"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "5:3", "citation": "לִשְׁכַּת הַפַּרְוָה, שָׁם הָיוּ מוֹלְחִין עוֹרוֹת קָדָשִׁים"},
@@ -866,7 +867,9 @@
       {"oeuvre": "Yoma", "ref": "3:3", "citation": "חָמֵשׁ טְבִילוֹת… וְכֻלָּן בַּקֹּדֶשׁ עַל בֵּית הַפַּרְוָה, חוּץ מִזּוֹ בִלְבָד"},
       {"oeuvre": "Yoma", "ref": "3:6", "citation": "הֱבִיאוּהוּ לְבֵית הַפַּרְוָה, וּבַקֹּדֶשׁ הָיְתָה"},
       {"oeuvre": "Yoma", "ref": "3:6", "citation": "פָּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"},
-      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"}
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"},
+      {"oeuvre": "Yoma", "ref": "35a", "citation": "מַאי ״פַּרְוָה״? אָמַר רַב יוֹסֵף: פַּרְוָה אַמְגּוּשָׁא"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "35a", "citation": "מכשף אחד בנאה ושמו פרווה"}
     ],
     "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Les trois chambres du sud sont dans l'Azara, et non sur la terrasse du 'Heil, car la Mishna place les bains du Cohen Gadol « dans le sacré, sur la Parva » (Yoma 3:3) ; or le toit d'un bâtiment élevé hors de l'enceinte n'est pas sanctifié (Tosfot Yom Tov sur Middot 5:3). Choix de la visite : le maake du bain, les peaux empilées sur une banquette et le tas de sel. Non représentés : le drap de lin et les marches du bain."
   },
@@ -1005,7 +1008,7 @@
   "lishkat_lechem_hapanim": {
     "he": "לִשְׁכַּת עוֹשֵׂי לֶחֶם הַפָּנִים",
     "translit": "Lishkat Osei Le'hem HaPanim",
-    "resume": "La chambre où la famille de Beit Garmou cuit les douze pains de proposition, qui restent toute la semaine sur la Table du Heikhal. On les pétrit et on les façonne au-dehors, mais on les cuit dans le sacré : la chambre est donc dans la moitié sacrée du Beit HaMoked. Chaque pain cuit dans un moule, et on le remet dans un moule à la sortie du four pour qu'il ne se déforme pas.",
+    "resume": "La chambre où la famille de Beit Garmou cuit les douze pains de proposition, qui restent toute la semaine sur la Table du Heikhal. On les pétrit et on les façonne au-dehors, mais on les cuit dans le sacré : la chambre est donc dans la moitié sacrée du Beit HaMoked. Chaque pain cuit dans un moule, et on le remet dans un moule à la sortie du four pour qu'il ne se déforme pas. Les Garmou gardaient leur art pour eux, et la Mishna le leur compte à honte. Les Sages ont fait venir des boulangers d'Alexandrie : ceux-ci savaient cuire comme eux, mais pas défourner comme eux. Le pain est fait comme une boîte ouverte, comme une barque, explique Rashi ; craignant de le briser en le collant à la paroi du four, les Alexandrins chauffaient dehors et cuisaient dehors, et leur pain moisissait. Celui des Garmou, chauffé et cuit dedans, ne moisissait pas. Rappelée, la famille n'est revenue que pour un salaire doublé : vingt-quatre mané par jour au lieu de douze. Sa raison était celle des Avtinas : elle savait le Temple promis à la destruction, et craignait qu'un homme indigne apprenne l'art et s'en serve pour l'idolâtrie. On la loue aussi : jamais on ne trouva de pain blanc dans la main de ses enfants, pour qu'on ne dise pas qu'ils se nourrissaient du pain de proposition.",
     "cotes": [
       "angle sud-est, dans la moitié sacrée",
       "6 × 8 amot",
@@ -1016,9 +1019,16 @@
       {"oeuvre": "Mena'hot", "ref": "11:2", "citation": "אֶחָד שְׁתֵּי הַלֶּחֶם וְאֶחָד לֶחֶם הַפָּנִים, לִישָׁתָן וַעֲרִיכָתָן בַּחוּץ, וַאֲפִיָּתָן בִּפְנִים"},
       {"oeuvre": "Mena'hot", "ref": "11:1", "citation": "וּבִטְפוּס הָיָה עוֹשֶׂה אוֹתָן. וּכְשֶׁהוּא רָדָן, נוֹתְנָן בִּטְפוּס, כְּדֵי שֶׁלֹּא יִתְקַלְקְלוּ"},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 1:6", "citation": "דרומית מזרחית. היא היתה לשכת לחם הפנים וסמוכה לעזרה ונמצאת שהיתה מקודשת אתיא כמ\"ד אפייתן בפנים"},
-      {"oeuvre": "Bartenura", "ref": "Middot 1:6", "citation": "בֵּית גַּרְמוּ הָיוּ עוֹשִׂים לֶחֶם הַפָּנִים שָׁם"}
+      {"oeuvre": "Bartenura", "ref": "Middot 1:6", "citation": "בֵּית גַּרְמוּ הָיוּ עוֹשִׂים לֶחֶם הַפָּנִים שָׁם"},
+      {"oeuvre": "Shekalim", "ref": "5:1", "citation": "בֵּית גַּרְמוּ עַל מַעֲשֵׂה לֶחֶם הַפָּנִים"},
+      {"oeuvre": "Yoma", "ref": "3:11", "citation": "שֶׁל בֵּית גַּרְמוּ לֹא רָצוּ לְלַמֵּד עַל מַעֲשֵׂה לֶחֶם הַפָּנִים"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "וְהָיוּ יוֹדְעִין לֶאֱפוֹת כְּמוֹתָן, וְלֹא הָיוּ יוֹדְעִין לִרְדּוֹת כְּמוֹתָן. שֶׁהַלָּלוּ מַסִּיקִין מִבַּחוּץ וְאוֹפִין מִבַּחוּץ, וְהַלָּלוּ מַסִּיקִין מִבִּפְנִים וְאוֹפִין מִבִּפְנִים. הַלָּלוּ פִּיתָּן מִתְעַפֶּשֶׁת, וְהַלָּלוּ אֵין פִּיתָּן מִתְעַפֶּשֶׁת"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "38a", "citation": "לפי שהוא עשוי כמין תיבה פרוצה כמין ספינה היו יראים לדבקם מבפנים לתנור ואופין אותן מבחוץ"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "כָּפְלוּ לָהֶם שְׂכָרָן וּבָאוּ. בְּכׇל יוֹם הָיוּ נוֹטְלִין שְׁנֵים עָשָׂר מָנֶה, וְהַיּוֹם עֶשְׂרִים וְאַרְבָּעָה"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "יוֹדְעִין הָיוּ שֶׁל בֵּית אַבָּא שֶׁבַּיִת זֶה עָתִיד לֵיחָרֵב, שֶׁמָּא יִלְמוֹד אָדָם שֶׁאֵינוֹ מְהוּגָּן וְיֵלֵךְ וְיַעֲבוֹד עֲבוֹדָה זָרָה בְּכָךְ"},
+      {"oeuvre": "Yoma", "ref": "38a", "citation": "מֵעוֹלָם לֹא נִמְצֵאת פַּת נְקִיָּה בְּיַד בְּנֵיהֶם, שֶׁלֹּא יֹאמְרוּ מִמַּעֲשֵׂה לֶחֶם הַפָּנִים זֶה נִיזּוֹנִין"}
     ],
-    "note": "Retenu : la cuisson dans le sacré, selon le premier avis de Mena'hot 11:2 (Tosfot Yom Tov). R. Yehouda y met tout le travail du pain. Choix de la visite : les cotes de la chambre, la forme du four et la place du mobilier."
+    "note": "Retenu : la cuisson dans le sacré, selon le premier avis de Mena'hot 11:2 (Tosfot Yom Tov). R. Yehouda y met tout le travail du pain. Yoma 38a ne situe pas l'atelier des Garmou ; c'est Bartenura qui les met dans cette chambre. Écarté : les vingt-quatre et quarante-huit mané de R. Yehouda, pour le salaire d'avant et d'après. Choix de la visite : les cotes de la chambre, la forme du four et la place du mobilier."
   },
   "lishkat_hachotamot": {
     "he": "לִשְׁכַּת הַחוֹתָמוֹת",

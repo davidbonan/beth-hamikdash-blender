@@ -381,8 +381,7 @@ def draper(objet, epingles, tissu):
     scene.frame_set(1)
 
 
-def _objet(humain, mm, nom, materiau):
-    h = humain
+def objet_du_maillage(mm, nom, materiau):
     me = bpy.data.meshes.new(nom)
     me.from_pydata([p[:] for p in mm.sommets], [], mm.faces)
     me.update()
@@ -394,10 +393,14 @@ def _objet(humain, mm, nom, materiau):
     couleurs.data.foreach_set("color", valeurs)
     me.uv_layers.new(name="UVMap").data.foreach_set("uv", [x for face in mm.uvs for coin in face for x in coin])
     me.shade_smooth()
-    objet = bpy.data.objects.new(nom, me)
-    for c in h.rig.users_collection:
+    return bpy.data.objects.new(nom, me)
+
+
+def _objet(humain, mm, nom, materiau):
+    objet = objet_du_maillage(mm, nom, materiau)
+    for c in humain.rig.users_collection:
         c.objects.link(objet)
-    objet.parent = h.rig
+    objet.parent = humain.rig
     return objet
 
 

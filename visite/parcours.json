@@ -984,7 +984,8 @@
      "concept": "sair_hamishtaleach",
      "figurants": [
       "sair_hamishtaleach",
-      "korim_oumishtahavim"
+      "korim_oumishtahavim",
+      "lashon_zehorit_1"
      ],
      "source": {
       "oeuvre": "Yoma",
@@ -1085,6 +1086,71 @@
      }
     },
     {
+     "id": "lashon_zehorit",
+     "concept": "lashon_zehorit",
+     "figurants": [
+      "lashon_zehorit_2"
+     ],
+     "source": {
+      "oeuvre": "Yoma",
+      "ref": "67a"
+     },
+     "point": [
+      -74,
+      3
+     ],
+     "sol": 6,
+     "via": [
+      [
+       140,
+       0
+      ],
+      [
+       20,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       -12.5,
+       0
+      ],
+      [
+       -20,
+       -12
+      ],
+      [
+       -55.5,
+       -12
+      ],
+      [
+       -56,
+       -4
+      ],
+      [
+       -74,
+       -4
+      ]
+     ],
+     "cible": [
+      -75.4,
+      10,
+      -10
+     ],
+     "titre": {
+      "fr": "L'Oulam : la langue d'écarlate a blanchi",
+      "en": "The Ulam: the strip of scarlet has turned white",
+      "he": "האולם: לשון של זהורית הלבין"
+     },
+     "texte": {
+      "fr": "Quand le bouc partait, une langue de laine écarlate était nouée à l'ouverture de l'Oulam, au-dehors. Quand il arrivait au désert, elle blanchissait : « Si vos fautes sont comme l'écarlate, elles deviendront blanches comme la neige. » Blanche, on se réjouissait ; restée rouge, on était triste et honteux (Yoma 67a). On finit par la nouer au-dedans, puis par la partager entre le rocher et les cornes du bouc. Pendant les quarante ans de Shimon HaTsadik, elle blanchit chaque année ; pendant les quarante ans avant la destruction, jamais (Yoma 39a-b).",
+      "en": "When the goat left, a strip of scarlet wool was tied at the opening of the Ulam, on the outside. When it reached the wilderness, the strip turned white: “Though your sins be as scarlet, they shall be as white as snow.” White, they rejoiced; still red, they were sad and ashamed (Yoma 67a). In the end it was tied inside, then divided between the rock and the goat's horns. During the forty years of Shimon HaTzaddik it turned white every year; during the forty years before the destruction, never (Yoma 39a–b).",
+      "he": "בשעת שילוח השעיר היה לשון של זהורית קשור על פתח האולם מבחוץ. כשהגיע השעיר למדבר, הלבין: ״אם יהיו חטאיכם כשנים, כשלג ילבינו.״ הלבין – היו שמחים; לא הלבין – היו עצבים ומתביישים (יומא סז ע״א). לבסוף קשרוהו מבפנים, ואחר כך חילקוהו בין הסלע לבין קרני השעיר. כל ארבעים שנה ששימש שמעון הצדיק היה מלבין בכל שנה; ארבעים שנה קודם החורבן לא הלבין (יומא לט ע״א–ע״ב)."
+     }
+    },
+    {
      "id": "keriat_hatorah",
      "concept": "ezrat_nashim",
      "figurants": [
@@ -1102,7 +1168,31 @@
      "sol": -10,
      "via": [
       [
-       140,
+       -74,
+       -4
+      ],
+      [
+       -56,
+       -4
+      ],
+      [
+       -55.5,
+       -12
+      ],
+      [
+       -20,
+       -12
+      ],
+      [
+       -12.5,
+       0
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       20,
        0
       ]
      ],

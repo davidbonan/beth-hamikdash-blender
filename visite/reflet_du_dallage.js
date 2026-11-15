@@ -105,10 +105,12 @@ const TEINTE = "color";
 function matieresUnies(teinteDe, epure) {
   const unies = new Map();
   const teintes = new WeakSet();
+  // Les teintes que ce reflet a posées : celles qu'un objet de figurant porte de lui-même ne se repeignent pas.
+  const poses = new WeakSet();
   const unie = (side) => unies.get(side) ?? unies.set(side, new THREE.MeshStandardMaterial({ vertexColors: true, side })).get(side);
   const luit = ({ emissive, emissiveIntensity }) => emissive.getHex() * emissiveIntensity > 0;
   // Ce qui luit, ce qui bouge par ses os et ce qui n'a pas reçu ses sommets garde sa matière épurée.
-  const seTeint = ({ isSkinnedMesh, material, geometry }) => !isSkinnedMesh && material.isMeshStandardMaterial && !luit(material) && geometry.hasAttribute(TEINTE);
+  const seTeint = ({ isSkinnedMesh, material, geometry }) => !isSkinnedMesh && material.isMeshStandardMaterial && !luit(material) && poses.has(geometry.getAttribute(TEINTE));
 
   function teindre({ geometry, material }) {
     const { r, g, b } = teinteDe(material);
@@ -123,6 +125,7 @@ function matieresUnies(teinteDe, epure) {
     preparer({ isSkinnedMesh, geometry }) {
       if (isSkinnedMesh || geometry.hasAttribute(TEINTE)) return;
       geometry.setAttribute(TEINTE, new THREE.BufferAttribute(new Uint8Array(geometry.getAttribute("position").count * 4), 4, true));
+      poses.add(geometry.getAttribute(TEINTE));
     },
     vetir(maillage) {
       if (!seTeint(maillage)) return epure(maillage);

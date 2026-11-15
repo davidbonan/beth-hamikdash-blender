@@ -45,6 +45,7 @@ SECTIONS = (
     "modenature_azara",
     "mizbeach",
     "sous_l_azara",
+    "mehilat_parva",
     "bayit.oulam",
     "bayit.heikhal",
     "bayit.kelim",

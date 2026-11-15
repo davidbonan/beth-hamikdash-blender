@@ -27,6 +27,8 @@ const OUVRAGES = {
   bamidbar: "Numbers", nombres: "Numbers",
   "i samuel": "I Samuel", "shmuel i": "I Samuel",
   yirmeyahou: "Jeremiah", jeremie: "Jeremiah",
+  yeshayahou: "Isaiah", isaie: "Isaiah",
+  "tosafot sur yoma": "Tosafot on Yoma",
   yehezkel: "Ezekiel",
   "rambam temidin": "Mishneh Torah, Daily Offerings and Additional Offerings",
   "rambam tefila": "Mishneh Torah, Prayer and the Priestly Blessing",

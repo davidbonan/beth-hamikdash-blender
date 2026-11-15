@@ -1,5 +1,6 @@
 import math
 
+import bpy
 import numpy as np
 from mathutils import Matrix, Vector
 
@@ -7,17 +8,17 @@ import beit_hamikdash_gestes as G
 from beit_hamikdash_visite import AMA, Z_AZ, Z_BAT, Z_EZN
 from blockout.primitives.parametres import Z_MAARAKHA
 
-from ..matieres import CHENE, LIN, OR, bois, lin, metal
+from ..matieres import BRONZE, CHENE, LIN, OR, SHANI, bois, laine, lin, metal
 from ..corps import Gabarit, _alea
 from ..maillage import TOUR, Maillage, pave
-from ..habillage import HAUT_Z, _objet, lier, porter
+from ..habillage import HAUT_Z, _objet, lier, objet_du_maillage, porter
 from ..ustensiles import mizrak, tabouret, tourner_profil, tube_simple
 from ..mise_en_scene import (RECUL_ASSIS, assis, coude_ouvert, devant_poitrine, ecouter, hatava,
                              lire_le_sefer, mains_aux_genoux, mains_jointes, repere_mizrak, repere_vers,
                              saisir, tenir, tenir_le_sefer, vers_la_figure, zerika)
 from ..bigdei_kehouna import cohen, cohen_gadol, cohen_gadol_en_or
 from ..tenues import fidele
-from ..role import Role
+from ..role import Objet, Role
 from ..betes import FRONT_DU_SEIR, amener_le_par, amener_le_seir, front_du_par, poser_seir
 
 
@@ -83,6 +84,36 @@ def _sair_hamishtaleach():
         return h
     return Role(nom, nom, batir, lambda h, a, horloge, t: semikha(front_du_seir(h))(h, a, horloge, t), SEIR_OU, 0.0,
                 famille="cohanim")
+
+
+# « בָּרִאשׁוֹנָה הָיוּ קוֹשְׁרִין לָשׁוֹן שֶׁל זְהוֹרִית עַל פֶּתַח אוּלָם מִבַּחוּץ » (Yoma 67a) : rouge au départ du bouc,
+# blanche quand il est au désert (Yoma 6:8). Le jambage nord, au bord de la façade, l'anneau, la hauteur et la taille
+# de la langue : CHOIX. Son nu regarde le sud et prend le soleil ; celui du jambage sud reste à l'ombre.
+LASHON_OU = (-75.4, 10.0, Z_BAT + 4.5)
+LASHON_CAP = 180.0
+NEIGE = (0.88, 0.87, 0.84)
+
+
+def _lashon_zehorit(k, couleur):
+    nom = f"lashon_zehorit_{k}"
+
+    def batir():
+        ruban, anneau = Maillage(), Maillage()
+        centre = Vector((0.0, 0.045, -0.04))
+        tour = [centre + Vector((0.0, 0.04 * math.cos(a), 0.04 * math.sin(a))) for a in np.linspace(0.0, TOUR, 17)]
+        anneau.nappe(tube_simple(tour, 0.006, 6), BRONZE, "objet")
+        noeud = centre + Vector((0.0, 0.0, -0.04))
+        boucle = [noeud + Vector((0.014 * math.sin(a), 0.014 * math.cos(a), 0.0)) for a in np.linspace(0.0, TOUR, 13)]
+        ruban.nappe(tube_simple(boucle, 0.007, 6), couleur, "objet")
+        pan = [noeud + Vector((0.006 * math.sin(2.1 * j), 0.012 * math.sin(1.3 * j), -0.04 * j)) for j in range(13)]
+        ruban.nappe([[p + Vector((dx, dy, 0.0)) for dx, dy in ((-0.018, 0.002), (0.018, 0.002), (0.018, -0.002),
+                                                                (-0.018, -0.002))] for p in pan], couleur, "objet")
+        pose = objet_du_maillage(ruban, nom, laine())
+        fer = objet_du_maillage(anneau, f"{nom}_anneau", metal())
+        bpy.context.scene.collection.objects.link(fer)
+        fer.parent = pose
+        return pose
+    return Objet(nom, "lashon_zehorit", batir, LASHON_OU, LASHON_CAP)
 
 
 # Les cohanim dans l'Ezrat Cohanim, les Israélites dans l'Ezrat Israël (Middot 5:1), tous la tête vers le Heikhal.
@@ -476,6 +507,7 @@ def roles_kippour():
         _mizrak_en_main("bigdei_lavan_5", asperger, (-136.2, 0.0, Z_BAT), 180.0, 16.0),
         _mizrak_en_main("bigdei_lavan_6", matan_keranot, MIZBEACH_HAZAHAV_OU, MIZBEACH_HAZAHAV_CAP, 12.0),
         _sair_hamishtaleach(),
+        _lashon_zehorit(1, SHANI), _lashon_zehorit(2, NEIGE),
         _keriat_hatorah("bigdei_lavan_7", (37.0, 0.0, Z_EZN)),
         _aupres_du_sefer(0, (37.4, 1.9, Z_EZN), 200.0), _aupres_du_sefer(1, (38.6, -1.9, Z_EZN), 160.0),
         _aupres_du_sefer(2, (40.0, -3.3, Z_EZN), 160.0),

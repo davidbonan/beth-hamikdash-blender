@@ -1326,5 +1326,94 @@
       {"oeuvre": "Rambam Me'houssrei Kappara", "ref": "4:2", "citation": "נוֹטֵל הַכֹּהֵן מִלּוֹג הַשֶּׁמֶן וְיוֹצֵק לְתוֹךְ כַפּוֹ שֶׁל חֲבֵרוֹ הַשְּׂמָאלִית… וְאִם הִזָּה וְלֹא כִּוֵּן כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳדָשִׁים כְּשֵׁרוֹת… וּשְׁאָר הַלּוֹג מִתְחַלֵּק לַכֹּהֲנִים"}
     ],
     "note": "Choix de la visite : celui qui asperge est celui qui a l'huile dans la paume, comme le verset le dit ; les deux cohanim dans l'Ezrat Israël, près de Nikanor, tournés vers l'ouest ; la forme et le métal du vase."
+  },
+
+  "mehilat_parva": {
+    "he": "מחילת פרוה",
+    "translit": "Me'hilat Parva",
+    "resume": "« Qu'est-ce que Parva ? Un mage », dit Rav Yosef, et la chambre où l'on sale les peaux porte son nom. Ce qu'il fit, chaque commentateur le raconte à sa façon. Pour Rashi, il a bâti la chambre. Pour le Rambam, il perça le mur de l'Azara dans cette chambre pour voir le service, et y fut tué. Pour le Arukh, que citent les Tosafot, il creusa une galerie sous le sol du sanctuaire pour voir le Cohen Gadol à son service ; les cohanim l'entendirent creuser, le trouvèrent, et la chambre prit son nom. C'est là qu'on amène le Cohen Gadol le jour de Kippour, pour sa deuxième immersion, et la chambre est dans le sacré ; un non-Juif ne passait même pas le 'Heil. La visite fait donc partir la galerie de l'esplanade, au-delà du Soreg, et la mène sous le 'Heil jusqu'au pied du mur sud, où un puits remonte à la brèche. Depuis la chambre, on ne voit que quelques pierres qui ne ressemblent pas au mur.",
+    "cotes": [
+      "départ : l'esplanade, trois amot au-delà du Soreg, sous une dalle qui ne ressemble pas aux autres",
+      "une galerie de 2 amot de large et 4 de haut, 2 amot sous le dallage, longue de 30 amot",
+      "un puits de 22 amot sous le mur sud de la Lishkat HaParva, des prises pour les pieds",
+      "la brèche, 2 amot sur 2,5, au pied du mur, rebouchée"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "35a", "citation": "מַאי ״פַּרְוָה״? אָמַר רַב יוֹסֵף: פַּרְוָה אַמְגּוּשָׁא"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "35a", "citation": "מכשף אחד בנאה ושמו פרווה"},
+      {"oeuvre": "Tosafot sur Yoma", "ref": "35a", "citation": "פי' בערוך וזה לשונו יש מן החכמים שאומרים כי חפר מחילה תחת הקרקע בקדש עד שיראה עבודת כהן גדול והרגישו הכהנים בחפירה ומצאוהו וקרא אותה הלשכה על שמו"},
+      {"oeuvre": "Rambam sur Middot", "ref": "5:3", "citation": "שם איש אמגושי שחתר בקיר העזרה בלשכה זו כדי לראות העבודה ונהרג על כן נקראת הלשכה על שמו"},
+      {"oeuvre": "Bartenura", "ref": "Middot 5:3", "citation": "אָדָם מְכַשֵּׁף שֶׁשְּׁמוֹ פַּרְוָה בָּנָה אוֹתָהּ לִשְׁכָּה עַל יְדֵי מְכַשֵּׁפוּת, וְנִקְרֵאת עַל שְׁמוֹ. כָּךְ מָצָאתִי. וְרַמְבַּ\"ם כָּתַב, שֶׁהָיָה חוֹתֵר בַּקִּיר כְּדֵי לִרְאוֹת מִשָּׁם הֵיאַךְ הָיָה כֹּהֵן עוֹבֵד הָעֲבוֹדָה וְנֶהֱרַג שָׁם"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:3", "citation": "ואני תמה שיקיימו בקדש בנין הנעשה ע\"י כשוף"},
+      {"oeuvre": "Yoma", "ref": "3:6", "citation": "הֱבִיאוּהוּ לְבֵית הַפַּרְוָה, וּבַקֹּדֶשׁ הָיְתָה"},
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "הַחֵיל מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם"}
+    ],
+    "note": "Retenu : le Arukh et le Rambam ensemble — la galerie sous le sol, et la brèche dans le mur de l'Azara, dans cette chambre. Écarté : Rashi et Bartenura, pour qui Parva a bâti la chambre ; Tosfot Yom Tov s'étonne qu'on garde dans le sacré un bâtiment fait par sorcellerie. Choix de la visite : tout le tracé — le départ au-delà du Soreg, la profondeur, la section, le puits et ses prises, la place de la brèche entre la banquette et le mur est, ses pierres de bouchage et la dalle de l'esplanade. Aucune source ne dit d'où il partait, ni qu'on ait laissé la galerie ouverte : elle est là pour qu'on la voie."
+  },
+
+  "course_kevesh": {
+    "he": "רָצִין וְעוֹלִין בַּכֶּבֶשׁ",
+    "translit": "Ratzin ve'olin bakevesh",
+    "resume": "Au début, qui voulait déblayer l'autel au matin le déblayait. Quand ils étaient nombreux, les cohanim couraient et montaient le kevesh, et celui qui devançait l'autre dans les quatre amot du haut, contre l'autel, gagnait ; à égalité, le préposé leur faisait lever un doigt, et l'on comptait. Un jour, deux arrivèrent ensemble ; l'un poussa l'autre, qui tomba et se cassa la jambe. Voyant qu'on en venait au danger, le Beit Din décida qu'on ne déblaierait plus l'autel que par tirage au sort. La guemara raconte pire. L'un, devancé dans les quatre amot, prit un couteau et le planta dans le cœur de l'autre. Rabbi Tsadok se tint sur les marches de l'Oulam : « Écoutez, nos frères, maison d'Israël ! Il est dit : si l'on trouve un mort sur la terre… Pour qui apporterons-nous la génisse : pour la ville, ou pour les cours ? » Tout le peuple éclata en sanglots. Le père du jeune homme vint, le trouva qui se débattait encore, et dit : « Qu'il soit votre expiation. Mon fils se débat encore, et le couteau n'est pas devenu impur. » La pureté des ustensiles leur pesait plus que le sang versé.",
+    "cotes": [
+      "le kevesh : 32 amot sur 16, au sud de l'autel",
+      "les quatre amot du haut, contre l'autel",
+      "Rabbi Tsadok sur les marches de l'Oulam"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "2:1", "citation": "וּבִזְמַן שֶׁהֵן מְרֻבִּין, רָצִין וְעוֹלִין בַּכֶּבֶשׁ, וְכָל הַקּוֹדֵם אֶת חֲבֵרוֹ בְאַרְבַּע אַמּוֹת זָכָה"},
+      {"oeuvre": "Bartenura", "ref": "Yoma 2:1", "citation": "לִיכָּנֵס לְתוֹךְ אַרְבַּע אַמּוֹת עֶלְיוֹנוֹת שֶׁל כֶּבֶשׁ הַסְּמוּכוֹת לְרֹאשׁ הַמִּזְבֵּחַ, זָכָה לִתְרֹם"},
+      {"oeuvre": "Yoma", "ref": "2:2", "citation": "וְדָחַף אֶחָד מֵהֶן אֶת חֲבֵרוֹ, וְנָפַל וְנִשְׁבְּרָה רַגְלוֹ. וְכֵיוָן שֶׁרָאוּ בֵית דִּין שֶׁבָּאִין לִידֵי סַכָּנָה, הִתְקִינוּ שֶׁלֹּא יְהוּ תוֹרְמִין אֶת הַמִּזְבֵּחַ אֶלָּא בְפַיִס"},
+      {"oeuvre": "Yoma", "ref": "23a", "citation": "קָדַם אֶחָד מֵהֶן לְתוֹךְ אַרְבַּע אַמּוֹת שֶׁל חֲבֵירוֹ, נָטַל סַכִּין וְתָקַע לוֹ בְּלִבּוֹ"},
+      {"oeuvre": "Yoma", "ref": "23a", "citation": "עָמַד רַבִּי צָדוֹק עַל מַעֲלוֹת הָאוּלָם… אָנוּ, עַל מִי לְהָבִיא עֶגְלָה עֲרוּפָה? עַל הָעִיר, אוֹ עַל הָעֲזָרוֹת? גָּעוּ כׇּל הָעָם בִּבְכִיָּה"},
+      {"oeuvre": "Yoma", "ref": "23a", "citation": "הֲרֵי הוּא כַּפָּרַתְכֶם, וַעֲדַיִין בְּנִי מְפַרְפֵּר, וְלֹא נִטְמְאָה סַכִּין. לְלַמֶּדְךָ שֶׁקָּשָׁה עֲלֵיהֶם טׇהֳרַת כֵּלִים יוֹתֵר מִשְּׁפִיכוּת דָּמִים"},
+      {"oeuvre": "Deutéronome", "ref": "21:1", "citation": "כִּי יִמָּצֵא חָלָל בָּאֲדָמָה"},
+      {"oeuvre": "Melakhim II", "ref": "21:16", "citation": "וְגַם דָּם נָקִי שָׁפַךְ מְנַשֶּׁה הַרְבֵּה מְאֹד עַד אֲשֶׁר מִלֵּא אֶת יְרוּשָׁלִַם פֶּה לָפֶה"},
+      {"oeuvre": "Middot", "ref": "3:3", "citation": "וְכֶבֶשׁ הָיָה לִדְרוֹמוֹ שֶׁל מִזְבֵּחַ, שְׁלֹשִׁים וּשְׁתַּיִם עַל רֹחַב שֵׁשׁ עֶשְׂרֵה"}
+    ],
+    "note": "La guemara se demande lequel des deux récits vient d'abord : si le meurtre avait précédé, une jambe cassée n'aurait rien ajouté. Sa réponse : le meurtre est le premier, mais on l'avait pris pour un malheur isolé ; la jambe cassée montra que la course menait d'elle-même au danger (Yoma 23a). Rien n'est modélisé de la course : la fiche se lit depuis le kevesh."
+  },
+
+  "shimon_hatsadik": {
+    "he": "שִׁמְעוֹן הַצַּדִּיק",
+    "translit": "Shimon HaTsadik",
+    "resume": "Quarante ans Shimon HaTsadik servit comme Cohen Gadol, et quarante ans les signes l'accompagnèrent. Le sort « pour HaShem » montait toujours dans sa main droite. La langue d'écarlate blanchissait. La lampe occidentale de la Menora brûlait encore. Le feu de l'autel se renforçait de lui-même, et les cohanim n'y portaient que deux bûches, pour la mitsva. La bénédiction était dans l'omer, les deux pains et le pain de proposition : un cohen qui en recevait la taille d'une olive mangeait à sa faim, et en laissait. Après lui, tantôt oui, tantôt non. L'année de sa mort, il l'annonça : chaque Yom Kippour, un vieillard vêtu et drapé de blanc entrait avec lui et sortait avec lui ; cette fois, le vieillard était vêtu et drapé de noir, il était entré avec lui et n'était pas ressorti. Après la fête, il fut malade sept jours et mourut, et ses frères les cohanim cessèrent de bénir par le Nom. Quarante ans avant la destruction, aucun signe ne revint, et les portes du Heikhal s'ouvraient d'elles-mêmes, jusqu'à ce que Rabban Yo'hanan ben Zakkaï les tance : « Heikhal, Heikhal, pourquoi t'effraies-tu toi-même ? Je sais que ta fin est d'être détruit. »",
+    "cotes": [
+      "quarante ans Cohen Gadol",
+      "cinq signes : le sort, l'écarlate, la lampe occidentale, le feu de l'autel, le pain"
+    ],
+    "sources": [
+      {"oeuvre": "Avot", "ref": "1:2", "citation": "שִׁמְעוֹן הַצַּדִּיק הָיָה מִשְּׁיָרֵי כְנֶסֶת הַגְּדוֹלָה"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "אַרְבָּעִים שָׁנָה שֶׁשִּׁמֵּשׁ שִׁמְעוֹן הַצַּדִּיק, הָיָה גּוֹרָל עוֹלֶה בְּיָמִין… וְהָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין… וְהָיָה נֵר מַעֲרָבִי דּוֹלֵק"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "וְהָיָה אֵשׁ שֶׁל מַעֲרָכָה מִתְגַּבֵּר, וְלֹא הָיוּ כֹּהֲנִים צְרִיכִין לְהָבִיא עֵצִים לְמַעֲרָכָה, חוּץ מִשְּׁנֵי גְּזִירֵי עֵצִים כְּדֵי לְקַיֵּים מִצְוַת עֵצִים"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "וְנִשְׁתַּלְּחָה בְּרָכָה בָּעוֹמֶר, וּבִשְׁתֵּי הַלֶּחֶם, וּבְלֶחֶם הַפָּנִים. וְכׇל כֹּהֵן שֶׁמַּגִּיעוֹ כְּזַיִת, יֵשׁ אוֹכְלוֹ וְשָׂבֵעַ, וְיֵשׁ אוֹכְלוֹ וּמוֹתִיר"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "בְּכׇל יוֹם הַכִּפּוּרִים הָיָה מִזְדַּמֵּן לִי זָקֵן אֶחָד לָבוּשׁ לְבָנִים וְעָטוּף לְבָנִים, נִכְנַס עִמִּי וְיָצָא עִמִּי, וְהַיּוֹם נִזְדַּמֵּן לִי זָקֵן אֶחָד לָבוּשׁ שְׁחוֹרִים וְעָטוּף שְׁחוֹרִים, נִכְנַס עִמִּי וְלֹא יָצָא עִמִּי"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "אַחַר הָרֶגֶל חָלָה שִׁבְעָה יָמִים וָמֵת. וְנִמְנְעוּ אֶחָיו הַכֹּהֲנִים מִלְּבָרֵךְ בַּשֵּׁם"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "אַרְבָּעִים שָׁנָה קוֹדֶם חוּרְבַּן הַבַּיִת לֹא הָיָה גּוֹרָל עוֹלֶה בְּיָמִין, וְלֹא הָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין, וְלֹא הָיָה נֵר מַעֲרָבִי דּוֹלֵק. וְהָיוּ דַּלְתוֹת הַהֵיכָל נִפְתְּחוֹת מֵאֲלֵיהֶן"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "הֵיכָל הֵיכָל! מִפְּנֵי מָה אַתָּה מַבְעִית עַצְמְךָ? יוֹדֵעַ אֲנִי בְּךָ שֶׁסּוֹפְךָ עָתִיד לֵיחָרֵב"}
+    ],
+    "note": "Rien n'est modélisé de lui. La fiche se lit depuis la Menora, dont la lampe occidentale est l'un des signes ; la langue d'écarlate se voit dans le parcours de Yom Kippour, à l'ouverture de l'Oulam."
+  },
+
+  "lashon_zehorit": {
+    "he": "לָשׁוֹן שֶׁל זְהוֹרִית",
+    "translit": "Lashon shel zehorit",
+    "resume": "Le jour de Kippour, on nouait une langue de laine écarlate sur la tête du bouc émissaire avant de l'envoyer. Rabbi Yishmaël parle d'une autre, nouée à l'entrée du sanctuaire : quand le bouc arrivait au désert, elle blanchissait, comme il est écrit : « Si vos fautes sont comme l'écarlate, elles deviendront blanches comme la neige. » Selon la baraita, on l'attachait d'abord à l'ouverture de l'Oulam, au-dehors. Si elle blanchissait, on se réjouissait ; sinon, on était triste et honteux. On la mit au-dedans, mais on venait encore jeter un œil ; alors on la partagea, une moitié nouée au rocher, l'autre entre les cornes du bouc. Pendant les quarante ans de Shimon HaTsadik, elle blanchissait chaque année ; pendant les quarante ans avant la destruction, jamais.",
+    "cotes": [
+      "à l'ouverture de l'Oulam, au-dehors, sur le jambage sud",
+      "nouée à un anneau, quatre amot et demie au-dessus du seuil",
+      "rouge au départ du bouc, blanche quand il arrive au désert"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "4:2", "citation": "קָשַׁר לָשׁוֹן שֶׁל זְהוֹרִית בְּרֹאשׁ שָׂעִיר הַמִּשְׁתַּלֵּחַ"},
+      {"oeuvre": "Yoma", "ref": "6:8", "citation": "רַבִּי יִשְׁמָעֵאל אוֹמֵר, וַהֲלֹא סִימָן אַחֵר הָיָה לָהֶם, לָשׁוֹן שֶׁל זְהוֹרִית הָיָה קָשׁוּר עַל פִּתְחוֹ שֶׁל הֵיכָל, וּכְשֶׁהִגִּיעַ שָׂעִיר לַמִּדְבָּר הָיָה הַלָּשׁוֹן מַלְבִּין"},
+      {"oeuvre": "Yeshayahou", "ref": "1:18", "citation": "אִם יִהְיוּ חֲטָאֵיכֶם כַּשָּׁנִים כַּשֶּׁלֶג יַלְבִּינוּ"},
+      {"oeuvre": "Yoma", "ref": "67a", "citation": "בָּרִאשׁוֹנָה הָיוּ קוֹשְׁרִין לָשׁוֹן שֶׁל זְהוֹרִית עַל פֶּתַח הָאוּלָם מִבַּחוּץ, הִלְבִּין — הָיוּ שְׂמֵחִין, לֹא הִלְבִּין — הָיוּ עֲצֵבִין וּמִתְבַּיְּישִׁין. הִתְקִינוּ שֶׁיִּהְיוּ קוֹשְׁרִין עַל פֶּתַח אוּלָם מִבִּפְנִים… הִתְקִינוּ שֶׁיִּהְיוּ קוֹשְׁרִין אוֹתוֹ חֶצְיוֹ בְּסֶלַע וְחֶצְיוֹ בֵּין קַרְנָיו"},
+      {"oeuvre": "Yoma", "ref": "6:6", "citation": "חוֹלֵק לָשׁוֹן שֶׁל זְהוֹרִית, חֶצְיוֹ קָשַׁר בַּסֶּלַע וְחֶצְיוֹ קָשַׁר בֵּין שְׁתֵּי קַרְנָיו"},
+      {"oeuvre": "Rambam Avodat Yom HaKippurim", "ref": "3:7", "citation": "חוֹלֵק לָשׁוֹן שֶׁל זְהוֹרִית שֶׁבְּקַרְנָיו. חֶצְיוֹ קוֹשֵׁר בַּסֶּלַע וְחֶצְיוֹ קוֹשֵׁר בֵּין שְׁתֵּי קַרְנָיו"},
+      {"oeuvre": "Yoma", "ref": "39a", "citation": "אַרְבָּעִים שָׁנָה שֶׁשִּׁמֵּשׁ שִׁמְעוֹן הַצַּדִּיק… וְהָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין"},
+      {"oeuvre": "Yoma", "ref": "39b", "citation": "אַרְבָּעִים שָׁנָה קוֹדֶם חוּרְבַּן הַבַּיִת… וְלֹא הָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין"}
+    ],
+    "note": "Retenu : la première manière de la baraita, à l'ouverture de l'Oulam, au-dehors (Yoma 67a), celle qu'on voyait de l'Azara. La Mishna dit « l'entrée du Heikhal » (Yoma 6:8). Le Rambam ne connaît que la langue partagée entre le rocher et les cornes (Avodat Yom HaKippourim 3:7) : celle de l'Oulam est un usage aboli, que la visite ne montre que dans le parcours de Yom Kippour, rouge quand le bouc part, blanche quand il est arrivé. Choix de la visite : le jambage, la hauteur, l'anneau, la taille de la langue."
   }
 }
