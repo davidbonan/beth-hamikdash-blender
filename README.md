@@ -29,7 +29,7 @@ Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `vi
 |---|---|
 | `fiche_technique_beit_hamikdash.md` | Référence architecturale : cotes en amot, sources (*Middot*, *Yoma*, *Tamid*, *Pesa'him*, Rambam), matériaux, §9 = liste des erreurs à ne jamais laisser passer. |
 | `modele/beit_hamikdash_blockout.py` | Script Blender : génère toute la scène en volumes. **Aucune caméra.** Point d'entrée : il importe dans l'ordre (`SECTIONS`) les zones du paquet `modele/blockout/`. |
-| `modele/blockout/` | Le code du blockout, une zone par module — `har_habayit`, `ezrat_nashim`, `azara`, `lishkot`, `heil`, `mizbeach`, `sous_l_azara`, `mehilat_parva`, `bayit/` (Oulam, Heikhal, kelim, Parokhot, parois d'or, Kodesh HaKodashim), `pays/`, `foule`, `finitions`, `eclairage` — et ce qu'elles partagent dans `primitives/` : paramètres, matières, volumes, gravures, ouvrages. |
+| `modele/blockout/` | Le code du blockout, une zone par module — `har_habayit`, `ezrat_nashim`, `azara`, `lishkot`, `heil`, `mizbeach`, `sous_l_azara`, `mehilat_parva`, `para_adouma`, `bayit/` (Oulam, Heikhal, kelim, Parokhot, parois d'or, Kodesh HaKodashim), `pays/`, `foule`, `finitions`, `eclairage` — et ce qu'elles partagent dans `primitives/` : paramètres, matières, volumes, gravures, ouvrages. |
 | `modele/cameras.json` | Les plans : nom, focale, durée, course de la caméra et course de sa cible, en amot. La source ; le .blend en est l'artefact. |
 | `modele/beit_hamikdash_cameras.py` | Pose dans la scène les plans déclarés dans `modele/cameras.json`. |
 | `modele/beit_hamikdash.blend` | Scène générée (à regénérer après toute modification du script ou de `modele/cameras.json`). |

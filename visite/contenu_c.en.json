@@ -1414,5 +1414,147 @@
       {"oeuvre": "Yoma", "ref": "39b", "citation": "אַרְבָּעִים שָׁנָה קוֹדֶם חוּרְבַּן הַבַּיִת… וְלֹא הָיָה לָשׁוֹן שֶׁל זְהוֹרִית מַלְבִּין"}
     ],
     "note": "Adopted: the baraita's first practice, at the opening of the Ulam, on the outside (Yoma 67a), the one seen from the Azara. The Mishna says “the entrance of the Heikhal” (Yoma 6:8). The Rambam knows only the strip divided between the rock and the horns (Service on the Day of Atonement 3:7): the one at the Ulam is an abolished practice, which the tour shows only on the Yom Kippur tour, red when the goat leaves, white once it has arrived. Tour's choice: the jamb, the height, the ring, the size of the strip."
+  },
+  "para_adouma": {
+    "nom": "The red heifer",
+    "translit": "Para Adumah",
+    "resume": "“Let them take you a red heifer, perfect, without blemish, on which a yoke has never come.” Burned outside the camp, its ash mixed with living water purifies whoever touched a corpse — and without it, such a person does not pass the Cheil. From Moshe to the destruction, only nine were burned: Moshe the first, Ezra the second, then seven — Shimon HaTzaddik and Yochanan the Kohen Gadol two each, Elyehoenai ben HaKof, Chanamel the Egyptian and Yishmael ben Piavi one each. The tenth, writes the Rambam, will be made by the king Messiah. Everything around it is made so that no impurity comes near: the kohen set apart seven days in a house of stone, children born above a void, a ramp of arches to the Mount of Olives. And yet the kohen is made impure, on purpose, just before he burns it: the Sadducees said one had to wait for sunset, and the Sages wanted to show them they were wrong.",
+    "cotes": [
+      "9 parot from Moshe to the destruction of the Second Temple; the 10th, the king Messiah",
+      "the way: the Beit Even, Sha'ar Shushan, the kevesh, the Mount of Olives",
+      "the ash in three parts: the Cheil, the Mount of Olives, the mishmarot"
+    ],
+    "sources": [
+      {"oeuvre": "Nombres", "ref": "19:2", "citation": "וְיִקְח֣וּ אֵלֶ֩יךָ֩ פָרָ֨ה אֲדֻמָּ֜ה תְּמִימָ֗ה אֲשֶׁ֤ר אֵֽין־בָּהּ֙ מ֔וּם אֲשֶׁ֛ר לֹא־עָלָ֥ה עָלֶ֖יהָ עֹֽל"},
+      {"oeuvre": "Para", "ref": "3:5", "citation": "שִׁמְעוֹן הַצַּדִּיק וְיוֹחָנָן כֹּהֵן גָּדוֹל עָשׂוּ שְׁתַּיִם שְׁתַּיִם, אֶלְיְהוֹעֵינַי בֶּן הַקּוֹף וַחֲנַמְאֵל הַמִּצְרִי וְיִשְׁמָעֵאל בֶּן פִּיאָבִי עָשׂוּ אַחַת אֶחָת"},
+      {"oeuvre": "Rambam Para Adouma", "ref": "3:4", "citation": "וְתֵשַׁע פָּרוֹת אֲדֻמּוֹת נַעֲשׂוּ מִשֶּׁנִּצְטַוּוּ בְּמִצְוָה זוֹ עַד שֶׁחָרַב הַבַּיִת בַּשְּׁנִיָּה… וְהָעֲשִׂירִית יַעֲשֶׂה הַמֶּלֶךְ הַמָּשִׁיחַ"},
+      {"oeuvre": "Para", "ref": "3:7", "citation": "וּמְטַמְּאִים הָיוּ אֶת הַכֹּהֵן הַשּׂוֹרֵף אֶת הַפָּרָה, מִפְּנֵי הַצְּדוֹקִים, שֶׁלֹּא יִהְיוּ אוֹמְרִים, בִּמְעֹרְבֵי שֶׁמֶשׁ הָיְתָה נַעֲשֵׂית"},
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "הַחֵיל מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם"}
+    ],
+    "note": "Adopted: the Sages, seven parot since Ezra (Para 3:5), whom the Rambam follows. Set aside: R. Meir, who counts only five after Ezra. The heifer itself, the kohen and those who accompany him are not yet in the tour: only the way is followed, from the Beit Even to the Mount of Olives."
+  },
+  "beit_even": {
+    "nom": "Beit Even",
+    "translit": "Beit Even",
+    "resume": "Seven days before burning the para, the kohen who will burn it is separated from his house and settled in a chamber to the northeast, facing the Mikdash: it was called Beit Even, the house of stone. Everything he uses during these seven days is of stone, dried dung or raw clay, materials that do not take impurity. Each day he is sprinkled with the ash of one of the earlier parot, a different one each day. According to R. Chanina, the Segan of the kohanim, he is sprinkled all seven days; the Kohen Gadol of Kippur, also set apart seven days, is sprinkled only on the third and the seventh. The northeast is no accident: the para is a chatat, and the chatat requires the north.",
+    "cotes": [
+      "7 days of separation, begun on a Wednesday so that the 4th, which has no sprinkling, falls on Shabbat",
+      "a chamber of 20 × 16 amot to the northeast of the Mikdash, beyond the Soreg",
+      "bench, jars and cups: of stone"
+    ],
+    "sources": [
+      {"oeuvre": "Para", "ref": "3:1", "citation": "שִׁבְעַת יָמִים קֹדֶם לִשְׂרֵפַת הַפָּרָה מַפְרִישִׁין כֹּהֵן הַשּׂוֹרֵף אֶת הַפָּרָה מִבֵּיתוֹ לַלִּשְׁכָּה שֶׁעַל פְּנֵי הַבִּירָה, צָפוֹנָה מִזְרָחָה, וּבֵית אֶבֶן הָיְתָה נִקְרֵאת"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:1", "citation": "וּבֵית אֶבֶן הָיְתָה נִקְרֵאת. לְפִי שֶׁכָּל מַעֲשֶׂיהָ הָיוּ בִכְלֵי גְלָלִים כְּלֵי אֲבָנִים כְּלֵי אֲדָמָה שֶׁאֵינָן מְקַבְּלִין טֻמְאָה"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:1", "citation": "כֵּיוָן דְּחַטָּאת הִיא וְחַטָּאת טְעוּנָה צָפוֹן, תַּקִּינוּ לֵיהּ רַבָּנָן בְּצָפוֹנָה מִזְרָחָה"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:1", "citation": "הַבִּירָה. אִית דְּאָמְרֵי מָקוֹם הָיָה בְהַר הַבַּיִת וּבִירָה שְׁמוֹ. וְאִית דְּאָמְרֵי כָּל הַמִּקְדָּשׁ קָרוּי בִּירָה"},
+      {"oeuvre": "Rambam Para Adouma", "ref": "2:5", "citation": "בִּרְבִיעִי בְּשַׁבָּת הָיוּ מַפְרִישִׁין אוֹתוֹ כְּדֵי שֶׁיָּחוּל רְבִיעִי שֶׁלּוֹ לִהְיוֹת בְּשַׁבָּת"}
+    ],
+    "note": "Adopted: the בירה is the whole Mikdash (the second view of the Bartenura), and the chamber faces its northeast corner. Set aside: the first view, for which the Bira is a place on the Har HaBayit that bore this name. Tour's choice: the exact place, beyond the Soreg, the size, the door on the south and the stone furniture."
+  },
+  "kelalim": {
+    "nom": "The ash jars of the Cheil",
+    "translit": "Kelal shel Chatat",
+    "resume": "The ash of each para was divided into three: one part for the mishmarot of kohanim, one on the Mount of Olives where Israel came to purify themselves, and one kept in the Cheil, “in deposit.” The ash of each para was kept there in this way. The Tosefta says where: stone jars sealed in the wall of the steps of the Ezrat Nashim, whose stone lids could be seen from the Cheil. It is there, at the gate, that the children born for purity arrived: a rope was tied to the horns of a ram, with a stick at its end that was thrown into the jar; the ram was struck, it drew back, the ash spilled, and the child took it without having to plunge his hand in. R. Yosei: “Do not give the Sadducees room to mock” — the child took it himself.",
+    "cotes": [
+      "9 stone lids, one per para, in the riser of the first step of the Cheil",
+      "north of the gate of the Ezrat Nashim, at ankle height",
+      "the jars stay in the stone"
+    ],
+    "sources": [
+      {"oeuvre": "Para", "ref": "3:11", "citation": "וְחוֹלְקִים אוֹתוֹ לִשְׁלשָׁה חֲלָקִים, אֶחָד נִתָּן בַּחֵיל, וְאֶחָד נִתָּן בְּהַר הַמִּשְׁחָה, וְאֶחָד הָיָה מִתְחַלֵּק לְכָל הַמִּשְׁמָרוֹת"},
+      {"oeuvre": "Rambam Para Adouma", "ref": "3:4", "citation": "וְזֶה שֶׁנִּתַּן בַּחֵיל הָיָה מוּכָן וּמֻצְנָע… וְכֵן הָיוּ מַצְנִיעִין מֵאֵפֶר כָּל פָּרָה וּפָרָה שֶׁשּׂוֹרְפִין בַּחֵיל"},
+      {"oeuvre": "Rash MiShantz", "ref": "Para 3:3", "citation": "באו לשער היוצא מעזרת נשים לחיל וקילולות של אבן היו קבועין בכותל מעלות של עזרת נשים וכיסוייהן של אבן נראין בחיל ובתוכן אפר מכל פרה ופרה שהיו שורפים"},
+      {"oeuvre": "Para", "ref": "3:3", "citation": "וּבְפֶתַח הָעֲזָרָה הָיָה מְתֻקָּן קָלָל שֶׁל חַטָּאת, וּמְבִיאִין זָכָר שֶׁל רְחֵלִים וְקוֹשְׁרִים חֶבֶל בֵּין קַרְנָיו… רַבִּי יוֹסֵי אוֹמֵר, אַל תִּתְּנוּ מָקוֹם לַצְּדוֹקִים לִרְדּוֹת"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:3", "citation": "בְּפֶתַח הָעֲזָרָה. שֶׁל נָשִׁים, הַסְּמוּכָה לַחֵיל… קָלָל. כַּד קָטָן"}
+    ],
+    "note": "Adopted: the gate of the Mishna is that of the Ezrat Nashim, on the Cheil (Bartenura), and the kelal of Para 3:3 is the deposit of the Cheil of 3:11, in the jars of the Tosefta, which the Rash MiShantz cites (Tosfot Yom Tov). Tour's choice: nine lids, one per para counted by the Rambam; their size; their place north of the gate, in the riser of the first step."
+  },
+  "chalal": {
+    "nom": "The void beneath the Har HaBayit",
+    "translit": "Ha'chalal",
+    "resume": "“The Har HaBayit and the Azarot: beneath them it was hollow, because of the tomb of the deep.” A forgotten tomb may lie anywhere under the rock, and the impurity of a dead person who has no space above him “bursts through and rises”: a void stops it. So they built on vaults. In Jerusalem, courtyards were built this way on the rock, above a void: children were born and raised there who had never touched the impurity of the dead, until the age of eight. For the para, they went to the Shiloach seated on doors laid on the backs of oxen — the wide belly of the ox still separating them from the ground —, a stone cup in hand; they filled it and climbed back on the doors. Arrived at the Har HaBayit, they got down: there, the ground was hollow.",
+    "cotes": [
+      "a section of 60 × 30 amot under the east axis, between the Soreg and Sha'ar Shushan",
+      "three vaulted aisles on two arcades, 10 amot under the keystone, the paving above",
+      "no access: seen in free flight"
+    ],
+    "sources": [
+      {"oeuvre": "Para", "ref": "3:3", "citation": "בָּאוּ לְהַר הַבַּיִת וְיָרְדוּ. הַר הַבַּיִת וְהָעֲזָרוֹת, תַּחְתֵּיהֶם חָלוּל, מִפְּנֵי קֶבֶר הַתְּהוֹם"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:2", "citation": "שֶׁמָּא יֵשׁ תַּחְתָּיו קֶבֶר וְאֵין לוֹ לַמֵּת אֹהֶל חָלָל טֶפַח, וְטֻמְאָה שֶׁהִיא רְצוּצָה בּוֹקַעַת וְעוֹלָה, לְפִיכָךְ הָיוּ בוֹנִים אוֹתוֹ עַל גַּבֵּי כִפִּין, שֶׁאֲפִלּוּ יֵשׁ קֶבֶר תַּחְתֵּיהֶן הֶחָלָל מַפְסִיקוֹ"},
+      {"oeuvre": "Para", "ref": "3:2", "citation": "חֲצֵרוֹת הָיוּ בִירוּשָׁלַיִם בְּנוּיוֹת עַל גַּבֵּי סֶלַע וְתַחְתֵּיהֶם חָלוּל… וּמְבִיאִים שְׁוָרִים וְעַל גַּבֵּיהֶן דְּלָתוֹת, וְתִינוֹקוֹת יוֹשְׁבִין עַל גַּבֵּיהֶן וְכוֹסוֹת שֶׁל אֶבֶן בְּיָדָם"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:2", "citation": "וּמְגַדְּלוֹת שָׁם אֶת בְּנֵיהֶן. עַד שֶׁיִּהְיוּ בֶן שְׁמֹנֶה… וּמְבִיאִים שְׁוָרִים. שֶׁכְּרֵסָן רְחָבָה"}
+    ],
+    "note": "Tour's choice: the shape of the void — three aisles with a shallow barrel vault on two arcades —, its height and the section shown. The Mishna says only that it was hollow; the Bartenura, that they built on vaults (כִּפִּין). Not modeled: the rest of the void, under the esplanade and under the Azarot, and the children's courtyards of the city."
+  },
+  "kevesh_hapara": {
+    "nom": "The kevesh of the para",
+    "translit": "Kevesh HaPara",
+    "resume": "The kohen, the para and those who assist him go out by the east gate, the one on which Shushan is sculpted, and do not touch the ground again until the Mount of Olives: a ramp of arches set on arches was built for them. Each upper arch sets its two feet on the backs of two lower arches, so that under each foot there is a void and not another foot: a tomb buried under a pier could not rise as far as the deck. The place of burning and the mikveh at the summit are hollow too. If the para refused to advance, no other cow was brought out with it, neither black nor red, so that no one would say two had been slaughtered. The kevesh was paid for from the remains of the Temple chamber; Abba Shaul says the Kohanim Gedolim built it with their own money.",
+    "cotes": [
+      "1,394 amot (669 m) from Sha'ar Shushan to the summit, in a straight line on the axis",
+      "9 tiers of arches of 16 amot; 145 amot above the Kidron",
+      "10 amot wide, that of the gate; a single slope, of one tenth"
+    ],
+    "sources": [
+      {"oeuvre": "Para", "ref": "3:6", "citation": "וְכֶבֶשׁ הָיוּ עוֹשִׂים מֵהַר הַבַּיִת לְהַר הַמִּשְׁחָה, כִּפִּין עַל גַּבֵּי כִפִּין, וְכִפָּה כְנֶגֶד הָאֹטֶם, מִפְּנֵי קֶבֶר הַתְּהוֹם"},
+      {"oeuvre": "Rambam Para Adouma", "ref": "3:1", "citation": "וְכִפָּה עַל כָּל שְׁנֵי כִפִּין כְּדֵי שֶׁיִּהְיוּ שְׁנֵי רַגְלֵי הַכִּפָּה עַל גַּג שְׁנֵי כִפִּין שֶׁתַּחְתֶּיהָ… אַף מְקוֹם שְׂרֵפָתָהּ וּמְקוֹם הַטְּבִילָה שֶׁהָיוּ בְּהַר הַמִּשְׁחָה תַּחְתֵּיהֶן חָלוּל"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:6", "citation": "וְאֵין רַגְלֵי הַכִּפָּה הָעֶלְיוֹנָה כְּנֶגֶד רַגְלֵי הַתַּחְתּוֹנָה, אֶלָּא כְנֶגֶד הַכִּפָּה עַצְמָהּ"},
+      {"oeuvre": "Middot", "ref": "1:3", "citation": "שַׁעַר הַמִּזְרָחִי, עָלָיו שׁוּשַׁן הַבִּירָה צוּרָה, שֶׁבּוֹ כֹהֵן גָּדוֹל הַשּׂוֹרֵף אֶת הַפָּרָה וּפָרָה וְכָל מְסַעֲדֶיהָ יוֹצְאִים לְהַר הַמִּשְׁחָה"},
+      {"oeuvre": "Para", "ref": "3:7", "citation": "לֹא הָיְתָה פָרָה רוֹצָה לָצֵאת, אֵין מוֹצִיאִין עִמָּהּ שְׁחוֹרָה, שֶׁלֹּא יֹאמְרוּ, שְׁחוֹרָה שָׁחֲטוּ. וְלֹא אֲדֻמָּה, שֶׁלֹּא יֹאמְרוּ, שְׁתַּיִם שָׁחֲטוּ"},
+      {"oeuvre": "Shekalim", "ref": "4:2", "citation": "כֶּבֶשׁ פָּרָה… בָּאִין מִשְּׁיָרֵי הַלִּשְׁכָּה. אַבָּא שָׁאוּל אוֹמֵר, כֶּבֶשׁ פָּרָה כֹּהֲנִים גְּדוֹלִים עוֹשִׂין אוֹתוֹ מִשֶּׁל עַצְמָן"}
+    ],
+    "note": "Adopted: the tiers offset by half a bay, each pier on the keystone of the arch below (Rambam, Bartenura). Tour's choice: the straight course on the axis; a single slope, from the threshold of the gate to the summit, never less than ten amot above the ground; the width, the bay (12 amot of opening, piers of 4), the height of the tiers, the parapet. Herod's wall is leveled across its width, and today's city is erased where it passes: Dominus Flevit, the Benedictine convent and two buildings at the summit."
+  },
+  "makom_hasereifa": {
+    "nom": "The place of the burning",
+    "translit": "Mekom Sereifatah",
+    "resume": "At the summit of the Mount of Olives, facing the east gate. All the walls of the Temple were high, except the eastern one, so that from here the kohen could see the entrance of the Heikhal at the moment of sprinkling the blood. The para is bound with a rope of rushes and laid on the pyre, its head to the south, its face to the west. The kohen stands in the east, facing west: he slaughters with his right hand, receives the blood in the left, and sprinkles of it seven times with his finger toward the Holy of Holies, dipping the finger again each time. If he does not aim at the entrance, the para is invalid. He wipes his hand on the para, goes down and lights it. When it bursts, he stands outside the pit and takes the cedar wood, the hyssop and the scarlet wool: “Is this cedar wood? Is this cedar wood?” — three times for each, and three times they answer him “yes.” Then he throws them into the fire.",
+    "cotes": [
+      "on the axis, 1,425 amot east of Sha'ar Shushan (684 m)",
+      "a platform of 80 × 40 amot on arches, 12 to 17 amot above the ground",
+      "the pit: 18 × 10 amot, 6 deep, steps on the east"
+    ],
+    "sources": [
+      {"oeuvre": "Middot", "ref": "2:4", "citation": "כָּל הַכְּתָלִים שֶׁהָיוּ שָׁם, הָיוּ גְבוֹהִים, חוּץ מִכֹּתֶל הַמִּזְרָחִי, שֶׁהַכֹּהֵן הַשּׂוֹרֵף אֶת הַפָּרָה עוֹמֵד בְּרֹאשׁ הַר הַמִּשְׁחָה, וּמִתְכַּוֵּן וְרוֹאֶה בְפִתְחוֹ שֶׁל הֵיכָל בִּשְׁעַת הַזָּיַת הַדָּם"},
+      {"oeuvre": "Yoma", "ref": "16a", "citation": "אִי אָמְרַתְּ בִּשְׁלָמָא רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב הִיא — הַיְינוּ דְּאִיכַּסִּי לֵיהּ פִּיתְחָא"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "16a", "citation": "סתמא דקתני דכותל מזרחי נמוך כדי לראות ממעל לו דרך שערי עזרת נשים ועזרת ישראל את חלל פתח ההיכל"},
+      {"oeuvre": "Para", "ref": "3:9", "citation": "רֹאשָׁהּ בַּדָּרוֹם וּפָנֶיהָ לַמַּעֲרָב. הַכֹּהֵן עוֹמֵד בַּמִּזְרָח וּפָנָיו לַמַּעֲרָב… טָבַל וְהִזָּה שֶׁבַע פְּעָמִים כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳּדָשִׁים… יָרַד וְהִצִּית אֶת הָאֵשׁ"},
+      {"oeuvre": "Para", "ref": "4:2", "citation": "הִזָּה וְלֹא כִוֵּן כְּנֶגֶד הַפֶּתַח, פְּסוּלָה"},
+      {"oeuvre": "Para", "ref": "3:10", "citation": "נִבְקְעָה, וְעָמַד חוּץ מִגִּתָּהּ. נָטַל עֵץ אֶרֶז וְאֵזוֹב וּשְׁנִי תוֹלַעַת. אָמַר לָהֶן, עֵץ אֶרֶז זֶה, עֵץ אֶרֶז זֶה"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:7", "citation": "וְאַף מְקוֹם מַעֲרַכְתָּהּ וְגִתָּהּ הַשְּׁנוּיִין לְקַמָּן, כֻּלָּן עַל גַּבֵּי כִפִּין הָיוּ"}
+    ],
+    "note": "Adopted: the kohen slaughters and sprinkles from the east edge of the pit, level with the top of the pyre, and goes down into it to light the fire (“יָרַד וְהִצִּית”). The Talmud counts the steps: according to R. Eliezer ben Yaakov, they raise the floor of the Heikhal above the twenty amot of the gates, so that whoever looks from below, through the gates, cannot see the bottom of its opening; hence the low east wall, to see it from above, over the wall and through the gates of the Ezrat Nashim and the Ezrat Israel (Rashi). In the scene, from the kohen's eye, half of the Heikhal opening can be seen: the lower part through Sha'ar Nikanor, the upper part over the Azara wall; the lintel of Nikanor hides the middle. Tour's choice: the platform, its height, the size and depth of the pit, its steps. The terrain is today's; the summit chosen is the high point of the axis."
+  },
+  "maarakhat_hapara": {
+    "nom": "The pyre of the para",
+    "translit": "Ma'arakhat HaPara",
+    "resume": "The wood is arranged in advance: cedar, orenim and broshim — conifers — and smooth fig, the woods that burn best. It is built up as a tower, wide at the bottom and narrow at the top, leaving windows in it to pass the fire through, and its face — the side where it is lit — looks west, toward the Temple. It stands at the bottom of its pit. Once the para is burned, the ash is beaten with sticks and passed through sieves; what remains black and holds ash is pounded, and the bones always are.",
+    "cotes": [
+      "12 layers of crossed logs, from 6 amot a side down to 3",
+      "5½ amot high: the top is flush with the platform",
+      "cedar and conifer in alternation"
+    ],
+    "sources": [
+      {"oeuvre": "Para", "ref": "3:8", "citation": "וְעֵצִים הָיוּ מְסֻדָּרִים שָׁם, עֲצֵי אֲרָזִים וָאֳרָנִים וּבְרוֹשִׁים וַעֲצֵי תְאֵנָה חֲלָקָה. וְעוֹשִׂין אוֹתָהּ כְּמִין מִגְדָּל, וּמְפַתְּחִין בָּהּ חַלּוֹנוֹת, וַחֲזִיתָהּ מַעֲרָבָה"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:8", "citation": "כְּמִין מִגְדָּל. רְחָבָה מִלְּמַטָּה וְצָרָה מִלְמַעְלָה… וַחֲזִיתָהּ מַעֲרָבָה… כְּלַפֵּי הַמִּקְדָּשׁ"},
+      {"oeuvre": "Para", "ref": "3:11", "citation": "נִשְׂרְפָה, חוֹבְטִין אוֹתָהּ בְּמַקְלוֹת, וְכוֹבְרִין אוֹתָהּ בִּכְבָרוֹת… שָׁחוֹר שֶׁיֶּשׁ בּוֹ אֵפֶר, כּוֹתְשִׁין אוֹתוֹ… הָעֶצֶם, בֵּין כָּךְ וּבֵין כָּךְ הָיָה נִכְתָּשׁ"}
+    ],
+    "note": "Tour's choice: the size of the pyre, its layers of crossed logs whose gaps make the windows, two woods out of four. The para is not laid on it."
+  },
+  "beit_tevila_har_hamishcha": {
+    "nom": "The mikveh of the Mount of Olives",
+    "translit": "Beit HaTevilah shebeHar HaMish'cha",
+    "resume": "The elders of Israel went up on foot to the Mount of Olives, ahead of the procession: there was a mikveh there. When the kohen arrived, they laid their hands on him — which made him impure — and said to him: “My lord the Kohen Gadol, immerse once.” He went down, immersed, came up, dried himself, and burned the para that same day, without waiting for sunset. It was deliberate: the Sadducees held that one had to wait for evening, and the Sages had the para burned by a man who had immersed that same day, to show them they were wrong. This mikveh too was built on vaults.",
+    "cotes": [
+      "8 × 6 amot, 3 amot of water",
+      "steps on the south",
+      "north of the pit, on the same platform"
+    ],
+    "sources": [
+      {"oeuvre": "Para", "ref": "3:7", "citation": "וְזִקְנֵי יִשְׂרָאֵל הָיוּ מַקְדִּימִים בְּרַגְלֵיהֶם לְהַר הַמִּשְׁחָה, וּבֵית טְבִילָה הָיָה שָׁם"},
+      {"oeuvre": "Para", "ref": "3:8", "citation": "סָמְכוּ יְדֵיהֶם עָלָיו וְאָמְרוּ לוֹ, אִישִׁי כֹּהֵן גָּדוֹל, טְבֹל אֶחָת. יָרַד וְטָבַל וְעָלָה וְנִסְתַּפֵּג"},
+      {"oeuvre": "Bartenura", "ref": "Para 3:7", "citation": "וְאוֹתוֹ בֵית הַטְּבִילָה נַמִּי חָלוּל הָיָה עַל גַּבֵּי כִפִּין מִפְּנֵי קֶבֶר הַתְּהוֹם… וּמְטַמְּאִים הָיוּ אֶת הַכֹּהֵן. בְּמַה שֶּׁהָיוּ סוֹמְכִים יְדֵיהֶם עָלָיו"}
+    ],
+    "note": "Adopted: the kohen becomes impure through the hands of the elders (Bartenura). Set aside: the Rambam, cited by the Bartenura, for whom he was made impure by a sheretz or another impurity that ends at evening. A plain kohen could burn the para; one said “my lord the Kohen Gadol” only when he was one (Bartenura). Tour's choice: the place of the mikveh, its size, its steps."
   }
 }

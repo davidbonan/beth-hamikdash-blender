@@ -52,6 +52,7 @@ SECTIONS = (
     "bayit.parokhot",
     "bayit.parois_d_or",
     "bayit.kodesh_hakodashim",
+    "para_adouma",
     "pays.jerusalem",
     "foule",
     "finitions",

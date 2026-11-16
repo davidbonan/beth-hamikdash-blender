@@ -2,9 +2,9 @@ import math
 
 from ..primitives.parametres import AMA
 from ..primitives.matieres import (MAT_BLEU_POLICE, MAT_CARROSSERIE_SOMBRE, MAT_INOX, MAT_PLASTIQUE, MAT_PNEU, MAT_VITRE)
-from ..primitives.volumes import FACES_BOITE, alea
+from ..primitives.volumes import FACES_BOITE, alea, extrusion
 from .calage import Z_PLACE_HAUTE, vers_scene
-from .place_du_kotel import _cap, _devant, _extrusion, _pave, _poser, _poutre
+from .place_du_kotel import _cap, _devant, _pave, _poser, _poutre
 
 
 # Les silhouettes de profil (avance depuis le milieu, hauteur), en mètres pour une longueur L
@@ -22,7 +22,7 @@ def _silhouette_de_la_berline(L, H):
 def _en_travers(p, cap, profil, largeur, travers=0.0):
     """Un profil (avance, hauteur) en mètres au-dessus de la place, extrudé sur `largeur` en travers du cap, centré à `travers` à gauche."""
     amot = [(x / AMA, Z_PLACE_HAUTE + z / AMA) for x, z in profil]
-    return _extrusion(amot, _devant(p, cap, 0, travers + largeur / 2), (math.sin(cap), -math.cos(cap)), (math.cos(cap), math.sin(cap)), largeur)
+    return extrusion(amot, _devant(p, cap, 0, travers + largeur / 2), (math.sin(cap), -math.cos(cap)), (math.cos(cap), math.sin(cap)), largeur)
 
 
 def _roue(p, cap, avance, travers, rayon=0.34, cotes=10):

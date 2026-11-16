@@ -54,9 +54,9 @@ Les deux gros scripts ne sont plus que des points d'entrée ; leur code est dans
 ```
 modele/blockout/
   primitives/   parametres (AMA, Z_*, FOULE, RACINE, m) · noeuds · pierre · tissage · matieres (MAT_*)
-                volumes (box, cyl, revolution…) · gravures · ouvrages (lishka, shaar, moulure, escalier…)
+                volumes (box, cyl, revolution, extrusion, fondre…) · gravures · ouvrages (lishka, shaar, moulure, escalier…)
   nettoyage · har_habayit · ezrat_nashim · azara · lishkot · heil · modenature_azara
-  mizbeach · sous_l_azara · mehilat_parva
+  mizbeach · sous_l_azara · mehilat_parva · para_adouma
   bayit/        oulam · heikhal · kelim · parokhot · parois_d_or · kodesh_hakodashim
   pays/         calage · herode · place_du_kotel · second_oeuvre · facades_du_kotel · parc_de_police · mobilier_du_kotel · ville · jerusalem (celui qui bâtit le pays)
   foule · finitions (dessus foulés, biseau, tailles) · eclairage

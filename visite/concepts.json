@@ -1082,6 +1082,73 @@
       "lieu": true
     },
     {
+      "id": "para_adouma",
+      "nom": "La para adouma",
+      "zone": "har_habayit",
+      "prefixes": []
+    },
+    {
+      "id": "beit_even",
+      "nom": "Beit Even",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Beit_Even"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "kelalim",
+      "nom": "Les jarres de cendre du 'Heil",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Kelal_"
+      ]
+    },
+    {
+      "id": "chalal",
+      "nom": "Le vide sous le Har HaBayit",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Chalal_"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "kevesh_hapara",
+      "nom": "Le kevesh de la para",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Kevesh_HaPara"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "makom_hasereifa",
+      "nom": "Le lieu de la sereifa",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Sereifa_plateforme",
+        "Sereifa_gat"
+      ],
+      "lieu": true
+    },
+    {
+      "id": "maarakhat_hapara",
+      "nom": "Le bûcher de la para",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Sereifa_maarakha"
+      ]
+    },
+    {
+      "id": "beit_tevila_har_hamishcha",
+      "nom": "Le mikvé du mont des Oliviers",
+      "zone": "har_habayit",
+      "prefixes": [
+        "Sereifa_mikve"
+      ]
+    },
+    {
       "id": "portes_houlda",
       "nom": "Portes de 'Houlda",
       "zone": "har_habayit",

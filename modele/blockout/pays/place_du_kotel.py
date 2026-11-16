@@ -9,7 +9,7 @@ from ..primitives.matieres import (MAT_ACIER_BLANC, MAT_BOIS_DU_PONT, MAT_BORNE_
                                    MAT_MURAILLE, MAT_OR, MAT_PIERRE, MAT_PIERRE_DE_JERUSALEM, MAT_PLASTIQUE,
                                    MAT_PORTIQUE, MAT_RELIURES, MAT_SOL, MAT_TOILE, MAT_TOLE, MAT_VERRE_DE_SUSPENSION,
                                    MAT_VITRE)
-from ..primitives.volumes import FACES_BOITE, _cercle, alea, empty, lampe, mesh_from_pydata, plage, revolution
+from ..primitives.volumes import FACES_BOITE, _cercle, alea, empty, extrusion, fondre, lampe, mesh_from_pydata, plage, revolution
 from .calage import (CLE_WILSON, CONTREMARCHE, CUVETTE_KOTEL, ESCALIER_PLACE, GARDE_CORPS, HARAM, KOTEL, LARGEUR_ESCALIER,
                      LARGEUR_PONT, MAILLE_PAYS, PARAPET_DE_PRIERE, PAYS_DONNEES, PLACE_KOTEL, PONT_MAGHREBINS,
                      PORTEE_WILSON, SALLES_WILSON, Z_HAUT_ESCALIER, Z_PLACE_HAUTE, Z_PLACE_KOTEL,
@@ -66,17 +66,8 @@ def _poutre(a, b, za, zb, gauche, droite, hauteur):
             + [(p[0] + nx * d, p[1] + ny * d, z + hauteur) for p, z, d in bas])
 
 
-def _fondre(morceaux):
-    """Des (sommets, faces) mis dans un seul maillage."""
-    verts, faces = [], []
-    for v, f in morceaux:
-        faces += [[len(verts) + i for i in face] for face in f]
-        verts += v
-    return verts, faces
-
-
 def _assembler(boites):
-    return _fondre((huit, FACES_BOITE) for huit in boites)
+    return fondre((huit, FACES_BOITE) for huit in boites)
 
 
 def pont_des_maghrebins(epaisseur=0.4, entraxe=8, travee=2 / AMA, sous_toit=2.3 / AMA, latte=0.22 / AMA):
@@ -145,7 +136,7 @@ def pont_des_maghrebins(epaisseur=0.4, entraxe=8, travee=2 / AMA, sous_toit=2.3 
     couverture.append(_toit_a_deux_pentes(_devant(entree, _cap(trace[-1], entree), 0.6 / AMA), trace[-1], seuil + sous_toit + 0.9 / AMA,
                                           seuil + sous_toit + 0.9 / AMA, demi + 1.4, 0.9 / AMA))
     mesh_from_pydata("Maghrebins_pont", *_assembler(tablier + bois), "00_HarHabayit", MAT_BOIS_DU_PONT())
-    mesh_from_pydata("Maghrebins_pont_toit", *_fondre([(huit, FACES_BOITE) for huit in toit] + couverture), "00_HarHabayit", MAT_TOLE())
+    mesh_from_pydata("Maghrebins_pont_toit", *fondre([(huit, FACES_BOITE) for huit in toit] + couverture), "00_HarHabayit", MAT_TOLE())
     mesh_from_pydata("Maghrebins_pont_palees", *_assembler(piles), "00_HarHabayit", MAT_ACIER_BLANC())
     mesh_from_pydata("Maghrebins_pont_palissade", *_assembler(palissade), "00_HarHabayit", MAT_TOILE())
 
@@ -164,22 +155,6 @@ def _face_du_kotel(anneau):
                key=lambda e: _distance_a_l_anneau(((e[0][0] + e[1][0]) / 2, (e[0][1] + e[1][1]) / 2), HARAM))
     return (a, b) if _distance_a_l_anneau(a, PLACE_KOTEL) < _distance_a_l_anneau(b, PLACE_KOTEL) else (b, a)
 
-
-def _extrusion(profil, origine, u, v, longueur):
-    """Un profil (v, z) fermé, sens direct, extrudé de `longueur` le long de u : flancs et
-    deux bouts."""
-    def monde(pv, pz, pu):
-        return (origine[0] + u[0] * pu + v[0] * pv, origine[1] + u[1] * pu + v[1] * pv, pz)
-    n = len(profil)
-    verts = [monde(pv, pz, 0) for pv, pz in profil] + [monde(pv, pz, longueur) for pv, pz in profil]
-    faces = [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
-    for a, b, c in geometry.tessellate_polygon([[Vector((pv, pz, 0)) for pv, pz in profil]]):
-        direct = ((profil[b][0] - profil[a][0]) * (profil[c][1] - profil[a][1])
-                  - (profil[b][1] - profil[a][1]) * (profil[c][0] - profil[a][0])) > 0
-        faces += [[a, c, b], [n + a, n + b, n + c]] if direct else [[a, b, c], [n + a, n + c, n + b]]
-    if u[0] * v[1] - u[1] * v[0] < 0:
-        faces = [f[::-1] for f in faces]
-    return verts, faces
 
 
 def _repere_de_wilson():
@@ -219,7 +194,7 @@ def salles_de_wilson(segments=16):
     arche = [(rayon - rayon * math.cos(math.pi * k / segments), NAISSANCE_WILSON + rayon * math.sin(math.pi * k / segments))
              for k in range(segments + 1)]
     profil = [(PORTEE_WILSON, pied), (largeur, pied), (largeur, Z_HAR), (0, Z_HAR)] + arche
-    mesh_from_pydata("Wilson_arche", *_extrusion(profil, a, u, v, longueur), "00_HarHabayit", MAT_MURAILLE())
+    mesh_from_pydata("Wilson_arche", *extrusion(profil, a, u, v, longueur), "00_HarHabayit", MAT_MURAILLE())
     coin = _point_de_wilson
     sol =[coin(0, 0), coin(longueur, 0), coin(longueur, PORTEE_WILSON), coin(0, PORTEE_WILSON)]
     fond = [coin(longueur - 1, 0), coin(longueur, 0), coin(longueur, PORTEE_WILSON), coin(longueur - 1, PORTEE_WILSON)]
@@ -519,7 +494,7 @@ def _bibliotheque(nom, p, cap, longueur, hauteur, z, rayon=0.4 / AMA, profondeur
 
 def _poser(nom, morceaux, mat, col="00_HarHabayit"):
     if morceaux:
-        mesh_from_pydata(nom, *_fondre(morceaux), col, mat)
+        mesh_from_pydata(nom, *fondre(morceaux), col, mat)
 
 
 def _poser_les_livres(nom, livres, col="00_HarHabayit"):
@@ -798,7 +773,7 @@ def muret_de_priere(panneau=2.4 / AMA, joint=0.3 / AMA, epaisseur=0.5 / AMA):
         vers_l_aire = (-math.sin(cap) * cote, math.cos(cap) * cote)
         profil = [(-epaisseur / 2, Z_PLACE_HAUTE), (epaisseur / 2, Z_PLACE_HAUTE), (epaisseur / 2, tete - 0.3 / AMA), (-epaisseur / 2, tete)]
         for k in range(n):
-            panneaux.append(_extrusion(profil, _devant(a, cap, k * pas + joint / 2), (math.cos(cap), math.sin(cap)), vers_l_aire, pas - joint))
+            panneaux.append(extrusion(profil, _devant(a, cap, k * pas + joint / 2), (math.cos(cap), math.sin(cap)), vers_l_aire, pas - joint))
             grilles.append(_pave(_devant(a, cap, k * pas), cap, joint, 0.04 / AMA, Z_PLACE_HAUTE, tete + 0.04 / AMA))
             bancs.append(_pave(_devant(a, cap, (k + 0.5) * pas, cote * (epaisseur / 2 + 0.25 / AMA)), cap, pas * 0.6, 0.45 / AMA,
                                Z_PLACE_KOTEL, Z_PLACE_KOTEL + 0.45 / AMA))

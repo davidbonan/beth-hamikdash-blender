@@ -6,10 +6,10 @@ from ..primitives.parametres import AMA, Z_HAR
 from ..primitives.matieres import (MAT_ACIER_BLANC, MAT_CHENE, MAT_DALLAGE_KOTEL, MAT_FER, MAT_FER_BRUN, MAT_MEHITSA, MAT_MURAILLE, MAT_OR, MAT_PIERRE,
                                    MAT_PIERRE_DE_JERUSALEM, MAT_PLASTIQUE, MAT_SOL, MAT_TERRE, MAT_TOILE, MAT_TOLE,
                                    MAT_VERRE_DE_LAMPE, MAT_VITRE)
-from ..primitives.volumes import FACES_BOITE, alea, arc, plage
+from ..primitives.volumes import FACES_BOITE, alea, arc, extrusion, plage
 from .calage import (CUVETTE_KOTEL, PARAPET_HAR, PAYS_DONNEES, Z_PLACE_HAUTE, Z_PLACE_KOTEL, _abscisses, _dans, _direct,
                      _plus_proche_sur_l_anneau, _point_a_l_abscisse, vers_scene, volumes)
-from .place_du_kotel import (BORD_NORD, SOUS_LE_PONT, WILSON, _baie, _cap, _coupole, _devant, _extrusion, _fut, _pave, _point_de_wilson,
+from .place_du_kotel import (BORD_NORD, SOUS_LE_PONT, WILSON, _baie, _cap, _coupole, _devant, _fut, _pave, _point_de_wilson,
                              _poser, _poutre)
 from .second_oeuvre import (Percements, _a_droite, _bandeau, _decale, _plaque, _unitaire, applique, climatiseur,
                             descente_d_eau, parabole, projecteur, repere_de_projecteur, verre_de_projecteur)
@@ -45,7 +45,7 @@ def _mur_a_arcades(p, q, z0, z1, epaisseur, arches=(), avance=0.0):
         bas += [(centre - portee / 2, z0)] + arc(centre, portee / 2, z0 + cle - fleche, fleche) + [(centre + portee / 2, z0)]
     long_ = math.dist(p, q)
     profil = bas + [(long_, z0), (long_, z1), (0, z1)]
-    return _extrusion(profil, _decale(p, _a_droite(p, q, -avance)), _a_droite(p, q, 1), _unitaire(p, q), epaisseur + avance)
+    return extrusion(profil, _decale(p, _a_droite(p, q, -avance)), _a_droite(p, q, 1), _unitaire(p, q), epaisseur + avance)
 
 
 def _plafond(anneau, z):
@@ -97,7 +97,7 @@ def makhkama():
     for pv in (6.6, 13.2):
         coin = _decale(_point_de_wilson(0, (pv - 1.4) / AMA), (sud[0] * 0.3 / AMA, sud[1] * 0.3 / AMA))
         profil = [(0, pied), (1.9 / AMA, pied), (1.9 / AMA, Z_PLACE_KOTEL + 7.6 / AMA), (0, Z_PLACE_KOTEL + 10 / AMA)]
-        contreforts.append(_extrusion(profil, coin, v, sud, 2.8 / AMA))
+        contreforts.append(extrusion(profil, coin, v, sud, 2.8 / AMA))
     _poser("Makhkama_contreforts", contreforts, MAT_PIERRE_DE_JERUSALEM())
     avant = lambda point: _decale(point, (sud[0] * 0.3 / AMA, sud[1] * 0.3 / AMA))
     pa, qa = avant(p), avant(q)
@@ -129,7 +129,7 @@ def makhkama():
     # À son angle ouest, le mur s'épaule d'un glacis de pierre qui redescend vers la terrasse des arcades.
     pied_du_glacis = Z_PLACE_HAUTE + H_ARRIERE - 0.5 / AMA
     glacis = [(0, pied_du_glacis), (8 / AMA, pied_du_glacis), (8 / AMA, pied_du_glacis + 0.6 / AMA), (0, H_MAKHKAMA - 4 / AMA)]
-    _poser("Makhkama_glacis", [_extrusion(glacis, _decale(q, (u[0] * 1.2 / AMA, u[1] * 1.2 / AMA)), sud, v, 1.5 / AMA)], MAT_PIERRE_DE_JERUSALEM())
+    _poser("Makhkama_glacis", [extrusion(glacis, _decale(q, (u[0] * 1.2 / AMA, u[1] * 1.2 / AMA)), sud, v, 1.5 / AMA)], MAT_PIERRE_DE_JERUSALEM())
 
 
 def toits_du_nord():
@@ -328,7 +328,7 @@ def parvis_de_la_fondation(palier=15 / AMA, rampe=14 / AMA, epaisseur=0.4 / AMA)
     garde = 0.95 / AMA
     profil = [(0, Z_PLACE_HAUTE), (palier + rampe + 0.5 / AMA, Z_PLACE_HAUTE), (palier + rampe + 0.5 / AMA, Z_PLACE_HAUTE + garde),
               (palier + rampe / 2, Z_PLACE_HAUTE + garde), (palier, seuil + garde), (0, seuil + garde)]
-    parapet = [_extrusion(profil, devant(0, LARGEUR_DU_PARVIS), _a_droite(p, q, -1), _unitaire(p, q), epaisseur),
+    parapet = [extrusion(profil, devant(0, LARGEUR_DU_PARVIS), _a_droite(p, q, -1), _unitaire(p, q), epaisseur),
                (_poutre(p, devant(0, LARGEUR_DU_PARVIS + epaisseur), Z_PLACE_HAUTE, Z_PLACE_HAUTE, epaisseur, 0, seuil + garde - Z_PLACE_HAUTE), FACES_BOITE)]
     _poser("Fondation_du_Kotel_parapet", parapet, MAT_PIERRE_DE_JERUSALEM())
 
@@ -409,7 +409,7 @@ def _voute(centre, cap, portee, longueur, naissance, fleche, epaisseur=0.12 / AM
     dessus = arc(0, portee / 2, naissance, fleche, segments)
     dessous = [(x * (1 - 2 * epaisseur / portee), z - epaisseur) for x, z in dessus]
     travers = (-math.sin(cap), math.cos(cap))
-    return _extrusion(dessous + dessus[::-1], _devant(centre, cap, -longueur / 2), (math.cos(cap), math.sin(cap)), travers, longueur)
+    return extrusion(dessous + dessus[::-1], _devant(centre, cap, -longueur / 2), (math.cos(cap), math.sin(cap)), travers, longueur)
 
 
 def pavillons_de_controle():

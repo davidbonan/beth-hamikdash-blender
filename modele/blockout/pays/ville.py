@@ -6,6 +6,7 @@ from mathutils import Vector
 from ..primitives.parametres import AMA, m
 from ..primitives.matieres import (MAT_BETON, MAT_CHAUX, MAT_FEUILLAGE, MAT_MAISON, MAT_MURAILLE, MAT_TERRE_CUITE, MAT_TRONC)
 from ..primitives.volumes import alea, cyl, plage, sphere
+from ..para_adouma import sur_le_chemin_de_la_para
 from .calage import (CUVETTE_KOTEL, EPAISSEUR_MURAILLE, ESCALIER_PLACE, H_MURAILLE, HARAM, MAILLE_PAYS, PAYS, PAYS_DONNEES, PAYS_DOSSIER,
                      PLACE_KOTEL, _abscisses, _dans, _dans_le_carre, _direct, _distance_a_l_anneau,
                      _point_a_l_abscisse, sol_naturel, vers_scene, volumes)
@@ -94,7 +95,7 @@ def ville():
         cx = sum(x for x, _ in anneau) / len(anneau)
         cy = sum(y for _, y in anneau) / len(anneau)
         if (_dans((cx, cy), HARAM) or _dans_le_carre(cx, cy, 2) or _dans((cx, cy), PLACE_KOTEL)
-                or _barre_l_escalier(anneau)):
+                or _barre_l_escalier(anneau) or sur_le_chemin_de_la_para(anneau)):
             continue
         if b["osm"] in (FONDATION, GALERIE, AU_PIED_DE_LA_FALAISE, ANCIENNE_RAMPE):
             continue

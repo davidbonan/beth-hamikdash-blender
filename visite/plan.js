@@ -8,7 +8,7 @@ const TAILLE_ETIQUETTE = 13;   // px
 const LONGUEUR_VISITEUR = 18;  // px, le faisceau du visiteur sur le plan entier
 const RAYON_PIED = 13;         // px : le disque où la flèche d'arrivée tourne, sous l'épingle
 const HAUTEUR_EPINGLE = 30 + 2 * RAYON_PIED; // px
-const HAUTEUR_ETAGE = 10;      // mètres : un lieu qui commence plus haut est à l'étage
+const HAUTEUR_ETAGE = 10;      // mètres : un lieu qui commence plus haut, au-dessus d'un autre, est à l'étage
 const FENETRE_MINI = 60;       // mètres : ce que la minicarte montre autour du visiteur
 const VUE_OUVERTURE = 150;     // mètres : ce que le plan montre autour du visiteur à l'ouverture
 const PART_ECHELLE = 0.25;     // de la largeur visible, ce que la barre d'échelle du plan couvre au plus
@@ -55,10 +55,15 @@ function niveauxDu(dessin, tousLesLieux, emprises) {
   // Du plus petit au plus grand au sol : le premier qui contient un point est le lieu qu'on y lit. Au volume,
   // l'esplanade d'Hérode, mince, passerait avant l'Azara qu'elle entoure.
   const lieux = [...tousLesLieux].sort((a, b) => surface(emprises.get(a)) - surface(emprises.get(b)));
+  // Sur une hauteur — le mont des Oliviers —, un lieu qui commence haut n'a rien sous lui : il n'est pas à l'étage.
+  const aLEtage = (b) => b.min.y > HAUTEUR_ETAGE && lieux.some((id) => {
+    const dessous = emprises.get(id);
+    return dessous.min.y < b.min.y && contientAPlat(dessous, (b.min.x + b.max.x) / 2, (b.min.z + b.max.z) / 2);
+  });
   // En plein air, ce qui se voit d'en haut et tient tout entier dans le plan.
   const lieuxDeSurface = lieux.filter((id) => {
     const b = emprises.get(id);
-    return !souterrains.has(id) && b.min.y <= HAUTEUR_ETAGE
+    return !souterrains.has(id) && !aLEtage(b)
       && contient(dessin, b.min.x, b.min.z) && contient(dessin, b.max.x, b.max.z);
   });
   // Un lieu qui descend aux tunnels a, en surface, son plancher au-dessus d'eux : son escalier n'est pas son sol.
@@ -112,7 +117,7 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   const choixNiveau = carte.querySelector(".niveaux");
   const bulle = carte.querySelector(".bulle");
   const nomBulle = bulle.querySelector(".nom"), inaccessible = bulle.querySelector(".inaccessible");
-  const allerIci = bulle.querySelector(".aller-ici"), vueDuLieu = bulle.querySelector(".vue-du-lieu");
+  const allerIci = bulle.querySelector(".aller-ici");
 
   const niveaux = niveauxDu(dessin, lieux, emprises);
   const [deSurface] = niveaux;
@@ -301,7 +306,6 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     nomBulle.textContent = nomDeLEpingle();
     inaccessible.hidden = !!epingle.pieds;
     allerIci.disabled = !epingle.pieds;
-    vueDuLieu.hidden = !!epingle.destination || !epingle.lieu;
     bulle.hidden = false;
     placerEpingle();
   }
@@ -347,13 +351,6 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     if (!destination) allerAuPoint(pieds);
     else if (destination.entree) allerVers(destination.id);
     else allerElement(destination.id);
-  }
-
-  function voirLeLieu() {
-    const { lieu } = epingle;
-    fermer();
-    if (entrees.some((e) => e.id === lieu)) allerVers(lieu);
-    else allerElement(lieu);
   }
 
   // ---- aller à ----
@@ -460,7 +457,6 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   carte.querySelector(".dezoomer").onclick = () => gestes.zoomer(0.5);
   carte.querySelector(".recentrer").onclick = recentrer;
   allerIci.onclick = partirDeLEpingle;
-  vueDuLieu.onclick = voirLeLieu;
   bulle.querySelector(".fermer").onclick = oublierEpingle;
   entier.addEventListener("keydown", (e) => { if (e.key === "Enter") partirDeLEpingle(); });
   addEventListener("keydown", (e) => {

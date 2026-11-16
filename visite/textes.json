@@ -121,7 +121,6 @@
       "parcours_vitesse": "Vitesse",
       "parcours_replier": "Replier ou déplier la carte",
       "aller_ici": "Aller ici",
-      "vue_du_lieu": "Vue du lieu",
       "inaccessible": "Inaccessible à pied",
       "plan_ici": "Ce point",
       "niveau": "Niveau",
@@ -140,8 +139,7 @@
       "heikhal": "Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
       "lishkot": "Lishkot",
-      "sous_terrain": "Souterrains",
-      "mehilat_parva": "Galerie de Parva"
+      "sous_terrain": "Souterrains"
     }
   },
   "he": {
@@ -266,7 +264,6 @@
       "parcours_vitesse": "מהירות",
       "parcours_replier": "קיפול או פתיחה של הכרטיס",
       "aller_ici": "מעבר לכאן",
-      "vue_du_lieu": "מבט על המקום",
       "inaccessible": "אין גישה ברגל",
       "plan_ici": "נקודה זו",
       "niveau": "מפלס",
@@ -285,8 +282,7 @@
       "heikhal": "ההיכל",
       "kodesh_hakodashim": "קודש הקודשים",
       "lishkot": "הלשכות",
-      "sous_terrain": "המחילות",
-      "mehilat_parva": "מחילת פרוה"
+      "sous_terrain": "המחילות"
     },
     "entrees": {
       "har_habayit": "הר הבית, על הציר המזרחי",
@@ -299,7 +295,8 @@
       "oulam": "תחת תקרת האולם",
       "heikhal": "בתוך ההיכל",
       "kodesh_hakodashim": "קודש הקודשים",
-      "place_kotel": "רחבת הכותל"
+      "place_kotel": "רחבת הכותל",
+      "har_hamishcha": "הר המשחה, מול השער המזרחי"
     },
     "oeuvres": {
       "Arakhin": "ערכין",
@@ -345,6 +342,9 @@
       "Rambam Matnot Aniyim": "רמב״ם, הלכות מתנות עניים",
       "Rambam Mikvaot": "רמב״ם, הלכות מקוואות",
       "Rambam Sota": "רמב״ם, הלכות סוטה",
+      "Rambam Para Adouma": "רמב״ם, הלכות פרה אדומה",
+      "Para": "פרה",
+      "Rash MiShantz": "ר״ש משאנץ",
       "Sota": "סוטה",
       "Rambam Sanhedrin": "רמב״ם, הלכות סנהדרין",
       "Rambam sur Mena'hot": "רמב״ם, פירוש המשניות למנחות",
@@ -531,7 +531,6 @@
       "parcours_vitesse": "Speed",
       "parcours_replier": "Fold or unfold the card",
       "aller_ici": "Go here",
-      "vue_du_lieu": "View of the place",
       "inaccessible": "Out of reach on foot",
       "plan_ici": "This spot",
       "niveau": "Level",
@@ -550,8 +549,7 @@
       "heikhal": "Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
       "lishkot": "Lishkot",
-      "sous_terrain": "Underground",
-      "mehilat_parva": "Parva's tunnel"
+      "sous_terrain": "Underground"
     },
     "entrees": {
       "har_habayit": "Har HaBayit, on the east axis",
@@ -564,7 +562,8 @@
       "oulam": "Under the Ulam",
       "heikhal": "In the Heikhal",
       "kodesh_hakodashim": "Kodesh HaKodashim",
-      "place_kotel": "Western Wall Plaza"
+      "place_kotel": "Western Wall Plaza",
+      "har_hamishcha": "Mount of Olives, facing the Eastern Gate"
     },
     "oeuvres": {
       "Arakhin": "Arakhin",
@@ -610,6 +609,9 @@
       "Rambam Matnot Aniyim": "Rambam, Hilchot Matnot Aniyim",
       "Rambam Mikvaot": "Rambam, Hilchot Mikvaot",
       "Rambam Sota": "Rambam, Hilchot Sotah",
+      "Rambam Para Adouma": "Rambam, Hilchot Parah Adumah",
+      "Para": "Parah",
+      "Rash MiShantz": "Rash MiShantz",
       "Sota": "Sotah",
       "Rambam Sanhedrin": "Rambam, Hilchot Sanhedrin",
       "Rambam sur Mena'hot": "Rambam on Menachot",

@@ -33,10 +33,12 @@ AIRE_MIN = 1.0               # m² : plus petit, un contour ne se dessine pas
 HAUT_DU_CIEL = 400.0
 PENTE_MAX = 0.25             # composante verticale de la normale au-delà de laquelle une face est un dessus ou un dessous
 BAS_DU_MONDE = -200.0
-# En mètres, dans le repère du glb : x vers l'est, z vers le sud. `releve` : ce que les rayons couvrent,
-# le Temple et la place du Kotel ; `bornes` : jusqu'où la carte se déplace, la vieille ville autour.
-RELEVE = dict(x=(-345.0, 170.0), z=(-300.0, 400.0))
-BORNES = dict(x=(-420.0, 240.0), z=(-360.0, 460.0))
+# En mètres, dans le repère du glb : x vers l'est, z vers le sud. `releve` : le cadre du relevé ; les rayons ne
+# tombent que dans `zones_relevees`, le Temple et la place du Kotel, puis la bande du kevesh de la para jusqu'au lieu
+# de la sereifa ; `bornes` : jusqu'où la carte se déplace, la ville autour.
+RELEVE = dict(x=(-345.0, 830.0), z=(-300.0, 400.0))
+ZONES_RELEVEES = [dict(x=(-345.0, 170.0), z=(-300.0, 400.0)), dict(x=(170.0, 830.0), z=(-20.0, 20.0))]
+BORNES = dict(x=(-420.0, 900.0), z=(-360.0, 460.0))
 CACHEES = {"77_Fumee", "70_Kelim", "65_Aron", "99_Outils", "91_Lumiere", "90_Cameras", "01_Pays"}
 
 # L'ordre de dessin, du dessous au dessus.
@@ -47,7 +49,7 @@ PAR_CONCEPT = {
     "mur_herode": "mur", "mur_har_habayit": "mur", "kotel": "mur", "arche_wilson": "mur",
     "portiques": "bati", "gezuztra": "bati", "kippa_beit_hamoked": "bati",
     "azara": "cour", "ezrat_nashim": "cour", "ezrat_israel": "cour", "quinze_marches": "cour", "doukhan": "cour",
-    "douze_marches_oulam": "cour", "beit_hamitbahayim": "cour", "yam": "eau",
+    "douze_marches_oulam": "cour", "beit_hamitbahayim": "cour", "yam": "eau", "kevesh_hapara": "bati",
 }
 PAR_ZONE = {"mizbeach": "autel", "heikhal": "sanctuaire", "oulam": "sanctuaire", "kodesh_hakodashim": "sanctuaire", "lishkot": "bati"}
 PAR_COLLECTION = {"00_HarHabayit": "esplanade", "10_EzratNashim": "cour", "20_Azara": "cour", "80_Lishkot": "bati",
@@ -67,13 +69,17 @@ MUR = re.compile(r"couronnement|_mur|creneaux|bandeau|parapet")
 NIVEAUX = [
     dict(id="heikhal", coupe=4.5, x=(-88.0, -33.0), z=(-27.0, 27.0), pas=6.0, dans="sanctuaire",
          lieux=["oulam", "heikhal", "kodesh_hakodashim", "taim", "mesiba", "douze_marches_oulam"]),
-    dict(id="sous_terrain", coupe=-6.0, plancher=-8.0, x=(-95.0, 5.0), z=(-51.0, 44.0), pas=4.0, souterraine=True,
-         lieux=["mesiba_bira", "beit_hatevila", "shit"],
+    # Sous terre, un tronçon par profondeur : chacun a sa coupe.
+    dict(id="sous_terrain", pas=4.0, souterraine=True,
          # Bâti en surface, il descend aux tunnels : vu du plan de surface, il commence au-dessus d'eux.
-         acces=["beit_hamoked"]),
-    # Plus bas que les tunnels du Beit HaMoked, et sans accès : sa brèche est rebouchée.
-    dict(id="mehilat_parva", coupe=-9.6, plancher=-11.0, x=(-40.0, -34.0), z=(30.0, 50.0), pas=4.0, souterraine=True,
-         lieux=["mehilat_parva"], acces=[]),
+         acces=["beit_hamoked"],
+         troncons=[
+             dict(coupe=-6.0, plancher=-8.0, x=(-95.0, 5.0), z=(-51.0, 44.0), lieux=["mesiba_bira", "beit_hatevila", "shit"]),
+             # Plus bas que les tunnels du Beit HaMoked, et sans accès : sa brèche est rebouchée.
+             dict(coupe=-9.6, plancher=-11.0, x=(-40.0, -34.0), z=(30.0, 50.0), lieux=["mehilat_parva"]),
+             # Sous l'esplanade, entre le Soreg et Sha'ar Shushan : le tronçon ouvert du vide, sans accès.
+             dict(coupe=-11.5, plancher=-14.0, x=(76.0, 106.0), z=(-7.6, 7.6), lieux=["chalal"]),
+         ]),
 ]
 
 
@@ -108,11 +114,34 @@ class Scene(NamedTuple):
     dessous: BVHTree        # ceux tournés vers le bas
     categories: np.ndarray  # par triangle de `arbre`, l'indice de sa catégorie (-1 : mobilier)
     lieux: np.ndarray       # par triangle de `arbre`, l'indice de son lieu dans LIEUX (-1 : aucun)
+    sommets: np.ndarray
+    triangles: np.ndarray
+    verticale: np.ndarray   # par triangle, la composante verticale de sa normale
+
+
+class Sens(NamedTuple):
+    dessus: BVHTree
+    dessous: BVHTree
+
+
+def par_sens(sommets, triangles, verticale):
+    """Deux faces qui coïncident — le dessous d'une dalle sur le dessus d'une autre — ne sortent d'un même arbre
+    qu'une fois : rangées par sens, elles ne se masquent plus."""
+    def arbre(choix):
+        return BVHTree.FromPolygons(sommets.tolist(), triangles[choix].tolist(), all_triangles=True)
+    return Sens(arbre(verticale > PENTE_MAX), arbre(verticale < -PENTE_MAX))
+
+
+def doublure(scene, lieux):
+    """Les seules faces des lieux. Une galerie doublée dans un massif plein est, pour la scène entière, dans la
+    matière : vue de ses faces, elle est un vide."""
+    choix = np.isin(scene.lieux, [LIEUX.index(lieu) for lieu in lieux if lieu in LIEUX])
+    utiles, triangles = np.unique(scene.triangles[choix], return_inverse=True)
+    return par_sens(scene.sommets[utiles], triangles.reshape(-1, 3), scene.verticale[choix])
 
 
 def scene_a_plat():
-    """Les triangles visibles en arbres. Deux faces qui coïncident — le dessous d'une dalle sur le dessus d'une
-    autre — ne sortent d'un même arbre qu'une fois : rangées par sens, elles ne se masquent plus."""
+    """Les triangles visibles en arbres : tous, puis par sens."""
     prefixes = sorted(((p, c["id"], c["zone"]) for c in CONCEPTS for p in c["prefixes"]), key=lambda t: -len(t[0]))
     graphe = bpy.context.evaluated_depsgraph_get()
     sommets, triangles, categories, lieux = [], [], [], []
@@ -145,26 +174,24 @@ def scene_a_plat():
     a, b, c = (sommets[triangles[:, k]] for k in range(3))
     normales = np.cross(b - a, c - a)
     verticale = normales[:, 2] / np.maximum(np.linalg.norm(normales, axis=1), 1e-12)
-    liste = sommets.tolist()
-
-    def arbre(choix):
-        return BVHTree.FromPolygons(liste, triangles[choix].tolist(), all_triangles=True)
-
-    return Scene(arbre(slice(None)), arbre(verticale > PENTE_MAX), arbre(verticale < -PENTE_MAX),
-                 np.concatenate(categories), np.concatenate(lieux))
+    tous = BVHTree.FromPolygons(sommets.tolist(), triangles.tolist(), all_triangles=True)
+    return Scene(tous, *par_sens(sommets, triangles, verticale), np.concatenate(categories), np.concatenate(lieux),
+                 sommets, triangles, verticale)
 
 
-def releve(arbre, x, z, pas):
-    """La face que chaque rayon tombé du ciel touche d'abord (-1 : rien), rangée 0 au nord."""
-    nx, nz = round((x[1] - x[0]) * pas), round((z[1] - z[0]) * pas)
-    faces = np.full((nz, nx), -1, np.int32)
+def releve(arbre, cadre, zones, pas):
+    """Dans le cadre, la face que chaque rayon tombé du ciel sur une des zones touche d'abord (-1 : rien), rangée 0 au nord."""
+    x, z = cadre["x"], cadre["z"]
+    faces = np.full((round((z[1] - z[0]) * pas), round((x[1] - x[0]) * pas)), -1, np.int32)
     bas = Vector((0.0, 0.0, -1.0))
-    for j in range(nz):
-        zv = z[0] + (j + 0.5) / pas
-        for i in range(nx):
-            _, _, face, _ = arbre.ray_cast(Vector((x[0] + (i + 0.5) / pas, -zv, HAUT_DU_CIEL)), bas)
-            if face is not None:
-                faces[j, i] = face
+    for zone in zones:
+        colonnes = range(*(round((v - x[0]) * pas) for v in zone["x"]))
+        for j in range(*(round((v - z[0]) * pas) for v in zone["z"])):
+            zv = z[0] + (j + 0.5) / pas
+            for i in colonnes:
+                _, _, face, _ = arbre.ray_cast(Vector((x[0] + (i + 0.5) / pas, -zv, HAUT_DU_CIEL)), bas)
+                if face is not None:
+                    faces[j, i] = face
     return faces
 
 
@@ -332,12 +359,12 @@ def traversees(arbre, origine, direction):
         point = touche + direction * 1e-4
 
 
-def airs(scene, x, y):
+def airs(sens, x, y):
     """Les vides de la verticale, (sol, plafond) — l'algorithme de `solsLibres` (visite/marche.js) : un dessus franchi
     en descendant fait entrer dans la matière, un dessous en fait sortir. Un rayon seul, de la coupe, se trompait
     sur les planchers des ta'im qui entrent dans le mur du Heikhal."""
-    faces = sorted([(c, 1) for c in traversees(scene.dessus, Vector((x, y, HAUT_DU_CIEL)), Vector((0.0, 0.0, -1.0)))]
-                   + [(c, -1) for c in traversees(scene.dessous, Vector((x, y, BAS_DU_MONDE)), Vector((0.0, 0.0, 1.0)))],
+    faces = sorted([(c, 1) for c in traversees(sens.dessus, Vector((x, y, HAUT_DU_CIEL)), Vector((0.0, 0.0, -1.0)))]
+                   + [(c, -1) for c in traversees(sens.dessous, Vector((x, y, BAS_DU_MONDE)), Vector((0.0, 0.0, 1.0)))],
                    reverse=True)
     vides, profondeur, plafond = [], 0, math.inf
     for cote, sens in faces:
@@ -352,7 +379,7 @@ def airs(scene, x, y):
     return vides
 
 
-def coupe_a(scene, x, z, pas, hauteur):
+def coupe_a(sens, x, z, pas, hauteur):
     """À `hauteur`, pixel par pixel : la cote du sol du vide où l'on est (NaN dans la matière), et s'il a un plafond."""
     nx, nz = round((x[1] - x[0]) * pas), round((z[1] - z[0]) * pas)
     sol = np.full((nz, nx), np.nan, np.float32)
@@ -360,7 +387,7 @@ def coupe_a(scene, x, z, pas, hauteur):
     for j in range(nz):
         zv = z[0] + (j + 0.5) / pas
         for i in range(nx):
-            vide = next(((s, p) for s, p in airs(scene, x[0] + (i + 0.5) / pas, -zv) if s <= hauteur < p), None)
+            vide = next(((s, p) for s, p in airs(sens, x[0] + (i + 0.5) / pas, -zv) if s <= hauteur < p), None)
             if vide:
                 sol[j, i], couvert[j, i] = vide[0], vide[1] < math.inf
     return sol, np.isnan(sol), couvert
@@ -403,25 +430,47 @@ def points_d_etiquette(faces, lieux):
     return points
 
 
-def plan_de_coupe(scene, niveau, surface):
-    """Sous la coupe d'un bâtiment, ses murs tranchés et son sol ; sous terre, les seuls tunnels."""
+def coupe_de_batiment(scene, niveau, surface):
+    """Sous la coupe d'un bâtiment, sous son toit seulement — ailleurs c'est le plan de surface —, ses murs tranchés
+    et son sol."""
     x, z, pas = niveau["x"], niveau["z"], niveau["pas"]
-    sol, plein, couvert = coupe_a(scene, x, z, pas, niveau["coupe"])
+    sol, plein, _ = coupe_a(scene, x, z, pas, niveau["coupe"])
     coupe = np.full(sol.shape, -2, np.int16)
-    if niveau.get("souterraine"):
-        # Sous un plafond, et dans un lieu du niveau : ni l'esplanade à ciel ouvert, ni le vide sous une dalle.
-        # Le massif plein ne se dessine pas : les tunnels se lisent sur le plan de surface pâli.
-        libre = ~plein & (sol > niveau["plancher"]) & couvert & dans_les_lieux(niveau["lieux"], x, z, pas)
-        coupe[libre] = 0
-    else:
-        # Sous son toit seulement, ailleurs c'est le plan de surface ; ce qui n'y est pas mur tranché est sol.
-        lignes = ((np.arange(sol.shape[0]) + 0.5) / pas + z[0] - RELEVE["z"][0]) * PAS
-        colonnes = ((np.arange(sol.shape[1]) + 0.5) / pas + x[0] - RELEVE["x"][0]) * PAS
-        sous_le_toit = surface[lignes.astype(int)][:, colonnes.astype(int)] == CATEGORIES.index(niveau["dans"])
-        coupe[sous_le_toit] = 0
-        coupe[ouvrir(plein, 2) & sous_le_toit] = 1
-    coupe = majorite(coupe, (-2, 0, 1))
-    return vectoriser(coupe, x, z, pas, ["sol", "mur"])
+    lignes = ((np.arange(sol.shape[0]) + 0.5) / pas + z[0] - RELEVE["z"][0]) * PAS
+    colonnes = ((np.arange(sol.shape[1]) + 0.5) / pas + x[0] - RELEVE["x"][0]) * PAS
+    sous_le_toit = surface[lignes.astype(int)][:, colonnes.astype(int)] == CATEGORIES.index(niveau["dans"])
+    coupe[sous_le_toit] = 0
+    coupe[ouvrir(plein, 2) & sous_le_toit] = 1
+    return vectoriser(majorite(coupe, (-2, 0, 1)), x, z, pas, ["sol", "mur"])
+
+
+def tunnels(scene, troncon, pas):
+    """Sous un plafond, et dans un lieu du tronçon : ni l'esplanade à ciel ouvert, ni le vide sous une dalle. Le massif
+    plein ne se dessine pas : les tunnels se lisent sur le plan de surface pâli."""
+    x, z = troncon["x"], troncon["z"]
+    dedans = dans_les_lieux(troncon["lieux"], x, z, pas)
+    libre = np.zeros(dedans.shape, bool)
+    for sens in (scene, doublure(scene, troncon["lieux"])):
+        sol, plein, couvert = coupe_a(sens, x, z, pas, troncon["coupe"])
+        libre |= ~plein & (sol > troncon["plancher"]) & couvert & dedans
+    coupe = np.where(libre, 0, -2).astype(np.int16)
+    return vectoriser(majorite(coupe, (-2, 0)), x, z, pas, ["sol"])
+
+
+def niveau_souterrain(scene, niveau):
+    """Les tronçons, chacun à sa profondeur, en un seul niveau ; on y cherche le sol sous le plus haut d'entre eux."""
+    troncons = niveau["troncons"]
+    sols = "".join(c["d"] for t in troncons for c in tunnels(scene, t, niveau["pas"]))
+    return dict(id=niveau["id"], coupe=max(t["coupe"] for t in troncons), lieux=[l for t in troncons for l in t["lieux"]],
+                min=[min(t["x"][0] for t in troncons), min(t["z"][0] for t in troncons)],
+                max=[max(t["x"][1] for t in troncons), max(t["z"][1] for t in troncons)],
+                couches=[dict(categorie="sol", d=sols)], souterraine=True, acces=niveau["acces"])
+
+
+def niveau_de_batiment(scene, niveau, surface):
+    return dict(id=niveau["id"], coupe=niveau["coupe"], lieux=niveau["lieux"],
+                min=[niveau["x"][0], niveau["z"][0]], max=[niveau["x"][1], niveau["z"][1]],
+                couches=coupe_de_batiment(scene, niveau, surface))
 
 
 def ville():
@@ -442,16 +491,10 @@ def ville():
 def main():
     debut = time.time()
     scene = scene_a_plat()
-    faces = releve(scene.arbre, RELEVE["x"], RELEVE["z"], PAS)
+    faces = releve(scene.arbre, RELEVE, ZONES_RELEVEES, PAS)
     surface, couches = plan_de_surface(faces, scene.categories)
-    niveaux = []
-    for niveau in NIVEAUX:
-        sortie = dict(id=niveau["id"], coupe=niveau["coupe"], lieux=niveau["lieux"],
-                      min=[niveau["x"][0], niveau["z"][0]], max=[niveau["x"][1], niveau["z"][1]],
-                      couches=plan_de_coupe(scene, niveau, surface))
-        if niveau.get("souterraine"):
-            sortie.update(souterraine=True, acces=niveau["acces"])
-        niveaux.append(sortie)
+    niveaux = [niveau_souterrain(scene, n) if n.get("souterraine") else niveau_de_batiment(scene, n, surface)
+               for n in NIVEAUX]
     plan = dict(min=[BORNES["x"][0], BORNES["z"][0]], max=[BORNES["x"][1], BORNES["z"][1]],
                 ville=ville(), couches=couches, niveaux=niveaux, etiquettes=points_d_etiquette(faces, scene.lieux))
     SORTIE.write_text(json.dumps(plan, ensure_ascii=False, separators=(",", ":")))

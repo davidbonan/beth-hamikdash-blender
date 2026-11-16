@@ -62,6 +62,7 @@ LARGEUR_CHANFREIN = 0.03 * AMA
 # En amot. `cadre` : concepts à montrer entiers ; sans `position`, le navigateur recule le long du `cap` (0 = est, 90 = nord).
 Z_HAR, Z_EZN, Z_EZI, Z_AZ, Z_BAT = -16.0, -10.0, -2.5, 0.0, 6.0
 Z_PLACE_KOTEL = -51.58
+Z_SEREIFA = 115.0
 
 REPERES = [
     dict(id="har_habayit", nom="Har HaBayit, sur l'axe est",
@@ -91,6 +92,9 @@ REPERES = [
     # Z_PLACE_KOTEL du blockout : le dallage d'Hérode moins les dix-neuf mètres du mur.
     dict(id="place_kotel", nom="Place du Kotel",
          position=(-482.1, -399.9, Z_PLACE_KOTEL), cap=47, tangage=10),
+    # La place du cohen qui brûle la para, au bord est de la fosse : le regard file vers l'ouverture du Heikhal.
+    dict(id="har_hamishcha", nom="Mont des Oliviers, face à la porte orientale",
+         position=(1661.0, 0.0, Z_SEREIFA), cap=180, tangage=-3),
 ]
 
 # Ce que « Un élément… » et le plan montrent de `<id>` quand le recul automatique n'y suffit pas ; une cour ne tient entière qu'en vol.
@@ -166,6 +170,16 @@ VUES = [
     dict(id="vue_shimon_hatsadik", cadre=["menora", "shulchan"], cap=180, sol=Z_BAT, recul_max=24.0),
     # Le jambage nord de l'Oulam, où le parcours de Yom Kippour noue la langue.
     dict(id="vue_lashon_zehorit", position=(-74.0, -3.0, Z_BAT), cap=96, tangage=6),
+    # Le chemin de la para, de la chambre du cohen au sommet du mont des Oliviers.
+    dict(id="vue_beit_even", position=(176.0, 100.0, Z_HAR), cap=90, tangage=-6),
+    dict(id="vue_kelalim", position=(155.0, 12.0, Z_HAR), cap=180, tangage=-30),
+    dict(id="vue_chalal", position=(216.0, 0.0, Z_HAR - 12), cap=180, tangage=4),
+    # D'en face, le kevesh est un trait sur la pente : il se lit au-dessus du Kidron, ses étages décalés montant au sommet.
+    dict(id="vue_kevesh_hapara", position=(480.0, -190.0, 0.0), cap=41, tangage=-8, vol=True),
+    dict(id="vue_makom_hasereifa", position=(1678.0, 0.0, Z_SEREIFA), cap=180, tangage=-6),
+    dict(id="vue_maarakhat_hapara", position=(1661.0, 0.0, Z_SEREIFA), cap=180, tangage=-30),
+    dict(id="vue_beit_tevila_har_hamishcha", position=(1668.0, 19.0, Z_SEREIFA), cap=270, tangage=-35),
+    dict(id="vue_para_adouma", position=(1661.0, 0.0, Z_SEREIFA), cap=180, tangage=-3),
 ]
 
 

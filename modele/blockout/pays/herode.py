@@ -5,7 +5,8 @@ from ..primitives.parametres import Z_HAR
 from ..primitives.pierre import pierre
 from ..primitives.matieres import CALCAIRE, MAT_MURAILLE, MAT_SOL, _exposer
 from ..primitives.volumes import plage
-from ..har_habayit import HX0, HX1, HY0, HY1
+from ..har_habayit import HX0, HX1, HY0, HY1, MIZRAHI_Y
+from ..para_adouma import KEVESH_X0, LARGEUR_KEVESH
 from .calage import (APPAREILS_KOTEL, EPAISSEUR_HAR, HARAM, KOTEL, LARGEUR_PONT, MAILLE_PAYS, PARAPET_HAR,
                      PONT_MAGHREBINS, Z_PLACE_KOTEL, _dans_le_carre, _distance_a_l_anneau, sol_naturel,
                      volumes)
@@ -42,22 +43,28 @@ def _pres_du_kotel(p, marge=6):
     return _distance_a_l_anneau(p, KOTEL) < marge
 
 
-def _porte_des_maghrebins(a, b):
-    """Où le pont des Maghrébins passe le segment a-b du mur, ou None."""
+def _passages():
+    """Ce qui franchit le mur au niveau du dallage, (départ, au-delà, largeur) : le pont des
+    Maghrébins prolongé d'un tronçon, le kevesh de la para tiré vers le mont des Oliviers."""
     p, q = PONT_MAGHREBINS[-2], PONT_MAGHREBINS[-1]
-    au_dela = (2 * q[0] - p[0], 2 * q[1] - p[1])
-    return geometry.intersect_line_line_2d(Vector(p), Vector(au_dela), Vector(a), Vector(b))
+    return [(p, (2 * q[0] - p[0], 2 * q[1] - p[1]), LARGEUR_PONT),
+            ((KEVESH_X0, MIZRAHI_Y), (KEVESH_X0 + 100, MIZRAHI_Y), LARGEUR_KEVESH)]
 
 
 def _travees_du_mur(a, b, z1):
-    """(début, fin, crête) le long du segment, en fractions : la porte des Maghrébins
-    arase le mur au dallage sur la largeur du pont."""
-    porte = _porte_des_maghrebins(a, b)
-    if porte is None:
-        return [(0, 1, z1)]
-    t, demi = math.dist(a, porte) / math.dist(a, b), LARGEUR_PONT / 2 / math.dist(a, b)
-    a0, a1 = max(0, t - demi), min(1, t + demi)
-    return [(0, a0, z1), (a0, a1, Z_HAR), (a1, 1, z1)]
+    """(début, fin, crête) le long du segment, en fractions : chaque passage arase le mur
+    au dallage sur sa largeur."""
+    coupures = []
+    for depart, au_dela, largeur in _passages():
+        croise = geometry.intersect_line_line_2d(Vector(depart), Vector(au_dela), Vector(a), Vector(b))
+        if croise is not None:
+            t, demi = math.dist(a, croise) / math.dist(a, b), largeur / 2 / math.dist(a, b)
+            coupures.append((max(0, t - demi), min(1, t + demi)))
+    travees, debut = [], 0
+    for a0, a1 in sorted(coupures):
+        travees += [(debut, a0, z1), (a0, a1, Z_HAR)]
+        debut = a1
+    return [t for t in travees + [(debut, 1, z1)] if t[1] > t[0]]
 
 
 def murs_herode():

@@ -1,7 +1,7 @@
 import bpy
 import math
 import zlib
-from mathutils import Matrix, Vector
+from mathutils import Matrix, Vector, geometry
 
 from .parametres import AMA, m
 from .matieres import MAT_COLONNE, MAT_FER, MAT_OR, MAT_PIERRE, MAT_TERRE_CUITE, braise
@@ -172,6 +172,32 @@ def arc(centre, demi, naissance, fleche, segments=8):
     return [(centre + rayon * math.sin(-ouverture + 2 * ouverture * k / segments),
              naissance + fleche - rayon + rayon * math.cos(-ouverture + 2 * ouverture * k / segments))
             for k in range(segments + 1)]
+
+def extrusion(profil, origine, u, v, longueur):
+    """Un profil (v, z) fermé, sens direct, extrudé de `longueur` le long de u : flancs et
+    deux bouts."""
+    def monde(pv, pz, pu):
+        return (origine[0] + u[0] * pu + v[0] * pv, origine[1] + u[1] * pu + v[1] * pv, pz)
+    n = len(profil)
+    verts = [monde(pv, pz, 0) for pv, pz in profil] + [monde(pv, pz, longueur) for pv, pz in profil]
+    faces = [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
+    for a, b, c in geometry.tessellate_polygon([[Vector((pv, pz, 0)) for pv, pz in profil]]):
+        direct = ((profil[b][0] - profil[a][0]) * (profil[c][1] - profil[a][1])
+                  - (profil[b][1] - profil[a][1]) * (profil[c][0] - profil[a][0])) > 0
+        faces += [[a, c, b], [n + a, n + b, n + c]] if direct else [[a, b, c], [n + a, n + c, n + b]]
+    if u[0] * v[1] - u[1] * v[0] < 0:
+        faces = [f[::-1] for f in faces]
+    return verts, faces
+
+
+def fondre(morceaux):
+    """Des (sommets, faces) mis dans un seul maillage."""
+    verts, faces = [], []
+    for v, f in morceaux:
+        faces += [[len(verts) + i for i in face] for face in f]
+        verts += v
+    return verts, faces
+
 
 def cyl(name, x, y, z0, z1, r, col="20_Azara", mat=None, verts=32):
     return _lisser(prism(name, _cercle(x, y, r, verts), min(z0, z1), max(z0, z1), col, mat), verts)

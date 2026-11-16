@@ -2,6 +2,7 @@ import math
 
 from ..primitives.volumes import alea
 from ..har_habayit import HX1
+from ..para_adouma import sur_le_chemin_de_la_para
 from .calage import PAYS, _nappe_du_pays
 from .herode import esplanade_herode, murs_herode
 from .place_du_kotel import place_du_kotel
@@ -22,6 +23,6 @@ jardin_archeologique()
 for i in range(1300):
     nom = f"Olivier_{i:04d}"
     x, y = HX1 + 120 + 3000 * alea(nom, 5), -2400 + 4800 * alea(nom, 6)
-    if alea(nom, 0) > 0.7 or (math.floor(x / 10), math.floor(y / 10)) in CASES_BATIES:
+    if alea(nom, 0) > 0.7 or (math.floor(x / 10), math.floor(y / 10)) in CASES_BATIES or sur_le_chemin_de_la_para([(x, y)], 4):
         continue
     olivier(nom, x, y, PAYS)

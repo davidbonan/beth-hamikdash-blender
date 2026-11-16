@@ -11,7 +11,7 @@ const TRAITES = {
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
   sanhedrin: "Sanhedrin", negaim: "Negaim", ketoubot: "Ketubot", ketubot: "Ketubot", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
   pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim", shabbat: "Shabbat",
-  sota: "Sotah",
+  sota: "Sotah", para: "Parah",
 };
 const OUVRAGES = {
   "rambam beit habehira": "Mishneh Torah, The Chosen Temple",
@@ -54,6 +54,7 @@ const OUVRAGES = {
   "hagahot yaavetz sur sanhedrin": "Haggahot Ya'avetz on Sanhedrin",
   "rambam mikvaot": "Mishneh Torah, Immersion Pools",
   "rambam sota": "Mishneh Torah, Woman Suspected of Infidelity",
+  "rambam para adouma": "Mishneh Torah, Red Heifer",
   "rambam avodat yom hakippurim": "Mishneh Torah, Service on the Day of Atonement",
   "yerushalmi yoma": "Jerusalem Talmud Yoma",
   "tosefta sanhedrin": "Tosefta Sanhedrin",
@@ -71,7 +72,7 @@ const COMMENTAIRES = {
   bartenura: "Bartenura on Mishnah", "tosfot yom tov": "Tosafot Yom Tov on Mishnah",
   "tiferet israel": "Yachin on Mishnah", rashash: "Rashash on Mishnah", boaz: "Boaz on Mishnah",
   radak: "Radak on", "metsoudat david": "Metzudat David on", "melekhet shelomoh": "Melekhet Shelomoh on Mishnah",
-  "lechem shamayim": "Lechem Shamayim on Mishnah",
+  "lechem shamayim": "Lechem Shamayim on Mishnah", "rash mishantz": "Rash MiShantz on Mishnah",
 };
 
 const pele = (s) => (s || "").toLowerCase().normalize("NFD")

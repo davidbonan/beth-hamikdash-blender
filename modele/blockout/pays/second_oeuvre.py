@@ -2,8 +2,8 @@ import math
 
 from ..primitives.parametres import AMA
 from ..primitives.matieres import MAT_CHENE, MAT_FER_BRUN, MAT_VITRE
-from ..primitives.volumes import FACES_BOITE, arc, empty, plage
-from .place_du_kotel import _baie, _cap, _devant, _extrusion, _fut, _pave, _poser, _poutre
+from ..primitives.volumes import FACES_BOITE, arc, empty, extrusion, plage
+from .place_du_kotel import _baie, _cap, _devant, _fut, _pave, _poser, _poutre
 
 
 # Ce qui habille un mur une fois le gros œuvre monté : chambranles, appuis, croisées, grilles,
@@ -43,7 +43,7 @@ def _bandeau(p, q, z, hauteur=0.25 / AMA, saillie=0.08 / AMA):
 def _encadrement(p, q, s, z0, dehors, dedans, saillie):
     """La bande de pierre entre deux contours (v, z) parcourus de gauche à droite, plaquée sur le mur."""
     profil = dehors[::-1] + dedans
-    return _extrusion([(v, z0 + z) for v, z in profil], _devant(p, _cap(p, q), s, -0.02), _a_droite(p, q, -1), _unitaire(p, q), saillie + 0.02)
+    return extrusion([(v, z0 + z) for v, z in profil], _devant(p, _cap(p, q), s, -0.02), _a_droite(p, q, -1), _unitaire(p, q), saillie + 0.02)
 
 
 def _contour(demi, hauteur, cintre, segments=6):

@@ -24,7 +24,8 @@ TEXEL = 0.2
 SALLES_CLOSES = ("lishkat_hagazit", "lishkat_hagola", "beit_hahalifot", "lishkat_hamedichin", "lishkat_haparva",
                  "lishkat_hamelach", "lishkat_haetz", "beit_hatevila")
 # Le rebord d'une keren fait un quart d'ama : à moins de quatre texels, l'ombre de son puits bave dessus.
-TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03, "keranot": 0.012} | dict.fromkeys(SALLES_CLOSES, 0.08)
+# Le kevesh se voit de loin : à 20 cm sa carte montait à 2048², 16 Mo de GPU pour 2 % de la scène.
+TEXEL_DE = {"mizbeach": 0.03, "yessod": 0.03, "keranot": 0.012, "kevesh_hapara": 0.4} | dict.fromkeys(SALLES_CLOSES, 0.08)
 # Sous AIRE_MIN, mais de la chaux du Mizbea'h : sans carte, il tranche en gris sur le corps qui en a une.
 # Les éléments du Beit HaMoked, fiche à part : sans carte, le ciel les éclairerait dans la salle close comme au-dehors.
 # La dalle de l'Arche aussi : sans carte, elle se détachait en blanc sur le pavage cuit de la Lishkat HaEtzim.

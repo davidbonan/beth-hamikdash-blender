@@ -107,7 +107,8 @@ export function vuesDuTemple({ camera, marche, emprises, reperes, obstacles, ten
     if (!lieu && niveau.ailleurs) return solAuPoint(x, z, niveau.ailleurs);
     if (!lieu && !niveau.horsDesLieux) return null;
     const plancher = lieu ? (niveau.planchers?.get(lieu) ?? emprises.get(lieu).min.y) - MARGE_PLANCHER : -Infinity;
-    const plafond = Math.min(niveau.plafond, plancher + HAUSSE_MAX);
+    // Un lieu sur une hauteur a son plancher au-dessus du plafond du niveau : il ne garde que le sien.
+    const plafond = Math.min(plancher < niveau.plafond ? niveau.plafond : Infinity, plancher + HAUSSE_MAX);
     const sol = marche.solsLibres(x, z)
       .filter(({ y, libre }) => y >= plancher && y < plafond && libre >= HAUTEUR_LIBRE)
       .reverse()
