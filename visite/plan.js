@@ -111,6 +111,7 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   const bouton = document.querySelector("#minicarte .disque");
   const fenetre = document.querySelector("#plan");
   const mini = bouton.querySelector("svg");
+  bouton.querySelector(".rose").style.setProperty("--nord", `${dessin.nord}deg`);
   const carte = fenetre.querySelector(".carte");
   const entier = carte.querySelector("svg");
   const barre = fenetre.querySelector(".echelle");

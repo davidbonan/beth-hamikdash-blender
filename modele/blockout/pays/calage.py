@@ -23,11 +23,10 @@ PAYS = "01_Pays"
 PAYS_DOSSIER = MODELE / "pays"
 PAYS_DONNEES = json.loads((PAYS_DOSSIER / "pays.json").read_text())
 # Le rocher du Dôme est la Even HaShetiya, « שֶׁהָיְתָה שָׁם מִימוֹת נְבִיאִים רִאשׁוֹנִים » (Yoma 5:2) :
-# CHOIX, l'identification courante. Le Temple garde l'est vrai, celui de la ligne de
-# mire de la para (Middot 2:4) ; le Haram actuel est tourné de 6°, et son mur est passe
-# alors une dizaine de mètres en dedans de l'angle nord-est du carré. ORIENTATION, en
-# degrés, tourne la géographie autour du rocher.
-ORIENTATION = 0.0
+# CHOIX, l'identification courante. L'axe du Temple est perpendiculaire au mur est du Haram,
+# pré-hérodien (Ritmeyer), à 84° du nord : il vise le sommet du mont des Oliviers, « בְּרֹאשׁ
+# הַר הַמִּשְׁחָה » (Middot 2:4). ORIENTATION, en degrés, tourne la géographie autour du rocher.
+ORIENTATION = -6.0
 # L'esplanade actuelle devient Z_HAR : médiane du relief dans le Haram, 740,2 m.
 ALTITUDE_HAR = 740.2
 PARAPET_HAR = 4          # la crête du mur d'Hérode au-dessus du dallage, CHOIX

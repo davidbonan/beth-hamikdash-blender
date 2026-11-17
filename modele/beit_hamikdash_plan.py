@@ -88,6 +88,12 @@ def vers_la_visite(est, nord):
     return x * AMA, -y * AMA
 
 
+def nord_geographique():
+    """En degrés, dans le sens horaire depuis le haut de la carte."""
+    (x0, z0), (x1, z1) = vers_la_visite(0, 0), vers_la_visite(0, 1)
+    return round(math.degrees(math.atan2(x1 - x0, z0 - z1)), 2)
+
+
 def categorie(nom, collection, prefixes):
     if MOBILIER.search(nom):
         return None
@@ -496,7 +502,7 @@ def main():
     niveaux = [niveau_souterrain(scene, n) if n.get("souterraine") else niveau_de_batiment(scene, n, surface)
                for n in NIVEAUX]
     plan = dict(min=[BORNES["x"][0], BORNES["z"][0]], max=[BORNES["x"][1], BORNES["z"][1]],
-                ville=ville(), couches=couches, niveaux=niveaux, etiquettes=points_d_etiquette(faces, scene.lieux))
+                nord=nord_geographique(), ville=ville(), couches=couches, niveaux=niveaux, etiquettes=points_d_etiquette(faces, scene.lieux))
     SORTIE.write_text(json.dumps(plan, ensure_ascii=False, separators=(",", ":")))
     print(f"plan · {SORTIE.stat().st_size // 1024} Ko en {time.time() - debut:.0f} s")
 
