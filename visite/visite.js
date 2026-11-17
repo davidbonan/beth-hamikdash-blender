@@ -85,6 +85,7 @@ for (const { emprises, vues } of distributions) {
   reperes.vues.push(...vues.filter((vue) => !reperes.vues.some((v) => v.id === vue.id)));
 }
 const EMPRISES = new Map(Object.entries(reperes.emprises).map(([id, b]) => [id, enBoite(b)]));
+chargement.tracerLePlan(DESSIN_DU_PLAN, EMPRISES.get("mur_har_habayit"));
 
 const CONCEPTS = await conceptsEn(langue(), fiche, contenus);
 
