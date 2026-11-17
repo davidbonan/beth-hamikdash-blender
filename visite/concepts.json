@@ -1004,6 +1004,31 @@
       ]
     },
     {
+      "id": "machta_kessef",
+      "nom": "La ma'hta d'argent",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Machta_kessef"
+      ]
+    },
+    {
+      "id": "magrefot_tsinorot",
+      "nom": "Magrefot et tsinorot",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Magrefot_",
+        "Tsinorot_"
+      ]
+    },
+    {
+      "id": "pesakhter",
+      "nom": "Pesakhter",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Pesakhter"
+      ]
+    },
+    {
       "id": "yakhin_boaz",
       "nom": "Yakhin et Boaz",
       "zone": "oulam",

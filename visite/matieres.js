@@ -24,14 +24,14 @@ import { LECTURE_DU_REFLET, REFLET } from "./reflet_du_dallage.js";
 const LISSE = 0, PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 6, ENDUIT = 7, SUIE = 8,
       MARBRE_HERODE = 9, TAMBOUR = 10, MAISON = 11, BRAISE = 12, DALLE = 13, MURAILLE = 14, ROCHE = 15,
       LAMBRIS = 16, MIKSHE = 17, CHAUX = 18, KOTEL_HERODIEN = 19, KOTEL_OMEYYADE = 20, KOTEL_MAMELOUK = 21,
-      DALLE_KOTEL = 22, DALLE_DE_PRIERE = 23, LUMINAIRE = 24, BUCHE = 25;
+      DALLE_KOTEL = 22, DALLE_DE_PRIERE = 23, LUMINAIRE = 24, BUCHE = 25, MONOLITHE = 26;
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
   "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Robe_Royale", "Figure_Voile", "Figure_Meil",
   "Figure_Ephod", "Toile_blanche", "Drapeau_blanc", "Drapeau_bleu", "Caprier", "Caprier_sec", "Palme"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
-const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
+const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MONOLITHE, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
                           KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
 // Celles qui gardent leur appareil au profil sobre : les murs, les sols, l'or, et l'étoffe pour les keruvim de la Parokhet.
 const ESSENTIELLES = new Set([PIERRE, DALLE, METAL, ETOFFE]);
@@ -122,7 +122,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // Famille → nappe photographique. L'or et l'eau n'en ont pas : une feuille martelée
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
-                   13: "pierre", 14: "pierre", 15: "pierre", 19: "pierre", 20: "pierre", 21: "pierre", 22: "pierre", 23: "pierre",
+                   13: "pierre", 14: "pierre", 15: "pierre", 19: "pierre", 20: "pierre", 21: "pierre", 22: "pierre", 23: "pierre", 26: "pierre",
                    3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois", 18: "enduit", 25: "bois" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
@@ -150,7 +150,7 @@ const CARREAU = {
   // La bûche ne prend de la photo que son fil : sa couleur est celle de ce que le feu en a laissé.
   25: [0.5, 0.30, 0.30, 1.20, 0.60],
   // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
-  9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.4, 0.28, 0.28, 1.20, 0.65],
+  9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.4, 0.28, 0.28, 1.20, 0.65], 26: [2.4, 0.28, 0.28, 1.20, 0.65],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
   // Le dallage prend le carreau le plus court et la plus faible couleur de tous les
   // calcaires : une cour est lavée et balayée, et la nappe scannée y posait des lichens
@@ -170,7 +170,7 @@ const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
   Dallage_kotel: DALLE_KOTEL, Dallage_de_priere: DALLE_DE_PRIERE, Pierre_de_Jerusalem: MAISON,
   Pierre_kotel_herodien: KOTEL_HERODIEN, Pierre_kotel_omeyyade: KOTEL_OMEYYADE, Pierre_kotel_mamelouk: KOTEL_MAMELOUK,
-  Maisons: MAISON, Pierre_colonne: TAMBOUR,
+  Maisons: MAISON, Pierre_colonne: TAMBOUR, Pierre_monolithe: MONOLITHE,
   Marbre_blanc: MARBRE, Marbre_Herode: MARBRE_HERODE,
   Or: METAL, Or_plaque: METAL, Or_mikshe: MIKSHE, Argent: METAL, Bronze: METAL, Nehoshet_matzhiv: METAL,
   Nehoshet_martele: METAL, Fer: METAL, Fer_lame: METAL, Fer_brun: METAL, Tole: METAL, Acier_blanc: METAL,
@@ -346,7 +346,7 @@ const vec3 OMBRE_JOINT = vec3(0.72, 0.66, 0.58);
 const float CREUX_M = 0.020;
 // Part de la coulure qu'un parement garde : la muraille et la ville entière, le Temple lavé la moitié. COULURE_EXPOSEE du blockout.
 const float COULURE_EXPOSEE = 0.16;
-float exposition(){ return FAMILLE == 11 || FAMILLE == 14 || FAMILLE >= 19 ? 1.0 : 0.5; }
+float exposition(){ return FAMILLE == 11 || FAMILLE == 14 || (FAMILLE >= 19 && FAMILLE != 26) ? 1.0 : 0.5; }
 // Le Kotel au-dessus de sa place : Hérode, les Omeyyades, puis les petites assises, chaque
 // bande calée sur son premier lit. Mêmes valeurs que APPAREILS_KOTEL du blockout, en amot.
 const float Z_PLACE_KOTEL = -51.5833, Z_KOTEL_OMEYYADE = -35.5417, Z_KOTEL_MAMELOUK = -28.875;
@@ -896,6 +896,9 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     // sur la normale, qui bascule quatre fois autour du fût, et la trame sautait quatre
     // fois par colonne.
     appareil(P, N, Appareil(1.4, 1.0e4, 1.0e4, 0.0, JOINT, LISERE), teinte, pente, rugo, photo);
+  }
+  else if (FAMILLE == 26) {          // un bloc d'une pièce : ni lit ni joint
+    appareil(P, N, Appareil(1.0e4, 1.0e4, 1.0e4, 0.0, JOINT, LISERE), teinte, pente, rugo, photo);
   }
   else if (FAMILLE == 9) {           // le bâtiment : trois marbres, polis et veinés
     marbreHerode(P, N, teinte, pente, rugo, photo);

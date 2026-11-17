@@ -12,13 +12,14 @@ from ..matieres import BRONZE, CHENE, LIN, OR, SHANI, bois, laine, lin, metal
 from ..corps import Gabarit, _alea
 from ..maillage import TOUR, Maillage, pave
 from ..habillage import HAUT_Z, _objet, lier, objet_du_maillage, porter
-from ..ustensiles import mizrak, tabouret, tourner_profil, tube_simple
+from ..ustensiles import MACHTA_DE_KIPPOUR, RAYON_DU_MANCHE, machta, mizrak, tabouret, tube_simple
 from ..mise_en_scene import (RECUL_ASSIS, assis, coude_ouvert, devant_poitrine, ecouter, hatava,
-                             lire_le_sefer, mains_aux_genoux, mains_jointes, repere_mizrak, repere_vers,
+                             lire_le_sefer, mains_aux_genoux, mains_jointes, repere_machta, repere_mizrak, repere_vers,
                              saisir, tenir, tenir_le_sefer, vers_la_figure, zerika)
 from ..bigdei_kehouna import cohen, cohen_gadol, cohen_gadol_en_or
 from ..tenues import fidele
 from ..role import Objet, Role
+from .figures_tamid import SUR_LA_PIERRE_DE_LA_MENORA
 from ..betes import FRONT_DU_SEIR, amener_le_par, amener_le_seir, front_du_par, poser_seir
 
 
@@ -349,25 +350,8 @@ def _aupres_du_goral(k, ou):
 
 
 # « עָלָה לְרֹאשׁ הַמִּזְבֵּחַ, וּפִנָּה גֶחָלִים אֵילָךְ וְאֵילָךְ, וְחוֹתֶה מִן הַמְאֻכָּלוֹת הַפְּנִימִיּוֹת » (Yoma 4:3) ; la ma'hta
-# d'or au long manche (4:4), dans la droite (5:1). Cotes de la fiche §8g : bassin de 0,56 ama sur 0,16, manche de 1,1 ama.
-RAYON_DU_MANCHE = 0.011
+# d'or au long manche (4:4), dans la droite (5:1).
 DUREE_DE_LA_PELLETEE = 8.0
-BRAISE = (0.34, 0.05, 0.015)
-
-
-def machta(mm, braises, repere):
-    manche = [Vector((0.0, 0.0, z)) for z in np.linspace(-0.35, 0.18, 5)]
-    mm.nappe([[repere @ p for p in a] for a in tube_simple(manche, RAYON_DU_MANCHE, 8)], OR, "objet")
-    fond = repere @ Matrix.Translation((0.0, 0.0, 0.18 + 0.135)) @ Matrix.Rotation(math.pi / 2.0, 4, "Y")
-    tourner_profil(mm, fond, ((0.0, 0.004), (0.006, 0.118), (0.077, 0.135), (0.080, 0.137)), OR, 24)
-    tourner_profil(braises, fond, ((0.010, 0.0), (0.012, 0.11), (0.030, 0.12), (0.036, 0.09), (0.040, 0.0)), BRAISE, 16)
-
-
-# Le bassin du côté du pouce, ouvert vers le ciel quand la main a pris sa pose `poses`.
-def repere_machta(a, poses):
-    _, centre, axe = G.prise(a, "r", RAYON_DU_MANCHE)
-    haut = a.sq.repos["hand_r"].to_3x3() @ (poses["hand_r"].to_3x3().inverted() @ HAUT_Z)
-    return repere_vers(centre, axe, haut)
 
 
 def puiser(h, a, horloge, t):
@@ -386,7 +370,7 @@ def _machta(nom, ou):
         a = G.Acteur(h.squelette, h.sol)
         poses = a.sq.resoudre(puiser(h, a, G.Horloge(DUREE_DE_LA_PELLETEE), 0.0))[0]
         pelle, braises = Maillage(), Maillage()
-        machta(pelle, braises, repere_machta(a, poses))
+        machta(pelle, braises, repere_machta(a, poses), MACHTA_DE_KIPPOUR)
         lier(h, pelle, f"{nom}_machta", metal(), "hand_r")
         lier(h, braises, f"{nom}_gehalim", bois(), "hand_r")
         return h
@@ -464,7 +448,7 @@ def _zerika_du_cohen_gadol(nom):
 
 
 def _nerot_du_cohen_gadol(nom):
-    return Role(nom, "bigdei_zahav", lambda: cohen_gadol_en_or(nom), hatava, (-123.6, -7.5, Z_BAT + 0.9), 180.0,
+    return Role(nom, "bigdei_zahav", lambda: cohen_gadol_en_or(nom), hatava, SUR_LA_PIERRE_DE_LA_MENORA, 180.0,
                 duree=10.0, famille="cohanim")
 
 

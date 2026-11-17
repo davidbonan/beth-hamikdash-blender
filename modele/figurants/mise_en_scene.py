@@ -10,8 +10,8 @@ from beit_hamikdash_visite import AMA
 from blockout.primitives.parametres import Z_AZ, Z_MAARAKHA
 
 from .maillage import TOUR, Maillage
-from .habillage import lier, materiau_de
-from .ustensiles import RAYON_GIZRA, sefer
+from .habillage import HAUT_Z, lier, materiau_de
+from .ustensiles import RAYON_DU_MANCHE, RAYON_GIZRA, sefer
 
 
 # `repere` : place au repos de l'objet, en repère d'armature.
@@ -235,6 +235,19 @@ def charger(h, a, horloge, t):
     axe = buche.col[2].to_3d()
     return saisir(a, corps, RAYON_GIZRA, {"l": buche @ Vector((0.0, 0.0, 0.22)), "r": buche @ Vector((0.0, 0.0, -0.22))},
                   {"l": -axe, "r": axe}, poles={"l": None, "r": None})
+
+
+# Le bassin du côté du pouce, ouvert vers le ciel quand la main a pris sa pose `poses`.
+def repere_machta(a, poses):
+    _, centre, axe = G.prise(a, "r", RAYON_DU_MANCHE)
+    haut = a.sq.repos["hand_r"].to_3x3() @ (poses["hand_r"].to_3x3().inverted() @ HAUT_Z)
+    return repere_vers(centre, axe, haut)
+
+
+# « נָטַל מַחְתַּת הַכֶּסֶף וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ » (Tamid 1:4) : dans la droite, devant la hanche, le bassin en avant ; la gauche suit la marche.
+def porter_la_machta(h, a, horloge, t):
+    poing = Vector((-0.15, -0.28, h.z_hanche + 0.04))
+    return saisir(a, G.composer(), RAYON_DU_MANCHE, {"r": poing}, {"r": Vector((0.12, -1.0, 0.10))})
 
 
 PENTE_KEVESH = (Z_MAARAKHA - Z_AZ) / 30.0

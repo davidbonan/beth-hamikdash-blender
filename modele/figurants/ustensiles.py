@@ -1,7 +1,8 @@
 import math
+from typing import NamedTuple
 
 import numpy as np
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 import beit_hamikdash_gestes as G
 
@@ -50,6 +51,33 @@ def tourner_profil(mm, repere, profil, couleur, n=22, zone="objet"):
     anneaux = [[repere @ Vector((r * math.cos(a), r * math.sin(a), z)) for a in np.linspace(0, TOUR, n, endpoint=False)]
                for z, r in profil]
     mm.nappe(anneaux, couleur, zone)
+
+
+# « בְּכָל יוֹם הָיְתָה כְבֵדָה, וְהַיּוֹם קַלָּה. בְּכָל יוֹם הָיְתָה יָדָהּ קְצָרָה, וְהַיּוֹם אֲרֻכָּה » (Yoma 4:4).
+class Machta(NamedTuple):
+    metal: tuple
+    manche_derriere_la_prise: float
+    echelle_du_bassin: float
+
+
+RAYON_DU_MANCHE = 0.011
+BRAISE = (0.34, 0.05, 0.015)
+# Fiche §8g : bassin de 0,56 ama sur 0,16, manche de 1,1 ama.
+MACHTA_DE_KIPPOUR = Machta(OR, 0.35, 1.0)
+# D'argent (Tamid 1:4), quatre kabin contre trois (Yoma 4:4), le manche court : le bassin un dixième plus large (CHOIX).
+MACHTA_DE_CHAQUE_JOUR = Machta(ARGENT, 0.12, 1.1)
+
+
+# La prise à l'origine, le manche le long du z, le bassin au bout, ouvert vers le x du repère.
+def machta(mm, braises, repere, modele):
+    k = modele.echelle_du_bassin
+    manche = [Vector((0.0, 0.0, z)) for z in np.linspace(-modele.manche_derriere_la_prise, 0.18, 5)]
+    mm.nappe([[repere @ p for p in a] for a in tube_simple(manche, RAYON_DU_MANCHE, 8)], modele.metal, "objet")
+    fond = repere @ Matrix.Translation((0.0, 0.0, 0.18 + 0.135 * k)) @ Matrix.Rotation(math.pi / 2.0, 4, "Y")
+    bassin = ((0.0, 0.004), (0.006, 0.118), (0.077, 0.135), (0.080, 0.137))
+    gehalim = ((0.010, 0.0), (0.012, 0.11), (0.030, 0.12), (0.036, 0.09), (0.040, 0.0))
+    tourner_profil(mm, fond, [(z * k, r * k) for z, r in bassin], modele.metal, 24)
+    tourner_profil(braises, fond, [(z * k, r * k) for z, r in gehalim], BRAISE, 16)
 
 
 # D'argent (Tamid 7:3 ; Bamidbar 10:2), embouchure à l'origine, pavillon au bout du z ; la longueur est un CHOIX.

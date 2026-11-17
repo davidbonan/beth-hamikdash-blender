@@ -107,6 +107,59 @@
     "note": "Retenu : un grand ustensile qu'on jette pour faire du bruit (Bartenura), en forme de pelle à cendres (Tosfot Yom Tov, le Rosh). Écarté : le Raavad, rapporté par le Rashash, pour qui c'est l'instrument de musique à dix trous d'Arakhin 10b-11a, dont on lâchait toutes les voix d'un coup. Choix de la visite : son diamètre, son manche et le bronze."
   },
 
+  "machta_kessef": {
+    "he": "מחתת הכסף",
+    "translit": "Ma'htat hakessef",
+    "resume": "Chaque matin, celui qui a gagné le sort de la terumat hadeshen sanctifie ses mains et ses pieds au Kiyor avant de toucher un ustensile, puis prend la ma'hta d'argent, posée à terre dans l'angle entre le kevesh et l'autel, à l'ouest du kevesh. Il monte au sommet, écarte les braises, ramasse les cendres consumées au cœur du feu et redescend les entasser au lieu du deshen (Tamid 1:4 ; Rambam Temidin ouMoussafin 2:12). Selon Yoma 4:4, la ma'hta de chaque jour est d'argent, lourde, au manche court, et tient quatre kabin ; celle de Kippour est d'or, légère, au manche long, et en tient trois.",
+    "cotes": [
+      "à terre, dans l'angle du kevesh et de l'autel, à l'ouest du kevesh",
+      "d'argent, quatre kabin, le manche court",
+      "bassin d'environ 0,7 ama"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "וַהֲרֵי הַמַּחְתָּה נְתוּנָה בַמִּקְצוֹעַ בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ, בְּמַעֲרָבוֹ שֶׁל כָּבֶשׁ"},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "נָטַל מַחְתַּת הַכֶּסֶף וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ, וּפִנָּה אֶת הַגֶּחָלִים הֵילָךְ וְהֵילָךְ, חָתָה מִן הַמְאֻכָּלוֹת הַפְּנִימִיּוֹת, וְיָרַד"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:12", "citation": "וְאַחַר כָּךְ לוֹקֵחַ הַמַּחְתָּה וְשֶׁל כֶּסֶף הָיְתָה"},
+      {"oeuvre": "Yoma", "ref": "4:4", "citation": "בְּכָל יוֹם חוֹתֶה בְשֶׁל אַרְבַּעַת קַבִּין… בְּכָל יוֹם הָיְתָה כְבֵדָה, וְהַיּוֹם קַלָּה. בְּכָל יוֹם הָיְתָה יָדָהּ קְצָרָה, וְהַיּוֹם אֲרֻכָּה"}
+    ],
+    "note": "Choix de la visite : la forme que Yoma 4:4 donne à la ma'hta de chaque jour. La michna parle là de celle de la ketoret ; qu'elle soit aussi celle de la terumat hadeshen, elle ne le dit pas. Le bassin est celui de Kippour, un dixième plus large pour quatre kabin ; le manche est tourné vers le sud."
+  },
+  "magrefot_tsinorot": {
+    "he": "מגרפות וצינורות",
+    "translit": "Magrefot vetsinorot",
+    "resume": "Dès que le cohen de la terumat hadeshen est redescendu, ses frères courent, sanctifient mains et pieds au Kiyor, prennent les magrefot et les tsinorot et montent au sommet de l'autel (Tamid 2:1). Les tsinorot repoussent sur les côtés les membres que le feu n'a pas consumés pendant la nuit ; les magrefot raclent le deshen de tous les côtés et l'entassent sur le tapoua'h, au milieu de l'autel (Rambam Temidin ouMoussafin 2:13). Le modèle les pose sur la table d'argent à l'ouest du kevesh, celle des kelei sharet (Shekalim 6:4).",
+    "cotes": [
+      "deux pelles et deux fourches, sur la table d'argent à l'ouest du kevesh",
+      "de cuivre, comme les ustensiles de l'autel du Mishkan"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "2:1", "citation": "נָטְלוּ אֶת הַמַּגְרֵפוֹת וְאֶת הַצִּנּוֹרוֹת וְעָלוּ לְרֹאשׁ הַמִּזְבֵּחַ"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Tamid 2:1", "citation": "נטלו את המגרפות. יעים להסיר את הדשן ולפנותו לתפוח… ואת הצנורות. מזלגות להסיר את האברים"},
+      {"oeuvre": "Rambam sur Tamid", "ref": "2:1", "citation": "מגריפות שם ידוע: וצינורות שפודין"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:13", "citation": "וְאַחַר כָּךְ גּוֹרְפִין אֶת הַדֶּשֶׁן בְּמַגְרֵפוֹת מִכָּל צִדְדֵי הַמִּזְבֵּחַ. וּמַעֲלִין אוֹתוֹ עֲרֵמָה עַל גַּבֵּי הַתַּפּוּחַ"},
+      {"oeuvre": "Shekalim", "ref": "6:4", "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף… עַל שֶׁל כֶּסֶף כְּלֵי שָׁרֵת"},
+      {"oeuvre": "Shemot", "ref": "27:3", "citation": "וְעָשִׂיתָ סִּירֹתָיו לְדַשְּׁנוֹ וְיָעָיו וּמִזְרְקֹתָיו וּמִזְלְגֹתָיו וּמַחְתֹּתָיו לְכָל כֵּלָיו תַּעֲשֶׂה נְחֹשֶׁת"}
+    ],
+    "note": "Retenu : les magrefot sont des pelles et les tsinorot des fourches pour les membres (Tosfot Yom Tov) ; le Rambam fait des tsinorot des broches. Elles ne sont pas la magrefa qu'on jette à terre (Tamid 5:6), qui a sa propre fiche. Choix de la visite : leur place sur la table d'argent, leur nombre, leurs cotes et le cuivre, pris de l'autel du Mishkan (Shemot 27:3)."
+  },
+  "pesakhter": {
+    "he": "פסכתר",
+    "translit": "Pesakhter",
+    "resume": "Un grand vaisseau qui tient un lethekh, quinze se'a, muni de deux chaînes : l'un la tire en descendant, l'autre la retient d'en haut pour qu'elle ne roule pas. Elle sert à trois choses : le Shabbat, on la renverse sur les braises tombées de la ma'hta et sur un sheretz, et l'on y descend le deshen du haut de l'autel (Tamid 5:5). Pour le Rambam, c'est dans la pesakhter qu'on ratisse le tas du tapoua'h avant de le descendre (Temidin ouMoussafin 2:13).",
+    "cotes": [
+      "un lethekh, quinze se'a : environ 124 litres, à 1 kav = 1,38 l",
+      "deux chaînes",
+      "à terre entre les deux tables du kevesh"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "5:5", "citation": "וּפְסַכְתֵּר הָיְתָה כְלִי גָדוֹל מַחֲזֶקֶת לֶתֶךְ, וּשְׁתֵּי שַׁרְשְׁרוֹת הָיוּ בָהּ, אַחַת שֶׁהוּא מוֹשֵׁךְ בָּהּ וְיוֹרֵד, וְאַחַת שֶׁהוּא אוֹחֵז בָּהּ מִלְמַעְלָן בִּשְׁבִיל שֶׁלֹּא תִתְגַּלְגֵּל"},
+      {"oeuvre": "Tamid", "ref": "5:5", "citation": "כּוֹפִין אוֹתָהּ עַל גַּב גֶּחָלִים וְעַל הַשֶּׁרֶץ בְּשַׁבָּת, וּמוֹרִידִין בָּהּ אֶת הַדֶּשֶׁן מֵעַל גַּבֵּי הַמִּזְבֵּחַ"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:13", "citation": "וְגוֹרְפִין אוֹתָהּ הָעֲרֵמָה בִּפְסַכְתֵּר. וְהוּא כְּלִי גָּדוֹל שֶׁמַּחְזִיק לֶתֶךְ. וּמוֹרִידִין אוֹתוֹ לְמַטָּה"},
+      {"oeuvre": "Siftei 'Hakhamim", "ref": "Bamidbar 4:13", "citation": "פסכתר. בשלהי פרק המוצא תפילין פירש\"י פסכתר סיר של נחושת"}
+    ],
+    "note": "Choix de la visite : la forme d'un chaudron, d'après Rashi qui en fait un « סיר של נחושת » (cité par Siftei 'Hakhamim) ; sa place entre les deux tables, à l'ouest du kevesh ; la longueur des chaînes. Le Rambam est seul à la dire employée chaque jour pour le tas du tapoua'h : la michna dit seulement qu'on y descend le deshen."
+  },
+
   "candelabres_shoeva": {
     "he": "מנורות של זהב",
     "translit": "Menorot shel zahav (Simhat Beit HaShoeva)",
@@ -311,18 +364,20 @@
   "aliyat_hakevesh": {
     "he": "העלייה בכבש",
     "translit": "Aliyat hakevesh",
-    "resume": "On ne monte pas à l'autel par des marches — « tu ne monteras pas à mon autel par des degrés » — mais par le kevesh, la rampe de trente-deux amot sur seize adossée au sud de l'autel. Tous ceux qui montent à l'autel montent par la droite, en font le tour et redescendent par la gauche, hors trois services où l'on revient sur ses pas. Le parcours du tamid fait monter ce cohen par le côté est de la rampe et redescendre par l'ouest, en boucle.",
+    "resume": "On ne monte pas à l'autel par des marches — « tu ne monteras pas à mon autel par des degrés » — mais par le kevesh, la rampe de trente-deux amot sur seize adossée au sud de l'autel. Tous ceux qui montent à l'autel montent par la droite, en font le tour et redescendent par la gauche, hors trois services où l'on revient sur ses pas. Le parcours du tamid fait monter ce cohen par le côté est de la rampe et redescendre par l'ouest, en boucle : c'est celui de la terumat hadeshen, qui monte la ma'hta d'argent en main, seul, à la lumière de la ma'arakha (Tamid 1:4).",
     "cotes": [
       "kevesh : 32 amot de long, 16 de large, au sud de l'autel",
       "montée par la droite, descente par la gauche",
-      "jamais de marches"
+      "jamais de marches",
+      "la ma'hta d'argent en main"
     ],
     "sources": [
       {"oeuvre": "Shemot", "ref": "20:23", "citation": "וְלֹא תַעֲלֶה בְמַעֲלֹת עַל מִזְבְּחִי"},
       {"oeuvre": "Middot", "ref": "3:3", "citation": "וְכֶבֶשׁ הָיָה לִדְרוֹמוֹ שֶׁל מִזְבֵּחַ, שְׁלֹשִׁים וּשְׁתַּיִם עַל רֹחַב שֵׁשׁ עֶשְׂרֵה"},
-      {"oeuvre": "Zeva'him", "ref": "6:3", "citation": "כָּל הָעוֹלִים לַמִּזְבֵּחַ, עוֹלִין דֶּרֶךְ יָמִין, וּמַקִּיפִין וְיוֹרְדִין דֶּרֶךְ שְׂמֹאל"}
+      {"oeuvre": "Zeva'him", "ref": "6:3", "citation": "כָּל הָעוֹלִים לַמִּזְבֵּחַ, עוֹלִין דֶּרֶךְ יָמִין, וּמַקִּיפִין וְיוֹרְדִין דֶּרֶךְ שְׂמֹאל"},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "נָטַל מַחְתַּת הַכֶּסֶף וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ… אֵין אָדָם נִכְנָס עִמּוֹ, וְלֹא נֵר בְּיָדוֹ, אֶלָּא מְהַלֵּךְ לְאוֹר הַמַּעֲרָכָה"}
     ],
-    "note": "Choix de la visite : ce cohen monte les mains vides, pour montrer la rampe et son sens ; il ne porte ni membre ni ustensile."
+    "note": "Choix de la visite : la ma'hta garde ses braises à la montée comme à la descente, alors qu'il monte la pelle vide et redescend chargé ; et il tourne en boucle sur la rampe, pour en montrer le sens."
   },
 
   "zerika": {

@@ -106,6 +106,59 @@
     "note": "Adopted: a large utensil thrown down to make noise (Bartenura), shaped like an ash shovel (Tosafot Yom Tov, the Rosh). Set aside: the Raavad, cited by the Rashash, for whom it is the ten-holed musical instrument of Arakhin 10b-11a, all of whose voices were released at once. Tour's choice: its diameter, its handle and the bronze."
   },
 
+  "machta_kessef": {
+    "nom": "The silver machta",
+    "translit": "Machtat hakesef",
+    "resume": "Every morning, the one who won the lot of the terumat hadeshen sanctifies his hands and feet at the Kiyor before touching any vessel, then takes the silver machta, set on the ground in the corner between the kevesh and the altar, west of the kevesh. He goes up to the top, pushes the coals aside, scoops up the consumed ashes from the heart of the fire and comes down to heap them at the place of the deshen (Tamid 1:4; Rambam Temidin uMusafin 2:12). According to Yoma 4:4, the everyday machta is of silver, heavy, short-handled, and holds four kabin; that of Yom Kippur is of gold, light, long-handled, and holds three.",
+    "cotes": [
+      "on the ground, in the corner of the kevesh and the altar, west of the kevesh",
+      "silver, four kabin, short handle",
+      "pan about 0.7 ama across"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "וַהֲרֵי הַמַּחְתָּה נְתוּנָה בַמִּקְצוֹעַ בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ, בְּמַעֲרָבוֹ שֶׁל כָּבֶשׁ"},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "נָטַל מַחְתַּת הַכֶּסֶף וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ, וּפִנָּה אֶת הַגֶּחָלִים הֵילָךְ וְהֵילָךְ, חָתָה מִן הַמְאֻכָּלוֹת הַפְּנִימִיּוֹת, וְיָרַד"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:12", "citation": "וְאַחַר כָּךְ לוֹקֵחַ הַמַּחְתָּה וְשֶׁל כֶּסֶף הָיְתָה"},
+      {"oeuvre": "Yoma", "ref": "4:4", "citation": "בְּכָל יוֹם חוֹתֶה בְשֶׁל אַרְבַּעַת קַבִּין… בְּכָל יוֹם הָיְתָה כְבֵדָה, וְהַיּוֹם קַלָּה. בְּכָל יוֹם הָיְתָה יָדָהּ קְצָרָה, וְהַיּוֹם אֲרֻכָּה"}
+    ],
+    "note": "Tour's choice: the shape Yoma 4:4 gives the everyday machta. The mishna speaks there of the incense machta; that it is also the one of the terumat hadeshen, it does not say. The pan is the Yom Kippur one, a tenth wider for four kabin; the handle points south."
+  },
+  "magrefot_tsinorot": {
+    "nom": "Magrefot and tsinorot",
+    "translit": "Magrefot vetsinorot",
+    "resume": "As soon as the kohen of the terumat hadeshen has come down, his brothers run, sanctify hands and feet at the Kiyor, take the magrefot and the tsinorot and go up to the top of the altar (Tamid 2:1). The tsinorot push aside the limbs the fire did not consume during the night; the magrefot rake the deshen from every side and heap it on the tapuach, in the middle of the altar (Rambam Temidin uMusafin 2:13). The model lays them on the silver table west of the kevesh, the table of the klei sharet (Shekalim 6:4).",
+    "cotes": [
+      "two shovels and two forks, on the silver table west of the kevesh",
+      "of copper, like the vessels of the altar of the Mishkan"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "2:1", "citation": "נָטְלוּ אֶת הַמַּגְרֵפוֹת וְאֶת הַצִּנּוֹרוֹת וְעָלוּ לְרֹאשׁ הַמִּזְבֵּחַ"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Tamid 2:1", "citation": "נטלו את המגרפות. יעים להסיר את הדשן ולפנותו לתפוח… ואת הצנורות. מזלגות להסיר את האברים"},
+      {"oeuvre": "Rambam sur Tamid", "ref": "2:1", "citation": "מגריפות שם ידוע: וצינורות שפודין"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:13", "citation": "וְאַחַר כָּךְ גּוֹרְפִין אֶת הַדֶּשֶׁן בְּמַגְרֵפוֹת מִכָּל צִדְדֵי הַמִּזְבֵּחַ. וּמַעֲלִין אוֹתוֹ עֲרֵמָה עַל גַּבֵּי הַתַּפּוּחַ"},
+      {"oeuvre": "Shekalim", "ref": "6:4", "citation": "וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף… עַל שֶׁל כֶּסֶף כְּלֵי שָׁרֵת"},
+      {"oeuvre": "Shemot", "ref": "27:3", "citation": "וְעָשִׂיתָ סִּירֹתָיו לְדַשְּׁנוֹ וְיָעָיו וּמִזְרְקֹתָיו וּמִזְלְגֹתָיו וּמַחְתֹּתָיו לְכָל כֵּלָיו תַּעֲשֶׂה נְחֹשֶׁת"}
+    ],
+    "note": "Adopted: the magrefot are shovels and the tsinorot forks for the limbs (Tosafot Yom Tov); the Rambam makes the tsinorot spits. They are not the magrefa thrown to the ground (Tamid 5:6), which has its own entry. Tour's choice: their place on the silver table, their number, their dimensions and the copper, taken from the altar of the Mishkan (Shemot 27:3)."
+  },
+  "pesakhter": {
+    "nom": "Pesachter",
+    "translit": "Pesachter",
+    "resume": "A large vessel holding a letech, fifteen se'ah, fitted with two chains: one kohen pulls it as he goes down, the other holds it from above so it does not roll. It serves three purposes: on Shabbat it is turned over the coals scattered from the machta and over a sheretz, and the deshen is brought down in it from the top of the altar (Tamid 5:5). For the Rambam, the heap on the tapuach is raked into the pesachter before it is taken down (Temidin uMusafin 2:13).",
+    "cotes": [
+      "a letech, fifteen se'ah: about 124 litres, at 1 kav = 1.38 l",
+      "two chains",
+      "on the ground between the two tables of the kevesh"
+    ],
+    "sources": [
+      {"oeuvre": "Tamid", "ref": "5:5", "citation": "וּפְסַכְתֵּר הָיְתָה כְלִי גָדוֹל מַחֲזֶקֶת לֶתֶךְ, וּשְׁתֵּי שַׁרְשְׁרוֹת הָיוּ בָהּ, אַחַת שֶׁהוּא מוֹשֵׁךְ בָּהּ וְיוֹרֵד, וְאַחַת שֶׁהוּא אוֹחֵז בָּהּ מִלְמַעְלָן בִּשְׁבִיל שֶׁלֹּא תִתְגַּלְגֵּל"},
+      {"oeuvre": "Tamid", "ref": "5:5", "citation": "כּוֹפִין אוֹתָהּ עַל גַּב גֶּחָלִים וְעַל הַשֶּׁרֶץ בְּשַׁבָּת, וּמוֹרִידִין בָּהּ אֶת הַדֶּשֶׁן מֵעַל גַּבֵּי הַמִּזְבֵּחַ"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:13", "citation": "וְגוֹרְפִין אוֹתָהּ הָעֲרֵמָה בִּפְסַכְתֵּר. וְהוּא כְּלִי גָּדוֹל שֶׁמַּחְזִיק לֶתֶךְ. וּמוֹרִידִין אוֹתוֹ לְמַטָּה"},
+      {"oeuvre": "Siftei 'Hakhamim", "ref": "Bamidbar 4:13", "citation": "פסכתר. בשלהי פרק המוצא תפילין פירש\"י פסכתר סיר של נחושת"}
+    ],
+    "note": "Tour's choice: the shape of a cauldron, after Rashi, who calls it a “סיר של נחושת” (quoted by Siftei Chachamim); its place between the two tables, west of the kevesh; the length of the chains. Only the Rambam has it used every day for the heap of the tapuach: the mishna says only that the deshen is brought down in it."
+  },
+
   "candelabres_shoeva": {
     "nom": "Candelabra of Simchat Beit HaShoeva",
     "translit": "Menorot shel zahav (Simchat Beit HaShoeva)",
@@ -309,18 +362,20 @@
   "aliyat_hakevesh": {
     "nom": "Going up the kevesh",
     "translit": "Aliyat hakevesh",
-    "resume": "One does not go up to the altar by steps — “you shall not go up by steps to My altar” — but by the kevesh, the ramp thirty-two amot by sixteen set against the south of the altar. All who go up to the altar go up by the right, go around and come down by the left, except for three services where one returns the way one came. The tamid tour has this kohen go up the east side of the ramp and down the west, in a loop.",
+    "resume": "One does not go up to the altar by steps — “you shall not go up by steps to My altar” — but by the kevesh, the ramp thirty-two amot by sixteen set against the south of the altar. All who go up to the altar go up by the right, go around and come down by the left, except for three services where one returns the way one came. The tamid tour has this kohen go up the east side of the ramp and down the west, in a loop: he is the kohen of the terumat hadeshen, going up with the silver machta in hand, alone, by the light of the ma'arakha (Tamid 1:4).",
     "cotes": [
       "kevesh: 32 amot long, 16 wide, south of the altar",
       "up by the right, down by the left",
-      "never steps"
+      "never steps",
+      "the silver machta in hand"
     ],
     "sources": [
       {"oeuvre": "Shemot", "ref": "20:23", "citation": "וְלֹא תַעֲלֶה בְמַעֲלֹת עַל מִזְבְּחִי"},
       {"oeuvre": "Middot", "ref": "3:3", "citation": "וְכֶבֶשׁ הָיָה לִדְרוֹמוֹ שֶׁל מִזְבֵּחַ, שְׁלֹשִׁים וּשְׁתַּיִם עַל רֹחַב שֵׁשׁ עֶשְׂרֵה"},
-      {"oeuvre": "Zeva'him", "ref": "6:3", "citation": "כָּל הָעוֹלִים לַמִּזְבֵּחַ, עוֹלִין דֶּרֶךְ יָמִין, וּמַקִּיפִין וְיוֹרְדִין דֶּרֶךְ שְׂמֹאל"}
+      {"oeuvre": "Zeva'him", "ref": "6:3", "citation": "כָּל הָעוֹלִים לַמִּזְבֵּחַ, עוֹלִין דֶּרֶךְ יָמִין, וּמַקִּיפִין וְיוֹרְדִין דֶּרֶךְ שְׂמֹאל"},
+      {"oeuvre": "Tamid", "ref": "1:4", "citation": "נָטַל מַחְתַּת הַכֶּסֶף וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ… אֵין אָדָם נִכְנָס עִמּוֹ, וְלֹא נֵר בְּיָדוֹ, אֶלָּא מְהַלֵּךְ לְאוֹר הַמַּעֲרָכָה"}
     ],
-    "note": "Tour's choice: this kohen goes up empty-handed, to show the ramp and its direction; he carries neither limb nor vessel."
+    "note": "Tour's choice: the machta keeps its coals on the way up as on the way down, though he goes up with the pan empty and comes down loaded; and he circles the ramp in a loop, to show its direction."
   },
 
   "zerika": {

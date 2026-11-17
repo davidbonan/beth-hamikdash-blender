@@ -1,14 +1,21 @@
+import beit_hamikdash_gestes as G
 from beit_hamikdash_visite import Z_AZ, Z_BAT
 from blockout.primitives.parametres import Z_MAARAKHA
 
 from ..corps import Gabarit, _alea
-from ..ustensiles import ever, gizra, mizrak
+from ..habillage import lier
+from ..maillage import Maillage
+from ..matieres import bois, metal
+from ..ustensiles import MACHTA_DE_CHAQUE_JOUR, ever, gizra, machta, mizrak
 from ..mise_en_scene import (BATTEMENT, MESURES, Stade, chanter, charger, ecouter, garder, hatava, lavage,
-                             priere, repere_ever, repere_gizra, repere_mizrak, saler, tenir, zerika)
+                             porter_la_machta, priere, repere_ever, repere_gizra, repere_machta,
+                             repere_mizrak, saler, tenir, zerika)
 from ..bigdei_kehouna import cohen
 from ..tenues import fidele, levi
 from ..role import LEVIIM_INSTRUMENTS, Role, _levi
 
+# Sur le palier de la pierre de la Menora (Tamid 3:9 ; kelim.py), à portée de ses lampes.
+SUR_LA_PIERRE_DE_LA_MENORA = (-124.0, -7.5, Z_BAT + 0.9)
 
 # À terre, dans l'Ezrat Israël au pied du Doukhan : la tête à hauteur des pieds des Léviim (Arakhin 2:6, R. Eliézer ben Yaakov).
 def _tzoar(k, y):
@@ -30,6 +37,17 @@ def _cohen(nom, geste, ou, cap, gabarit, tenu=None, gris=False, duree=16.0):
     return Role(nom, nom, batir, geste, ou, cap, duree=duree, famille="cohanim")
 
 
+def _porteur_de_la_machta():
+    h = cohen("aliyat_hakevesh", Gabarit(1.77, age=0.62))
+    a = G.Acteur(h.squelette, h.sol)
+    poses = a.sq.resoudre(porter_la_machta(h, a, G.Horloge(1.0), 0.0))[0]
+    pelle, braises = Maillage(), Maillage()
+    machta(pelle, braises, repere_machta(a, poses), MACHTA_DE_CHAQUE_JOUR)
+    lier(h, pelle, "aliyat_hakevesh_machta", metal(), "hand_r")
+    lier(h, braises, "aliyat_hakevesh_gehalim", bois(), "hand_r")
+    return h
+
+
 # Un des cinq postes des Léviim aux portes de l'Azara (Middot 1:1), hors de la porte, sur le palier des quinze marches.
 def _shomer_levi():
     return Role("shomer_levi", "shomer_levi", lambda: levi("shomer_levi", Gabarit(1.79, age=0.45)), garder,
@@ -42,7 +60,7 @@ def roles_du_tamid():
         # Au Kiyor (Middot 3:6) : main droite sur le pied droit, main gauche sur le pied gauche, penché.
         _cohen("kiddoush_yadayim", lavage, (-59.0, -17.4, Z_AZ), 90.0, Gabarit(1.74, age=0.55), duree=12.0),
         # Le kevesh au sud de l'autel (Middot 3:3) : on monte par la droite, on descend par la gauche (Zeva'him 6:3).
-        Role("aliyat_hakevesh", "aliyat_hakevesh", lambda: cohen("aliyat_hakevesh", Gabarit(1.77, age=0.62)),
+        Role("aliyat_hakevesh", "aliyat_hakevesh", _porteur_de_la_machta, porter_la_machta,
              trajet=Stade((-38.0, -52.0), (-38.0, -28.0), 2.0, sens=-1), vitesse=1.0, sol_haut=Z_MAARAKHA, famille="cohanim"),
         # Le sang du tamid au coin nord-est (Tamid 4:1).
         _cohen("zerika", zerika, (-20.5, 4.6, Z_AZ), 142.0, Gabarit(1.72, age=0.82, peau="old_caucasian_male"),
@@ -53,8 +71,7 @@ def roles_du_tamid():
         # Le bois monté sur l'autel pour la ma'arakha, dressée à l'est (Tamid 2:3-4).
         _cohen("siddour_hamaarakha", charger, (-26.0, -9.0, Z_MAARAKHA), 180.0, Gabarit(1.76, age=0.42),
                tenu=("gizra", gizra, repere_gizra), duree=8.0),
-        # Sur la marche haute de la pierre de la Menora (Tamid 3:9).
-        _cohen("hatavat_hanerot", hatava, (-123.6, -7.5, Z_BAT + 0.9), 180.0, Gabarit(1.70, age=0.58), duree=10.0),
+        _cohen("hatavat_hanerot", hatava, SUR_LA_PIERRE_DE_LA_MENORA, 180.0, Gabarit(1.70, age=0.58), duree=10.0),
     ] + [_levi(k, genre) for k, genre in enumerate(LEVIIM_INSTRUMENTS)] + [
         _tzoar(0, 3.2), _tzoar(1, -3.2),
         # Les anshei ma'amad, debout sur leur korban dans l'Ezrat Israël (Ta'anit 4:2 ; Middot 5:1).

@@ -14,7 +14,7 @@ from .nettoyage import scene
 # DESSUS FOULÉS
 #   Ce qu'on foule est le dallage de la cour, ce qui se tient debout un parement — marche ou dalle.
 # ----------------------------------------------------------------------------
-FOULES = re.compile(r"Heil_(terrasse|marche)_.+|Marche_.+|Doukhan_\d+|Menora_marche_\d+"
+FOULES = re.compile(r"Heil_(terrasse|marche)_.+|Marche_.+|Doukhan_\d+"
                     r"|Gezuztra_(nord|sud)|Escalier_.+|.+_escalier_\d+|.+_mesiba_\d+"
                     r"|Mesiba_bira_vis_\d+|Beit_HaTevila_(montee|mikve_marches)_\d+"
                     r"|Lishkat_Metzoraim_NO_marche_\d+|Lishkat_HaGazit_estrade_.+"

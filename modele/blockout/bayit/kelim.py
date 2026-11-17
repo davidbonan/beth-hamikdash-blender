@@ -2,8 +2,9 @@ import math
 from mathutils import Vector
 
 from ..primitives.parametres import GEVIIM_RENVERSES, MENORA_DROITE, TEFAH, Z_BAT, m
-from ..primitives.matieres import MAT_BOIS_CHARBON, MAT_CENDRE, MAT_LECHEM, MAT_OR, MAT_OR_MIKSHE, MAT_PETILA, MAT_SHEMEN
-from ..primitives.volumes import (alea, box, cyl, cyl_between, ellipsoide, lampe, limbe, link_to, mesh_from_pydata,
+from ..primitives.matieres import (MAT_BOIS_CHARBON, MAT_CENDRE, MAT_LECHEM, MAT_MONOLITHE, MAT_OR, MAT_OR_MIKSHE, MAT_PETILA,
+                                  MAT_SHEMEN)
+from ..primitives.volumes import (alea, box, cyl, cyl_between, ellipsoide, extrusion, lampe, limbe, link_to, mesh_from_pydata,
                                  revolution_axe, sphere, tore)
 
 
@@ -198,11 +199,8 @@ def teni(nom, x, y):
                             MAT_BOIS_CHARBON(), 5)
         pecham["sans_biseau"] = True
 
-# Menora : 18 tefa'him, 7 branches dans le plan N-S, trois marches devant
+# Menora : 18 tefa'him, 7 branches dans le plan N-S
 YM = -7.5
-for i in range(3):
-    box(f"Menora_marche_{i}", XU + 1.2 + i * 0.4, XU + 1.6 + i * 0.4, YM - 1.5, YM + 1.5,
-        Z_BAT, Z_BAT + 0.3 * (3 - i), "70_Kelim")
 
 # « וְאִם הָיְתָה חֲלוּלָה כְּשֵׁרָה » (Beit HaBe'hira 3:4) : creuse, d'où l'épaisseur, sous le poids d'un
 # kikar avec ses lampes (Rashi sur Shemot 25:39). Paroi et diamètres : CHOIX.
@@ -426,7 +424,51 @@ def kuz(nom, x, y, z):
                    MAT_OR(), rotation=(math.pi / 2, 0, math.pi / 2), majeur=32, mineur=12))
 
 
+# Giron « וְשִׁלְחָהּ חֲצִי אַמָּה » (Middot 2:3) ; palier d'une ama et contremarche de 0,3 : CHOIX, la demi-ama
+# de Middot mettrait les lampes à hauteur de cuisse du Cohen.
+EVEN_OUEST, PALIER, GIRON, CONTREMARCHE, DEMI_EVEN = XU + 0.6, 1.0, 0.5, 0.3, 1.5
+
+
+def marche(k):
+    """Le dessus de la k-ième marche depuis le sol : la troisième est le palier."""
+    return Z_BAT + k * CONTREMARCHE
+
+
+def even_lifnei_hamenora(nom, y):
+    """« וְאֶבֶן הָיְתָה לִפְנֵי הַמְּנוֹרָה וּבָהּ שָׁלשׁ מַעֲלוֹת » (Tamid 3:9) : une seule pierre, taillée en marches
+    qui descendent vers l'est."""
+    x1, x2, x3 = EVEN_OUEST + PALIER, EVEN_OUEST + PALIER + GIRON, EVEN_OUEST + PALIER + 2 * GIRON
+    profil = [(EVEN_OUEST, marche(0)), (x3, marche(0)), (x3, marche(1)), (x2, marche(1)), (x2, marche(2)),
+              (x1, marche(2)), (x1, marche(3)), (EVEN_OUEST, marche(3))]
+    mesh_from_pydata(nom, *extrusion(profil, (0.0, y - DEMI_EVEN), (0.0, 1.0), (1.0, 0.0), 2 * DEMI_EVEN),
+                     "70_Kelim", MAT_MONOLITHE())
+
+
+def malkach(nom, x, y, z):
+    """« מַלְקָחֶיהָ », « הַצְּבָתִים הָעֲשׂוּיִין לִקַּח בָּהֶם הַפְּתִילָה מִתּוֹךְ הַשֶּׁמֶן » (Rashi sur Shemot 25:38) :
+    deux branches jointes par un ressort, couchées, pointes vers la Menora. Forme et taille : CHOIX."""
+    r, ressort, longueur = 0.05 * TEFAH, 0.12 * TEFAH, 2 * TEFAH
+    or_cisele(tore(f"{nom}_ressort", x, y, z + r, ressort, r, "70_Kelim", MAT_OR(), majeur=24, mineur=8))
+    for k, s in enumerate((1, -1)):
+        or_cisele(cyl_between(f"{nom}_{k}", (x, y + s * ressort, z + r), (x - longueur, y + s * 0.2 * ressort, z + r),
+                              r, "70_Kelim", MAT_OR(), verts=8))
+
+
+def machta(nom, x, y, z):
+    """« וּמַחְתֹּתֶיהָ », « כְּמִין בָּזִיכִין קְטַנִּים שֶׁחוֹתֶה בָּהֶן אֶת הָאֵפֶר שֶׁבַּנֵּר » (Rashi sur Shemot 25:38) :
+    une coupelle qui entre dans le ner. Taille : CHOIX."""
+    or_cisele(revolution_axe(nom, (x, y, z), (0, 0, 1),
+                             [(0, 0), (0.24 * TEFAH, 0), (0.36 * TEFAH, 0.1 * TEFAH), (0.42 * TEFAH, 0.24 * TEFAH),
+                              (0.38 * TEFAH, 0.24 * TEFAH), (0.33 * TEFAH, 0.13 * TEFAH), (0.22 * TEFAH, 0.05 * TEFAH),
+                              (0, 0.05 * TEFAH)], "70_Kelim", MAT_OR(), 32))
+
+
 menora("Menora", XU, YM, allumee=True)
-kuz("Menora_kuz", XU + 1.8, YM + 0.9, Z_BAT + 0.6)
+even_lifnei_hamenora("Menora_even", YM)
+# « וּמַנִּיחַ עָלֶיהָ … מַלְקָחֶיהָ וּמַחְתּוֹתֶיהָ » (Rambam Beit HaBe'hira 3:11), sur le palier (Yakhin sur Tamid 3:82)
+for cote, s in (("S", -1), ("N", 1)):
+    malkach(f"Menora_malkach_{cote}", EVEN_OUEST + 0.55, YM + s * 1.05, marche(3))
+    machta(f"Menora_machta_{cote}", EVEN_OUEST + 0.45, YM + s * 1.3, marche(3))
+kuz("Menora_kuz", EVEN_OUEST + PALIER + GIRON / 2, YM + 0.9, marche(2))
 mizbeach_hazahav("Mizbeach_Zahav")
 teni("Mizbeach_Zahav_teni", XZ + DEMI_Z + 0.55, YZ - 0.15)

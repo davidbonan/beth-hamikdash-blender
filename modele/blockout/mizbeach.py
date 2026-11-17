@@ -423,8 +423,55 @@ def tas(name, centre, z0, hauteur, rayon, mat):
 # « וּשְׁנַיִם בְּמַעֲרַב הַכֶּבֶשׁ, אֶחָד שֶׁל שַׁיִשׁ וְאֶחָד שֶׁל כֶּסֶף; עַל שֶׁל שַׁיִשׁ הָיוּ נוֹתְנִים אֶת הָאֵבָרִים, עַל
 # שֶׁל כֶּסֶף כְּלֵי שָׁרֵת » (Shekalim 6:4 ; Rambam 2:15). Cotes, celles des tables du Beit
 # HaMitba'haïm ; place, à l'ouest de la rampe du yessod : CHOIX.
-table_de_service("Kevesh_shulchan_shaish", (KX0 - 8.5, KX0 - 7.5, MY0 - 20, MY0 - 18), Z_AZ, 1.5, "30_Mizbeach", MAT_MARBRE())
-table_de_service("Kevesh_shulchan_kessef", (KX0 - 8.5, KX0 - 7.5, MY0 - 15, MY0 - 13), Z_AZ, 1.5, "30_Mizbeach", MAT_ARGENT())
+HAUTEUR_SHULCHAN = 1.5
+SHULCHAN_KESSEF = (KX0 - 8.5, KX0 - 7.5, MY0 - 15, MY0 - 13)
+table_de_service("Kevesh_shulchan_shaish", (KX0 - 8.5, KX0 - 7.5, MY0 - 20, MY0 - 18), Z_AZ, HAUTEUR_SHULCHAN, "30_Mizbeach", MAT_MARBRE())
+table_de_service("Kevesh_shulchan_kessef", SHULCHAN_KESSEF, Z_AZ, HAUTEUR_SHULCHAN, "30_Mizbeach", MAT_ARGENT())
+# « וַהֲרֵי הַמַּחְתָּה נְתוּנָה בַמִּקְצוֹעַ בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ, בְּמַעֲרָבוֹ שֶׁל כָּבֶשׁ » (Tamid 1:4 ; Rambam Temidin
+# ouMoussafin 2:12) : à terre, dans l'angle du flanc ouest du kevesh et de la face sud de l'autel. D'argent, quatre kabin
+# et le manche court (Yoma 4:4) : le bassin de la ma'hta de Kippour un dixième plus large. Manche vers le sud : CHOIX.
+MACHTA_X, MACHTA_Y, MACHTA_R = KX0 - 0.45, CORPS[2] - 0.45, 0.358
+revolution("Machta_kessef", MACHTA_X, MACHTA_Y, Z_AZ,
+           [(0.264, 0.0), (0.286, 0.0), (0.33, 0.176), (MACHTA_R, 0.182), (MACHTA_R, 0.204), (0.325, 0.204),
+            (0.303, 0.176), (0.259, 0.033), (0.0, 0.033)], "30_Mizbeach", MAT_ARGENT(), verts=32)
+cyl_between("Machta_kessef_manche", (MACHTA_X, MACHTA_Y - MACHTA_R + 0.03, Z_AZ + 0.15),
+            (MACHTA_X, MACHTA_Y - MACHTA_R - 0.6, Z_AZ + 0.04), 0.035, "30_Mizbeach", MAT_ARGENT(), verts=12)
+# « נָטְלוּ אֶת הַמַּגְרֵפוֹת וְאֶת הַצִּנּוֹרוֹת » (Tamid 2:1), les pelles du deshen et les fourches des membres
+# (Tosfot Yom Tov ad loc.). Le texte ne dit pas où on les prend : sur la table d'argent des kelei sharet (Shekalim 6:4),
+# deux de chaque, CHOIX. Le cuivre est celui des « יָעָיו… וּמִזְלְגֹתָיו » de l'autel du Mishkan (Shemot 27:3).
+PLATEAU_KESSEF = Z_AZ + HAUTEUR_SHULCHAN
+X_SHULCHAN = (SHULCHAN_KESSEF[0] + SHULCHAN_KESSEF[1]) / 2
+Y_MAGREFOT, R_MAGREFOT = SHULCHAN_KESSEF[2] + 0.45, 0.3
+for k in range(2):
+    z = PLATEAU_KESSEF + 0.035 * k
+    revolution(f"Magrefot_{k}", X_SHULCHAN, Y_MAGREFOT, z,
+               [(R_MAGREFOT, 0.0), (R_MAGREFOT, 0.015), (0.22, 0.045), (0.08, 0.06), (0.0, 0.06)],
+               "30_Mizbeach", MAT_BRONZE(), verts=24)
+    cyl_between(f"Magrefot_{k}_manche", (X_SHULCHAN, Y_MAGREFOT + R_MAGREFOT - 0.05, z + 0.025),
+                (X_SHULCHAN, SHULCHAN_KESSEF[3] - 0.1, z + 0.025), 0.03, "30_Mizbeach", MAT_BRONZE(), verts=8)
+for k, x in enumerate((SHULCHAN_KESSEF[0] + 0.12, SHULCHAN_KESSEF[1] - 0.12)):
+    z = PLATEAU_KESSEF + 0.025
+    cyl_between(f"Tsinorot_{k}", (x, SHULCHAN_KESSEF[2] + 0.75, z), (x, SHULCHAN_KESSEF[3] - 0.05, z), 0.025,
+                "30_Mizbeach", MAT_BRONZE(), verts=8)
+    for j, d in enumerate((-0.06, 0.0, 0.06)):
+        cyl_between(f"Tsinorot_{k}_shen_{j}", (x, SHULCHAN_KESSEF[2] + 0.78, z), (x + d, SHULCHAN_KESSEF[2] + 0.4, z),
+                    0.012, "30_Mizbeach", MAT_BRONZE(), verts=6)
+# « וּפְסַכְתֵּר הָיְתָה כְלִי גָדוֹל מַחֲזֶקֶת לֶתֶךְ, וּשְׁתֵּי שַׁרְשְׁרוֹת הָיוּ בָהּ, אַחַת שֶׁהוּא מוֹשֵׁךְ בָּהּ וְיוֹרֵד, וְאַחַת שֶׁהוּא
+# אוֹחֵז בָּהּ מִלְמַעְלָן » ; « וּמוֹרִידִין בָּהּ אֶת הַדֶּשֶׁן מֵעַל גַּבֵּי הַמִּזְבֵּחַ » (Tamid 5:5 ; Rambam Temidin 2:13). Un lethekh,
+# 90 kabin à 1,38 l (fiche §8g), 1,1 ama³ ; « סיר של נחושת » (Rashi, cité par Siftei 'Hakhamim, Bamidbar 4:13). Forme,
+# place entre les deux tables et longueur des chaînes : CHOIX.
+PESAKHTER_X, PESAKHTER_Y, PESAKHTER_R = X_SHULCHAN, MY0 - 16.5, 0.70
+revolution("Pesakhter", PESAKHTER_X, PESAKHTER_Y, Z_AZ,
+           [(0.0, 0.0), (0.55, 0.0), (0.68, 0.30), (PESAKHTER_R, 0.55), (0.66, 0.90), (0.62, 0.90), (0.65, 0.55),
+            (0.63, 0.30), (0.50, 0.05), (0.0, 0.05)], "30_Mizbeach", MAT_BRONZE(), verts=32)
+for k, sens in enumerate((-1, 1)):
+    anneau_y = PESAKHTER_Y + sens * 0.66
+    tore(f"Pesakhter_anneau_{k}", PESAKHTER_X, anneau_y, Z_AZ + 0.96, 0.08, 0.02, "30_Mizbeach", MAT_BRONZE(),
+         rotation=(0, math.pi / 2, 0))
+    chaine = [(PESAKHTER_X, anneau_y, Z_AZ + 0.9), (PESAKHTER_X + 0.5, anneau_y + sens * 0.15, Z_AZ + 0.04),
+              (PESAKHTER_X + 1.4, anneau_y + sens * 0.25, Z_AZ + 0.04), (PESAKHTER_X + 2.2, anneau_y + sens * 0.1, Z_AZ + 0.04)]
+    for j, (p, q) in enumerate(zip(chaine, chaine[1:])):
+        cyl_between(f"Pesakhter_shalshelet_{k}_{j}", p, q, 0.03, "30_Mizbeach", MAT_BRONZE(), verts=6)
 # « הָפַךְ פָּנָיו לַצָּפוֹן, הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת. צָבַר אֶת הַגֶּחָלִים עַל גַּבֵּי הָרִצְפָה רָחוֹק
 # מִן הַכֶּבֶשׁ שְׁלשָׁה טְפָחִים » (Tamid 1:4) : trois tefa'him, une demi-ama. Taille du tas : CHOIX.
 tas("Kevesh_makom_deshen", (KX1 + 1.5, KY0 + 10), Z_AZ, 0.5, 1.0, MAT_CENDRE())

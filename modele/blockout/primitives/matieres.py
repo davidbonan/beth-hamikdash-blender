@@ -450,6 +450,8 @@ MAT_MAISON = lambda: _voiler(_exposer(pierre("Maisons", (0.64, 0.55, 0.40),
 # choisit son axe sur la normale (`_parement`), qui bascule quatre fois autour du fût,
 # et la trame sautait quatre fois par colonne.
 MAT_COLONNE = lambda: pierre("Pierre_colonne", CALCAIRE, Appareil(1.4, (1e4, 1e4), 0.0, JOINT, LISERE))
+# Un bloc taillé d'une pièce, la pierre de la Menora : ni lit ni joint, dont le liseré marquerait ses flancs.
+MAT_MONOLITHE = lambda: pierre("Pierre_monolithe", CALCAIRE, Appareil(1e4, (1e4, 1e4), 0.0, JOINT, LISERE))
 MAT_FEUILLAGE = lambda: _voiler(material("Olivier_feuillage", (0.24, 0.30, 0.17)))
 MAT_TRONC = lambda: _voiler(material("Olivier_tronc", (0.30, 0.24, 0.17)))
 MAT_EAU = lambda: eau("Eau_Kiyor")
