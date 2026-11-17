@@ -1,4 +1,4 @@
-// Le plan se manie comme une carte : glisser, pincer, molette, double appui, flèches ; un appui bref vise un point.
+// Le plan se manie comme une carte : glisser, pincer, molette, deux doigts sur le pavé, double appui, flèches ; un appui bref vise un point.
 const APPUI_PX = { mouse: 5, pen: 5, touch: 10 };
 const APPUI_MS = 500;
 const DOUBLE_MS = 280;            // un appui attend ce temps qu'un second en fasse un double, qui zoome
@@ -7,6 +7,8 @@ const FACTEUR_DOUBLE = 2;
 const MOLETTE = 0.0015;           // par pixel de défilement
 const MOLETTE_PINCEE = 0.01;      // le pincé d'un pavé tactile arrive en molette, à petits pas
 const LIGNE_PX = 33;
+const CRAN = 120;                 // wheelDeltaY d'un cran de souris
+const GESTE_PAVE_MS = 300;        // un défilement du pavé reste un glissement jusqu'à ce silence
 const INERTIE_S = 0.325;
 const ELAN_MIN = 20;              // px/s
 const ECHANTILLONS_MS = 100;
@@ -178,11 +180,25 @@ export function gestesDuPlan(svg, { bornes, echelleMax, quandBouge, quandVise })
   svg.addEventListener("pointerup", relacher);
   svg.addEventListener("pointercancel", relacher);
 
+  // Une souris tourne par crans ; le pavé défile au pixel, souvent sur deux axes. Firefox ne dit les lignes que si deltaMode est lu avant deltaY.
+  let paveJusqua = 0;
+  function defileAuPave(e) {
+    const enLignes = e.deltaMode === WheelEvent.DOM_DELTA_LINE;
+    const maintenant = performance.now();
+    const pave = maintenant < paveJusqua || (!enLignes && (e.deltaX !== 0 || e.wheelDeltaY % CRAN !== 0));
+    paveJusqua = pave ? maintenant + GESTE_PAVE_MS : 0;
+    return pave;
+  }
+
   svg.addEventListener("wheel", (e) => {
     e.preventDefault();
     arreter();
+    if (!e.ctrlKey && defileAuPave(e)) {
+      appliquer({ x: vue.x + e.deltaX / vue.echelle, z: vue.z + e.deltaY / vue.echelle, echelle: vue.echelle });
+      return;
+    }
     const [x, y] = relatif(e.clientX, e.clientY);
-    const pixels = e.deltaY * (e.deltaMode === 1 ? LIGNE_PX : 1);
+    const pixels = e.deltaY * (e.deltaMode === WheelEvent.DOM_DELTA_LINE ? LIGNE_PX : 1);
     appliquer(zoomAutour(vue.echelle * Math.exp(-pixels * (e.ctrlKey ? MOLETTE_PINCEE : MOLETTE)), x, y));
   }, { passive: false });
 
