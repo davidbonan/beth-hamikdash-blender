@@ -172,9 +172,9 @@ float ombreProche(sampler2D carte, vec2 taille, float biais, vec4 coord, vec3 no
 `;
 
 // Ce qui bouche le soleil de loin étale son ombre : la fenêtre proche cède à la carte lointaine à mesure que la pénombre dépasse ce qu'elle sait rendre.
-const PENOMBRE = (pointMonde, normaleMonde) => /* glsl */`
+const PENOMBRE = (pointMonde, normaleMonde, pixelMonde) => /* glsl */`
 float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
-  vec2 loin = ombreLointaine(${pointMonde}, ${normaleMonde});
+  vec2 loin = ombreLointaine(${pointMonde}, ${normaleMonde}, ${pixelMonde});
   float sortie = sortieDe(vec3(coord.xy, coord.z + biais) / coord.w, ${FONDU.toFixed(2)});
   if (sortie >= 1.0) return loin.x;
   float etale = smoothstep(${PENOMBRE_PROCHE.toFixed(3)}, ${PENOMBRE_LOINTAINE.toFixed(3)}, loin.y * ${DIAMETRE_SOLEIL});
@@ -182,16 +182,16 @@ float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coo
 }
 `;
 
-const SANS_PENOMBRE = (pointMonde, normaleMonde) => /* glsl */`
+const SANS_PENOMBRE = (pointMonde, normaleMonde, pixelMonde) => /* glsl */`
 float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
   float sortie = sortieDe(vec3(coord.xy, coord.z + biais) / coord.w, ${FONDU.toFixed(2)});
   float ombre = sortie < 1.0 ? ombreProche(carte, taille, biais, rayon, coord) : 1.0;
-  return sortie > 0.0 ? mix(ombre, ombreLointaine(${pointMonde}, ${normaleMonde}).x, sortie) : ombre;
+  return sortie > 0.0 ? mix(ombre, ombreLointaine(${pointMonde}, ${normaleMonde}, ${pixelMonde}).x, sortie) : ombre;
 }
 `;
 
 // Chaque prise se compare au plan de la face, au centre de son texel : le biais constant qu'il faudrait au dallage décollerait les ombres de leur pied.
-const fondues = (pointMonde, normaleMonde) => /* glsl */`
+const fondues = (pointMonde, normaleMonde, pixelMonde) => /* glsl */`
 #ifdef USE_SHADOWMAP
 uniform sampler2D uCarteLointaine;
 uniform mat4 uOmbreLointaine;
@@ -215,8 +215,10 @@ float sortieDe(vec3 coord, float fondu){
 }
 
 // x : la part de soleil ; y : en mètres, l'éloignement moyen de ce qui le bouche, nul si rien ne le bouche.
-vec2 ombreLointaine(vec3 point, vec3 normale){
-  vec3 coord = (uOmbreLointaine * vec4(point + normale * ${RETRAIT_LOINTAIN.toFixed(2)}, 1.0)).xyz;
+// Le décor vu s'allège jusqu'à ecartDetail pixels, la carte non : sans ce retrait, la coupole allégée tombait dans l'ombre de la sienne.
+vec2 ombreLointaine(vec3 point, vec3 normale, float pixel){
+  float retrait = ${RETRAIT_LOINTAIN.toFixed(2)} + ${PROFIL.ecartDetail.toFixed(1)} * pixel;
+  vec3 coord = (uOmbreLointaine * vec4(point + normale * retrait, 1.0)).xyz;
   float sortie = sortieDe(coord, ${FONDU_LOINTAIN.toFixed(2)});
   if (sortie >= 1.0) return vec2(1.0, 0.0);
   vec2 pente = penteDe(uPenteLointaine * normale);
@@ -235,7 +237,7 @@ vec2 ombreLointaine(vec3 point, vec3 normale){
   return vec2(mix(soleil / ${((GRILLE_LOINTAINE - 1) ** 2).toFixed(1)}, 1.0, sortie), eloignement);
 }
 
-${PROFIL.ombres.penombre ? NETTE + PENOMBRE(pointMonde, normaleMonde) : SANS_PENOMBRE(pointMonde, normaleMonde)}
+${PROFIL.ombres.penombre ? NETTE + PENOMBRE(pointMonde, normaleMonde, pixelMonde) : SANS_PENOMBRE(pointMonde, normaleMonde, pixelMonde)}
 #endif
 `;
 
@@ -262,9 +264,9 @@ export function epargner() {
 }
 
 /** Le morceau de three, sa fonction devenue la lecture de la fenêtre proche du profil léger, la nôtre à sa place. */
-export function assemblage(pointMonde, normaleMonde) {
+export function assemblage(pointMonde, normaleMonde, pixelMonde) {
   const morceau = THREE.ShaderChunk.shadowmap_pars_fragment;
   const ecarte = morceau.replace("float getShadow(", PROFIL.ombres.penombre ? "float getShadowDur(" : "float ombreProche(");
   if (ecarte === morceau) throw new Error("three a renommé getShadow : pénombre perdue");
-  return ecarte + fondues(pointMonde, normaleMonde);
+  return ecarte + fondues(pointMonde, normaleMonde, pixelMonde);
 }

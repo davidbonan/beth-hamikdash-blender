@@ -1273,7 +1273,7 @@ export function habiller(materiau, horloges, jeux) {
 
     nuanceur.fragmentShader = greffable(nuanceur.fragmentShader)
       .greffer("#include <common>", "#include <common>\n" + drapeaux + refletDuCiel() + COMMUN + LECTURE_DU_REFLET + "#ifdef FIL\nvarying float vCouverture;\n#endif\n")
-      .greffer("#include <shadowmap_pars_fragment>", assemblage("vMonde", "normalize(vNMonde)"))
+      .greffer("#include <shadowmap_pars_fragment>", assemblage("vMonde", "normalize(vNMonde)", "vPixel"))
       // Les maillages sont exportés sans normales : three les tire des dérivées.
       // La normale de monde se prend donc au même endroit, pas d'un attribut absent.
       // La normale vient de l'attribut, pas des dérivées de la position : c'est elle
