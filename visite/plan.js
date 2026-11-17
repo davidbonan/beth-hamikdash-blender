@@ -100,6 +100,24 @@ function fondDeVille(ville) {
   return groupe;
 }
 
+// La carte met le nord géographique en haut : le dessin, tracé dans le repère de la scène, y tourne de `nord` degrés.
+function repereDeLaCarte(nord) {
+  const a = -nord * Math.PI / 180, cos = Math.cos(a), sin = Math.sin(a);
+  const versCarte = (x, z) => [x * cos - z * sin, x * sin + z * cos];
+  const versLeMonde = (x, z) => [x * cos + z * sin, z * cos - x * sin];
+  const cadre = (min, max) => {
+    const coins = [[min[0], min[1]], [max[0], min[1]], [max[0], max[1]], [min[0], max[1]]].map(([x, z]) => versCarte(x, z));
+    const xs = coins.map(([x]) => x), zs = coins.map(([, z]) => z);
+    return { min: [Math.min(...xs), Math.min(...zs)], max: [Math.max(...xs), Math.max(...zs)] };
+  };
+  const monde = (...enfants) => {
+    const groupe = noeud("g", { transform: `rotate(${-nord})` });
+    groupe.append(...enfants);
+    return groupe;
+  };
+  return { nord, versCarte, versLeMonde, cadre, cadreDe: (b) => cadre([b.min.x, b.min.z], [b.max.x, b.max.z]), monde };
+}
+
 function visiteurDessine() {
   const visiteur = noeud("g", { class: "visiteur" });
   visiteur.append(noeud("path", { class: "faisceau", d: FAISCEAU }), noeud("circle", { class: "point", r: RAYON_POINT }));
@@ -111,7 +129,6 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   const bouton = document.querySelector("#minicarte .disque");
   const fenetre = document.querySelector("#plan");
   const mini = bouton.querySelector("svg");
-  bouton.querySelector(".rose").style.setProperty("--nord", `${dessin.nord}deg`);
   const carte = fenetre.querySelector(".carte");
   const entier = carte.querySelector("svg");
   const barre = fenetre.querySelector(".echelle");
@@ -120,6 +137,7 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   const nomBulle = bulle.querySelector(".nom"), inaccessible = bulle.querySelector(".inaccessible");
   const allerIci = bulle.querySelector(".aller-ici");
 
+  const repere = repereDeLaCarte(dessin.nord);
   const niveaux = niveauxDu(dessin, lieux, emprises);
   const [deSurface] = niveaux;
   const souterrains = lieuxSouterrains(dessin);
@@ -144,10 +162,10 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   const coupesDessinees = new Map(niveaux.filter((n) => n.coupe).map((n) => [n, couches(n.coupe.couches, n.souterraine ? "coupe souterraine" : "coupe")]));
 
   const gestes = gestesDuPlan(entier, {
-    bornes: dessin,
+    bornes: repere.cadre(dessin.min, dessin.max),
     echelleMax: PX_PAR_AMA_MAX / ama,
     quandBouge: suivreLaVue,
-    quandVise: viser,
+    quandVise: (x, z) => viser(...repere.versLeMonde(x, z)),
   });
 
   const niveauDuLieu = (lieu) => niveaux.find((n) => n.coupe && n.lieuxDeLaCoupe.includes(lieu)) ?? deSurface;
@@ -160,7 +178,7 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
   function dessinerMini(voulu) {
     const fond = noeud("g", { class: voulu.souterraine ? "pale" : "" });
     fond.append(ville.cloneNode(true), deSurfaceDessine.cloneNode(true));
-    mini.replaceChildren(fond, ...(voulu.souterraine ? [coupesDessinees.get(voulu).cloneNode(true)] : []), visiteurDessine());
+    mini.replaceChildren(repere.monde(fond, ...(voulu.souterraine ? [coupesDessinees.get(voulu).cloneNode(true)] : []), visiteurDessine()));
     mini.dataset.niveau = voulu.id;
   }
 
@@ -182,14 +200,14 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     // Du plus grand au plus petit : à chaque échelle, les grands lieux se nomment d'abord.
     const etiquettes = noeud("g", { class: "etiquettes" });
     for (const id of [...voulu.nommes].sort((a, b) => surface(emprises.get(b)) - surface(emprises.get(a)))) {
-      const [x, z] = pointDEtiquette(id);
+      const [x, z] = repere.versCarte(...pointDEtiquette(id));
       etiquettes.append(noeud("text", { x, y: z, "data-lieu": id }));
     }
     const visiteur = visiteurDessine();
     const marque = noeud("g", { class: "epingle", visibility: "hidden" });
     marque.append(noeud("circle", { class: "pied", r: RAYON_PIED }), noeud("path", { class: "apercu", d: FLECHE }),
       noeud("path", { class: "tete", d: EPINGLE, transform: `translate(0 ${-RAYON_PIED})` }));
-    entier.replaceChildren(fond, etiquettes, visiteur, marque);
+    entier.replaceChildren(repere.monde(fond), etiquettes, repere.monde(visiteur), marque);
     for (const b of choixNiveau.children) b.setAttribute("aria-pressed", String(b.dataset.niveau === voulu.id));
     nommer();
   }
@@ -211,7 +229,7 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     const poses = [];
     for (const t of entier.querySelectorAll("text[data-lieu]")) {
       const b = emprises.get(t.dataset.lieu);
-      const [cx, y] = pointDEtiquette(t.dataset.lieu);
+      const [cx, y] = repere.versCarte(...pointDEtiquette(t.dataset.lieu));
       const l = (t.textContent.length * TAILLE_ETIQUETTE * 0.62) / echelle, h = (TAILLE_ETIQUETTE * 1.2) / echelle;
       const cadre = { x: cx - l / 2, y: y - h / 2, l, h };
       const tue = b.max.x - b.min.x < l || poses.some((p) => croise(cadre, p));
@@ -233,10 +251,12 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
 
   // Zoomé sur le Heikhal, le plan passe à sa coupe ; dézoomé ou sorti de lui, il revient en surface.
   function niveauVoulu() {
-    const { x, z, echelle } = gestes.vue;
+    const { echelle } = gestes.vue;
+    const [x, z] = repere.versLeMonde(gestes.vue.x, gestes.vue.z);
     for (const [coupe, foyer] of foyers) {
       if (coupe.souterraine) continue;
-      const seuil = gestes.echellePour(largeurDe(coupe.coupe), hauteurDe(coupe.coupe)) * PART_BASCULE * (niveau === coupe ? HYSTERESE : 1);
+      const cadre = repere.cadre(coupe.coupe.min, coupe.coupe.max);
+      const seuil = gestes.echellePour(largeurDe(cadre), hauteurDe(cadre)) * PART_BASCULE * (niveau === coupe ? HYSTERESE : 1);
       if (echelle >= seuil && contientAPlat(foyer, x, z)) return coupe;
     }
     return deSurface;
@@ -269,12 +289,12 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     const foyer = foyers.get(n);
     if (!foyer) return;
     const { x, z, echelle } = gestes.vue;
+    const cadre = repere.cadreDe(foyer);
+    const l = largeurDe(cadre), h = hauteurDe(cadre);
     const demiL = entier.clientWidth / 2 / echelle, demiH = entier.clientHeight / 2 / echelle;
-    const enVue = croise({ x: x - demiL, y: z - demiH, l: 2 * demiL, h: 2 * demiH },
-      { x: foyer.min.x, y: foyer.min.z, l: foyer.max.x - foyer.min.x, h: foyer.max.z - foyer.min.z });
+    const enVue = croise({ x: x - demiL, y: z - demiH, l: 2 * demiL, h: 2 * demiH }, { x: cadre.min[0], y: cadre.min[1], l, h });
     if (enVue) return;
-    const l = foyer.max.x - foyer.min.x, h = foyer.max.z - foyer.min.z;
-    gestes.animerVers({ x: foyer.min.x + l / 2, z: foyer.min.z + h / 2, echelle: gestes.echellePour(l * 1.2, h * 1.2) });
+    gestes.animerVers({ x: cadre.min[0] + l / 2, z: cadre.min[1] + h / 2, echelle: gestes.echellePour(l * 1.2, h * 1.2) });
   }
 
   // ---- épingle ----
@@ -323,17 +343,18 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     marque.setAttribute("visibility", epingle ? "visible" : "hidden");
     if (!epingle) return;
     const taille = 1 / gestes.vue.echelle;
-    marque.setAttribute("transform", `translate(${epingle.x.toFixed(2)} ${epingle.z.toFixed(2)}) scale(${taille.toFixed(4)})`);
+    const [x, z] = repere.versCarte(epingle.x, epingle.z);
+    marque.setAttribute("transform", `translate(${x.toFixed(2)} ${z.toFixed(2)}) scale(${taille.toFixed(4)})`);
     const apercu = marque.querySelector(".apercu");
     apercu.setAttribute("visibility", epingle.angle === null || !epingle.pieds ? "hidden" : "visible");
-    if (epingle.angle !== null) apercu.setAttribute("transform", `rotate(${epingle.angle.toFixed(1)}) scale(${RAYON_PIED * 0.85})`);
+    if (epingle.angle !== null) apercu.setAttribute("transform", `rotate(${(epingle.angle - repere.nord).toFixed(1)}) scale(${RAYON_PIED * 0.85})`);
     marque.classList.toggle("perdue", !epingle.pieds);
     placerBulle();
   }
 
   // Au-dessus de l'épingle, et dessous quand le haut de la carte manque ; elle suit la carte.
   function placerBulle() {
-    const [sx, sy] = gestes.versEcran(epingle.x, epingle.z);
+    const [sx, sy] = gestes.versEcran(...repere.versCarte(epingle.x, epingle.z));
     const l = carte.clientWidth, h = carte.clientHeight;
     const dedans = sx >= 0 && sx <= l && sy >= 0 && sy <= h;
     bulle.style.visibility = dedans ? "" : "hidden";
@@ -375,9 +396,10 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     auto = !voulu.souterraine;
     viserDestination(id);
     const boite = emprises.get(id);
-    const centre = boite ? { x: (boite.min.x + boite.max.x) / 2, z: (boite.min.z + boite.max.z) / 2 } : { x: epingle.x, z: epingle.z };
-    const echelle = boite ? gestes.echellePour((boite.max.x - boite.min.x) * 1.4, (boite.max.z - boite.min.z) * 1.4) : gestes.vue.echelle;
-    gestes.animerVers({ ...centre, echelle });
+    const cadre = boite && repere.cadreDe(boite);
+    const [x, z] = cadre ? [(cadre.min[0] + cadre.max[0]) / 2, (cadre.min[1] + cadre.max[1]) / 2] : repere.versCarte(epingle.x, epingle.z);
+    const echelle = cadre ? gestes.echellePour(largeurDe(cadre) * 1.4, hauteurDe(cadre) * 1.4) : gestes.vue.echelle;
+    gestes.animerVers({ x, z, echelle });
   }
 
   const aller = allerA(fenetre.querySelector(".aller"), { destinations, choisir: choisirDestination });
@@ -392,7 +414,8 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     afficherNiveau(visiteur);
     oublierEpingle();
     const centre = pose ?? { x: (dessin.min[0] + dessin.max[0]) / 2, z: (dessin.min[1] + dessin.max[1]) / 2 };
-    gestes.regler({ x: centre.x, z: centre.z, echelle: gestes.echellePour(VUE_OUVERTURE, VUE_OUVERTURE) });
+    const [x, z] = repere.versCarte(centre.x, centre.z);
+    gestes.regler({ x, z, echelle: gestes.echellePour(VUE_OUVERTURE, VUE_OUVERTURE) });
     etiqueter();
     entier.focus({ preventScroll: true });
   }
@@ -410,7 +433,8 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     const visiteur = niveauDuLieu(lieuDuVisiteur);
     auto = !visiteur.souterraine;
     if (visiteur !== niveau) afficherNiveau(visiteur);
-    gestes.animerVers({ x: pose.x, z: pose.z, echelle: Math.max(gestes.vue.echelle, gestes.echellePour(VUE_OUVERTURE, VUE_OUVERTURE)) });
+    const [x, z] = repere.versCarte(pose.x, pose.z);
+    gestes.animerVers({ x, z, echelle: Math.max(gestes.vue.echelle, gestes.echellePour(VUE_OUVERTURE, VUE_OUVERTURE)) });
   }
 
   function rafraichir() {
@@ -432,7 +456,8 @@ export function plan({ dessin, emprises, lieux, entrees, concepts, ama,
     lieuDuVisiteur = lieu;
     const voulu = souterrains.has(lieu) ? niveauDuLieu(lieu) : deSurface;
     if (mini.dataset.niveau !== voulu.id) dessinerMini(voulu);
-    mini.setAttribute("viewBox", `${pose.x - FENETRE_MINI / 2} ${pose.z - FENETRE_MINI / 2} ${FENETRE_MINI} ${FENETRE_MINI}`);
+    const [x, z] = repere.versCarte(pose.x, pose.z);
+    mini.setAttribute("viewBox", `${x - FENETRE_MINI / 2} ${z - FENETRE_MINI / 2} ${FENETRE_MINI} ${FENETRE_MINI}`);
     poserVisiteur(mini, FENETRE_MINI / 9, true);
   }
 

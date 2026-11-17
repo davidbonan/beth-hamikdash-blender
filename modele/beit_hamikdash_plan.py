@@ -89,7 +89,7 @@ def vers_la_visite(est, nord):
 
 
 def nord_geographique():
-    """En degrés, dans le sens horaire depuis le haut de la carte."""
+    """Où le nord géographique pointe dans le dessin, en degrés dans le sens horaire depuis le haut."""
     (x0, z0), (x1, z1) = vers_la_visite(0, 0), vers_la_visite(0, 1)
     return round(math.degrees(math.atan2(x1 - x0, z0 - z1)), 2)
 
