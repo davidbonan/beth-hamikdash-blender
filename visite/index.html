@@ -749,16 +749,16 @@
     text-shadow: 0 0 3px rgba(13,12,11,.95), 0 0 1px rgba(13,12,11,.95); pointer-events: none;
   }
   #minicarte .etiquettes { display: none; }
-  /* Le plan ne tourne pas avec le visiteur : nord en haut, est à droite, quelle que soit la langue. */
-  #minicarte .rose { position: absolute; inset: 0; pointer-events: none; direction: ltr; }
+  /* Le plan ne tourne pas avec le visiteur ; la rose montre le nord géographique, à `--nord` du haut, quelle que soit la langue. */
+  #minicarte .rose { position: absolute; inset: 0; pointer-events: none; direction: ltr; transform: rotate(var(--nord, 0deg)); }
   #minicarte .rose span {
     position: absolute; font-size: 11px; font-weight: 600; line-height: 1; color: #f3efe6;
     text-shadow: 0 0 3px rgba(13,12,11,.95), 0 0 1px rgba(13,12,11,.95);
   }
-  #minicarte .rose .nord { top: 4px; left: 50%; transform: translateX(-50%); color: #d9a441; }
-  #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%); }
-  #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%); }
-  #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%); }
+  #minicarte .rose .nord { top: 4px; left: 50%; transform: translateX(-50%) rotate(calc(-1 * var(--nord, 0deg))); color: #d9a441; }
+  #minicarte .rose .sud { bottom: 4px; left: 50%; transform: translateX(-50%) rotate(calc(-1 * var(--nord, 0deg))); }
+  #minicarte .rose .est { right: 5px; top: 50%; transform: translateY(-50%) rotate(calc(-1 * var(--nord, 0deg))); }
+  #minicarte .rose .ouest { left: 5px; top: 50%; transform: translateY(-50%) rotate(calc(-1 * var(--nord, 0deg))); }
   #recherche {
     position: fixed; inset: 0; z-index: 28; display: flex; flex-direction: column; gap: 10px;
     padding: calc(12px + var(--marge-haut)) calc(16px + var(--marge-droite))

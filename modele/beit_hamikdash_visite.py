@@ -62,7 +62,7 @@ LARGEUR_CHANFREIN = 0.03 * AMA
 # En amot. `cadre` : concepts à montrer entiers ; sans `position`, le navigateur recule le long du `cap` (0 = est, 90 = nord).
 Z_HAR, Z_EZN, Z_EZI, Z_AZ, Z_BAT = -16.0, -10.0, -2.5, 0.0, 6.0
 Z_PLACE_KOTEL = -51.58
-Z_SEREIFA = 115.0
+Z_SEREIFA = 139.5
 
 REPERES = [
     dict(id="har_habayit", nom="Har HaBayit, sur l'axe est",
@@ -91,7 +91,7 @@ REPERES = [
     # Au sud-ouest de la place : ailleurs, le Kotel et le nord cachent le Heikhal. La place est à
     # Z_PLACE_KOTEL du blockout : le dallage d'Hérode moins les dix-neuf mètres du mur.
     dict(id="place_kotel", nom="Place du Kotel",
-         position=(-482.1, -399.9, Z_PLACE_KOTEL), cap=47, tangage=10),
+         position=(-522.1, -362.9, Z_PLACE_KOTEL), cap=41, tangage=10),
     # La place du cohen qui brûle la para, au bord est de la fosse : le regard file vers l'ouverture du Heikhal.
     dict(id="har_hamishcha", nom="Mont des Oliviers, face à la porte orientale",
          position=(1661.0, 0.0, Z_SEREIFA), cap=180, tangage=-3),
@@ -106,8 +106,8 @@ VUES = [
                 "lishkat_hametzoraim", "lishkat_beit_shemanya", "quinze_marches"],
          cap=180, sol=60.0, recul_max=300.0, vol=True),
     dict(id="vue_sol_har_habayit", position=(187.5, -291.7, 163.4), cap=131, tangage=-23.5, vol=True),
-    dict(id="vue_place_kotel", position=(-482.1, -399.9, Z_PLACE_KOTEL), cap=47, tangage=10),
-    dict(id="vue_arche_wilson", position=(-382.1, -281.2, Z_PLACE_KOTEL), cap=83, tangage=8),
+    dict(id="vue_place_kotel", position=(-522.1, -362.9, Z_PLACE_KOTEL), cap=41, tangage=10),
+    dict(id="vue_arche_wilson", position=(-410.2, -255.3, Z_PLACE_KOTEL), cap=77, tangage=8),
     dict(id="vue_heikhal", cadre=["menora", "shulchan", "mizbeach_hazahav"], cap=180, sol=Z_BAT,
          recul_max=24.0),
     dict(id="vue_tavla_hasota", position=(-105.0, 3.0, Z_BAT), cap=42, tangage=-24),
