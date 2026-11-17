@@ -91,7 +91,7 @@
         "citation": "וְכֵן סָבִיב לְכָתְלֵי הָאוּלָם מִלְּמַטָּה עַד לְמַעְלָה… אַמָּה אַחַת חָלָק וְרֹבֶד שָׁלֹשׁ אַמּוֹת… וְרֹבֶד הָעֶלְיוֹן הָיָה רָחְבּוֹ אַרְבַּע"
       }
     ],
-    "note": "Retenu : aucune colonne ni pilastre sur la façade ; aucune source n'en met devant elle (Middot 3:7-8 et 4:6-7, Rambam). Yakhin et Boaz, du Premier Temple (Melakhim I 7:21), se dressent dans l'Oulam, de part et d'autre de l'ouverture. Lecture de la visite : le Rambam (Beit HaBe'hira 4:9) alterne « מִלְּמַטָּה עַד לְמַעְלָה » une ama nue et un rovad de trois amot, dont il donne le « רֹחַב » ; la visite prend ces trois amot pour la hauteur du bandeau. Choix de la visite : la saillie des bandeaux, qu'aucune source ne chiffre, fixée à une ama."
+    "note": "Retenu : aucune colonne ni pilastre sur la façade ; aucune source n'en met devant elle (Middot 3:7-8 et 4:6-7, Rambam). Choix de la visite : Yakhin et Boaz, colonnes du Premier Temple dressées « לְאֻלָם הַהֵיכָל » (Melakhim I 7:21) et brisées par les Chaldéens (Melakhim II 25:13), sont reprises dans l'Oulam, de part et d'autre de l'ouverture, comme le lisent le Radak, le Ralbag et la Metsoudat David. Lecture de la visite : le Rambam (Beit HaBe'hira 4:9) alterne « מִלְּמַטָּה עַד לְמַעְלָה » une ama nue et un rovad de trois amot, dont il donne le « רֹחַב » ; la visite prend ces trois amot pour la hauteur du bandeau. Choix de la visite : la saillie des bandeaux, qu'aucune source ne chiffre, fixée à une ama."
   },
   "douze_marches_oulam": {
     "he": "מעלות האולם",
@@ -289,7 +289,7 @@
         "citation": "צר שבחלון היו מבפנים והרוחב שבחלון מוחזר כלפי חוץ להוציא אורה לעולם"
       }
     ],
-    "note": "Premier Temple : le plafond de cèdre (Melakhim I 6:9), le sol d'or (Melakhim I 6:30) et les fenêtres (Melakhim I 6:4, commenté par Mena'hot 86b) ; Middot 4:1 ne parle que d'or. Le Rambam écrit pourtant « וְאֵין בּוֹנִין בּוֹ עֵץ בּוֹלֵט כְּלָל » (Beit HaBe'hira 1:9), ce qui pèse contre un plafond de bois apparent : le cèdre est un choix de la visite."
+    "note": "Premier Temple : le plafond de cèdre (Melakhim I 6:9), le sol d'or (Melakhim I 6:30) et les fenêtres (Melakhim I 6:4, commenté par Mena'hot 86b) ; Middot 4:1 ne parle que d'or. Le Rambam écrit pourtant « וְאֵין בּוֹנִין בּוֹ עֵץ בּוֹלֵט כְּלָל » (Beit HaBe'hira 1:9), ce qui pèse contre un plafond de bois apparent : le cèdre est un choix de la visite, comme le sol d'or. Les fenêtres sont aussi celles du Second Temple : Bartenura parle des couronnes « שבחלונות של היכל » (sur Middot 3:8)."
   },
   "portes_heikhal": {
     "he": "דלתות ההיכל",
@@ -325,6 +325,11 @@
         "oeuvre": "Melakhim I",
         "ref": "6:34–35",
         "citation": "וּשְׁתֵּי דַלְתוֹת עֲצֵי בְרוֹשִׁים… וְצִפָּה זָהָב מְיֻשָּׁר עַל הַמְּחֻקֶּה"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:7",
+        "citation": "לֹא הָיָה שׁוֹחֵט הַשּׁוֹחֵט, עַד שֶׁשּׁוֹמֵעַ קוֹל שַׁעַר הַגָּדוֹל שֶׁנִּפְתָּח"
       }
     ],
     "note": "Choix de la visite : les quatre portes sont montrées ouvertes, comme pendant le service, et le rideau n'est pas représenté. Premier Temple : Melakhim I 6:34–35 ; Middot 4:1 ne dit pas la matière des portes. Écarté : R. Yehouda (Middot 4:1), pour qui les portes se tenaient dans l'embrasure et se repliaient sur elles-mêmes."
@@ -509,9 +514,9 @@
       "22 coupes, 11 pommes, 9 fleurs",
       "à 2,5 amot du mur sud",
       "trois marches de pierre devant",
-      "lampes à pas égal de 3 tefa'him",
+      "lampes à pas égal de 3 tefa'him (choix de la visite)",
       "le kuz sur la deuxième marche",
-      "creuse, un kikar d'or avec ses lampes ≈ 58 kg"
+      "creuse, un kikar d'or avec ses lampes ≈ 58 kg (conversion du projet)"
     ],
     "sources": [
       {
@@ -573,6 +578,16 @@
         "oeuvre": "Rambam sur Mena'hot",
         "ref": "3:7",
         "citation": "ראיתי לצייר בכאן צורת המנורה שלימה"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:6",
+        "citation": "וְהַכּוּז דּוֹמֶה לְקִיתוֹן גָּדוֹל שֶׁל זָהָב"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "6:1",
+        "citation": "נָטַל אֶת הַכּוּז מִמַּעֲלָה שְׁנִיָּה"
       }
     ],
     "note": "Retenu : les lampes alignées du nord au sud, avec R. Elazar b. R. Shimon (Mena'hot 98b) et le Rambam (Beit HaBe'hira 3:12). Écarté : Rabbi, pour qui la Menora était placée d'est en ouest (Mena'hot 98b). Retenu : des branches droites, montant en diagonale, selon le dessin du Rambam (commentaire de la Michna, Mena'hot 3:7) et Rashi (sur Exode 25:32). Écarté : les branches arrondies des représentations courantes. Retenu : les coupes renversées, bouche en bas, comme au dessin du Rambam. Son commentaire décrit pourtant la coupe étroite en bas, et prévient que le dessin n'en montre pas la forme exacte, seulement le nombre et la place des ornements (Rambam sur Mena'hot 3:7)."
@@ -580,13 +595,13 @@
   "shulchan": {
     "he": "שולחן",
     "translit": "Shul'han",
-    "resume": "La Table se tient au nord du Heikhal, à deux amot et demie du mur, dans la moitié ouest de la salle, face à la Menora. Elle mesure 2 amot de long, 1 de large, 1,5 de haut, en bois d'acacia plaqué d'or, avec une bordure, le zer. Elle porte les douze pains de proposition, le le'hem hapanim, rangés en deux piles de six qui montent d'environ deux amot au-dessus d'elle. Les pains sont séparés par 28 tubes d'or, portés par quatre montants d'or posés au sol, qui dépassent les piles et montent plus haut que la Menora. Dans la visite, deux coupes d'encens sont posées sur les piles ; le Rambam les place à côté d'elles.",
+    "resume": "La Table se tient au nord du Heikhal, à deux amot et demie du mur, dans la moitié ouest de la salle, face à la Menora. Elle mesure 2 amot de long, 1 de large, 1,5 de haut, en bois d'acacia plaqué d'or, avec une bordure, le zer. Elle porte les douze pains de proposition, le le'hem hapanim, rangés en deux piles de six qui montent d'environ deux amot au-dessus d'elle. Les pains sont séparés par 28 tubes d'or, portés par quatre montants d'or posés au sol ; la visite les fait dépasser les piles et monter plus haut que la Menora. Dans la visite, deux coupes d'encens sont posées sur les piles ; le Rambam les place à côté d'elles.",
     "cotes": [
       "2 amot de long × 1 de large × 1,5 de haut, à l'ama de six tefa'him (R. Meir)",
       "à 2,5 amot du mur nord",
       "12 pains en deux piles de 6",
       "pain de 10 × 5 tefa'him, relevé de 2 tefa'him de chaque côté de la Table, 7 etzbaot de haut",
-      "piles séparées de 2 tefa'him, soit ≈ 2 amot de pile au-dessus de la Table",
+      "piles séparées de 2 tefa'him ; chaque pile monte de 12 tefa'him, 2 amot, au-dessus de la Table, pour qui replie les pains de deux tefa'him (Mena'hot 96a)",
       "28 tubes d'or (kanim), quatre montants (snifim) ≈ 3,6 amot (hauteur : choix du modèle)",
       "deux coupes d'encens (bazikhin) : sur les piles dans le modèle, à côté des piles selon le Rambam"
     ],
@@ -655,11 +670,11 @@
     "resume": "L'autel de l'encens, au centre du Heikhal entre la Table et la Menora, un peu en avant vers l'est. Une ama sur une ama, deux amot de haut, en acacia plaqué d'or : le dessus, les parois et les cornes, qui sont prises dans la masse de l'autel. Un zer d'or en fait le tour comme une couronne et dépasse le dessus ; sous lui, à deux angles opposés, les deux anneaux qui recevaient les barres du transport. L'autel n'a pas de feu à lui : chaque matin, le cohen qui en ôte la cendre la ramasse dans le teni, un panier d'or qu'il laisse par terre devant l'autel jusqu'après l'aspersion du sang du tamid, puis on y apporte des braises du grand autel pour l'encens. Le feu, dit le Talmud, n'avait pas prise sur son or. À Yom Kippour, l'encens du matin et du soir y est brûlé comme chaque jour ; celui du jour l'est dans le Kodesh HaKodashim. Ce jour-là, le Cohen Gadol en asperge les quatre cornes, en commençant par celle du nord-est, puis sept fois le dessus, sur l'or dégagé des braises.",
     "cotes": [
       "1 × 1 ama × 2 de haut, cornes comprises",
-      "quatre cornes d'un tefa'h et demi",
-      "un zer d'un tefa'h, qui dépasse le dessus",
+      "quatre cornes d'un tefa'h et demi (choix de la visite)",
+      "un zer d'un tefa'h, qui dépasse le dessus (choix de la visite)",
       "deux anneaux, aux angles nord-est et sud-ouest",
-      "à 6 amot à l'est de la Table et de la Menora",
-      "le teni : 2 kabin et demi, ≈ 3,5 l"
+      "à 6 amot à l'est de la Table et de la Menora (choix de la visite ; les sources disent « un peu » vers l'extérieur)",
+      "le teni : 2 kabin et demi, ≈ 3,5 l (conversion du projet)"
     ],
     "sources": [
       {
@@ -731,14 +746,24 @@
         "oeuvre": "Rambam Avodat Yom HaKippurim",
         "ref": "4:1–2",
         "citation": "וּמַקְטִיר קְטֹרֶת שֶׁל בֵּין הָעַרְבַּיִם וּמֵיטִיב אֶת הַנֵּרוֹת שֶׁל בֵּין הָעַרְבַּיִם כִּשְׁאָר הַיָּמִים"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "3:9",
+        "citation": "וְהִנִּיחוֹ וְיָצָא"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "6:1",
+        "citation": "וְנָטַל אֶת הַטֶּנִי וְהִשְׁתַּחֲוָה וְיָצָא"
       }
     ],
-    "note": "Les deux anneaux suivent le verset et Rashi, qui les met aux angles, lu par le Haamek Davar : l'un à l'angle nord-est, l'autre au sud-ouest, une barre dans chacun. Écartés : Abarbanel et le Malbim lisent dans Rashi quatre anneaux, deux de chaque côté, à ses angles ; Shadal aussi en compte quatre, deux par côté ; le Bekhor Shor et Rav Hirsch en mettent un au milieu de chaque côté. Écarté aussi : Kelim 17:10 mesure cet autel avec une ama plus petite, de cinq tefa'him — R. Meir et R. Yehouda s'accordent sur ce point (Mena'hot 97b) —, soit environ 0,40 × 0,40 m au sol ; les textes ne disent pas si ses deux amot de haut suivent la même ama. La visite garde l'ama ordinaire de six tefa'him : 0,48 × 0,48 × 0,96 m. Choix de la visite, là où les textes se taisent : les deux amot comptent les cornes, comme les dix de l'autel extérieur ; les cornes sont carrées et s'affinent jusqu'à une tête arrondie ; le zer monte au-dessus du dessus comme celui de l'Arche (Rashi sur Exode 25:11) et porte des fleurons de lys, la fleur de la Menora ; les barres ne sont pas posées, rien ne déplace l'autel hors du Bayit. Le teni est un panier d'or à côtes, avec deux anses ; la scène le montre au matin, comme le kuz sur la marche de la Menora."
+    "note": "Les deux anneaux suivent le verset et Rashi, qui les met aux angles, lu par le Haamek Davar : l'un à l'angle nord-est, l'autre au sud-ouest, une barre dans chacun. Écartés : le Malbim lit dans Rashi quatre anneaux, deux de chaque côté, à ses angles, et dit qu'Abarbanel l'explique ainsi ; Shadal aussi en compte quatre, deux par côté ; le Bekhor Shor en met un de chaque côté, Rav Hirsch un au milieu de chaque côté. Écarté aussi : Kelim 17:10 mesure cet autel avec une ama plus petite, de cinq tefa'him — R. Meir et R. Yehouda s'accordent sur ce point (Mena'hot 97b) —, soit environ 0,40 × 0,40 m au sol ; les textes ne disent pas si ses deux amot de haut suivent la même ama. La visite garde l'ama ordinaire de six tefa'him : 0,48 × 0,48 × 0,96 m. Choix de la visite, là où les textes se taisent : les deux amot comptent les cornes, comme les dix de l'autel extérieur ; les cornes sont carrées et s'affinent jusqu'à une tête arrondie ; le zer monte au-dessus du dessus comme celui de l'Arche (Rashi sur Exode 25:11) et porte des fleurons de lys, la fleur de la Menora ; les barres ne sont pas posées, rien ne déplace l'autel hors du Bayit. Le teni est un panier d'or à côtes, avec deux anses ; la scène le montre au matin, comme le kuz sur la marche de la Menora."
   },
   "tavla_hasota": {
     "he": "טַבְלָא שֶׁל שַׁיִשׁ",
     "translit": "Tavla shel shayish",
-    "resume": "Une dalle de marbre d'une ama sur une ama, dans le sol du Heikhal, à droite en entrant, avec un anneau pour la soulever. Elle sert au rite de la sota, la femme que son mari soupçonne d'adultère : la Torah demande au cohen de mettre dans l'eau qu'elle boira de la poussière « du sol du Mishkan ». Le sol du Heikhal est revêtu ; cette dalle y garde un carré de terre. Le cohen puise un demi-log d'eau au Kiyor dans une coupe de terre cuite neuve, entre au Heikhal, tourne à droite, soulève la dalle par son anneau, prend de la terre dessous et en met assez pour qu'elle se voie à la surface de l'eau. La parasha de la sota, elle, est écrite sur la tavla d'or de la reine Hélène, dans l'Oulam.",
+    "resume": "Une dalle de marbre d'une ama sur une ama, dans le sol du Heikhal, à droite en entrant, avec un anneau pour la soulever. Elle sert au rite de la sota, la femme que son mari soupçonne d'adultère : la Torah demande au cohen de mettre dans l'eau qu'elle boira de la poussière « du sol du Mishkan ». Le sol du Heikhal est revêtu ; cette dalle y garde un carré de terre. Le cohen puise un demi-log d'eau au Kiyor dans une coupe de terre cuite neuve, entre au Heikhal, tourne à droite, soulève la dalle par son anneau, prend de la terre dessous et en met assez pour qu'elle se voie à la surface de l'eau. La parasha de la sota, elle, est écrite sur la tavla d'or de la reine Hélène (Yoma 3:10) ; la visite la place dans l'Oulam.",
     "cotes": [
       "dalle de marbre d'1 × 1 ama",
       "anneau de fer scellé",
@@ -774,9 +799,14 @@
         "oeuvre": "Bartenura",
         "ref": "Sota 2:2",
         "citation": "לְאוֹחֲזָהּ בְּטַבַּעְתָּהּ וּלְהַגְבִּיהָהּ מִשְּׁאָר הָרִצְפָּה שֶׁהִיא כֻּלָּהּ בְּאַבְנֵי שַׁיִשׁ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "3:10",
+        "citation": "וְאַף הִיא עָשְׂתָה טַבְלָא שֶׁל זָהָב שֶׁפָּרָשַׁת סוֹטָה כְתוּבָה עָלֶיהָ"
       }
     ],
-    "note": "Retenu : à droite en entrant, donc au nord, le Heikhal s'ouvrant à l'est. Écarté : Bartenura, pour qui tout le sol du Heikhal est de dalles de marbre, celle-ci ne s'en distinguant que par son anneau ; la visite garde le sol plaqué d'or du Premier Temple (Melakhim I 6:30), sur lequel le marbre tranche. Choix de la visite : la place exacte de la dalle, à deux amot du mur est, et le fer de l'anneau, comme à la tavla des clés du Beit HaMoked (Middot 1:9). Non modélisée : la terre sous la dalle."
+    "note": "Retenu : à droite en entrant, donc au nord, le Heikhal s'ouvrant à l'est. Écarté : Bartenura, pour qui tout le sol du Heikhal est de dalles de marbre, celle-ci ne s'en distinguant que par son anneau ; la visite garde le sol plaqué d'or du Premier Temple (Melakhim I 6:30), sur lequel le marbre tranche. Choix de la visite : la place exacte de la dalle, à deux amot du mur est, et le fer de l'anneau, que la visite donne aussi à la tavla des clés du Beit HaMoked (Middot 1:9 ne dit pas sa matière). Non modélisée : la terre sous la dalle."
   },
   "parokhet": {
     "he": "פרוכת",
@@ -845,6 +875,11 @@
         "oeuvre": "I Rois",
         "ref": "8:8",
         "citation": ""
+      },
+      {
+        "oeuvre": "Rashi Exode",
+        "ref": "26:1",
+        "citation": "פַּרְצוּף אֶחָד מִכָּאן וּפַרְצוּף אֶחָד מִכָּאן – אֲרִי מִצַּד זֶה וְנֶשֶׁר מִצַּד זֶה"
       }
     ],
     "note": "Retenu : les quatre matières — trois laines et le lin — sont tissées dans chaque fil (Shekalim 8:5 ; Rashi sur Exode 26:31) : l'étoffe est un pourpre chiné, pas des bandes de couleur. Shmouel range pourtant cette description parmi les trois où les Sages parlent « en langage d'exagération » (Tamid 29a–b). Choix de la visite : une étoffe lourde et plate, sans drapé, et des figures sans visage humain ; l'autre image du revers n'est pas représentée. Écarté : R. Yossi, pour qui il n'y avait qu'une seule parokhet (Yoma 5:1). Choix de la visite : Yoma 54a ne parle que d'une parokhet ; avec deux, les barres de l'Arche traversent l'ama de Traksin, emportent le rideau intérieur et font bomber l'extérieur."
@@ -896,9 +931,14 @@
         "oeuvre": "Lévitique",
         "ref": "16:34",
         "citation": "אַחַת בַּשָּׁנָה"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "52b",
+        "citation": "כְּבֵין שְׁנֵי הַבַּדִּים"
       }
     ],
-    "note": "Choix de la visite : la pierre et l'Arche au centre de la salle. Écarté : le Rambam, qui met la pierre « בְּמַעֲרָבוֹ », dans la partie ouest du Kodesh HaKodashim (Beit HaBe'hira 4:1). Choix de la visite : l'obscurité de la salle, qu'aucune source ne décrit."
+    "note": "Choix de la visite : la pierre et l'Arche au centre de la salle. Écarté : le Rambam, qui met la pierre « בְּמַעֲרָבוֹ », dans la partie ouest du Kodesh HaKodashim (Beit HaBe'hira 4:1). Choix de la visite : l'obscurité de la salle, qu'aucune source ne décrit ; l'Arche à sa place. Au Second Temple, sans Arche, le Cohen Gadol posait la pelle sur la pierre (Yoma 5:2), et Yoma 52b lit « comme entre les barres »."
   },
   "even_hashetiya": {
     "he": "אבן השתייה",
@@ -1119,7 +1159,7 @@
         "citation": "צְלוֹחִית שֶׁל חֶרֶס"
       }
     ],
-    "note": "Retenu : devant l'Arche, la manne et le bâton seulement (Rambam, Beit HaBe'hira 4:1) ; la fiole de manne en terre, « צְלוֹחִית שֶׁל חֶרֶס » (Rashi sur Exode 16:33) ; le coffret « à côté » d'elle (I Samuel 6:8 ; Bava Batra 14a). Choix de la visite : la manne et le bâton entre les badim, là même où se pose la ma'hta (Yoma 5:1) — le Rambam dit seulement « וּלְפָנָיו » ; la place de la fiole d'huile, que les sources disent seulement cachée avec l'Arche (Yoma 52b ; Horayot 12a) ; le côté nord du coffret. L'Arche reste fermée ; on ne voit ni les Tables ni le Sefer Torah. Écarté : le Sefer Torah posé à côté de l'Arche, sur le coffret des Philistins ou sur une planche, selon R. Yehouda (Bava Batra 14b)."
+    "note": "Retenu : devant l'Arche, la manne et le bâton seulement (Rambam, Beit HaBe'hira 4:1) ; la fiole de manne en terre, « צְלוֹחִית שֶׁל חֶרֶס » (Rashi sur Exode 16:33) ; le coffret « à côté » d'elle (I Samuel 6:8 ; Bava Batra 14a). Choix de la visite : la manne et le bâton entre les badim, là même où se pose la ma'hta (Yoma 5:1) — le Rambam dit seulement « וּלְפָנָיו » ; la place de la fiole d'huile, que les sources disent seulement cachée avec l'Arche (Yoma 52b ; Horayot 12a) ; le côté nord du coffret. L'Arche reste fermée ; on ne voit ni les Tables ni le Sefer Torah. Écarté : le Sefer Torah posé à côté de l'Arche, sur le coffret des Philistins ou sur une planche, selon R. Yehouda (Bava Batra 14a-b)."
   },
   "machta": {
     "he": "מחתה",
@@ -1150,6 +1190,11 @@
         "oeuvre": "Rambam Avodat Yom HaKippurim",
         "ref": "4:1",
         "citation": ""
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "44b",
+        "citation": "כְּדֵי שֶׁתְּהֵא זְרוֹעוֹ שֶׁל כֹּהֵן גָּדוֹל מְסַיַּיעְתּוֹ"
       }
     ],
     "note": "Le bassin, son manche et leurs cotes sont un CHOIX ; sa place entre les badim, au pied de l'Arche, est Yoma 5:1. Choix de la visite : la lumière de la salle vient de l'Arche — « עַד שֶׁלֹּא נִיטַּל הָאָרוֹן הָיָה נִכְנַס וְיוֹצֵא לְאוֹרוֹ שֶׁלְאָרוֹן » (Yerushalmi Yoma 5:3) — et les braises n'en sont que le point chaud. Le Cohen Gadol la porte de la main droite malgré la règle qui voudrait la gauche : plus légère que la pelle de chaque jour (Yoma 4:4), elle reste trop lourde et trop chaude pour la main gauche jusqu'à l'Arche (Rambam, Avodat Yom HaKippourim 4:1)."

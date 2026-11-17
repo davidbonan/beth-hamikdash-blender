@@ -11,7 +11,6 @@
     "sources": [
       {"oeuvre": "Middot", "ref": "2:1", "citation": ""},
       {"oeuvre": "Middot", "ref": "1:3", "citation": ""},
-      {"oeuvre": "Middot", "ref": "2:2", "citation": ""},
       {"oeuvre": "Middot", "ref": "2:4", "citation": "tous les murs qui étaient là étaient hauts, sauf le mur oriental, car le cohen qui brûle la para se tient au sommet du mont des Oliviers, vise, et voit l'ouverture du Heikhal au moment de l'aspersion du sang."},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:1", "citation": "הַר הַבַּיִת וְהוּא הַר הַמּוֹרִיָּה הָיָה חֲמֵשׁ מֵאוֹת אַמָּה עַל חֲמֵשׁ מֵאוֹת אַמָּה וְהָיָה מֻקָּף חוֹמָה"},
       {"oeuvre": "Bartenura", "ref": "Middot 2:4", "citation": "חוּץ מִכֹּתֶל מִזְרָחִי. הוּא הַתַּחְתּוֹן לְרַגְלֵי הַר הַבַּיִת"}
@@ -50,7 +49,7 @@
   "heil": {
     "he": "החיל",
     "translit": "Ha'Heil",
-    "resume": "Le 'Heil est la bande de dix amot qui court entre le Soreg et le mur de l'Ezrat Nashim. Douze marches la franchissent, chacune d'une demi-ama de haut et d'une demi-ama de profondeur.",
+    "resume": "Le 'Heil est la bande de dix amot qui court entre le Soreg et les murs de l'Ezrat Nashim et de l'Azara. Douze marches la franchissent, chacune d'une demi-ama de haut et d'une demi-ama de profondeur.",
     "cotes": [
       "bande de 10 amot entre le Soreg et le mur de l'Ezrat Nashim",
       "12 marches",
@@ -117,9 +116,9 @@
     "translit": "Gezuztra",
     "resume": "Une galerie faisait le tour de l'Ezrat Nashim. Elle fut ajoutée pour Sim'hat Beit HaShoeva : les femmes regardaient d'en haut et les hommes d'en bas, « afin qu'ils ne soient pas mêlés ».",
     "cotes": [
-      "tout autour de la cour, ouverte à l'ouest vers Nikanor, coupée à la porte est",
+      "tout autour de la cour, ouverte à l'ouest vers Nikanor, coupée à la porte est (choix de la visite)",
       "à la crête des chambres d'angle, 15,6 amot au-dessus de la cour",
-      "large de 3,5 amot"
+      "large de 3,5 amot le long des murs, en saillie d'une ama et demie le long des chambres (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:5", "citation": "וַחֲלָקָה הָיְתָה בָּרִאשׁוֹנָה, וְהִקִּיפוּהָ כְצוֹצְרָה, שֶׁהַנָּשִׁים רוֹאוֹת מִלְמַעְלָן, וְהָאֲנָשִׁים מִלְּמַטָּן, כְּדֵי שֶׁלֹּא יְהוּ מְעֹרָבִין"},
@@ -216,7 +215,7 @@
   "quinze_marches": {
     "he": "חמש עשרה מעלות",
     "translit": "'Hamesh esreh maalot",
-    "resume": "Quinze marches semi-circulaires montent de l'Ezrat Nashim à l'Ezrat Israël. Elles répondent aux quinze Shir HaMaalot des Psaumes, et les Léviim s'y tiennent avec leurs instruments pour dire le chant lors de Sim'hat Beit HaShoeva. Sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, se trouvent les chambres où ils rangeaient leurs instruments, les Lishkot HaLéviim, une de chaque côté des marches.",
+    "resume": "Quinze marches semi-circulaires montent de l'Ezrat Nashim à l'Ezrat Israël. Elles répondent aux quinze Shir HaMaalot des Psaumes, et les Léviim s'y tiennent avec leurs instruments pour dire le chant lors de Sim'hat Beit HaShoeva. Sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, se trouvent les chambres où ils rangeaient leurs instruments, les Lishkot HaLéviim ; la visite en met une de chaque côté des marches.",
     "cotes": ["15 marches semi-circulaires"],
     "sources": [
       {"oeuvre": "Middot", "ref": "2:5", "citation": "comme la moitié d'une aire ronde"},
@@ -230,7 +229,7 @@
   "lishkot_haleviim": {
     "he": "לשכות הלויים",
     "translit": "Lishkot HaLéviim",
-    "resume": "Sous l'Ezrat Israël, des chambres s'ouvraient sur l'Ezrat Nashim : les Léviim y rangeaient leurs kinorot, leurs nevalim, leurs metziltayim et tous les instruments du chant. Elles sont au pied des quinze marches, sur lesquelles les Léviim se tenaient avec leurs instruments pour dire le chant.",
+    "resume": "Sous l'Ezrat Israël, des chambres s'ouvraient sur l'Ezrat Nashim : les Léviim y rangeaient leurs kinorot, leurs nevalim, leurs metziltayim et tous les instruments du chant. La visite les met au pied des quinze marches, sur lesquelles les Léviim se tenaient avec leurs instruments pour dire le chant.",
     "cotes": [
       "sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim",
       "deux chambres, de part et d'autre des quinze marches",
@@ -242,7 +241,7 @@
       {"oeuvre": "Nombres", "ref": "10:8", "citation": "וּבְנֵי אַהֲרֹן הַכֹּהֲנִים יִתְקְעוּ בַּחֲצֹצְרוֹת"},
       {"oeuvre": "Soucca", "ref": "5:4", "citation": "וְהַלְוִיִּם בְּכִנּוֹרוֹת וּבִנְבָלִים וּבִמְצִלְתַּיִם וּבַחֲצוֹצְרוֹת"}
     ],
-    "note": "Ce que dit la michna : des chambres sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, où les Léviim déposent leurs instruments ; ni leur nombre ni leur place. Choix de la visite : deux chambres, une de chaque côté des marches, avec des portes de 3 × 6 amot — la cote de Middot 2:3, vingt sur dix, est celle des portes de l'Azara, et ces chambres n'ont que six amot et demie de haut —, les rayonnages de cèdre, les crochets et la place de chaque instrument. Pas de 'hatzotzrot : la michna ne les nomme pas parmi ce qu'on y dépose, et ce sont les cohanim qui en sonnent (Nombres 10:8). À Sim'hat Beit HaSho'éva, pourtant, les Léviim en jouent sur les quinze marches (Soucca 5:4). Modélisé : deux chambres de 10,5 × 6 amot sous le dallage de l'Ezrat Israël."
+    "note": "Ce que dit la michna : des chambres sous l'Ezrat Israël, ouvertes sur l'Ezrat Nashim, où les Léviim déposent leurs instruments ; ni leur nombre ni leur place. Choix de la visite : deux chambres, une de chaque côté des marches, avec des portes de 3 × 6 amot — Middot 2:3 donne vingt sur dix à « toutes les ouvertures et portes qui étaient là » ; la visite s'en écarte ici, ces chambres n'ayant que six amot et demie de haut —, les rayonnages de cèdre, les crochets et la place de chaque instrument. Pas de 'hatzotzrot : la michna ne les nomme pas parmi ce qu'on y dépose, et ce sont les cohanim qui en sonnent (Nombres 10:8). À Sim'hat Beit HaSho'éva, pourtant, les Léviim en jouent sur les quinze marches (Soucca 5:4). Modélisé : deux chambres de 10,5 × 6 amot sous le dallage de l'Ezrat Israël."
   },
 
   "lishkat_hakelim": {
@@ -257,7 +256,7 @@
       {"oeuvre": "Shekalim", "ref": "5:6", "citation": "לִשְׁכַּת הַכֵּלִים, כָּל מִי שֶׁהוּא מִתְנַדֵּב כֶּלִי, זוֹרְקוֹ לְתוֹכָהּ. וְאַחַת לִשְׁלשִׁים יוֹם, גִּזְבָּרִין פּוֹתְחִין אוֹתָהּ. וְכָל כְּלִי שֶׁמּוֹצְאִין בּוֹ צֹרֶךְ לְבֶדֶק הַבַּיִת, מַנִּיחִין אוֹתוֹ. וְהַשְּׁאָר נִמְכָּרִין בִּדְמֵיהֶן וְנוֹפְלִין לְלִשְׁכַּת בֶּדֶק הַבַּיִת"},
       {"oeuvre": "Rambam Arakhin", "ref": "2:12", "citation": "שְׁתֵּי לְשָׁכוֹת הָיוּ בַּמִּקְדָּשׁ, אַחַת לִשְׁכַּת חֲשָׁאִים. וְאַחַת לִשְׁכַּת הַכֵּלִים"},
       {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 3:5", "citation": "צריכה עיון באיזה מקום היתה עומדת"},
-      {"oeuvre": "Mishnat Eretz Israël", "ref": "Préface à Tamid et Middot 7:79", "citation": "כך לשכת הכלים ולשכת חשאין ; אולי גם הן נפתחו לעזרת נשים"}
+      {"oeuvre": "Mishnat Eretz Israël", "ref": "Préface à Tamid et Middot 7:79", "citation": "כך לשכת הכלים (תמיד פ\"א מ\"ג) ולשכת חשאין (שקלים פ\"ה מ\"ו); אולי גם הן נפתחו לעזרת נשים"}
     ],
     "note": "Aucune source ne situe cette chambre ni celle des 'Hashaïm : le Raavad s'en étonne, rapporté par Melekhet Shelomoh (Tamid 3:5), et Mishnat Eretz Israël propose qu'elles s'ouvraient elles aussi sur l'Ezrat Nashim. La visite les range sous l'Ezrat Israël, avec celles des Léviim : un choix. Choix aussi : la porte de bronze fermée, la baie par où l'on jette le don, le tas d'ustensiles. On n'y entre pas : elle ne s'ouvre qu'une fois par mois."
   },
@@ -276,7 +275,7 @@
       {"oeuvre": "Rambam Matnot Aniyim", "ref": "10:8", "citation": "הַנּוֹתֵן צְדָקָה לָעֲנִיִּים וְלֹא יָדַע לְמִי נָתַן וְלֹא יָדַע הֶעָנִי מִמִּי לָקַח… כְּגוֹן לִשְׁכַּת חֲשָׁאִים שֶׁהָיְתָה בַּמִּקְדָּשׁ"},
       {"oeuvre": "Sifrei Devarim", "ref": "117:7", "citation": "מִכָּן אָמְרוּ: לִשְׁכַּת חֲשָׁאִים הָיְתָה בִּירוּשָׁלִַם"},
       {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 3:5", "citation": "צריכה עיון באיזה מקום היתה עומדת"},
-      {"oeuvre": "Mishnat Eretz Israël", "ref": "Préface à Tamid et Middot 7:79", "citation": "כך לשכת הכלים ולשכת חשאין ; אולי גם הן נפתחו לעזרת נשים"}
+      {"oeuvre": "Mishnat Eretz Israël", "ref": "Préface à Tamid et Middot 7:79", "citation": "כך לשכת הכלים (תמיד פ\"א מ\"ג) ולשכת חשאין (שקלים פ\"ה מ\"ו); אולי גם הן נפתחו לעזרת נשים"}
     ],
     "note": "Aucune source ne situe cette chambre : le Raavad s'en étonne pour sa voisine (Melekhet Shelomoh sur Tamid 3:5), et Mishnat Eretz Israël propose qu'elles s'ouvraient toutes deux sur l'Ezrat Nashim. La visite la range sous l'Ezrat Israël : un choix, comme le coffre de cèdre cerclé de bronze. Variante : le Sifrei (Devarim 117), citant la michna, lit « à Jérusalem » au lieu de « dans le Mikdash » ; il ne situe rien dans le Temple."
   },
@@ -284,7 +283,7 @@
   "beit_din_har_habayit": {
     "he": "בית דין שעל פתח הר הבית",
     "translit": "Beit din shé'al peta'h Har HaBayit",
-    "resume": "Le premier des trois tribunaux de Jérusalem, un tribunal de vingt-trois. Un sage dont l'enseignement était contesté dans sa ville venait d'abord ici ; si les juges avaient une tradition, ils la disaient, sinon on montait au tribunal de la porte de l'Azara, puis au grand Sanhédrin de la Lishkat HaGazit. Le Tiferet Israël le place juste à l'intérieur de la porte est du Har HaBayit, celle que surmonte l'image de Shushan HaBira : il siège sous le portique, au bord du passage de la porte. Les juges siègent en demi-cercle, le plus sage au milieu pour qu'il les voie tous ; deux greffiers se tiennent debout devant eux, et trois rangs d'élèves sont assis en face.",
+    "resume": "Le premier des trois tribunaux de Jérusalem, un tribunal de vingt-trois. Un sage dont l'enseignement était contesté dans sa ville venait d'abord ici ; si les juges avaient une tradition, ils la disaient, sinon on montait au tribunal de la porte de l'Azara, puis au grand Sanhédrin de la Lishkat HaGazit. Le Tiferet Israël le place juste à l'intérieur de la porte est du Har HaBayit, celle que surmonte l'image de Shushan HaBira ; la visite le fait siéger sous le portique, au bord du passage de la porte. Les juges siègent en demi-cercle, le plus sage au milieu pour qu'il les voie tous ; deux greffiers se tiennent debout devant eux, et trois rangs d'élèves sont assis en face.",
     "cotes": [
       "23 juges en demi-cercle, le plus sage au milieu",
       "deux greffiers debout",
@@ -292,7 +291,7 @@
     ],
     "sources": [
       {"oeuvre": "Sanhedrin", "ref": "11:2", "citation": "שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת, וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית"},
-      {"oeuvre": "Tiferet Israël", "ref": "Sanhedrin 11:9", "citation": "אחד יושב על פתח הר הבית מבפנים לשער מזרח של חומת הר הבית"},
+      {"oeuvre": "Tiferet Israël", "ref": "Sanhedrin 11:2, Yakhin 9", "citation": "אחד יושב על פתח הר הבית מבפנים לשער מזרח של חומת הר הבית"},
       {"oeuvre": "Hagahot Ya'avetz sur Sanhedrin", "ref": "88b", "citation": "סתמו הוא שער המזרחי שעליו שושן הבירה צורה"},
       {"oeuvre": "Tosefta Sanhedrin", "ref": "7:1", "citation": "ושני בתי דינין של ג' היו בירושלים אחד בהר הבית ואחד בחיל"},
       {"oeuvre": "Pesachim", "ref": "13b", "citation": "הר הבית סטיו כפול היה… סטיו לפנים מסטיו"},
@@ -308,7 +307,7 @@
   "beit_din_haazara": {
     "he": "בית דין שעל פתח העזרה",
     "translit": "Beit din shé'al peta'h HaAzara",
-    "resume": "Le deuxième des trois tribunaux de Jérusalem, un tribunal de vingt-trois. On y montait quand le tribunal de la porte du Har HaBayit n'avait pas de tradition sur la question ; s'il n'en avait pas non plus, on allait au grand Sanhédrin de la Lishkat HaGazit. Le Tiferet Israël le place juste à l'intérieur de la porte est de l'Ezrat Nashim : les juges y siègent dos à la colonnade de la galerie, face à la porte de Nikanor.",
+    "resume": "Le deuxième des trois tribunaux de Jérusalem, un tribunal de vingt-trois. On y montait quand le tribunal de la porte du Har HaBayit n'avait pas de tradition sur la question ; s'il n'en avait pas non plus, on allait au grand Sanhédrin de la Lishkat HaGazit. Le Tiferet Israël le place juste à l'intérieur de la porte est de l'Ezrat Nashim ; la visite fait siéger les juges dos à la colonnade de la galerie, face à la porte de Nikanor.",
     "cotes": [
       "23 juges en demi-cercle, le plus sage au milieu",
       "deux greffiers debout",
@@ -316,7 +315,7 @@
     ],
     "sources": [
       {"oeuvre": "Sanhedrin", "ref": "11:2", "citation": "שְׁלֹשָׁה בָתֵּי דִינִין הָיוּ שָׁם, אֶחָד יוֹשֵׁב עַל פֶּתַח הַר הַבַּיִת, וְאֶחָד יוֹשֵׁב עַל פֶּתַח הָעֲזָרָה, וְאֶחָד יוֹשֵׁב בְּלִשְׁכַּת הַגָּזִית"},
-      {"oeuvre": "Tiferet Israël", "ref": "Sanhedrin 11:10", "citation": "ואחד יושב על פתח העזרה מבפנים לשער מזרח של עזרת נשים"},
+      {"oeuvre": "Tiferet Israël", "ref": "Sanhedrin 11:2, Yakhin 10", "citation": "ואחד יושב על פתח העזרה מבפנים לשער מזרח של עזרת נשים"},
       {"oeuvre": "Rambam Sanhedrin", "ref": "1:3", "citation": "וְהַגָּדוֹל בְּחָכְמָה שֶׁבְּכֻלָּן רֹאשׁ עֲלֵיהֶן וְהַשְּׁאָר יוֹשְׁבִין בְּעִגּוּל כְּמוֹ חֲצִי גֹּרֶן כְּדֵי שֶׁיְּהֵא הָרֹאשׁ רוֹאֶה אֶת כֻּלָּן"},
       {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Sanhedrin 4:3", "citation": "סנהדרין. אף של כ\"ג. רש\"י"},
@@ -324,7 +323,7 @@
       {"oeuvre": "Rashi sur Sanhedrin", "ref": "86b", "citation": "ואחד יושב למעלה הימנו - כשעברו עזרת נשים ובאין לפני עזרת ישראל"},
       {"oeuvre": "Tosefta Sanhedrin", "ref": "7:1", "citation": "ושני בתי דינין של ג' היו בירושלים אחד בהר הבית ואחד בחיל"}
     ],
-    "note": "Ce que disent les textes : trois tribunaux (Sanhedrin 11:2), dont deux de vingt-trois ; le Tiferet Israël met celui-ci « à l'intérieur de la porte est de l'Ezrat Nashim ». Le demi-cercle, les greffiers et les élèves valent pour un tribunal de vingt-trois comme pour le grand (Tosfot Yom Tov sur Sanhedrin 4:3, au nom de Rashi). Choix de la visite : le côté sud de la porte, dos à la colonnade de la galerie, un passage laissé devant les shofarot ; les deux gradins et les sièges. Le Rambam compte vingt-trois élèves par rang (Sanhedrin 1:7) : la scène montre les trois rangs, pas tous les élèves. Écartés : Rashi (Sanhedrin 86b), qui le met au bout de l'Ezrat Nashim, devant l'Ezrat Israël ; la Tossefta (Sanhedrin 7:1), qui le met « dans le 'Heil », où les douze marches prennent déjà les dix amot, et ne lui donne que trois juges."
+    "note": "Ce que disent les textes : trois tribunaux (Sanhedrin 11:2), dont deux de vingt-trois ; le Tiferet Israël met celui-ci « à l'intérieur de la porte est de l'Ezrat Nashim ». Le demi-cercle, les greffiers et les élèves valent pour un tribunal de vingt-trois comme pour le grand (Tosfot Yom Tov sur Sanhedrin 4:3, au nom de Rashi). Choix de la visite : le côté sud de la porte, dos à la colonnade de la galerie, un passage laissé devant les shofarot ; les deux gradins et les sièges. Le Rambam compte vingt-trois élèves par rang (Sanhedrin 1:7) : la scène montre les trois rangs, pas tous les élèves. Écartés : Rashi (Sanhedrin 86b), qui le met au bout de l'Ezrat Nashim, devant l'Ezrat Israël ; la Tossefta (Sanhedrin 7:1), qui le met « dans le 'Heil » et ne lui donne que trois juges."
   },
 
   "shaar_nikanor": {
@@ -347,7 +346,7 @@
       {"oeuvre": "Middot", "ref": "2:6", "citation": "שֶׁבַּמִּזְרָח, שַׁעַר נִקָּנוֹר. וּשְׁנֵי פִשְׁפָּשִׁים הָיוּ לוֹ, אֶחָד מִימִינוֹ וְאֶחָד מִשְּׂמֹאלוֹ"},
       {"oeuvre": "Soucca", "ref": "5:5", "citation": "שָׁלשׁ לִפְתִיחַת שְׁעָרִים"}
     ],
-    "note": "Choix de la visite : la porte est montrée ouverte, battants rabattus dans l'embrasure, comme pendant le service ; Soucca 5:5 ne parle que de sonneries « à l'ouverture des portes », sans dire combien de temps elles restent ouvertes. Fermée, elle couperait la ligne de mire que le mur est bas doit laisser passer. Les pishpeshin viennent de la liste des treize portes d'Abba Yossi ben 'Hanan (Middot 2:6) ; Middot 1:4 donne à Nikanor deux lishkot, celles de Pin'has HaMalbish et des Osei 'Havitin. Les tours : « וַיַּעַשׂ אֶת אֵילִים שִׁשִּׁים אַמָּה » (Ye'hezkel 40:14), et Ye'hezkel 40:32 donne aux portes intérieures les mêmes mesures ; Ye'hezkel décrit le Temple futur, les dresser à Nikanor est un choix, comme leur forme ; leurs fenêtres et la palme à leur tête suivent Rashi, le Radak et la Metzudat David sur Ye'hezkel 40:16. Les ressauts suivent les jambages à degrés que le Radak et le Ralbag lisent en Melakhim I 6:31. Écarté : R. Eliézer ben Yaakov (Yoma 38a), pour qui c'était un bronze poli, « נְחֹשֶׁת קְלוֹנִיתָא », qui brillait comme l'or."
+    "note": "Choix de la visite : la porte est montrée ouverte, battants rabattus dans l'embrasure, comme pendant le service ; Soucca 5:5 ne parle que de sonneries « à l'ouverture des portes », sans dire combien de temps elles restent ouvertes. Fermée, elle couperait la ligne de mire que le mur est bas doit laisser passer. Les pishpeshin viennent de la liste des treize portes d'Abba Yossi ben 'Hanan (Middot 2:6) ; Middot 1:4 donne à Nikanor deux lishkot, celles de Pin'has HaMalbish et des Osei 'Havitin. Les tours : « וַיַּעַשׂ אֶת אֵילִים שִׁשִּׁים אַמָּה » (Ye'hezkel 40:14), et Ye'hezkel 40:32 donne aux portes intérieures les mêmes mesures ; Ye'hezkel décrit le Temple futur, les dresser à Nikanor est un choix, comme leur forme ; leurs fenêtres et la palme à leur tête suivent Rashi, le Radak et la Metzudat David sur Ye'hezkel 40:16. Les ressauts suivent les jambages à degrés que le Radak lit en Melakhim I 6:31. Écarté : R. Eliézer ben Yaakov (Yoma 38a), pour qui c'était un bronze poli, « נְחֹשֶׁת קְלוֹנִיתָא », qui brillait comme l'or."
   },
 
   "azara": {
@@ -378,7 +377,7 @@
       "20 amot de haut × 10 de large",
       "trois corps de porte de 20 amot de large, débordant de 12 amot du mur (choix de la visite, sans source)",
       "deux vantaux d'or par porte, ouverts et rabattus dans l'épaisseur du mur ; montants, panneaux, clous, pivot et anneau (forme : choix de la visite)",
-      "deux ressauts dorés entre la baie et le cadre, comme les jambages à degrés que le Radak et le Ralbag lisent en Melakhim I 6:31 (choix de la visite)"
+      "deux ressauts dorés entre la baie et le cadre, comme les jambages à degrés que le Radak lit en Melakhim I 6:31 (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:4", "citation": "שֶׁבַּדָּרוֹם, שַׁעַר הַדֶּלֶק. שֵׁנִי לוֹ, שַׁעַר הַבְּכוֹרוֹת. שְׁלִישִׁי לוֹ, שַׁעַר הַמָּיִם"},
@@ -390,7 +389,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:4", "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב. וּשְׁלֹשָׁה מִן הַדָּרוֹם סְמוּכִין לַמַּעֲרָב"},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 2:3", "citation": "וזה שדקדק הרמב\"ם בספ\"א מהל' ב\"ה וכתב אפילו שערי העזרה מצפין אותן זהב אם מצאה ידם"}
     ],
-    "note": "Retenu : sept portes, selon Middot 1:4–5. Écarté : les treize portes d'Abba Yossi ben 'Hanan (Middot 2:6, Shekalim 6:3) ; c'est pourtant sa liste qui donne le sens du comptage, « סְמוּכִים לַמַּעֲרָב », que le Rambam (Beit HaBe'hira 5:4) reprend sans les noms, et Middot 1:4–5 n'en indique aucun. Les noms du sud sont en Middot 1:4, ceux du nord en Middot 1:5 ; Yoma 19a lit au sud Sha'ar HaDelaka et Sha'ar HaKorban, sans changer la place de Sha'ar HaMayim, et au nord Sha'ar Beit HaMoked. Choix de la visite : l'écartement des portes, qu'aucune source ne donne — le Beit HaMoked, plus large, recule de cinq amot vers l'ouest —, et le corps de porte de 20 × 12 amot et ses vingt degrés, qui n'ont pas de source."
+    "note": "Retenu : sept portes, selon Middot 1:4–5. Écarté : les treize portes d'Abba Yossi ben 'Hanan (Middot 2:6), que Shekalim 6:3 énumère aussi ; c'est pourtant sa liste qui donne le sens du comptage, « סְמוּכִים לַמַּעֲרָב », que le Rambam (Beit HaBe'hira 5:4) reprend sans les noms, et Middot 1:4–5 n'en indique aucun. Les noms du sud sont en Middot 1:4, ceux du nord en Middot 1:5 ; Yoma 19a lit au sud Sha'ar HaDelaka et Sha'ar HaKorban, sans changer la place de Sha'ar HaMayim, et au nord Sha'ar Beit HaMoked. Choix de la visite : l'écartement des portes, qu'aucune source ne donne — le Beit HaMoked, plus large, recule de cinq amot vers l'ouest —, et le corps de porte de 20 × 12 amot et ses vingt degrés, qui n'ont pas de source."
   },
 
   "doukhan": {
@@ -524,11 +523,10 @@
       "30 amot au sol ; la tête en porte-à-faux couvre les retraits du yessod et du sovev, de 5 tefa'him chacun",
       "hauteur : 9 amot moins un tefa'h, celle de la ma'arakha (Rambam, Beit HaBe'hira 2:13)",
       "revouva : niche d'une ama sur une ama dans la face ouest",
-      "lieu du deshen : à dix amot du pied, trois tefa'him de la face est"
+      "lieu du deshen : à environ dix amot du pied, trois tefa'him de la face est"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:3", "citation": ""},
-      {"oeuvre": "Middot", "ref": "3:4", "citation": ""},
       {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
       {"oeuvre": "Shemot", "ref": "20:23", "citation": ""},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:13–15", "citation": "וַאֲוִיר מְעַט הָיָה מַפְסִיק בֵּין הַכֶּבֶשׁ לַמִּזְבֵּחַ"},
@@ -645,7 +643,7 @@
       {"oeuvre": "Meïla", "ref": "3:3", "citation": "יָצְאוּ לַשִּׁיתִין, אֵין מוֹעֲלִים בָּהֶם"},
       {"oeuvre": "Soucca", "ref": "4:9", "citation": "עָלָה בַכֶּבֶשׁ וּפָנָה לִשְׂמֹאלוֹ"},
       {"oeuvre": "Soucca", "ref": "49a", "citation": "שִׁיתִּין מְחוֹלָלִין וְיוֹרְדִין עַד תְּהוֹם"},
-      {"oeuvre": "Tiferet Israël", "ref": "Middot 3:3", "citation": "ויורדים משם בסולם אל החלל הקטן שתחת היסוד"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 3:3, Yakhin 28", "citation": "ויורדים משם בסולם אל החלל הקטן שתחת היסוד"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "2:11", "citation": "וְהֵן הַנִּקְרָאִין שִׁיתִין שֶׁהַדָּמִים יוֹרְדִין בָּהֶן"}
     ],
     "note": "Retenu : le shit est le creux sous l'autel où descendent le vin et l'eau des libations, comme le lisent Bartenura et le Rambam dans leurs commentaires sur Middot 3:3. Dans le Mishné Torah, le Rambam donne aussi le nom de shitin aux deux trous où descend le sang (Beit HaBe'hira 2:11). Écarté : le Tiferet Israël, pour qui c'est le creux où s'écoule le sang. Non représentés : les deux trous du sang et le canal qui l'emporte (Middot 3:2). Choix de la visite : la place de la dalle, les dimensions du creux, l'échelle et le conduit."
@@ -742,7 +740,8 @@
       {"oeuvre": "Middot", "ref": "5:2", "citation": "מִן הַטַּבָּעוֹת לַשֻּׁלְחָנוֹת אַרְבַּע, מִן הַשֻּׁלְחָנוֹת וְלַנַּנָּסִין אַרְבַּע"},
       {"oeuvre": "Tamid", "ref": "3:5", "citation": ""},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:13–15", "citation": "בֵּית הַמִּטְבָּחַיִם י\"ב אַמּוֹת וּמֶחֱצָה… מְקוֹם הַשֻּׁלְחָנוֹת שְׁמוֹנֶה אַמּוֹת"},
-      {"oeuvre": "Zeva'him", "ref": "5:1", "citation": "פַּר וְשָׂעִיר שֶׁל יוֹם הַכִּפּוּרִים שְׁחִיטָתָן בַּצָּפוֹן"}
+      {"oeuvre": "Zeva'him", "ref": "5:1", "citation": "פַּר וְשָׂעִיר שֶׁל יוֹם הַכִּפּוּרִים שְׁחִיטָתָן בַּצָּפוֹן"},
+      {"oeuvre": "Bartenura", "ref": "Middot 3:5", "citation": "וְהָיוּ קְבוּעוֹת בָּרִצְפָּה"}
     ],
     "note": "Retenu : le découpage du Rambam (Beit HaBe'hira 5:13–15), qui donne 12,5 amot aux ninnasin et 8 aux tables. Écarté : Middot 3:5 et Tamid 3:5 placent les tables entre les piliers, et Middot 5:2 compte quatre amot des anneaux aux tables, puis quatre des tables aux ninnasin, sans bande de 12,5. Choix de la visite : des piliers de pierre ; la Mishna dit seulement « עַמּוּדִים נַנָּסִין »."
   },
@@ -758,7 +757,8 @@
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:5", "citation": "six rangées de quatre, et certains disent quatre rangées de six"},
-      {"oeuvre": "Middot", "ref": "5:2", "citation": ""}
+      {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
+      {"oeuvre": "Bartenura", "ref": "Middot 3:5", "citation": "וְהָיוּ קְבוּעוֹת בָּרִצְפָּה"}
     ],
     "note": "Middot 3:5 donne deux dispositions : six rangées de quatre anneaux, ou quatre rangées de six. La visite pose quatre rangées de six."
   },
@@ -766,7 +766,7 @@
   "lishkat_hagazit": {
     "he": "לשכת הגזית",
     "translit": "Lishkat HaGazit",
-    "resume": "Siège du Sanhédrin, et lieu du tirage au sort des Cohanim. Elle est à cheval sur le mur nord de l'Azara, moitié dans le sacré, moitié hors : le mur s'interrompt sur sa largeur, et la limite est tracée au sol. Deux ouvertures, l'une sur l'Azara au sud, l'autre sur le hol à l'est, en haut de vingt degrés venant de la terrasse du 'Heil. La guemara les appelle petahim, et non she'arim — ce ne sont pas des portes de l'Azara. Ses murs sont de pierre taillée coupée de rangs de cèdre ; dans la moitié de hol, où siège le tribunal, le sol est de cèdre et le mur du fond est revêtu de panneaux de cèdre sculptés. Dans la moitié sacrée, les Cohanim se tiennent en cercle pour le tirage au sort, et ils y viennent lire le Shema. Le Sanhédrin siège dans la moitié de hol, car nul ne s'assied dans l'Azara, sauf les rois de la maison de David. Il siège en demi-cercle, pour que les juges se voient : le Nasi au milieu, l'Av Beit Din à sa droite, deux greffiers debout devant eux — trois selon R. Yehouda —, et trois rangs d'élèves assis face aux juges. Il siège là du Tamid du matin à celui du soir ; le Shabbat et les jours de fête, il siège sur le 'Heil. Il y juge les Cohanim : celui qu'on trouve inapte s'habille de noir et s'en va, celui qu'on trouve apte s'habille de blanc et entre servir avec ses frères. Deux tribunaux de vingt-trois siègent plus bas, aux portes est du Har HaBayit et de l'Ezrat Nashim : on monte de l'un à l'autre, puis ici (Sanhedrin 11:2).",
+    "resume": "Siège du Sanhédrin, et lieu du tirage au sort des Cohanim. Elle est à cheval sur le mur nord de l'Azara, moitié dans le sacré, moitié hors : le mur s'interrompt sur sa largeur, et la visite marque la limite par des têtes de poutres sorties des murs. Deux ouvertures, l'une sur l'Azara au sud, l'autre sur le hol à l'est, en haut de vingt degrés venant de la terrasse du 'Heil. La guemara les appelle petahim, et non she'arim — ce ne sont pas des portes de l'Azara. Ses murs sont de pierre taillée coupée de rangs de cèdre ; dans la moitié de hol, où siège le tribunal, le sol est de cèdre et le mur du fond est revêtu de panneaux de cèdre sculptés. Dans la moitié sacrée, les Cohanim se tiennent en cercle pour le tirage au sort ; c'est aussi à la Lishkat HaGazit qu'ils viennent lire le Shema. Le Sanhédrin siège dans la moitié de hol, car nul ne s'assied dans l'Azara, sauf les rois de la maison de David. Il siège en demi-cercle, pour que les juges se voient : le Nasi au milieu, l'Av Beit Din à sa droite, deux greffiers debout devant eux — trois selon R. Yehouda —, et trois rangs d'élèves assis face aux juges. Il siège là du Tamid du matin à celui du soir ; le Shabbat et les jours de fête, il siège sur le 'Heil. Il y juge les Cohanim : celui qu'on trouve inapte s'habille de noir et s'en va, celui qu'on trouve apte s'habille de blanc et entre servir avec ses frères. Deux tribunaux de vingt-trois siègent plus bas, l'un à l'entrée du Har HaBayit, l'autre à l'entrée de l'Azara : on monte de l'un à l'autre, puis ici (Sanhedrin 11:2).",
     "cotes": [
       "à cheval sur le mur nord",
       "moitié dans le sacré, moitié hors, la limite tracée au sol",
@@ -777,7 +777,7 @@
     ],
     "sources": [
       {"oeuvre": "Yoma", "ref": "25a", "citation": "חֶצְיָהּ בַּקֹּדֶשׁ וְחֶצְיָהּ בַּחוֹל… שְׁנֵי פְתָחִים הָיוּ לָהּ"},
-      {"oeuvre": "Yoma", "ref": "25a", "citation": "לשכת הגזית כמין בסילקי גדולה היתה, פייס במזרחה, וזקן יושב במערבה. והכהנים מוקפין ועומדין כמין כוליאר"},
+      {"oeuvre": "Yoma", "ref": "25a", "citation": "לשכת הגזית כמין בסילקי גדולה היתה, פייס במזרחה, וזקן יושב במערבה. והכהנים מוקפין ועומדין כמין בכוליאר"},
       {"oeuvre": "Yoma", "ref": "25a", "citation": "אין ישיבה בעזרה אלא למלכי בית דוד בלבד"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "וּבַחֵצִי שֶׁל חֹל הָיוּ הַסַּנְהֶדְרִין יוֹשְׁבִין"},
       {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "סַנְהֶדְרִין הָיְתָה כַּחֲצִי גֹרֶן עֲגֻלָּה, כְּדֵי שֶׁיְּהוּ רוֹאִין זֶה אֶת זֶה. וּשְׁנֵי סוֹפְרֵי הַדַּיָּנִין עוֹמְדִין לִפְנֵיהֶם, אֶחָד מִיָּמִין וְאֶחָד מִשְּׂמֹאל"},
@@ -792,7 +792,8 @@
       {"oeuvre": "Melakhim I", "ref": "10:19", "citation": "וְרֹאשׁ עָגֹל לַכִּסֵּה מֵאַחֲרָיו וְיָדֹת מִזֶּה וּמִזֶּה אֶל מְקוֹם הַשָּׁבֶת"},
       {"oeuvre": "Yoma", "ref": "19a", "citation": "שָׁלֹשׁ שֶׁבַּצָּפוֹן: לִשְׁכַּת הָעֵץ, לִשְׁכַּת הַגּוֹלָה, לִשְׁכַּת הַגָּזִית"},
       {"oeuvre": "Sanhedrin", "ref": "4:3", "citation": "רַבִּי יְהוּדָה אוֹמֵר, שְׁלֹשָׁה"},
-      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:4", "citation": "אבל במקום שפתוחה היא לחול היו מעלות שעליה עולין וממנה יורדין לחול"}
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:4", "citation": "אבל במקום שפתוחה היא לחול היו מעלות שעליה עולין וממנה יורדין לחול"},
+      {"oeuvre": "Melakhim I", "ref": "6:36", "citation": "שְׁלֹשָׁה טוּרֵי גָזִית וְטוּר כְּרֻתֹת אֲרָזִים"}
     ],
     "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Écarté : l'orientation de la baraita de Yoma 25a, « le tirage au sort à l'est, et l'ancien assis à l'ouest », d'où Abayé tire que la moitié sacrée est à l'est et la moitié profane à l'ouest ; à cheval sur le mur nord, la salle de la visite a son sacré au sud et son profane au nord. Écarté aussi : R. Yehouda, pour qui les greffiers sont trois (Sanhedrin 4:3). Choix de la visite : l'ouverture côté profane, à l'est, et ses vingt degrés — Tosfot Yom Tov (Middot 5:4) dit qu'on y montait par des marches, sans en donner le nombre ; le décor, que la guemara dit seulement « comme une grande basilique », pris au Tanakh et non à l'architecture romaine : rangs de poutres de cèdre dans la pierre comme dans les murs de la cour de Shlomo, sol de cèdre comme sa salle de jugement, mur du fond en panneaux de cèdre cadrés dont les traverses portent les coloquintes et les fleurs du Bayit, plafond de poutres de cèdre ; les trois gradins et l'estrade du Nasi ; les sièges sur le modèle du trône de Shlomo, à dossier arrondi et accoudoirs, sans ses lions, celui du Nasi plaqué d'or ; les pupitres des greffiers et les bancs des élèves ; la limite marquée par des têtes de poutres sorties des murs, par analogie avec les rashei pispasin du Beit HaMoked (Middot 1:6, Bartenura). La salle montre la disposition du tribunal, pas son nombre : soixante et onze juges et trois rangs d'élèves n'y tiennent pas."
   },
@@ -831,7 +832,7 @@
       {"oeuvre": "Bartenura", "ref": "Middot 5:4", "citation": "אוֹתָהּ לִשְׁכַּת הָעֵץ הִיא הָיְתָה לִשְׁכַּת כֹּהֵן גָּדוֹל. וְהִיא לִשְׁכַּת פַּרְהֶדְרִין"},
       {"oeuvre": "Tosfot Yom Tov", "ref": "Middot 5:4", "citation": "כתב הר\"ב לשכת פרהדרין כו'. הכי מסיק בגמ' פ\"ק דיומא דף י\"ט"}
     ],
-    "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Retenu aussi : la disposition que Tosfot Yom Tov (Middot 5:4) tire de « derrière les deux » — HaGazit devant, à l'est ; HaGola derrière elle, côté cour ; HaEtz derrière HaGola, dos au nord, donc de l'autre côté du mur, sur la terrasse du 'Heil. Choix de la visite : sa porte, sur le 'Heil. Écarté : l'identification à la chambre du Cohen Gadol. Abba Shaul (Middot 5:4) dit que c'était sa chambre ; Yoma 19a y voit l'une de ses deux chambres, Parhedrin ou Avtinas, sans trancher ; Bartenura (Middot 5:4) et le Rambam (Beit HaBe'hira 5:17) l'identifient à la Lishkat Parhedrin. La visite place la Lishkat Parhedrin au sud, comme une chambre distincte."
+    "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Retenu aussi : la disposition que Tosfot Yom Tov (Middot 5:4) tire de « derrière les deux » — HaGazit devant, à l'est ; HaGola derrière elle, côté cour ; HaEtz derrière HaGola, dos au nord ; Tosfot Yom Tov la dit bâtie dans le sacré, mais ouverte seulement sur le profane. Choix de la visite : la placer de l'autre côté du mur, sur la terrasse du 'Heil, avec sa porte sur le 'Heil, et lui donner toute la largeur des deux autres. Écarté : l'identification à la chambre du Cohen Gadol. Abba Shaul (Middot 5:4) dit que c'était sa chambre ; Yoma 19a y voit l'une de ses deux chambres, Parhedrin ou Avtinas, sans trancher ; Tosfot Yom Tov lit dans sa conclusion l'identification à Parhedrin ; Bartenura (Middot 5:4) et le Rambam (Beit HaBe'hira 5:17) l'identifient à la Lishkat Parhedrin. La visite place la Lishkat Parhedrin au sud, comme une chambre distincte."
   },
 
   "lishkat_hamelach": {
@@ -841,7 +842,7 @@
     "cotes": [
       "au sud, dans l'Azara, contre la face intérieure du mur",
       "la plus orientale des trois, séparée des deux autres par Sha'ar HaBekhorot",
-      "porte à l'est, le pied du kevesh passant à une ama de sa face nord"
+      "porte à l'est, le pied du kevesh passant à une ama de son socle nord"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "5:3", "citation": "לִשְׁכַּת הַמֶּלַח, שָׁם הָיוּ נוֹתְנִים מֶלַח לַקָּרְבָּן"},
@@ -854,7 +855,7 @@
   "lishkat_haparva": {
     "he": "לשכת הפרוה",
     "translit": "Lishkat HaParva",
-    "resume": "La chambre où l'on sale les peaux des korbanot. Sur son toit se trouve le bain rituel du Cohen Gadol : quatre des cinq immersions de Yom Kippour s'y font, un drap de lin tendu entre lui et le peuple. Son nom est celui d'un mage, Parva, dit Rav Yosef. Rashi en fait le bâtisseur de la chambre ; le Rambam et le Arukh racontent qu'il voulut voir le Cohen Gadol à son service, qu'il creusa jusqu'ici et qu'il y fut pris. Au pied du mur sud, entre la banquette et l'angle, des pierres qui ne ressemblent pas au mur bouchent sa brèche.",
+    "resume": "La chambre où l'on sale les peaux des korbanot. Sur son toit se trouve le bain rituel du Cohen Gadol : quatre des cinq immersions de Yom Kippour s'y font, un drap de lin tendu entre lui et le peuple. Son nom est celui d'un mage, Parva, dit Rav Yosef. Rashi en fait le bâtisseur de la chambre ; le Rambam (sur Middot 5:3) raconte qu'il perça le mur de l'Azara dans cette chambre pour voir le service, et qu'il y fut tué. La visite montre sa brèche au pied du mur sud, entre la banquette et l'angle, bouchée de pierres qui ne ressemblent pas au mur.",
     "cotes": [
       "au sud, dans l'Azara, contre la face intérieure du mur",
       "le bain rituel sur le toit, avec son maake",
@@ -869,7 +870,8 @@
       {"oeuvre": "Yoma", "ref": "3:6", "citation": "פָּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"},
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:17", "citation": "שְׁמוֹנֶה לְשָׁכוֹת הָיוּ בְּעֶזְרַת יִשְׂרָאֵל. שָׁלֹשׁ בַּצָּפוֹן. וְשָׁלֹשׁ בַּדָּרוֹם"},
       {"oeuvre": "Yoma", "ref": "35a", "citation": "מַאי ״פַּרְוָה״? אָמַר רַב יוֹסֵף: פַּרְוָה אַמְגּוּשָׁא"},
-      {"oeuvre": "Rashi sur Yoma", "ref": "35a", "citation": "מכשף אחד בנאה ושמו פרווה"}
+      {"oeuvre": "Rashi sur Yoma", "ref": "35a", "citation": "מכשף אחד בנאה ושמו פרווה"},
+      {"oeuvre": "Rambam sur Middot", "ref": "5:3", "citation": "שחתר בקיר העזרה בלשכה זו כדי לראות העבודה ונהרג"}
     ],
     "note": "Retenu : la répartition de Yoma 19a et du Rambam (Beit HaBe'hira 5:17) — Mela'h, Parva et Medi'hin au sud, Etz, Gola et Gazit au nord. Le texte courant de Middot 5:3–4 inverse les deux côtés ; Tosfot Yom Tov (Middot 5:3) signale la variante. Le Rambam place en outre ces chambres « dans l'Ezrat Israël » ; la visite les adosse au mur de l'Azara. Les trois chambres du sud sont dans l'Azara, et non sur la terrasse du 'Heil, car la Mishna place les bains du Cohen Gadol « dans le sacré, sur la Parva » (Yoma 3:3) ; or le toit d'un bâtiment élevé hors de l'enceinte n'est pas sanctifié (Tosfot Yom Tov sur Middot 5:3). Choix de la visite : le maake du bain, les peaux empilées sur une banquette et le tas de sel. Non représentés : le drap de lin et les marches du bain."
   },
@@ -897,7 +899,7 @@
     "resume": "La grande salle voûtée où dorment les Cohanim de garde, à cheval sur le mur nord de l'Azara : c'est la troisième porte du nord que compte Middot 1:5. Elle tient son nom de son feu : deux foyers y brûlent jour et nuit, pour les cohanim qui marchent pieds nus sur le marbre, et c'est à eux qu'on allume le feu à la veille de Shabbat. On y entre de l'Azara par un guichet percé dans le grand vantail d'or ; celle du 'Heil est en haut de vingt degrés. Aux quatre angles s'ouvrent quatre petites chambres, deux dans le sacré, deux hors, et des têtes de poutres sorties des murs marquent la séparation : au sud-ouest les agneaux du korban, au sud-est le pain de proposition, au nord-est les pierres de l'autel cachées par les Hasmonéens et les sceaux des libations, au nord-ouest un feu et la descente vers le bain rituel. Tout autour, les gradins de pierre où dorment les anciens ; les jeunes cohanim dorment à terre.",
     "cotes": [
       "à cheval sur le mur nord, 30 × 29 amot",
-      "voûte en berceau : naissance à 28 amot, flèche 6",
+      "toit plat à 28 amot, portant au milieu une coupole de 21 amot de diamètre (clé à 38,5 amot)",
       "deux sha'arim : au sud sur l'Azara, avec son guichet, au nord sur le 'Heil",
       "quatre chambres aux angles, deux dans le sacré, deux hors",
       "deux foyers allumés jour et nuit dans la moitié 'hol",
@@ -927,9 +929,10 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:9", "citation": "וּבַיִת גָּדוֹל הָיָה בְּצַד הָעֲזָרָה בִּצְפוֹנָהּ מִבַּחוּץ בֵּין הָעֲזָרָה וְהַחֵיל וְהָיָה בָּנוּי כִּפָּה"},
       {"oeuvre": "Melekhet Shelomoh", "ref": "Middot 1:6", "citation": "בית המוקד היה כלו בחול… אלא הלשכות שלו חציין בקודש וחציין בחול"},
       {"oeuvre": "Middot", "ref": "2:6", "citation": "וּלְעֻמָּתָן בַּצָּפוֹן סְמוּכִים לַמַּעֲרָב"},
-      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:4", "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב"}
+      {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:4", "citation": "שְׁלֹשָׁה מִן הַצָּפוֹן הַסְּמוּכִין לַמַּעֲרָב"},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַשְּׁעָרִים שֶׁהָיוּ שָׁם, נִשְׁתַּנּוּ לִהְיוֹת שֶׁל זָהָב, חוּץ מִשַּׁעַר נִקָּנוֹר"}
     ],
-    "note": "Retenu : à cheval sur la limite du sacré — deux de ses chambres « dans le sacré » et deux « hors » (Middot 1:6), le bâtiment « en partie dans l'Azara » selon Bartenura, comme le lit Rachi (Yoma 15b). Écartés : le Rambam (Beit HaBe'hira 5:9), qui le met « au nord de l'Azara, dehors, entre l'Azara et le 'Heil », et R. Shemaya (cité par Melekhet Shelomoh), pour qui la salle est tout entière hors du sacré et ses seules chambres à cheval. Tamid 3:3 nomme les mêmes quatre chambres : la chambre des sceaux est celle des pierres (Bartenura), et celle des agneaux, longue sur le mur ouest, paraît au sud-ouest ou au nord-ouest selon d'où l'on vient (Yoma 17a, Rachi). Deux lectures du feu où se réchauffe celui qui s'est immergé : au Beit HaTevila (Rambam 5:11), ou dans la chambre nord-ouest du Moked (Bartenura, Melekhet Shelomoh au nom du Roch) — la visite allume les deux. Les rashei pispasin sont des têtes de poutres côté 'hol (Bartenura, Tosfot Yom Tov), non le treillis au sol du Rambam. Lechem Shamayim met la dalle des clés dans la moitié 'hol, où l'on dort dessus. Choix de la visite : la porte du nord la plus orientale reculée de cinq amot pour la largeur de la salle, la salle au niveau de l'Azara, toutes les cotes, l'emplacement des vingt degrés et le mobilier."
+    "note": "Retenu : à cheval sur la limite du sacré — deux de ses chambres « dans le sacré » et deux « hors » (Middot 1:6), le bâtiment « en partie dans l'Azara » selon Bartenura, comme le lit Rachi (Yoma 15b). Écartés : le Rambam (Beit HaBe'hira 5:9), qui le met « au nord de l'Azara, dehors, entre l'Azara et le 'Heil », et R. Shemaya (cité par Melekhet Shelomoh), pour qui la salle est tout entière hors du sacré et ses seules chambres à cheval. Tamid 3:3 nomme les mêmes quatre chambres : la chambre des sceaux est celle des pierres (Bartenura), et celle des agneaux, longue sur le mur ouest, paraît au sud-ouest ou au nord-ouest selon d'où l'on vient (Yoma 17a, Rachi). Deux lectures du feu où se réchauffe celui qui s'est immergé : au Beit HaTevila (Rambam 5:11), ou dans la chambre nord-ouest du Moked (Bartenura, le Rambam sur Middot 1:6) — la visite allume les deux. Les rashei pispasin sont des têtes de poutres côté 'hol (Bartenura, Tosfot Yom Tov), non le treillis au sol du Rambam. Lechem Shamayim met la dalle des clés dans la moitié 'hol, où l'on dort dessus. Choix de la visite : la porte du nord la plus orientale reculée de cinq amot pour la largeur de la salle, la salle au niveau de l'Azara, toutes les cotes, les vingt degrés et leur emplacement, le nombre et la place des foyers — Bartenura dit seulement « מְדוּרוֹת » (sur Middot 1:5) —, et le mobilier."
   },
   "kippa_beit_hamoked": {
     "he": "כִּפַּת בֵּית הַמּוֹקֵד",
@@ -953,7 +956,7 @@
   "shaarei_beit_hamoked": {
     "he": "שַׁעֲרֵי בֵּית הַמּוֹקֵד",
     "translit": "Sha'arei Beit HaMoked",
-    "resume": "Le Beit HaMoked a deux portes face à face : l'une sur l'Azara, au sud, l'autre sur le 'Heil, au nord. Une seule garde suffit pour les deux, dit Abayé, parce qu'elles se voient l'une l'autre. Dans le vantail d'or du sud est percé un guichet, le pishpash : chaque matin, avant l'aube, le préposé l'ouvre et entre dans l'Azara avec deux torches, pour s'assurer que tous les ustensiles sont à leur place. Ouvrir la grande porte de nuit aurait été trop lourd.",
+    "resume": "Le Beit HaMoked a deux portes face à face : l'une sur l'Azara, au sud, l'autre sur le 'Heil, au nord. Une seule garde suffit pour les deux, dit Abayé, parce qu'elles se voient l'une l'autre. Dans le vantail d'or du sud est percé un guichet, le pishpash : chaque matin, avant l'aube, le préposé l'ouvre et entre dans l'Azara ; ceux qui le suivent portent deux torches, et ils vérifient que tous les ustensiles sont à leur place. Ouvrir la grande porte de nuit aurait été trop lourd.",
     "cotes": [
       "porte sud de 10 × 20 amot, deux vantaux d'or rabattus dans la salle",
       "guichet de 2 × 4,5 amot dans le vantail ouest, son anneau de fer",
@@ -965,7 +968,9 @@
       {"oeuvre": "Bartenura", "ref": "Middot 1:7", "citation": "פִּשְׁפָּשׁ קָטָן. שַׁעַר קָטָן בְּתוֹךְ הַשַּׁעַר הַגָּדוֹל"},
       {"oeuvre": "Tamid", "ref": "26b", "citation": "אָמַר אַבָּיֵי: כֵּיוָן דְּגַבֵּי הֲדָדֵי הֲווֹ קָיְימִי – סַגִּי לְהוּ בְּחַד שׁוֹמֵר, דָּוֵי לְהָכָא וְדָוֵי לְהָכָא"},
       {"oeuvre": "Melekhet Shelomoh", "ref": "Middot 1:7", "citation": "שקשה היה להם לפתוח פתח גדול בלילה"},
-      {"oeuvre": "Lechem Shamayim", "ref": "Tamid 1:3", "citation": "אבל זה מפתח קטן של פשפש. לא היו מצניעין אותו שם. אלא היה מזומן בידיהם"}
+      {"oeuvre": "Lechem Shamayim", "ref": "Tamid 1:3", "citation": "אבל זה מפתח קטן של פשפש. לא היו מצניעין אותו שם. אלא היה מזומן בידיהם"},
+      {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים וְהַשְּׁעָרִים שֶׁהָיוּ שָׁם, גָּבְהָן עֶשְׂרִים אַמָּה, וְרָחְבָּן עֶשֶׂר אַמּוֹת"},
+      {"oeuvre": "Bartenura", "ref": "Tamid 1:3", "citation": "כְּדֵי שֶׁיִּהְיוּ בוֹדְקִים וְרוֹאִים כָּל כְּלֵי שָׁרֵת שֶׁיִּהְיוּ כֻלָּן בִּמְקוֹמָן"}
     ],
     "note": "Retenu : le pishpash est une petite porte percée dans la grande (Bartenura, Melekhet Shelomoh), comme le Rambam l'explique sur Tamid 1:3 ; sur Middot 1:6, il donne aussi au mot le sens d'un treillis. Lechem Shamayim tire du texte que sa clé n'était pas sous la dalle avec celles de l'Azara, mais à portée de main. Non suivi : une autre lecture, rapportée par Melekhet Shelomoh sur Tamid 1:1 avec le Roch, met la porte de l'Azara près de l'angle nord-est et l'autre au milieu du mur est. Choix de la visite : le guichet dans le vantail ouest, ses cotes, et les vingt degrés."
   },
@@ -1033,10 +1038,10 @@
   "lishkat_hachotamot": {
     "he": "לִשְׁכַּת הַחוֹתָמוֹת",
     "translit": "Lishkat HaChotamot",
-    "resume": "Les Hasmonéens ont caché ici les pierres de l'autel que les rois grecs avaient souillées en y sacrifiant à l'idolâtrie : on ne pouvait plus s'en servir, et on les a mises à l'abri. La même chambre, Tamid et Shekalim l'appellent chambre des sceaux. Qui voulait des libations payait Yo'hanan, le préposé aux sceaux, et recevait un sceau marqué « veau », « bélier », « chevreau » ou « pécheur » ; il l'échangeait contre les libations auprès d'A'hiya, et le soir les deux comptes étaient rapprochés.",
+    "resume": "Les Hasmonéens ont caché ici les pierres de l'autel que les rois grecs avaient souillées en y sacrifiant à l'idolâtrie : on ne pouvait plus s'en servir, et on les a mises à l'abri. La même chambre, Tamid l'appelle chambre des sceaux (Tamid 3:3). Qui voulait des libations payait Yo'hanan, le préposé aux sceaux, et recevait un sceau marqué « veau », « bélier », « chevreau » ou « pécheur » ; il l'échangeait contre les libations auprès d'A'hiya, et le soir les deux comptes étaient rapprochés.",
     "cotes": [
       "angle nord-est, dans la moitié 'hol",
-      "6 × 10 amot",
+      "6 × 10 amot (choix de la visite)",
       "les pierres de l'autel entassées, une table et ses quatre sceaux"
     ],
     "sources": [
@@ -1045,9 +1050,10 @@
       {"oeuvre": "Tamid", "ref": "3:3", "citation": "וְאַרְבַּע לְשָׁכוֹת הָיוּ שָׁם, אַחַת לִשְׁכַּת הַטְּלָאִים, וְאַחַת לִשְׁכַּת הַחוֹתָמוֹת"},
       {"oeuvre": "Shekalim", "ref": "5:3", "citation": "אַרְבָּעָה חוֹתָמוֹת הָיוּ בַּמִּקְדָּשׁ, וְכָתוּב עֲלֵיהֶן, עֵגֶל, זָכָר, גְּדִי, חוֹטֵא"},
       {"oeuvre": "Shekalim", "ref": "5:4", "citation": "מִי שֶׁהוּא מְבַקֵּשׁ נְסָכִים הוֹלֵךְ לוֹ אֵצֶל יוֹחָנָן שֶׁהוּא מְמֻנֶּה עַל הַחוֹתָמוֹת, נוֹתֵן לוֹ מָעוֹת וּמְקַבֵּל מִמֶּנּוּ חוֹתָם"},
-      {"oeuvre": "Melekhet Shelomoh", "ref": "Middot 1:6", "citation": "דעל כרחין לשכת החותמות ולשכת בית המוקד השנויות בתמיד פ\"ג הם היו אותם שתי לשכות דקחשיב הכא"}
+      {"oeuvre": "Melekhet Shelomoh", "ref": "Middot 1:6", "citation": "דעל כרחין לשכת החותמות ולשכת בית המוקד השנויות בתמיד פ\"ג הם היו אותם שתי לשכות דקחשיב הכא"},
+      {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 3:3", "citation": "ואותם שתים של אבני המזבח וירידת הטבילה היו חוץ לעזרה"}
     ],
-    "note": "Retenu : une seule chambre sous deux noms (Bartenura, Tosfot Yom Tov ; Tosafot, Yoma 17a, rapportés par Melekhet Shelomoh) : le Beit HaMoked n'avait que quatre chambres. Ben Azzaï compte cinq sceaux, écrits en araméen (Shekalim 5:3) ; la visite en montre quatre. Choix de la visite : le nombre de pierres, la table, la forme des sceaux."
+    "note": "Retenu : une seule chambre sous deux noms (Bartenura, Tosfot Yom Tov ; Tosafot, Yoma 17a, rapportés par Melekhet Shelomoh) : le Beit HaMoked n'avait que quatre chambres. Ben Azzaï compte cinq sceaux, écrits en araméen (Shekalim 5:3) ; la visite en montre quatre. Choix de la visite : les dimensions de la chambre, le nombre de pierres, la table, la forme des sceaux."
   },
   "lishkat_beit_hamoked": {
     "he": "לִשְׁכַּת בֵּית הַמּוֹקֵד",
@@ -1055,7 +1061,7 @@
     "resume": "La petite chambre qui porte le nom de la grande, et qui ouvre sur elle. Le cohen devenu impur pendant la nuit y descend vers le bain rituel par la mesiba, le passage qui court sous le Mikdach. Un feu y brûle sans cesse : si celui de la grande salle s'éteint, c'est ici qu'on reprend le feu, selon le Roch.",
     "cotes": [
       "angle nord-ouest, dans la moitié 'hol",
-      "6 × 10 amot",
+      "6 × 10 amot (choix de la visite)",
       "un foyer de pierre et le puits de la mesiba"
     ],
     "sources": [
@@ -1064,14 +1070,16 @@
       {"oeuvre": "Rashi sur Yoma", "ref": "15b", "citation": "לשכת בית המוקד - לשכה קטנה שקרויה בית המוקד ופתוחה לבית המוקד הגדול"},
       {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 3:3", "citation": "לשכת בית המוקד ושם היתה מדורה תמידית שאם יכבה האש בבית המוקד הגדול לוקחים משם אש"},
       {"oeuvre": "Rambam sur Tamid", "ref": "3:3", "citation": "שבאחת מהן היתה אש בוערת והיא הנקראת מדורה"},
-      {"oeuvre": "Bartenura", "ref": "Middot 1:6", "citation": "בְּאוֹתָהּ לִשְׁכָּה הָיָה יוֹרֵד הַכֹּהֵן שֶׁרָאָה קֶרִי וְהוֹלֵךְ בַּמְּחִלָּה שֶׁתַּחַת בֵּית הַמִּקְדָּשׁ לְבֵית הַטְּבִילָה"}
+      {"oeuvre": "Bartenura", "ref": "Middot 1:6", "citation": "בְּאוֹתָהּ לִשְׁכָּה הָיָה יוֹרֵד הַכֹּהֵן שֶׁרָאָה קֶרִי וְהוֹלֵךְ בַּמְּחִלָּה שֶׁתַּחַת בֵּית הַמִּקְדָּשׁ לְבֵית הַטְּבִילָה"},
+      {"oeuvre": "Tamid", "ref": "1:1", "citation": "וּמְדוּרָה הָיְתָה שָׁם"},
+      {"oeuvre": "Rambam sur Middot", "ref": "1:6", "citation": "והלשכה שיש בה מדורת האש ששם מתחמם מי שטבל"}
     ],
-    "note": "Retenu : la chambre de la descente est la « Lishkat Beit HaMoked » de Tamid 3:3 (Rachi, Bartenura). Deux lectures du feu où le cohen se réchauffe après le bain : ici, selon le Roch et Bartenura — le Rambam sur Tamid 3:3 met un feu dans l'une des quatre chambres sans dire laquelle —, ou au Beit HaTevila, selon le Rambam (Beit HaBe'hira 5:11). La visite allume les deux. Choix de la visite : la place du foyer et du puits."
+    "note": "Retenu : la chambre de la descente est la « Lishkat Beit HaMoked » de Tamid 3:3 (Rachi, Bartenura). Deux lectures du feu où le cohen se réchauffe après le bain : au Beit HaTevila, comme le dit la Mishna (Tamid 1:1) et le Rambam (Beit HaBe'hira 5:11), ou ici, selon Bartenura et le Rambam dans son commentaire de Middot 1:6. Le Roch (cité par Melekhet Shelomoh sur Tamid 3:3) met dans cette chambre un feu permanent, qui sert à rallumer celui de la grande salle. La visite allume les deux. Choix de la visite : les dimensions de la chambre, la place du foyer et du puits."
   },
   "rovadim_beit_hamoked": {
     "he": "רוֹבְדִין שֶׁל אֶבֶן",
     "translit": "Rovdin shel even",
-    "resume": "Des gradins de pierre font le tour de la salle : les anciens de la maison paternelle de service y dorment, car on n'apporte pas de lit dans le Mikdach. Ce ne sont pas des marches posées contre le mur : selon Abayé, on bâtissait le mur de pierres de dix amot et de huit amot, et les deux amot qui dépassaient formaient la banquette. On ne pouvait pas tailler la pierre au fer une fois dans le Mikdach ; la saillie était donc prévue dès la carrière.",
+    "resume": "Des gradins de pierre font le tour de la salle : les anciens de la maison paternelle de service y dorment, car on n'apporte pas de lit dans le Mikdach. Ce ne sont pas des marches posées contre le mur : selon Abayé, on bâtissait le mur de pierres de dix amot et de huit amot, et les deux amot qui dépassaient, explique Melekhet Shelomoh, formaient la banquette. On ne pouvait pas tailler la pierre au fer une fois dans le Mikdach ; la saillie était donc prévue dès la carrière.",
     "cotes": [
       "deux gradins : 2 amot de saillie, puis 1 ama, chacun d'une ama de haut",
       "le long de la nef, des murs des chambres et du mur est",
@@ -1085,16 +1093,16 @@
       {"oeuvre": "Melekhet Shelomoh", "ref": "Tamid 1:1", "citation": "אותן שתי אמות שבולטות לצורך איצטוואות הן בולטות וחוץ לעזרה מותר לחותכן ולהשוותם בברזל אבל משבאו לעזרה אסור להניף עליהם ברזל"},
       {"oeuvre": "Tamid", "ref": "26b", "citation": "זִקְנֵי בֵּית אָב יְשֵׁנִים שָׁם. וְאַמַּאי? לְעַיְּילִי מִטּוֹת! אָמַר אַבָּיֵי: לָאו אוֹרַח אַרְעָא לְעַיּוֹלֵי מִטּוֹת לְבֵית הַמִּקְדָּשׁ"}
     ],
-    "note": "Retenu : la lecture d'Abayé (Tamid 26b), et deux gradins l'un sur l'autre, plus étroit en haut (Bartenura). Lechem Shamayim (sur Tamid 1:1) les veut sur les quatre côtés, d'après « מֻקָּף ». Choix de la visite : la hauteur des gradins, et leur tracé autour des chambres."
+    "note": "Retenu : la lecture d'Abayé (Tamid 26b), et deux gradins l'un sur l'autre, plus étroit en haut (Bartenura). Lechem Shamayim (sur Tamid 1:1) les veut sur les quatre côtés, d'après « מֻקָּף ». Choix de la visite : la saillie du gradin haut, la hauteur des gradins, et leur tracé autour des chambres."
   },
   "rashei_pispasin": {
     "he": "רָאשֵׁי פִסְפָּסִין",
     "translit": "Rashei pispasin",
-    "resume": "Le Beit HaMoked est à cheval sur la limite du sacré : deux de ses chambres sont dans le sacré, deux hors. Des têtes de poutres sortent des murs à l'endroit où le sacré commence, pour qu'on sache de quel côté on se tient : les saintetés se mangent dans le sacré, et un cohen impur n'a rien à faire au-delà. Le bois reste du côté 'hol, car on ne plante « aucun bois » près de l'autel.",
+    "resume": "Le Beit HaMoked est à cheval sur la limite du sacré : deux de ses chambres sont dans le sacré, deux hors. Des têtes de poutres sortent des murs à l'endroit où le sacré commence, pour qu'on sache de quel côté on se tient : les saintetés se mangent dans le sacré. Le bois reste du côté 'hol, car on ne plante « aucun bois » près de l'autel.",
     "cotes": [
       "trois rangs de têtes de poutres de cèdre, de chaque côté",
       "sur l'axe du mur de l'Azara, côté 'hol",
-      "une ama de saillie"
+      "une ama de saillie (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:6", "citation": "וְאַרְבַּע לְשָׁכוֹת הָיוּ בְּבֵית הַמּוֹקֵד, כְּקִיטוֹנוֹת פְּתוּחוֹת לִטְרַקְלִין, שְׁתַּיִם בַּקֹּדֶשׁ וּשְׁתַּיִם בַּחֹל, וְרָאשֵׁי פִסְפָּסִין מַבְדִּילִין בֵּין קֹדֶשׁ לַחֹל"},
@@ -1108,10 +1116,10 @@
   "tavla_hamaftechot": {
     "he": "טַבְלָא שֶׁל שַׁיִשׁ",
     "translit": "Tavla shel shayish",
-    "resume": "Les clés de l'Azara dorment sous une dalle de marbre d'une ama sur une ama, scellée dans le sol, avec un anneau pour la soulever ; elles pendent à une chaîne dans la cavité. À l'heure de fermer, le cohen soulève la dalle, prend les clés, ferme de l'intérieur pendant que le Lévi dort dehors, puis remet les clés et la dalle, étend sa couverture dessus et s'y endort. Personne ne peut ainsi prendre les clés à son insu.",
+    "resume": "Les clés de l'Azara dorment dans une cavité d'une ama sur une ama, fermée par une dalle de marbre où est fixé un anneau pour la soulever ; elles pendent à une chaîne dans la cavité. À l'heure de fermer, le cohen soulève la dalle, prend les clés, ferme de l'intérieur pendant que le Lévi dort dehors, puis remet les clés et la dalle, étend sa couverture dessus et s'y endort. Personne ne peut ainsi prendre les clés à son insu.",
     "cotes": [
       "dalle de marbre d'1 × 1 ama",
-      "anneau de fer scellé",
+      "anneau de fer scellé (choix de la visite)",
       "dans la nef, côté 'hol, entre les deux foyers"
     ],
     "sources": [
@@ -1125,11 +1133,11 @@
   "kesatot_beit_hamoked": {
     "he": "כְּסָתוֹת הַכֹּהֲנִים",
     "translit": "Kesatot haKohanim",
-    "resume": "Les anciens de la maison paternelle dorment sur les gradins, les jeunes cohanim à terre, chacun sur sa couverture, comme les gardes dans la cour des rois. Ces jeunes sont en âge de servir ; plus petits, on les appelle « rovim » et ils gardent ailleurs. Personne ne dort dans ses vêtements de service : on les plie et on les pose à hauteur de tête, puis on se couvre de son propre manteau.",
+    "resume": "Les anciens de la maison paternelle dorment sur les gradins, les jeunes cohanim à terre, chacun sur sa couverture, comme les gardes dans la cour des rois. Ces jeunes sont en âge de servir ; plus petits, on les appelle « rovim » et ils gardent ailleurs. Personne ne dort dans ses vêtements de service : on les plie et on les pose à hauteur de tête — la Mishna dit « sous la tête », la Guemara lit « à hauteur de » (Tamid 27a) —, puis on se couvre de son propre manteau.",
     "cotes": [
       "quatre couches d'anciens sur les gradins, côté 'hol",
       "quatre couches de jeunes cohanim à terre, près des feux",
-      "couverture et coussin de laine"
+      "couverture et coussin de laine (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Tamid", "ref": "1:1", "citation": "וְזִקְנֵי בֵית אָב יְשֵׁנִים שָׁם, וּמַפְתְּחוֹת הָעֲזָרָה בְּיָדָם. וּפִרְחֵי כְהֻנָּה אִישׁ כִּסְתּוֹ בָאָרֶץ"},
@@ -1178,7 +1186,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:11", "citation": ""},
       {"oeuvre": "Rambam Mikvaot", "ref": "4:1", "citation": "אַמָּה עַל אַמָּה בְּרוּם שָׁלֹשׁ אַמּוֹת"}
     ],
-    "note": "Choix de la visite : aucune source ne situe ni ne mesure cette salle. Sa place, ses dimensions et la forme du bain, du foyer et des toilettes sont dessinées pour la visite. Le Rambam (Beit HaBe'hira 5:11) met ici le feu où l'on se réchauffe ; Bartenura et le Roch le mettent dans la chambre nord-ouest du Beit HaMoked : la visite allume les deux."
+    "note": "Choix de la visite : aucune source ne situe ni ne mesure cette salle. Sa place, ses dimensions et la forme du bain, du foyer et des toilettes sont dessinées pour la visite. La Mishna (Tamid 1:1) et le Rambam (Beit HaBe'hira 5:11) mettent ici le feu où l'on se réchauffe ; Bartenura et le Rambam dans son commentaire de Middot 1:6 le mettent dans la chambre nord-ouest du Beit HaMoked : la visite allume les deux."
   },
 
   "shaar_hamayim": {
@@ -1260,12 +1268,13 @@
   "beit_hanitzotz": {
     "he": "בית הניצוץ",
     "translit": "Beit HaNitzotz",
-    "resume": "La chambre bâtie en étage (aliyah) au-dessus de Sha'ar HaNitzotz, sur le mur nord de l'Azara, où les cohanim montent la garde. Middot 1:5 décrit cette aliyah sans la nommer ; Tamid 1:1 compte le Beit HaNitzotz parmi les postes de garde des cohanim et en fait une aliyah : la visite identifie les deux.",
+    "resume": "La chambre bâtie en étage (aliyah) au-dessus de Sha'ar HaNitzotz, sur le mur nord de l'Azara, où les cohanim montent la garde. Middot 1:5 décrit cette aliyah sans la nommer ; Tamid 1:1 compte le Beit HaNitzotz parmi les postes de garde des cohanim et en fait une aliyah ; la Guemara (Tamid 26b) identifie les deux.",
     "cotes": ["aliyah au-dessus de Sha'ar HaNitzotz"],
     "sources": [
       {"oeuvre": "Middot", "ref": "1:5", "citation": "וַעֲלִיָּה בְנוּיָה עַל גַּבָּיו, שֶׁהַכֹּהֲנִים שׁוֹמְרִים מִלְמַעְלָן וְהַלְוִיִּם מִלְּמַטָּן"},
       {"oeuvre": "Middot", "ref": "1:1", "citation": "בִּשְׁלשָׁה מְקוֹמוֹת הַכֹּהֲנִים שׁוֹמְרִים בְּבֵית הַמִּקְדָּשׁ, בְּבֵית אַבְטִינָס, וּבְבֵית הַנִּיצוֹץ, וּבְבֵית הַמּוֹקֵד"},
-      {"oeuvre": "Tamid", "ref": "1:1", "citation": "בֵּית אַבְטִינָס וּבֵית הַנִּיצוֹץ הָיוּ עֲלִיּוֹת"}
+      {"oeuvre": "Tamid", "ref": "1:1", "citation": "בֵּית אַבְטִינָס וּבֵית הַנִּיצוֹץ הָיוּ עֲלִיּוֹת"},
+      {"oeuvre": "Tamid", "ref": "26b", "citation": "תָּא שְׁמַע, דִּתְנַן: שֶׁבַּצָּפוֹן שַׁעַר הַנִּיצוֹץ"}
     ]
   },
 
@@ -1293,7 +1302,7 @@
     "resume": "L'une des deux chambres qui flanquent la porte de Nikanor, dans l'Ezrat Israël selon le Rambam (Beit HaBe'hira 5:17) — l'autre étant la Lishkat Pin'has HaMalbish. On y fait les 'havitin, l'offrande quotidienne du Cohen Gadol, pétrie, façonnée et cuite dans l'enceinte sacrée : une table, un foyer et la poêle, la ma'havat de Lévitique 6:14, plate selon R. 'Hanania ben Gamliel.",
     "cotes": [
       "contre le mur est, au sud de la porte de Nikanor",
-      "porte à l'ouest, sur l'Ezrat Israël",
+      "porte à l'ouest, sur l'Ezrat Israël (choix de la visite)",
       "table, foyer et ma'havat"
     ],
     "sources": [
@@ -1312,7 +1321,7 @@
     "resume": "L'une des deux chambres qui flanquent la porte de Nikanor, dans l'Ezrat Israël selon le Rambam (Beit HaBe'hira 5:17) — l'autre étant la Lishkat Osei 'Havitin. Pin'has est préposé aux vêtements des Cohanim : le long des murs, les placards fermés où chaque garde range les siens.",
     "cotes": [
       "contre le mur est, au nord de la porte de Nikanor",
-      "porte à l'ouest, sur l'Ezrat Israël",
+      "porte à l'ouest, sur l'Ezrat Israël (choix de la visite)",
       "placards fermés sur six rangs (choix de la visite)"
     ],
     "sources": [
@@ -1341,7 +1350,7 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:2", "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"},
       {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
-    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien. Les vantaux : « toutes les ouvertures avaient des portes, sauf celle de l'Oulam » (Middot 2:3). Leur bronze est un choix : l'or, le Rambam ne le dit que des portes de l'Azara (cité par Tosfot Yom Tov sur Middot 2:3)."
+    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien. Les vantaux : « toutes les ouvertures avaient des portes, sauf celle de l'Oulam » (Middot 2:3). Leur bronze est un choix de la visite : Middot 2:3 dit que « toutes les portes qui étaient là » furent changées en or, sauf celle de Nikanor ; la visite ne l'applique pas aux portes du Har HaBayit."
   },
 
   "shaar_tadi": {
@@ -1380,6 +1389,6 @@
       {"oeuvre": "Rambam Beit HaBe'hira", "ref": "5:2", "citation": "רֹחַב כָּל שַׁעַר עֶשֶׂר אַמּוֹת וְגָבְהוֹ עֶשְׂרִים"},
       {"oeuvre": "Middot", "ref": "2:3", "citation": "כָּל הַפְּתָחִים שֶׁהָיוּ שָׁם, הָיוּ לָהֶן דְּלָתוֹת, חוּץ מִשֶּׁל אוּלָם"}
     ],
-    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien. Les vantaux : « toutes les ouvertures avaient des portes, sauf celle de l'Oulam » (Middot 2:3). Leur bronze est un choix : l'or, le Rambam ne le dit que des portes de l'Azara (cité par Tosfot Yom Tov sur Middot 2:3)."
+    "note": "Choix de la visite : les timorot des jambages viennent d'Ézéchiel 40:26, qui décrit le Temple futur ; Middot n'en dit rien. Les vantaux : « toutes les ouvertures avaient des portes, sauf celle de l'Oulam » (Middot 2:3). Leur bronze est un choix de la visite : Middot 2:3 dit que « toutes les portes qui étaient là » furent changées en or, sauf celle de Nikanor ; la visite ne l'applique pas aux portes du Har HaBayit."
   }
 }

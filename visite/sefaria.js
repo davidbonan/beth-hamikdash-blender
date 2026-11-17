@@ -11,7 +11,7 @@ const TRAITES = {
   houlin: "Chullin", chullin: "Chullin", horayot: "Horayot",
   sanhedrin: "Sanhedrin", negaim: "Negaim", ketoubot: "Ketubot", ketubot: "Ketubot", meila: "Meilah", meilah: "Meilah", keritot: "Keritot",
   pesachim: "Pesachim", pesahim: "Pesachim", "pessahim": "Pesachim", shabbat: "Shabbat",
-  sota: "Sotah", para: "Parah",
+  sota: "Sotah", para: "Parah", bikkourim: "Bikkurim", nazir: "Nazir", haguiga: "Chagigah",
 };
 const OUVRAGES = {
   "rambam beit habehira": "Mishneh Torah, The Chosen Temple",
@@ -66,11 +66,24 @@ const OUVRAGES = {
   "rambam sur menahot": "Rambam on Mishnah Menachot", "rambam sur menachot": "Rambam on Mishnah Menachot",
   "shemot rabba": "Shemot Rabbah", "shir hashirim rabba": "Shir HaShirim Rabbah",
   "teshouvot haradbaz ii": "Teshuvot HaRadbaz Volume 2",
+  "rambam haguiga": "Mishneh Torah, Festival Offering",
+  "rambam bikkourim": "Mishneh Torah, First Fruits and other Gifts to Priests Outside the Sanctuary",
+  "rambam korban pessah": "Mishneh Torah, Paschal Offering",
+  "rambam loulav": "Mishneh Torah, Shofar, Sukkah and Lulav",
+  "rambam mehoussrei kappara": "Mishneh Torah, Offerings for Those with Incomplete Atonement",
+  "rambam melakhim": "Mishneh Torah, Kings and Wars",
+  "rambam nezirout": "Mishneh Torah, Nazariteship",
+  "bartenura sur bikkourim": "Bartenura on Mishnah Bikkurim",
+  "bartenura sur kelim": "Bartenura on Mishnah Kelim",
+  "bartenura sur menahot": "Bartenura on Mishnah Menachot",
+  "bartenura sur pesachim": "Bartenura on Mishnah Pesachim",
+  "haamek davar exode": "Haamek Davar on Exodus",
+  tehillim: "Psalms", esther: "Esther",
 };
 // Un commentaire porte le livre commenté dans sa cote : « Bartenura », « Middot 3:3 ».
 const COMMENTAIRES = {
   bartenura: "Bartenura on Mishnah", "tosfot yom tov": "Tosafot Yom Tov on Mishnah",
-  "tiferet israel": "Yachin on Mishnah", rashash: "Rashash on Mishnah", boaz: "Boaz on Mishnah",
+  rashash: "Rashash on Mishnah", boaz: "Boaz on Mishnah",
   radak: "Radak on", "metsoudat david": "Metzudat David on", "melekhet shelomoh": "Melekhet Shelomoh on Mishnah",
   "lechem shamayim": "Lechem Shamayim on Mishnah", "rash mishantz": "Rash MiShantz on Mishnah",
 };
@@ -89,8 +102,22 @@ function lienCommentaire(commentaire, ref) {
   return commente ? url(`${commentaire} ${commente} ${cote[2]}`) : null;
 }
 
+// Sefaria numérote Yakhin en continu sur le chapitre : « Middot 3:3, Yakhin 28 » est Yachin Middot 3:28.
+function lienYakhin(ref) {
+  const cote = /^(.+) (\d+):\d+, Yakhin (\d+)$/.exec((ref || "").trim());
+  const traite = cote && TRAITES[pele(cote[1])];
+  return traite ? url(`Yachin on Mishnah ${traite} ${cote[2]}:${cote[3]}`) : null;
+}
+
+function lienMishnatEretzIsrael(ref) {
+  const cote = /^Préface à Tamid et Middot (\d+:\d+)$/.exec((ref || "").trim());
+  return cote ? url(`Mishnat Eretz Yisrael on Mishnah Tamid, Preface to Tamid and Middot ${cote[1]}`) : null;
+}
+
 export function lienSefaria(oeuvre, ref) {
   const clef = pele(oeuvre);
+  if (clef === "tiferet israel") return lienYakhin(ref);
+  if (clef === "mishnat eretz israel") return lienMishnatEretzIsrael(ref);
   if (COMMENTAIRES[clef]) return lienCommentaire(COMMENTAIRES[clef], ref);
   if (clef === "rambam") return lienSefaria(`Rambam ${ref.replace(/ [\d:–-]+$/, "")}`, ref.match(/[\d:–-]+$/)?.[0]);
   const direct = OUVRAGES[clef];

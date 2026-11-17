@@ -89,7 +89,7 @@
   "magrefa": {
     "nom": "Magrefa",
     "translit": "Magrefa",
-    "resume": "When the kohanim reach the space between the Ulam and the Mizbeach, one of them takes the magrefa and throws it to the ground. In Jerusalem no one can hear his neighbour over it, and the crash serves as a signal: the kohanim come to bow down, the Levites to sing, and the head of the ma'amad stands the impure at the eastern gates (Tamid 5:6). It is a large utensil thrown to make a noise (Bartenura); Tosafot Yom Tov and the Rosh give it the shape of an ash shovel. The model lays it on the ground where it falls.",
+    "resume": "When the kohanim reach the space between the Ulam and the Mizbeach, one of them takes the magrefa and throws it to the ground. In Jerusalem no one can hear his neighbour over it, and the crash serves as a signal: the kohanim come to bow down, the Levites to sing, and the head of the ma'amad stands the impure at the eastern gate (Tamid 5:6). It is a large utensil thrown to make a noise (Bartenura); Tosafot Yom Tov and the Rosh give it the shape of an ash shovel. The model lays it on the ground where it falls.",
     "cotes": [
       "on the ground between the Ulam and the Mizbeach, where it is thrown",
       "shaped like an ash shovel: a lid of thin metal, with a handle"
@@ -109,7 +109,7 @@
   "candelabres_shoeva": {
     "nom": "Candelabra of Simchat Beit HaShoeva",
     "translit": "Menorot shel zahav (Simchat Beit HaShoeva)",
-    "resume": "The great golden candelabra erected in the Ezrat Nashim for Simchat Beit HaShoeva. Each bears four golden cups (sefalim) at its top and four ladders by which one climbs to pour in the oil. They rise far above the walls of the Ezrat Nashim.",
+    "resume": "The great golden candelabra erected in the Ezrat Nashim for Simchat Beit HaShoeva. Each bears four golden cups (sefalim) at its top and four ladders by which one climbs to pour in the oil. They rise far above the walls the tour gives the Ezrat Nashim, whose height no source states.",
     "cotes": [
       "fifty amot high",
       "four golden cups (sefalim) at the top of each",
@@ -126,7 +126,7 @@
   "shofarot": {
     "nom": "The Thirteen Shofarot",
     "translit": "Shelosha asar shofarot",
-    "resume": "Thirteen trunks “shaped like a shofar” — narrow at the top, wide at the bottom, so that no hand could be slipped in — lined up, in the tour, along the east wall of the Ezrat Nashim, on either side of the gate.",
+    "resume": "Thirteen collection chests “shaped like a shofar” — narrow at the top, wide at the bottom, so that no hand could be slipped in — lined up, in the tour, along the east wall of the Ezrat Nashim, on either side of the gate.",
     "cotes": [
       "thirteen",
       "narrow at the top, wide at the bottom, so that no hand could be slipped in",
@@ -155,7 +155,7 @@
       {"oeuvre": "Ye'hezkel", "ref": "41:18-19", "citation": "וְתִמֹרָה בֵּין כְּרוּב לִכְרוּב, וּשְׁנַיִם פָּנִים לַכְּרוּב"},
       {"oeuvre": "Middot", "ref": "4:1", "citation": "שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב, חוּץ מֵאַחַר הַדְּלָתוֹת"}
     ],
-    "note": "First Temple: I Kings 6:29; Middot 4:1 speaks only of gold, “שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב.” Ezekiel 41:18-20 describes the future Temple. Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The keruvim take the form of the chayot, “וָאֵדַע כִּי כְרוּבִים הֵמָּה” (Ezekiel 10:20): two wings covering the body and two joined to the neighbour's (1:11), human hands under the wings (1:8), a straight leg — “נראין כרגל אחת” (Rashi on Berakhot 10b) — with a round foot (Rashi on 1:7). Tour's choice: the four wings of the chayot given to the wall keruvim, which keep only the faces of a man and a lion (41:19), without features, and their wings joined above the palm. Set aside: a child keruv dressed in a robe — the child's face (Sukkah 5b) is said of the keruvim of the Ark. The three registers, the relief depth and the details of the motifs are designed for the tour."
+    "note": "First Temple: I Kings 6:29; Middot 4:1 speaks only of gold, “שֶׁכָּל הַבַּיִת טוּחַ בְּזָהָב.” Ezekiel 41:18-20 describes the future Temple. Tour's choice: the carvings rise “from the ground to above the opening” (Ezekiel 41:20), that is, a little beyond the twenty amot of the Heikhal's entrance (Middot 4:1); above them the gold remains bare. The keruvim take the form of the chayot, “וָאֵדַע כִּי כְרוּבִים הֵמָּה” (Ezekiel 10:20): two wings covering the body and two joined to the neighbour's (1:11), human hands under the wings (1:8), a straight leg — “נראין כרגל אחד” (Rashi on Berakhot 10b) — with a round foot (Rashi on 1:7). Tour's choice: the four wings of the chayot given to the wall keruvim, which keep only the faces of a man and a lion (41:19), without features, and their wings joined above the palm. Set aside: a child keruv dressed in a robe — the child's face (Sukkah 5b) is said of the keruvim of the Ark. The three registers, the relief depth and the details of the motifs are designed for the tour."
   },
 
   "chaines_devir": {
@@ -207,23 +207,23 @@
       {"oeuvre": "Middot", "ref": "4:7", "citation": "הָאוּלָם עוֹדֵף עָלָיו חֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַצָּפוֹן, וַחֲמֵשׁ עֶשְׂרֵה אַמָּה מִן הַדָּרוֹם, וְהוּא הָיָה נִקְרָא בֵּית הַחֲלִיפוֹת, שֶׁשָּׁם גּוֹנְזִים אֶת הַסַּכִּינִים"},
       {"oeuvre": "Bartenura sur Middot", "ref": "4:7", "citation": "בֵּית הַחֲלִיפוֹת. עַל שֵׁם הַסַּכִּינִים שֶׁגּוֹנְזִים שָׁם… שֶׁכֵּן בִּלְשׁוֹן רוֹמִי קוֹרִין לַסַּכִּינִים הַגְּדוֹלִים חֲלָפִים"},
       {"oeuvre": "Bartenura sur Soucca", "ref": "5:8", "citation": "חַלּוֹנוֹת הָיוּ בְּלִשְׁכַּת הַחֲלִיפוֹת שֶׁשָּׁם גּוֹנְזִין אֶת סַכִּינֵיהֶם"},
-      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "דלכל משמר ומשמר היה שם ארגז מיוחד בכותל לגנוז שם סכיניהן"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7, Yakhin 72", "citation": "דלכל משמר ומשמר היה שם ארגז מיוחד בכותל לגנוז שם סכיניהן"},
       {"oeuvre": "Rambam Ma'asse HaKorbanot", "ref": "4:7", "citation": "כָּל הַזְּבָחִים אֵין שׁוֹחֲטִין אוֹתָן לְכַתְּחִלָּה אֶלָּא בְּסַכִּין מִכְּלֵי שָׁרֵת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "1:13", "citation": "וּשְׁאָר כְּלֵי הַשָּׁרֵת כֻּלָּן שֶׁל כֶּסֶף וְשֶׁל זָהָב הָיוּ וּמֻתָּר לַעֲשׂוֹתָן מִשְּׁאָר מִינֵי מַתָּכוֹת"},
       {"oeuvre": "Rambam Klei HaMikdash", "ref": "4:3", "citation": "וְעוֹלִין לִירוּשָׁלַיִם לַעֲבוֹדָה מִשְׁמָר לְכָל שַׁבָּת"},
       {"oeuvre": "Houlin", "ref": "31a", "citation": "הָיָה שׁוֹחֵט וְהִתִּיז, אָמַר רַבִּי זֵירָא: מְלֹא צַוָּאר וְחוּץ לַצַּוָּאר"},
-      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "שהיה האולם יתר לכאן ולכאן, היה חדר מכאן ומכאן, ונקראו בית חליפות"},
-      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7", "citation": "ולכל א' מב' בתי החליפות שבאולם היו ב' פתחים, א' לאולם, וא' בזוית… וכל א' מב' אלו הפתחים היה גבוה ח' אמות"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7, Yakhin 71", "citation": "שהיה האולם יתר לכאן ולכאן, היה חדר מכאן ומכאן, ונקראו בית חליפות"},
+      {"oeuvre": "Tiferet Israël", "ref": "Middot 4:7, Yakhin 72", "citation": "ולכל א' מב' בתי החליפות שבאולם היו ב' פתחים, א' לאולם, וא' בזוית… וכל א' מב' אלו הפתחים היה גבוה ח' אמות"},
       {"oeuvre": "Zeva'him", "ref": "55b", "citation": "שְׁנֵי פִּשְׁפָּשִׁין הָיוּ בְּבֵית הַחֲלִיפוֹת, וְגוֹבְהָן שְׁמֹנָה; כְּדֵי לְהַכְשִׁיר אֶת הָעֲזָרָה כּוּלָּהּ לַאֲכִילַת קׇדְשֵׁי קָדָשִׁים, וְלִשְׁחִיטַת קָדָשִׁים קַלִּים"},
       {"oeuvre": "Rashi sur Zeva'him", "ref": "55b", "citation": "שני פשפשין היו בבית החליפות ופתוחין למערב"}
     ],
-    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam (Beit HaBechirah 4:5) counts the Ulam wall and its ten amot within the hundred-amot width, as if they ran along the whole building; the Raavad disputes it (“שלא היה שם כותל לאולם כלל”). The tour follows Middot 4:7 and Bartenura: the fifteen amot project only at the Ulam. The tour follows Tiferet Yisrael (Yachin on Middot 4:7): each projection is a closed room, with its door onto the Ulam and its wicket in the western corner, eight amot high (Zevachim 55b), opening to the west (Rashi, citing the Tosefta). Set aside: Tosafot Yom Tov, for whom the projection is the Ulam itself, open; Rashi (Zevachim 55b), who puts the niches in the western wall, on the outside, and gives the name Beit HaChalifot to the court opposite. Width of the doors, partition, door leaf and the steps down to the Azara: choices."
+    "note": "Tour's choice: no source says where the west wall of Beit HaHalifot runs — the tour takes it out of the 16 amot so the body of the building stays 70 wide. The size of the niches, their place in the side wall, their order (that of the mishmarot in Divrei HaYamim I 24) are choices, as are the shape of the knives, their iron, their bronze handles and their number, two per niche. The Rambam (Beit HaBechirah 4:5) counts the Ulam wall and its ten amot within the hundred-amot width, as if they ran along the whole building; the Raavad disputes it (“שלא היה שם כותל לאולם כלל”). The tour follows Middot 4:7 and Bartenura: the fifteen amot project only at the Ulam. The tour follows Tiferet Yisrael (Yachin on Middot 4:7): each projection is a closed room, with its door onto the Ulam and its wicket in the western corner, eight amot high (Zevachim 55b); the wickets open to the west (Rashi, citing the Tosefta). Set aside: Tosafot Yom Tov, for whom the projection is the Ulam itself, open; Rashi (Zevachim 55b), who puts the niches in the western wall, on the outside, and gives the name Beit HaChalifot to the court opposite. Width of the doors, partition, door leaf and the steps down to the Azara: choices."
   },
 
   "niche_bilga": {
     "nom": "Bilga's walled-up niche",
     "translit": "'Halonah shel Bilga",
-    "resume": "Bilga is the fifteenth of the twenty-four mishmarot. The Mishna penalises it three times: it always divides its loaves on the south side, even on the day it enters service; its slaughtering ring is fixed, so it must borrow the others'; and its knife niche is walled up. The Gemara gives two reasons. Miriam, daughter of Bilga, had renounced the Torah and married a Greek officer; when the Greeks entered the Heikhal she struck the altar with her sandal: “Lukos, lukos — wolf, wolf! How long will you devour Israel's wealth without standing by them in their hour of distress?” The Sages penalised the whole mishmar, for what a child says in the market he has heard from his father or his mother. According to the other view, Bilga's mishmar was late in coming, and Yeshevav, who precedes it, served in its place.",
+    "resume": "Bilga is the fifteenth of the twenty-four mishmarot. The Mishna penalises it three times: it always divides its loaves on the south side, even on the day it enters service; its slaughtering ring is fixed, so it must borrow the others'; and its knife niche is walled up. The Gemara gives two reasons. Miriam, daughter of Bilga, had renounced the Torah and married a Greek officer; when the Greeks entered the Heikhal she struck the altar with her sandal: “Lukos, lukos — wolf, wolf! How long will you devour Israel's wealth without standing by them in their hour of distress?” The Sages penalised her father, for what a child says in the market he has heard from his father or his mother; and the whole mishmar with him: “woe to the wicked, woe to his neighbour.” According to the other view, Bilga's mishmar was late in coming, and Yeshevav, who precedes it, served in its place.",
     "cotes": [
       "15th mishmar of 24",
       "the niche, the ring and the division of the loaves"
@@ -281,7 +281,8 @@
       {"oeuvre": "Arakhin", "ref": "2:3", "citation": ""},
       {"oeuvre": "Middot", "ref": "2:6", "citation": "מַעֲלָה הָיְתָה שָׁם, וּגְבוֹהָה אַמָּה, וְהַדּוּכָן נָתוּן עָלֶיהָ, וּבָהּ שָׁלשׁ מַעֲלוֹת שֶׁל חֲצִי חֲצִי אַמָּה"},
       {"oeuvre": "Divrei HaYamim II", "ref": "5:12", "citation": "מְלֻבָּשִׁים בּוּץ"},
-      {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"}
+      {"oeuvre": "Tamid", "ref": "7:3", "citation": "וְהִקִּישׁ בֶּן אַרְזָא בַּצֶּלְצָל, וְדִבְּרוּ הַלְוִיִּם בַּשִּׁיר"},
+      {"oeuvre": "Arakhin", "ref": "13b", "citation": "כְּנֶגֶד תִּשְׁעָה כִּנּוֹרוֹת"}
     ],
     "note": "Tour's choice: the Mishna does not say how the Leviim were dressed; the linen comes from the dedication of Shlomo's Temple (II Chronicles 5:12). The white kippa, the place on the top step facing the Sanctuary, the passage left open on the axis and the swaying are also choices. Adopted: the view of R. Eliezer ben Yaakov (Middot 2:6) — a one-ama step separates the Ezrat Israel from the Ezrat Kohanim, and the Dukhan stands on it. According to the first view in the mishna, the two courts are separated only by a row of projections (rashei pispasin). The Levite children, who stood below according to R. Eliezer ben Yaakov (Arakhin 2:6), have their own entry at the foot of the Dukhan in the tamid tour."
   },
@@ -386,7 +387,8 @@
       {"oeuvre": "Shemot", "ref": "30:7", "citation": "בְּהֵיטִיבוֹ אֶת הַנֵּרֹת יַקְטִירֶנָּה"},
       {"oeuvre": "Tamid", "ref": "3:9", "citation": "מִי שֶׁזָּכָה בְדִשּׁוּן הַמְּנוֹרָה, נִכְנַס וּמָצָא שְׁנֵי נֵרוֹת מִזְרָחִיִּים דּוֹלְקִים, מְדַשֵּׁן אֶת הַשְּׁאָר… וְאֶבֶן הָיְתָה לִפְנֵי הַמְּנוֹרָה וּבָהּ שָׁלשׁ מַעֲלוֹת, שֶׁעָלֶיהָ הַכֹּהֵן עוֹמֵד וּמֵטִיב אֶת הַנֵּרוֹת. וְהִנִּיחַ אֶת הַכּוּז עַל מַעֲלָה שְׁנִיָּה וְיָצָא"},
       {"oeuvre": "Tamid", "ref": "6:1", "citation": "נָטַל אֶת הַכּוּז מִמַּעֲלָה שְׁנִיָּה, וְהִשְׁתַּחֲוָה וְיָצָא"},
-      {"oeuvre": "Rambam Temidin", "ref": "6:4", "citation": "וְאַחַר כָּךְ מְפִיסִין פַּיִס שְׁלִישִׁי וּרְבִיעִי וְזוֹכֶה בַּקְּטֹרֶת מִי שֶׁזָּכָה וְנִכְנַס וּמַקְטִיר. וְאַחַר כָּךְ נִכְנַס זֶה שֶׁזָּכָה בְּדִשּׁוּן הַמְּנוֹרָה וּמֵטִיב שְׁתֵּי הַנֵּרוֹת"}
+      {"oeuvre": "Rambam Temidin", "ref": "6:4", "citation": "וְאַחַר כָּךְ מְפִיסִין פַּיִס שְׁלִישִׁי וּרְבִיעִי וְזוֹכֶה בַּקְּטֹרֶת מִי שֶׁזָּכָה וְנִכְנַס וּמַקְטִיר. וְאַחַר כָּךְ נִכְנַס זֶה שֶׁזָּכָה בְּדִשּׁוּן הַמְּנוֹרָה וּמֵטִיב שְׁתֵּי הַנֵּרוֹת"},
+      {"oeuvre": "Rambam Temidin", "ref": "3:12", "citation": "וְנוֹתֵן בּוֹ פְּתִילָה אַחֶרֶת וְשֶׁמֶן אַחֵר"}
     ],
     "note": "The shape of the kuz is a choice."
   },
@@ -401,15 +403,16 @@
       "voice alone, without nevel or kinor"
     ],
     "sources": [
-      {"oeuvre": "Arakhin", "ref": "2:6", "citation": "אֵין קָטָן נִכְנָס לָעֲזָרָה לַעֲבוֹדָה אֶלָּא בְשָׁעָה שֶׁהַלְוִיִּם עוֹמְדִים בַּשִּׁיר… רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, אֵין עוֹלִין לַמִּנְיָן, וְאֵין עוֹמְדִים עַל הַדּוּכָן, אֶלָּא בָאָרֶץ הָיוּ עוֹמְדִין, וְרָאשֵׁיהֶן מִבֵּין רַגְלֵי הַלְוִיִּם, וְצוֹעֲרֵי הַלְוִיִּם הָיוּ נִקְרָאִין"}
+      {"oeuvre": "Arakhin", "ref": "2:6", "citation": "אֵין קָטָן נִכְנָס לָעֲזָרָה לַעֲבוֹדָה אֶלָּא בְשָׁעָה שֶׁהַלְוִיִּם עוֹמְדִים בַּשִּׁיר… רַבִּי אֱלִיעֶזֶר בֶּן יַעֲקֹב אוֹמֵר, אֵין עוֹלִין לַמִּנְיָן, וְאֵין עוֹמְדִים עַל הַדּוּכָן, אֶלָּא בָאָרֶץ הָיוּ עוֹמְדִין, וְרָאשֵׁיהֶן מִבֵּין רַגְלֵי הַלְוִיִּם, וְצוֹעֲרֵי הַלְוִיִּם הָיוּ נִקְרָאִין"},
+      {"oeuvre": "Middot", "ref": "2:6", "citation": "נִמְצֵאת עֶזְרַת הַכֹּהֲנִים גְּבוֹהָה מֵעֶזְרַת יִשְׂרָאֵל שְׁתֵּי אַמּוֹת וּמֶחֱצָה"}
     ],
     "note": "Adopted: R. Eliezer ben Yaakov, as for the Dukhan itself. According to the first view in the mishna, the children stand with the Leviim. Tour's choice: two children, on either side of the axis, in a linen kutonet like the singers."
   },
 
   "shomer_levi": {
     "nom": "A Levite on guard",
-    "translit": "Shomer",
-    "resume": "The kohanim keep watch in the Temple in three places, the Leviim in twenty-one: five at the five gates of the Temple Mount, four at its inner corners, five at the gates of the Azara, four at its outer corners, and three at the chambers. The man of the Temple Mount makes his rounds with torches before him; a guard he finds asleep he strikes with his staff, and he may burn his garment. The free visit places a Levite outside the Nikanor Gate, on the steps, facing the Ezrat Nashim.",
+    "translit": "Shomer min haLeviim",
+    "resume": "The kohanim keep watch in the Temple in three places, the Leviim in twenty-one: five at the five gates of the Temple Mount, four at its inner corners, five at the gates of the Azara, four at its outer corners, one at the Lishkat HaKorban, one at the Lishkat HaParokhet and one behind the Beit HaKapporet. The man of the Temple Mount makes his rounds with torches before him; a guard he finds asleep he strikes with his staff, and he may burn his garment. The free visit places a Levite outside the Nikanor Gate, on the steps, facing the Ezrat Nashim.",
     "cotes": [
       "twenty-one Levite posts",
       "five at the gates of the Azara",
@@ -435,7 +438,8 @@
     "sources": [
       {"oeuvre": "Ta'anit", "ref": "4:2", "citation": "וְכִי הֵיאַךְ קָרְבָּנוֹ שֶׁל אָדָם קָרֵב, וְהוּא אֵינוֹ עוֹמֵד עַל גַּבָּיו… עַל כָּל מִשְׁמָר וּמִשְׁמָר הָיָה מַעֲמָד בִּירוּשָׁלַיִם שֶׁל כֹּהֲנִים, שֶׁל לְוִיִּם, וְשֶׁל יִשְׂרְאֵלִים"},
       {"oeuvre": "Middot", "ref": "5:1", "citation": "מְקוֹם דְּרִיסַת יִשְׂרָאֵל אַחַת עֶשְׂרֵה אַמָּה, מְקוֹם דְּרִיסַת הַכֹּהֲנִים אַחַת עֶשְׂרֵה אַמָּה"},
-      {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת הַכֹּהֲנִים מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין יִשְׂרָאֵל נִכְנָסִים לְשָׁם אֶלָּא בִשְׁעַת צָרְכֵיהֶם, לִסְמִיכָה לִשְׁחִיטָה וְלִתְנוּפָה"}
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "עֶזְרַת הַכֹּהֲנִים מְקֻדֶּשֶׁת מִמֶּנָּה, שֶׁאֵין יִשְׂרָאֵל נִכְנָסִים לְשָׁם אֶלָּא בִשְׁעַת צָרְכֵיהֶם, לִסְמִיכָה לִשְׁחִיטָה וְלִתְנוּפָה"},
+      {"oeuvre": "Rambam Klei HaMikdash", "ref": "6:2", "citation": "מִי שֶׁהָיָה מֵהֶן בִּירוּשָׁלַיִם אוֹ קָרוֹב לָהּ נִכְנָסִין לַמִּקְדָּשׁ"}
     ],
     "note": "Project's position: the worshippers are not in period costume but in what their community wears today for Yom Kippur — suit and tallit, suit and kippa. This is a deliberate stance, not a reconstruction. The gestures are also choices."
   },
@@ -482,11 +486,11 @@
   "place_kotel": {
     "nom": "Western Wall Plaza",
     "translit": "Rechavat HaKotel",
-    "resume": "Today's prayer plaza at the foot of the Kotel, nineteen metres below the platform. Retaining walls surround it: the upper city stands above it. It has two levels: against the Kotel, the prayer area, dug out in 1968; to the west, the visitors' upper plaza, sixty centimetres higher, behind a low wall with a parapet that two gaps open. From its north-west corner a stairway climbs to the Jewish Quarter, and a covered passage leads to HaGai Street; to the north are the covered halls of Wilson's Arch; to the south-west, a passage towards Batei Machaseh; to the south, through the security checks, the way to the Dung Gate, and the Mughrabi Bridge climbing to the platform.",
+    "resume": "Today's prayer plaza at the foot of the Kotel, nineteen metres below the platform. Retaining walls surround it: the upper city stands above it. It has two levels: against the Kotel, the prayer area, dug out in 1967; to the west, the visitors' upper plaza, sixty centimetres higher, behind a low wall with a parapet that two gaps open. From its north-west corner a stairway climbs to the Jewish Quarter, and a covered passage leads to HaGai Street; to the north are the covered halls of Wilson's Arch; to the south-west, a passage towards Batei Machaseh; to the south, through the security checks, the way to the Dung Gate, and the Mughrabi Bridge climbing to the platform.",
     "cotes": [
       "outline and stairway line from OpenStreetMap",
-      "the Jewish Quarter, twenty-two metres above the plaza (elevator project from Tiferet Yisrael Street)",
-      "two levels since 1968: the prayer area lowered by about two metres, then the step to the upper plaza reduced to sixty centimetres; the low wall between them, about ninety centimetres high, has carried a one-metre stone parapet since 1979 (S. Bahat, Cathedra 174, 2020)",
+      "the Jewish Quarter, about twenty-six metres above the plaza (elevator project from Misgav Ladach Street)",
+      "the prayer area dug out by about two and a half metres in the autumn of 1967; two levels since the 1968 compromise, which reduced the step to the upper plaza to sixty centimetres; the low wall between them, about ninety centimetres high, has carried a one-metre stone parapet since 1979 (S. Bahat, Cathedra 174, 2020)",
       "the passages to HaGai Street, Batei Machaseh and the Dung Gate, and the gaps in the low wall, from OpenStreetMap",
       "the furniture from OpenStreetMap: netilat yadayim stations, fountains, mechitza, low wall of the prayer area, fences, security checks, the \"HaKotel HaMa'aravi\" bus stop",
       "a thousand white plastic chairs, delivered in 2020 (thekotel.org)",
@@ -514,7 +518,7 @@
         "citation": "הַדָּבָר בָּרוּר שֶׁתַּחַת הַכִּיפָּה שָׁם אֶבֶן הַשְּׁתִיָּה בְּלִי סָפֵק"
       }
     ],
-    "note": "Choice of the tour: the Temple keeps the true east of Middot 2:4; the present outline is turned by six degrees, and its eastern wall runs about ten metres inside the north-east corner of the square. Nothing is built on it: the platform belongs to the Temple."
+    "note": "Choice of the tour: the Temple faces due east, the entrance of the Heikhal facing the Mount of Anointing (Middot 2:4); the present outline is turned by six degrees, and its eastern wall runs about ten metres inside the north-east corner of the square. Nothing is built on it: the platform belongs to the Temple."
   },
   "mur_herode": {
     "nom": "Herod's wall",
@@ -530,7 +534,7 @@
     "resume": "North of the plaza, the covered prayer halls under the causeway leading to the Chain Gate. The Kotel continues there under a great arch springing from it: it once carried a bridge to the platform, above the street that ran along the wall.",
     "cotes": [
       "span of the arch: thirteen metres",
-      "its crown: 6.1 m above today's floor",
+      "its crown: about 6 to 7.5 m above today's floor (published surveys differ)",
       "outline of the halls from OpenStreetMap",
       "an ark holding more than a hundred Torah scrolls and a library, from the 2005–2008 renovation; the ner tamid, lit in 2010 (thekotel.org)",
       "a shaft showing fourteen courses below the floor (Wikipedia)"
@@ -604,6 +608,11 @@
         "oeuvre": "Middot",
         "ref": "2:5",
         "citation": "וַחֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת עוֹלוֹת מִתּוֹכָהּ לְעֶזְרַת יִשְׂרָאֵל, כְּנֶגֶד חֲמֵשׁ עֶשְׂרֵה מַעֲלוֹת שֶׁבַּתְּהִלִּים"
+      },
+      {
+        "oeuvre": "Bartenura sur Soucca",
+        "ref": "5:4",
+        "citation": "אֲבָל דּוּכָן לְשִׁיר שֶׁל קָרְבָּן אֵצֶל הַמִּזְבֵּחַ הָיָה"
       }
     ]
   },
@@ -724,6 +733,11 @@
         "oeuvre": "Rambam Avodat Yom HaKippurim",
         "ref": "2:6",
         "citation": "וּמַזְכִּיר אֶת הַשֵּׁם בְּכָל וִדּוּי מֵהֶן שָׁלֹשׁ פְּעָמִים… וּבְכֻלָּם הוּא מַזְכִּיר כִּכְתָבוֹ שֶׁהוּא הַשֵּׁם הַמְפֹרָשׁ"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "6:3",
+        "citation": "מְסָרוֹ לְמִי שֶׁהָיָה מוֹלִיכוֹ"
       }
     ],
     "note": "Tour's choice: the Mishna says which way the goat faces, not where the Kohen Gadol stands. The tour places him against the goat's flank, facing the same way, his hands between its horns. The place north-east of the altar, the breed of the goat and the way the crimson strip is tied are also choices. The mitznefet is the same linen band as the priests' migba'at, wound flat."
@@ -781,7 +795,7 @@
       {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם. פָּשַׁט, יָרַד וְטָבַל, עָלָה וְנִסְתַּפֵּג. הֵבִיאוּ לוֹ בִגְדֵי זָהָב, וְלָבַשׁ וְקִדֵּשׁ יָדָיו וְרַגְלָיו"},
       {"oeuvre": "Rambam Avodat Yom HaKippurim", "ref": "2:2", "citation": "וְחָמֵשׁ טְבִילוֹת וַעֲשָׂרָה קִדּוּשִׁין טוֹבֵל כֹּהֵן גָּדוֹל וּמְקַדֵּשׁ בּוֹ בַּיּוֹם"}
     ],
-    "note": "Tour's choice: for the seven days in the Parhedrin chamber, no source says which garments he wears; the tour shows him in the golden ones, which he may wear on a service day even outside the service. The colours of the twelve stones, the cut of the ephod and the seat are choices. The avnet, tied under the me'il, is not shown."
+    "note": "Tour's choice: for the seven days in the Parhedrin chamber, neither the Mishna (Yoma 1) nor the Rambam (Avodat Yom HaKippurim 1) says which garments he wears; the tour shows him in the golden ones, which he may wear on a service day even outside the service. The colours of the twelve stones, the cut of the ephod and the seat are choices. The avnet, tied under the me'il, is not shown."
   },
   "bigdei_lavan": {
     "nom": "The Kohen Gadol in the white garments",
@@ -832,14 +846,15 @@
   "sadin_shel_butz": {
     "nom": "The linen sheet",
     "translit": "Sadin shel butz",
-    "resume": "At each immersion a sheet of fine linen is spread between the Kohen Gadol and the people. Behind it he undresses, goes down to immerse, comes up, dries himself, puts on the garments brought to him and sanctifies his hands and feet. The first time above the Water Gate, the others on the roof of the Beit HaParva.",
+    "resume": "At each immersion — the Mishna says so of the first two — a sheet of fine linen is spread between the Kohen Gadol and the people. Behind it he undresses, goes down to immerse, comes up, dries himself, puts on the garments brought to him and sanctifies his hands and feet. The first time above the Water Gate, the others on the roof of the Beit HaParva.",
     "cotes": [
       "at each immersion",
       "between him and the people",
       "fine linen"
     ],
     "sources": [
-      {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם. פָּשַׁט, יָרַד וְטָבַל, עָלָה וְנִסְתַּפֵּג. הֵבִיאוּ לוֹ בִגְדֵי זָהָב, וְלָבַשׁ וְקִדֵּשׁ יָדָיו וְרַגְלָיו"}
+      {"oeuvre": "Yoma", "ref": "3:4", "citation": "פֵּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם. פָּשַׁט, יָרַד וְטָבַל, עָלָה וְנִסְתַּפֵּג. הֵבִיאוּ לוֹ בִגְדֵי זָהָב, וְלָבַשׁ וְקִדֵּשׁ יָדָיו וְרַגְלָיו"},
+      {"oeuvre": "Yoma", "ref": "3:6", "citation": "פָּרְסוּ סָדִין שֶׁל בּוּץ בֵּינוֹ לְבֵין הָעָם"}
     ],
     "note": "Tour's choice: who holds it, and how high, the Mishna does not say. The tour has two priests stretch it at shoulder height: the Kohen Gadol's head, in the headdress of the moment, shows above it."
   },
@@ -1029,7 +1044,7 @@
   "mikra_bikkourim": {
     "nom": "The reading of the bikkurim",
     "translit": "Mikra bikkurim",
-    "resume": "With the basket still on his shoulder, the bearer says to the kohen “I declare today to HaShem your God that I have come into the land” (Deuteronomy 26:3), and reads up to “Arami oved avi”. At first, whoever could read read, and whoever could not was prompted; people then held back from bringing, so it was instituted that everyone be prompted, whether he knows how or not.",
+    "resume": "With the basket still on his shoulder, the bearer says to the kohen “I declare today to HaShem your God that I have come into the land” (Deuteronomy 26:3), and reads up to “Arami oved avi”, where he lowers the basket; the first view in the Mishna has him read the whole passage with the basket on his shoulder (Bikkurim 3:6). At first, whoever could read read, and whoever could not was prompted; people then held back from bringing, so it was instituted that everyone be prompted, whether he knows how or not.",
     "cotes": [
       "the basket still on his shoulder",
       "facing the kohen"
@@ -1127,8 +1142,8 @@
 
   "aravot": {
     "nom": "The aravot around the altar",
-    "translit": "Aravot",
-    "resume": "Below Jerusalem, at Motza, they gather tall willow branches; they come and stand them at the sides of the altar, their tops bent over it, and sound teki'a, teru'a, teki'a — every day of the seven days of the festival. Eleven amot tall, they overhang the altar by one ama: so they are set on the yesod, not on the ground.",
+    "translit": "Arava",
+    "resume": "Below Jerusalem, at Motza, they gather tall willow branches; they come and stand them at the sides of the altar, their tops bent over it, and sound teki'a, teru'a, teki'a — every day of the seven days of the festival, except a Shabbat falling in its midst. Eleven amot tall, they overhang the altar by one ama: so they are set on the yesod, not on the ground.",
     "cotes": [
       "eleven amot",
       "set on the yesod",
@@ -1273,7 +1288,8 @@
       {"oeuvre": "Nombres", "ref": "6:18", "citation": "וְגִלַּח הַנָּזִיר פֶּתַח אֹהֶל מוֹעֵד אֶת רֹאשׁ נִזְרוֹ וְלָקַח אֶת שְׂעַר רֹאשׁ נִזְרוֹ וְנָתַן עַל הָאֵשׁ אֲשֶׁר תַּחַת זֶבַח הַשְּׁלָמִים"},
       {"oeuvre": "Nazir", "ref": "6:9", "citation": "הַכֹּהֵן נוֹטֵל אֶת הַזְּרוֹעַ בְּשֵׁלָה מִן הָאַיִל, וְחַלַּת מַצָּה אַחַת מִן הַסַּל, וּרְקִיק מַצָּה אֶחָד, וְנוֹתֵן עַל כַּפֵּי הַנָּזִיר וּמְנִיפָן, וְאַחַר כָּךְ הֻתַּר הַנָּזִיר לִשְׁתּוֹת יַיִן"},
       {"oeuvre": "Rambam Nezirout", "ref": "8:2", "citation": "וּמְבַשֵּׁל הַשְּׁלָמִים אוֹ שׁוֹלְקָן וְלוֹקֵחַ מִן הָרֹטֶב שֶׁל זִבְחֵי הַשְּׁלָמִים וְנוֹתֵן עַל הַשֵּׂעָר וְאַחַר כָּךְ מַשְׁלִיכוֹ לָאֵשׁ תַּחַת דּוּד הַשְּׁלָמִים"},
-      {"oeuvre": "Rambam Nezirout", "ref": "8:3", "citation": "וְהֵיכָן מְגַלֵּחַ שְׂעָרוֹ בְּעֶזְרַת הַנָּשִׁים בְּלִשְׁכַּת הַנְּזִירִים שֶׁהָיְתָה שָׁם בְּקֶרֶן מִזְרָחִית דְּרוֹמִית… וְאֵינוֹ מְגַלֵּחַ עַד שֶׁיִּהְיֶה פֶּתַח הָעֲזָרָה פָּתוּחַ… לֹא שֶׁיְּגַלַּח כְּנֶגֶד הַפֶּתַח שֶׁזֶּה בִּזְיוֹן מִקְדָּשׁ הוּא"}
+      {"oeuvre": "Rambam Nezirout", "ref": "8:3", "citation": "וְהֵיכָן מְגַלֵּחַ שְׂעָרוֹ בְּעֶזְרַת הַנָּשִׁים בְּלִשְׁכַּת הַנְּזִירִים שֶׁהָיְתָה שָׁם בְּקֶרֶן מִזְרָחִית דְּרוֹמִית… וְאֵינוֹ מְגַלֵּחַ עַד שֶׁיִּהְיֶה פֶּתַח הָעֲזָרָה פָּתוּחַ… לֹא שֶׁיְּגַלַּח כְּנֶגֶד הַפֶּתַח שֶׁזֶּה בִּזְיוֹן מִקְדָּשׁ הוּא"},
+      {"oeuvre": "Nombres", "ref": "6:14", "citation": "כֶּבֶשׂ בֶּן שְׁנָתוֹ תָמִים אֶחָד לְעֹלָה וְכַבְשָׂה אַחַת בַּת שְׁנָתָהּ תְּמִימָה לְחַטָּאת וְאַיִל אֶחָד תָּמִים לִשְׁלָמִים"}
     ],
     "note": "Tour's choice: his place west of the hearth and the gesture, the hand above the wall; the tuft in his hand; his beard, which the verse does not name — it says “the head of his nazirhood”; his clothes."
   },
@@ -1376,7 +1392,7 @@
   "shimon_hatsadik": {
     "nom": "Shimon HaTzaddik",
     "translit": "Shimon HaTzaddik",
-    "resume": "For forty years Shimon HaTzaddik served as Kohen Gadol, and for forty years the signs went with him. The lot “for HaShem” always came up in his right hand. The strip of scarlet turned white. The western lamp of the Menorah kept burning. The fire of the altar grew strong of itself, and the kohanim brought only two logs to it, for the mitzvah. Blessing lay in the omer, the two loaves and the showbread: a kohen who received an olive's bulk of it ate his fill, and left some over. After him, sometimes yes, sometimes no. In the year of his death, he announced it: every Yom Kippur, an old man dressed and wrapped in white went in with him and came out with him; this time the old man was dressed and wrapped in black, went in with him and did not come out. After the festival he was ill seven days and died, and his brothers the kohanim ceased to bless with the Name. Forty years before the destruction, no sign returned, and the doors of the Heikhal opened by themselves, until Rabban Yochanan ben Zakkai rebuked them: “Heikhal, Heikhal, why do you frighten yourself? I know that your end is to be destroyed.”",
+    "resume": "For forty years Shimon HaTzaddik served as Kohen Gadol, and for forty years the signs went with him. The lot “for HaShem” always came up in his right hand. The strip of scarlet turned white. The western lamp of the Menorah kept burning. The fire of the altar grew strong of itself, and the kohanim brought only two logs to it, for the mitzvah. Blessing lay in the omer, the two loaves and the showbread: of a kohen who received an olive's bulk of it, one ate his fill, another left some over. After him, the signs came sometimes yes, sometimes no, and a curse fell on those breads: each kohen received only a bean's bulk. In the year of his death, he announced it: every Yom Kippur, an old man dressed and wrapped in white went in with him and came out with him; this time the old man was dressed and wrapped in black, went in with him and did not come out. After the festival he was ill seven days and died, and his brothers the kohanim ceased to bless with the Name. Forty years before the destruction, the lot no longer came up in the right hand, the scarlet no longer turned white, the western lamp no longer burned, and the doors of the Heikhal opened by themselves, until Rabban Yochanan ben Zakkai rebuked them: “Heikhal, Heikhal, why do you frighten yourself? I know that your end is to be destroyed.”",
     "cotes": [
       "forty years Kohen Gadol",
       "five signs: the lot, the scarlet, the western lamp, the altar fire, the bread"
@@ -1399,7 +1415,7 @@
     "translit": "Lashon shel zehorit",
     "resume": "On Yom Kippur a strip of scarlet wool was tied on the head of the scapegoat before it was sent away. Rabbi Yishmael speaks of another, tied at the entrance of the sanctuary: when the goat reached the wilderness, it turned white, as it is written: “Though your sins be as scarlet, they shall be as white as snow.” According to the baraita, it was first tied at the opening of the Ulam, on the outside. If it turned white, they rejoiced; if not, they were sad and ashamed. It was moved inside, but people still came to peek; so it was divided, one half tied to the rock, the other between the goat's horns. During the forty years of Shimon HaTzaddik it turned white every year; during the forty years before the destruction, never.",
     "cotes": [
-      "at the opening of the Ulam, on the outside, on the south jamb",
+      "at the opening of the Ulam, on the outside, on the north jamb",
       "tied to a ring, four and a half amot above the threshold",
       "red when the goat leaves, white when it reaches the wilderness"
     ],
@@ -1429,14 +1445,19 @@
       {"oeuvre": "Para", "ref": "3:5", "citation": "שִׁמְעוֹן הַצַּדִּיק וְיוֹחָנָן כֹּהֵן גָּדוֹל עָשׂוּ שְׁתַּיִם שְׁתַּיִם, אֶלְיְהוֹעֵינַי בֶּן הַקּוֹף וַחֲנַמְאֵל הַמִּצְרִי וְיִשְׁמָעֵאל בֶּן פִּיאָבִי עָשׂוּ אַחַת אֶחָת"},
       {"oeuvre": "Rambam Para Adouma", "ref": "3:4", "citation": "וְתֵשַׁע פָּרוֹת אֲדֻמּוֹת נַעֲשׂוּ מִשֶּׁנִּצְטַוּוּ בְּמִצְוָה זוֹ עַד שֶׁחָרַב הַבַּיִת בַּשְּׁנִיָּה… וְהָעֲשִׂירִית יַעֲשֶׂה הַמֶּלֶךְ הַמָּשִׁיחַ"},
       {"oeuvre": "Para", "ref": "3:7", "citation": "וּמְטַמְּאִים הָיוּ אֶת הַכֹּהֵן הַשּׂוֹרֵף אֶת הַפָּרָה, מִפְּנֵי הַצְּדוֹקִים, שֶׁלֹּא יִהְיוּ אוֹמְרִים, בִּמְעֹרְבֵי שֶׁמֶשׁ הָיְתָה נַעֲשֵׂית"},
-      {"oeuvre": "Kelim", "ref": "1:8", "citation": "הַחֵיל מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם"}
+      {"oeuvre": "Kelim", "ref": "1:8", "citation": "הַחֵיל מְקֻדָּשׁ מִמֶּנּוּ, שֶׁאֵין גּוֹיִם וּטְמֵא מֵת נִכְנָסִים לְשָׁם"},
+      {"oeuvre": "Nombres", "ref": "19:3", "citation": "וְהוֹצִיא אֹתָהּ אֶל מִחוּץ לַמַּחֲנֶה"},
+      {"oeuvre": "Nombres", "ref": "19:17", "citation": "וְנָתַן עָלָיו מַיִם חַיִּים אֶל כֶּלִי"},
+      {"oeuvre": "Para", "ref": "3:1", "citation": "וּבֵית אֶבֶן הָיְתָה נִקְרֵאת"},
+      {"oeuvre": "Para", "ref": "3:2", "citation": "חֲצֵרוֹת הָיוּ בִירוּשָׁלַיִם בְּנוּיוֹת עַל גַּבֵּי סֶלַע, וְתַחְתֵּיהֶם חָלוּל"},
+      {"oeuvre": "Para", "ref": "3:6", "citation": "כִּפִּין עַל גַּבֵּי כִפִּין"}
     ],
     "note": "Adopted: the Sages, seven parot since Ezra (Para 3:5), whom the Rambam follows. Set aside: R. Meir, who counts only five after Ezra. The heifer itself, the kohen and those who accompany him are not yet in the tour: only the way is followed, from the Beit Even to the Mount of Olives."
   },
   "beit_even": {
     "nom": "Beit Even",
     "translit": "Beit Even",
-    "resume": "Seven days before burning the para, the kohen who will burn it is separated from his house and settled in a chamber to the northeast, facing the Mikdash: it was called Beit Even, the house of stone. Everything he uses during these seven days is of stone, dried dung or raw clay, materials that do not take impurity. Each day he is sprinkled with the ash of one of the earlier parot, a different one each day. According to R. Chanina, the Segan of the kohanim, he is sprinkled all seven days; the Kohen Gadol of Kippur, also set apart seven days, is sprinkled only on the third and the seventh. The northeast is no accident: the para is a chatat, and the chatat requires the north.",
+    "resume": "Seven days before burning the para, the kohen who will burn it is separated from his house and settled in a chamber to the northeast, facing the Mikdash: it was called Beit Even, the house of stone. Everything he uses during these seven days is of stone, dried dung or raw clay, materials that do not take impurity. Each day he is sprinkled with the ash of one of the earlier parot, a different one each day — except the fourth, says the Rambam, which has no sprinkling. According to R. Chanina, the Segan of the kohanim, he is sprinkled all seven days; the Kohen Gadol of Kippur, also set apart seven days, is sprinkled only on the third and the seventh. The northeast is no accident: the para is a chatat, and the chatat requires the north.",
     "cotes": [
       "7 days of separation, begun on a Wednesday so that the 4th, which has no sprinkling, falls on Shabbat",
       "a chamber of 20 × 16 amot to the northeast of the Mikdash, beyond the Soreg",
@@ -1453,7 +1474,7 @@
   },
   "kelalim": {
     "nom": "The ash jars of the Cheil",
-    "translit": "Kelal shel Chatat",
+    "translit": "Kalal shel Chatat",
     "resume": "The ash of each para was divided into three: one part for the mishmarot of kohanim, one on the Mount of Olives where Israel came to purify themselves, and one kept in the Cheil, “in deposit.” The ash of each para was kept there in this way. The Tosefta says where: stone jars sealed in the wall of the steps of the Ezrat Nashim, whose stone lids could be seen from the Cheil. It is there, at the gate, that the children born for purity arrived: a rope was tied to the horns of a ram, with a stick at its end that was thrown into the jar; the ram was struck, it drew back, the ash spilled, and the child took it without having to plunge his hand in. R. Yosei: “Do not give the Sadducees room to mock” — the child took it himself.",
     "cotes": [
       "9 stone lids, one per para, in the riser of the first step of the Cheil",
@@ -1471,7 +1492,7 @@
   },
   "chalal": {
     "nom": "The void beneath the Har HaBayit",
-    "translit": "Ha'chalal",
+    "translit": "Chalal she-tachat Har HaBayit",
     "resume": "“The Har HaBayit and the Azarot: beneath them it was hollow, because of the tomb of the deep.” A forgotten tomb may lie anywhere under the rock, and the impurity of a dead person who has no space above him “bursts through and rises”: a void stops it. So they built on vaults. In Jerusalem, courtyards were built this way on the rock, above a void: children were born and raised there who had never touched the impurity of the dead, until the age of eight. For the para, they went to the Shiloach seated on doors laid on the backs of oxen — the wide belly of the ox still separating them from the ground —, a stone cup in hand; they filled it and climbed back on the doors. Arrived at the Har HaBayit, they got down: there, the ground was hollow.",
     "cotes": [
       "a section of 60 × 30 amot under the east axis, between the Soreg and Sha'ar Shushan",
@@ -1484,16 +1505,16 @@
       {"oeuvre": "Para", "ref": "3:2", "citation": "חֲצֵרוֹת הָיוּ בִירוּשָׁלַיִם בְּנוּיוֹת עַל גַּבֵּי סֶלַע וְתַחְתֵּיהֶם חָלוּל… וּמְבִיאִים שְׁוָרִים וְעַל גַּבֵּיהֶן דְּלָתוֹת, וְתִינוֹקוֹת יוֹשְׁבִין עַל גַּבֵּיהֶן וְכוֹסוֹת שֶׁל אֶבֶן בְּיָדָם"},
       {"oeuvre": "Bartenura", "ref": "Para 3:2", "citation": "וּמְגַדְּלוֹת שָׁם אֶת בְּנֵיהֶן. עַד שֶׁיִּהְיוּ בֶן שְׁמֹנֶה… וּמְבִיאִים שְׁוָרִים. שֶׁכְּרֵסָן רְחָבָה"}
     ],
-    "note": "Tour's choice: the shape of the void — three aisles with a shallow barrel vault on two arcades —, its height and the section shown. The Mishna says only that it was hollow; the Bartenura, that they built on vaults (כִּפִּין). Not modeled: the rest of the void, under the esplanade and under the Azarot, and the children's courtyards of the city."
+    "note": "Tour's choice: the shape of the void — three aisles with a shallow barrel vault on two arcades —, its height and the section shown. The Mishna says only that it was hollow; the Bartenura says the courtyards of the city were built on vaults (כִּפִּין) (Para 3:2), and the tour does the same here. Not modeled: the rest of the void, under the esplanade and under the Azarot, and the children's courtyards of the city."
   },
   "kevesh_hapara": {
     "nom": "The kevesh of the para",
     "translit": "Kevesh HaPara",
-    "resume": "The kohen, the para and those who assist him go out by the east gate, the one on which Shushan is sculpted, and do not touch the ground again until the Mount of Olives: a ramp of arches set on arches was built for them. Each upper arch sets its two feet on the backs of two lower arches, so that under each foot there is a void and not another foot: a tomb buried under a pier could not rise as far as the deck. The place of burning and the mikveh at the summit are hollow too. If the para refused to advance, no other cow was brought out with it, neither black nor red, so that no one would say two had been slaughtered. The kevesh was paid for from the remains of the Temple chamber; Abba Shaul says the Kohanim Gedolim built it with their own money.",
+    "resume": "The kohen, the para and those who assist him go out by the east gate, the one on which Shushan is sculpted, and do not touch the ground again until the Mount of Olives: a ramp of arches set on arches was built for them. Each upper arch sets its two feet on the backs of two lower arches, so that under each foot there is a void and not another foot: a tomb buried under a pier could not rise as far as the deck. The place of burning and the mikveh at the summit are hollow too. If the para refused to advance, no other cow was brought out with it, not a black one, so that no one would say a black one had been slaughtered, nor a red one, so that no one would say two had been slaughtered. The kevesh was paid for from the remains of the Temple chamber; Abba Shaul says the Kohanim Gedolim built it with their own money.",
     "cotes": [
       "1,394 amot (669 m) from Sha'ar Shushan to the summit, in a straight line on the axis",
-      "9 tiers of arches of 16 amot; 145 amot above the Kidron",
-      "10 amot wide, that of the gate; a single slope, of one tenth"
+      "9 tiers of arches of 16 amot; up to 144 amot above the Kidron",
+      "10 amot wide, that of the gate; two slopes, about one in ten, then one in fourteen near the summit"
     ],
     "sources": [
       {"oeuvre": "Para", "ref": "3:6", "citation": "וְכֶבֶשׁ הָיוּ עוֹשִׂים מֵהַר הַבַּיִת לְהַר הַמִּשְׁחָה, כִּפִּין עַל גַּבֵּי כִפִּין, וְכִפָּה כְנֶגֶד הָאֹטֶם, מִפְּנֵי קֶבֶר הַתְּהוֹם"},
@@ -1503,7 +1524,7 @@
       {"oeuvre": "Para", "ref": "3:7", "citation": "לֹא הָיְתָה פָרָה רוֹצָה לָצֵאת, אֵין מוֹצִיאִין עִמָּהּ שְׁחוֹרָה, שֶׁלֹּא יֹאמְרוּ, שְׁחוֹרָה שָׁחֲטוּ. וְלֹא אֲדֻמָּה, שֶׁלֹּא יֹאמְרוּ, שְׁתַּיִם שָׁחֲטוּ"},
       {"oeuvre": "Shekalim", "ref": "4:2", "citation": "כֶּבֶשׁ פָּרָה… בָּאִין מִשְּׁיָרֵי הַלִּשְׁכָּה. אַבָּא שָׁאוּל אוֹמֵר, כֶּבֶשׁ פָּרָה כֹּהֲנִים גְּדוֹלִים עוֹשִׂין אוֹתוֹ מִשֶּׁל עַצְמָן"}
     ],
-    "note": "Adopted: the tiers offset by half a bay, each pier on the keystone of the arch below (Rambam, Bartenura). Tour's choice: the straight course on the axis; a single slope, from the threshold of the gate to the summit, never less than ten amot above the ground; the width, the bay (12 amot of opening, piers of 4), the height of the tiers, the parapet. Herod's wall is leveled across its width, and today's city is erased where it passes: Dominus Flevit, the Benedictine convent and two buildings at the summit."
+    "note": "Adopted: the tiers offset by half a bay, each pier on the keystone of the arch below (Rambam, Bartenura). Tour's choice: the straight course on the axis; a continuous climb, from the threshold of the gate to the summit, never less than ten amot above the ground; the width, the bay (12 amot of opening, piers of 4), the height of the tiers, the parapet. Herod's wall is leveled across its width, and today's city is erased where it passes: Dominus Flevit, the Benedictine convent and two buildings at the summit."
   },
   "makom_hasereifa": {
     "nom": "The place of the burning",
@@ -1511,7 +1532,7 @@
     "resume": "At the summit of the Mount of Olives, facing the east gate. All the walls of the Temple were high, except the eastern one, so that from here the kohen could see the entrance of the Heikhal at the moment of sprinkling the blood. The para is bound with a rope of rushes and laid on the pyre, its head to the south, its face to the west. The kohen stands in the east, facing west: he slaughters with his right hand, receives the blood in the left, and sprinkles of it seven times with his finger toward the Holy of Holies, dipping the finger again each time. If he does not aim at the entrance, the para is invalid. He wipes his hand on the para, goes down and lights it. When it bursts, he stands outside the pit and takes the cedar wood, the hyssop and the scarlet wool: “Is this cedar wood? Is this cedar wood?” — three times for each, and three times they answer him “yes.” Then he throws them into the fire.",
     "cotes": [
       "on the axis, 1,425 amot east of Sha'ar Shushan (684 m)",
-      "a platform of 80 × 40 amot on arches, 12 to 17 amot above the ground",
+      "a platform of 80 × 40 amot on arches, 12 to 15 amot above the ground",
       "the pit: 18 × 10 amot, 6 deep, steps on the east"
     ],
     "sources": [
@@ -1521,9 +1542,10 @@
       {"oeuvre": "Para", "ref": "3:9", "citation": "רֹאשָׁהּ בַּדָּרוֹם וּפָנֶיהָ לַמַּעֲרָב. הַכֹּהֵן עוֹמֵד בַּמִּזְרָח וּפָנָיו לַמַּעֲרָב… טָבַל וְהִזָּה שֶׁבַע פְּעָמִים כְּנֶגֶד בֵּית קֹדֶשׁ הַקֳּדָשִׁים… יָרַד וְהִצִּית אֶת הָאֵשׁ"},
       {"oeuvre": "Para", "ref": "4:2", "citation": "הִזָּה וְלֹא כִוֵּן כְּנֶגֶד הַפֶּתַח, פְּסוּלָה"},
       {"oeuvre": "Para", "ref": "3:10", "citation": "נִבְקְעָה, וְעָמַד חוּץ מִגִּתָּהּ. נָטַל עֵץ אֶרֶז וְאֵזוֹב וּשְׁנִי תוֹלַעַת. אָמַר לָהֶן, עֵץ אֶרֶז זֶה, עֵץ אֶרֶז זֶה"},
-      {"oeuvre": "Bartenura", "ref": "Para 3:7", "citation": "וְאַף מְקוֹם מַעֲרַכְתָּהּ וְגִתָּהּ הַשְּׁנוּיִין לְקַמָּן, כֻּלָּן עַל גַּבֵּי כִפִּין הָיוּ"}
+      {"oeuvre": "Bartenura", "ref": "Para 3:7", "citation": "וְאַף מְקוֹם מַעֲרַכְתָּהּ וְגִתָּהּ הַשְּׁנוּיִין לְקַמָּן, כֻּלָּן עַל גַּבֵּי כִפִּין הָיוּ"},
+      {"oeuvre": "Para", "ref": "3:11", "citation": "כְּרָכָן בִּשְׁיָרֵי הַלָּשׁוֹן וְהִשְׁלִיךְ לְתוֹךְ שְׂרֵפָתָהּ"}
     ],
-    "note": "Adopted: the kohen slaughters and sprinkles from the east edge of the pit, level with the top of the pyre, and goes down into it to light the fire (“יָרַד וְהִצִּית”). The Talmud counts the steps: according to R. Eliezer ben Yaakov, they raise the floor of the Heikhal above the twenty amot of the gates, so that whoever looks from below, through the gates, cannot see the bottom of its opening; hence the low east wall, to see it from above, over the wall and through the gates of the Ezrat Nashim and the Ezrat Israel (Rashi). In the scene, from the kohen's eye, half of the Heikhal opening can be seen: the lower part through Sha'ar Nikanor, the upper part over the Azara wall; the lintel of Nikanor hides the middle. Tour's choice: the platform, its height, the size and depth of the pit, its steps. The terrain is today's; the summit chosen is the high point of the axis."
+    "note": "Adopted: the kohen slaughters and sprinkles from the east edge of the pit, level with the top of the pyre, and goes down into it to light the fire (“יָרַד וְהִצִּית”). The Talmud counts the steps: according to R. Eliezer ben Yaakov, they raise the floor of the Heikhal above the twenty amot of the gates, so that whoever looks from below, through the gates, sees nothing of its opening; hence the low east wall, to see it from above, over the wall and through the gates of the Ezrat Nashim and the Ezrat Israel (Rashi). In the scene, from the kohen's eye, half of the Heikhal opening can be seen: the lower part through Sha'ar Nikanor, the upper part over the Azara wall; the lintel and cornice of Nikanor, then the crest of the Azara wall, hide the middle. Tour's choice: the platform, its height, the size and depth of the pit, its steps. The terrain is today's; the summit chosen is the high point of the axis."
   },
   "maarakhat_hapara": {
     "nom": "The pyre of the para",
@@ -1531,7 +1553,7 @@
     "resume": "The wood is arranged in advance: cedar, orenim and broshim — conifers — and smooth fig, the woods that burn best. It is built up as a tower, wide at the bottom and narrow at the top, leaving windows in it to pass the fire through, and its face — the side where it is lit — looks west, toward the Temple. It stands at the bottom of its pit. Once the para is burned, the ash is beaten with sticks and passed through sieves; what remains black and holds ash is pounded, and the bones always are.",
     "cotes": [
       "12 layers of crossed logs, from 6 amot a side down to 3",
-      "5½ amot high: the top is flush with the platform",
+      "about 5½ amot high: the top comes just below the platform",
       "cedar and conifer in alternation"
     ],
     "sources": [
@@ -1555,6 +1577,6 @@
       {"oeuvre": "Para", "ref": "3:8", "citation": "סָמְכוּ יְדֵיהֶם עָלָיו וְאָמְרוּ לוֹ, אִישִׁי כֹּהֵן גָּדוֹל, טְבֹל אֶחָת. יָרַד וְטָבַל וְעָלָה וְנִסְתַּפֵּג"},
       {"oeuvre": "Bartenura", "ref": "Para 3:7", "citation": "וְאוֹתוֹ בֵית הַטְּבִילָה נַמִּי חָלוּל הָיָה עַל גַּבֵּי כִפִּין מִפְּנֵי קֶבֶר הַתְּהוֹם… וּמְטַמְּאִים הָיוּ אֶת הַכֹּהֵן. בְּמַה שֶּׁהָיוּ סוֹמְכִים יְדֵיהֶם עָלָיו"}
     ],
-    "note": "Adopted: the kohen becomes impure through the hands of the elders (Bartenura). Set aside: the Rambam, cited by the Bartenura, for whom he was made impure by a sheretz or another impurity that ends at evening. A plain kohen could burn the para; one said “my lord the Kohen Gadol” only when he was one (Bartenura). Tour's choice: the place of the mikveh, its size, its steps."
+    "note": "Adopted: the kohen becomes impure through the hands of the elders (Bartenura). Set aside: the Rambam, cited by the Bartenura, for whom he was made impure by a sheretz or another impurity that ends at evening. A plain kohen could burn the para; the Mishna says “my lord the Kohen Gadol” because it was sometimes done by a Kohen Gadol (Bartenura on Para 3:8). Tour's choice: the place of the mikveh, its size, its steps."
   }
 }
