@@ -172,8 +172,16 @@ float ombreProche(sampler2D carte, vec2 taille, float biais, vec4 coord, vec3 no
 `;
 
 // Ce qui bouche le soleil de loin étale son ombre : la fenêtre proche cède à la carte lointaine à mesure que la pénombre dépasse ce qu'elle sait rendre.
-const PENOMBRE = (pointMonde, normaleMonde, pixelMonde) => /* glsl */`
+// Au profil ultra, la carte cède son nom à la lecture qui y ajoute le contact lu à l'écran.
+const LECTURE = PROFIL.ecran ? "ombreDeLaCarte" : "getShadow";
+const CONTACT = /* glsl */`
 float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
+  return ombreDeLaCarte(carte, taille, biais, rayon, coord) * mContact;
+}
+`;
+
+const PENOMBRE = (pointMonde, normaleMonde, pixelMonde) => /* glsl */`
+float ${LECTURE}(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
   vec2 loin = ombreLointaine(${pointMonde}, ${normaleMonde}, ${pixelMonde});
   float sortie = sortieDe(vec3(coord.xy, coord.z + biais) / coord.w, ${FONDU.toFixed(2)});
   if (sortie >= 1.0) return loin.x;
@@ -183,7 +191,7 @@ float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coo
 `;
 
 const SANS_PENOMBRE = (pointMonde, normaleMonde, pixelMonde) => /* glsl */`
-float getShadow(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
+float ${LECTURE}(sampler2D carte, vec2 taille, float biais, float rayon, vec4 coord){
   float sortie = sortieDe(vec3(coord.xy, coord.z + biais) / coord.w, ${FONDU.toFixed(2)});
   float ombre = sortie < 1.0 ? ombreProche(carte, taille, biais, rayon, coord) : 1.0;
   return sortie > 0.0 ? mix(ombre, ombreLointaine(${pointMonde}, ${normaleMonde}, ${pixelMonde}).x, sortie) : ombre;
@@ -238,6 +246,7 @@ vec2 ombreLointaine(vec3 point, vec3 normale, float pixel){
 }
 
 ${PROFIL.ombres.penombre ? NETTE + PENOMBRE(pointMonde, normaleMonde, pixelMonde) : SANS_PENOMBRE(pointMonde, normaleMonde, pixelMonde)}
+${PROFIL.ecran ? CONTACT : ""}
 #endif
 `;
 

@@ -29,6 +29,10 @@ const JEUX = {
   marbre: { couleur: "matieres/marbre_c_1024.webp", normale: "matieres/marbre_n_1024.webp", moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
   etoffe: { normale: "matieres/etoffe_n_1024.webp" },
 };
+const FINES = {
+  meleke: { couleur: "matieres/meleke_c_2048.webp", normale: "matieres/meleke_n_2048.webp", moyenne: [0.7944, 0.6925, 0.5849], rugosite: 0.8110 },
+  dallage: { couleur: "matieres/dallage_c_2048.webp", normale: "matieres/dallage_n_2048.webp", moyenne: [0.7890, 0.6751, 0.5412], rugosite: 0.6961 },
+};
 
 export async function nappes() {
   const chargeur = new THREE.TextureLoader();
@@ -38,12 +42,12 @@ export async function nappes() {
     texture.colorSpace = espace;
     // Un dallage vu en enfilade est le cas normal ici, pas l'exception : sans
     // anisotropie sa nappe se réduit en bouillie dès trois mètres.
-    texture.anisotropy = 8;
+    texture.anisotropy = PROFIL.textures.anisotropie.nappes;
     return texture;
   };
 
   const jeux = new Map();
-  await Promise.all(Object.entries(PROFIL.textures.nappes ? JEUX : {}).map(async ([nom, jeu]) => {
+  await Promise.all(Object.entries(PROFIL.textures.nappes ? { ...JEUX, ...(PROFIL.textures.fines ? FINES : {}) } : {}).map(async ([nom, jeu]) => {
     const [couleur, normale] = await Promise.all([
       jeu.couleur ? chargeur.loadAsync(jeu.couleur) : null,
       chargeur.loadAsync(jeu.normale),
