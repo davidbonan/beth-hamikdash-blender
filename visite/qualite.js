@@ -82,13 +82,12 @@ async function liaisonLente() {
 
 // `fines` : la pierre de taille et le dallage en calcaire à vacuoles, en 2048 ; `irregularite` : ce qu'une pierre a de clarté, de chaleur, de pente et de bombé à elle ;
 // `assises` : les joints de la pierre de taille calés sur les arêtes de chaque face, plutôt que sur une trame du monde.
-// `biseau` : aucune arête de pierre n'est vive ; son rayon en mètres, lu à l'écran sur la passe de géométrie.
 // `etalonnage` : la pierre au soleil sort de l'épaule de la courbe, où sa nappe se tassait ; l'ombre se relève d'autant, et la lumière cuite du jour reprend sa chaleur.
 const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7, 0.6], echelleDepart: 1, antiCrenelage: 4, grainLeger: false, preProfondeur: true,
   habillageEssentiel: false, paysage: true,
   textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024, fines: true, assises: true,
               irregularite: { bloc: 0.025, bombe: 0.010, dalle: 0.012, bombeDalle: 0.003, nuance: 0.10, nuanceDalle: 0.12, poliDalle: 0.0 } }, ecartDetail: 1, porteeDetail: Infinity,
-  ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12, geometrie: 0.5, biseau: { rayon: 0.06 },
+  ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12, geometrie: 0.5,
   halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 40 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { presents: true, ombre: true },
   fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 } };
 
@@ -97,7 +96,7 @@ const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, defini
 const LEGER = { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.75], echelleDepart: 1, antiCrenelage: 4, grainLeger: true, preProfondeur: false,
   habillageEssentiel: false, paysage: true,
   textures: { decor: 1024, figurants: 512, nappes: true, nuages: 512 }, ecartDetail: 1, porteeDetail: Infinity,
-  ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: 6, geometrie: 0.5, biseau: null,
+  ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: 6, geometrie: 0.5,
   halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 12 }, sanctuaire: { ombre: true, carte: 256 }, feux: { ombre: false, carte: 256 }, figurants: { presents: true, ombre: false },
   fumee: { pas: 16, octaves: 2 }, feuDeLAutel: { flammes: 12, fumee: 18, octaves: 2 }, reflets: null };
 

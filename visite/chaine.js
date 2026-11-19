@@ -28,7 +28,7 @@
 import * as THREE from "three";
 import { FEU_DE_L_AUTEL, empriseDuFeu, foyersDuFeu } from "./feu_de_l_autel.js";
 import { parTranches } from "./fil.js";
-import { BISEAU_LU, COURBE_DE_L_ECRAN, EXPOSITION, EXPOSITION_DEHORS, TEINTE_CUITE } from "./matieres.js";
+import { COURBE_DE_L_ECRAN, EXPOSITION, EXPOSITION_DEHORS, TEINTE_CUITE } from "./matieres.js";
 import { OMBRE_LOINTAINE, profondeurLointaine } from "./ombres.js";
 import { PROFIL } from "./qualite.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -167,64 +167,6 @@ const COMPOSITION = {
       ao /= 16.0;
       vec4 c = texture2D(tDiffuse, vUv);
       gl_FragColor = vec4(c.rgb * ao.x * ao.y, c.a);
-    }`,
-};
-
-// LE BISEAU : aucune arête de pierre n'est vive. Sa normale arrondie, et de quel côté du plan tombent ses voisines (la courbure,
-// négative sur une arête, positive dans un creux), en une texture que la matière relit : r distance, g courbure, ba normale arrondie.
-const BISEAU = PROFIL.biseau;
-const BISEAU_DES_ARETES = {
-  uniforms: { tGeo: { value: null }, uTanFov: { value: 0 }, uAspect: { value: 1 } },
-  vertexShader: OCCLUSION.vertexShader,
-  fragmentShader: /* glsl */`
-    uniform sampler2D tGeo;
-    uniform float uTanFov, uAspect;
-
-    vec3 positionVue(vec2 uv, float z){
-      return vec3((uv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0) * z, -z);
-    }
-
-    vec2 versOcta(vec3 n){
-      n /= abs(n.x) + abs(n.y) + abs(n.z);
-      vec2 signe = vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
-      return n.z >= 0.0 ? n.xy : (1.0 - abs(n.yx)) * signe;
-    }
-
-    // La moyenne des normales voisines à moins d'un rayon dans l'espace, et de quel côté du plan elles tombent.
-    void arrondir(ivec2 ici, ivec2 bord, vec3 P, vec3 n, out vec3 arrondie, out float courbure){
-      arrondie = n; courbure = 0.0;
-      float rayon = ${(BISEAU?.rayon ?? 0).toFixed(3)};
-      float pixel = 2.0 * uTanFov * -P.z / float(bord.y + 1);
-      float rayonPx = min(rayon / pixel, 48.0);
-      if (rayonPx < 0.75) return;
-      vec2 taille = vec2(bord + 1);
-      vec3 somme = n;
-      float poids = 1.0, penche = 0.0;
-      for (int k = 0; k < 32; k++) {
-        float r = sqrt((float(k) + 0.5) / 32.0);
-        float a = float(k) * 2.39996;
-        ivec2 q = clamp(ici + ivec2(round(vec2(cos(a), sin(a)) * r * rayonPx)), ivec2(0), bord);
-        vec4 gq = texelFetch(tGeo, q, 0);
-        if (gq.a <= 0.0) continue;
-        vec3 d = positionVue((vec2(q) + 0.5) / taille, gq.a) - P;
-        float w = (1.0 - r * r) * (1.0 - smoothstep(0.7 * rayon, 1.3 * rayon, length(d)));
-        somme += (gq.rgb * 2.0 - 1.0) * w;
-        penche += dot(d, n) / rayon * w;
-        poids += w;
-      }
-      arrondie = normalize(somme);
-      courbure = clamp(penche / poids, -1.0, 1.0);
-    }
-
-    void main(){
-      ivec2 ici = ivec2(gl_FragCoord.xy), bord = textureSize(tGeo, 0) - 1;
-      vec4 g = texelFetch(tGeo, ici, 0);
-      if (g.a <= 0.0) { gl_FragColor = vec4(0.0); return; }
-      vec3 n = normalize(g.rgb * 2.0 - 1.0);
-      vec3 P = positionVue((vec2(ici) + 0.5) / vec2(bord + 1), g.a);
-      vec3 arrondie; float courbure;
-      arrondir(ici, bord, P, n, arrondie, courbure);
-      gl_FragColor = vec4(g.a, courbure, versOcta(arrondie));
     }`,
 };
 
@@ -686,9 +628,7 @@ const liaison = (renderer, suivre) => new Promise((lies) => {
 const interrogerAvantUsage = (programme) => programme.getUniforms();
 
 export function chaine(renderer, scene, camera, horsGeo = []) {
-  // Le biseau compare des centimètres à des dizaines de mètres : le demi-flottant n'y suffit plus.
-  const geoFlottante = BISEAU && renderer.extensions.has("OES_texture_float_linear");
-  const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: geoFlottante ? THREE.FloatType : THREE.HalfFloatType, depthBuffer: true });
+  const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
   const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
   const cibleFumee = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
   const cibleRayons = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
@@ -710,13 +650,6 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   if (passeComposition) {
     passeComposition.uniforms.tAO.value = cibleAO.texture;
     composeur.addPass(passeComposition);
-  }
-  const cibleBiseau = BISEAU && new THREE.WebGLRenderTarget(1, 1, {
-    type: THREE.HalfFloatType, depthBuffer: false, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter });
-  const passeBiseau = BISEAU && new ShaderPass(BISEAU_DES_ARETES);
-  if (passeBiseau) {
-    passeBiseau.uniforms.tGeo.value = cibleGeo.texture;
-    BISEAU_LU.uBiseau.value = cibleBiseau.texture;
   }
   const fumee = new ShaderPass(FUMEE);
   fumee.uniforms.tGeo.value = cibleGeo.texture;
@@ -790,12 +723,6 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
       passeAO.uniforms.uAspect.value = camera.aspect;
     }
     passeComposition?.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
-    if (passeBiseau) {
-      passeBiseau.uniforms.uTanFov.value = tanFov;
-      passeBiseau.uniforms.uAspect.value = camera.aspect;
-      cibleBiseau.setSize(cibleGeo.width, cibleGeo.height);
-      BISEAU_LU.uPasImage.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
-    }
     fumee.uniforms.uTanFov.value = tanFov;
     fumee.uniforms.uAspect.value = camera.aspect;
     if (feu) {
@@ -908,7 +835,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     if (feu) voileDuFeu.enabled = feuDeLAutelVu();
     const eclaire = rayons && airEclaire.enabled;
     // Les matrices de la scène se refont à la passe de géométrie, que la suite fige : sans elle, on les refait ici.
-    if (passeAO || passeBiseau || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
+    if (passeAO || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
     else scene.updateMatrixWorld();
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
@@ -917,7 +844,6 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     if (passeAO) {
       passeAO.render(renderer, cibleAO, null, 0, false);
     }
-    passeBiseau?.render(renderer, cibleBiseau, null, 0, false);
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
     if (voileDuFeu?.enabled) {
       feu.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
@@ -928,13 +854,10 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
     scene.matrixWorldAutoUpdate = false;
-    // Le biseau ne vaut que pour l'œil : le miroir du dallage et les sondes, rendus d'ailleurs, liraient le pixel d'un autre point.
-    BISEAU_LU.uBiseauActif.value = passeBiseau ? 1 : 0;
     try {
       composeur.render();
     } finally {
       scene.matrixWorldAutoUpdate = true;
-      BISEAU_LU.uBiseauActif.value = 0;
     }
   }
 
@@ -960,7 +883,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function passesEnTampon() {
     const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
-    return [passeAO, passeComposition, passeBiseau, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
+    return [passeAO, passeComposition, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.

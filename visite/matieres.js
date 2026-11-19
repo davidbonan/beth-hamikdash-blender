@@ -44,8 +44,6 @@ const REFLET_DU_METAL = 1.6;
 export const refleteSaCour = (materiau) => [METAL, MIKSHE].includes(FAMILLES[materiau.name.replace(/_grave$/, "")]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
-// Le biseau que la chaîne prépare au pixel ; actif pour l'œil seul, le miroir et les sondes voient d'ailleurs.
-export const BISEAU_LU = { uBiseau: { value: null }, uPasImage: { value: new THREE.Vector2(1, 1) }, uBiseauActif: { value: 0 } };
 // Ce que l'étalonnage du profil rend à la lumière cuite du jour, en clarté et en chaleur.
 export const TEINTE_CUITE = { value: new THREE.Color(1, 1, 1) };
 // Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
@@ -219,27 +217,6 @@ uniform vec3 uLueurCouleur[${SALLES_MAX}];
 uniform mat4 uVersSalle[${SALLES_MAX}];
 varying float vPixel;
 uniform vec3 uTeinteCiel;
-
-#ifdef BISEAU
-uniform highp sampler2D uBiseau;
-uniform vec2 uPasImage;
-uniform float uBiseauActif;
-float mCourbure = 0.0;
-vec3 mArrondie = vec3(0.0);
-vec3 depuisOcta(vec2 o){
-  vec3 n = vec3(o, 1.0 - abs(o.x) - abs(o.y));
-  if (n.z < 0.0) n.xy = (1.0 - abs(n.yx)) * vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
-  return normalize(n);
-}
-// La passe du biseau a vu un autre point quand sa distance diffère : alors rien n'est lu.
-void lireBiseau(float distance){
-  if (uBiseauActif < 0.5) return;
-  vec4 b = texelFetch(uBiseau, ivec2(gl_FragCoord.xy * uPasImage * vec2(textureSize(uBiseau, 0))), 0);
-  if (abs(b.r - distance) > 0.03 * distance + 0.02) return;
-  mCourbure = b.g;
-  mArrondie = depuisOcta(b.ba);
-}
-#endif
 
 // 1 dehors, PENOMBRE_RESTE dans la pièce sans lumière : le ciel n'y entre pas.
 float penombre(vec3 p){
@@ -1436,9 +1413,6 @@ export function habiller(materiau, horloges, jeux) {
   const refletDuDallage = materiau.userData.refletDuDallage === true;
   if (refletDuDallage) Object.assign(uniformes, REFLET);
   uniformes.uTeinteCiel = TEINTE_CUITE;
-  // Le dallage miroir est à seize unités de texture la nuit, et plat : il se passe du biseau.
-  const biseau = PROFIL.biseau && !refletDuDallage;
-  if (biseau) Object.assign(uniformes, BISEAU_LU);
   const { sonde } = materiau.userData;
   if (sonde) Object.assign(uniformes, { uSondeMin: { value: sonde.min }, uSondeMax: { value: sonde.max }, uSondeCentre: { value: sonde.centre } });
   const rayonFil = materiau.userData.rayon;
@@ -1456,7 +1430,6 @@ export function habiller(materiau, horloges, jeux) {
     + (rayonFil ? "#define FIL\n" : "")
     + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
     + (sonde ? "#define SONDE_EN_BOITE\n" : "")
-    + (biseau ? "#define BISEAU\n" : "")
     + (fine ? "#define NAPPE_FINE\n" : "")
     + (PROFIL.textures.irregularite ? "#define IRREGULARITE\n" : "")
     + (PROFIL.textures.assises && CALEES.has(rendue) ? "#define ASSISES\n" : "");
@@ -1493,16 +1466,7 @@ export function habiller(materiau, horloges, jeux) {
         vec3 mTeinte, mPente, mFeu; float mRugo;
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);
         float mPenombre = penombre(vMonde);
-        float mHorsDesSalles = horsDesSalles(vMonde);
-        #ifdef BISEAU
-          lireBiseau(vViewPosition.z);
-          #ifdef TEMPERE
-            // La pierre s'use aux arêtes, plus claire et plus rêche, et s'encrasse dans les creux.
-            float mArete = clamp(-mCourbure * 2.0, 0.0, 1.0), mCreux = clamp(mCourbure * 2.0, 0.0, 1.0);
-            mTeinte *= (1.0 + 0.12 * mArete) * (1.0 - 0.30 * mCreux);
-            mRugo += 0.10 * mArete;
-          #endif
-        #endif`)
+        float mHorsDesSalles = horsDesSalles(vMonde);`)
       // Le soleil et le rebond sont des lumières directionnelles, qui ne connaissent
       // aucun mur : la pénombre reprend ce que leur boucle a ajouté. Les lampes
       // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.
@@ -1593,10 +1557,7 @@ export function habiller(materiau, horloges, jeux) {
       // qui ne depend pas du pixel voisin et ne grouille donc jamais.
       .greffer("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
-        normal = normalize(normal - mat3(viewMatrix) * mPente);
-        #ifdef BISEAU
-          if (dot(mArrondie, nonPerturbedNormal) > 0.2) normal = normalize(normal + mArrondie - nonPerturbedNormal);
-        #endif`)
+        normal = normalize(normal - mat3(viewMatrix) * mPente);`)
       .greffer("#include <envmap_physical_pars_fragment>", sonde ? environnementEnBoite() : "#include <envmap_physical_pars_fragment>")
       .source;
   };
