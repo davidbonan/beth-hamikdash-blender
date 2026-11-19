@@ -4,7 +4,8 @@ from .primitives.volumes import box, colonne, cyl, mur_perce, plage
 from .primitives.gravures import _relief_profil
 from .primitives.ouvrages import (BANDEAU, ENCADREMENT_SHAAR, EPAISSEUR_PLACAGE, SAILLIE_BANDEAU, VANTAIL_CADRE,
                                   VANTAIL_CLOU, VANTAIL_EP, VANTAIL_PIVOT, VANTAIL_RELIEF, battants, creneaux,
-                                  moulure, ordre_de_pilastres, shaar)
+                                  massif_evide, moulure, ordre_de_pilastres, shaar)
+from .mehilot_haaron.trace import BLOC
 
 
 # ----------------------------------------------------------------------------
@@ -19,7 +20,7 @@ from .primitives.ouvrages import (BANDEAU, ENCADREMENT_SHAAR, EPAISSEUR_PLACAGE,
 # il coince le Temple dans l'angle nord-ouest. Les valeurs sont un CHOIX, l'ordre non.
 HX0, HX1 = -274, 226      # ouest 82 derrière l'Azara ; est 81 devant l'Ezrat Nashim
 HY0, HY1 = -307, 193      # sud 234,5 ; nord 120,5
-box("HarHabayit_sol", HX0, HX1, HY0, HY1, Z_HAR - 1, Z_HAR, "00_HarHabayit", MAT_SOL())
+massif_evide("HarHabayit_sol", HX0, HX1, HY0, HY1, Z_HAR - 1, Z_HAR, [BLOC], "00_HarHabayit", MAT_SOL())
 # Cinq portes (Middot 1:3) : deux Houlda au sud, Kiponus à l'ouest, Tadi au nord,
 # la porte est sur l'axe. Middot 2:3 leur donne à toutes 20 amot de haut sur 10 de
 # large ; leurs abscisses sont un CHOIX.
@@ -171,8 +172,8 @@ for nm, bornes, dehors, paroi, h in (
 # Murs de soutènement : l'esplanade est une terrasse bâtie au-dessus du Kidron et du
 # Tyropéon, ses murs descendent jusqu'au rocher. Sans lui, le pays passait sous le
 # dallage et l'esplanade flottait au-dessus de ses propres vallées.
-box("HarHabayit_soubassement", HX0, HX1, HY0, HY1, Z_ROCHE, Z_HAR - 1, "00_HarHabayit",
-    MAT_MURAILLE())
+massif_evide("HarHabayit_soubassement", HX0, HX1, HY0, HY1, Z_ROCHE, Z_HAR - 1, [BLOC], "00_HarHabayit",
+             MAT_MURAILLE())
 pas = 10
 # « הַר הַבַּיִת סְטָיו כָּפוּל הָיָה… סְטָיו לִפְנִים מִסְּטָיו » (Pesa'him 13b), que Rashi lit « האיצטבא
 # סביב סביב מקפת ובתוך אותו הקף עוד אחר » : deux rangs de colonnes en anneaux, sur les quatre

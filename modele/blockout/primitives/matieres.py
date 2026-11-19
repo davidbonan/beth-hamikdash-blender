@@ -387,6 +387,18 @@ MAT_MEHITZA = lambda: enduit("Mehitza_behira", (0.40, 0.31, 0.20))
 MAT_TERRE_CUITE = lambda: enduit("Terre_cuite", (0.46, 0.25, 0.16))
 MAT_ROCHE = lambda: roche("Roche_shetiya")
 MAT_ROC_TAILLE = lambda: roche("Roche_taillee")      # la galerie de Parva
+MAT_ROC_ERAFLE = lambda: roche("Roche_eraflee")      # les virages des galeries de l'Arche : la visite y trace les éraflures
+MAT_POUSSIERE = lambda: enduit("Poussiere", (0.40, 0.36, 0.30))
+MAT_CALCITE = lambda: enduit("Calcite", (0.80, 0.76, 0.67))
+MAT_SUIE = lambda: material("Suie", (0.045, 0.040, 0.036))
+MAT_TERRE_CUITE_ANCIENNE = lambda: enduit("Terre_cuite_ancienne", (0.34, 0.25, 0.19))   # sous la poussière des siècles
+
+
+# Le rayon (m) part en extra glTF, comme celui des échelles : la visite tient le fil à un pixel et l'éclaircit d'autant.
+def MAT_FIL_D_ARAIGNEE(rayon):
+    mat = material("Fil_d_araignee", (0.80, 0.78, 0.74))
+    mat["rayon"] = m(rayon)
+    return mat
 MAT_SEL = lambda: enduit("Sel", (0.93, 0.93, 0.91))              # Lishkat HaMela'h (Middot 5:3)
 MAT_PEAU = lambda: etoffe("Peau", (0.40, 0.26, 0.16))            # peaux salées de la Parva (Middot 5:3)
 MAT_KETORET = lambda: enduit("Ketoret", (0.52, 0.38, 0.26))      # sammanim pilés (Keritot 6b)

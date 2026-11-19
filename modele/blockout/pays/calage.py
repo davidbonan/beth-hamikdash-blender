@@ -10,6 +10,7 @@ from ..primitives.matieres import MAT_TERRE
 from ..primitives.volumes import mesh_from_pydata
 from ..har_habayit import HX0, HX1, HY0, HY1
 from ..bayit.kodesh_hakodashim import SHETIYA_CENTRE
+from ..mehilot_haaron.trace import BLOC
 
 
 # ----------------------------------------------------------------------------
@@ -59,6 +60,10 @@ class Relief(NamedTuple):
     pas: float
     n: int
     altitudes: array.array
+
+
+# Le relief enfoui sous le carré passe sous le plus profond des souterrains : à mi-hauteur, il leur faisait un sol.
+Z_ENFOUI = BLOC[4] - 1
 
 
 def _lire_relief():
@@ -281,7 +286,7 @@ def _nappe_du_pays():
         i, j = k % n, k // n
         voisins = [verts[jj * n + ii][2] for jj in range(j - 2, j + 3) for ii in range(i - 2, i + 3)
                    if jj * n + ii not in enfouis]
-        verts[k] = (*verts[k][:2], min(voisins + [Z_HAR - 1]) if voisins else Z_HAR - 8)
+        verts[k] = (*verts[k][:2], min(voisins + [Z_HAR - 1]) if voisins else Z_ENFOUI)
     faces = [[j * n + i, j * n + i + 1, (j + 1) * n + i + 1, (j + 1) * n + i]
              for j in range(n - 1) for i in range(n - 1)]
     return mesh_from_pydata("Pays_relief", verts, faces, PAYS, MAT_TERRE())

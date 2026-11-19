@@ -10,6 +10,7 @@ from .primitives.ouvrages import (BANDEAU, CORNICHE, ENCADREMENT_SHAAR, FILET_OR
                                   SAILLIE_BANDEAU, SAILLIE_MOULURE, SOCLE, battants, ceinture, moulure,
                                   pilastre, shaar)
 from .har_habayit import HX1, MUR_HAR
+from .mehilot_haaron.trace import RITZPA_MESHUNA, Z_TETE
 
 
 # ----------------------------------------------------------------------------
@@ -124,8 +125,7 @@ for _k in range(3):
     gzir(f"Lishkat_Etzim_NE_billot_{_k}", (_bx, _by, Z_EZN), (_bx, _by, Z_EZN + 1.2), 0.7, "10_EzratNashim", MAT_CHENE(),
          fentes=FENTES_GZIR[:1])
 # « רָאָה הָרִצְפָּה שֶׁהִיא מְשֻׁנָּה מֵחֲבֵרוֹתֶיהָ » (Shekalim 6:2), « לֹא הָיְתָה הָאֶבֶן שָׁוָה לִשְׁאַר אַבְנֵי הָרִצְפָּה » (Bartenura). CHOIX : une dalle entière du pavage tracé par la visite, face à la porte, relevée d'un dixième d'ama.
-RITZPA_MESHUNA = (120, 124, 41.316, 49.316)
-box("Lishkat_Etzim_NE_ritzpa_meshuna", *RITZPA_MESHUNA, Z_EZN, Z_EZN + 0.1, "10_EzratNashim", MAT_SOL())
+box("Lishkat_Etzim_NE_ritzpa_meshuna", *RITZPA_MESHUNA, Z_TETE, Z_EZN + 0.1, "10_EzratNashim", MAT_SOL())
 # SUD-EST, Lishkat HaNezirim : « מְבַשְּׁלִין אֶת שַׁלְמֵיהֶן, וּמְגַלְּחִין אֶת שְׂעָרָן,
 # וּמְשַׁלְּחִים תַּחַת הַדּוּד » — le chaudron et son foyer. C'est le seul feu de l'Ezrat
 # Nashim en dehors de Simhat Beit HaShoeva.

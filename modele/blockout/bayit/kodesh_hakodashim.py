@@ -151,13 +151,11 @@ for etage, (saillie, zb, zh) in enumerate(((0.06, Z_KAPORET - 0.14, Z_ZER - 0.05
 # badim, la fiole de manne « צְלוֹחִית שֶׁל חֶרֶס » (Rashi Shemot 16:33) et le bâton d'Aharon avec
 # ses amandes et ses fleurs (Bamidbar 17:23-25). La fiole d'huile d'onction n'est que
 # « cachée avec » l'Arche (Yoma 52b) : sa place devant elle est un CHOIX.
-X_DEVANT = ARON_X1 + 0.32
-revolution("Aron_tsintsenet_man", X_DEVANT, 0.62, ZE,
-           [(0.07, 0), (0.12, 0.05), (0.13, 0.20), (0.09, 0.28), (0.06, 0.31), (0.07, 0.35),
-            (0.05, 0.35), (0.0, 0.33)], ARON, MAT_TERRE_CUITE(), verts=16)
-revolution("Aron_pakh_shemen", X_DEVANT, -0.62, ZE,
-           [(0.06, 0), (0.10, 0.04), (0.10, 0.16), (0.04, 0.22), (0.035, 0.30), (0.05, 0.32),
-            (0.0, 0.31)], ARON, MAT_PIERRE(), verts=16)
+X_DEVANT, Y_DEVANT = ARON_X1 + 0.32, 0.62
+TSINTSENET = [(0.07, 0), (0.12, 0.05), (0.13, 0.20), (0.09, 0.28), (0.06, 0.31), (0.07, 0.35), (0.05, 0.35), (0.0, 0.33)]
+PAKH_SHEMEN = [(0.06, 0), (0.10, 0.04), (0.10, 0.16), (0.04, 0.22), (0.035, 0.30), (0.05, 0.32), (0.0, 0.31)]
+revolution("Aron_tsintsenet_man", X_DEVANT, Y_DEVANT, ZE, TSINTSENET, ARON, MAT_TERRE_CUITE(), verts=16)
+revolution("Aron_pakh_shemen", X_DEVANT, -Y_DEVANT, ZE, PAKH_SHEMEN, ARON, MAT_PIERRE(), verts=16)
 # Le coffret des Philistins est « מִצִּדּוֹ » (Shmouel I 6:8 ; Bava Batra 14a), à côté de l'Arche
 # et non devant : au nord, au-delà du bad — le côté est un CHOIX. Posé au plus bas du rocher.
 ARGAZ = (KKC - 0.22, KKC + 0.22, 1.62, 2.02)
@@ -166,7 +164,8 @@ box("Aron_argaz", *ARGAZ, Z_ARGAZ, Z_ARGAZ + 0.28, ARON, MAT_CEDRE())
 box("Aron_argaz_couvercle", ARGAZ[0] - 0.03, ARGAZ[1] + 0.03, ARGAZ[2] - 0.03, ARGAZ[3] + 0.03,
     Z_ARGAZ + 0.28, Z_ARGAZ + 0.34, ARON, MAT_CEDRE())
 PIED_MATE, TETE_MATE = (ARON_X1 + 0.62, -1.02, ZE), (ARON_X1 + 0.02, -1.14, Z_ZER + 0.30)
-cyl_between("Aron_mate_Aharon", PIED_MATE, TETE_MATE, 0.03, ARON, MAT_CHENE(), verts=8)
+MATE_RAYON = 0.03
+cyl_between("Aron_mate_Aharon", PIED_MATE, TETE_MATE, MATE_RAYON, ARON, MAT_CHENE(), verts=8)
 for k, t in enumerate((0.80, 0.88, 0.96)):
     x_ = PIED_MATE[0] + t * (TETE_MATE[0] - PIED_MATE[0])
     y_ = PIED_MATE[1] + t * (TETE_MATE[1] - PIED_MATE[1]) + (0.05 if k % 2 else -0.05)

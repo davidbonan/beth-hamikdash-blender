@@ -193,8 +193,8 @@ const FAMILLES = {
   Parokhet_tissee: ETOFFE, Lin_blanc: ETOFFE, Tekhelet_meil: ETOFFE,
   Toile_blanche: ETOFFE, Peau: ETOFFE, Laine: ETOFFE, Avnet_kilayim: ETOFFE,
   Eau_Kiyor: EAU,
-  Chaux_blanche: CHAUX, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Roche_taillee: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
-  Solet: ENDUIT, Teven: ENDUIT, Klaf: ENDUIT, Mehitza_behira: ENDUIT,
+  Chaux_blanche: CHAUX, Sikra: ENDUIT, Terre_cuite: ENDUIT, Roche_shetiya: ROCHE, Roche_taillee: ROCHE, Roche_eraflee: ROCHE, Sel: ENDUIT, Ketoret: ENDUIT, Cendre: ENDUIT, Lechem_afui: ENDUIT,
+  Solet: ENDUIT, Teven: ENDUIT, Klaf: ENDUIT, Mehitza_behira: ENDUIT, Poussiere: ENDUIT, Calcite: ENDUIT, Terre_cuite_ancienne: ENDUIT,
   Chaux_noircie: SUIE, Braise: BRAISE, Verre_de_suspension: LUMINAIRE,
 };
 
@@ -980,6 +980,37 @@ void facettesAmande(vec3 P, vec3 N, inout vec3 pente, inout float rugo){
   rugo += (d - 0.35) * 0.04 * fin;
 }
 
+#ifdef ERAFLURE
+// Les barres de l'Arche, à l'épaule, ont rayé l'angle abattu des virages. Paliers à un multiple de cinq amot : la hauteur s'y lit au modulo.
+const float PALIER = 5.0 * AMA, CREUX_SILLON = 0.0012;
+const int SILLONS = 6;
+void eraflures(vec3 P, vec3 N, vec3 t1, inout vec3 teinte, inout vec3 pente, inout float rugo){
+  if (abs(N.y) > 0.5) return;
+  float s = dot(P, t1), h = mod(P.y, PALIER), pixel = empreinte(vec3(0.0, 1.0, 0.0));
+  float trace = 0.0, versLeHaut = 0.0;
+  for (int k = 0; k < SILLONS; k++) {
+    float i = float(k);
+    float centre = 1.16 + 0.06 * i + 0.03 * (alea1(i * 7.3) - 0.5) + 0.02 * sin(s * (0.7 + alea1(i * 3.1)) + i)
+                 + 0.010 * (bruit(vec3(s * 3.0, i * 5.0, 0.0)) - 0.5);
+    float largeur = 0.002 + 0.007 * alea1(i * 11.7), vue = max(largeur, pixel);
+    float tenue = smoothstep(0.30, 0.55, bruit(vec3(s * (1.6 + alea1(i * 2.9)) + i * 13.0, i, 1.0)));
+    float d = (h - centre) / vue, profil = exp(-d * d) * tenue * largeur / vue;
+    trace += profil;
+    versLeHaut += -2.0 * d / vue * profil;
+  }
+  trace = min(trace, 1.0);
+  float stries = mix(1.0, 0.55 + 0.45 * sin(h * 2600.0 + 6.0 * bruit(vec3(s * 40.0, 0.0, 2.0))), 1.0 - smoothstep(0.0006, 0.0018, pixel));
+  float repoudre = 0.45 + 0.55 * smoothstep(0.30, 0.70, bruit(P * 9.0));
+  float frais = trace * stries * repoudre, poli = exp(-pow((h - 1.31) / 0.10, 2.0)) * repoudre;
+  // « וְצִפִּיתָ אֹתָם זָהָב » (Shemot 25:13) : la barre dorée a laissé de son or au fond des sillons.
+  float dore = trace * smoothstep(0.80, 0.92, bruit(vec3(s * 70.0, h * 260.0, 3.0))) * (1.0 - smoothstep(0.0015, 0.004, pixel));
+  teinte *= mix(vec3(1.0), vec3(1.55, 1.60, 1.72), frais) * (1.0 + 0.15 * poli);
+  teinte = mix(teinte, vec3(2.6, 2.2, 1.2), 0.6 * dore);
+  rugo -= 0.20 * frais + 0.10 * poli + 0.25 * dore;
+  pente += vec3(0.0, 1.0, 0.0) * (CREUX_SILLON * versLeHaut * repoudre);
+}
+#endif
+
 // Les trois ma'arakhot de chaque jour — grande, ketoret, kiyoum haesh —, comme GEDOLA et MAARAKHOT_DE_GZIRIN du blockout : leur
 // centre en mètres de three (x, z), leur demi-côté en amot. Celle de Kippour ne brûle qu'un jour, et l'autel est reblanchi deux fois l'an (Middot 3:4).
 const vec3 MAARAKHOT[3] = vec3[3](vec3(-32.0 * AMA, 9.0 * AMA, 4.0), vec3(-293.0 / 6.0 * AMA, 101.0 / 6.0 * AMA, 1.5),
@@ -1236,6 +1267,9 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     pente = ((grainNorme(q + t1 * e) - g) * t1 + (grainNorme(q + t2 * e) - g) * t2) * (0.30 / e);
     teinte = vec3(0.80 + grainNorme(P * 2.2 + 17.0) * 0.40 + (grainNorme(P * 40.0) - 0.5) * 0.12);
     rugo = 0.10;
+#ifdef ERAFLURE
+    eraflures(P, N, t1, teinte, pente, rugo);
+#endif
   }
   else if (FAMILLE == 12) {                                  // gehalim : les braises
     // Le charbon se lit à deux échelles : des morceaux qui se cassent, et le réseau de
@@ -1593,6 +1627,7 @@ export function habiller(materiau, horloges, jeux) {
     }
   }
   const parokhet = materiau.name === "Parokhet_tissee";
+  const eraflee = nom === "Roche_eraflee";
   if (parokhet) uniformes.uParokhet = { value: jeux.get("parokhet").motif };
   if (gravure) uniformes.uGravure = { value: jeux.get("gravures").motif };
   const refletDuDallage = materiau.userData.refletDuDallage === true;
@@ -1611,6 +1646,7 @@ export function habiller(materiau, horloges, jeux) {
     + (jeu ? "#define NAPPE\n" : "")
     + (jeu?.couleur ? "#define NAPPE_COULEUR\n" : "")
     + (parokhet ? "#define PAROKHET\n" : "")
+    + (eraflee ? "#define ERAFLURE\n" : "")
     + (gravure ? "#define GRAVURE\n" : "")
     + (rayonFil ? "#define FIL\n" : "")
     + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
