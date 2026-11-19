@@ -79,6 +79,7 @@ NIVEAUX = [
              dict(coupe=-9.6, plancher=-11.0, x=(-40.0, -34.0), z=(30.0, 50.0), lieux=["mehilat_parva"]),
              # Sous l'esplanade, entre le Soreg et Sha'ar Shushan : le tronçon ouvert du vide, sans accès.
              dict(coupe=-11.5, plancher=-14.0, x=(76.0, 106.0), z=(-7.6, 7.6), lieux=["chalal"]),
+             dict(coupe=-12.0, plancher=-19.5, x=(49.0, 66.5), z=(-31.7, -13.9), lieux=["mehilot_haaron"]),
          ]),
 ]
 

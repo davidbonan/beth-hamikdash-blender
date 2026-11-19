@@ -881,6 +881,15 @@
       "lieu": true
     },
     {
+      "id": "mehilot_haaron",
+      "nom": "Les galeries de l'Arche",
+      "zone": "ezrat_nashim",
+      "prefixes": [
+        "Mehilot_HaAron"
+      ],
+      "lieu": true
+    },
+    {
       "id": "beit_hatevila",
       "nom": "Beit HaTevila",
       "zone": "lishkot",

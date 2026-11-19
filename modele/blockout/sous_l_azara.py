@@ -6,6 +6,7 @@ from .ezrat_nashim import EX1, MIKVE
 from .azara import AX0, AY0, AY1, T, X_DOUKHAN
 from .lishkot import BOR, PUITS_MESIBA
 from .mizbeach import HAUT, KIYOR_BOR, MX0, MY0
+from .mehilot_haaron.trace import BLOC, RITZPA_MESHUNA, Z_TETE
 
 
 # ----------------------------------------------------------------------------
@@ -68,9 +69,9 @@ massif_evide("Azara_sol", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_AZ - 1, Z_AZ,
 massif_evide("Podium_azara", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_EZN, Z_AZ - 1,
              VIDES_SOUS_AZARA, "00_HarHabayit")
 massif_evide("EzratNashim_sol", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_EZN - 1, Z_EZN,
-             VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN)], "10_EzratNashim", MAT_SOL())
+             VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN), (*RITZPA_MESHUNA, Z_TETE, Z_EZN)], "10_EzratNashim", MAT_SOL())
 massif_evide("Podium_har", AX0 - T, EX1 + 5, AY0 - T, AY1 + T, Z_HAR, Z_EZN - 1,
-             VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN)], "00_HarHabayit")
+             VIDES_SOUS_AZARA + [(*MIKVE, Z_HAR, Z_EZN), BLOC], "00_HarHabayit")
 
 
 escalier_a_vis("Mesiba_bira_vis", (PX0 + PX1) / 2, (PY0 + PY1) / 2, (PX1 - PX0) / 2,
