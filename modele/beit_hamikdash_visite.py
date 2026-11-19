@@ -181,6 +181,8 @@ VUES = [
     dict(id="vue_maarakhat_hapara", position=(1661.0, 0.0, Z_SEREIFA), cap=180, tangage=-30),
     dict(id="vue_beit_tevila_har_hamishcha", position=(1668.0, 19.0, Z_SEREIFA), cap=270, tangage=-35),
     dict(id="vue_para_adouma", position=(1661.0, 0.0, Z_SEREIFA), cap=180, tangage=-3),
+    # Le départ de la visite : sous la porte orientale de l'Ezrat Nashim, entre les candélabres, face au Nikanor et à l'Oulam.
+    dict(id="depart", position=(131.0, 0.0, Z_EZN), cap=180, tangage=16),
 ]
 
 

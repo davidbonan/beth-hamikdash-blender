@@ -568,9 +568,7 @@ await accorderLangue(langue());
 // ---------------------------------------------------------------------------
 // boucle
 // ---------------------------------------------------------------------------
-// La visite s'ouvre au-delà du Soreg, dans l'axe de la porte orientale : le 'Heil et
-// la porte de l'Ezrat Nashim se franchissent à pied, avant tout le reste.
-const depart = reperes.entrees.find((e) => e.id === "face_porte_est") || reperes.entrees[0];
+const depart = reperes.vues.find((v) => v.id === "depart") || reperes.entrees[0];
 vues.prendreVue(depart);
 
 const horloge = new THREE.Clock();
