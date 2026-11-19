@@ -65,6 +65,22 @@ def trame(nom, fils, serge=False, duvet=0.0, cote=256):
             _image(f"{nom}_relief", normale * 0.5 + 0.5, donnees=True))
 
 
+# Mèches raccordables le long du v : un bruit étiré en long, fin en travers, filtré dans le spectre pour se raccorder.
+def meches(nom, cote=256, longueur=24.0, finesse=1.0):
+    alea = np.random.default_rng(zlib.crc32(nom.encode()))
+    fu, fv = np.meshgrid(np.fft.fftfreq(cote), np.fft.fftfreq(cote))
+    filtre = np.exp(-2.0 * np.pi ** 2 * ((fu * finesse) ** 2 + (fv * longueur) ** 2))
+    hauteur = np.real(np.fft.ifft2(np.fft.fft2(alea.random((cote, cote))) * filtre))
+    hauteur = (hauteur - hauteur.min()) / np.ptp(hauteur)
+    teinte = 0.62 + 0.38 * hauteur
+    gx = (np.roll(hauteur, -1, 1) - np.roll(hauteur, 1, 1)) * 3.0
+    gy = (np.roll(hauteur, -1, 0) - np.roll(hauteur, 1, 0)) * 3.0
+    normale = np.dstack([-gx, -gy, np.ones_like(hauteur)])
+    normale /= np.linalg.norm(normale, axis=2, keepdims=True)
+    return (_image(f"{nom}_couleur", np.repeat(teinte[..., None], 3, axis=2)),
+            _image(f"{nom}_relief", normale * 0.5 + 0.5, donnees=True))
+
+
 def _douille(douilles, identifiant):
     return next(d for d in douilles if d.identifier == identifiant)
 
@@ -128,6 +144,10 @@ def metal():
 
 def poil():
     return _matiere("Figure_Poil", 0.9)
+
+
+def barbe():
+    return _matiere("Figure_Barbe", 0.78, tissu=meches("barbe"))
 
 
 def corne():
