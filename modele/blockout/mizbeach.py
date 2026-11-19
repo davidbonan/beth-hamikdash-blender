@@ -8,7 +8,7 @@ from .primitives.parametres import MODELE, TEFAH, Z_AZ, Z_MAARAKHA, Z_SOVEV, Z_Y
 from .primitives.matieres import (MAT_ARGENT, MAT_BOIS_CHARBON, MAT_BOIS_MAARAKHA, MAT_BOIS_ROUSSI,
                                   MAT_BRONZE, MAT_CEDRE, MAT_CENDRE, MAT_CHAUX, MAT_CHAUX_FEU, MAT_EAU,
                                   MAT_FER, MAT_MARBRE, MAT_SEL, MAT_SIKRA, braise, nuee)
-from .primitives.volumes import (_objet, _poser, alea, box, braises, crochet, cyl, cyl_between, lampe, link_to,
+from .primitives.volumes import (_objet, _poser, alea, box, braises, crochet, cyl, cyl_between, gzir, lampe, link_to,
                                  mesh_from_pydata, revolution, sphere, tore)
 from .primitives.ouvrages import table_de_service
 
@@ -231,47 +231,6 @@ MAARAKHOT = (("gedola", -36, -28, -13, -5), ("ketoret", -48, -45, -19, -16),
 R_GZIR, REWACH, PAS_LIT, LITS = 0.19, 0.16, 0.34, 4
 # Du bois fendu à la longueur d'un bras, pas des troncs : longueur d'une bûche et jour entre deux bouts, CHOIX.
 LONG_GZIR, JOUR_GZIR = 2.6, 0.25
-# La section d'une bûche, en angle d'écorce : un rondin, une moitié, un quartier.
-FENTES_GZIR = (2 * math.pi, math.pi, 0.55 * math.pi)
-COTES_GZIR, TRANCHES_GZIR = 9, 3
-
-def _section_de_gzir(cle, rayon):
-    """Le contour d'une bûche fendue, écorce en arc et bois à plat, et le rang du premier sommet de bois."""
-    arc = FENTES_GZIR[int(alea(cle, 6) * len(FENTES_GZIR))]
-    rond = arc == 2 * math.pi
-    pas = COTES_GZIR if rond else COTES_GZIR - 1
-    ecorce = [(rayon * (0.86 + 0.28 * alea(cle, 10 + k)) * math.cos(arc * k / pas),
-               rayon * (0.86 + 0.28 * alea(cle, 10 + k)) * math.sin(arc * k / pas)) for k in range(COTES_GZIR)]
-    if rond or arc == math.pi:
-        return ecorce, len(ecorce)
-    return ecorce + [(0.0, 0.0)], len(ecorce) - 1
-
-def gzir(cle, p0, p1, rayon, col, mat):
-    """Une bûche fendue entre deux points : sa section tourne sur elle-même et se déporte d'une tranche à l'autre."""
-    contour, bois = _section_de_gzir(cle, rayon)
-    n = len(contour)
-    tour = 2 * math.pi * alea(cle, 7)
-    verts = []
-    for t in range(TRANCHES_GZIR + 1):
-        angle = tour + 0.25 * (alea(cle, 20 + t) - 0.5)
-        ecart = [0.25 * rayon * (alea(cle, 30 + 2 * t + k) - 0.5) for k in (0, 1)]
-        taille = 0.9 + 0.2 * alea(cle, 40 + t)
-        z = t / TRANCHES_GZIR
-        verts += [(taille * (u * math.cos(angle) - v * math.sin(angle)) + ecart[0],
-                   taille * (u * math.sin(angle) + v * math.cos(angle)) + ecart[1], z) for u, v in contour]
-    flancs = [[t * n + k, t * n + (k + 1) % n, (t + 1) * n + (k + 1) % n, (t + 1) * n + k]
-              for t in range(TRANCHES_GZIR) for k in range(n)]
-    bouts = [list(range(n))[::-1], [TRANCHES_GZIR * n + k for k in range(n)]]
-    a, b = Vector(p0), Vector(p1)
-    repere = (b - a).to_track_quat('Z', 'Y').to_matrix()
-    longueur = (b - a).length
-    o = mesh_from_pydata(cle, [tuple(a + repere @ Vector((x, y, z * longueur))) for x, y, z in verts], flancs + bouts, col, mat)
-    # Lisse sur l'écorce, à plat sur le bois fendu et sur les bouts sciés.
-    for k, face in enumerate(o.data.polygons):
-        face.use_smooth = k < len(flancs) and k % n < bois - 1
-    o["sans_biseau"] = True
-    return o
-
 RETRAIT_LIT = 0.25
 RETRAIT_GEHALIM = RETRAIT_LIT * (LITS - 1) + 0.15
 

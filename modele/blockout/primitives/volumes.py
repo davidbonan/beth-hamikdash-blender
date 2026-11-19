@@ -486,6 +486,49 @@ def cyl_between(name, p0, p1, r, col, mat=None, verts=16):
     o.rotation_euler = d.to_track_quat('Z', 'Y').to_euler()
     return o
 
+# La section d'une bûche, en angle d'écorce : un rondin, une moitié, un quartier.
+FENTES_GZIR = (2 * math.pi, math.pi, 0.55 * math.pi)
+COTES_GZIR, TRANCHES_GZIR = 9, 3
+
+def _section_de_gzir(cle, rayon, fentes):
+    """Le contour d'une bûche fendue, écorce en arc et bois à plat, et le rang du premier sommet de bois."""
+    arc = fentes[int(alea(cle, 6) * len(fentes))]
+    rond = arc == 2 * math.pi
+    pas = COTES_GZIR if rond else COTES_GZIR - 1
+    ecorce = [(rayon * (0.86 + 0.28 * alea(cle, 10 + k)) * math.cos(arc * k / pas),
+               rayon * (0.86 + 0.28 * alea(cle, 10 + k)) * math.sin(arc * k / pas)) for k in range(COTES_GZIR)]
+    if rond or arc == math.pi:
+        return ecorce, len(ecorce)
+    return ecorce + [(0.0, 0.0)], len(ecorce) - 1
+
+def gzir(cle, p0, p1, rayon, col, mat, fentes=FENTES_GZIR):
+    """Une bûche fendue entre deux points (amot) : sa section tourne sur elle-même et se déporte d'une tranche à l'autre."""
+    contour, bois = _section_de_gzir(cle, rayon, fentes)
+    n = len(contour)
+    tour = 2 * math.pi * alea(cle, 7)
+    verts = []
+    for t in range(TRANCHES_GZIR + 1):
+        angle = tour + 0.25 * (alea(cle, 20 + t) - 0.5)
+        ecart = [0.25 * rayon * (alea(cle, 30 + 2 * t + k) - 0.5) for k in (0, 1)]
+        taille = 0.9 + 0.2 * alea(cle, 40 + t)
+        z = t / TRANCHES_GZIR
+        verts += [(taille * (u * math.cos(angle) - v * math.sin(angle)) + ecart[0],
+                   taille * (u * math.sin(angle) + v * math.cos(angle)) + ecart[1], z) for u, v in contour]
+    flancs = [[t * n + k, t * n + (k + 1) % n, (t + 1) * n + (k + 1) % n, (t + 1) * n + k]
+              for t in range(TRANCHES_GZIR) for k in range(n)]
+    bouts = [list(range(n))[::-1], [TRANCHES_GZIR * n + k for k in range(n)]]
+    a, b = Vector(p0), Vector(p1)
+    repere = (b - a).to_track_quat('Z', 'Y').to_matrix()
+    longueur = (b - a).length
+    o = mesh_from_pydata(cle, [tuple(a + repere @ Vector((x, y, z * longueur))) for x, y, z in verts], flancs + bouts, col, mat)
+    # Lisse sur l'écorce, à plat sur le bois fendu et sur les bouts sciés.
+    for k, face in enumerate(o.data.polygons):
+        face.use_smooth = k < len(flancs) and k % n < bois - 1
+    o["sans_biseau"] = True
+    # La moelle court de p0 à p1, en mètres : l'export y oriente les fibres et y centre les cernes.
+    o["moelle"] = [m(c) for c in (*p0, *p1)]
+    return o
+
 def tube_between(name, p0, p1, r, col, mat=None, verts=16):
     """Cylindre sans fonds et lissé entre deux points (amot) : ses normales partent de l'axe."""
     a, b = Vector([m(c) for c in p0]), Vector([m(c) for c in p1])

@@ -40,6 +40,7 @@ import subprocess
 import sys
 import tempfile
 import bpy
+import numpy as np
 from mathutils import Matrix, Vector
 
 MODELE = pathlib.Path(__file__).resolve().parent
@@ -209,8 +210,9 @@ def comprimer(glb, options=()):
     # sur la texture de la matière, qu'aucune matière n'a ici — à 16 bits l'écart
     # restait, un dixième de figure en haut de l'atlas, et le modelé glissait sous sa
     # plaque. En flottants, il les laisse telles quelles.
+    # `-vc 16` : la couleur porte un numéro de pièce, exact sur 16 bits.
     commande = ["npx", "-y", "gltfpack", "-i", str(glb), "-o", str(sortie),
-                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vpf", "-vn", "12", "-vtf", *options]
+                "-cc", "-kn", "-km", "-ke", "-kv", "-vp", "16", "-vpf", "-vn", "12", "-vtf", "-vc", "16", *options]
     try:
         subprocess.run(commande, check=True, capture_output=True, timeout=600)
     except (OSError, subprocess.SubprocessError) as erreur:
@@ -248,6 +250,77 @@ def chanfreiner(gardes):
         objet.data = bpy.data.meshes.new_from_object(objet.evaluated_get(deps))
         objet.modifiers.clear()
     print(f"  {len(biseautes)} volumes chanfreinés, {len(gardes) - len(biseautes)} sans chanfrein")
+
+
+def en_repere_gltf(v):
+    return np.array([v[0], v[2], -v[1]], dtype=np.float32)
+
+
+def axe_de_revolution(objet, rotation):
+    """L'axe d'une pièce tournée : la direction de normale que ses faces ne partagent pas avec les deux autres."""
+    maillage = objet.data
+    normales = np.empty(len(maillage.polygons) * 3)
+    aires = np.empty(len(maillage.polygons))
+    maillage.polygons.foreach_get("normal", normales)
+    maillage.polygons.foreach_get("area", aires)
+    normales = normales.reshape(-1, 3) @ np.linalg.inv(rotation)
+    tenseur = (normales * aires[:, None]).T @ normales
+    valeurs, vecteurs = np.linalg.eigh(tenseur)
+    return vecteurs[:, 0] if valeurs[1] - valeurs[0] > valeurs[2] - valeurs[1] else vecteurs[:, 2]
+
+
+# Le sens des fibres n'a pas de signe : en repère glTF, il pointe du côté de ce témoin pour une pièce sciée, à l'opposé pour une pièce ronde, dont la moelle est au cœur (`TEMOIN_DES_FIBRES` de matieres.js).
+TEMOIN_DES_FIBRES = np.array([0.23, 0.90, -0.37])
+
+
+def fibres_de(objet):
+    """(sens des fibres × demi-travers, cœur) d'une pièce de bois, en mètres et en repère de monde Blender."""
+    monde = np.array(objet.matrix_world)
+    rotation = monde[:3, :3]
+    sommets = np.empty(len(objet.data.vertices) * 3)
+    objet.data.vertices.foreach_get("co", sommets)
+    sommets = sommets.reshape(-1, 3) @ rotation.T + monde[:3, 3]
+    centre = sommets.mean(axis=0)
+    ronde = "pli_vif" in objet or "moelle" in objet
+    if "moelle" in objet:
+        bouts = np.array(objet["moelle"]).reshape(2, 3) @ rotation.T + monde[:3, 3]
+        axe = (bouts[1] - bouts[0]) / np.linalg.norm(bouts[1] - bouts[0])
+        centre = bouts.mean(axis=0)
+    elif ronde:
+        axe = axe_de_revolution(objet, rotation)
+    else:
+        axe = np.linalg.eigh(np.cov((sommets - centre).T))[1][:, 2]
+    le_long = (sommets - centre) @ axe
+    coeur = centre + axe * (le_long.min() + le_long.max()) / 2
+    travers = np.linalg.norm((sommets - coeur) - np.outer((sommets - coeur) @ axe, axe), axis=1).max()
+    # Une rondelle (plateau rond, billot plus large que haut) a son fil en travers, pas le long de son axe ; une moelle déclarée fait foi.
+    if le_long.max() - le_long.min() < travers and "moelle" not in objet:
+        horizontal = np.array([1.0, 0.0, 0.0]) if abs(axe[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
+        axe = horizontal - axe * (horizontal @ axe)
+        axe /= np.linalg.norm(axe)
+        travers = np.linalg.norm((sommets - coeur) - np.outer((sommets - coeur) @ axe, axe), axis=1).max()
+        ronde = False
+    if (en_repere_gltf(axe) @ TEMOIN_DES_FIBRES > 0) == ronde:
+        axe = -axe
+    return axe * travers, coeur
+
+
+# gltfpack jette tout attribut hors du glTF standard : la couleur porte le numéro de pièce, les extras du nœud sa table.
+PIECES = "Pieces"
+
+
+def numeroter_les_pieces(objets):
+    """Numérote chaque pièce de bois dans le rouge de COLOR_0 et rend la table (sens des fibres, cœur) de ces numéros, en repère glTF."""
+    pieces = [o for o in objets if any(f.material and f.material.get("bois") for f in o.material_slots)]
+    table = []
+    for numero, objet in enumerate(pieces, start=1):
+        if objet.data.users > 1:
+            objet.data = objet.data.copy()
+        fibre, coeur = fibres_de(objet)
+        table += [*map(float, en_repere_gltf(fibre)), *map(float, en_repere_gltf(coeur))]
+        couleur = objet.data.color_attributes.new(PIECES, "FLOAT_COLOR", "POINT")
+        couleur.data.foreach_set("color", np.tile(np.array([numero / 65535, 0.0, 0.0, 1.0], dtype=np.float32), len(objet.data.vertices)))
+    return table
 
 
 def concepts():
@@ -474,7 +547,10 @@ def exporter(chantier):
     emprises, fusionnes = {}, {}
     for ident in sorted(groupes):
         objets = sorted(groupes[ident], key=lambda o: o.name)
+        fibres = numeroter_les_pieces(objets)
         fusionnes[ident] = fusionner(ident, objets)
+        if fibres:
+            fusionnes[ident]["fibres"] = fibres
         emprises[ident] = bornes(fusionnes[ident])
         print(f"  {ident:26s} {len(objets):5d} volumes")
 
@@ -515,6 +591,9 @@ def exporter(chantier):
         # Un maillage sans couche UV ne sort aucune coordonnée ; les concepts qui
         # mêlent plaques et volumes nus en portent pour tous, à zéro sur les nus.
         export_texcoords=True,
+        export_vertex_color="NAME",
+        export_vertex_color_name=PIECES,
+        export_all_vertex_colors=False,
         export_skins=False,
         export_animations=False,
     )

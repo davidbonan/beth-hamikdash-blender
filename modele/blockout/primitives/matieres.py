@@ -160,6 +160,7 @@ def bois(name, rgb):
     """Cèdre des plafonds (« וַיִּסְפֹּן אֶת הַבַּיִת… בָּאֲרָזִים », Melakhim I 6:9) et chêne des
     maltera'ot (Middot 3:7) : le fil court le long de l'axe est-ouest, celui des poutres."""
     mat, neuf = _neuf(name, rgb)
+    mat["bois"] = True
     if not neuf:
         return mat
     liens = mat.node_tree.links

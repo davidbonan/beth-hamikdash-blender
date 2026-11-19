@@ -24,7 +24,9 @@ import { PROFIL, plafonner } from "./qualite.js";
 const JEUX = {
   pierre: { couleur: "matieres/pierre_c_1024.webp", normale: "matieres/pierre_n_1024.webp", moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
   enduit: { couleur: "matieres/enduit_c_1024.webp", normale: "matieres/enduit_n_1024.webp", moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
-  bois: { couleur: "matieres/bois_c_1024.webp", normale: "matieres/bois_n_1024.webp", moyenne: [0.3205, 0.1855, 0.0867], rugosite: 0.9154 },
+  bois: { couleur: "matieres/bois_c_1024.webp", normale: "matieres/bois_n_1024.webp", moyenne: [0.1528, 0.1284, 0.1008], rugosite: 0.5094 },
+  placage: { couleur: "matieres/placage_c_1024.webp", normale: "matieres/placage_n_1024.webp", moyenne: [0.3597, 0.2106, 0.0983], rugosite: 0.5303 },
+  ecorce: { couleur: "matieres/ecorce_c_1024.webp", normale: "matieres/ecorce_n_1024.webp", moyenne: [0.2461, 0.1935, 0.1513], rugosite: 0.6939 },
   metal: { couleur: "matieres/metal_c_1024.webp", normale: "matieres/metal_n_1024.webp", moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
   marbre: { couleur: "matieres/marbre_c_1024.webp", normale: "matieres/marbre_n_1024.webp", moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
   etoffe: { normale: "matieres/etoffe_n_1024.webp" },

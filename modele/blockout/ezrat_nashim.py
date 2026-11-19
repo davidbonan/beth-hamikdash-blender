@@ -3,7 +3,7 @@ import math
 from .primitives.parametres import CANDELABRES_SHOEVA, Z_EZN, Z_HAR
 from .primitives.matieres import (MAT_BOIS_MAARAKHA, MAT_BRONZE, MAT_CEDRE, MAT_CHENE, MAT_EAU, MAT_ECHELLE,
                                   MAT_LECHEM, MAT_OR, MAT_PIERRE, MAT_SOL, MAT_TERRE_CUITE, braise)
-from .primitives.volumes import (BALUSTRE, alea, box, colonne_cannelee, cone, cyl, cyl_between, graver,
+from .primitives.volumes import (BALUSTRE, FENTES_GZIR, alea, box, colonne_cannelee, cone, cyl, cyl_between, graver, gzir,
                                  mur_perce, piece_tournee, plage, prism, revolution, tube_between)
 from .primitives.gravures import bandeau_fleurons
 from .primitives.ouvrages import (BANDEAU, CORNICHE, ENCADREMENT_SHAAR, FILET_OR, PILASTRE_CHAPITEAU,
@@ -101,12 +101,12 @@ for _s, _x in enumerate((105.5, 116.0, 126.5)):
         for _k in range(5):
             if _l % 2 == 0:
                 _y = 58.0 + _k * 0.65
-                cyl_between(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_x, _y, _z), (_x + 8, _y, _z),
-                            0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+                gzir(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_x, _y, _z), (_x + 8, _y, _z),
+                     0.27, "10_EzratNashim", MAT_BOIS_MAARAKHA())
             else:
                 _xk = _x + 0.6 + _k * 1.8
-                cyl_between(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_xk, 57.7, _z), (_xk, 60.9, _z),
-                            0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+                gzir(f"Lishkat_Etzim_NE_bois_{_s}{_l}{_k}", (_xk, 57.7, _z), (_xk, 60.9, _z),
+                     0.27, "10_EzratNashim", MAT_BOIS_MAARAKHA())
 # Le tri lui-même : le vrac qui arrive près de la porte, les billots des cohanim qui l'examinent
 # — hors de l'Azara, rien n'interdit de s'asseoir —, et le bois véreux écarté à part. CHOIX :
 # places, nombres, et que le rebut attende là.
@@ -117,12 +117,12 @@ for _tas, (_cx, _cy, _n) in (("vrac", (112.0, 42.0, 14)), ("pasoul", (130.0, 38.
         _cap, _long = math.pi * alea(_cle, 2), 3 + 3 * alea(_cle, 3)
         _x, _y, _z = _cx + _r * math.cos(_a), _cy + _r * math.sin(_a), Z_EZN + 0.3 + 0.55 * (_k // 5)
         _dx, _dy = _long / 2 * math.cos(_cap), _long / 2 * math.sin(_cap)
-        cyl_between(_cle, (_x - _dx, _y - _dy, _z), (_x + _dx, _y + _dy, _z),
-                    0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA(), verts=6)
+        gzir(_cle, (_x - _dx, _y - _dy, _z), (_x + _dx, _y + _dy, _z), 0.3, "10_EzratNashim", MAT_BOIS_MAARAKHA())
 for _k in range(3):
     _a = math.radians(200 + 70 * _k)
-    cyl(f"Lishkat_Etzim_NE_billot_{_k}", 112 + 6.5 * math.cos(_a), 42 + 6.5 * math.sin(_a),
-        Z_EZN, Z_EZN + 1.2, 0.7, "10_EzratNashim", MAT_CHENE(), verts=12)
+    _bx, _by = 112 + 6.5 * math.cos(_a), 42 + 6.5 * math.sin(_a)
+    gzir(f"Lishkat_Etzim_NE_billot_{_k}", (_bx, _by, Z_EZN), (_bx, _by, Z_EZN + 1.2), 0.7, "10_EzratNashim", MAT_CHENE(),
+         fentes=FENTES_GZIR[:1])
 # « רָאָה הָרִצְפָּה שֶׁהִיא מְשֻׁנָּה מֵחֲבֵרוֹתֶיהָ » (Shekalim 6:2), « לֹא הָיְתָה הָאֶבֶן שָׁוָה לִשְׁאַר אַבְנֵי הָרִצְפָּה » (Bartenura). CHOIX : une dalle entière du pavage tracé par la visite, face à la porte, relevée d'un dixième d'ama.
 RITZPA_MESHUNA = (120, 124, 41.316, 49.316)
 box("Lishkat_Etzim_NE_ritzpa_meshuna", *RITZPA_MESHUNA, Z_EZN, Z_EZN + 0.1, "10_EzratNashim", MAT_SOL())

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { computeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
-import { calerLesAssises, habiller, refleteSaCour, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
+import { calerLesAssises, deplierLesFibres, habiller, refleteSaCour, ETOFFES, HAUTEUR_IMAGE, EXPOSITION, EXPOSITION_DEHORS } from "./matieres.js";
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
@@ -295,6 +295,7 @@ gltf.scene.traverse((o) => {
   o.receiveShadow = true;
   porterAuLoin(o);
   if (!brut) calerLesAssises(o);
+  deplierLesFibres(o);
   if (!brut) {
     const occlusion = occlusions.get(o.userData.groupeCuit);
     const lumiere = lumieres.get(o.userData.groupeCuit);

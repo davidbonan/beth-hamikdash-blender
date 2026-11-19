@@ -33,6 +33,8 @@ export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MONOLITHE, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
                           KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
+// Celles dont le fil suit chaque pièce, que l'export oriente.
+const BOISEES = new Set([BOIS, LAMBRIS, BUCHE]);
 // Celles dont les joints se calent sur les arêtes de chaque face, aux profils `assises`.
 const CALEES = new Set([PIERRE, MURAILLE]);
 // Celles qui gardent leur appareil au profil sobre : les murs, les sols, l'or, et l'étoffe pour les keruvim de la Parokhet.
@@ -131,7 +133,7 @@ vec3 grossirFil(vec3 p, vec3 n){
 // et une ride se décrivent, elles ne se photographient pas à plat.
 const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pierre",
                    13: "pierre", 14: "pierre", 15: "pierre", 19: "pierre", 20: "pierre", 21: "pierre", 22: "pierre", 23: "pierre", 26: "pierre",
-                   3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "bois", 18: "enduit", 25: "bois" };
+                   3: "metal", 17: "metal", 4: "bois", 5: "etoffe", 7: "enduit", 8: "enduit", 16: "placage", 18: "enduit", 25: "ecorce" };
 // Côté du carreau en mètres, puis les forces de couleur, de CHROMA, de relief et de
 // rugosité. Un carreau trop grand se lit en taches, trop petit il grésille. Le poli —
 // marbre, gazit scié — prend la même pierre que le reste, en moins appuyé : c'est cette
@@ -151,12 +153,13 @@ const NAPPE_DE = { 1: "pierre", 2: "pierre", 9: "marbre", 10: "pierre", 11: "pie
 const CARREAU = {
   1: [2.4, 0.28, 0.28, 1.20, 0.65], 2: [1.6, 0.30, 0.20, 0.30, 0.30],
   3: [1.6, 0.34, 0.14, 0.60, 0.70], 17: [1.6, 0.34, 0.14, 0.60, 0.70],
-  4: [1.2, 0.70, 0.70, 0.80, 0.50], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
+  // Le bois équarri prend sa photo à sa taille en travers, une face de 60 cm, et un relief mesuré : un bois raboté, pas une épave.
+  4: [0.6, 0.55, 0.35, 0.80, 0.45], 5: [0.6, 0.00, 0.00, 0.70, 0.30],
   7: [1.4, 0.75, 0.35, 0.90, 0.50],
   // La chaux du Mizbea'h est plane : la photo n'y ajoute que le grain, et sous la cendre presque rien.
   18: [1.4, 0.22, 0.20, 0.90, 0.50], 8: [1.4, 0.15, 0.20, 0.50, 0.40],
-  // La bûche ne prend de la photo que son fil : sa couleur est celle de ce que le feu en a laissé.
-  25: [0.5, 0.30, 0.30, 1.20, 0.60],
+  // L'écorce de la bûche prend tout son relief ; sa couleur reste celle de ce que le feu en a laissé.
+  25: [1.0, 0.50, 0.25, 0.40, 0.50],
   // Le marbre prend sa photo presque entière : ses veines sont sa matière, pas une salissure.
   9: [4.8, 1.00, 0.35, 0.15, 1.00], 10: [2.4, 0.28, 0.28, 1.20, 0.65], 26: [2.4, 0.28, 0.28, 1.20, 0.65],
   11: [1.6, 0.85, 0.55, 1.00, 0.60],
@@ -169,9 +172,8 @@ const CARREAU = {
   19: [2.4, 0.28, 0.28, 1.20, 0.65], 20: [2.4, 0.28, 0.28, 1.20, 0.65], 21: [2.4, 0.28, 0.28, 1.20, 0.65],
   // Le rocher de la Even HaShetiya n'a ni appareil ni lustre : la nappe y porte tout son relief.
   15: [1.0, 0.60, 0.40, 1.60, 0.70],
-  // Le lambris de cèdre prend la photo du bois trois fois plus grande et presque sans nœuds :
-  // à un mètre le carreau, une paroi de douze mètres se lisait en bardage de chalet.
-  16: [3.6, 0.22, 0.30, 0.30, 0.35],
+  // Le lambris de cèdre est un bois choisi et poli : un placage, plus grand et plus calme qu'une poutre équarrie.
+  16: [2.8, 0.45, 0.40, 0.50, 0.35],
 };
 
 // Aux profils `fines`, la pierre de taille et le dallage prennent un calcaire scié à ses vacuoles, deux fois plus fin, et appuyé.
@@ -742,6 +744,105 @@ void marbreHerode(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rug
   photo = vec4(vec3(b.tireBloc, b.tireFini, b.tireBloc + b.tireFini) * 13.0, 1.0);
 }
 
+#ifdef FIBRE
+flat varying vec3 vFibre;   // sens des fibres × demi-travers de la pièce (m) ; nul hors d'une pièce orientée
+flat varying vec3 vCoeur;
+// Le pendant de TEMOIN_DES_FIBRES (beit_hamikdash_visite.py) : du côté opposé, la pièce est ronde.
+const vec3 TEMOIN_DES_FIBRES = vec3(0.23, 0.90, -0.37);
+// q : le point dans le repère de sa pièce, xy en travers, z le long des fibres ; n : la normale dans ce repère.
+struct Piece { vec3 fil; vec3 e1; vec3 e2; vec3 q; vec3 n; float travers; bool ronde; float graine; };
+Piece mPiece;
+float mGrisaille = 0.0;
+void poserLaPiece(vec3 P, vec3 N){
+  float travers = length(vFibre);
+  vec3 fil = travers > 1e-4 ? vFibre / travers : vec3(0.0, 1.0, 0.0);
+  vec3 haut = abs(fil.y) < 0.9 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+  vec3 e1 = normalize(haut - fil * dot(haut, fil));
+  vec3 e2 = cross(fil, e1);
+  vec3 d = P - vCoeur;
+  mPiece = Piece(fil, e1, e2, vec3(dot(d, e1), dot(d, e2), dot(d, fil)), vec3(dot(N, e1), dot(N, e2), dot(N, fil)),
+                 travers, dot(vFibre, TEMOIN_DES_FIBRES) < 0.0, alea3(vCoeur * 1.7 + 0.5));
+}
+
+// Une pièce de plus d'un mètre de large (plafond, lambris) est un assemblage de planches : chacune a sa photo, sa teinte et son joint.
+const float LARGEUR_DE_PLANCHE = 0.30;
+const float TRAVERS_D_UN_PLANCHER = 0.6;
+bool estPlanchee(){ return mPiece.travers > TRAVERS_D_UN_PLANCHER; }
+float enTravers(){ return abs(mPiece.n.x) > abs(mPiece.n.y) ? mPiece.q.y : mPiece.q.x; }
+float graineDePlanche(float travers){
+  return estPlanchee() ? alea1(floor(travers / LARGEUR_DE_PLANCHE) + mPiece.graine * 113.0) : mPiece.graine;
+}
+float jointDePlanche(){
+  if (!estPlanchee()) return 0.0;
+  float d = abs(fract(enTravers() / LARGEUR_DE_PLANCHE + 0.5) - 0.5) * LARGEUR_DE_PLANCHE;
+  float pixel = empreinteMax();
+  return (1.0 - smoothstep(0.0015, 0.0015 + pixel, d)) * (1.0 - smoothstep(0.01, 0.03, pixel));
+}
+
+// Le long du fil, des veines étirées ; d'une pièce à l'autre, une teinte à elle ; le long d'une même pièce, des taches lentes.
+void filDuBois(float force, out vec3 teinte, out float rugo){
+  float pixel = empreinteMax();
+  vec3 graine = vec3(mPiece.graine * 17.0, mPiece.graine * 5.0, mPiece.graine * 11.0);
+  float f = grain(vec3(mPiece.q.xy * 9.0, mPiece.q.z * 1.1), pixel * 9.0);
+  float tache = grain(vec3(mPiece.q.xy * 2.5, mPiece.q.z * 0.6) + graine, pixel * 2.5);
+  teinte = vec3(1.0 + ((f - 0.5) * 0.18 - fract(f * 7.0) * 0.06 + (graineDePlanche(enTravers()) - 0.5) * 0.18 + (tache - 0.5) * 0.25) * force);
+  rugo = ((f - 0.5) * 0.10 + 0.06) * force;
+}
+
+// Le bois au soleil pâlit un peu par plaques, sans tourner au gris d'abandon : le Temple est entretenu.
+float grisaille(){
+  vec3 graine = vec3(mPiece.graine * 11.0, mPiece.graine * 17.0, mPiece.graine * 5.0);
+  float plaque = smoothstep(0.3, 0.65, grain(vec3(mPiece.q.xy * 1.5, mPiece.q.z * 0.4) + graine, empreinteMax() * 1.5));
+  return (0.10 + 0.15 * plaque) * (0.5 + 0.5 * mPiece.graine);
+}
+
+// Les fentes de séchage d'une pièce équarrie : de longs traits sombres le long du fil, par tronçons, sur une pièce sur trois.
+float fentesDeSechage(){
+  if (fract(mPiece.graine * 7.3) > 0.33) return 0.0;
+  float pixel = empreinteMax();
+  vec3 graine = vec3(mPiece.graine * 23.0, mPiece.graine * 7.0, 0.0);
+  float trace = grain(vec3(mPiece.q.xy * 6.0, mPiece.q.z * 0.35) + graine, pixel * 6.0);
+  float troncon = smoothstep(0.45, 0.65, grain(vec3(mPiece.q.xy * 3.0, mPiece.q.z * 0.8) + graine.yxz));
+  float largeur = 0.012 + pixel * 3.0;
+  return (1.0 - smoothstep(0.0, largeur, abs(trace - 0.5))) * troncon * (1.0 - smoothstep(0.004, 0.012, pixel));
+}
+
+float bout(){ return smoothstep(0.6, 0.85, abs(mPiece.n.z)); }
+
+// Le bout d'une coupe prend la poussière et grisaille, par plaques ; la scie ou la hache y laisse ses traits.
+float boutUse(){
+  float pixel = empreinteMax();
+  float plaque = grain(vec3(mPiece.q.xy * 14.0, mPiece.graine * 9.0), pixel * 14.0);
+  float trait = grain(vec3(mPiece.q.x * 3.0, mPiece.q.y * 60.0, mPiece.graine * 3.0), pixel * 60.0);
+  return 0.78 * (0.85 + 0.3 * plaque) * (0.92 + 0.16 * trait);
+}
+
+// Le bois d'été de chaque cerne, sombre, de 0 à 1. Une pièce sciée a laissé sa moelle hors d'elle ; une pièce ronde la garde au cœur.
+const float CERNES_PAR_METRE = 110.0;
+float cerne(){
+  float angle = mPiece.graine * 6.2832;
+  // Un arbre ne pousse pas droit : même au cœur d'un rondin, la moelle est à côté, et les cernes plus larges du côté du jour.
+  vec2 sens = vec2(cos(angle), sin(angle));
+  vec2 moelle = sens * mPiece.travers * (mPiece.ronde ? 0.08 + 0.17 * alea1(mPiece.graine * 97.0) : 0.6 + 1.6 * alea1(mPiece.graine * 97.0));
+  vec2 r = mPiece.q.xy - moelle;
+  float rayon = length(r) * (1.0 - 0.18 * dot(normalize(r + 1e-5), sens));
+  float t = rayon * CERNES_PAR_METRE + 4.0 * grain(vec3(rayon * 9.0, mPiece.graine * 40.0, 0.0))
+          + 2.5 * grain(vec3(mPiece.q.xy * 12.0, mPiece.graine * 40.0));
+  float annee = alea1(floor(t) + mPiece.graine * 61.0);
+  return mix(pow(fract(t), 3.0 + 6.0 * annee) * (0.5 + annee), 0.2, smoothstep(0.4, 1.0, empreinteMax() * CERNES_PAR_METRE));
+}
+
+// La fente de retrait d'un rondin sur deux, de la moelle vers l'écorce, sur un rayon tiré au hasard.
+float fenteDeRetrait(){
+  if (fract(mPiece.graine * 13.7) < 0.5) return 0.0;
+  float r = length(mPiece.q.xy);
+  float a = atan(mPiece.q.y, mPiece.q.x) - mPiece.graine * 6.2832;
+  float ecart = abs(mod(a + 3.1416, 6.2832) - 3.1416) * r;
+  float largeur = 0.012 * r / max(mPiece.travers, 1e-3);
+  return (1.0 - smoothstep(largeur, largeur + empreinteMax(), ecart)) * smoothstep(0.1, 0.25, r / max(mPiece.travers, 1e-3));
+}
+#endif
+
 #ifdef PAROKHET
 uniform sampler2D uParokhet;   // rgb hauteur du bombé, a masque de la figure
 #endif
@@ -801,6 +902,42 @@ vec3 penteNappe(vec3 p, vec3 w){
   return vec3(0.0, sx.y, sx.x) * w.x + vec3(sy.x, 0.0, sy.y) * w.y
        + vec3(sz.x, sz.y, 0.0) * w.z;
 }
+
+#ifdef FIBRE
+// Deux prises le long des fibres, dans le repère de la pièce et décalées d'une pièce à l'autre ; le bout n'en prend aucune.
+// Sur une planche de plusieurs mètres, un carreau seul revenait tous les 60 cm, nœuds compris, en grille : il s'étire le long
+// du fil, où le bois ne fait que filer, et une seconde prise décalée prend le relais par tronçons d'un mètre.
+const float ETIREMENT_DU_FIL = 0.4;
+const vec2 RELAIS_DU_FIL = vec2(0.47, 0.29);
+vec3 poidsDuFil(){ vec3 w = pow(abs(mPiece.n), vec3(4.0, 4.0, 8.0)); return w / max(w.x + w.y + w.z, 1e-5); }
+vec2 decalageDeLaPiece(){ return vec2(mPiece.graine * 7.13, fract(mPiece.graine * 31.7) * 3.71); }
+float relaisDuFil(){ return smoothstep(0.32, 0.68, grain(vec3(mPiece.q.xy * 0.7, mPiece.q.z * 0.9 + mPiece.graine * 29.0))); }
+vec2 surLeFil(vec2 travers_long, float carreau){
+  float planche = graineDePlanche(travers_long.x);
+  return travers_long * carreau * vec2(1.0, ETIREMENT_DU_FIL) + decalageDeLaPiece() + vec2(planche * 0.53, planche * 7.9);
+}
+vec4 priseDuFil(sampler2D carte, vec2 uv, vec4 moyenne){
+  float r = relaisDuFil();
+  vec4 c = mix(texture2D(carte, uv), texture2D(carte, uv + RELAIS_DU_FIL), r);
+  return moyenne + (c - moyenne) * inversesqrt(r * r + (1.0 - r) * (1.0 - r));
+}
+vec4 nappeDuFil(sampler2D carte, float carreau, vec4 moyenne){
+  vec3 w = poidsDuFil();
+  return priseDuFil(carte, surLeFil(mPiece.q.yz, carreau), moyenne) * w.x
+       + priseDuFil(carte, surLeFil(mPiece.q.xz, carreau), moyenne) * w.y + moyenne * w.z;
+}
+vec2 penteDuFil(vec2 uv){
+  float r = relaisDuFil();
+  vec3 a = texture2D(uNappeN, uv).xyz * 2.0 - 1.0, b = texture2D(uNappeN, uv + RELAIS_DU_FIL).xyz * 2.0 - 1.0;
+  vec2 s = mix(-a.xy / max(a.z, 0.2), -b.xy / max(b.z, 0.2), r) * inversesqrt(r * r + (1.0 - r) * (1.0 - r));
+  return s * vec2(1.0, ETIREMENT_DU_FIL);
+}
+vec3 penteNappeDuFil(float carreau){
+  vec3 w = poidsDuFil();
+  vec2 sa = penteDuFil(surLeFil(mPiece.q.yz, carreau)), sb = penteDuFil(surLeFil(mPiece.q.xz, carreau));
+  return (mPiece.e2 * sa.x + mPiece.fil * sa.y) * w.x + (mPiece.e1 * sb.x + mPiece.fil * sb.y) * w.y;
+}
+#endif
 #endif
 
 // Ce que le temps fait à une paroi et qu'aucun blockout ne porte. La pluie de
@@ -964,6 +1101,9 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   vec3 vue = (P - cameraPosition) / loin;
   // Plancher d'incidence : vu par la tranche, un plan étirerait le pixel à l'infini.
   regard = Regard(vue, max(abs(dot(N, vue)), 0.02), vPixel);
+#ifdef FIBRE
+  poserLaPiece(P, N);
+#endif
   float nettete = 1.0 - smoothstep(${PORTEES.teinte[0].toFixed(1)}, ${PORTEES.teinte[1].toFixed(1)}, loin);
   // Le relief se retire BIEN plus tôt que la couleur. Une teinte qui rétrécit sous le
   // pixel se moyenne toute seule ; une normale, non — elle bascule d'un pixel au
@@ -1033,15 +1173,21 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo = (g - 0.5) * 0.10;
     if (FAMILLE == 17) facettesAmande(P, N, pente, rugo);
   }
-  else if (FAMILLE == 4 || FAMILLE == 16) {                // bois : fil étiré
+#ifdef FIBRE
+  else if (FAMILLE == 4 || FAMILLE == 16) {                // bois : fil étiré le long de la pièce, cernes au bout
     // Le fil reste écrit — une planche de cèdre du Heikhal fait 20 amot de haut, et
     // aucune nappe d'un mètre ne porte une veine de cette longueur. Le lambris le garde
     // à moitié : c'est un bois choisi et poli.
-    float fort = FAMILLE == 16 ? 0.5 : 1.0;
-    float f = grain(P * vec3(9.0, 1.1, 9.0), empreinteMax() * 9.0);
-    teinte = vec3(1.0 + ((f - 0.5) * 0.18 - fract(f * 7.0) * 0.06) * fort);
-    rugo = (f - 0.5) * 0.10 * fort;
+    filDuBois(FAMILLE == 16 ? 0.5 : 1.0, teinte, rugo);
+    float b = bout();
+    float fente = mPiece.ronde ? fenteDeRetrait() : 0.0;
+    teinte *= 1.0 - 0.55 * jointDePlanche() * (1.0 - b);
+    teinte *= mix(1.0 - 0.4 * fentesDeSechage() * (FAMILLE == 16 ? 0.0 : 1.0), (1.0 - 0.35 * cerne()) * (1.0 - 0.6 * fente) * boutUse(), b);
+    rugo += 0.10 * b;
+    // Le lambris est à l'abri, dans le Heikhal : il garde sa couleur.
+    if (FAMILLE == 4) mGrisaille = grisaille();
   }
+#endif
   else if (FAMILLE == 5) {                                   // étoffe
     // La trame vient de la nappe : le sinus qui la portait valait 38 périodes au mètre
     // et grésillait dès deux pas de recul, ce qu'aucun mipmap ne pouvait rattraper.
@@ -1157,19 +1303,27 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     rugo += suie * 0.16 + cendre * 0.10;
     sang(P, N, teinte, rugo);
   }
-  else if (FAMILLE == 25) {                                  // gzirin : écorce, charbon en écailles, cendre
+#ifdef FIBRE
+  else if (FAMILLE == 25) {                                  // gzirin : écorce, aubier cerné au bout, charbon en écailles, cendre
     float pixel = empreinteMax();
     // Le feu prend une bûche par plaques : la brûlure du lit décide de la part, un bruit de l'endroit.
     float pris = smoothstep(-0.25, 0.25, uBrulure * 1.5 - 0.25 - grainOblique(P * 3.0, pixel * 3.0));
     // Le charbon de bois se fend en carreaux : une crête de bruit, comme la braise.
     float ecaille = grainOblique(P * 24.0, pixel * 24.0);
     float fente = (1.0 - smoothstep(0.0, 0.07, abs(ecaille - 0.5))) * pris;
-    vec3 ecorce = vec3(0.26, 0.21, 0.165) * (0.75 + 0.5 * grainOblique(P * vec3(11.0, 30.0, 11.0), pixel * 30.0));
+    // Le relief de l'écorce vient de la nappe ; coupée, la bûche montre son aubier cerné, bordé d'écorce.
+    float b = bout();
+    float aLEcorce = smoothstep(0.80, 0.86, length(mPiece.q.xy) / max(mPiece.travers, 1e-3));
+    float plaque = grain(vec3(mPiece.q.xy * 4.0, mPiece.q.z * 1.2) + mPiece.graine * 13.0, pixel * 4.0);
+    vec3 ecorce = vec3(0.26, 0.21, 0.165) * (0.8 + 0.4 * mPiece.graine) * mix(vec3(0.82, 0.84, 0.86), vec3(1.12, 1.06, 1.0), plaque);
+    vec3 aubier = vec3(0.50, 0.38, 0.25) * (1.0 - 0.35 * cerne()) * (1.0 - 0.7 * fenteDeRetrait()) * boutUse() / 0.78;
+    vec3 bois = mix(ecorce, mix(aubier, ecorce, aLEcorce), b);
     vec3 charbon = vec3(0.035, 0.033, 0.033) * (0.7 + 0.9 * ecaille) * (1.0 - 0.6 * fente);
     float cendre = smoothstep(0.50, 0.72, grainOblique(P * 6.0 + 3.0, pixel * 6.0)) * smoothstep(0.1, 0.9, N.y) * pris;
-    teinte = mix(mix(ecorce, charbon, pris), GRIS_CENDRE * 1.25, cendre * 0.8) / ${BUCHE_NEUTRE.toFixed(2)};
-    rugo = 0.15 - fente * 0.2;
+    teinte = mix(mix(bois, charbon, pris), GRIS_CENDRE * 1.25, cendre * 0.8) / ${BUCHE_NEUTRE.toFixed(2)};
+    rugo = 0.15 - fente * 0.2 + 0.08 * b;
   }
+#endif
   // Le dehors seulement : le Heikhal n'a pas vu la pluie, et l'enduit se refait.
   if (FAMILLE == 1 || FAMILLE == 10 || FAMILLE == 11 || FAMILLE == 14 || FAMILLE >= 19) patiner(P, N, exposition(), teinte, rugo);
 #ifdef GRAVURE
@@ -1208,6 +1362,8 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   float melange = smoothstep(0.30, 0.58, grain(P / 0.9));
   float garde = inversesqrt(melange * melange + (1.0 - melange) * (1.0 - melange));
   pente += mix(penteNappeOrientee(pb, w, sensA, vec2(0.0)), penteNappeOrientee(pb, w, sensB, DECALAGE), melange) * (garde * uCarreau.z * photo.w);
+#elif defined(FIBRE)
+  pente += penteNappeDuFil(uCarreau.x) * uCarreau.z;
 #else
   pente += penteNappe(pb, w) * (uCarreau.z * photo.w);
 #endif
@@ -1215,6 +1371,8 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 #ifdef NAPPE_FINE
   vec4 c = mix(nappeOrientee(uNappeC, pb, w, sensA, vec2(0.0)), nappeOrientee(uNappeC, pb, w, sensB, DECALAGE), melange);
   c = max(vec4(uMoyenne, uRugoMoy) + (c - vec4(uMoyenne, uRugoMoy)) * garde, vec4(0.03));
+#elif defined(FIBRE)
+  vec4 c = nappeDuFil(uNappeC, uCarreau.x, vec4(uMoyenne, uRugoMoy));
 #else
   vec4 c = nappe(uNappeC, pb, w);
 #endif
@@ -1226,6 +1384,8 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 #ifdef NAPPE_FINE
   // En projection à plat, sur une paroi, la tache ne varie que d'un côté : la nappe contrastée s'y étirait en bandes verticales.
   c.rgb *= mix(vec3(1.0), nappe(uNappeC, p * 0.2, w).rgb / uMoyenne, 0.35);
+#elif defined(FIBRE)
+  c.rgb *= mix(vec3(1.0), nappeDuFil(uNappeC, uCarreau.x * 0.2, vec4(uMoyenne, uRugoMoy)).rgb / uMoyenne, 0.35);
 #else
   c.rgb *= mix(vec3(1.0), texture2D(uNappeC, p.xz * 0.2).rgb / uMoyenne, 0.35);
 #endif
@@ -1364,6 +1524,30 @@ export function calerLesAssises(maillage) {
   geometry.setAttribute("bornesMax", new THREE.BufferAttribute(bornesMax, 3));
 }
 
+// Le rouge de la couleur numérote la pièce de bois, la table du nœud donne son sens des fibres et son cœur (beit_hamikdash_visite.py).
+// Sans numéro, la pièce garde un fil droit : sans attribut du tout, WebGL lirait celui qu'un autre programme a laissé.
+export function deplierLesFibres(maillage) {
+  const { geometry, material } = maillage;
+  const numeros = geometry.attributes.color;
+  if (numeros) {
+    geometry.deleteAttribute("color");
+    material.vertexColors = false;
+  }
+  if (!BOISEES.has(FAMILLES[material.name])) return;
+  let table;
+  for (let n = maillage; n && !table; n = n.parent) table = n.userData.fibres;
+  const nombre = geometry.attributes.position.count;
+  const fibre = new Float32Array(nombre * 3), coeur = new Float32Array(nombre * 3);
+  for (let i = 0; numeros && table && i < nombre; i++) {
+    const piece = Math.round(numeros.getX(i) * 65535) - 1;
+    if (piece < 0) continue;
+    fibre.set(table.slice(piece * 6, piece * 6 + 3), i * 3);
+    coeur.set(table.slice(piece * 6 + 3, piece * 6 + 6), i * 3);
+  }
+  geometry.setAttribute("_fibre", new THREE.BufferAttribute(fibre, 3));
+  geometry.setAttribute("_coeur", new THREE.BufferAttribute(coeur, 3));
+}
+
 export function habiller(materiau, horloges, jeux) {
   // Une matière `_grave` est sa matière de base, plus la carte des gravures.
   const gravure = materiau.name.endsWith("_grave");
@@ -1432,7 +1616,8 @@ export function habiller(materiau, horloges, jeux) {
     + (sonde ? "#define SONDE_EN_BOITE\n" : "")
     + (fine ? "#define NAPPE_FINE\n" : "")
     + (PROFIL.textures.irregularite ? "#define IRREGULARITE\n" : "")
-    + (PROFIL.textures.assises && CALEES.has(rendue) ? "#define ASSISES\n" : "");
+    + (PROFIL.textures.assises && CALEES.has(rendue) ? "#define ASSISES\n" : "")
+    + (BOISEES.has(rendue) ? "#define FIBRE\n" : "");
 
   // La sonde du Heikhal pose son propre reflet, celui de la salle : ce n'est plus le ciel qu'il faut éteindre.
   const refletDuCiel = () => (materiau.userData.refletVoitLeCiel === false ? "" : "#define REFLET_DU_CIEL\n");
@@ -1441,7 +1626,8 @@ export function habiller(materiau, horloges, jeux) {
     nuanceur.vertexShader = greffable(nuanceur.vertexShader)
       .greffer("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;\n"
                + "#ifdef GRAVURE\nvarying vec2 vGravure;\n#endif\n"
-               + "#ifdef ASSISES\nattribute vec3 bornesMin;\nattribute vec3 bornesMax;\nvarying vec3 vBornesMin;\nvarying vec3 vBornesMax;\n#endif\n")
+               + "#ifdef ASSISES\nattribute vec3 bornesMin;\nattribute vec3 bornesMax;\nvarying vec3 vBornesMin;\nvarying vec3 vBornesMax;\n#endif\n"
+               + "#ifdef FIBRE\nattribute vec3 _fibre;\nattribute vec3 _coeur;\nflat varying vec3 vFibre;\nflat varying vec3 vCoeur;\n#endif\n")
       .greffer("#include <begin_vertex>",
                "#include <begin_vertex>\n#ifdef FIL\ntransformed = grossirFil(transformed, objectNormal);\n#endif\n" +
                "vMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPixel = pixelVu(transformed);\n" +
@@ -1449,7 +1635,8 @@ export function habiller(materiau, horloges, jeux) {
                // Blender l'a écrit et comme la parokhet — sinon la plaque keruv lit la tuile
                // fleuron, et la timora un quart vide.
                "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n"
-               + "#ifdef ASSISES\nvBornesMin = bornesMin;\nvBornesMax = bornesMax;\n#endif\n")
+               + "#ifdef ASSISES\nvBornesMin = bornesMin;\nvBornesMax = bornesMax;\n#endif\n"
+               + "#ifdef FIBRE\nvFibre = _fibre;\nvCoeur = _coeur;\n#endif\n")
       .source;
 
     nuanceur.fragmentShader = greffable(nuanceur.fragmentShader)
@@ -1472,7 +1659,7 @@ export function habiller(materiau, horloges, jeux) {
       // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.
       .greffer("#include <lights_fragment_begin>", soleilEnPenombre())
       .greffer("#include <color_fragment>",
-               "#include <color_fragment>\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
+               "#include <color_fragment>\n#ifdef FIBRE\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722))) * vec3(0.94, 1.0, 1.08), mGrisaille);\n#endif\n#ifndef TEMPERE\ndiffuseColor.rgb *= mTeinte;\n#endif\n#ifdef FIL\ndiffuseColor.a *= vCouverture;\n#endif")
       // La teinte d'un minéral se pose APRÈS l'éclairage : son exposant dépend de la
       // clarté reçue. Le relief, lui, se tempère sur la lumière du ciel seule — celle
       // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
