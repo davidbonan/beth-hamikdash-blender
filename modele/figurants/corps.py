@@ -17,6 +17,7 @@ from bl_ext.blender_org.mpfb.services.targetservice import TargetService
 
 from .matieres import teinter_objet
 from .peau import creuser_la_peau
+from .barbe import barbe_d_un_bloc
 from .etoffes import _normaliser, etoffe_mpfb, garder_pieces, poids_de, repeser, surface_de
 
 
@@ -38,7 +39,7 @@ class Gabarit(NamedTuple):
     muscle: float = 0.55
     poids: float = 0.5
     peau: str = "middleage_caucasian_male"
-    teint: tuple = (0.82, 0.70, 0.60)
+    teint: tuple = (0.80, 0.71, 0.64)
 
 
 def _hauteur(humain):
@@ -95,7 +96,6 @@ class Humain:
         creuser_la_peau(self)
         poils = [("Eyebrows", sourcils and f"eyebrows/eyebrow{sourcils:03d}/eyebrow{sourcils:03d}.mhclo"),
                  ("Hair", cheveux and f"hair/{cheveux}/{cheveux}.mhclo")]
-        poils += [("Clothes", f"clothes/{b}/{b}.mhclo") for b in barbe or ()]
         self.cheveux = None
         for type_, chemin in poils:
             if chemin:
@@ -104,6 +104,11 @@ class Humain:
                 self.poils.append(objet)
                 if type_ == "Hair":
                     self.cheveux = objet
+        meches = [_asset(self.corps, "Clothes", f"clothes/{b}/{b}.mhclo") for b in barbe or ()]
+        for objet in meches:
+            teinter_objet(objet, teinte_poils, 512)
+        if meches:
+            self.poils.append(barbe_d_un_bloc(self, meches))
         self.vetements_mpfb, self.habits = [], []
         self.obstacles = {}
         self.rig.name = nom

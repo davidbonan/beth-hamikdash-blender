@@ -1,0 +1,14 @@
+{
+ "age": 0.72,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. A Judean priest (kohen) of the Second Temple period, about fifty-five, broad-shouldered. He wears a plain white linen ankle-length tunic with long fitted sleeves, finely woven, softly creased; a long sash wound several times around the waist, woven in narrow stripes of sky blue, purple, crimson and white linen, its two ends hanging down the front to the knees; a white linen cloth wound in layers around the head like a soft turban. Full salt-and-pepper beard, weathered olive skin, kind expression. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab31814/C3jOShAkKzNYgysP6qeeJ_wWVG2hwF.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab3181e/OOyhWgTLvEGpy9XPk_ey1_base_basic_pbr.glb"
+}

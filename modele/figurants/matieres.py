@@ -65,6 +65,22 @@ def trame(nom, fils, serge=False, duvet=0.0, cote=256):
             _image(f"{nom}_relief", normale * 0.5 + 0.5, donnees=True))
 
 
+# Mèches raccordables le long du v : un bruit étiré en long, fin en travers, filtré dans le spectre pour se raccorder.
+def meches(nom, cote=256, longueur=24.0, finesse=1.0):
+    alea = np.random.default_rng(zlib.crc32(nom.encode()))
+    fu, fv = np.meshgrid(np.fft.fftfreq(cote), np.fft.fftfreq(cote))
+    filtre = np.exp(-2.0 * np.pi ** 2 * ((fu * finesse) ** 2 + (fv * longueur) ** 2))
+    hauteur = np.real(np.fft.ifft2(np.fft.fft2(alea.random((cote, cote))) * filtre))
+    hauteur = (hauteur - hauteur.min()) / np.ptp(hauteur)
+    teinte = 0.62 + 0.38 * hauteur
+    gx = (np.roll(hauteur, -1, 1) - np.roll(hauteur, 1, 1)) * 3.0
+    gy = (np.roll(hauteur, -1, 0) - np.roll(hauteur, 1, 0)) * 3.0
+    normale = np.dstack([-gx, -gy, np.ones_like(hauteur)])
+    normale /= np.linalg.norm(normale, axis=2, keepdims=True)
+    return (_image(f"{nom}_couleur", np.repeat(teinte[..., None], 3, axis=2)),
+            _image(f"{nom}_relief", normale * 0.5 + 0.5, donnees=True))
+
+
 def _douille(douilles, identifiant):
     return next(d for d in douilles if d.identifier == identifiant)
 
@@ -103,7 +119,7 @@ def _matiere(nom, rugosite, metal=0.0, tissu=None):
 
 
 def lin():
-    return _matiere("Figure_Lin", 0.82, tissu=trame("lin", 24))
+    return _matiere("Figure_Lin", 0.82, tissu=trame("lin", 56))
 
 
 def laine():
@@ -128,6 +144,10 @@ def metal():
 
 def poil():
     return _matiere("Figure_Poil", 0.9)
+
+
+def barbe():
+    return _matiere("Figure_Barbe", 0.78, tissu=meches("barbe"))
 
 
 def corne():
@@ -161,11 +181,28 @@ def teinter(image, facteur, cote=1024):
     return _retoucher(image, ("teinte", tuple(round(f, 3) for f in facteur)), cote, multiplier)
 
 
-# Garde le grain et l'ombre des plis ; la clarté médiane prend la teinte `couleur`.
+RAYON_DU_GRAIN = 12
+
+
+def _flou(plan, rayon):
+    for axe in (0, 1):
+        for _ in range(3):
+            cumul = np.cumsum(np.pad(plan, [(rayon + 1, rayon) if a == axe else (0, 0) for a in (0, 1)], mode="edge"), axis=axe)
+            plan = (np.take(cumul, range(2 * rayon + 1, cumul.shape[axe]), axis=axe)
+                    - np.take(cumul, range(0, cumul.shape[axe] - 2 * rayon - 1), axis=axe)) / (2 * rayon + 1)
+    return plan
+
+
+# Garde le grain et les coutures ; les ombres peintes pour une autre coupe, plus larges que RAYON_DU_GRAIN, partent.
 def reteindre(image, couleur, cote=1024):
     def remplacer(px):
         clarte = px[:, :3] @ np.array((0.2126, 0.7152, 0.0722), dtype=np.float32)
-        relative = 1.0 + 0.5 * (clarte / max(float(np.median(clarte)), 1e-3) - 1.0)
+        cote_ = int(round(len(clarte) ** 0.5))
+        plan = clarte.reshape(cote_, cote_)
+        etoffe = (plan > 0.004).astype(np.float32)
+        fond = _flou(plan * etoffe, RAYON_DU_GRAIN) / np.maximum(_flou(etoffe, RAYON_DU_GRAIN), 1e-3)
+        grain = np.where(etoffe > 0, plan / np.maximum(fond, 1e-3), 1.0).ravel()
+        relative = 1.0 + 0.5 * (grain - 1.0)
         px[:, :3] = np.minimum(relative[:, None] * np.array(couleur, dtype=np.float32), 1.0)
     return _retoucher(image, ("reteinte", tuple(round(c, 3) for c in couleur)), cote, remplacer)
 

@@ -1,0 +1,14 @@
+{
+ "age": 0.12,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. A Judean boy of the Second Temple period, about seven years old. He wears an ankle-length tunic of blue wool with long sleeves and a small round dark cap. Short dark curly hair, olive skin, curious expression. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab31826/x8vfMkilHfFVt85psa99-_wuWSj8dM.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab31831/5c8cL7CllmHn5EAAT_kUf_base_basic_pbr.glb"
+}

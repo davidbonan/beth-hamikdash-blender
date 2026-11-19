@@ -1,0 +1,14 @@
+{
+ "age": 0.9,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. A Judean man of the Second Temple period in Jerusalem, an elder of about seventy-five, praying. He wears an ankle-length tunic of undyed natural wool with long sleeves, girded with a simple leather belt; over the tunic a large rectangular prayer mantle (tallit) of off-white wool with a few narrow dark blue stripes, draped over the head like a hood and over both shoulders, falling to the knees in front and behind, white fringes (tzitzit) hanging from its four corners. Long white beard, wrinkled olive skin, devout expression. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab3181d/PIKBbGNeBqR3jpK6dw1tb_u07VU5c5.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab31825/0SNd1CNREJOF3abYjUvp9_base_basic_pbr.glb"
+}

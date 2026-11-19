@@ -1,0 +1,14 @@
+{
+ "age": 0.62,
+ "prompt": "Same person, same face, same A-pose, same framing and background. Change only the clothing: the four white linen garments of Yom Kippur only: an ankle-length white linen tunic with long fitted sleeves, a long white linen sash wound several times around the waist with its ends hanging down the front, and a tall white linen turban wound in layers. No gold, no colour, no breastplate, no robe, no ornaments.",
+ "portrait": "https://v3b.fal.media/files/b/0ab3183c/VLMJIOLVD0AyOjF1xurWy_UKvwqz6O.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab31843/2Si85OcGF26wI1ETu1mDd_base_basic_pbr.glb"
+}
