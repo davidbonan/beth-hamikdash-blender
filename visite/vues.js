@@ -1,12 +1,11 @@
 // Les vues : où poser le visiteur, et vers quoi le tourner, pour une entrée, une vue de repères ou un élément.
 import * as THREE from "three";
 import { oeilQuiCadre, unirEmprises } from "./cadrage.js";
-import { OEIL } from "./marche.js";
+import { HAUTEUR_LIBRE, OEIL } from "./marche.js";
 
 const RECUL_AUTO = 60;
 // Le premier côté d'où l'élément se voit sans mur devant ; l'est d'abord, l'axe du parcours.
 const CAPS_AUTO = [180, 0, 90, 270];
-const HAUTEUR_LIBRE = OEIL + 0.25;   // m : sous moins, la tête touche
 const MARGE_PLANCHER = 0.1;          // m : le sol d'un lieu affleure le bas de son emprise
 // Plus haut au-dessus du bas d'une emprise, c'est le dessus d'un mur ou d'un toit : les murs sont du concept de leur cour.
 const HAUSSE_MAX = 6;

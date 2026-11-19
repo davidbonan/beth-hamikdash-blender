@@ -10,7 +10,7 @@ import { ecrire } from "./langue.js";
 import { lireRetenu, retenir } from "./memoire.js";
 
 const DENIVELE = 3;            // mètres à monter, puis à redescendre
-// Le vol est une fonction secondaire : il ne s'apprend que la première fois qu'on le demande.
+// Le vol est une fonction secondaire : il ne s'apprend que la première fois qu'on quitte le sol.
 // `bouton` : ce que l'étape fait toucher dans l'interface plutôt que dans la scène.
 const PREMIERS_PAS = {
   clef: "visite.initiation", fin: "fin",
@@ -21,9 +21,9 @@ const PREMIERS_PAS = {
   ],
 };
 const VOL = {
-  clef: "visite.initiation.vol", fin: "fin_vol", boutonFin: "#vol",
+  clef: "visite.initiation.vol", fin: "fin_vol",
   etapes: [
-    { nom: "voler", seuil: 1, bouton: "#vol" },
+    { nom: "voler", seuil: 1 },
     { nom: "monter", seuil: 2 * DENIVELE, bouton: "#vertical" },
   ],
 };
@@ -163,9 +163,12 @@ export function initiation({ elementAMontrer, estEnVol, suivreVisiteGuidee }) {
     else progresser("voler", 1);
   }
 
-  // Revenu à pied avant d'avoir fini d'apprendre le vol : c'est qu'on n'en voulait pas davantage.
+  // Reposé avant d'être monté, on n'en voulait pas davantage ; après, le sol n'a fait qu'abréger la descente.
   function noterAtterrissage() {
-    if (enCours() && parcours === VOL) terminer();
+    if (!enCours() || parcours !== VOL) return;
+    const etape = parcours.etapes[rang];
+    if (etape?.nom === "monter" && acquis >= DENIVELE) progresser("monter", etape.seuil - acquis);
+    else terminer();
   }
 
   bouton.onclick = (e) => { e.currentTarget.blur(); terminer(); };

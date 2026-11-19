@@ -30,11 +30,10 @@ const CAPTEES = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"];
 
 const borner = (v, min, max) => Math.min(Math.max(v, min), max);
 
-export function commandes(toile, { regarder, interroger, basculerVol }) {
+export function commandes(toile, { regarder, interroger }) {
   const etat = {
     long: 0, lat: 0, vert: 0, course: false, tourne: false,
     pointeur: { x: 0, y: 0, clientX: 0, clientY: 0, survole: false },
-    modeVol: (actif) => document.documentElement.classList.toggle("vol", actif),
   };
 
   // ---- clavier ----
@@ -45,7 +44,6 @@ export function commandes(toile, { regarder, interroger, basculerVol }) {
   addEventListener("keydown", (e) => {
     if (horsDeLaScene()) return;
     touches.add(e.code);
-    if (e.code === "KeyV") basculerVol();
     if (CAPTEES.includes(e.code)) e.preventDefault();
     recomposer();
   });
@@ -86,7 +84,7 @@ export function commandes(toile, { regarder, interroger, basculerVol }) {
     cercle.classList.remove("vu", "court");
   }
 
-  // ---- montée et descente en vol ----
+  // ---- montée et descente : quitter le sol ----
   let vertical = 0;
   for (const [selecteur, signe] of [["#monter", 1], ["#descendre", -1]]) {
     const b = document.querySelector(selecteur);

@@ -23,7 +23,7 @@ import { cinema } from "./cinema.js";
 import { parcours } from "./parcours.js";
 import { recherche } from "./recherche.js";
 import { AMA, OEIL, marcheur } from "./marche.js";
-import { ecrire, installerLangue, langue, langueChoisie, suivreLangue, texte, titrer } from "./langue.js";
+import { installerLangue, langue, langueChoisie, suivreLangue, texte, titrer } from "./langue.js";
 import { veillerAuxPannes } from "./pannes.js";
 import { confier, lireConfie, oublierConfie } from "./memoire.js";
 import { laisserPeindre, parTranches } from "./fil.js";
@@ -407,26 +407,8 @@ function interroger(clientX, clientY) {
 // ---------------------------------------------------------------------------
 // commandes
 // ---------------------------------------------------------------------------
-const mode = $("#mode"), boutonVol = $("#vol");
-const nomDuVol = boutonVol.querySelector("span"), iconeDuVol = boutonVol.querySelector("use");
-function afficherMode() {
-  ecrire(mode, marche.vol ? "en_vol" : "a_pied");
-  mode.classList.toggle("vole", marche.vol);
-  ecrire(nomDuVol, marche.vol ? "pied" : "vol");
-  iconeDuVol.setAttribute("href", marche.vol ? "#icone-pas" : "#icone-vol");
-  manette.modeVol(marche.vol);
-}
-
-function basculerVol() {
-  if (!marche.basculerVol()) return;
-  afficherMode();
+function noterChangementDeMode() {
   if (marche.vol) noterEnvol(); else noterAtterrissage();
-}
-boutonVol.onclick = (e) => { basculerVol(); e.currentTarget.blur(); };
-
-// Une vue dit comment on s'y tient : une cour se montre d'en haut, le reste depuis le dallage.
-function tenirLaVue(enVol) {
-  if (marche.tenirLeVol(enVol)) afficherMode();
 }
 
 const { lancerInitiation, initiationSuivie, initiationEnCours, noterRegard, noterDeplacement, noterInterrogation,
@@ -440,9 +422,8 @@ const manette = commandes(renderer.domElement, {
     marche.tourner(dLacet, dTangage);
     noterRegard(Math.abs(dLacet) + Math.abs(dTangage));
   },
-  interroger, basculerVol,
+  interroger,
 });
-afficherMode();
 
 // ---------------------------------------------------------------------------
 // barre
@@ -523,7 +504,7 @@ const elements = recherche({
   },
 });
 
-const vues = vuesDuTemple({ camera, marche, emprises: EMPRISES, reperes, obstacles, tenirLeVol: tenirLaVue });
+const vues = vuesDuTemple({ camera, marche, emprises: EMPRISES, reperes, obstacles, tenirLeVol: marche.tenirLeVol });
 
 // ---------------------------------------------------------------------------
 // lieux et plan
@@ -650,7 +631,7 @@ const guides = parcours({
     troupes.montrer();
   },
   poserA: (pieds, cible) => fondu(() => {
-    tenirLaVue(false);
+    marche.tenirLeVol(false);
     marche.poser(pieds);
     marche.orienterVers(cible);
   }),
@@ -738,7 +719,9 @@ function suivreLeFilm(dt) {
 function conduire(dt) {
   marche.lisserRegard(dt);
   avantLePas.copy(camera.position);
+  const enVol = marche.vol;
   marche.avancer(dt, manette);
+  if (marche.vol !== enVol) noterChangementDeMode();
   noterDeplacement(camera.position.distanceTo(avantLePas));
   if (marche.vol) noterAltitude(camera.position.y - avantLePas.y);
   if (entame || !enMarche()) return;

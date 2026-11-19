@@ -283,7 +283,7 @@
     body:has(#fiche.ouverte) #manche:not(.vu) { opacity: 0; }
   }
 
-  /* ---- montée et descente, en vol seulement ---- */
+  /* ---- montée et descente : au doigt, toujours là ---- */
   #vertical {
     position: fixed; right: calc(14px + var(--marge-droite));
     bottom: calc(24px + var(--marge-bas)); z-index: 14;
@@ -296,7 +296,7 @@
   }
   #vertical button:active { background: rgba(154,107,31,.55); }
   @media (hover: none) and (pointer: coarse) {
-    html.vol #vertical { display: flex; }
+    #vertical { display: flex; }
   }
 
   /* ---- étiquette au survol, accrochée au curseur ---- */
@@ -348,8 +348,6 @@
   #barre button:active, #barre .menu:active { transform: scale(.96); }
   #barre #chercher { display: inline-flex; align-items: center; gap: 7px; }
   #chercher .icone { width: 15px; height: 15px; }
-  #mode { font-size: 12px; letter-spacing: .04em; color: #9a9182; white-space: nowrap; }
-  #mode.vole { color: var(--or); }
   #barre #langue-courante, #barre #qualite-courante, #barre #moment, #barre #reglages-ouvrir {
     width: var(--commande); padding: 0; font-weight: 600;
   }
@@ -651,7 +649,7 @@
     to { box-shadow: 0 0 0 14px rgba(217,164,65,0); }
   }
 
-  /* Au doigt, en vol, les flèches ▲ ▼ tiennent le bas à droite : la carte monte au-dessus. */
+  /* Au doigt, les flèches ▲ ▼ tiennent le bas à droite : la carte monte au-dessus. */
   @media (hover: none) and (pointer: coarse) {
     #initiation .carte { bottom: calc(204px + var(--marge-bas)); }
   }
@@ -759,7 +757,7 @@
   /* Au bureau le libellé du menu se lit ; sur un écran étroit il se tronquait en « Un élémen… »,
      et une icône prend sa place, le menu natif invisible par-dessus. */
   .menu { display: contents; }
-  .menu .icone, .menu .nom, #vol .icone { display: none; }
+  .menu .icone, .menu .nom { display: none; }
 
   /* ---- plan ---- */
   #minicarte {
@@ -990,13 +988,12 @@
       color: #e8e0d0; border: 1px solid rgba(203,192,170,.28); border-radius: 4px; background: rgba(20,18,16,.82);
       transition: border-color .15s ease, transform .12s ease;
     }
-    #barre #chercher, #barre #vol { width: var(--commande); padding: 0; justify-content: center; }
-    .menu .icone, #chercher .icone, #vol .icone { display: block; width: 19px; height: 19px; }
+    #barre #chercher { width: var(--commande); padding: 0; justify-content: center; }
+    .menu .icone, #chercher .icone { display: block; width: 19px; height: 19px; }
     .menu .nom { display: block; }
-    #chercher span, #vol span { display: none; }
+    #chercher span { display: none; }
     /* Le menu natif, invisible, couvre l'icône et rien de plus : sa largeur minimale volerait sinon les touches voisines. */
     #barre .menu select { position: absolute; inset: 0; width: 100%; min-width: 0; height: 100%; opacity: 0; }
-    #mode { display: none; }
     #minicarte { width: 92px; top: calc(64px + var(--marge-haut)); }
   }
 
@@ -1100,12 +1097,6 @@
     <path d="M12 21.5s-6.5-6.4-6.5-11.3a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11.3-6.5 11.3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
     <circle cx="12" cy="10.2" r="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/>
   </symbol>
-  <symbol id="icone-vol" viewBox="0 0 24 24">
-    <path d="M23 11.5L19.95 10.37C19.69 9.22 19.04 8.56 19.04 8.56C17.4 6.92 14.75 6.92 13.11 8.56L11.63 10.04L5 3C4 7 5 11 7.45 14.22L2 19.5C2 19.5 10.89 21.5 16.07 17.45C18.83 15.29 19.45 14.03 19.84 12.7L23 11.5M17.71 11.72C17.32 12.11 16.68 12.11 16.29 11.72C15.9 11.33 15.9 10.7 16.29 10.31C16.68 9.92 17.32 9.92 17.71 10.31C18.1 10.7 18.1 11.33 17.71 11.72Z" fill="currentColor"/>
-  </symbol>
-  <symbol id="icone-pas" viewBox="0 0 24 24">
-    <path d="M7.5 3.5c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4H6.1c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM6.2 13h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4ZM16.5 9c1.9 0 3 2.1 3 4.6 0 1.8-.6 3-1.6 3.4h-2.8c-1-.4-1.6-1.6-1.6-3.4 0-2.5 1.1-4.6 3-4.6ZM15.2 18.5h2.7c.4 1.3.3 2.6-.2 3.4-.7 1.1-1.7 1.1-2.4 0-.5-.8-.6-2.1-.1-3.4Z" fill="currentColor"/>
-  </symbol>
   <symbol id="icone-lune" viewBox="0 0 24 24">
     <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
   </symbol>
@@ -1201,7 +1192,7 @@
               <path class="trait" d="M8 82 H88 M30 82 V66 H66 V82 M40 66 V54 H56 V66"/>
               <circle class="plein a-chemin" r="4.5" style="offset-path: path('M6 74 Q48 -4 90 74')"/>
             </svg>
-            <div><h2 data-texte="vol">Vol libre</h2><p data-texte-html="geste_vol_clavier">Survoler le Temple. <kbd>V</kbd> passe de la marche au vol.</p></div>
+            <div><h2 data-texte="geste_vol">Quitter le sol</h2><p data-texte-html="geste_vol_clavier">Survoler le Temple. <kbd>Espace</kbd> s'élève et traverse les murs, <kbd>C</kbd> redescend jusqu'au sol.</p></div>
           </div>
         </div>
         <div class="au-doigt">
@@ -1256,7 +1247,6 @@
 
 <div id="barre">
   <button id="chercher" type="button" aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><span data-texte="chercher">Chercher</span></button>
-  <button id="vol" title="Basculer marche / vol libre (V)" data-titre="vol_titre"><svg class="icone" aria-hidden="true"><use href="#icone-vol"></use></svg><span data-texte="vol">Vol libre</span></button>
   <div id="reglages">
     <div id="langue">
       <button id="langue-courante" type="button" title="Langue" aria-label="Langue" data-titre="langue"
@@ -1271,7 +1261,6 @@
             data-titre="initiation_titre"><span data-texte="aide">Aide</span></button>
   </div>
   <label class="menu" title="Suivre un service, station par station" data-titre="parcours_titre"><span class="nom" data-texte="menu_parcours">Visites guidées</span><select id="parcours-choix"><option value="" data-texte="parcours_menu">Parcours…</option></select></label>
-  <span id="mode" data-texte="a_pied">à pied</span>
   <button id="reglages-ouvrir" type="button" title="Réglages" aria-label="Réglages" data-titre="reglages"
           aria-haspopup="true" aria-expanded="false">⋯</button>
 </div>
@@ -1348,7 +1337,7 @@
   <span class="au-clavier" data-texte-html="aide_clavier">Glisser pour tourner la tête · clic sur un élément pour l'interroger<br>
         <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> ou les flèches pour marcher ·
         <kbd>Maj</kbd> pour courir<br>
-        <kbd>V</kbd> vol libre, puis <kbd>Espace</kbd> monter et <kbd>C</kbd> descendre</span>
+        <kbd>Espace</kbd> et <kbd>C</kbd> pour quitter le sol</span>
   <span class="au-doigt" data-texte-html="aide_doigt">Pouce gauche : marcher · pouce droit : regarder<br>Toucher un élément : lire sa fiche</span>
 </div>
 

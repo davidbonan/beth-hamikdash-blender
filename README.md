@@ -101,7 +101,7 @@ Trois dossiers portent le dépôt : `modele/` bâtit le Temple dans Blender, `vi
 | `visite/fil.js` | Rendre le fil de la page au navigateur entre deux tranches de calcul, ou le temps qu'il peigne une image. |
 | `visite/pilotage.js` | Les commandes : clavier au bureau, manche du pouce gauche — montré en permanence, il vient sous le pouce — et regard du pouce droit au doigt. |
 | `visite/recherche.js` | La recherche : la liste des éléments par zone, qu'un mot tapé resserre — nom, nom hébreu ou translittération, sans égard aux accents. |
-| `visite/initiation.js` | Les premiers pas : regarder, avancer, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis « Aide » dans la barre ; la carte de fin propose de suivre une visite guidée, les dix degrés de sainteté. Quitter le sol, monter et redescendre s'apprennent à part, la première fois qu'on demande le vol libre. |
+| `visite/initiation.js` | Les premiers pas : regarder, avancer, interroger un élément — chaque geste montré là où il se fait et validé quand le visiteur l'a fait. Au premier passage, et depuis « Aide » dans la barre ; la carte de fin propose de suivre une visite guidée, les dix degrés de sainteté. Quitter le sol, monter et redescendre s'apprennent à part, la première fois qu'on décolle. |
 | `visite/parcours.js`, `visite/parcours.json` | Les parcours guidés, au choix dans le menu « Visites guidées… » : le tamid du matin (neuf stations, Tamid 1–7), le seder ha'avoda de Yom Kippour (dix-sept stations, de la Lishkat Parhedrin au Heikhal du soir, Yoma 1–7), la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4), le korban Pessa'h (7 stations, Pessa'him 5:5–10), les bikkourim (5 stations, Bikkourim 3:2–6), les dix degrés de sainteté (9 stations, Kelim 1:6–9, sans figurants), Souccot au matin (4 stations, Soucca 4:5, 4:9), Hakhel (5 stations, Sota 7:8) et le nazir et le metzora (5 stations, Middot 2:5 ; Nega'im 14:7–10). La visite marche seule d'une station à la suivante — au pas, ×2 ou ×4 — sauf vers les hauts qu'aucun escalier ne dessert (l'étage du Beit Avtinas, les tevilot du Sha'ar HaMayim et du Beit HaParva), rejoints en fondu, et dit ce qu'on y voit ; chaque station ne montre que ses `figurants` ; la fiche du concept attend derrière le lien « Lire la fiche » de la carte. Les stations, en amot comme `cinema.json`, portent leurs points de passage et leur source. |
 | `visite/trajet.js` | Le pas du marcheur et le trajet d'une caméra qui marche seule : la vitesse, le sous-pas qui ne saute aucune contremarche, la polyligne des points de passage — ce que la marche libre, les parcours et le cinéma ont en commun. |
 | `visite/cadrage.js` | D'où un élément tient entier dans le champ de l'écran : le recul le long d'un cap, borné. |
@@ -411,8 +411,13 @@ gravi la première. Le pas qui arrive sur du vide regarde un pied plus loin — 
 dans le même sens : une fente plus étroite qu'un pied ne fait tomber personne. C'est ce
 qui fait monter sur l'autel : un quart d'ama d'air sépare la tête du kevesh de l'autel
 (*Zeva'him* 62b), un cheveu le petit kevesh du sovev, et le rayon de sol, tiré en un
-point, y tombait à chaque fois. **`V` bascule en vol libre** (`Espace` monter, `C`
-descendre) : un modèle se regarde aussi d'où l'on n'a pas le droit de se tenir.
+point, y tombait à chaque fois. **`Espace` (▲) fait quitter le sol, `C` (▼) descend** : en
+l'air, plus de collisions, on traverse les murs — un modèle se regarde aussi d'où l'on n'a
+pas le droit de se tenir. Près du sol on vole au pas, la vitesse ne vient qu'avec la
+hauteur (9 m/s à 6 m). Descendre pose sur le premier sol libre rencontré — de l'air
+au-dessus, pas le dallage sous un mur —, toit compris ; relâcher `C` puis le reprendre
+passe sous ce sol, et sous lui seul. Lâcher tout à moins de 0,5 m d'un sol y pose aussi ;
+plus haut on reste suspendu, et le vol à niveau traverse ce qu'il rase.
 
 Trois concepts sont traversables : les deux parokhot et les chaînes du Devir — une étoffe
 ne barre pas le passage, et une visite qui s'arrête devant la parokhet n'atteint jamais le

@@ -4,6 +4,7 @@ import { PAS, SOUS_PAS } from "./trajet.js";
 
 export const AMA = 0.48;
 export const OEIL = 1.55;        // yeux d'un homme de l'époque (1,65 m), sous les 1,75 m des silhouettes
+export const HAUTEUR_LIBRE = OEIL + 0.25;   // m : sous moins, la tête touche
 // Les degrés du 'Heil, de Nikanor et de l'Oulam font tous 1/2 ama — 0,24 m de haut
 // comme de giron. La garde se place juste au-dessus de MONTEE et ne porte qu'à une
 // peau : la première contremarche qu'elle voit est deux girons plus loin, jamais
@@ -23,7 +24,12 @@ const GLISSE_MIN = 0.25;  // part du pas qui longe le mur : en deçà, on le pre
 // Dans une vis, le regard tourne avec le pas : à 3,4 m/s autour d'un noyau, il faisait 400°/s.
 const VIS_PAS = 1.2;      // m/s
 const VIS_MARGE = 0.2;    // m : l'épaule ne frotte ni le noyau ni la paroi
-const VOL = 9.0;          // m/s en vol libre
+const VOL = 9.0;          // m/s en vol, une fois haut
+// Près du sol, l'air se traverse au pas : on ne file qu'en prenant de la hauteur.
+const CROISIERE = 6;      // m au-dessus du sol
+// À moins d'un empan d'un sol libre, on s'y pose ; plus haut, relâché, on reste suspendu.
+const PRISE = 0.5;        // m
+const DESCENTE = 0.1;     // m/s : en deçà, on vole à niveau
 // Le pas ne s'établit ni ne s'éteint d'un coup : une vitesse qui bascule de 0 à 3,4
 // m/s à l'image près se lit en saccade, et c'est elle qu'on prend pour un manque de
 // framerate. 0,09 s, c'est trente centimètres de glissé à l'arrêt — le pied qui se pose.
@@ -117,33 +123,53 @@ export function marcheur(camera, murs, vis) {
   // Le Temple ne se laisse pas traverser n'importe où : on monte à l'Ezrat Nashim par
   // les douze degrés du 'Heil, à l'Azara par les quinze marches, et l'autel se contourne.
   // C'est l'architecture, pas un défaut — mais un modèle se regarde aussi d'ailleurs que
-  // d'où l'on a le droit de se tenir : le vol libre est là pour ça.
+  // d'où l'on a le droit de se tenir : quitter le sol, c'est traverser murs et dalles.
   let vol = false;
-
-  function basculerVol() {
-    if (vol && !atterrir()) return false;
-    vol = !vol;
-    return true;
-  }
+  // La dalle que C vient de traverser exprès : on n'y retombe pas.
+  let solTraverse = null;
+  // Posé en tenant C : il faut le relâcher avant de passer sous ce sol.
+  let attendreLeRelache = false;
 
   function tenirLeVol(enVol) {
-    if (vol === enVol) return false;
     vol = enVol;
-    return true;
   }
 
-  function vitesseVoulue(manette) {
-    const vitesse = (vol ? VOL : PAS) * (manette.course ? COURSE : 1);
+  function vitesseVoulue(manette, vert) {
+    const vitesse = (vol ? vitesseEnVol() : PAS) * (manette.course ? COURSE : 1);
     camera.getWorldDirection(avant);
     if (!vol) avant.y = 0;
     avant.normalize();
     droite.crossVectors(avant, HAUT).normalize();
     voulu.set(0, 0, 0).addScaledVector(avant, manette.long).addScaledVector(droite, manette.lat);
-    if (vol) voulu.addScaledVector(HAUT, manette.vert);
+    if (vol) voulu.addScaledVector(HAUT, vert);
     // La diagonale ne va pas plus vite que le droit devant, mais un pouce à mi-course
     // marche à mi-vitesse : c'est la longueur qui est bridée, pas normalisée.
     const force = Math.min(voulu.length(), 1);
     return force < 1e-3 ? voulu.set(0, 0, 0) : voulu.normalize().multiplyScalar(vitesse * force);
+  }
+
+  function vitesseEnVol() {
+    const sol = solSous(sonde.copy(camera.position), OEIL + CROISIERE);
+    const hauteur = sol === null ? CROISIERE : piedsY - sol;
+    return THREE.MathUtils.lerp(PAS, VOL, THREE.MathUtils.smoothstep(hauteur, 0, CROISIERE));
+  }
+
+  // Le sol doit être libre : sous un mur aussi il y a du dallage, et l'on y marcherait dedans.
+  function sePoserSiProche() {
+    const { x, z } = camera.position;
+    const sol = solSous(sonde.set(x, piedsY + MONTEE, z), MONTEE + PRISE);
+    if (sol === null || (solTraverse !== null && sol > solTraverse - 0.01)) return false;
+    if (!solsLibres(x, z).some(({ y, libre }) => Math.abs(y - sol) < 0.01 && libre >= HAUTEUR_LIBRE)) return false;
+    piedsY = sol;
+    camera.position.y = sol + OEIL;
+    vol = false;
+    solTraverse = null;
+    return true;
+  }
+
+  function quitterLeSol(vert) {
+    vol = true;
+    solTraverse = vert < 0 ? piedsY : null;
   }
 
   function poserLePas(direction, distance) {
@@ -249,16 +275,22 @@ export function marcheur(camera, murs, vis) {
     }
   }
 
+  // Monter ou descendre, c'est quitter le pas. Descendre s'arrête au premier sol libre :
+  // pour passer dessous, on relâche C et on le reprend.
   function avancer(dt, manette) {
-    vitesseVoulue(manette);
+    if (manette.vert >= 0) attendreLeRelache = false;
+    const vert = attendreLeRelache ? 0 : manette.vert;
+    if (vert > 0) solTraverse = null;
+    if (vert !== 0 && !vol) quitterLeSol(vert);
+    vitesseVoulue(manette, vert);
     lisse.lerp(voulu, 1 - Math.exp(-dt / REPONSE));
-    if (lisse.lengthSq() < 4e-4) {
-      lisse.set(0, 0, 0);
-      return;
-    }
+    if (lisse.lengthSq() < 4e-4) lisse.set(0, 0, 0);
     if (!vol) return marcher(dt);
     camera.position.addScaledVector(lisse, dt);
     piedsY = camera.position.y - OEIL;
+    // À niveau, on traverse ce qu'on rase ; on se pose en lâchant tout, ou en descendant.
+    const relache = vert === 0 && manette.long === 0 && manette.lat === 0;
+    if (vert <= 0 && (relache || lisse.y < -DESCENTE) && sePoserSiProche()) attendreLeRelache = vert < 0;
   }
 
   function poser([x, y, z]) {
@@ -266,6 +298,7 @@ export function marcheur(camera, murs, vis) {
     piedsY = sol === null ? y : sol;
     camera.position.set(x, piedsY + OEIL, z);
     lisse.set(0, 0, 0);
+    solTraverse = null;
   }
 
   // Cap en degrés dans le repère de la fiche : 0 = est, 180 = ouest, l'axe du parcours du
@@ -281,16 +314,6 @@ export function marcheur(camera, murs, vis) {
   function orienterVers(point) {
     camera.lookAt(point);
     accorderRegard();
-  }
-
-  function atterrir() {
-    const { x, y, z } = camera.position;
-    // Une marche au-dessus de l'œil : en rasant la dalle en vol, il a pu passer dessous.
-    const sol = solSous(sonde.set(x, y + MONTEE, z), Infinity);
-    if (sol === null) return false;
-    piedsY = sol;
-    camera.position.y = sol + OEIL;
-    return true;
   }
 
   // Le regard suit le glissé, pas le curseur : bouton relâché, la souris redevient
@@ -324,7 +347,7 @@ export function marcheur(camera, murs, vis) {
 
   return {
     solSous, solEn, solsLibres, avancer, poser, orienterCap, orienterVers, tourner, accorderRegard, lisserRegard,
-    basculerVol, tenirLeVol,
+    tenirLeVol,
     suivreLaCamera() { piedsY = camera.position.y - OEIL; },
     get piedsY() { return piedsY; },
     get vol() { return vol; },
