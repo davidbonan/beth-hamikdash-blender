@@ -50,13 +50,13 @@ PAS_TEMOIN = 0.25
 PAS_MAX = 128
 
 # Le soleil de visite/visite.js et le ciel vu de visite/ciel.js, en repère Blender : (x, y, z) three = (x, z, -y).
-SOLEIL = Vector((150.0, -55.0, 58.0)).normalized()
+SOLEIL = Vector((150.0, -55.0, 160.0)).normalized()
 SOLEIL_COULEUR = 0xFFE6C8
 SOLEIL_FORCE = 4.9
 DIAMETRE_SOLEIL = 0.0093
 CIEL = {"haut": 0x2F5FA6, "bas": 0xA8C6E6, "sol": 0xA89C86, "horizon": 6.0}
-# Ciel clair, soleil à 20° : le ciel pose au sol de l'ordre du tiers de ce qu'y pose le soleil. Le dôme vu, lui, est réglé pour l'écran.
-DIFFUS = 0.33
+# Ciel clair, soleil à 45° : le ciel pose au sol de l'ordre du quart de ce qu'y pose le soleil. Le dôme vu, lui, est réglé pour l'écran.
+DIFFUS = 0.25
 # Le bleu du dôme vu, entier, virait les ombres des cours au bleu franc.
 SATURATION_CIEL = 0.27
 # La Menora, l'Arche, les braises et les lueurs de la Lishkat HaGazit de visite/visite.js (candela, et le souffle
@@ -426,7 +426,19 @@ def poser_sur_la_plus_proche(maillage, uv, orphelines, est_large):
                 uv[boucle].uv = pose
 
 
-def rabattre_les_minuscules(obj, taille):
+# Plaquée dos à dos contre une autre, une face est enfermée dans le volume voisin : sa carte est noire.
+def enfermees(maillage):
+    arbre = BVHTree.FromPolygons([sommet.co for sommet in maillage.vertices], [tuple(face.vertices) for face in maillage.polygons])
+    def couvert(face, point):
+        return any(g != face.index and normale.dot(face.normal) < -PARALLELE
+                   for _, normale, g, _ in arbre.find_nearest_range(point, TOLERANCE))
+    # Coins compris : la contremarche d'une marche dépasse de la marche plus basse plaquée contre elle.
+    return {face.index for face in maillage.polygons
+            if couvert(face, face.center)
+            and all(couvert(face, face.center.lerp(maillage.vertices[s].co, RETRAIT)) for s in face.vertices)}
+
+
+def rabattre_les_minuscules(obj, taille, cachees):
     """Rabat sur leur voisine les îles que le dépliage laisse sous le texel.
 
     Une île en découvre une autre : le flanc d'une taille ne touche que son chanfrein, qui
@@ -448,7 +460,8 @@ def rabattre_les_minuscules(obj, taille):
         for ile in minuscules:
             hotes = [maillage.polygons[g] for i in faces_de[ile] for g in contact.get(i, ())
                      if aires[ile_de[g]] >= TEXEL_ILE_MIN]
-            hote = max(hotes, key=lambda f: f.area) if hotes else None
+            # Le chanfrein entre deux blocs jointifs touche le dos de son bloc, plus large que le flanc qu'on voit.
+            hote = max([f for f in hotes if f.index not in cachees] or hotes, key=lambda f: f.area) if hotes else None
             plan = application_du_plan(maillage, uv, hote) if hote else None
             if plan is None:
                 restent.append(ile)
@@ -511,9 +524,21 @@ def deplier(obj, taille):
     for o in bpy.context.view_layer.objects:
         o.select_set(o is obj)
     bpy.context.view_layer.objects.active = obj
+    cachees = enfermees(obj.data)
     bpy.ops.object.mode_set(mode="EDIT")
+    bpy.context.tool_settings.mesh_select_mode = (False, False, True)
+    # Dépliées à part : un chanfrein entre deux blocs jointifs rejoignait l'île du dos caché de son bloc.
+    for part in (lambda f: f.index not in cachees, lambda f: f.index in cachees):
+        maillage = bmesh.from_edit_mesh(obj.data)
+        maillage.faces.ensure_lookup_table()
+        for face in maillage.faces:
+            face.select_set(False)
+        for face in maillage.faces:
+            face.select_set(part(face))
+        bmesh.update_edit_mesh(obj.data)
+        bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=2.0 / taille, area_weight=0.0)
+    # L'empaquetage ne range que la sélection : les îles laissées hors d'elle se superposaient aux autres.
     bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=2.0 / taille, area_weight=0.0)
     bpy.ops.object.mode_set(mode="OBJECT")
     # Empaqueté d'abord : c'est l'empaquetage qui dit ce qu'une île mesure en texels.
     empaqueter(taille)
@@ -524,7 +549,7 @@ def deplier(obj, taille):
     # Le rabattage vient APRÈS l'empaquetage, et rien ne le suit : c'est l'empaquetage qui fixe
     # l'échelle, donc ce qu'une île mesure en texels, et une île rabattue est plate en UV —
     # réempaqueter derrière, l'atlas entier s'effondrait sur une île d'un texel.
-    rabattre_les_minuscules(obj, taille)
+    rabattre_les_minuscules(obj, taille, cachees)
     return len(obj.data.uv_layers) - 1
 
 

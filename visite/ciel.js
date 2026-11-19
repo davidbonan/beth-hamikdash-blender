@@ -22,13 +22,8 @@ import * as THREE from "three";
 import { FullScreenQuad } from "three/addons/postprocessing/Pass.js";
 import { PROFIL } from "./qualite.js";
 
-// Vingt degrés au-dessus de l'horizon, à l'est : l'axe de l'avoda, et l'heure du
-// tamid du matin. L'angle n'est pas un détail d'ambiance — c'est lui qui décide si la
-// lumière RASE la pierre ou l'écrase. À 38°, l'assise, le joint, le chanfrein et le
-// grain des nappes recevaient tous la même clarté et le relief disparaissait. Plus bas
-// que vingt, en revanche, le dallage ne reçoit plus qu'un quart du soleil et l'ambiance
-// reprend le dessus : la cour repasse en aplat pâle, l'inverse de ce qu'on cherche.
-export const SOLEIL = new THREE.Vector3(150, 58, 55).normalize();
+// Quarante-cinq degrés, à l'est : plus bas, les murs de l'Azara mettaient la cour à l'ombre ; plus haut, le reflet du soleil sortait du dallage vu.
+export const SOLEIL = new THREE.Vector3(150, 160, 55).normalize();
 
 // L'AIR, et pas un brouillard. Un brouillard linéaire pose la même teinte à la même
 // distance dans toutes les directions : un calque gris sur l'image. L'air est plus dense
@@ -111,9 +106,11 @@ const LUNE_COUCHANTE = new THREE.Vector3(-150, 35, -20).normalize();
 // `feu` : le feu de l'autel, qui brûle toute la nuit (Vayikra 6:2) et que le jour noie.
 // `projecteurs` : ceux de la place du Kotel d'aujourd'hui, allumés tant que le soleil n'est pas levé.
 const LUMIERES_DE_NUIT = { astre: { couleur: 0xa9bde0, intensite: 0.35 }, appoint: 0, ciel: 0.008, cuite: 0.05, shoeva: true, feu: true, projecteurs: true };
+// `chaleurCuite` : sous l'étalonnage d'un profil, ce que la lumière cuite du jour reprend en clarté et en chaleur.
 const CIELS = {
   jour: { vu: VU, eclairant: ECLAIRANT,
-          lumieres: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false, projecteurs: false } },
+          lumieres: { astre: { couleur: 0xffe6c8, intensite: 4.9 }, appoint: 0.12, ciel: 0.16, cuite: 1, shoeva: false, feu: false, projecteurs: false,
+                      chaleurCuite: [1.36, 1.27, 1.11] } },
   nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, lumieres: LUMIERES_DE_NUIT },
   fin_de_nuit: { vu: VU_NUIT, eclairant: ECLAIRANT_NUIT, astre: LUNE_COUCHANTE, lumieres: LUMIERES_DE_NUIT },
   avant_l_aube: { vu: VU_AVANT_L_AUBE, eclairant: ECLAIRANT_AVANT_L_AUBE,

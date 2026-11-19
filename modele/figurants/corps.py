@@ -16,6 +16,7 @@ from bl_ext.blender_org.mpfb.services.rigservice import RigService
 from bl_ext.blender_org.mpfb.services.targetservice import TargetService
 
 from .matieres import teinter_objet
+from .peau import creuser_la_peau
 from .etoffes import _normaliser, etoffe_mpfb, garder_pieces, poids_de, repeser, surface_de
 
 
@@ -91,6 +92,7 @@ class Humain:
         yeux = _asset(self.corps, "Eyes", "eyes/low-poly/low-poly.mhclo")
         teinter_objet(yeux, (1.0, 1.0, 1.0), 256)
         self.accessoires = [yeux]
+        creuser_la_peau(self)
         poils = [("Eyebrows", sourcils and f"eyebrows/eyebrow{sourcils:03d}/eyebrow{sourcils:03d}.mhclo"),
                  ("Hair", cheveux and f"hair/{cheveux}/{cheveux}.mhclo")]
         poils += [("Clothes", f"clothes/{b}/{b}.mhclo") for b in barbe or ()]

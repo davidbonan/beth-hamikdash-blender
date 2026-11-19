@@ -290,7 +290,10 @@ Corps, peaux, yeux, cheveux, barbes et vêtements viennent de MakeHuman (extensi
 kutonet est la robe de moine `donitz_monk_robe` (CC0) sans pèlerine ni cordon, la robe et le
 voile de la fidèle `punkduck_medieval_dress` et `elvs_charity_veil1` (CC BY), teints par
 `reteindre`. Avnet, migba'at, kippot, talith (étole drapée par simulation) et instruments sont
-générés par le script. Une fois par machine :
+générés par le script. La kutonet ceinte tombe une fois par troupe en tissu simulé, sur le premier cohen qui la
+porte (`plis.py`, quelques minutes) : ses plis et leurs creux sont cuits dans ses textures, que les autres
+reçoivent par leurs UV. Le creux de la peau (orbites, narines, oreilles, doigts) est cuit une fois sur le premier
+corps et part en `occlusionTexture` glTF, partagée par tous les corps (`peau.py`). Une fois par machine :
 
 ```sh
 /Applications/Blender.app/Contents/MacOS/Blender --online-mode -c extension install mpfb --enable

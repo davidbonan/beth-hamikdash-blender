@@ -28,11 +28,13 @@ const LISSE = 0, PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
-  "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Robe_Royale", "Figure_Voile", "Figure_Meil",
+  "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Kutonet_Ceinte", "Figure_Robe", "Figure_Robe_Royale", "Figure_Voile", "Figure_Meil",
   "Figure_Ephod", "Toile_blanche", "Drapeau_blanc", "Drapeau_bleu", "Caprier", "Caprier_sec", "Palme"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MONOLITHE, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
                           KOTEL_HERODIEN, KOTEL_OMEYYADE, KOTEL_MAMELOUK]);
+// Celles dont les joints se calent sur les arêtes de chaque face, aux profils `assises`.
+const CALEES = new Set([PIERRE, MURAILLE]);
 // Celles qui gardent leur appareil au profil sobre : les murs, les sols, l'or, et l'étoffe pour les keruvim de la Parokhet.
 const ESSENTIELLES = new Set([PIERRE, DALLE, METAL, ETOFFE]);
 // Le dôme éclairant est beige et désaturé : à 1, l'or au soleil n'en reflétait qu'un gris-vert.
@@ -42,8 +44,12 @@ const REFLET_DU_METAL = 1.6;
 export const refleteSaCour = (materiau) => [METAL, MIKSHE].includes(FAMILLES[materiau.name.replace(/_grave$/, "")]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
+// Ce que la chaîne prépare au pixel au profil ultra ; actif pour l'œil seul, le miroir et les sondes voient d'ailleurs.
+export const ECRAN = { uEcran: { value: null }, uPasImage: { value: new THREE.Vector2(1, 1) }, uEcranActif: { value: 0 }, uSolRebond: { value: new THREE.Color(0) } };
+// Ce que l'étalonnage du profil rend à la lumière cuite du jour, en clarté et en chaleur.
+export const TEINTE_CUITE = { value: new THREE.Color(1, 1, 1) };
 // Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
-export const EXPOSITION_DEHORS = 0.80;
+export const EXPOSITION_DEHORS = 0.80 * (PROFIL.etalonnage?.exposition ?? 1);
 export const EXPOSITION = { value: EXPOSITION_DEHORS };
 // La courbe de l'écran : PBR Neutral de Khronos. ACES rendait le ciel et le bronze gris et jaunissait les blancs ;
 // celle-ci garde la teinte de ce qu'elle reçoit jusqu'à 0,76 et ne tasse que les hautes lumières.
@@ -94,6 +100,10 @@ export function eclairerLaSalle(versSalle, points, couleur) {
 
 // Le verre d'une lampe allumée : celui des projecteurs, que la nuit allume, et celui des suspensions, qui ne s'éteint pas.
 export const VERRE_ALLUME = { couleur: 0xffe6c0, eclat: 6 };
+
+// En mètres, où le relief puis la teinte du dessin se fondent. Plus loin en ultra : la pleine définition y tient encore le joint sans grésiller.
+const IRREG = PROFIL.textures.irregularite ?? { bloc: 0, bombe: 0, dalle: 0, bombeDalle: 0, nuance: 0, nuanceDalle: 0, poliDalle: 0 };
+const PORTEES = PROFIL.textures.portees ?? { relief: [16, 65], teinte: [60, 200] };
 
 const PIXEL = /* glsl */`
 uniform float uHauteurImage;
@@ -166,6 +176,10 @@ const CARREAU = {
   16: [3.6, 0.22, 0.30, 0.30, 0.35],
 };
 
+// Aux profils `fines`, la pierre de taille et le dallage prennent un calcaire scié à ses vacuoles, deux fois plus fin, et appuyé.
+const NAPPE_FINE_DE = { 1: "meleke", 10: "meleke", 14: "meleke", 26: "meleke", 13: "dallage" };
+const CARREAU_FIN = { meleke: [2.0, 1.0, 0.7, 0.9, 0.8], dallage: [2.2, 1.0, 0.6, 0.6, 0.6] };
+
 const FAMILLES = {
   Pierre_claire: PIERRE, Pierre_muraille: MURAILLE, Sol: DALLE,
   Dallage_kotel: DALLE_KOTEL, Dallage_de_priere: DALLE_DE_PRIERE, Pierre_de_Jerusalem: MAISON,
@@ -204,6 +218,38 @@ uniform vec4 uLueurs[${SALLES_MAX * LUEURS_MAX}];
 uniform vec3 uLueurCouleur[${SALLES_MAX}];
 uniform mat4 uVersSalle[${SALLES_MAX}];
 varying float vPixel;
+uniform vec3 uTeinteCiel;
+
+#ifdef ECRAN
+uniform highp sampler2D uEcran;
+uniform vec2 uPasImage;
+uniform float uEcranActif;
+uniform vec3 uSolRebond;
+float mOccultation = 1.0, mContact = 1.0, mReculDuReflet = 1.0, mCourbure = 0.0, mRebondPerdu = 0.0;
+vec3 mArrondie = vec3(0.0), mRebond = vec3(0.0), mDirectDiffus = vec3(0.0);
+vec4 quatre(float f){
+  uint u = floatBitsToUint(f);
+  return vec4(uvec4(u, u >> 8, u >> 16, u >> 24) & 0xFFu) * vec4(vec3(1.0 / 255.0), 1.0);
+}
+vec3 depuisOcta(vec2 o){
+  vec3 n = vec3(o, 1.0 - abs(o.x) - abs(o.y));
+  if (n.z < 0.0) n.xy = (1.0 - abs(n.yx)) * vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
+  return normalize(n);
+}
+// La passe d'écran a vu un autre point quand sa distance diffère : alors rien n'est lu.
+void lireEcran(float distance){
+  if (uEcranActif < 0.5) return;
+  vec4 e = texelFetch(uEcran, ivec2(gl_FragCoord.xy * uPasImage * vec2(textureSize(uEcran, 0))), 0);
+  if (abs(e.r - distance) > 0.03 * distance + 0.02) return;
+  vec4 acr = quatre(e.g), rebond = quatre(e.a);
+  mOccultation = acr.x; mContact = acr.y; mCourbure = acr.z * 2.0 - 1.0;
+  mReculDuReflet = exp2((acr.w - 1.0) / 125.0 * 7.0) - 1.0;
+  uint nb = floatBitsToUint(e.b);
+  mArrondie = depuisOcta(vec2(uvec2(nb, nb >> 12) & 0xFFFu) / 4095.0 * 2.0 - 1.0);
+  mRebondPerdu = (float(nb >> 24) - 1.0) / 125.0;
+  mRebond = rebond.rgb * exp2(rebond.w - 64.0);
+}
+#endif
 
 // 1 dehors, PENOMBRE_RESTE dans la pièce sans lumière : le ciel n'y entre pas.
 float penombre(vec3 p){
@@ -448,6 +494,26 @@ float ecart(float coord, float taille, out float rang, out float sens){
   return min(f, 1.0 - f) * taille;
 }
 
+#ifdef ASSISES
+varying vec3 vBornesMin;
+varying vec3 vBornesMax;
+// En pas égaux entre les arêtes de la face, et jamais sur elles : une arête est un angle de bloc, pas un joint.
+// Ni à moins de MARGE_CALEE d'elles : un pilastre ou un chanfrein portait sinon un joint en pointillé, d'une assise à l'autre.
+const float MARGE_CALEE = 0.3;
+float ecartCale(float coord, float debut, float etendue, float taille, float decalage, out float rang, out float sens, out float pas){
+  float n = max(1.0, floor(etendue / (taille * AMA) + 0.5));
+  // Plus étroite que deux marges, la face n'a pas de joint et garde le pas du bloc : le bombé d'un chanfrein pris pour un bloc de 1 cm le criblait de points.
+  pas = etendue < 2.0 * MARGE_CALEE ? taille * AMA : etendue / n;
+  rang = (coord - debut) / pas + decalage;
+  float k = floor(rang), f = rang - k;
+  float marge = MARGE_CALEE / pas;
+  float bas = k - decalage > marge && n - (k - decalage) > marge ? f : 1.0e4;
+  float haut = k + 1.0 - decalage > marge && n - (k + 1.0 - decalage) > marge ? 1.0 - f : 1.0e4;
+  sens = bas < haut ? 1.0 : -1.0;
+  return min(bas, haut) * pas / AMA;
+}
+#endif
+
 // Un joint plus fin que le pixel s'élargit jusqu'à lui en s'éclaircissant d'autant : un trait, pas un pointillé.
 float horsJoint(float d, float largeur, float pixel){
   float l = max(largeur, pixel);
@@ -473,6 +539,22 @@ float penteRampe(float d, vec2 rampe, float pixel){
 // — personne n'y marche.
 // rovad : la largeur d'une rangée ; longueurs : les deux longueurs de dalle ; nuance : l'écart de valeur d'une dalle à l'autre ;
 // poli : l'écart de rugosité d'une dalle à l'autre — toutes n'ont pas été polies de la même main, et ce sont les plus lisses qui accrochent le soleil.
+// Aucune pierre posée n'est dans le plan de ses voisines : chacune penche un peu et bombe un peu, et le soleil rasant le dit bloc par bloc.
+vec3 mInclinaison = vec3(0.0);
+#ifdef IRREGULARITE
+// Ce qui sépare une pierre de sa voisine en clarté et en chaleur, au-delà du banc ; la graine est tirée par bloc.
+vec3 nuancer(float graine, float ecart){
+  float clair = (alea1(graine * 9.1 + 0.2) - 0.5) * 2.0, chaud = (alea1(graine * 4.3 + 0.9) - 0.5) * 2.0;
+  return (1.0 + clair * ecart) * vec3(1.0 + 0.30 * chaud * ecart, 1.0, 1.0 - 0.45 * chaud * ecart);
+}
+vec3 incliner(vec2 dans, vec2 taille, vec3 axeU, vec3 axeV, float graine, float penche, float bombe){
+  vec2 tilt = (vec2(alea1(graine * 3.7 + 0.1), alea1(graine * 5.3 + 0.7)) - 0.5) * 2.0 * penche;
+  vec2 c = dans * 2.0 - 1.0;
+  vec2 dome = -2.0 * c * bombe * (0.4 + 0.6 * alea1(graine * 7.1 + 0.3)) / max(taille * 0.5, vec2(1e-3));
+  vec2 g = tilt + dome;
+  return axeU * g.x + axeV * g.y;
+}
+#endif
 struct Pavage { float rovad; vec2 longueurs; float nuance; float poli; };
 const Pavage PAVAGE_DES_COURS = Pavage(ROVAD_DALLE, vec2(8.0, 10.0), 0.03, 0.15);
 
@@ -495,12 +577,20 @@ void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float ru
   float pixelX = empreinte(vec3(1.0, 0.0, 0.0)) / AMA, pixelZ = empreinte(vec3(0.0, 0.0, 1.0)) / AMA;
   float lit = min(horsJoint(dx, JOINT_DALLE, pixelX), horsJoint(dz, JOINT_DALLE, pixelZ));
   float tireDalle = alea3(vec3(floor(colonne), num, 0.0));
+#ifdef IRREGULARITE
+  mInclinaison = incliner(vec2(fract(ligne), fract(colonne)), vec2(pavage.rovad, longueur) * AMA, vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0),
+                          tireDalle * 61.0 + num, ${IRREG.dalle.toFixed(4)}, ${IRREG.bombeDalle.toFixed(4)});
+#endif
   usure = grain(P / (20.0 * AMA));
   teinte = vec3((1.0 + (g - 0.5) * 0.10) * (1.0 - pavage.nuance * 0.5 + tireDalle * pavage.nuance) * mix(0.70, 1.0, lit))
          * mix(vec3(1.0), OMBRE_JOINT, 0.45 * usure);
   vec3 dir = dx < dz ? vec3(sensX, 0.0, 0.0) : vec3(0.0, 0.0, sensZ);
   pente = penteRampe(d, vec2(0.0, JOINT_DALLE), dx < dz ? pixelX : pixelZ) * dir * (CREUX_DALLE / AMA);
   rugo = (g - 0.5) * 0.10 - pavage.poli * tireDalle;
+#ifdef IRREGULARITE
+  teinte *= nuancer(tireDalle * 37.0 + num, ${IRREG.nuanceDalle.toFixed(3)});
+  rugo -= ${IRREG.poliDalle.toFixed(3)};
+#endif
   photo = vec4(vec3(tireDalle, tireRang, alea3(vec3(num, floor(colonne), 11.0))) * 13.0, 1.0);
 }
 
@@ -508,28 +598,52 @@ void dalles(vec3 P, Pavage pavage, out vec3 teinte, out vec3 pente, out float ru
 struct Appareil { float assise; float courte; float longue; float debord; float joint; float lisere; };
 // Ce que tailler() lit en un point : les tirages du bloc, la pente de son joint et le masque du creux.
 struct Bloc { float num; float parite; float tireAssise; float tireBloc; float tireFini;
-              float u; vec3 axe; vec3 pente; float creux; };
+              float u; vec3 axe; vec3 pente; float creux; vec2 dans; vec2 taille; };
 
 Bloc tailler(vec3 P, vec3 N, Appareil a){
   Bloc b;
-  float rang, sensZ, sensU;
-  float dz = ecart(P.y, a.assise, rang, sensZ);
+  float rang, sensZ, sensU, dz, du, colonne;
+  vec2 pas = vec2(0.0, a.assise * AMA);
+#ifdef ASSISES
+  vec3 etendue = vBornesMax - vBornesMin;
+  bool calee = etendue.y > 0.01;
+#else
+  const bool calee = false;
+#endif
+#ifdef ASSISES
+  if (calee) dz = ecartCale(P.y, vBornesMin.y, etendue.y, a.assise, 0.0, rang, sensZ, pas.y);
+  else
+#endif
+  dz = ecart(P.y, a.assise, rang, sensZ);
+  b.parite = mod(floor(rang), 2.0);
   b.num = floor(rang);
-  b.parite = mod(b.num, 2.0);
+#ifdef ASSISES
+  // Pair, pour garder la parité : deux faces calées comptent toutes deux leurs assises depuis zéro.
+  if (calee) b.num += 2.0 * floor(alea3(floor(vBornesMin * 4.0)) * 50.0);
+#endif
   b.tireAssise = alea1(b.num * 1.7 + 3.1);
   float longueur = b.tireAssise > 0.5 ? a.longue : a.courte;
+  pas.x = longueur * AMA;
   b.axe = abs(N.x) > abs(N.z) ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
   b.u = dot(P, b.axe);                            // la face décide de l'axe des joints
+#ifdef ASSISES
+  if (calee) du = ecartCale(b.u, dot(vBornesMin, b.axe), dot(etendue, b.axe), longueur, b.parite * 0.5, colonne, sensU, pas.x);
+  else {
+#endif
   // Les joints verticaux se décalent d'une assise à la suivante : alignés, ils font un
   // damier, que ne montre aucun appareil de pierre de taille.
   b.u += (b.parite * 0.5 + b.tireAssise * 0.37) * longueur * AMA;
-  float colonne;
-  float du = ecart(b.u, longueur, colonne, sensU);
+  du = ecart(b.u, longueur, colonne, sensU);
+#ifdef ASSISES
+  }
+#endif
   b.tireBloc = alea3(vec3(floor(colonne), b.num, 0.0));
   // La finition se tire À PART du banc. Sur le même tirage, la pierre la plus claire
   // serait toujours la plus piquée : les cinq finitions se liraient en cinq calcaires,
   // et le mur retomberait dans le nuancier qu'on cherche à quitter.
   b.tireFini = alea3(vec3(floor(colonne) + 19.0, b.num + 7.0, 3.0));
+  b.dans = vec2(fract(colonne), fract(rang));
+  b.taille = pas;
   float d = min(dz, du);
   // Le profil du bloc, en trois pentes : le joint, le liseré presque plat, le champ.
   // 0,62 de la course descend dans le joint, et il ne reste que 0,32 pour la marche du
@@ -562,8 +676,9 @@ const vec2 ONDE_STYLOLITHE = vec2(0.8, 0.25), DENTS_STYLOLITHE = vec2(0.06, 0.04
 const vec3 OMBRE_STYLOLITHE = vec3(0.55, 0.51, 0.45);
 
 float stylolithe(vec3 P, Bloc b, Appareil a, float graine){
-  float dans = (P.y / (a.assise * AMA) - b.num) * a.assise;
-  float hauteur = (0.2 + 0.6 * alea1(graine * 97.0 + 1.3)) * a.assise;
+  float assise = b.taille.y / AMA;
+  float dans = b.dans.y * assise;
+  float hauteur = (0.2 + 0.6 * alea1(graine * 97.0 + 1.3)) * assise;
   vec3 q = vec3(b.u / AMA, graine * 17.0, b.num * 3.1);
   float onde = (grain(q / ONDE_STYLOLITHE.x, empreinte(b.axe) / (ONDE_STYLOLITHE.x * AMA)) - 0.44) * 2.0 * ONDE_STYLOLITHE.y;
 #ifndef GRAIN_LEGER
@@ -586,6 +701,9 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
     return;
   }
   Bloc b = tailler(P, N, a);
+#ifdef IRREGULARITE
+  mInclinaison = incliner(b.dans, b.taille, b.axe, vec3(0.0, 1.0, 0.0), b.tireBloc * 53.0 + b.num, ${IRREG.bloc.toFixed(4)}, ${IRREG.bombe.toFixed(4)});
+#endif
   Finition taille = finition(b.tireFini);
   pente = b.pente;
   // Une coulure, pas une tache : un bruit étiré à la verticale. Une tache sur un mur se
@@ -601,6 +719,9 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   float f = b.parite * 0.10 + grain(P / (30.0 * AMA)) * 0.22 + b.tireBloc * 0.68;
   vec3 base = banc(f) * mix(vec3(1.0), OMBRE_JOINT, clamp(coulure + mouchete, 0.0, 1.0))
             * mix(OMBRE_STYLOLITHE, vec3(1.0), stylolithes(P, b, a));
+#ifdef IRREGULARITE
+  base *= nuancer(b.tireBloc * 29.0 + b.num, ${IRREG.nuance.toFixed(3)});
+#endif
   teinte = mix(base * OMBRE_JOINT, base, b.creux);
   // La rugosité varie DANS le bloc, pas seulement d'un bloc à l'autre : sous un soleil
   // rasant c'est le lustre qui donne la surface, la teinte ne fait que la colorer.
@@ -616,7 +737,13 @@ void appareil(vec3 P, vec3 N, Appareil a, out vec3 teinte, out vec3 pente, out f
   // dans le même sens sont ce qui sépare un parement bâti d'une trame imprimée sur
   // tout le mur.
   vec2 scie = mix(vec2(0.7, 26.0), vec2(26.0, 0.7), taille.couche);
-  rugo += (grain(vec3(b.u * scie.x, P.y * scie.y, 0.0), max(empreinte(b.axe) * scie.x, empreinte(vec3(0.0, 1.0, 0.0)) * scie.y)) - 0.5) * taille.strie;
+#ifdef NAPPE_FINE
+  // La nappe fine porte ses propres traits de scie : les stries écrites s'y ajoutaient en rayures sur toute la face.
+  const float PART_DES_STRIES = 0.25;
+#else
+  const float PART_DES_STRIES = 1.0;
+#endif
+  rugo += (grain(vec3(b.u * scie.x, P.y * scie.y, 0.0), max(empreinte(b.axe) * scie.x, empreinte(vec3(0.0, 1.0, 0.0)) * scie.y)) - 0.5) * taille.strie * PART_DES_STRIES;
 #endif
   // Le carreau de la nappe se recale sur CHAQUE bloc. Photographié à plat et lu en
   // coordonnées de monde, le même éclat de calcaire revenait tous les 2,4 m sur toute
@@ -684,6 +811,21 @@ vec4 nappe(sampler2D carte, vec3 p, vec3 w){
 // photographié sont alors deux gradients qui s'additionnent, au lieu de deux normales
 // qui se disputent la dernière. Une normale tangente (x, y, z) vient d'une hauteur dont
 // le gradient vaut -xy/z ; le plancher sur z borne ce que rend un texel presque couché.
+#ifdef NAPPE_FINE
+// Un quart de tour par unité : la même nappe, posée dans un autre sens d'un bloc au suivant.
+mat2 sens(float o){ float a = o * 1.5707963; float c = floor(cos(a) + 0.5), s = floor(sin(a) + 0.5); return mat2(c, s, -s, c); }
+vec4 nappeOrientee(sampler2D carte, vec3 p, vec3 w, mat2 R, vec2 d){
+  return texture2D(carte, R * p.zy + d) * w.x + texture2D(carte, R * p.xz + d) * w.y + texture2D(carte, R * p.xy + d) * w.z;
+}
+vec3 penteNappeOrientee(vec3 p, vec3 w, mat2 R, vec2 d){
+  vec3 x = texture2D(uNappeN, R * p.zy + d).xyz * 2.0 - 1.0;
+  vec3 y = texture2D(uNappeN, R * p.xz + d).xyz * 2.0 - 1.0;
+  vec3 z = texture2D(uNappeN, R * p.xy + d).xyz * 2.0 - 1.0;
+  vec2 sx = (-x.xy / max(x.z, 0.2)) * R, sy = (-y.xy / max(y.z, 0.2)) * R, sz = (-z.xy / max(z.z, 0.2)) * R;
+  return vec3(0.0, sx.y, sx.x) * w.x + vec3(sy.x, 0.0, sy.y) * w.y + vec3(sz.x, sz.y, 0.0) * w.z;
+}
+#endif
+
 vec3 penteNappe(vec3 p, vec3 w){
   vec3 x = texture2D(uNappeN, p.zy).xyz * 2.0 - 1.0;
   vec3 y = texture2D(uNappeN, p.xz).xyz * 2.0 - 1.0;
@@ -855,11 +997,11 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   vec3 vue = (P - cameraPosition) / loin;
   // Plancher d'incidence : vu par la tranche, un plan étirerait le pixel à l'infini.
   regard = Regard(vue, max(abs(dot(N, vue)), 0.02), vPixel);
-  float nettete = 1.0 - smoothstep(60.0, 200.0, loin);
+  float nettete = 1.0 - smoothstep(${PORTEES.teinte[0].toFixed(1)}, ${PORTEES.teinte[1].toFixed(1)}, loin);
   // Le relief se retire BIEN plus tôt que la couleur. Une teinte qui rétrécit sous le
   // pixel se moyenne toute seule ; une normale, non — elle bascule d'un pixel au
   // suivant et la façade se met à grésiller de blocs noirs et blancs.
-  float finesse = 1.0 - smoothstep(16.0, 65.0, loin);
+  float finesse = 1.0 - smoothstep(${PORTEES.relief[0].toFixed(1)}, ${PORTEES.relief[1].toFixed(1)}, loin);
   if (FAMILLE == 1 || FAMILLE == 14) {   // le pourtour, et la muraille des 500 amot
     appareil(P, N, Appareil(ASSISE, 8.0, 10.0, DEBORD, JOINT, LISERE), teinte, pente, rugo, photo);
   }
@@ -1080,6 +1222,9 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   teinte = mix(vec3(1.0), teinte, nettete);
   pente *= finesse;
   rugo *= nettete;
+#ifdef IRREGULARITE
+  pente += mInclinaison;
+#endif
   // La nappe passe APRÈS ces trois fondus, et n'en subit aucun : son fondu à elle est
   // le mipmap, qui la ramène à sa moyenne — donc à un rapport de 1 — exactement quand
   // elle cesse de tenir sous le pixel. L'y soumettre en plus l'effacerait à seize
@@ -1088,15 +1233,39 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
   vec3 p = P * uCarreau.x;
   vec3 pb = p + photo.xyz;      // le carreau recalé sur le bloc, quand il y a des blocs
   vec3 w = poidsTri(N);
+#ifdef NAPPE_FINE
+  // Deux prises tournées l'une de l'autre, mêlées par plages d'un mètre : le carreau n'a plus de période qu'on reconnaisse.
+  // Le mélange se renormalise, sans quoi l'écart à la moyenne fondrait là où les deux prises se partagent.
+  mat2 sensA = sens(floor(fract(photo.x * 0.731 + photo.y * 0.177) * 4.0)), sensB = sens(floor(fract(photo.z * 0.519 + 0.25) * 4.0));
+  const vec2 DECALAGE = vec2(0.37, 0.61);
+  float melange = smoothstep(0.30, 0.58, grain(P / 0.9));
+  float garde = inversesqrt(melange * melange + (1.0 - melange) * (1.0 - melange));
+  pente += mix(penteNappeOrientee(pb, w, sensA, vec2(0.0)), penteNappeOrientee(pb, w, sensB, DECALAGE), melange) * (garde * uCarreau.z * photo.w);
+#else
   pente += penteNappe(pb, w) * (uCarreau.z * photo.w);
+#endif
+#ifdef DETAIL_RAPPROCHE
+  // À bout de bras le carreau n'a plus que six texels au centimètre : une prise plus serrée, décalée, rend le grain.
+  pente += penteNappe(pb * 4.7 + 0.37, w) * (uCarreau.z * photo.w * 0.45) * (1.0 - smoothstep(1.5, 6.0, loin));
+#endif
 #ifdef NAPPE_COULEUR
+#ifdef NAPPE_FINE
+  vec4 c = mix(nappeOrientee(uNappeC, pb, w, sensA, vec2(0.0)), nappeOrientee(uNappeC, pb, w, sensB, DECALAGE), melange);
+  c = max(vec4(uMoyenne, uRugoMoy) + (c - vec4(uMoyenne, uRugoMoy)) * garde, vec4(0.03));
+#else
   vec4 c = nappe(uNappeC, pb, w);
+#endif
   // Une seconde échelle cinq fois plus lente, projetée à plat : ce sont des taches, pas
   // du grain, et une seule prise suffit à les porter. C'est elle qui empêche l'œil de
   // reconnaître le carreau et de voir un papier peint là où il y a de la pierre.
   // Elle se prend sur le carreau NON recalé : recalées bloc à bloc, ces taches-là
   // cesseraient d'être grandes et retomberaient au rang de moucheture.
+#ifdef NAPPE_FINE
+  // En projection à plat, sur une paroi, la tache ne varie que d'un côté : la nappe contrastée s'y étirait en bandes verticales.
+  c.rgb *= mix(vec3(1.0), nappe(uNappeC, p * 0.2, w).rgb / uMoyenne, 0.35);
+#else
   c.rgb *= mix(vec3(1.0), texture2D(uNappeC, p.xz * 0.2).rgb / uMoyenne, 0.35);
+#endif
   vec3 rapport = c.rgb / uMoyenne;
   rapport = mix(vec3(dot(rapport, vec3(0.2126, 0.7152, 0.0722))), rapport, uChroma);
   teinte *= mix(vec3(1.0), rapport, uCarreau.y);
@@ -1113,6 +1282,9 @@ function lampesSansOmbreHorsDesSalles(morceau) {
   return morceau.replace(lecture, `${lecture}
     #if UNROLLED_LOOP_INDEX >= NUM_POINT_LIGHT_SHADOWS
       directLight.color *= mHorsDesSalles;
+    #endif
+    #ifdef ECRAN
+      directLight.color *= mOccultation;
     #endif`);
 }
 
@@ -1130,6 +1302,9 @@ function soleilEnPenombre() {
   const boucle = morceau.slice(debut, fin);
   if (debut < 0 || fin < 0 || !boucle.includes(appel)) throw new Error("three a changé lights_fragment_begin : pénombre perdue");
   const ecartee = boucle.replace(appel, `
+    #if defined( ECRAN ) && ( UNROLLED_LOOP_INDEX >= NUM_DIR_LIGHT_SHADOWS )
+      directLight.color *= mOccultation;
+    #endif
     #if defined( USE_LIGHTMAP ) && ( UNROLLED_LOOP_INDEX >= NUM_DIR_LIGHT_SHADOWS )
       ${appel.replace("reflectedLight )", "mAppoint )")}
     #else
@@ -1157,6 +1332,9 @@ const LUEURS_DE_LA_SALLE = /* glsl */`
       float distanceLueur = length(versLueur);
       directLight.direction = versLueur / distanceLueur;
       directLight.color = uLueurCouleur[salle] * lueur.w * getDistanceAttenuation(distanceLueur, ${PORTEE_LUEUR.toFixed(1)}, 2.0);
+      #ifdef ECRAN
+        directLight.color *= mOccultation;
+      #endif
       directLight.visible = true;
       RE_Direct(directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight);
     }
@@ -1193,6 +1371,45 @@ const greffable = (source) => ({
  * Branche le calcul procédural sur une matière standard, sans la remplacer : le
  * modèle d'éclairage, les ombres et le tonemapping de three restent ceux d'origine.
  */
+function composantes(index, nombre) {
+  const parent = Int32Array.from({ length: nombre }, (_, i) => i);
+  const racine = (i) => {
+    while (parent[i] !== i) i = parent[i] = parent[parent[i]];
+    return i;
+  };
+  for (let t = 0; t < index.length; t += 3) {
+    const a = racine(index[t]);
+    parent[racine(index[t + 1])] = a;
+    parent[racine(index[t + 2])] = a;
+  }
+  return Int32Array.from({ length: nombre }, (_, i) => racine(i));
+}
+
+// Chaque morceau d'un seul tenant reçoit sa boîte dans le monde : les joints de `tailler` s'y calent.
+export function calerLesAssises(maillage) {
+  const famille = FAMILLES[maillage.material.name.replace(/_grave$/, "")];
+  const { geometry } = maillage;
+  if (!PROFIL.textures.assises || !CALEES.has(famille) || !geometry.index) return;
+  const position = geometry.attributes.position;
+  const racines = composantes(geometry.index.array, position.count);
+  const min = new Map(), max = new Map(), p = new THREE.Vector3();
+  maillage.updateWorldMatrix(true, false);
+  for (let i = 0; i < position.count; i++) {
+    p.fromBufferAttribute(position, i).applyMatrix4(maillage.matrixWorld);
+    const r = racines[i];
+    if (!min.has(r)) { min.set(r, p.clone()); max.set(r, p.clone()); continue; }
+    min.get(r).min(p);
+    max.get(r).max(p);
+  }
+  const bornesMin = new Float32Array(position.count * 3), bornesMax = new Float32Array(position.count * 3);
+  for (let i = 0; i < position.count; i++) {
+    min.get(racines[i]).toArray(bornesMin, i * 3);
+    max.get(racines[i]).toArray(bornesMax, i * 3);
+  }
+  geometry.setAttribute("bornesMin", new THREE.BufferAttribute(bornesMin, 3));
+  geometry.setAttribute("bornesMax", new THREE.BufferAttribute(bornesMax, 3));
+}
+
 export function habiller(materiau, horloges, jeux) {
   // Une matière `_grave` est sa matière de base, plus la carte des gravures.
   const gravure = materiau.name.endsWith("_grave");
@@ -1223,9 +1440,10 @@ export function habiller(materiau, horloges, jeux) {
   }
 
   const rendue = PROFIL.habillageEssentiel && !ESSENTIELLES.has(famille) ? LISSE : famille;
-  const jeu = jeux.get(NAPPE_DE[rendue]);
+  const fine = PROFIL.textures.fines && NAPPE_FINE_DE[rendue];
+  const jeu = jeux.get(fine || NAPPE_DE[rendue]);
   if (jeu) {
-    const [cote, couleur, chroma, relief, rugosite] = CARREAU[rendue];
+    const [cote, couleur, chroma, relief, rugosite] = fine ? CARREAU_FIN[fine] : CARREAU[rendue];
     uniformes.uNappeN = { value: jeu.normale };
     uniformes.uCarreau = { value: new THREE.Vector4(1 / cote, couleur, relief, rugosite) };
     uniformes.uChroma = { value: chroma };
@@ -1240,6 +1458,8 @@ export function habiller(materiau, horloges, jeux) {
   if (gravure) uniformes.uGravure = { value: jeux.get("gravures").motif };
   const refletDuDallage = materiau.userData.refletDuDallage === true;
   if (refletDuDallage) Object.assign(uniformes, REFLET);
+  uniformes.uTeinteCiel = TEINTE_CUITE;
+  if (PROFIL.ecran) Object.assign(uniformes, ECRAN);
   const { sonde } = materiau.userData;
   if (sonde) Object.assign(uniformes, { uSondeMin: { value: sonde.min }, uSondeMax: { value: sonde.max }, uSondeCentre: { value: sonde.centre } });
   const rayonFil = materiau.userData.rayon;
@@ -1256,7 +1476,12 @@ export function habiller(materiau, horloges, jeux) {
     + (gravure ? "#define GRAVURE\n" : "")
     + (rayonFil ? "#define FIL\n" : "")
     + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
-    + (sonde ? "#define SONDE_EN_BOITE\n" : "");
+    + (sonde ? "#define SONDE_EN_BOITE\n" : "")
+    + (PROFIL.ecran ? "#define ECRAN\n" : "")
+    + (jeu && !fine && PROFIL.textures.detailRapproche ? "#define DETAIL_RAPPROCHE\n" : "")
+    + (fine ? "#define NAPPE_FINE\n" : "")
+    + (PROFIL.textures.irregularite ? "#define IRREGULARITE\n" : "")
+    + (PROFIL.textures.assises && CALEES.has(rendue) ? "#define ASSISES\n" : "");
 
   // La sonde du Heikhal pose son propre reflet, celui de la salle : ce n'est plus le ciel qu'il faut éteindre.
   const refletDuCiel = () => (materiau.userData.refletVoitLeCiel === false ? "" : "#define REFLET_DU_CIEL\n");
@@ -1264,14 +1489,16 @@ export function habiller(materiau, horloges, jeux) {
     Object.assign(nuanceur.uniforms, uniformes);
     nuanceur.vertexShader = greffable(nuanceur.vertexShader)
       .greffer("#include <common>", "#include <common>\n" + drapeaux + PIXEL + FIL + "varying vec3 vMonde;\nvarying vec3 vNMonde;\n"
-               + "#ifdef GRAVURE\nvarying vec2 vGravure;\n#endif\n")
+               + "#ifdef GRAVURE\nvarying vec2 vGravure;\n#endif\n"
+               + "#ifdef ASSISES\nattribute vec3 bornesMin;\nattribute vec3 bornesMax;\nvarying vec3 vBornesMin;\nvarying vec3 vBornesMax;\n#endif\n")
       .greffer("#include <begin_vertex>",
                "#include <begin_vertex>\n#ifdef FIL\ntransformed = grossirFil(transformed, objectNormal);\n#endif\n" +
                "vMonde = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvPixel = pixelVu(transformed);\n" +
                // L'exporteur glTF retourne v (0 en haut) ; l'atlas se lit v montant, comme
                // Blender l'a écrit et comme la parokhet — sinon la plaque keruv lit la tuile
                // fleuron, et la timora un quart vide.
-               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n")
+               "vNMonde = normalize(mat3(modelMatrix) * objectNormal);\n#ifdef GRAVURE\nvGravure = vec2(uv.x, 1.0 - uv.y);\n#endif\n"
+               + "#ifdef ASSISES\nvBornesMin = bornesMin;\nvBornesMax = bornesMax;\n#endif\n")
       .source;
 
     nuanceur.fragmentShader = greffable(nuanceur.fragmentShader)
@@ -1288,7 +1515,16 @@ export function habiller(materiau, horloges, jeux) {
         vec3 mTeinte, mPente, mFeu; float mRugo;
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);
         float mPenombre = penombre(vMonde);
-        float mHorsDesSalles = horsDesSalles(vMonde);`)
+        float mHorsDesSalles = horsDesSalles(vMonde);
+        #ifdef ECRAN
+          lireEcran(vViewPosition.z);
+          #ifdef TEMPERE
+            // La pierre s'use aux arêtes, plus claire et plus rêche, et s'encrasse dans les creux et au pied de ce qui l'abrite.
+            float mArete = clamp(-mCourbure * 2.0, 0.0, 1.0), mCreux = clamp(mCourbure * 2.0, 0.0, 1.0);
+            mTeinte *= (1.0 + 0.12 * mArete) * (1.0 - 0.30 * mCreux) * mix(0.90, 1.0, mOccultation);
+            mRugo += 0.10 * mArete;
+          #endif
+        #endif`)
       // Le soleil et le rebond sont des lumières directionnelles, qui ne connaissent
       // aucun mur : la pénombre reprend ce que leur boucle a ajouté. Les lampes
       // ponctuelles — braises, Menora, lampe de tête — passent avant elle et restent.
@@ -1300,6 +1536,9 @@ export function habiller(materiau, horloges, jeux) {
       // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
       // La lumière cuite remplace le ciel sans direction, et prend le relief que ce ciel donne à la normale du grain.
       .greffer("#include <lights_fragment_end>", /* glsl */`
+        #ifdef ECRAN
+          mDirectDiffus = reflectedLight.directDiffuse;
+        #endif
         #if defined(TEMPERE) || defined(USE_LIGHTMAP)
           const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
           vec3 cielPlat = getAmbientLightIrradiance(ambientLightColor);
@@ -1343,6 +1582,7 @@ export function habiller(materiau, horloges, jeux) {
           #else
             vec3 mCuite = lightMapIrradiance * mRelief * mReliefCuit * mPenombre;
           #endif
+          mCuite *= uTeinteCiel;
         #endif
         float mPlan = 0.0;
         #ifdef REFLET_DU_DALLAGE
@@ -1364,6 +1604,38 @@ export function habiller(materiau, horloges, jeux) {
           reflectedLight.directDiffuse *= mTeinteVue;
           reflectedLight.indirectDiffuse *= mTeinteVue;
         #endif`)
+      // L'occlusion de l'écran prend tout sauf le soleil : un angle au soleil reste au soleil.
+      .greffer("#include <aomap_fragment>", /* glsl */`
+        #include <aomap_fragment>
+        #ifdef ECRAN
+          reflectedLight.indirectDiffuse *= mOccultation;
+          reflectedLight.indirectSpecular *= computeSpecularOcclusion(saturate(dot(geometryNormal, geometryViewDir)), mOccultation, material.roughness);
+          // La carte cuite tient déjà le rebond de Cycles : seul ce qui n'en a pas le prend de l'écran.
+          #ifdef USE_LIGHTMAP
+            vec3 mRebondDiffus = vec3(0.0);
+          #else
+            vec3 mRebondDiffus = (mRebond + uSolRebond * mRebondPerdu * mOccultation) * BRDF_Lambert(material.diffuseColor) * mPenombre;
+          #endif
+          #ifdef TEMPERE
+            mRebondDiffus *= mTeinteVue;
+          #endif
+          reflectedLight.indirectDiffuse += mRebondDiffus;
+        #endif`)
+      // La part de la lumière directe et de son rebond dans ce que le point renvoie : la chaîne la garde pour le rebond de l'image suivante.
+      .greffer("#include <opaque_fragment>", /* glsl */`
+        #include <opaque_fragment>
+        #if defined(ECRAN) && defined(OPAQUE)
+          if (uEcranActif > 0.5) {
+            vec3 mDirectVu = mDirectDiffus;
+            #ifdef TEMPERE
+              mDirectVu *= mTeinteVue;
+            #endif
+            // Le rebond reçu repart à son tour : un second rebond à l'image suivante, puis un troisième.
+            mDirectVu += mRebondDiffus * mOccultation;
+            const vec3 mLuma = vec3(0.2126, 0.7152, 0.0722);
+            gl_FragColor.a = clamp(dot(mDirectVu, mLuma) / max(dot(outgoingLight, mLuma), 1e-4), 0.0, 1.0);
+          }
+        #endif`)
       .greffer("#include <roughnessmap_fragment>",
                "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + mRugo, 0.03, 1.0);")
       // L'incandescence est une TEXTURE, pas une constante de matière : une braise dont
@@ -1378,7 +1650,10 @@ export function habiller(materiau, horloges, jeux) {
       // qui ne depend pas du pixel voisin et ne grouille donc jamais.
       .greffer("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
-        normal = normalize(normal - mat3(viewMatrix) * mPente);`)
+        normal = normalize(normal - mat3(viewMatrix) * mPente);
+        #ifdef ECRAN
+          if (dot(mArrondie, nonPerturbedNormal) > 0.2) normal = normalize(normal + mArrondie - nonPerturbedNormal);
+        #endif`)
       .greffer("#include <envmap_physical_pars_fragment>", sonde ? environnementEnBoite() : "#include <envmap_physical_pars_fragment>")
       .source;
   };

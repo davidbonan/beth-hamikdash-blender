@@ -26,7 +26,10 @@ export const REFLET = {
 // Pierre polie par les pas, pas glacée : le reflet s'étale avec la rugosité et la hauteur de ce qu'il montre, plus en long qu'en large.
 export const LECTURE_DU_REFLET = /* glsl */`
 #ifdef REFLET_DU_DALLAGE
-uniform sampler2D tReflet, tProfondeurReflet;
+uniform sampler2D tReflet;
+#ifndef ECRAN
+uniform sampler2D tProfondeurReflet;
+#endif
 uniform mat4 uVersReflet, uDeReflet;
 uniform vec2 uTexelReflet;
 uniform float uFocaleReflet, uRefletActif, uCoteReflet, uLobeReflet, uForceReflet;
@@ -37,8 +40,13 @@ float refleterLaCour(inout vec3 radiance, vec3 P, vec3 nPlan, vec3 nVue, float r
   vec4 q = uVersReflet * vec4(P, 1.0);
   vec3 nMonde = inverseTransformDirection(nVue, viewMatrix);
   vec2 uv = q.xy / q.w + nMonde.xz * TORSION;
+#ifdef ECRAN
+  float apres = mReculDuReflet;
+#else
   vec4 vu = uDeReflet * vec4(uv * 2.0 - 1.0, texture(tProfondeurReflet, uv).r * 2.0 - 1.0, 1.0);
-  float apres = distance(vu.xyz / vu.w, P), avant = distance(P, cameraPosition);
+  float apres = distance(vu.xyz / vu.w, P);
+#endif
+  float avant = distance(P, cameraPosition);
   float etale = uFocaleReflet * uLobeReflet * rugosite * rugosite * apres / (avant + apres);
   float flou = clamp(log2(max(etale, 1.0)), 0.0, FLOU_MAX);
   float pas = ETIREMENT * exp2(flou) * uTexelReflet.y;
