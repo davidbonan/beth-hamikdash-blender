@@ -28,9 +28,8 @@
 import * as THREE from "three";
 import { FEU_DE_L_AUTEL, empriseDuFeu, foyersDuFeu } from "./feu_de_l_autel.js";
 import { parTranches } from "./fil.js";
-import { COURBE_DE_L_ECRAN, ECRAN, EXPOSITION, EXPOSITION_DEHORS, TEINTE_CUITE } from "./matieres.js";
+import { BISEAU_LU, COURBE_DE_L_ECRAN, EXPOSITION, EXPOSITION_DEHORS, TEINTE_CUITE } from "./matieres.js";
 import { OMBRE_LOINTAINE, profondeurLointaine } from "./ombres.js";
-import { REFLET } from "./reflet_du_dallage.js";
 import { PROFIL } from "./qualite.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -45,9 +44,8 @@ import { FXAAShader } from "three/addons/shaders/FXAAShader.js";
 const ECHANTILLONS = PROFIL.occlusion;
 // Une ama et demie : l'occlusion doit dire « ce coin est un coin », pas ombrer la
 // cour. Plus large, elle assombrit les murs entiers dès qu'on s'en approche.
-// Au profil ultra elle épargne le soleil : elle peut porter plus loin et appuyer plus fort.
-const RAYON = PROFIL.ecran?.occlusion.rayon ?? 1.8;
-const FORCE = PROFIL.ecran?.occlusion.force ?? 0.8;
+const RAYON = 1.8;
+const FORCE = 0.8;
 // Le second rayon, celui du CONTACT. 1,8 m dit « ce coin est un coin » ; il ne dit rien
 // du pli de trois centimètres où la contremarche rencontre le giron, où le fût pose sur
 // sa base, où court le joint d'une assise. C'est ce trait fin, et lui seul, que l'œil
@@ -85,39 +83,11 @@ const GEOMETRIE = new THREE.ShaderMaterial({
     void main(){ gl_FragColor = vec4(normalize(vN) * 0.5 + 0.5, vZ); }`,
 });
 
-// L'OMBRE DE CONTACT (ultra) : vers l'astre sur quelques décimètres d'écran, là où la carte du soleil rend du gris.
-const CONTACT = PROFIL.ecran?.contact;
-const CONTACT_GLSL = CONTACT ? /* glsl */`
-    uniform vec3 uVersLAstre;
-    uniform vec2 uTailleGeo;
-    float contact(vec3 P, vec3 N, float tour){
-      if (dot(N, uVersLAstre) <= 0.0) return 1.0;
-      float z = -P.z;
-      // Le biais suit la précision de la distance stockée, et l'épaisseur prêtée à ce qui bouche, la distance elle-même.
-      float biais = 0.002 + 0.0006 * z, epaisseur = ${CONTACT.epaisseur.toFixed(2)} + 0.01 * z;
-      vec3 depart = P + N * (0.004 + 0.001 * z);
-      for (int i = 0; i < ${CONTACT.prises}; i++) {
-        float t = (float(i) + tour) / ${CONTACT.prises.toFixed(1)};
-        vec3 S = depart + uVersLAstre * (${CONTACT.portee.toFixed(2)} * t);
-        if (-S.z < 0.05) break;
-        vec2 uvS = 0.5 + 0.5 * (S.xy / -S.z) / (uTanFov * vec2(uAspect, 1.0));
-        if (any(lessThan(uvS, vec2(0.0))) || any(greaterThan(uvS, vec2(1.0)))) break;
-        float zS = texelFetch(tGeo, ivec2(uvS * uTailleGeo), 0).a;
-        float devant = -S.z - zS;
-        // Le bout du rayon ombre moins que son départ : une ombre de contact s'éteint en s'éloignant de ce qui la porte.
-        if (zS > 0.0 && devant > biais && devant < epaisseur) {
-          return mix(1.0 - t * t, 1.0, smoothstep(${CONTACT.fin[0].toFixed(1)}, ${CONTACT.fin[1].toFixed(1)}, z));
-        }
-      }
-      return 1.0;
-    }` : "";
-
 const OCCLUSION = {
   uniforms: {
     tGeo: { value: null }, uTanFov: { value: 0 }, uAspect: { value: 1 },
     uRayon: { value: RAYON }, uForce: { value: FORCE },
     uRayonFin: { value: RAYON_FIN }, uForceFin: { value: FORCE_FIN },
-    uVersLAstre: { value: new THREE.Vector3() }, uTailleGeo: { value: new THREE.Vector2() },
   },
   vertexShader: /* glsl */`
     varying vec2 vUv;
@@ -132,7 +102,6 @@ const OCCLUSION = {
     vec3 positionVue(vec2 uv, float z){
       return vec3((uv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0) * z, -z);
     }
-${CONTACT_GLSL}
 
     // Ce que voit UNE prise : rien si elle sort du cadre ou tombe sur le ciel, sinon la
     // part d'horizon que la scène lui bouche, atténuée quand ce qui la bouche est trop
@@ -176,8 +145,7 @@ ${CONTACT_GLSL}
       float aoFin = 1.0 - uForceFin * occFin / float(${ECHANTILLONS});
       ao = mix(ao, 1.0, smoothstep(${PORTEE[0].toFixed(1)}, ${PORTEE[1].toFixed(1)}, g.a));
       aoFin = mix(aoFin, 1.0, smoothstep(${PORTEE_FIN[0].toFixed(1)}, ${PORTEE_FIN[1].toFixed(1)}, g.a));
-      // Au profil ultra la matière lit l'occlusion en un seul canal : le second porte le contact.
-      gl_FragColor = ${CONTACT ? "vec4(ao * aoFin, contact(P, N, tour), 0.0, 1.0)" : "vec4(ao, aoFin, 0.0, 1.0)"};
+      gl_FragColor = vec4(ao, aoFin, 0.0, 1.0);
     }`,
 };
 
@@ -202,127 +170,18 @@ const COMPOSITION = {
     }`,
 };
 
-// LE REBOND (ultra) : la cuisson ne tient que le ciel ; ce que les surfaces vues à dix mètres renvoient de lumière directe, lu dans l'image précédente.
-const REBOND = PROFIL.ecran?.rebond;
-// Le dallage des cours, et la part d'une cour au soleil : des CHOIX, réglés sur le rebond que l'écran voit quand il voit le sol.
-const ALBEDO_DU_SOL = 0.55, PART_AU_SOLEIL = 0.6;
-const REBOND_GLSL = /* glsl */`
-    uniform sampler2D tGeo, tLumiere;
-    uniform float uTanFov, uAspect;
-    uniform mat4 uVersAvant;
-    uniform vec3 uVersLeHaut;
-    uniform float uForce;
-    varying vec2 vUv;
-    const float RAYON = ${(REBOND?.rayon ?? 1).toFixed(2)};
-    const int PRISES = ${REBOND?.prises ?? 1}, PAS = ${REBOND?.pas ?? 1};
-
-    vec3 positionVue(vec2 uv, float z){
-      return vec3((uv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0) * z, -z);
-    }
-    vec2 versEcran(vec3 S){ return 0.5 + 0.5 * (S.xy / -S.z) / (uTanFov * vec2(uAspect, 1.0)); }
-
-    void main(){
-      vec2 taille = vec2(textureSize(tGeo, 0));
-      vec4 g = texelFetch(tGeo, ivec2(vUv * taille), 0);
-      if (g.a <= 0.0) { gl_FragColor = vec4(0.0); return; }
-      vec3 P = positionVue(vUv, g.a);
-      vec3 N = normalize(g.rgb * 2.0 - 1.0);
-      vec3 T = normalize(abs(N.z) < 0.9 ? cross(vec3(0.0, 0.0, 1.0), N) : cross(vec3(0.0, 1.0, 0.0), N));
-      vec3 B = cross(N, T);
-      float tour = (mod(floor(gl_FragCoord.x), 4.0) * 4.0 + mod(floor(gl_FragCoord.y), 4.0)) / 16.0;
-      vec3 depart = P + N * (0.02 + 0.002 * g.a);
-      vec3 somme = vec3(0.0);
-      float perdus = 0.0;
-      for (int i = 0; i < PRISES; i++) {
-        float fi = float(i);
-        float r = sqrt((fi + 0.5) / float(PRISES));
-        float ang = (fi + tour) * 2.39996;
-        vec3 dir = T * (cos(ang) * r) + B * (sin(ang) * r) + N * sqrt(max(0.0, 1.0 - r * r));
-        // Un rayon qui descend sans rien toucher à l'écran finit au sol : la matière lui prête un sol moyen.
-        float perdu = dot(dir, uVersLeHaut) < 0.0 ? 1.0 : 0.0;
-        for (int k = 0; k < PAS; k++) {
-          float t = (float(k) + 0.5 + 0.5 * fract(tour * 7.0 + fi * 0.618)) / float(PAS);
-          vec3 S = depart + dir * (RAYON * t * t);
-          if (-S.z < 0.05) break;
-          vec2 uvS = versEcran(S);
-          if (any(lessThan(uvS, vec2(0.0))) || any(greaterThan(uvS, vec2(1.0)))) break;
-          vec4 gs = texelFetch(tGeo, ivec2(uvS * taille), 0);
-          if (gs.a <= 0.0) break;
-          float devant = -S.z - gs.a;
-          if (devant < 0.01 + 0.002 * g.a) continue;
-          perdu = 0.0;
-          // Plus épais que ce qu'on traverse, c'est un premier plan qui cache, pas ce que le rayon a touché.
-          if (devant > max(0.3 + 0.02 * g.a, 2.0 * RAYON * (2.0 * t + 1.0) / float(PAS * PAS))) break;
-          vec3 Q = positionVue(uvS, gs.a);
-          if (dot(gs.rgb * 2.0 - 1.0, Q - P) >= 0.0) break;
-          vec4 avant = uVersAvant * vec4(Q, 1.0);
-          vec2 uvA = avant.xy / avant.w * 0.5 + 0.5;
-          if (avant.w > 0.0 && all(greaterThan(uvA, vec2(0.0))) && all(lessThan(uvA, vec2(1.0))))
-            somme += texture2D(tLumiere, uvA).rgb;
-          break;
-        }
-        perdus += perdu;
-      }
-      // Prises en cosinus : l'éclairement est π fois la moyenne des luminances.
-      gl_FragColor = vec4(somme * (3.14159 / float(PRISES)) * uForce, perdus / float(PRISES));
-    }`;
-const REBOND_DU_SOLEIL = REBOND && new THREE.ShaderMaterial({
-  uniforms: { tGeo: { value: null }, tLumiere: { value: null }, uTanFov: { value: 0 }, uAspect: { value: 1 }, uVersAvant: { value: new THREE.Matrix4() },
-              uVersLeHaut: { value: new THREE.Vector3() }, uForce: { value: REBOND?.force ?? 0 } },
-  vertexShader: OCCLUSION.vertexShader,
-  fragmentShader: REBOND_GLSL,
-});
-
-// L'image de la scène, sa part de lumière directe seule (la matière la met en alpha), gardée pour le rebond de l'image suivante.
-class Releve extends Pass {
-  constructor(cible) {
-    super();
-    this.needsSwap = false;
-    this.cible = cible;
-    this.quad = new FullScreenQuad(new THREE.ShaderMaterial({
-      uniforms: { tDiffuse: { value: null } },
-      vertexShader: OCCLUSION.vertexShader,
-      fragmentShader: /* glsl */`
-        uniform sampler2D tDiffuse;
-        varying vec2 vUv;
-        void main(){ vec4 c = texture2D(tDiffuse, vUv); gl_FragColor = vec4(c.rgb * clamp(c.a, 0.0, 1.0), 1.0); }`,
-    }));
-  }
-
-  render(renderer, writeBuffer, readBuffer) {
-    this.quad.material.uniforms.tDiffuse.value = readBuffer.texture;
-    renderer.setRenderTarget(this.cible);
-    this.quad.render(renderer);
-  }
-}
-
-// L'ÉCRAN (ultra), en une texture car la nuit le dallage miroir est à seize unités : r distance, g occlusion·contact·courbure·recul, b normale arrondie, a rebond.
-// Une matière et non un nuanceur : ShaderPass clonerait les uniformes du reflet, et lirait une profondeur figée.
-const BISEAU = PROFIL.ecran?.biseau;
-const ECRAN_FLOU = new THREE.ShaderMaterial({
-  uniforms: { tGeo: { value: null }, tAO: { value: null }, tRebond: { value: null }, uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
-              tProfondeurReflet: REFLET.tProfondeurReflet, uVersReflet: REFLET.uVersReflet, uDeReflet: REFLET.uDeReflet,
-              uRefletActif: REFLET.uRefletActif, uCoteReflet: REFLET.uCoteReflet },
+// LE BISEAU : aucune arête de pierre n'est vive. Sa normale arrondie, et de quel côté du plan tombent ses voisines (la courbure,
+// négative sur une arête, positive dans un creux), en une texture que la matière relit : r distance, g courbure, ba normale arrondie.
+const BISEAU = PROFIL.biseau;
+const BISEAU_DES_ARETES = {
+  uniforms: { tGeo: { value: null }, uTanFov: { value: 0 }, uAspect: { value: 1 } },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
-    uniform sampler2D tGeo, tAO, tRebond, tProfondeurReflet;
-    uniform float uTanFov, uAspect, uRefletActif, uCoteReflet;
-    uniform mat4 uMonde, uVersReflet, uDeReflet;
-    varying vec2 vUv;
+    uniform sampler2D tGeo;
+    uniform float uTanFov, uAspect;
 
     vec3 positionVue(vec2 uv, float z){
       return vec3((uv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0) * z, -z);
-    }
-
-    // En mètres, du dallage à ce qu'il reflète : le flou du reflet en dépend. Le même test que refleterLaCour.
-    float reculDuReflet(vec3 P, vec3 n){
-      P = (uMonde * vec4(P, 1.0)).xyz;
-      vec3 N = mat3(uMonde) * n;
-      if (uRefletActif < 0.5 || N.y < 0.95 || abs(P.y - uCoteReflet) > 0.02) return 1.0;
-      vec4 q = uVersReflet * vec4(P, 1.0);
-      vec2 uv = q.xy / q.w;
-      vec4 vu = uDeReflet * vec4(uv * 2.0 - 1.0, texture2D(tProfondeurReflet, uv).r * 2.0 - 1.0, 1.0);
-      return distance(vu.xyz / vu.w, P);
     }
 
     vec2 versOcta(vec3 n){
@@ -331,24 +190,8 @@ const ECRAN_FLOU = new THREE.ShaderMaterial({
       return n.z >= 0.0 ? n.xy : (1.0 - abs(n.yx)) * signe;
     }
 
-    // Quatre octets dans un flottant : le dernier, entre 1 et 126, tient l'exposant loin du zéro et du NaN.
-    float quatre(vec3 v, float octet){
-      uvec3 o = uvec3(round(clamp(v, 0.0, 1.0) * 255.0));
-      return uintBitsToFloat(o.x | (o.y << 8) | (o.z << 16) | (uint(octet) << 24));
-    }
-    // La normale sur deux fois douze bits, et dans l'octet du haut la part des rayons du rebond perdus vers le sol.
-    float normaleEtPart(vec2 o, float part){
-      uvec2 n = uvec2(round(clamp(o * 0.5 + 0.5, 0.0, 1.0) * 4095.0));
-      return uintBitsToFloat(n.x | (n.y << 12) | (uint(1.0 + round(clamp(part, 0.0, 1.0) * 125.0)) << 24));
-    }
-    // Le rebond en couleur à exposant partagé.
-    float lumiere(vec3 c){
-      float e = clamp(ceil(log2(max(max(c.r, max(c.g, c.b)), 1e-6))), -60.0, 60.0);
-      return quatre(clamp(c / exp2(e), 0.0, 1.0), e + 64.0);
-    }
-
-    // L'arête arrondie : la moyenne des normales voisines à moins d'un rayon dans l'espace, et de quel côté du plan elles tombent.
-    void biseau(ivec2 ici, ivec2 bord, vec3 P, vec3 n, out vec3 arrondie, out float courbure){
+    // La moyenne des normales voisines à moins d'un rayon dans l'espace, et de quel côté du plan elles tombent.
+    void arrondir(ivec2 ici, ivec2 bord, vec3 P, vec3 n, out vec3 arrondie, out float courbure){
       arrondie = n; courbure = 0.0;
       float rayon = ${(BISEAU?.rayon ?? 0).toFixed(3)};
       float pixel = 2.0 * uTanFov * -P.z / float(bord.y + 1);
@@ -370,7 +213,7 @@ const ECRAN_FLOU = new THREE.ShaderMaterial({
         poids += w;
       }
       arrondie = normalize(somme);
-      courbure = penche / poids;
+      courbure = clamp(penche / poids, -1.0, 1.0);
     }
 
     void main(){
@@ -379,38 +222,11 @@ const ECRAN_FLOU = new THREE.ShaderMaterial({
       if (g.a <= 0.0) { gl_FragColor = vec4(0.0); return; }
       vec3 n = normalize(g.rgb * 2.0 - 1.0);
       vec3 P = positionVue((vec2(ici) + 0.5) / vec2(bord + 1), g.a);
-      float tolerance = 0.01 + 0.01 * g.a;
-      vec2 somme = vec2(0.0);
-      float poids = 0.0;
-      for (int y = -2; y <= 1; y++)
-        for (int x = -2; x <= 1; x++) {
-          ivec2 q = clamp(ici + ivec2(x, y), ivec2(0), bord);
-          vec4 gq = texelFetch(tGeo, q, 0);
-          float w = gq.a > 0.0 ? exp(-abs(gq.a - g.a) / tolerance) * max(dot(n, gq.rgb * 2.0 - 1.0), 0.0) : 0.0;
-          somme += texelFetch(tAO, q, 0).rg * w;
-          poids += w;
-        }
-      vec2 ac = somme / max(poids, 1e-4);
-      // Le rebond est en demi-définition, tourné sur 4 × 4 : seize de ses pixels autour, guidés comme l'occlusion.
-      vec4 rebond = vec4(0.0);
-      float poidsRebond = 0.0;
-      ivec2 bordRebond = textureSize(tRebond, 0) - 1;
-      for (int y = -2; y <= 1; y++)
-        for (int x = -2; x <= 1; x++) {
-          ivec2 q = clamp(ici + 2 * ivec2(x, y), ivec2(0), bord);
-          vec4 gq = texelFetch(tGeo, q, 0);
-          float w = gq.a > 0.0 ? exp(-abs(gq.a - g.a) / (2.0 * tolerance)) * pow(max(dot(n, gq.rgb * 2.0 - 1.0), 0.0), 4.0) : 0.0;
-          rebond += texelFetch(tRebond, clamp(q / 2, ivec2(0), bordRebond), 0) * w;
-          poidsRebond += w;
-        }
-      rebond /= max(poidsRebond, 1e-4);
       vec3 arrondie; float courbure;
-      biseau(ici, bord, P, n, arrondie, courbure);
-      vec2 o = versOcta(arrondie);
-      float recul = clamp(log2(1.0 + reculDuReflet(P, n)) / 7.0, 0.0, 1.0);
-      gl_FragColor = vec4(g.a, quatre(vec3(ac, courbure * 0.5 + 0.5), 1.0 + round(recul * 125.0)), normaleEtPart(o, rebond.a), lumiere(rebond.rgb));
+      arrondir(ici, bord, P, n, arrondie, courbure);
+      gl_FragColor = vec4(g.a, courbure, versOcta(arrondie));
     }`,
-});
+};
 
 // LA FUMÉE de la ketoret, dans le seul volume qui en a : le Kodesh HaKodashim. Une
 // passe d'écran, pas un objet — la scène n'a ni volumes ni particules, et un nuage de
@@ -870,8 +686,8 @@ const liaison = (renderer, suivre) => new Promise((lies) => {
 const interrogerAvantUsage = (programme) => programme.getUniforms();
 
 export function chaine(renderer, scene, camera, horsGeo = []) {
-  // En pleine définition, le contact compare des centimètres à dix mètres : le demi-flottant n'y suffit plus.
-  const geoFlottante = PROFIL.ecran && renderer.extensions.has("OES_texture_float_linear");
+  // Le biseau compare des centimètres à des dizaines de mètres : le demi-flottant n'y suffit plus.
+  const geoFlottante = BISEAU && renderer.extensions.has("OES_texture_float_linear");
   const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: geoFlottante ? THREE.FloatType : THREE.HalfFloatType, depthBuffer: true });
   const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
   const cibleFumee = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
@@ -886,7 +702,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   passeScene.clear = !PROFIL.preProfondeur;
   composeur.addPass(passeScene);
   const passeAO = PROFIL.occlusion > 0 && new ShaderPass(OCCLUSION);
-  const passeComposition = passeAO && !PROFIL.ecran ? new ShaderPass(COMPOSITION) : null;
+  const passeComposition = passeAO ? new ShaderPass(COMPOSITION) : null;
   if (passeAO) {
     passeAO.renderToScreen = false;
     passeAO.uniforms.tGeo.value = cibleGeo.texture;
@@ -895,25 +711,13 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     passeComposition.uniforms.tAO.value = cibleAO.texture;
     composeur.addPass(passeComposition);
   }
-  const cibleLumiere = REBOND_DU_SOLEIL && new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
-  const cibleRebond = REBOND_DU_SOLEIL && new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
-  const passeRebond = REBOND_DU_SOLEIL && new ShaderPass(REBOND_DU_SOLEIL);
-  if (passeRebond) {
-    passeRebond.uniforms.tGeo.value = cibleGeo.texture;
-    passeRebond.uniforms.tLumiere.value = cibleLumiere.texture;
-    composeur.insertPass(new Releve(cibleLumiere), composeur.passes.indexOf(passeScene) + 1);
+  const cibleBiseau = BISEAU && new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType, depthBuffer: false, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter });
+  const passeBiseau = BISEAU && new ShaderPass(BISEAU_DES_ARETES);
+  if (passeBiseau) {
+    passeBiseau.uniforms.tGeo.value = cibleGeo.texture;
+    BISEAU_LU.uBiseau.value = cibleBiseau.texture;
   }
-  const vueAvant = new THREE.Matrix4();
-  const cibleEcran = PROFIL.ecran && new THREE.WebGLRenderTarget(1, 1, {
-    type: THREE.FloatType, depthBuffer: false, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter });
-  const flouEcran = PROFIL.ecran && new ShaderPass(ECRAN_FLOU);
-  if (flouEcran) {
-    flouEcran.uniforms.tGeo.value = cibleGeo.texture;
-    flouEcran.uniforms.tAO.value = cibleAO.texture;
-    flouEcran.uniforms.tRebond.value = cibleRebond.texture;
-    ECRAN.uEcran.value = cibleEcran.texture;
-  }
-  const versLAstre = new THREE.Vector3(0, 1, 0);
   const fumee = new ShaderPass(FUMEE);
   fumee.uniforms.tGeo.value = cibleGeo.texture;
   const voile = new ShaderPass(VOILE);
@@ -984,18 +788,13 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     if (passeAO) {
       passeAO.uniforms.uTanFov.value = tanFov;
       passeAO.uniforms.uAspect.value = camera.aspect;
-      passeAO.uniforms.uTailleGeo.value.set(cibleGeo.width, cibleGeo.height);
     }
     passeComposition?.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
-    if (cibleEcran) {
-      flouEcran.uniforms.uTanFov.value = tanFov;
-      flouEcran.uniforms.uAspect.value = camera.aspect;
-      cibleEcran.setSize(cibleGeo.width, cibleGeo.height);
-      cibleLumiere.setSize(demi.l, demi.h);
-      cibleRebond.setSize(demi.l, demi.h);
-      passeRebond.uniforms.uTanFov.value = tanFov;
-      passeRebond.uniforms.uAspect.value = camera.aspect;
-      ECRAN.uPasImage.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
+    if (passeBiseau) {
+      passeBiseau.uniforms.uTanFov.value = tanFov;
+      passeBiseau.uniforms.uAspect.value = camera.aspect;
+      cibleBiseau.setSize(cibleGeo.width, cibleGeo.height);
+      BISEAU_LU.uPasImage.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
     }
     fumee.uniforms.uTanFov.value = tanFov;
     fumee.uniforms.uAspect.value = camera.aspect;
@@ -1012,12 +811,11 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     rayons.uniforms.uAspect.value = camera.aspect;
   }
 
-  function eclairerLAir(versLAstreVoulu, teinte, eclat) {
-    versLAstre.copy(versLAstreVoulu);
+  function eclairerLAir(versLAstre, teinte, eclat) {
     if (!rayons) return;
     airEclaire.enabled = eclat > 0;
     airEclaire.uniforms.uTeinte.value.set(teinte);
-    rayons.uniforms.uVersLAstre.value.copy(versLAstreVoulu);
+    rayons.uniforms.uVersLAstre.value.copy(versLAstre);
     rayons.uniforms.uDensite.value = PROFIL.rayons.densite * eclat;
   }
 
@@ -1051,14 +849,11 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     empriseDuFeuDeLAutel = empriseDuFeu(lits);
   }
 
-  /** `astre` : sa couleur et son intensité ; `partDuCiel` : ce que le moment garde du ciel de jour. */
-  // Ce que renvoie un sol de cour moyen sous cet astre : le rebond le prête aux rayons qui sortent de l'écran vers le bas.
-  function eclairerLeRebond(versLAstreVoulu, { astre, chaleurCuite = [1, 1, 1] }) {
+  function teinterLaLumiereCuite(chaleurCuite = [1, 1, 1]) {
     if (PROFIL.etalonnage) TEINTE_CUITE.value.setRGB(...chaleurCuite);
-    if (!passeRebond) return;
-    ECRAN.uSolRebond.value.set(astre.couleur).multiplyScalar(astre.intensite * Math.max(versLAstreVoulu.y, 0) * ALBEDO_DU_SOL * PART_AU_SOLEIL);
   }
 
+  /** `astre` : sa couleur et son intensité ; `partDuCiel` : ce que le moment garde du ciel de jour. */
   function eclairerLeFeu(versLAstre, astre, partDuCiel) {
     if (!feu) return;
     feu.uniforms.uVersLAstre.value.copy(versLAstre);
@@ -1113,23 +908,16 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     if (feu) voileDuFeu.enabled = feuDeLAutelVu();
     const eclaire = rayons && airEclaire.enabled;
     // Les matrices de la scène se refont à la passe de géométrie, que la suite fige : sans elle, on les refait ici.
-    if (passeAO || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
+    if (passeAO || passeBiseau || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
     else scene.updateMatrixWorld();
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
     if (passeAO) {
-      passeAO.uniforms.uVersLAstre.value.copy(versLAstre).transformDirection(camera.matrixWorldInverse);
       passeAO.render(renderer, cibleAO, null, 0, false);
     }
-    if (flouEcran) {
-      passeRebond.uniforms.uVersAvant.value.multiplyMatrices(vueAvant, camera.matrixWorld);
-      passeRebond.uniforms.uVersLeHaut.value.set(0, 1, 0).transformDirection(camera.matrixWorldInverse);
-      passeRebond.render(renderer, cibleRebond, null, 0, false);
-      flouEcran.uniforms.uMonde.value.copy(camera.matrixWorld);
-      flouEcran.render(renderer, cibleEcran, null, 0, false);
-    }
+    passeBiseau?.render(renderer, cibleBiseau, null, 0, false);
     if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
     if (voileDuFeu?.enabled) {
       feu.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
@@ -1140,14 +928,13 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     renderer.setRenderTarget(null);
     // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
     scene.matrixWorldAutoUpdate = false;
-    // L'écran ne vaut que pour l'œil : le miroir du dallage et les sondes, rendus d'ailleurs, liraient le pixel d'un autre point.
-    ECRAN.uEcranActif.value = flouEcran ? 1 : 0;
+    // Le biseau ne vaut que pour l'œil : le miroir du dallage et les sondes, rendus d'ailleurs, liraient le pixel d'un autre point.
+    BISEAU_LU.uBiseauActif.value = passeBiseau ? 1 : 0;
     try {
       composeur.render();
-      vueAvant.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     } finally {
       scene.matrixWorldAutoUpdate = true;
-      ECRAN.uEcranActif.value = 0;
+      BISEAU_LU.uBiseauActif.value = 0;
     }
   }
 
@@ -1173,7 +960,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function passesEnTampon() {
     const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
-    return [passeAO, passeComposition, passeRebond, flouEcran, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
+    return [passeAO, passeComposition, passeBiseau, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.
@@ -1197,5 +984,5 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     }
   }
 
-  return { rendre, redimensionner, enfumer, embraser, eclairerLeFeu, eclairerLAir, eclairerLeRebond, compiler, get luminance() { return photometre.luminance; } };
+  return { rendre, redimensionner, enfumer, embraser, eclairerLeFeu, eclairerLAir, teinterLaLumiereCuite, compiler, get luminance() { return photometre.luminance; } };
 }

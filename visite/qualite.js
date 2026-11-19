@@ -12,8 +12,6 @@
  * plus sur l'iPad qui perdrait son contexte au cinquantième — et le lent part en sobre.
  * Le visiteur peut aussi choisir son profil dans la barre.
  *
- * Le profil ultra ne se prend jamais seul : on le choisit dans la barre, ou `?qualite=ultra`.
- *
  * `?qualite=basse` force le profil léger depuis un bureau, `?qualite=minimale` le très
  * léger, `?qualite=sobre` le sobre : c'est ainsi qu'on les vérifie sans téléphone sous la main.
  */
@@ -28,7 +26,7 @@ const coeurs = navigator.hardwareConcurrency || 8;
 const faible = tactile && (navigator.deviceMemory <= 4 || coeurs <= 4);
 const RETENU = "visite-profil-retenu", REPLIS = "visite-profil-replis", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
 // Du plus riche au plus pauvre.
-export const NIVEAUX = ["ultra", "haute", "basse", "minimale", "sobre"];
+export const NIVEAUX = ["haute", "basse", "minimale", "sobre"];
 // Un téléphone descend et remonte d'un cran à la fois, jamais jusqu'au profil lourd.
 const REPLIABLES = NIVEAUX.slice(NIVEAUX.indexOf("basse"));
 // Une remontée qui a échoué ce nombre de fois ne se retente plus : le profil battrait d'une visite à l'autre.
@@ -84,12 +82,13 @@ async function liaisonLente() {
 
 // `fines` : la pierre de taille et le dallage en calcaire à vacuoles, en 2048 ; `irregularite` : ce qu'une pierre a de clarté, de chaleur, de pente et de bombé à elle ;
 // `assises` : les joints de la pierre de taille calés sur les arêtes de chaque face, plutôt que sur une trame du monde.
+// `biseau` : aucune arête de pierre n'est vive ; son rayon en mètres, lu à l'écran sur la passe de géométrie.
 // `etalonnage` : la pierre au soleil sort de l'épaule de la courbe, où sa nappe se tassait ; l'ombre se relève d'autant, et la lumière cuite du jour reprend sa chaleur.
 const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7, 0.6], echelleDepart: 1, antiCrenelage: 4, grainLeger: false, preProfondeur: true,
   habillageEssentiel: false, paysage: true,
-  textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024, anisotropie: { nappes: 8, cuites: 1 }, fines: true, assises: true,
+  textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024, fines: true, assises: true,
               irregularite: { bloc: 0.025, bombe: 0.010, dalle: 0.012, bombeDalle: 0.003, nuance: 0.10, nuanceDalle: 0.12, poliDalle: 0.0 } }, ecartDetail: 1, porteeDetail: Infinity,
-  ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12, geometrie: 0.5, ecran: null,
+  ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12, geometrie: 0.5, biseau: { rayon: 0.06 },
   halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 40 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { presents: true, ombre: true },
   fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 } };
 
@@ -97,15 +96,15 @@ const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, defini
 // `preProfondeur` : à 390 × 844 elle coûte plus de géométrie qu'elle n'épargne de pixels (50 → 39 ms mesurés sans elle).
 const LEGER = { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.75], echelleDepart: 1, antiCrenelage: 4, grainLeger: true, preProfondeur: false,
   habillageEssentiel: false, paysage: true,
-  textures: { decor: 1024, figurants: 512, nappes: true, nuages: 512, anisotropie: { nappes: 8, cuites: 1 } }, ecartDetail: 1, porteeDetail: Infinity,
-  ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: 6, geometrie: 0.5, ecran: null,
+  textures: { decor: 1024, figurants: 512, nappes: true, nuages: 512 }, ecartDetail: 1, porteeDetail: Infinity,
+  ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: 6, geometrie: 0.5, biseau: null,
   halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 12 }, sanctuaire: { ombre: true, carte: 256 }, feux: { ombre: false, carte: 256 }, figurants: { presents: true, ombre: false },
   fumee: { pas: 16, octaves: 2 }, feuDeLAutel: { flammes: 12, fumee: 18, octaves: 2 }, reflets: null };
 
 // `halo` et `rayons` nuls = pas de passe du tout, et pas seulement une force nulle : leurs cibles sont allouées par leur constructeur, qu'elles servent ou non.
 // `occlusion` nulle épargne aussi la passe de géométrie qu'elle lisait, hors du Kodesh HaKodashim dont la fumée la lit encore.
 const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echelleDepart: 0.7,
-  textures: { decor: 512, figurants: 256, nappes: true, nuages: 512, anisotropie: { nappes: 8, cuites: 1 } }, ecartDetail: 2,
+  textures: { decor: 512, figurants: 256, nappes: true, nuages: 512 }, ecartDetail: 2,
   occlusion: 0, halo: null, rayons: null,
   fumee: { pas: 8, octaves: 1 }, feuDeLAutel: null };
 
@@ -114,16 +113,9 @@ const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echell
 // `antiCrenelage` nul : la cible de la scène n'est plus multi-échantillonnée, le FXAA de la chaîne reste seul sur les arêtes.
 // `porteeDetail` : du parvis, le Kotel et ses abords, derrière les murs, faisaient encore un quart des triangles tracés.
 const SOBRE = { ...TRES_LEGER, antiCrenelage: 0, habillageEssentiel: true, paysage: false, figurants: { presents: false, ombre: false },
-  textures: { decor: 512, figurants: 256, nappes: false, nuages: 512, anisotropie: { nappes: 8, cuites: 1 } }, sanctuaire: { ombre: false, carte: 256 }, porteeDetail: 150 };
+  textures: { decor: 512, figurants: 256, nappes: false, nuages: 512 }, sanctuaire: { ombre: false, carte: 256 }, porteeDetail: 150 };
 
-// Le lourd sans économie, plus ce que lit la matière à l'écran en pleine définition : contact au soleil, occlusion hors soleil.
-const ULTRA = { ...LOURD, definitionMax: 2, echelles: [1, 0.85, 0.7],
-  textures: { ...LOURD.textures, anisotropie: { nappes: 16, cuites: 16 }, detailRapproche: true, portees: { relief: [40, 130], teinte: [120, 350] } },
-  ombres: { taille: 4096, portee: 40, penombre: true, lointaine: 4096 }, occlusion: 16, geometrie: 1,
-  ecran: { contact: { prises: 16, portee: 0.6, epaisseur: 0.25, fin: [30, 60] }, occlusion: { rayon: 0.8, force: 0.7 }, biseau: { rayon: 0.06 }, rebond: { rayon: 10, prises: 12, pas: 8, force: 1 } },
-  rayons: { densite: 0.001, prises: 64 }, reflets: { definition: 1 } };
-
-const PROFILS = { ultra: ULTRA, haute: LOURD, basse: LEGER, minimale: TRES_LEGER, sobre: SOBRE };
+const PROFILS = { haute: LOURD, basse: LEGER, minimale: TRES_LEGER, sobre: SOBRE };
 const force = demande in PROFILS;
 const replis = () => Number(lireRetenu(REPLIS) ?? 0);
 

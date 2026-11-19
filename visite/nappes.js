@@ -42,7 +42,7 @@ export async function nappes() {
     texture.colorSpace = espace;
     // Un dallage vu en enfilade est le cas normal ici, pas l'exception : sans
     // anisotropie sa nappe se réduit en bouillie dès trois mètres.
-    texture.anisotropy = PROFIL.textures.anisotropie.nappes;
+    texture.anisotropy = 8;
     return texture;
   };
 

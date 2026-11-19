@@ -44,8 +44,8 @@ const REFLET_DU_METAL = 1.6;
 export const refleteSaCour = (materiau) => [METAL, MIKSHE].includes(FAMILLES[materiau.name.replace(/_grave$/, "")]);
 // Hauteur du tampon d'image en pixels, tenue à jour par visite.js.
 export const HAUTEUR_IMAGE = { value: 1 };
-// Ce que la chaîne prépare au pixel au profil ultra ; actif pour l'œil seul, le miroir et les sondes voient d'ailleurs.
-export const ECRAN = { uEcran: { value: null }, uPasImage: { value: new THREE.Vector2(1, 1) }, uEcranActif: { value: 0 }, uSolRebond: { value: new THREE.Color(0) } };
+// Le biseau que la chaîne prépare au pixel ; actif pour l'œil seul, le miroir et les sondes voient d'ailleurs.
+export const BISEAU_LU = { uBiseau: { value: null }, uPasImage: { value: new THREE.Vector2(1, 1) }, uBiseauActif: { value: 0 } };
 // Ce que l'étalonnage du profil rend à la lumière cuite du jour, en clarté et en chaleur.
 export const TEINTE_CUITE = { value: new THREE.Color(1, 1, 1) };
 // Exposition du tonemapping à ciel ouvert, et celle du moment, que visite.js tient à jour à mesure que l'œil s'adapte.
@@ -101,9 +101,9 @@ export function eclairerLaSalle(versSalle, points, couleur) {
 // Le verre d'une lampe allumée : celui des projecteurs, que la nuit allume, et celui des suspensions, qui ne s'éteint pas.
 export const VERRE_ALLUME = { couleur: 0xffe6c0, eclat: 6 };
 
-// En mètres, où le relief puis la teinte du dessin se fondent. Plus loin en ultra : la pleine définition y tient encore le joint sans grésiller.
 const IRREG = PROFIL.textures.irregularite ?? { bloc: 0, bombe: 0, dalle: 0, bombeDalle: 0, nuance: 0, nuanceDalle: 0, poliDalle: 0 };
-const PORTEES = PROFIL.textures.portees ?? { relief: [16, 65], teinte: [60, 200] };
+// En mètres, où le relief puis la teinte du dessin se fondent.
+const PORTEES = { relief: [16, 65], teinte: [60, 200] };
 
 const PIXEL = /* glsl */`
 uniform float uHauteurImage;
@@ -220,34 +220,24 @@ uniform mat4 uVersSalle[${SALLES_MAX}];
 varying float vPixel;
 uniform vec3 uTeinteCiel;
 
-#ifdef ECRAN
-uniform highp sampler2D uEcran;
+#ifdef BISEAU
+uniform highp sampler2D uBiseau;
 uniform vec2 uPasImage;
-uniform float uEcranActif;
-uniform vec3 uSolRebond;
-float mOccultation = 1.0, mContact = 1.0, mReculDuReflet = 1.0, mCourbure = 0.0, mRebondPerdu = 0.0;
-vec3 mArrondie = vec3(0.0), mRebond = vec3(0.0), mDirectDiffus = vec3(0.0);
-vec4 quatre(float f){
-  uint u = floatBitsToUint(f);
-  return vec4(uvec4(u, u >> 8, u >> 16, u >> 24) & 0xFFu) * vec4(vec3(1.0 / 255.0), 1.0);
-}
+uniform float uBiseauActif;
+float mCourbure = 0.0;
+vec3 mArrondie = vec3(0.0);
 vec3 depuisOcta(vec2 o){
   vec3 n = vec3(o, 1.0 - abs(o.x) - abs(o.y));
   if (n.z < 0.0) n.xy = (1.0 - abs(n.yx)) * vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
   return normalize(n);
 }
-// La passe d'écran a vu un autre point quand sa distance diffère : alors rien n'est lu.
-void lireEcran(float distance){
-  if (uEcranActif < 0.5) return;
-  vec4 e = texelFetch(uEcran, ivec2(gl_FragCoord.xy * uPasImage * vec2(textureSize(uEcran, 0))), 0);
-  if (abs(e.r - distance) > 0.03 * distance + 0.02) return;
-  vec4 acr = quatre(e.g), rebond = quatre(e.a);
-  mOccultation = acr.x; mContact = acr.y; mCourbure = acr.z * 2.0 - 1.0;
-  mReculDuReflet = exp2((acr.w - 1.0) / 125.0 * 7.0) - 1.0;
-  uint nb = floatBitsToUint(e.b);
-  mArrondie = depuisOcta(vec2(uvec2(nb, nb >> 12) & 0xFFFu) / 4095.0 * 2.0 - 1.0);
-  mRebondPerdu = (float(nb >> 24) - 1.0) / 125.0;
-  mRebond = rebond.rgb * exp2(rebond.w - 64.0);
+// La passe du biseau a vu un autre point quand sa distance diffère : alors rien n'est lu.
+void lireBiseau(float distance){
+  if (uBiseauActif < 0.5) return;
+  vec4 b = texelFetch(uBiseau, ivec2(gl_FragCoord.xy * uPasImage * vec2(textureSize(uBiseau, 0))), 0);
+  if (abs(b.r - distance) > 0.03 * distance + 0.02) return;
+  mCourbure = b.g;
+  mArrondie = depuisOcta(b.ba);
 }
 #endif
 
@@ -1244,10 +1234,6 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
 #else
   pente += penteNappe(pb, w) * (uCarreau.z * photo.w);
 #endif
-#ifdef DETAIL_RAPPROCHE
-  // À bout de bras le carreau n'a plus que six texels au centimètre : une prise plus serrée, décalée, rend le grain.
-  pente += penteNappe(pb * 4.7 + 0.37, w) * (uCarreau.z * photo.w * 0.45) * (1.0 - smoothstep(1.5, 6.0, loin));
-#endif
 #ifdef NAPPE_COULEUR
 #ifdef NAPPE_FINE
   vec4 c = mix(nappeOrientee(uNappeC, pb, w, sensA, vec2(0.0)), nappeOrientee(uNappeC, pb, w, sensB, DECALAGE), melange);
@@ -1282,9 +1268,6 @@ function lampesSansOmbreHorsDesSalles(morceau) {
   return morceau.replace(lecture, `${lecture}
     #if UNROLLED_LOOP_INDEX >= NUM_POINT_LIGHT_SHADOWS
       directLight.color *= mHorsDesSalles;
-    #endif
-    #ifdef ECRAN
-      directLight.color *= mOccultation;
     #endif`);
 }
 
@@ -1302,9 +1285,6 @@ function soleilEnPenombre() {
   const boucle = morceau.slice(debut, fin);
   if (debut < 0 || fin < 0 || !boucle.includes(appel)) throw new Error("three a changé lights_fragment_begin : pénombre perdue");
   const ecartee = boucle.replace(appel, `
-    #if defined( ECRAN ) && ( UNROLLED_LOOP_INDEX >= NUM_DIR_LIGHT_SHADOWS )
-      directLight.color *= mOccultation;
-    #endif
     #if defined( USE_LIGHTMAP ) && ( UNROLLED_LOOP_INDEX >= NUM_DIR_LIGHT_SHADOWS )
       ${appel.replace("reflectedLight )", "mAppoint )")}
     #else
@@ -1332,9 +1312,6 @@ const LUEURS_DE_LA_SALLE = /* glsl */`
       float distanceLueur = length(versLueur);
       directLight.direction = versLueur / distanceLueur;
       directLight.color = uLueurCouleur[salle] * lueur.w * getDistanceAttenuation(distanceLueur, ${PORTEE_LUEUR.toFixed(1)}, 2.0);
-      #ifdef ECRAN
-        directLight.color *= mOccultation;
-      #endif
       directLight.visible = true;
       RE_Direct(directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight);
     }
@@ -1459,7 +1436,9 @@ export function habiller(materiau, horloges, jeux) {
   const refletDuDallage = materiau.userData.refletDuDallage === true;
   if (refletDuDallage) Object.assign(uniformes, REFLET);
   uniformes.uTeinteCiel = TEINTE_CUITE;
-  if (PROFIL.ecran) Object.assign(uniformes, ECRAN);
+  // Le dallage miroir est à seize unités de texture la nuit, et plat : il se passe du biseau.
+  const biseau = PROFIL.biseau && !refletDuDallage;
+  if (biseau) Object.assign(uniformes, BISEAU_LU);
   const { sonde } = materiau.userData;
   if (sonde) Object.assign(uniformes, { uSondeMin: { value: sonde.min }, uSondeMax: { value: sonde.max }, uSondeCentre: { value: sonde.centre } });
   const rayonFil = materiau.userData.rayon;
@@ -1477,8 +1456,7 @@ export function habiller(materiau, horloges, jeux) {
     + (rayonFil ? "#define FIL\n" : "")
     + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
     + (sonde ? "#define SONDE_EN_BOITE\n" : "")
-    + (PROFIL.ecran ? "#define ECRAN\n" : "")
-    + (jeu && !fine && PROFIL.textures.detailRapproche ? "#define DETAIL_RAPPROCHE\n" : "")
+    + (biseau ? "#define BISEAU\n" : "")
     + (fine ? "#define NAPPE_FINE\n" : "")
     + (PROFIL.textures.irregularite ? "#define IRREGULARITE\n" : "")
     + (PROFIL.textures.assises && CALEES.has(rendue) ? "#define ASSISES\n" : "");
@@ -1516,12 +1494,12 @@ export function habiller(materiau, horloges, jeux) {
         matiere(vMonde, normalize(vNMonde), mTeinte, mPente, mRugo, mFeu);
         float mPenombre = penombre(vMonde);
         float mHorsDesSalles = horsDesSalles(vMonde);
-        #ifdef ECRAN
-          lireEcran(vViewPosition.z);
+        #ifdef BISEAU
+          lireBiseau(vViewPosition.z);
           #ifdef TEMPERE
-            // La pierre s'use aux arêtes, plus claire et plus rêche, et s'encrasse dans les creux et au pied de ce qui l'abrite.
+            // La pierre s'use aux arêtes, plus claire et plus rêche, et s'encrasse dans les creux.
             float mArete = clamp(-mCourbure * 2.0, 0.0, 1.0), mCreux = clamp(mCourbure * 2.0, 0.0, 1.0);
-            mTeinte *= (1.0 + 0.12 * mArete) * (1.0 - 0.30 * mCreux) * mix(0.90, 1.0, mOccultation);
+            mTeinte *= (1.0 + 0.12 * mArete) * (1.0 - 0.30 * mCreux);
             mRugo += 0.10 * mArete;
           #endif
         #endif`)
@@ -1536,9 +1514,6 @@ export function habiller(materiau, horloges, jeux) {
       // que l'ombre portée ne coupe pas, et qui l'écrivait sur les parois à l'ombre.
       // La lumière cuite remplace le ciel sans direction, et prend le relief que ce ciel donne à la normale du grain.
       .greffer("#include <lights_fragment_end>", /* glsl */`
-        #ifdef ECRAN
-          mDirectDiffus = reflectedLight.directDiffuse;
-        #endif
         #if defined(TEMPERE) || defined(USE_LIGHTMAP)
           const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
           vec3 cielPlat = getAmbientLightIrradiance(ambientLightColor);
@@ -1604,38 +1579,6 @@ export function habiller(materiau, horloges, jeux) {
           reflectedLight.directDiffuse *= mTeinteVue;
           reflectedLight.indirectDiffuse *= mTeinteVue;
         #endif`)
-      // L'occlusion de l'écran prend tout sauf le soleil : un angle au soleil reste au soleil.
-      .greffer("#include <aomap_fragment>", /* glsl */`
-        #include <aomap_fragment>
-        #ifdef ECRAN
-          reflectedLight.indirectDiffuse *= mOccultation;
-          reflectedLight.indirectSpecular *= computeSpecularOcclusion(saturate(dot(geometryNormal, geometryViewDir)), mOccultation, material.roughness);
-          // La carte cuite tient déjà le rebond de Cycles : seul ce qui n'en a pas le prend de l'écran.
-          #ifdef USE_LIGHTMAP
-            vec3 mRebondDiffus = vec3(0.0);
-          #else
-            vec3 mRebondDiffus = (mRebond + uSolRebond * mRebondPerdu * mOccultation) * BRDF_Lambert(material.diffuseColor) * mPenombre;
-          #endif
-          #ifdef TEMPERE
-            mRebondDiffus *= mTeinteVue;
-          #endif
-          reflectedLight.indirectDiffuse += mRebondDiffus;
-        #endif`)
-      // La part de la lumière directe et de son rebond dans ce que le point renvoie : la chaîne la garde pour le rebond de l'image suivante.
-      .greffer("#include <opaque_fragment>", /* glsl */`
-        #include <opaque_fragment>
-        #if defined(ECRAN) && defined(OPAQUE)
-          if (uEcranActif > 0.5) {
-            vec3 mDirectVu = mDirectDiffus;
-            #ifdef TEMPERE
-              mDirectVu *= mTeinteVue;
-            #endif
-            // Le rebond reçu repart à son tour : un second rebond à l'image suivante, puis un troisième.
-            mDirectVu += mRebondDiffus * mOccultation;
-            const vec3 mLuma = vec3(0.2126, 0.7152, 0.0722);
-            gl_FragColor.a = clamp(dot(mDirectVu, mLuma) / max(dot(outgoingLight, mLuma), 1e-4), 0.0, 1.0);
-          }
-        #endif`)
       .greffer("#include <roughnessmap_fragment>",
                "#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + mRugo, 0.03, 1.0);")
       // L'incandescence est une TEXTURE, pas une constante de matière : une braise dont
@@ -1651,7 +1594,7 @@ export function habiller(materiau, horloges, jeux) {
       .greffer("#include <normal_fragment_maps>", /* glsl */`
         #include <normal_fragment_maps>
         normal = normalize(normal - mat3(viewMatrix) * mPente);
-        #ifdef ECRAN
+        #ifdef BISEAU
           if (dot(mArrondie, nonPerturbedNormal) > 0.2) normal = normalize(normal + mArrondie - nonPerturbedNormal);
         #endif`)
       .greffer("#include <envmap_physical_pars_fragment>", sonde ? environnementEnBoite() : "#include <envmap_physical_pars_fragment>")

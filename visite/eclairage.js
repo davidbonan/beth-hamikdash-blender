@@ -243,7 +243,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
     const lumieres = lumieresDu(voulu);
     rendu.eclairerLAir(astreDu(voulu), lumieres.astre.couleur, rayonsDu(voulu));
     rendu.eclairerLeFeu(astreDu(voulu), lumieres.astre, lumieres.cuite);
-    rendu.eclairerLeRebond(astreDu(voulu), lumieres);
+    rendu.teinterLaLumiereCuite(lumieres.chaleurCuite);
   }
 
   function eclairerAu(voulu) {

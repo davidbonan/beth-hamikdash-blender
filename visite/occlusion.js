@@ -19,7 +19,6 @@ async function texture({ carte, canal }, format, colorSpace) {
   texture.flipY = false;
   texture.channel = canal;
   texture.colorSpace = colorSpace;
-  texture.anisotropy = PROFIL.textures.anisotropie.cuites;
   await charger(texture, carte);
   texture.onUpdate = () => texture.image.close();
   envoyees.push({ texture, carte });
