@@ -364,6 +364,11 @@ def puiser(h, a, horloge, t):
     return saisir(a, corps, RAYON_DU_MANCHE, {"r": poing}, {"r": Vector((0.1, -1.0, -0.45 - 0.25 * va))})
 
 
+# Il puise à la ma'arakha de Kippour (Bartenura Yoma 4:6), « מִצַּד מַעֲרָב » (Rashi Yoma 45b) : debout à l'est d'elle, face à l'ouest.
+# Ses cotes sont celles de MAARAKHOT_DE_GZIRIN du blockout, qui bâtit à l'import et ne s'importe pas ici.
+MAARAKHA_DE_KIPPOUR_OU = (-46.3, -3.5, Z_MAARAKHA)
+
+
 def _machta(nom, ou):
     def batir():
         h = cohen_gadol(nom)
@@ -487,7 +492,7 @@ def roles_kippour():
         _viduy_rishon("bigdei_lavan_2", (-61.0, 15.2, Z_AZ)),
         _goral("bigdei_lavan_3", (-15.5, 38.0, Z_AZ)),
         _aupres_du_goral(0, (-14.0, 39.5, Z_AZ)), _aupres_du_goral(1, (-14.0, 36.5, Z_AZ)),
-        _machta("bigdei_lavan_4", (-27.0, -10.5, Z_MAARAKHA)),
+        _machta("bigdei_lavan_4", MAARAKHA_DE_KIPPOUR_OU),
         _mizrak_en_main("bigdei_lavan_5", asperger, (-136.2, 0.0, Z_BAT), 180.0, 16.0),
         _mizrak_en_main("bigdei_lavan_6", matan_keranot, MIZBEACH_HAZAHAV_OU, MIZBEACH_HAZAHAV_CAP, 12.0),
         _sair_hamishtaleach(),

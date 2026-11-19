@@ -652,38 +652,68 @@
   "maarakhot": {
     "he": "מערכות",
     "translit": "Ma'arakhot",
-    "resume": "Les bûchers dressés sur la surface de l'autel. Selon R. Yossé, trois feux y brûlent, et quatre à Yom Kippour. Au centre, le tapoua'h, le monticule de cendre que touchent les bûches de la grande ma'arakha. Parmi les miracles du Temple, la Mishna compte que la pluie n'éteignait pas le feu de la ma'arakha et que le vent ne l'emportait pas sur la colonne de fumée.",
+    "resume": "Les bûchers dressés sur la surface de l'autel. Selon R. Yossé, trois feux y brûlent chaque jour : la grande ma'arakha, à l'est du tapoua'h, où l'on offre les sacrifices ; celle de la ketoret, contre le bord ouest, d'où l'on prend les braises de l'encens ; celle du kiyoum haesh, pour que le feu ne s'éteigne jamais. Yom Kippour en ajoute une quatrième. La grande est dressée comme la décrit Bartenura : un tas de branches de figuier, où l'on couche deux longues bûches polies d'est en ouest, jusqu'à toucher le tapoua'h ; entre elles, on glisse du petit bois pour allumer, et à l'est s'ouvre le passage par où le feu prend. Parmi les miracles du Temple, la Mishna compte que la pluie n'éteignait pas le feu de la ma'arakha et que le vent ne l'emportait pas sur la colonne de fumée.",
     "cotes": [
       "surface de l'autel : 28 × 28 amot",
       "zone du feu : 24 × 24 amot, après l'ama des keranot et l'ama de passage",
       "trois feux, quatre à Kippour (R. Yossé ; R. Meir : 4 et 5 ; R. Yehouda : 2 et 3)",
-      "la quatrième de Kippour donne les braises de la ketoret du Kodesh HaKodashim",
+      "grande ma'arakha : à l'est du tapoua'h, tournée vers l'est ; 8 × 8 amot dans le modèle (choix)",
+      "deux gzirin longs et polis, d'est en ouest, dans le tas de branches de figuier",
+      "ketoret : contre le bord ouest, à 4 amot au nord de la corne sud-ouest",
+      "kiyoum haesh : où l'on veut sur l'autel ; au nord-ouest du tapoua'h dans le modèle (choix)",
+      "la quatrième de Kippour donne les braises de la ketoret du Kodesh HaKodashim ; la visite ne la montre qu'au parcours de Yom Kippour",
       "tapoua'h : au centre du sommet"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:1", "citation": ""},
       {"oeuvre": "Yoma", "ref": "4:6", "citation": ""},
-      {"oeuvre": "Tamid", "ref": "2:1–5", "citation": ""},
       {"oeuvre": "Tamid", "ref": "2:2", "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ"},
-      {"oeuvre": "Rambam Temidin", "ref": "2:4–7", "citation": ""},
+      {"oeuvre": "Tamid", "ref": "2:4", "citation": "סִדֵּר הַמַּעֲרָכָה גְדוֹלָה מִזְרָחָה, וַחֲזִיתָהּ מִזְרָחָה, וְרָאשֵׁי הַגִּזְרִין הַפְּנִימִיִּם הָיוּ נוֹגְעִים בַּתַּפּוּחַ"},
+      {"oeuvre": "Bartenura", "ref": "Tamid 2:3", "citation": "שְׁנֵי עֵצִים אֲרֻכִּים וּמְשׁוּפִין הָיוּ נוֹתְנִים לְתוֹךְ אֹרֶךְ הַמַּעֲרָכָה"},
+      {"oeuvre": "Bartenura", "ref": "Tamid 2:4", "citation": "חֲרִיּוֹת וְקִסְמִין דַּקִּין תּוֹחֲבִין בֵּין הַגְּדוֹלִים לְהַצִּית הָאֵשׁ"},
+      {"oeuvre": "Tamid", "ref": "2:5", "citation": "מִכְּנֶגֶד קֶרֶן מַעֲרָבִית דְּרוֹמִית, מָשׁוּךְ מִן הַקֶּרֶן כְּלַפֵּי צָפוֹן אַרְבַּע אַמּוֹת"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:4–8", "citation": ""},
+      {"oeuvre": "Rambam Temidin", "ref": "2:9", "citation": "מַעֲרָכָה שְׁלִישִׁית שֶׁל קִיּוּם הָאֵשׁ עוֹשֶׂה אוֹתָהּ בְּכָל מָקוֹם שֶׁיִּרְצֶה מִן הַמִּזְבֵּחַ"},
       {"oeuvre": "Bartenura", "ref": "Yoma 4:6", "citation": "וּמוֹסִיפִין בְּיוֹם הַכִּפּוּרִים עוֹד מַעֲרָכָה אַחַת לִטֹּל מִמֶּנָּה גֶּחָלִים לַקְּטֹרֶת לִפְנַי וְלִפְנִים"},
       {"oeuvre": "Avot", "ref": "5:5", "citation": "וְלֹא כִבּוּ גְשָׁמִים אֵשׁ שֶׁל עֲצֵי הַמַּעֲרָכָה, וְלֹא נָצְחָה הָרוּחַ אֶת עַמּוּד הֶעָשָׁן"}
-    ]
+    ],
+    "note": "Choix de la visite : la grande suit Bartenura. Pour le Rambam, les gzirin sont le bois fendu de tout le bûcher, et deux bûches s'y ajoutent ; Tif'eret Israël empile des carrés de bûches. Choix aussi : la taille des feux, le nombre des branches, la place du kiyoum haesh et celle de Kippour sur le bord ouest."
   },
 
   "tapuach": {
     "he": "תפוח",
     "translit": "Tapoua'h",
-    "resume": "Au milieu du sommet, le monticule où l'on monte la cendre ramassée sur l'autel. Il en portait parfois près de trois cents kor. Aux fêtes, on ne le vidait pas : c'était une parure pour l'autel. Les bouts intérieurs des bûches de la grande ma'arakha le touchent.",
+    "resume": "Au milieu du sommet, le monticule où l'on monte la cendre ramassée sur l'autel. Il en portait parfois près de trois cents kor, un chiffre que le Talmud range parmi les exagérations des Sages. Aux fêtes, on ne le vidait pas : c'était une parure pour l'autel. Les bouts intérieurs des deux longues bûches de la grande ma'arakha le touchent.",
     "cotes": [
       "au milieu du sommet de l'autel",
       "4 amot de diamètre et 1,5 de haut dans le modèle (choix)"
     ],
     "sources": [
       {"oeuvre": "Tamid", "ref": "2:2", "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ, פְּעָמִים עָלָיו כִּשְׁלשׁ מֵאוֹת כּוֹר. וּבָרְגָלִים לֹא הָיוּ מְדַשְּׁנִין אוֹתוֹ, מִפְּנֵי שֶׁהוּא נוֹי לַמִּזְבֵּחַ"},
-      {"oeuvre": "Rambam Temidin", "ref": "2:7", "citation": "וְרָאשֵׁי הַגְּזָרִים הַפְּנִימִיִּים הָיוּ נוֹגְעִין בַּדֶּשֶׁן שֶׁבְּאֶמְצַע הַמִּזְבֵּחַ וְהוּא הַנִּקְרָא תַּפּוּחַ"}
+      {"oeuvre": "Tamid", "ref": "29a", "citation": "בִּשְׁלֹשָׁה מְקוֹמוֹת דִּבְּרוּ חֲכָמִים בִּלְשׁוֹן הֲבַאי, וְאֵלּוּ הֵן: תַּפּוּחַ, גֶּפֶן, וּפָרֹכֶת"},
+      {"oeuvre": "Rambam Temidin", "ref": "2:7", "citation": "וְרָאשֵׁי הַגְּזָרִים הַפְּנִימִיִּים הָיוּ נוֹגְעִין בַּדֶּשֶׁן שֶׁבְּאֶמְצַע הַמִּזְבֵּחַ וְהוּא הַנִּקְרָא תַּפּוּחַ"},
+      {"oeuvre": "Bartenura", "ref": "Tamid 2:4", "citation": "הַפְּנִימִיִּים הָיוּ אֲרֻכִּים עַד שֶׁהָיוּ נוֹגְעִים בַּתַּפּוּחַ"}
     ],
-    "note": "Choix de la visite : sa taille. Les sources en donnent le volume, pas la forme."
+    "note": "Choix de la visite : sa taille. Les sources en donnent le volume, pas la forme. Écarté : le Raavad, pour qui le tapoua'h est une estrade carrée haute d'une ama."
+  },
+
+  "maarakha_kippour": {
+    "he": "מערכה של יום הכיפורים",
+    "translit": "Ma'arakha de Yom Kippour",
+    "resume": "Le jour de Kippour, l'autel porte un feu de plus que les autres jours. Le Cohen Gadol y remplit la pelle de braises sur lesquelles il brûlera l'encens dans le Kodesh HaKodashim. Ces braises se prennent « de devant l'Éternel », du côté ouest de l'autel, celui qui fait face au Heikhal. La visite ne montre ce feu qu'au parcours de Yom Kippour.",
+    "cotes": [
+      "une ma'arakha de plus que chaque jour",
+      "contre le bord ouest de l'autel, en face des portes de l'Oulam et du Heikhal",
+      "3 × 3 amot dans le modèle (choix)"
+    ],
+    "sources": [
+      {"oeuvre": "Yoma", "ref": "4:6", "citation": "רַבִּי יוֹסֵי אוֹמֵר, בְּכָל יוֹם שָׁלשׁ, וְהַיּוֹם אַרְבַּע"},
+      {"oeuvre": "Bartenura", "ref": "Yoma 4:6", "citation": "וּמוֹסִיפִין בְּיוֹם הַכִּפּוּרִים עוֹד מַעֲרָכָה אַחַת לִטֹּל מִמֶּנָּה גֶּחָלִים לַקְּטֹרֶת לִפְנַי וְלִפְנִים"},
+      {"oeuvre": "Lévitique", "ref": "16:12", "citation": "וְלָקַח מְלֹא הַמַּחְתָּה גַּחֲלֵי אֵשׁ מֵעַל הַמִּזְבֵּחַ מִלִּפְנֵי ה׳"},
+      {"oeuvre": "Rashi sur Yoma", "ref": "45b", "citation": "מִלִּפְנֵי ה׳ מִצַּד מַעֲרָב"},
+      {"oeuvre": "Yoma", "ref": "4:3", "citation": "נָטַל מַחְתָּה וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ, וּפִנָּה גֶחָלִים אֵילָךְ וְאֵילָךְ, וְחוֹתֶה מִן הַמְעֻכָּלוֹת הַפְּנִימִיּוֹת"}
+    ],
+    "note": "Choix de la visite : sa taille, et sa place sur le bord ouest."
   },
 
   "sefalim": {

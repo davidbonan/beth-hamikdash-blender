@@ -1,5 +1,5 @@
 {
-  "_lisez_moi": "Encyclopédie de la visite. Une entrée par concept. `prefixes` fait le lien avec les noms d'objets du blockout : beit_hamikdash_visite.py y attache chaque volume (préfixe le plus long gagnant), et regroupe en un seul maillage par concept. `dit`/`retenu`/`modelise` sont les trois plans que le skill mikdash interdit de confondre. `lieu` : un endroit où l'on se tient — la barre en donne le nom, le plan le dessine.",
+  "_lisez_moi": "Encyclopédie de la visite. Une entrée par concept. `prefixes` fait le lien avec les noms d'objets du blockout : beit_hamikdash_visite.py y attache chaque volume (préfixe le plus long gagnant), et regroupe en un seul maillage par concept. `dit`/`retenu`/`modelise` sont les trois plans que le skill mikdash interdit de confondre. `lieu` : un endroit où l'on se tient — la barre en donne le nom, le plan le dessine. `fete` : un concept que la visite ne montre qu'au parcours de cette fête (`fete` de parcours.json), et que la cuisson ne voit pas : son ombre ne reste pas les autres jours.",
   "concepts": [
     {
       "id": "mur_har_habayit",
@@ -422,6 +422,15 @@
       "prefixes": [
         "Maarakha_tapuach"
       ]
+    },
+    {
+      "id": "maarakha_kippour",
+      "nom": "La ma'arakha de Yom Kippour",
+      "zone": "mizbeach",
+      "prefixes": [
+        "Maarakha_kippour"
+      ],
+      "fete": "kippour"
     },
     {
       "id": "sefalim",

@@ -1151,6 +1151,22 @@ palettes, sans flamme ni fumée.
 - **Le sang de la zeriqa** s'écrase en éventail sur ses deux coins et file vers le yessod en filets. Les shirayim
   restent sur le yessod : la petite rampe, à une nima de lui, n'en reçoit pas.
 
+### Les ma'arakhot selon Bartenura (19/11)
+
+- **La grande n'est plus un empilement de lits.** Bartenura (*Tamid* 2:3–4) : des מֻרְבִּיּוֹת, « עֲנָפִים שֶׁל תְּאֵנָה », et
+  « שְׁנֵי עֵצִים אֲרֻכִּים וּמְשׁוּפִין… לְתוֹךְ אֹרֶךְ הַמַּעֲרָכָה », dont les bouts intérieurs touchent le tapoua'h ; entre
+  eux l'aliyta, « חֲרִיּוֹת וְקִסְמִין דַּקִּין », et à l'est « הַפֶּתַח וְהַחַלּוֹן ». Le script couche 420 branches en tas,
+  deux gzirin est-ouest à une ama l'un de l'autre, du petit bois entre eux, et laisse le petah et le 'halon vides
+  (**CHOIX** des nombres et des tailles). Le Rambam, Tif'eret Israël et le Raavad, écartés, sont à la fiche §6.
+- **La ketoret longe le bord ouest**, 4 amot au nord de la corne sud-ouest (*Tamid* 2:5 ; Tif'eret Israël 2:32) : elle
+  était rentrée de près de 6 amot en diagonale. Le kiyoum haesh va « בְּכָל מָקוֹם שֶׁיִּרְצֶה » (Rambam *Temidin* 2:9).
+  Celle de Kippour passe au bord ouest, en face des portes de l'Oulam et du Heikhal, « מִלִּפְנֵי ה׳ — מִצַּד מַעֲרָב »
+  (Rashi *Yoma* 45b). Les positions se calculent depuis le מְקוֹם הַמַּעֲרָכָה de *Middot* 3:1 (`MAQOM_HAMAARAKHA`).
+- **La quatrième ne brûle qu'à Kippour.** Elle a son concept, `maarakha_kippour`, et `fete: "kippour"` dans
+  `concepts.json` ; le parcours de Yom Kippour porte la même `fete`. `visite/fete.js` cache ses maillages, les sort de
+  ce que le doigt vise et de ce qu'on heurte, et n'allume son foyer que ce jour-là — `reperes.json` donne à chaque
+  foyer son concept.
+
 ## Licence
 
 - **Code** — scripts Python, JavaScript, shell et `visite/index.html` : [MIT](LICENSE).

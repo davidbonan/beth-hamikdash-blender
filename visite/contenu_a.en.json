@@ -1285,12 +1285,16 @@
   "maarakhot": {
     "nom": "The Ma'arakhot",
     "translit": "Ma'arakhot",
-    "resume": "The woodpiles set up on the surface of the altar. According to R. Yosei, three fires burn there, and four on Yom Kippur. In the center is the tapuach, the mound of ash that the logs of the great ma'arakha touch. Among the miracles of the Temple, the Mishnah counts that the rain did not put out the fire of the ma'arakha and the wind did not prevail over the column of smoke.",
+    "resume": "The woodpiles set up on the surface of the altar. According to R. Yosei, three fires burn there every day: the great ma'arakha, east of the tapuach, on which the offerings are burned; the ma'arakha of the incense, along the western edge, from which the coals for the incense are taken; and the one for keeping the fire, so that it never goes out. Yom Kippur adds a fourth. The great one is built as Bartenura describes it: a heap of fig branches, into which two long, smoothed logs are laid from east to west, far enough to touch the tapuach; kindling is slipped between them, and on the east side an opening lets the fire catch. Among the miracles of the Temple, the Mishnah counts that the rain did not put out the fire of the ma'arakha and the wind did not prevail over the column of smoke.",
     "cotes": [
       "surface of the altar: 28 × 28 amot",
       "fire zone: 24 × 24 amot, past the ama of the horns and the ama of walkway",
       "three fires, four on Kippur (R. Yosei; R. Meir: 4 and 5; R. Yehuda: 2 and 3)",
-      "the fourth on Kippur provides the coals for the incense of the Kodesh HaKodashim",
+      "great ma'arakha: east of the tapuach, facing east; 8 × 8 amot in the model (choice)",
+      "two long, smoothed gzirin, east to west, in the heap of fig branches",
+      "incense: along the western edge, 4 amot north of the southwest horn",
+      "keeping the fire: anywhere on the altar; northwest of the tapuach in the model (choice)",
+      "the fourth on Kippur provides the coals for the incense of the Kodesh HaKodashim; the tour shows it only on the Yom Kippur path",
       "tapuach: at the center of the top"
     ],
     "sources": [
@@ -1306,18 +1310,38 @@
       },
       {
         "oeuvre": "Tamid",
-        "ref": "2:1–5",
-        "citation": ""
-      },
-      {
-        "oeuvre": "Tamid",
         "ref": "2:2",
         "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ"
       },
       {
+        "oeuvre": "Tamid",
+        "ref": "2:4",
+        "citation": "סִדֵּר הַמַּעֲרָכָה גְדוֹלָה מִזְרָחָה, וַחֲזִיתָהּ מִזְרָחָה, וְרָאשֵׁי הַגִּזְרִין הַפְּנִימִיִּם הָיוּ נוֹגְעִים בַּתַּפּוּחַ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Tamid 2:3",
+        "citation": "שְׁנֵי עֵצִים אֲרֻכִּים וּמְשׁוּפִין הָיוּ נוֹתְנִים לְתוֹךְ אֹרֶךְ הַמַּעֲרָכָה"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Tamid 2:4",
+        "citation": "חֲרִיּוֹת וְקִסְמִין דַּקִּין תּוֹחֲבִין בֵּין הַגְּדוֹלִים לְהַצִּית הָאֵשׁ"
+      },
+      {
+        "oeuvre": "Tamid",
+        "ref": "2:5",
+        "citation": "מִכְּנֶגֶד קֶרֶן מַעֲרָבִית דְּרוֹמִית, מָשׁוּךְ מִן הַקֶּרֶן כְּלַפֵּי צָפוֹן אַרְבַּע אַמּוֹת"
+      },
+      {
         "oeuvre": "Rambam Temidin",
-        "ref": "2:4–7",
+        "ref": "2:4–8",
         "citation": ""
+      },
+      {
+        "oeuvre": "Rambam Temidin",
+        "ref": "2:9",
+        "citation": "מַעֲרָכָה שְׁלִישִׁית שֶׁל קִיּוּם הָאֵשׁ עוֹשֶׂה אוֹתָהּ בְּכָל מָקוֹם שֶׁיִּרְצֶה מִן הַמִּזְבֵּחַ"
       },
       {
         "oeuvre": "Bartenura",
@@ -1329,12 +1353,13 @@
         "ref": "5:5",
         "citation": "וְלֹא כִבּוּ גְשָׁמִים אֵשׁ שֶׁל עֲצֵי הַמַּעֲרָכָה, וְלֹא נָצְחָה הָרוּחַ אֶת עַמּוּד הֶעָשָׁן"
       }
-    ]
+    ],
+    "note": "Choice of the tour: the great ma'arakha follows Bartenura. For the Rambam, the gzirin are the split wood of the whole pile, to which two logs are added; Tiferet Yisrael stacks squares of logs. Also chosen: the size of the fires, the number of branches, the place of the fire-keeping pile and of the Kippur one on the western edge."
   },
   "tapuach": {
     "nom": "The tapuach",
     "translit": "Tapuach",
-    "resume": "In the middle of the top, the mound onto which the ash gathered on the altar is heaped. At times it held nearly three hundred kor. On the festivals it was not cleared, for it was an adornment of the altar. The inner ends of the logs of the great ma'arakhah touch it.",
+    "resume": "In the middle of the top, the mound onto which the ash gathered on the altar is heaped. At times it held nearly three hundred kor, a figure the Talmud counts among the Sages' exaggerations. On the festivals it was not cleared, for it was an adornment of the altar. The inner ends of the two long logs of the great ma'arakha touch it.",
     "cotes": [
       "in the middle of the altar top",
       "4 amot across and 1.5 high in the model (choice)"
@@ -1346,12 +1371,60 @@
         "citation": "וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ, פְּעָמִים עָלָיו כִּשְׁלשׁ מֵאוֹת כּוֹר. וּבָרְגָלִים לֹא הָיוּ מְדַשְּׁנִין אוֹתוֹ, מִפְּנֵי שֶׁהוּא נוֹי לַמִּזְבֵּחַ"
       },
       {
+        "oeuvre": "Tamid",
+        "ref": "29a",
+        "citation": "בִּשְׁלֹשָׁה מְקוֹמוֹת דִּבְּרוּ חֲכָמִים בִּלְשׁוֹן הֲבַאי, וְאֵלּוּ הֵן: תַּפּוּחַ, גֶּפֶן, וּפָרֹכֶת"
+      },
+      {
         "oeuvre": "Rambam Temidin",
         "ref": "2:7",
         "citation": "וְרָאשֵׁי הַגְּזָרִים הַפְּנִימִיִּים הָיוּ נוֹגְעִין בַּדֶּשֶׁן שֶׁבְּאֶמְצַע הַמִּזְבֵּחַ וְהוּא הַנִּקְרָא תַּפּוּחַ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Tamid 2:4",
+        "citation": "הַפְּנִימִיִּים הָיוּ אֲרֻכִּים עַד שֶׁהָיוּ נוֹגְעִים בַּתַּפּוּחַ"
       }
     ],
-    "note": "Choice of the tour: its size. The sources give its volume, not its shape."
+    "note": "Choice of the tour: its size. The sources give its volume, not its shape. Set aside: the Ra'avad, for whom the tapuach is a square platform one ama high."
+  },
+  "maarakha_kippour": {
+    "nom": "The Yom Kippur ma'arakha",
+    "translit": "Ma'arakha of Yom Kippur",
+    "resume": "On Kippur the altar carries one more fire than on other days. From it the Kohen Gadol fills the pan with the coals on which he will burn the incense in the Kodesh HaKodashim. These coals are taken \"from before the Lord\", from the western side of the altar, the side that faces the Heikhal. The tour shows this fire only on the Yom Kippur path.",
+    "cotes": [
+      "one ma'arakha more than every day",
+      "along the western edge of the altar, facing the doors of the Ulam and the Heikhal",
+      "3 × 3 amot in the model (choice)"
+    ],
+    "sources": [
+      {
+        "oeuvre": "Yoma",
+        "ref": "4:6",
+        "citation": "רַבִּי יוֹסֵי אוֹמֵר, בְּכָל יוֹם שָׁלשׁ, וְהַיּוֹם אַרְבַּע"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Yoma 4:6",
+        "citation": "וּמוֹסִיפִין בְּיוֹם הַכִּפּוּרִים עוֹד מַעֲרָכָה אַחַת לִטֹּל מִמֶּנָּה גֶּחָלִים לַקְּטֹרֶת לִפְנַי וְלִפְנִים"
+      },
+      {
+        "oeuvre": "Lévitique",
+        "ref": "16:12",
+        "citation": "וְלָקַח מְלֹא הַמַּחְתָּה גַּחֲלֵי אֵשׁ מֵעַל הַמִּזְבֵּחַ מִלִּפְנֵי ה׳"
+      },
+      {
+        "oeuvre": "Rashi sur Yoma",
+        "ref": "45b",
+        "citation": "מִלִּפְנֵי ה׳ מִצַּד מַעֲרָב"
+      },
+      {
+        "oeuvre": "Yoma",
+        "ref": "4:3",
+        "citation": "נָטַל מַחְתָּה וְעָלָה לְרֹאשׁ הַמִּזְבֵּחַ, וּפִנָּה גֶחָלִים אֵילָךְ וְאֵילָךְ, וְחוֹתֶה מִן הַמְעֻכָּלוֹת הַפְּנִימִיּוֹת"
+      }
+    ],
+    "note": "Choice of the tour: its size, and its place on the western edge."
   },
   "sefalim": {
     "nom": "The two silver sefalim",

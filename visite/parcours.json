@@ -1,5 +1,5 @@
 {
- "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7), le seder ha'avoda de Yom Kippour (Yoma 1–7), la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4), le korban Pessa'h (Pessa'him 5:5–10), les bikkourim (Bikkourim 3:2–6), les dix degrés de sainteté (Kelim 1:6–9), Souccot au matin (Soucca 4:5, 4:9), Hakhel (Sota 7:8), le nazir et le metzora (Middot 2:5 ; Nega'im 14:7–10). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. `figurants`, d'une station : ceux de la troupe qu'elle montre, par nom (`sair_hamishtaleach`) ou par concept (`leviim` pour les douze) ; `[]` n'en montre aucun, sans lui toute la troupe. En marche, un figurant change hors du cadre, sinon à l'arrivée. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `fondu` une station qu'aucun chemin à pied ne rejoint — un toit —, où l'on arrive et d'où l'on part sous le voile, sans `via`, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
+ "_lisez_moi": "Les parcours guidés, station par station : le tamid du matin (Tamid 1–7), le seder ha'avoda de Yom Kippour (Yoma 1–7), la nuit de Sim'hat Beit HaSho'éva (Soucca 5:1–4), le korban Pessa'h (Pessa'him 5:5–10), les bikkourim (Bikkourim 3:2–6), les dix degrés de sainteté (Kelim 1:6–9), Souccot au matin (Soucca 4:5, 4:9), Hakhel (Sota 7:8), le nazir et le metzora (Middot 2:5 ; Nega'im 14:7–10). `moment`, du parcours ou d'une station : \"nuit\" éteint le soleil et allume les mâts de l'Ezrat Nashim ; \"fin_de_nuit\", de même, la lune couchante à l'ouest ; \"avant_l_aube\", la nuit sans lune et sans les mâts ; \"aube\", l'est éclairé, le soleil pas encore levé ; sans lui, le jour. Tous allument le feu de l'autel. `troupe` : les figurants du parcours (visite/<troupe>.glb), ceux de la visite libre revenant à la sortie. `fete` : ce que l'autel ne porte que ce jour-là (`fete` d'un concept, concepts.json), la visite libre étant un jour ordinaire. `figurants`, d'une station : ceux de la troupe qu'elle montre, par nom (`sair_hamishtaleach`) ou par concept (`leviim` pour les douze) ; `[]` n'en montre aucun, sans lui toute la troupe. En marche, un figurant change hors du cadre, sinon à l'arrivée. En amot, dans le repère de la visite comme cinema.json : `point` [x, z] où l'on se tient, `sol` la hauteur du dallage, `cible` [x, y, z] ce qu'on regarde, `via` les points de passage depuis la station précédente, `fondu` une station qu'aucun chemin à pied ne rejoint — un toit —, où l'on arrive et d'où l'on part sous le voile, sans `via`, `concept` la fiche que le lien « Lire la fiche » de la carte ouvre. `titre` et `texte` sont traduits sur place, comme textes.json. Un point de passage traverse un mur ou manque un escalier ? verifier.mjs --parcours le dit.",
  "parcours": [
   {
    "id": "tamid",
@@ -458,6 +458,7 @@
   {
    "id": "yom_kippour",
    "troupe": "figures_kippour",
+   "fete": "kippour",
    "titre": {
     "fr": "Yom Kippour",
     "en": "Yom Kippur",
@@ -748,8 +749,8 @@
       "ref": "4:3"
      },
      "point": [
-      -25.5,
-      15
+      -40,
+      12.5
      ],
      "sol": 9,
      "via": [
@@ -782,14 +783,14 @@
        26
       ],
       [
-       -30,
+       -39,
        18
       ]
      ],
      "cible": [
-      -31,
-      10.5,
-      9
+      -48.8,
+      9.6,
+      3.5
      ],
      "titre": {
       "fr": "Le second viduy, le sang, la ma'hta",
@@ -797,9 +798,9 @@
       "he": "וידוי שני, הדם, המחתה"
      },
      "texte": {
-      "fr": "Revenu à son taureau, il confesse une seconde fois, pour lui, sa maison et les fils d'Aaron (Yoma 4:2) ; il l'égorge, reçoit le sang dans le mizrak et le donne à celui qui le remue sur la quatrième rangée de dalles du Heikhal, pour qu'il ne fige pas. Puis il prend la ma'hta, monte au sommet de l'autel, écarte les braises de part et d'autre et puise parmi les plus consumées, à l'intérieur ; il descend la poser sur la quatrième rangée de l'Azara.",
-      "en": "Back at his bull, he confesses a second time, for himself, his house and the sons of Aaron (Yoma 4:2); he slaughters it, receives the blood in the mizrak and hands it to the one who stirs it on the fourth row of tiles of the Heikhal, so that it does not congeal. Then he takes the machta, climbs to the top of the altar, pushes the coals aside and scoops from the most consumed ones, inside; he comes down and sets it on the fourth row of the Azara.",
-      "he": "חוזר אצל פרו ומתוודה שנית, עליו ועל ביתו ועל בני אהרן (יומא ד, ב); שוחטו, מקבל את דמו במזרק ונותנו למי שממרס בו על הרובד הרביעי שבהיכל, כדי שלא יקרוש. נוטל מחתה ועולה לראש המזבח, מפנה גחלים אילך ואילך וחותה מן המעוכלות הפנימיות; יורד ומניחה על הרובד הרביעי שבעזרה."
+      "fr": "Revenu à son taureau, il confesse une seconde fois, pour lui, sa maison et les fils d'Aaron (Yoma 4:2) ; il l'égorge, reçoit le sang dans le mizrak et le donne à celui qui le remue sur la quatrième rangée de dalles du Heikhal, pour qu'il ne fige pas. Puis il prend la ma'hta, monte au sommet de l'autel, écarte les braises de part et d'autre et puise parmi les plus consumées, à l'intérieur ; il descend la poser sur la quatrième rangée de l'Azara. Il puise à la ma'arakha que l'on ajoute ce jour-là, du côté ouest de l'autel, « de devant l'Éternel » (Bartenura sur Yoma 4:6 ; Rashi, Yoma 45b).",
+      "en": "Back at his bull, he confesses a second time, for himself, his house and the sons of Aaron (Yoma 4:2); he slaughters it, receives the blood in the mizrak and hands it to the one who stirs it on the fourth row of tiles of the Heikhal, so that it does not congeal. Then he takes the machta, climbs to the top of the altar, pushes the coals aside and scoops from the most consumed ones, inside; he comes down and sets it on the fourth row of the Azara. He takes them from the ma'arakha added on that day, on the western side of the altar, \"from before the Lord\" (Bartenura on Yoma 4:6; Rashi, Yoma 45b).",
+      "he": "חוזר אצל פרו ומתוודה שנית, עליו ועל ביתו ועל בני אהרן (יומא ד, ב); שוחטו, מקבל את דמו במזרק ונותנו למי שממרס בו על הרובד הרביעי שבהיכל, כדי שלא יקרוש. נוטל מחתה ועולה לראש המזבח, מפנה גחלים אילך ואילך וחותה מן המעוכלות הפנימיות; יורד ומניחה על הרובד הרביעי שבעזרה. חותה מן המערכה שמוסיפים בו ביום, מצד מערב של המזבח, „מלפני ה׳” (ר״ע מברטנורא יומא ד, ו; רש״י יומא מה ע״ב)."
      }
     },
     {

@@ -336,7 +336,6 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
   }
 
   eclairerLAirAu(moment);
-  rendu.embraser((reperes.foyers ?? []).map(({ min, max }) => new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max))));
   allumerMenora(reperes.flammes);
   allumerLesSalles(reperes.lueurs);
   eclairerKodeshHakodashim(reperes.arche, reperes.braises);

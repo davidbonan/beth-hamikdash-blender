@@ -332,6 +332,12 @@ def concepts():
     return sorted(regles, key=lambda r: -len(r[0]))
 
 
+# Un concept qui n'est là qu'un jour (`fete`) : la cuisson ne le voit pas, sans quoi son ombre resterait tous les autres jours.
+def concepts_d_un_jour():
+    fiche = json.loads((DOSSIER / "concepts.json").read_text(encoding="utf-8"))
+    return {c["id"] for c in fiche["concepts"] if c.get("fete")}
+
+
 def concept_de(nom, regles):
     for prefixe, ident in regles:
         if nom.startswith(prefixe):
@@ -429,9 +435,10 @@ def lampes(prefixe):
             for o in bpy.data.objects if o.type == "LIGHT" and o.name.startswith(prefixe)]
 
 
-def foyers():
-    """Le lit de braises de chaque ma'arakha, en mètres de la visite, le plus étendu d'abord."""
-    lits = [bornes(o) for o in bpy.data.objects if o.type == "MESH" and re.fullmatch(r"Maarakha_.+_gehalim", o.name)]
+def foyers(regles):
+    """Le lit de braises de chaque ma'arakha, en mètres de la visite, le plus étendu d'abord, et son concept : la visite n'allume celui d'une fête que ce jour-là."""
+    lits = [{**bornes(o), "concept": concept_de(o.name, regles)}
+            for o in bpy.data.objects if o.type == "MESH" and re.fullmatch(r"Maarakha_.+_gehalim", o.name)]
     return sorted(lits, key=lambda lit: (lit["min"][0] - lit["max"][0]) * (lit["max"][2] - lit["min"][2]))
 
 
@@ -527,7 +534,7 @@ def exporter(chantier):
     lueurs = {salle: {"points": lampes(f"{prefixe}_lueur"), "salle": repere_de(f"{prefixe}_salle")}
               for salle, prefixe in SALLES_A_LUEURS.items()}
     projecteurs = vides("Kotel_projecteur_")
-    lits_de_braises = foyers()
+    lits_de_braises = foyers(regles)
     vis_de_degres = vis()
 
     gardes = {o for nom in COLLECTIONS if (c := bpy.data.collections.get(nom))
@@ -557,9 +564,14 @@ def exporter(chantier):
         print(f"  {ident:26s} {len(objets):5d} volumes")
 
     # Avant l'aplatissement : la cuisson voit encore les matières du blockout.
+    d_un_jour = [fusionnes[ident] for ident in sorted(concepts_d_un_jour() & fusionnes.keys())]
+    for obj in d_un_jour:
+        obj.hide_render = True
     cartes = ({}, {}, {}) if "--sans-occlusion" in sys.argv else cuire(
         fusionnes, chantier, {"flammes": flammes, "arche": arche, "braises": braises, "lueurs": lueurs["lishkat_hagazit"]["points"],
                               **{salle: lueurs[salle]["points"] for salle in LAMPES_DE_SALLE}})
+    for obj in d_un_jour:
+        obj.hide_render = False
     if cartes is None:
         return False
     occlusion, lumiere, empreintes = cartes

@@ -14,8 +14,8 @@
  * Rien ici ne connaît la scène : visite.js prête la caméra le temps du trajet, pose ou
  * oriente le visiteur quand on le lui demande, et passe au `moment` que la station,
  * sinon le parcours, déclare — le jour, s'ils n'en disent rien — et à la `troupe` du
- * parcours, les figurants de son service, dont chaque station appelle les siens ; en
- * sortant, à ceux de la visite libre.
+ * parcours, les figurants de son service, dont chaque station appelle les siens, et à sa
+ * `fete`, ce que l'autel ne porte que ce jour-là ; en sortant, à la visite libre d'un jour ordinaire.
  */
 import * as THREE from "three";
 import { PAS, REPONSE_SOL, SOUS_PAS, cibleEnM, lisse, pointEnM, polyligne } from "./trajet.js";
@@ -35,7 +35,7 @@ const CHEVRON_GAUCHE = "M8.5 2 2.5 8l6 6", CHEVRON_DROIT = "M3.5 2l6 6-6 6", COC
 const part = (x, de, longueur) => lisse(Math.min(Math.max((x - de) / longueur, 0), 1));
 
 export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marcher, arriver, changerDeMoment, changerDeTroupe,
-  appelerFigurants, relayerFigurants, ouvrirFiche, fermerFiche }) {
+  changerDeFete, appelerFigurants, relayerFigurants, ouvrirFiche, fermerFiche }) {
   const racine = document.querySelector("#parcours");
   const carte = racine.querySelector(".carte");
   const nom = carte.querySelector(".nom"), rang = carte.querySelector(".rang"), source = carte.querySelector(".source");
@@ -194,6 +194,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     stations = guide.stations;
     racine.hidden = false;
     changerDeTroupe(guide.troupe);
+    changerDeFete(guide.fete);
     sauter(rang);
   }
 
@@ -204,6 +205,7 @@ export function parcours({ parcours: liste, camera, sol, oeil, ama, poserA, marc
     racine.hidden = true;
     changerDeMoment("jour");
     changerDeTroupe();
+    changerDeFete();
     appelerFigurants();
   }
 

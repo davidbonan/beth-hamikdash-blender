@@ -217,17 +217,22 @@ for nm, (x, y) in KERANOT.items():
 # « כְּשִׁשָּׁה טְפָחִים מִסּוֹף הַסּוֹבֵב וּלְמַטָּה » (Rambam 2:8-9). Largeur du trait : CHOIX.
 Z_SIKRA = Z_SOVEV - 6 * TEFAH
 ceinture_de_chaux("Mizbeach_sikra", CORPS, Z_SIKRA - 0.05, Z_SIKRA + 0.05, "30_Mizbeach", MAT_SIKRA())
-# Trois ma'arakhot chaque jour et quatre à Kippour, l'avis de R. Yossi (Yoma 4:6 ; Rambam
-# Temidin ouMousafin 2:4-5) : la grande à l'est, celle de la ketoret à l'angle sud-ouest
-# (Tamid 2:4-5), celle du kiyoum haesh, et à Kippour celle des braises de la ketoret du
-# Kodesh HaKodashim (Bartenura ad loc.). R. Meir en ajoute une pour les membres de la
-# veille, que R. Yossi brûle au bord de la grande.
-MAARAKHOT = (("gedola", -36, -28, -13, -5), ("ketoret", -48, -45, -19, -16),
-             ("kiyum", -48, -45, -4, -1), ("kippour", -42, -39, -19, -16))
-# « וְרֶוַח הָיָה בֵין הַגִּזְרִין, שֶׁהָיוּ מַצִּיתִין אֶת הָאֲלִיתָא מִשָּׁם » (Tamid 2:4 ; Rambam
-# Temidin ouMousafin 2:7) : les bûches ne sont PAS jointives. C'est ce vide-là qui fait
-# lire un bûcher — deux lits jointifs sous une dalle donnaient une palette sous un
-# matelas, ce que la visite montrait de près.
+# « מְקוֹם הַקְּרָנוֹת אַמָּה מִזֶּה וְאַמָּה מִזֶּה… מְקוֹם הִלּוּךְ רַגְלֵי הַכֹּהֲנִים, אַמָּה מִזֶּה וְאַמָּה מִזֶּה… מְקוֹם הַמַּעֲרָכָה » (Middot 3:1).
+MAQOM_HAMAARAKHA = (HAUT[0] + 2, HAUT[1] - 2, HAUT[2] + 2, HAUT[3] - 2)
+# « וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ » (Tamid 2:2) ; ses « שְׁלֹשׁ מֵאוֹת כּוֹר » sont « בִּלְשׁוֹן הֲבַאי » (Tamid 29a). Taille : CHOIX.
+TAPUACH, R_TAPUACH, H_TAPUACH = ((MX0 + MX1) / 2, (MY0 + MY1) / 2), 2.0, 1.5
+# La grande à l'est du tapoua'h, qu'elle touche (Tamid 2:4) ; 8 × 8 amot : CHOIX.
+GEDOLA = (TAPUACH[0] + R_TAPUACH, TAPUACH[0] + R_TAPUACH + 8, TAPUACH[1] - 4, TAPUACH[1] + 4)
+_X0 = MAQOM_HAMAARAKHA[0]
+# Trois chaque jour, une de plus à Kippour (R. Yossé, Yoma 4:6 ; Rambam Temidin 2:4-5). Leur taille, 3 × 3 amot : CHOIX.
+# La ketoret « מִכְּנֶגֶד קֶרֶן מַעֲרָבִית דְּרוֹמִית, מָשׁוּךְ מִן הַקֶּרֶן כְּלַפֵּי צָפוֹן אַרְבַּע אַמּוֹת » (Tamid 2:5), le long du bord ouest (Tif'eret Israël 2:32).
+# Le kiyoum haesh « בְּכָל מָקוֹם שֶׁיִּרְצֶה מִן הַמִּזְבֵּחַ » (Rambam Temidin 2:9) : sa place, CHOIX.
+# Kippour, pour les braises de la ketoret du Kodesh HaKodashim (Bartenura Yoma 4:6), « מִלִּפְנֵי ה׳ מִצַּד מַעֲרָב » (Rashi Yoma 45b),
+# face aux portes de l'Oulam et du Heikhal : sa place sur ce bord, CHOIX.
+MAARAKHOT_DE_GZIRIN = (("ketoret", _X0, _X0 + 3, HAUT[2] + 1 + 4, HAUT[2] + 1 + 7),
+                       ("kiyum", TAPUACH[0] - 6, TAPUACH[0] - 3, TAPUACH[1] + 8, TAPUACH[1] + 11),
+                       ("kippour", _X0, _X0 + 3, TAPUACH[1] + 4, TAPUACH[1] + 7))
+# « וְרֶוַח הָיָה בֵין הַגִּזְרִין » (Tamid 2:4) : les bûches ne sont pas jointives.
 R_GZIR, REWACH, PAS_LIT, LITS = 0.19, 0.16, 0.34, 4
 # Du bois fendu à la longueur d'un bras, pas des troncs : longueur d'une bûche et jour entre deux bouts, CHOIX.
 LONG_GZIR, JOUR_GZIR = 2.6, 0.25
@@ -267,12 +272,89 @@ def maarakha(nm, xa, xb, ya, yb):
     braises(f"Maarakha_{nm}_gehalim", xa + RETRAIT_GEHALIM, xb - RETRAIT_GEHALIM, ya + RETRAIT_GEHALIM, yb - RETRAIT_GEHALIM,
             Z_MAARAKHA + 1.5 * R_GZIR + (LITS - 2) * PAS_LIT, "30_Mizbeach", braise("Braise"), profondeur=0.05)
 
-for nm, xa, xb, ya, yb in MAARAKHOT:
+for nm, xa, xb, ya, yb in MAARAKHOT_DE_GZIRIN:
     maarakha(nm, xa, xb, ya, yb)
+
+# La grande selon Bartenura (Tamid 2:3-4) : un tas de מֻרְבִּיּוֹת, « עֲנָפִים שֶׁל תְּאֵנָה », où l'on couche
+# « שְׁנֵי עֵצִים אֲרֻכִּים וּמְשׁוּפִין… לְתוֹךְ אֹרֶךְ הַמַּעֲרָכָה », dont les bouts intérieurs touchent le tapoua'h.
+# Entre les deux, l'aliyta, « חֲרִיּוֹת וְקִסְמִין דַּקִּין תּוֹחֲבִין בֵּין הַגְּדוֹלִים », et à l'est « הַפֶּתַח וְהַחַלּוֹן ».
+# Grosseur des deux gzirin et jour entre eux, nombre et taille des branches, hauteur du tas, du petah et du 'halon : CHOIX.
+R_GZIR_GADOL, JOUR_DES_GZIRIN = 0.28, 1.0
+MURAVIOT, ALIYTA = 420, 40
+H_TAS = 1.5
+PETAH, HALON = (0.0, 0.8), (1.05, 1.35)
+
+def hauteur_du_tas(x, y):
+    xa, xb, ya, yb = GEDOLA
+    bord = max(abs(2 * (x - xa) / (xb - xa) - 1), abs(2 * (y - ya) / (yb - ya) - 1))
+    return H_TAS * (0.35 + 0.65 * (1 - bord * bord))
+
+def dans_l_ouverture(x, y, z):
+    """Ce que le petah, et le 'halon au-dessus de lui, laissent vide entre les deux gzirin, à l'est."""
+    xb, haut = GEDOLA[1], z - Z_MAARAKHA
+    entre = abs(y - TAPUACH[1]) < JOUR_DES_GZIRIN / 2 + 0.1
+    return entre and ((x > xb - 1.8 and PETAH[0] <= haut < PETAH[1]) or (x > xb - 1.2 and HALON[0] <= haut < HALON[1]))
+
+def bois_selon_le_feu(cle, z):
+    """Le feu prend par le bas : charbon et bois roussi s'y mêlent au bois frais."""
+    tirage, bas = alea(cle, 7), z < Z_MAARAKHA + 0.4
+    if bas and tirage < 0.5:
+        return MAT_BOIS_CHARBON()
+    return MAT_BOIS_ROUSSI() if tirage < (0.75 if bas else 0.3) else MAT_BOIS_MAARAKHA()
+
+def bouts_de_la_branche(centre, longueur, cap, pente):
+    """Les deux bouts d'une branche couchée autour de `centre`, raccourcie pour rester sur la ma'arakha."""
+    xa, xb, ya, yb = GEDOLA
+    d = Vector((math.cos(cap) * math.cos(pente), math.sin(cap) * math.cos(pente), math.sin(pente)))
+    c = Vector(centre)
+    demi = longueur / 2
+    for axe, (bas, haut) in ((0, (xa, xb)), (1, (ya, yb))):
+        if abs(d[axe]) > 1e-6:
+            demi = min(demi, min(c[axe] - bas, haut - c[axe]) / abs(d[axe]))
+    return tuple(c - d * demi), tuple(c + d * demi)
+
+def coucher_les_muraviot():
+    xa, xb, ya, yb = GEDOLA
+    for i in range(MURAVIOT):
+        cle = f"Maarakha_gedola_zmora_{i:03d}"
+        x, y = xa + 0.3 + (xb - xa - 0.6) * alea(cle, 1), ya + 0.3 + (yb - ya - 0.6) * alea(cle, 2)
+        rayon = 0.03 + 0.04 * alea(cle, 3)
+        z = Z_MAARAKHA + rayon + (hauteur_du_tas(x, y) - 2 * rayon) * alea(cle, 4)
+        p0, p1 = bouts_de_la_branche((x, y, z), 1.2 + 1.2 * alea(cle, 5), 2 * math.pi * alea(cle, 6), 0.5 * (alea(cle, 8) - 0.5))
+        milieu = tuple((a + b) / 2 for a, b in zip(p0, p1))
+        if any(dans_l_ouverture(*p) for p in (p0, milieu, p1)):
+            continue
+        gzir(cle, p0, p1, rayon, "30_Mizbeach", bois_selon_le_feu(cle, z), fentes=(2 * math.pi,))
+
+def coucher_les_deux_gzirin():
+    """Les deux grosses bûches est-ouest, de part et d'autre du jour où l'on glisse l'aliyta."""
+    xa, xb, _, _ = GEDOLA
+    for k, sens in enumerate((-1, 1)):
+        y = TAPUACH[1] + sens * (JOUR_DES_GZIRIN / 2 + R_GZIR_GADOL)
+        p0, p1 = (xa - 0.35, y, Z_MAARAKHA + R_GZIR_GADOL), (xb - 0.1, y, Z_MAARAKHA + R_GZIR_GADOL)
+        o = cyl_between(f"Maarakha_gedola_gzir_{k}", p0, p1, R_GZIR_GADOL, "30_Mizbeach", MAT_BOIS_MAARAKHA(), verts=14)
+        o["moelle"] = [m(c) for c in (*p0, *p1)]
+
+def glisser_l_aliyta():
+    xa, xb, _, _ = GEDOLA
+    for i in range(ALIYTA):
+        cle = f"Maarakha_gedola_aliyta_{i:02d}"
+        x = xa + 0.3 + (xb - xa - 1.0) * alea(cle, 1)
+        y = TAPUACH[1] + (alea(cle, 2) - 0.5) * JOUR_DES_GZIRIN * 0.8
+        z = Z_MAARAKHA + 0.05 + 0.4 * alea(cle, 3)
+        demi, ecart = 0.2 + 0.3 * alea(cle, 4), 0.3 * (alea(cle, 5) - 0.5)
+        gzir(cle, (x - demi, y - ecart, z), (x + demi, y + ecart, z + 0.05), 0.015 + 0.015 * alea(cle, 6), "30_Mizbeach",
+             bois_selon_le_feu(cle, z), fentes=(2 * math.pi,))
+
+coucher_les_muraviot()
+coucher_les_deux_gzirin()
+glisser_l_aliyta()
+braises("Maarakha_gedola_gehalim", GEDOLA[0] + 0.5, GEDOLA[1] - 0.5, GEDOLA[2] + 0.5, GEDOLA[3] - 0.5,
+        Z_MAARAKHA + 0.12, "30_Mizbeach", braise("Braise"), profondeur=0.05)
 # Le feu lui-même. La ma'arakha était une boîte noire sans source : la colonne de fumée
 # montait d'un autel éteint, et la rampe du plan 7b n'avait que la lumière du ciel — la
 # raison pour laquelle elle ne se détachait ni de l'autel ni du dallage.
-_, GX0, GX1, GY0, GY1 = MAARAKHOT[0]
+GX0, GX1, GY0, GY1 = GEDOLA
 feu = lampe("Maarakha_feu", 'AREA', (m((GX0 + GX1) / 2), m((GY0 + GY1) / 2), m(Z_MAARAKHA + 1.2)))
 feu.data.shape = 'RECTANGLE'
 feu.data.size = m(GX1 - GX0)
@@ -434,9 +516,7 @@ for k, sens in enumerate((-1, 1)):
 # « הָפַךְ פָּנָיו לַצָּפוֹן, הָלַךְ לְמִזְרָחוֹ שֶׁל כֶּבֶשׁ כְּעֶשֶׂר אַמּוֹת. צָבַר אֶת הַגֶּחָלִים עַל גַּבֵּי הָרִצְפָה רָחוֹק
 # מִן הַכֶּבֶשׁ שְׁלשָׁה טְפָחִים » (Tamid 1:4) : trois tefa'him, une demi-ama. Taille du tas : CHOIX.
 tas("Kevesh_makom_deshen", (KX1 + 1.5, KY0 + 10), Z_AZ, 0.5, 1.0, MAT_CENDRE())
-# « וְתַפּוּחַ הָיָה בְאֶמְצַע הַמִּזְבֵּחַ » (Tamid 2:2), que touchent les bouts intérieurs des
-# gzirin de la grande ma'arakha (Tamid 2:4 ; Rambam Temidin ouMousafin 2:7). Taille : CHOIX.
-tas("Maarakha_tapuach", (xc, (MY0 + MY1) / 2), Z_MAARAKHA, 1.5, 2.0, MAT_CENDRE())
+tas("Maarakha_tapuach", TAPUACH, Z_MAARAKHA, H_TAPUACH, R_TAPUACH, MAT_CENDRE())
 # « בִּשְׁלֹשָׁה מְקוֹמוֹת הַמֶּלַח נְתוּנָה… וְעַל גַּבֵּי הַכֶּבֶשׁ » (Mena'hot 21b), là où l'on sale les membres,
 # posés « מֵחֲצִי הַכֶּבֶשׁ וּלְמַטָּה בְּמַעֲרָבוֹ, וּמְלָחוּם » (Tamid 4:3). Un tas, sa taille et sa place dans
 # cette moitié : CHOIX. Son fond plat s'enfonce dans la pente côté haut.

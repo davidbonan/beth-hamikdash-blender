@@ -31,6 +31,7 @@ import { laisserPeindre, parTranches } from "./fil.js";
 import { ecranDeChargement, glisser, remplir } from "./chargement.js";
 import { TROUPES, TROUPE_LIBRE, troupesDeFigurants } from "./figurants.js";
 import { eclairerLeTemple } from "./eclairage.js";
+import { fetesDuTemple } from "./fete.js";
 import { designation } from "./designation.js";
 import { annonce } from "./annonce.js";
 import { vuesDuTemple } from "./vues.js";
@@ -338,6 +339,9 @@ await Promise.all([
   chargement.compiler((suivre) => rendu.compiler(scene, suivre)),
   parTranches(obstacles, chargement.enJaugeant("arbres", obstacles.length, construireArbre)).then(allegerLeTemple).then(envoyerLesTextures),
 ]);
+// Après les nuanceurs et les arbres : ce qu'une fête montre doit être compilé et arpentable le jour où il paraît.
+const fetes = fetesDuTemple({ maillages, concepts: CONCEPTS, foyers: reperes.foyers ?? [], rendu, obstacles, murs });
+fetes.celebrer();
 const refleterLeHeikhal = () => sonderHeikhal(renderer, scene, {
   kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
   materiaux: materiauxHeikhal,
@@ -640,6 +644,7 @@ const guides = parcours({
   changerDeTroupe: (voulue = TROUPE_LIBRE) => {
     if (troupes.demander(voulue)) fondu(() => troupes.presenter(voulue));
   },
+  changerDeFete: (fete) => fondu(() => fetes.celebrer(fete)),
   appelerFigurants: (noms) => fondu(() => {
     troupes.appeler(noms);
     troupes.montrer();

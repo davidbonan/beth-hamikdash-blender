@@ -980,9 +980,10 @@ void facettesAmande(vec3 P, vec3 N, inout vec3 pente, inout float rugo){
   rugo += (d - 0.35) * 0.04 * fin;
 }
 
-// Les quatre ma'arakhot : leur centre en mètres de three (x, z), leur demi-côté en amot. Mêmes cotes que MAARAKHOT du blockout.
-const vec3 MAARAKHOT[4] = vec3[4](vec3(-32.0 * AMA, 9.0 * AMA, 4.0), vec3(-46.5 * AMA, 17.5 * AMA, 1.5),
-                                  vec3(-46.5 * AMA, 2.5 * AMA, 1.5), vec3(-40.5 * AMA, 17.5 * AMA, 1.5));
+// Les trois ma'arakhot de chaque jour — grande, ketoret, kiyoum haesh —, comme GEDOLA et MAARAKHOT_DE_GZIRIN du blockout : leur
+// centre en mètres de three (x, z), leur demi-côté en amot. Celle de Kippour ne brûle qu'un jour, et l'autel est reblanchi deux fois l'an (Middot 3:4).
+const vec3 MAARAKHOT[3] = vec3[3](vec3(-32.0 * AMA, 9.0 * AMA, 4.0), vec3(-293.0 / 6.0 * AMA, 101.0 / 6.0 * AMA, 1.5),
+                                  vec3(-42.5 * AMA, -0.5 * AMA, 1.5));
 // Les cotes de l'autel, en amot, celles du blockout (Rambam, Beit HaBe'hira 2:7-9) ; ses angles en (x, z) de three.
 const float Z_YESSOD = 5.0 / 6.0, Z_SIKRA = 29.0 / 6.0, Z_MAARAKHA = 53.0 / 6.0, RETRAIT_MIZBEACH = 5.0 / 6.0;
 const vec2 MIZBEACH_NE = vec2(-22.0, -7.0), MIZBEACH_SO = vec2(-54.0, 25.0), VERS_LE_SO = vec2(-RETRAIT_MIZBEACH, RETRAIT_MIZBEACH);
@@ -1276,7 +1277,7 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
                   * (1.0 - smoothstep(0.2, 2.6, sous_la_levre)) * step(0.0, sous_la_levre) * (1.0 - abs(N.y));
     // À quelle distance du bûcher le plus proche, en amot ; négative dessous.
     float pres = 99.0;
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < 3; k++) {
       vec2 ecart = abs(P.xz - MAARAKHOT[k].xy) / AMA - MAARAKHOT[k].z;
       pres = min(pres, length(max(ecart, 0.0)) + min(max(ecart.x, ecart.y), 0.0));
     }
