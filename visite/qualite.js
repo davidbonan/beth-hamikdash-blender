@@ -15,7 +15,6 @@
  * `?qualite=basse` force le profil léger depuis un bureau, `?qualite=minimale` le très
  * léger, `?qualite=sobre` le sobre : c'est ainsi qu'on les vérifie sans téléphone sous la main.
  */
-import { suivreLangue, texte } from "./langue.js";
 import { confier, lireConfie, lireRetenu, oublier, oublierConfie, retenir } from "./memoire.js";
 
 const demande = new URLSearchParams(location.search).get("qualite");
@@ -136,7 +135,7 @@ function niveauApresChute(choisi) {
 }
 
 // "" : l'automatique.
-function choisir(niveau) {
+export function choisir(niveau) {
   if (niveau) retenir(CHOISI, niveau);
   else oublier(CHOISI);
 }
@@ -154,6 +153,8 @@ function chuterSiChargementTue() {
 if (!force) chuterSiChargementTue();
 const choisi = lireRetenu(CHOISI);
 const manuel = !force && choisi in PROFILS;
+// Ce que la jauge montre : un profil forcé par `?qualite=` n'est pas un choix du visiteur.
+export const AUTOMATIQUE = !manuel;
 
 export const NIVEAU = force ? demande : manuel ? choisi : await niveauDeLaMachine();
 export const PROFIL = avecLaPoseDemandee(PROFILS[NIVEAU]);
@@ -194,60 +195,13 @@ export function tomber() {
 }
 
 // Ce que l'automatique prendrait : sous un profil choisi ou forcé, le banc ne se rejoue pas pour le dire.
-const niveauTenu = () => (!manuel && !force ? NIVEAU : niveauAutomatiqueConnu());
+export const niveauTenu = () => (!manuel && !force ? NIVEAU : niveauAutomatiqueConnu());
 
 // Un cran au-dessus de ce que la machine tient risque de saccader, deux y sont trop lourds.
 const CHARGES = ["fluide", "risque", "lourd"];
-function chargeDe(niveau) {
+export function chargeDe(niveau) {
   const crans = NIVEAUX.indexOf(niveauTenu()) - NIVEAUX.indexOf(niveau);
   return CHARGES[Math.min(Math.max(crans, 0), CHARGES.length - 1)];
-}
-
-const element = (nom, proprietes) => Object.assign(document.createElement(nom), proprietes);
-
-function boutonDeNiveau(niveau, ...contenu) {
-  const bouton = element("button", { type: "button" });
-  bouton.dataset.niveau = niveau;
-  bouton.setAttribute("aria-pressed", String(niveau === (manuel ? NIVEAU : "")));
-  bouton.append(...contenu);
-  return bouton;
-}
-
-// L'automatique à part, avec le profil qu'il prend sur cette machine ; dessous, les profils à choisir soi-même.
-function choixDeNiveau() {
-  const auto = boutonDeNiveau("",
-    element("span", { textContent: texte("qualite_auto") }),
-    element("small", { textContent: texte("qualite_auto_note").replace("{niveau}", texte(`qualite_${niveauTenu()}`).toLowerCase()) }));
-  auto.className = "auto";
-  const manuels = NIVEAUX.map((niveau) => {
-    const charge = element("span", { className: "charge", textContent: texte(`qualite_${chargeDe(niveau)}`) });
-    charge.dataset.charge = chargeDe(niveau);
-    return boutonDeNiveau(niveau, element("span", { textContent: texte(`qualite_${niveau}`) }), charge);
-  });
-  return [auto, element("h3", { textContent: texte("qualite_manuel") }), ...manuels];
-}
-
-// Le profil est figé au chargement, lu par toute la visite : en changer, c'est la recharger.
-export function brancherChoix({ recharger }) {
-  const fenetre = document.querySelector("#qualite-choix");
-  const niveaux = fenetre.querySelector(".niveaux");
-  const fermer = () => { fenetre.hidden = true; };
-  const remplir = () => niveaux.replaceChildren(...choixDeNiveau());
-
-  remplir();
-  suivreLangue(remplir);
-  document.querySelector("#qualite-courante").onclick = (e) => { e.currentTarget.blur(); fenetre.hidden = false; };
-  fenetre.querySelector(".fermer").onclick = fermer;
-  fenetre.onclick = (e) => { if (e.target === fenetre) fermer(); };
-  niveaux.onclick = (e) => {
-    const choix = e.target.closest("[data-niveau]");
-    if (!choix) return;
-    fermer();
-    if (choix.getAttribute("aria-pressed") === "true") return;
-    choisir(choix.dataset.niveau);
-    recharger();
-  };
-  addEventListener("keydown", (e) => { if (e.key === "Escape") fermer(); });
 }
 
 // La mémoire GPU est ce qui fait perdre son contexte WebGL à un iPhone : au-delà de `cote`, une texture pèse sans rien montrer de plus sur un petit écran.

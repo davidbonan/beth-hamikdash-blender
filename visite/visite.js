@@ -12,7 +12,8 @@ import { refleterLesDallages } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, cuireLesNuages, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
-import { NIVEAU, PROFIL, brancherChoix, marquerChargementAcheve, seRelever, seReplier } from "./qualite.js";
+import { NIVEAU, PROFIL, marquerChargementAcheve, seRelever, seReplier } from "./qualite.js";
+import { brancherJauge, signalerSaccade } from "./jauge.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { panneau } from "./fiche.js";
@@ -574,7 +575,7 @@ const avantLePas = new THREE.Vector3();
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
 // Seule la définition cède : le miroir du dallage n'est pas un palier, lâché il manquait à l'œil sans que l'image y gagne assez.
-const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart, { quandABout: seReplier, quandALAise: seRelever });
+const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart, { quandABout: () => { seReplier(); signalerSaccade(); }, quandALAise: seRelever });
 function ajusterEchelle(dt) {
   const voulue = regulateur.suivre(dt, performance.now() / 1000);
   if (voulue === null) return;
@@ -797,7 +798,7 @@ boutonReglages.onclick = (e) => { e.currentTarget.blur(); montrerReglages(!regla
 reglages.addEventListener("click", (e) => { if (!e.target.closest("#langue-courante")) montrerReglages(false); });
 addEventListener("pointerdown", (e) => { if (!e.target.closest?.("#reglages, #reglages-ouvrir")) montrerReglages(false); });
 addEventListener("keydown", (e) => { if (e.key === "Escape") montrerReglages(false); });
-brancherChoix({ recharger: () => {
+brancherJauge({ recharger: () => {
   const regard = camera.getWorldDirection(new THREE.Vector3()).add(camera.position);
   confier(REPRISE, JSON.stringify({ position: camera.position.toArray(), regard: regard.toArray(), moment: eclairage.moment }));
   const url = new URL(location);

@@ -348,7 +348,7 @@
   #barre button:active, #barre .menu:active { transform: scale(.96); }
   #barre #chercher { display: inline-flex; align-items: center; gap: 7px; }
   #chercher .icone { width: 15px; height: 15px; }
-  #barre #langue-courante, #barre #qualite-courante, #barre #moment, #barre #reglages-ouvrir {
+  #barre #langue-courante, #barre #moment, #barre #reglages-ouvrir {
     width: var(--commande); padding: 0; font-weight: 600;
   }
   /* Langue, heure et aide gardent leur place dans la barre large ; l'étroite les range sous « ⋯ ». */
@@ -376,35 +376,103 @@
   }
   #barre #langue-menu button:hover { border-color: var(--or); }
 
-  /* ---- qualité ---- */
+  /* ---- qualité : la jauge dit le profil, elle déroule la ma'arakha qui en change ---- */
+  #barre #qualite-courante { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; }
+  #qualite-courante .aiguille { transform-origin: 12px 16.5px; transition: transform .3s cubic-bezier(.3,1.5,.5,1); }
+  :root[dir="rtl"] #qualite-courante svg { scale: -1 1; }
+  /* Le rythme est resté lent au dernier palier : la pastille bat jusqu'au rechargement. */
+  #qualite-courante[data-saccade]::after {
+    content: ""; position: absolute; top: -4px; inset-inline-end: -4px; width: 10px; height: 10px; border-radius: 50%;
+    background: #d9a441; box-shadow: 0 0 0 2px #141210; animation: qualite-battre 1.6s ease-in-out infinite;
+  }
+  @keyframes qualite-battre { 50% { box-shadow: 0 0 0 2px #141210, 0 0 0 6px rgba(217,164,65,.25); } }
+
   #qualite-choix {
-    position: fixed; inset: 0; z-index: 28; display: grid; place-items: center; grid-template-rows: minmax(0, 1fr);
-    padding: calc(16px + var(--marge-haut)) calc(16px + var(--marge-droite)) calc(16px + var(--marge-bas)) calc(16px + var(--marge-gauche));
-    background: rgba(13,12,11,.6);
+    position: fixed; z-index: 28; top: var(--qualite-haut, 56px);
+    inset-inline-start: clamp(12px, var(--qualite-ancre, 12px), calc(100vw - 332px)); width: 320px;
+    display: grid; gap: 10px; padding: 12px; border-radius: 8px; color: #e8e0d0;
+    border: 1px solid rgba(203,192,170,.28); background: #141210; box-shadow: 0 14px 34px rgba(0,0,0,.5);
+    animation: qualite-deplier .16s ease-out;
   }
-  #qualite-choix .cadre {
-    width: min(360px, 100%); padding: 14px 16px 16px; border-radius: 8px; color: #e8e0d0;
-    max-height: 100%; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
-    border: 1px solid rgba(203,192,170,.22); background: rgba(20,18,16,.96); box-shadow: 0 12px 32px rgba(0,0,0,.45);
+  @keyframes qualite-deplier { from { opacity: 0; transform: translateY(-6px); } }
+  #qualite-choix .tete { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  #qualite-choix h2 { margin: 0; font-size: 15px; font-weight: 500; }
+  #qualite-choix .auto { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #a9a094; }
+  #qualite-choix .interrupteur {
+    position: relative; flex: none; width: 38px; height: 22px; padding: 0; border-radius: 11px; cursor: pointer;
+    border: 1px solid rgba(203,192,170,.3); background: #2a2622;
   }
-  #qualite-choix .tete { display: flex; align-items: center; margin-bottom: 10px; }
-  #qualite-choix .niveaux { display: flex; flex-direction: column; gap: 6px; }
-  #qualite-choix .niveaux button {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; padding: 6px 12px;
-    font: inherit; font-size: 15px; text-align: start; color: #e8e0d0; cursor: pointer;
-    border: 1px solid rgba(203,192,170,.18); border-radius: 6px; background: none;
+  #qualite-choix .interrupteur::after {
+    content: ""; position: absolute; top: 2px; inset-inline-start: 2px; width: 16px; height: 16px; border-radius: 50%;
+    background: #a9a094; transition: translate .18s ease;
   }
-  #qualite-choix .niveaux button:hover, #qualite-choix [aria-pressed="true"] { border-color: var(--or); color: #f3efe6; }
-  #qualite-choix [aria-pressed="true"] > span:first-child::before { content: "✓ "; color: #d9a441; }
-  #qualite-choix .niveaux .auto { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding-block: 10px; }
-  #qualite-choix .auto small { font-size: 12px; line-height: 1.4; color: #a9a094; }
-  #qualite-choix h3 { margin: 10px 0 2px; color: #a9a094; }
-  /* La pastille dit ce que la machine en fera, le mot à côté le dit à qui ne distingue pas les couleurs. */
-  #qualite-choix .charge { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: #a9a094; white-space: nowrap; }
-  #qualite-choix .charge::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #6fae6a; }
+  #qualite-choix .interrupteur[aria-checked="true"] { background: var(--or); border-color: #d9a441; }
+  #qualite-choix .interrupteur[aria-checked="true"]::after { translate: 16px; background: #f3efe6; }
+  :root[dir="rtl"] #qualite-choix .interrupteur[aria-checked="true"]::after { translate: -16px; }
+  #qualite-choix :is(button, input):focus-visible { outline: 2px solid #d9a441; outline-offset: 2px; }
+
+  /* Gravées au trait doré comme les icônes de la barre : le bois froid reste pâle, le feu n'est que lueur et contour. */
+  #qualite-choix .maarakha { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 100%; gap: 6px; height: 60px; touch-action: none; cursor: pointer; }
+  #qualite-choix .maarakha i { display: block; min-height: 0; }
+  #qualite-choix .maarakha svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  #qualite-choix .maarakha input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
+  #qualite-choix .maarakha:has(input:focus-visible) { outline: 2px solid #d9a441; outline-offset: 4px; border-radius: 4px; }
+  #qualite-choix .trait { fill: none; stroke: #c9a668; stroke-width: .9; stroke-linecap: round; stroke-linejoin: round; transition: stroke .3s, opacity .3s; }
+  #qualite-choix .bois { fill: #161310; }
+  #qualite-choix .fil { stroke-width: .5; opacity: .7; }
+  #qualite-choix .sol { stroke: #8a8174; stroke-width: .6; }
+  #qualite-choix i:not(.allume) .trait { stroke: #a9a094; opacity: .35; }
+  #qualite-choix i:not(.allume) .vif { display: none; }
+  #qualite-choix i.allume:nth-child(n+3) .bois { stroke: #e2b766; }
+  #qualite-choix .lueur { animation: qualite-rougeoyer 2.6s ease-in-out infinite; }
+  #qualite-choix .langue {
+    fill: rgba(255,205,120,.1); stroke: #f3cb78; stroke-width: .75; stroke-linecap: round;
+    transform-box: fill-box; transform-origin: 50% 100%; animation: qualite-vaciller 1.5s ease-in-out infinite;
+  }
+  #qualite-choix .langue .veine { fill: none; stroke-width: .5; opacity: .8; }
+  #qualite-choix .volute {
+    fill: none; stroke: url(#qualite-fumee); stroke-width: .8; stroke-linecap: round; opacity: .5;
+    transform-box: fill-box; transform-origin: 50% 100%; animation: qualite-volute 3.3s ease-out infinite;
+  }
+  #qualite-choix .etincelle { fill: #f6d58e; transform-box: fill-box; animation: qualite-jaillir 1.9s ease-out infinite; }
+  @keyframes qualite-rougeoyer { 50% { opacity: .65; } }
+  @keyframes qualite-vaciller {
+    0%, 100% { transform: scale(1, 1) skewX(0); }
+    25% { transform: scale(.93, 1.07) skewX(2.5deg); }
+    50% { transform: scale(1.04, .95) skewX(-1.5deg); }
+    75% { transform: scale(.97, 1.04) skewX(1deg); }
+  }
+  @keyframes qualite-volute {
+    0% { opacity: 0; transform: translate(0, 2px) scale(.8, .5); }
+    25% { opacity: .9; }
+    100% { opacity: 0; transform: translate(2.5px, -15px) scale(1.2, 1.25); }
+  }
+  @keyframes qualite-jaillir { 0% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(3px, -24px); } }
+
+  /* La pastille dit ce que la machine en fera, le message le dit en mots à qui ne distingue pas les couleurs. */
+  #qualite-choix .reperes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 11px; color: #a9a094; }
+  #qualite-choix .reperes span { display: inline-flex; justify-content: center; align-items: center; gap: 4px; text-align: center; }
+  #qualite-choix .reperes .actif { color: #e8e0d0; }
+  #qualite-choix [data-charge]::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: #6fae6a; }
   #qualite-choix [data-charge="risque"]::before { background: #d9a441; }
   #qualite-choix [data-charge="lourd"]::before { background: #d2553f; }
-  #qualite-choix .consigne { margin: 12px 0 0; font-size: 12px; line-height: 1.4; color: #a9a094; }
+  #qualite-choix .message { display: flex; align-items: baseline; gap: 7px; margin: 0; font-size: 13px; line-height: 1.4; color: #a9a094; }
+  #qualite-choix .message::before { width: 8px; height: 8px; translate: 0 -1px; }
+  #qualite-choix .application { display: grid; gap: 4px; }
+  #qualite-choix .appliquer {
+    height: 36px; border-radius: 5px; cursor: pointer; font: inherit; font-size: 14px;
+    border: 1px solid #d9a441; background: var(--or); color: #fff7e6; transition: transform .12s ease;
+  }
+  #qualite-choix .appliquer:active { transform: scale(.98); }
+  #qualite-choix .application small { text-align: center; font-size: 11px; color: #a9a094; }
+  @media (prefers-reduced-motion: reduce) {
+    #qualite-choix, #qualite-choix *, #qualite-courante::after { animation: none !important; }
+    #qualite-courante .aiguille { transition: none; }
+  }
+  /* Téléphone debout : toute la largeur, sous la barre. */
+  @media (max-width: 720px) {
+    #qualite-choix { inset-inline: auto; left: calc(12px + var(--marge-gauche)); right: calc(12px + var(--marge-droite)); width: auto; }
+  }
 
   #accueil {
     position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; justify-items: center;
@@ -793,15 +861,15 @@
              calc(16px + var(--marge-bas)) calc(16px + var(--marge-gauche));
     color: #e8e0d0; background: rgba(13,12,11,.93); backdrop-filter: blur(4px);
   }
-  :is(#recherche, #qualite-choix) h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
-  :is(#recherche, #qualite-choix) .fermer {
+  #recherche h2 { margin: 0; margin-inline-end: auto; font-size: 18px; font-weight: 500; letter-spacing: .02em; }
+  #recherche .fermer {
     flex: 0 0 auto; height: 34px; padding: 0 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;
     font: inherit; font-size: 13px; line-height: 1;
     border: 1px solid rgba(203,192,170,.28); background: rgba(20,18,16,.82); color: #e8e0d0;
     transition: border-color .15s ease, transform .12s ease;
   }
-  :is(#recherche, #qualite-choix) .fermer:hover { border-color: var(--or); color: #f3efe6; }
-  :is(#recherche, #qualite-choix) .fermer { width: 34px; padding: 0; font-size: 18px; }
+  #recherche .fermer:hover { border-color: var(--or); color: #f3efe6; }
+  #recherche .fermer { width: 34px; padding: 0; font-size: 18px; }
 
   /* Le plan se lit comme une carte de ville, à aplats clairs ; ses commandes gardent l'habit de la visite et flottent dessus. */
   :root {
@@ -968,8 +1036,8 @@
   /* ---- au doigt, rien de ce qui se touche sous 44 px ---- */
   @media (pointer: coarse) {
     #barre { --commande: 44px; }
-    #plan button, :is(#recherche, #qualite-choix) .fermer { height: 44px; }
-    :is(#recherche, #qualite-choix) .fermer, #plan .zoom button, #plan .recentrer { width: 44px; }
+    #plan button, #recherche .fermer { height: 44px; }
+    #recherche .fermer, #plan .zoom button, #plan .recentrer { width: 44px; }
     #plan .bulle .actions button { height: 40px; }
     #plan .aller input, #plan .tete .fermer { height: 44px; }
     #plan .tete .fermer { width: 44px; }
@@ -999,7 +1067,10 @@
 
   /* ---- barre étroite, debout comme couché : ce qu'on règle une fois se range sous « ⋯ » ---- */
   @media (max-width: 720px), (max-height: 520px) {
-    #barre #reglages-ouvrir { display: inline-grid; margin-inline-start: auto; }
+    /* La jauge reste dans la barre, juste avant « ⋯ » : on la consulte sans rien ouvrir. */
+    #barre #qualite-courante { order: 1; width: var(--commande); padding: 0; justify-content: center; margin-inline-start: auto; }
+    #qualite-courante .nom { display: none; }
+    #barre #reglages-ouvrir { display: inline-grid; order: 2; }
     #reglages {
       position: absolute; top: 100%; inset-inline-end: calc(12px + max(var(--marge-gauche), var(--marge-droite)));
       display: flex; flex-direction: column; gap: 2px; min-width: 200px; padding: 4px; border-radius: 5px;
@@ -1007,15 +1078,13 @@
     }
     #reglages:not(.ouverts) { display: none; }
     #reglages { z-index: 1; }
-    #barre #reglages > button, #barre #langue-courante, #barre #qualite-courante {
+    #barre #reglages > button, #barre #langue-courante {
       display: grid; grid-template-columns: 21px auto; justify-content: start; column-gap: 10px;
       width: 100%; padding: 0 10px; font-weight: 400; border-color: transparent; background: none;
     }
-    #reglages > button::after, #langue-courante::after, #qualite-courante::after { content: attr(title); }
+    #reglages > button::after, #langue-courante::after { content: attr(title); }
     #rejouer span { display: none; }
     #rejouer::before { content: "?"; text-align: center; font-weight: 600; }
-    /* Ce qu'on ne règle qu'en cas de gêne passe en dernier. */
-    #qualite-courante { order: 2; }
     #langue-menu { position: static; min-width: 0; padding: 2px 0 0; border: 0; background: none; }
   }
 
@@ -1111,11 +1180,8 @@
     <circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/>
     <path d="m15 15 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
   </symbol>
-  <symbol id="icone-jauge" viewBox="0 0 24 24">
-    <path d="M3.5 16.5a8.5 8.5 0 0 1 17 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-    <path d="M12 16.5l4.8-5.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-    <circle cx="12" cy="16.5" r="1.5" fill="currentColor"/>
-  </symbol>
+  <radialGradient id="qualite-lueur"><stop offset="0" stop-color="#ffb45a" stop-opacity=".42"/><stop offset=".5" stop-color="#e07a2a" stop-opacity=".14"/><stop offset="1" stop-color="#e07a2a" stop-opacity="0"/></radialGradient>
+  <linearGradient id="qualite-fumee" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c4bbad" stop-opacity=".9"/><stop offset="1" stop-color="#c4bbad" stop-opacity="0"/></linearGradient>
 </svg>
 
 <div id="accueil" hidden>
@@ -1247,14 +1313,13 @@
 
 <div id="barre">
   <button id="chercher" type="button" aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="#icone-loupe"></use></svg><span data-texte="chercher">Chercher</span></button>
+  <button id="qualite-courante" type="button" title="Qualité de l'image" data-titre="qualite" aria-haspopup="dialog" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3.5 16.5a8.5 8.5 0 0 1 17 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path class="aiguille" d="M12 16.5V9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.6" fill="currentColor"/></svg><span class="nom"></span></button>
   <div id="reglages">
     <div id="langue">
       <button id="langue-courante" type="button" title="Langue" aria-label="Langue" data-titre="langue"
               aria-haspopup="true" aria-expanded="false"><svg class="drapeau" aria-hidden="true"><use href="#drapeau-fr"></use></svg></button>
       <div id="langue-menu" hidden></div>
     </div>
-    <button id="qualite-courante" type="button" title="Qualité de l'image" aria-label="Qualité de l'image" data-titre="qualite"
-            aria-haspopup="dialog"><svg aria-hidden="true"><use href="#icone-jauge"></use></svg></button>
     <button id="moment" type="button" title="Passer à la nuit" aria-label="Passer à la nuit" aria-pressed="false"
             data-titre="moment_nuit"><svg aria-hidden="true"><use href="#icone-lune"></use></svg></button>
     <button id="rejouer" type="button" title="Revoir les premiers pas" aria-label="Revoir les premiers pas"
@@ -1316,13 +1381,16 @@
 </div>
 
 <div id="qualite-choix" role="dialog" aria-labelledby="qualite-titre" hidden>
-  <div class="cadre">
-    <div class="tete">
-      <h2 id="qualite-titre" data-texte="qualite">Qualité de l'image</h2>
-      <button class="fermer" type="button" title="Fermer" aria-label="Fermer" data-titre="fermer">×</button>
-    </div>
-    <div class="niveaux"></div>
-    <p class="consigne" data-texte="qualite_recharge"></p>
+  <div class="tete">
+    <h2 id="qualite-titre" data-texte="qualite">Qualité de l'image</h2>
+    <span class="auto"><span data-texte="qualite_auto" aria-hidden="true">Automatique</span><button class="interrupteur" type="button" role="switch" aria-checked="true" aria-label="Automatique" data-titre="qualite_auto"></button></span>
+  </div>
+  <div class="maarakha"><input type="range" min="0" max="3" step="1" aria-labelledby="qualite-titre"></div>
+  <div class="reperes"></div>
+  <p class="message"></p>
+  <div class="application" hidden>
+    <button class="appliquer" type="button" data-texte="qualite_appliquer">Appliquer</button>
+    <small data-texte="qualite_recharge">La visite se recharge au même endroit.</small>
   </div>
 </div>
 
