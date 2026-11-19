@@ -563,7 +563,7 @@ function dessiner(dt) {
   ciel.position.copy(camera.position);
   detail.choisir(HAUTEUR_IMAGE.value);
   dallage.rendre();
-  rendu.rendre();
+  rendu.rendre(dt);
 }
 
 const aide = $("#aide");

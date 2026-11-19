@@ -89,7 +89,8 @@ const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, defini
               irregularite: { bloc: 0.025, bombe: 0.010, dalle: 0.012, bombeDalle: 0.003, nuance: 0.10, nuanceDalle: 0.12, poliDalle: 0.0 } }, ecartDetail: 1, porteeDetail: Infinity,
   ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: 12, geometrie: 0.5,
   halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 40 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { presents: true, ombre: true },
-  fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 } };
+  fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 },
+  bouge: { pose: 1 / 96, prises: 12 } };
 
 // Un téléphone part à `echelleDepart` et ne monte au-dessus qu'en tenant ses 60 images : chaque iPhone trouve la sienne.
 // `preProfondeur` : à 390 × 844 elle coûte plus de géométrie qu'elle n'épargne de pixels (50 → 39 ms mesurés sans elle).
@@ -155,8 +156,15 @@ const choisi = lireRetenu(CHOISI);
 const manuel = !force && choisi in PROFILS;
 
 export const NIVEAU = force ? demande : manuel ? choisi : await niveauDeLaMachine();
-export const PROFIL = PROFILS[NIVEAU];
+export const PROFIL = avecLaPoseDemandee(PROFILS[NIVEAU]);
 if (!force) confier(INACHEVE, NIVEAU);
+
+// `?pose=48` pose le flou de bougé à 1/48 s sur tout profil, `?pose=0` l'ôte : de quoi le comparer.
+function avecLaPoseDemandee(profil) {
+  const inverse = Number(new URLSearchParams(location.search).get("pose") ?? NaN);
+  if (Number.isNaN(inverse)) return profil;
+  return { ...profil, bouge: inverse > 0 ? { prises: 12, ...profil.bouge, pose: 1 / inverse } : null };
+}
 
 export function marquerChargementAcheve() {
   oublierConfie(INACHEVE);

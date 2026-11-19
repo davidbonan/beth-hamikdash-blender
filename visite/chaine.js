@@ -417,6 +417,41 @@ const SORTIE = new THREE.ShaderMaterial({
     }`,
 });
 
+// Le FLOU DE BOUGÉ de la caméra : le pixel rendu est retrouvé là où l'image d'avant le voyait, et la pose étale l'écart.
+const BOUGE = PROFIL.bouge;
+// Un écart plus grand que ce quart d'écran est un saut, pas un geste ; la traînée reste sous ce quarantième.
+const SAUT = 0.25, TRAINEE_MAX = 0.025;
+const FLOU_DE_BOUGE = BOUGE && {
+  uniforms: { tDiffuse: { value: null }, tGeo: { value: null }, uFacteur: { value: 0 },
+              uVersAvant: { value: new THREE.Matrix4() }, uProjectionInverse: { value: new THREE.Matrix4() } },
+  vertexShader: OCCLUSION.vertexShader,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse, tGeo;
+    uniform mat4 uVersAvant, uProjectionInverse;
+    uniform float uFacteur;
+    varying vec2 vUv;
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      float z = texelFetch(tGeo, ivec2(vUv * vec2(textureSize(tGeo, 0))), 0).a;
+      vec4 r = uProjectionInverse * vec4(vUv * 2.0 - 1.0, 1.0, 1.0);
+      vec3 rayon = r.xyz / r.w;
+      // Le ciel et ce qui passe la portée de la géométrie sont à l'infini : seule la rotation les déplace.
+      vec4 avant = z > 0.0 ? uVersAvant * vec4(rayon * (z / -rayon.z), 1.0) : uVersAvant * vec4(rayon, 0.0);
+      if (avant.w <= 0.0) { gl_FragColor = c; return; }
+      vec2 ecart = vUv - (avant.xy / avant.w * 0.5 + 0.5);
+      if (length(ecart) > ${SAUT}) { gl_FragColor = c; return; }
+      vec2 trainee = ecart * uFacteur;
+      trainee *= min(1.0, ${TRAINEE_MAX} / max(length(trainee), 1e-6));
+      if (length(trainee * vec2(textureSize(tDiffuse, 0))) < 0.5) { gl_FragColor = c; return; }
+      // Le départ de chaque pixel est décalé : les paliers des prises se fondent en bruit, que le grain recouvre.
+      float decale = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+      vec3 somme = vec3(0.0);
+      for (int i = 0; i < ${BOUGE?.prises ?? 0}; i++)
+        somme += texture2D(tDiffuse, vUv + trainee * ((float(i) + decale) / ${BOUGE?.prises ?? 0}.0 - 0.5)).rgb;
+      gl_FragColor = vec4(somme / ${BOUGE?.prises ?? 0}.0, c.a);
+    }`,
+};
+
 // L'ÉTALONNAGE, en toute fin : netteté, ombres relevées, bascule de teinte, vignettage, grain.
 //
 // La NETTETÉ est celle d'un téléphone, qui accentue toute photographie : adaptative (CAS
@@ -666,6 +701,12 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     voileDuFeu.enabled = false;
     composeur.addPass(voileDuFeu);
   }
+  // Avant le halo : une haute lumière traînée déborde en traînée, comme sur la pellicule.
+  const bouge = FLOU_DE_BOUGE && new ShaderPass(FLOU_DE_BOUGE);
+  if (bouge) {
+    bouge.uniforms.tGeo.value = cibleGeo.texture;
+    composeur.addPass(bouge);
+  }
   // Avant le halo : c'est la lumière de la scène qu'on mesure, pas son débordement.
   const photometre = new Photometre();
   composeur.addPass(photometre);
@@ -830,13 +871,28 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     }
   }
 
-  function rendre() {
+  // Une image de pas nul est un saut demandé (vue, capture) : elle n'a pas de mouvement à étaler.
+  const vueAvant = new THREE.Matrix4(), vueCourante = new THREE.Matrix4();
+  function poserLeBouge(dt) {
+    if (!bouge) return;
+    vueCourante.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    bouge.enabled = dt > 0 && !vueCourante.equals(vueAvant);
+    if (bouge.enabled) {
+      bouge.uniforms.uFacteur.value = BOUGE.pose / dt;
+      bouge.uniforms.uVersAvant.value.multiplyMatrices(vueAvant, camera.matrixWorld);
+      bouge.uniforms.uProjectionInverse.value.copy(camera.projectionMatrixInverse);
+    }
+    vueAvant.copy(vueCourante);
+  }
+
+  function rendre(dt) {
     voile.enabled = pieceEnfumeeVue();
     if (feu) voileDuFeu.enabled = feuDeLAutelVu();
     const eclaire = rayons && airEclaire.enabled;
     // Les matrices de la scène se refont à la passe de géométrie, que la suite fige : sans elle, on les refait ici.
-    if (passeAO || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
+    if (passeAO || bouge || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
     else scene.updateMatrixWorld();
+    poserLeBouge(dt);
 
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
@@ -883,7 +939,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function passesEnTampon() {
     const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
-    return [passeAO, passeComposition, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
+    return [passeAO, passeComposition, bouge, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.
