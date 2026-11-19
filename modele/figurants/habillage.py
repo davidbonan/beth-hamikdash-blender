@@ -21,6 +21,10 @@ AVNET_BRODE = Teintes(((0.000, LIN), (0.010, TEKHELET), (0.022, ARGAMAN), (0.034
 AVNET_DE_LIN = Teintes(tuple((dz, LIN) for dz, _ in AVNET_BRODE.bandes), (LIN,) * 3)
 
 
+# Les quatre fils en filets étroits, tissés serrés : en trois larges rayures, les pans faisaient ruban de jouet.
+FILETS = 9
+
+
 def avnet(mm, ceinture, surface, teintes=AVNET_BRODE):
     z0 = ceinture.z - 0.032
     th = _angles()
@@ -31,13 +35,18 @@ def avnet(mm, ceinture, surface, teintes=AVNET_BRODE):
         couleurs.append(couleur)
     mm.nappe(anneaux, lambda i, j: couleurs[i + 1], "buste")
     raies = teintes.raies
-    for depart, longueur in ((0.42, 0.52), (0.52, 0.44)):
+    # Les pans tombent d'un nœud : chacun s'écarte et vrille un peu en descendant, droits ils pendaient en lattes.
+    for depart, longueur, ecart, vrille in ((0.42, 0.52, 0.035, 0.35), (0.52, 0.44, -0.025, -0.28)):
         travers = Vector((math.cos(depart), math.sin(depart), 0.0))
+        dehors = Vector((*_vers(depart), 0.0))
         rangs = []
         for k in range(14):
-            centre = hors_de(surface, ceinture.point(depart, z0 + 0.03 - longueur * k / 13, 0.016), 0.008)
-            rangs.append([centre + travers * (0.027 * c) for c in (-1.0, -0.33, 0.33, 1.0)])
-        mm.nappe(rangs, lambda i, j: raies[j], "jupe", ferme=False)
+            u = k / 13
+            centre = hors_de(surface, ceinture.point(depart, z0 + 0.03 - longueur * u, 0.016), 0.008) + travers * (ecart * u * u)
+            a = vrille * u * math.sin(math.pi * u)
+            biais = travers * math.cos(a) + dehors * math.sin(a)
+            rangs.append([centre + biais * (0.027 * c) for c in np.linspace(-1.0, 1.0, FILETS + 1)])
+        mm.nappe(rangs, lambda i, j: raies[j % len(raies)], "jupe", ferme=False)
 
 
 def _crane(humain, dessus=()):
@@ -69,8 +78,9 @@ def coiffe(mm, humain, rangs, couleur, zone="head", ouverture=None, n=40):
 
 
 # Une bande de lin enroulée « comme un chapeau » (Rambam Klei HaMikdash 8:2), chaque tour chevauchant le précédent ;
-# `bas` : son premier tour, sous le sommet du crâne.
-def migbaat(mm, humain, tours=5.0, par_tour=40, largeur=0.048, epaisseur=0.009, montee=0.022, bas=0.085):
+# `bas` : son premier tour, sous le sommet du crâne. Mince et large, son bord bas posé sur le tour d'avant, le haut glissé
+# sous le suivant ; serrée à la main, elle ondule et ne monte pas d'un pas égal : régulière, elle s'empilait en planches.
+def migbaat(mm, humain, tours=6.5, par_tour=48, largeur=0.066, epaisseur=0.006, montee=0.015, bas=0.085):
     h = humain
     points = _crane(h, h.poils)
     sommet = float(points[:, 2].max())
@@ -87,20 +97,26 @@ def migbaat(mm, humain, tours=5.0, par_tour=40, largeur=0.048, epaisseur=0.009, 
     angles = np.append(_angles(), TOUR)
     z0, total = h.z_tete - bas, int(tours * par_tour)
     sections = []
+    travers = np.linspace(-1.0, 1.0, 7)
     for s in range(total + 1):
         t = s / par_tour
         th = TOUR * t + 0.6
-        z = z0 + montee * t + 0.007 * math.sin(th - 0.9)
+        z = z0 + montee * t + 0.007 * math.sin(th - 0.9) + 0.004 * math.sin(2.0 * th + 1.7 * t) + 0.002 * math.sin(5.0 * th + 3.1 * t)
         r_env, cy = contour(z)
         dome = G.lisse((z - (sommet - 0.05)) / 0.07)
-        r = float(np.interp(th % TOUR, angles, np.append(r_env, r_env[0]))) * (1.0 - 0.5 * dome) + epaisseur * (0.8 + 0.3 * t)
+        gonfle = 0.0025 * math.sin(3.0 * th + 2.3 * t) + 0.0015 * math.sin(7.0 * th - t)
+        r = float(np.interp(th % TOUR, angles, np.append(r_env, r_env[0]))) * (1.0 - 0.5 * dome) + epaisseur * (1.0 + 0.6 * t) + gonfle
+        # Le bout est rentré sous le tour d'avant, comme on arrête un turban.
+        r -= 3.0 * epaisseur * (1.0 - G.lisse((total - s) / 24))
         dx, dy = _vers(th)
         centre, dehors = Vector((r * dx, cy + r * dy, z)), Vector((dx, dy, 0.0))
-        haut = (HAUT_Z - dehors * (0.2 + 0.9 * dome)).normalized()
-        w = largeur * (0.35 + 0.65 * G.lisse(s / 10) * G.lisse((total - s) / 10)) / 2
-        e = epaisseur / 2
-        profil = ((-e, -w), (e, -0.9 * w), (1.3 * e, 0.0), (e, 0.9 * w), (-e, w), (-0.6 * e, 0.0))
-        sections.append([centre + dehors * a + haut * b for a, b in profil])
+        haut = (HAUT_Z - dehors * (0.35 + 0.45 * dome)).normalized()
+        w = largeur * (1.0 + 0.10 * math.sin(2.0 * th + 0.8 * t)) * (0.35 + 0.65 * G.lisse(s / 10) * G.lisse((total - s) / 30)) / 2
+        e = epaisseur
+        devant = [(e * (0.5 * (1.0 - b * b) - 0.7 * b), w * b) for b in travers]
+        # Le bord se roule : plus épais qu'au milieu, il ne coupe pas comme une feuille.
+        dos = [(a - e * (0.5 + 0.4 * b * b), b * 0.97) for a, b in devant[::-1]]
+        sections.append([centre + dehors * a + haut * b for a, b in devant + dos])
     mm.nappe(sections, LIN, "head")
     coiffe(mm, h, [(-0.035, 0.010, 0.80), (-0.015, 0.010, 0.62), (0.0, 0.008, 0.42), (0.008, 0.004, 0.2)], LIN, "head")
 

@@ -103,7 +103,7 @@ def _matiere(nom, rugosite, metal=0.0, tissu=None):
 
 
 def lin():
-    return _matiere("Figure_Lin", 0.82, tissu=trame("lin", 24))
+    return _matiere("Figure_Lin", 0.82, tissu=trame("lin", 56))
 
 
 def laine():
@@ -161,11 +161,28 @@ def teinter(image, facteur, cote=1024):
     return _retoucher(image, ("teinte", tuple(round(f, 3) for f in facteur)), cote, multiplier)
 
 
-# Garde le grain et l'ombre des plis ; la clarté médiane prend la teinte `couleur`.
+RAYON_DU_GRAIN = 12
+
+
+def _flou(plan, rayon):
+    for axe in (0, 1):
+        for _ in range(3):
+            cumul = np.cumsum(np.pad(plan, [(rayon + 1, rayon) if a == axe else (0, 0) for a in (0, 1)], mode="edge"), axis=axe)
+            plan = (np.take(cumul, range(2 * rayon + 1, cumul.shape[axe]), axis=axe)
+                    - np.take(cumul, range(0, cumul.shape[axe] - 2 * rayon - 1), axis=axe)) / (2 * rayon + 1)
+    return plan
+
+
+# Garde le grain et les coutures ; les ombres peintes pour une autre coupe, plus larges que RAYON_DU_GRAIN, partent.
 def reteindre(image, couleur, cote=1024):
     def remplacer(px):
         clarte = px[:, :3] @ np.array((0.2126, 0.7152, 0.0722), dtype=np.float32)
-        relative = 1.0 + 0.5 * (clarte / max(float(np.median(clarte)), 1e-3) - 1.0)
+        cote_ = int(round(len(clarte) ** 0.5))
+        plan = clarte.reshape(cote_, cote_)
+        etoffe = (plan > 0.004).astype(np.float32)
+        fond = _flou(plan * etoffe, RAYON_DU_GRAIN) / np.maximum(_flou(etoffe, RAYON_DU_GRAIN), 1e-3)
+        grain = np.where(etoffe > 0, plan / np.maximum(fond, 1e-3), 1.0).ravel()
+        relative = 1.0 + 0.5 * (grain - 1.0)
         px[:, :3] = np.minimum(relative[:, None] * np.array(couleur, dtype=np.float32), 1.0)
     return _retoucher(image, ("reteinte", tuple(round(c, 3) for c in couleur)), cote, remplacer)
 

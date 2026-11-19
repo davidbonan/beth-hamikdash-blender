@@ -38,7 +38,7 @@ class Gabarit(NamedTuple):
     muscle: float = 0.55
     poids: float = 0.5
     peau: str = "middleage_caucasian_male"
-    teint: tuple = (0.82, 0.70, 0.60)
+    teint: tuple = (0.80, 0.71, 0.64)
 
 
 def _hauteur(humain):
