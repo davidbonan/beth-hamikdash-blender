@@ -16,6 +16,7 @@ from .habillage import (AVNET_BRODE, AVNET_DE_LIN, HAUT_Z, KUTONET, _crane_et_ch
                         ourler)
 from .ustensiles import tourner_profil, tube_simple
 from .mise_en_scene import repere_vers
+from .plis import plisser
 
 
 class Habits(NamedTuple):
@@ -50,7 +51,9 @@ def vetir_de_lin(h, habits):
     robe = h.vetir_mpfb(KUTONET)
     h.detendre()
     empiecement(h, robe)
-    ceindre(h, robe, habits.avnet)
+    ceinture = ceindre(h, robe, habits.avnet)
+    plisser(h, robe, ceinture)
+    h.ranger()
     coiffer(h, habits.coiffe)
     appliquer_visibilite(h, h.visible & ~h.efface)
     return h
@@ -62,6 +65,7 @@ def ceindre(h, robe, teintes):
     ceint = Maillage()
     avnet(ceint, ceinture, surface_de(h, [robe]), teintes)
     lier(h, ceint, f"{h.nom}_avnet", lin())
+    return ceinture
 
 
 def coiffer(h, coiffe):

@@ -28,7 +28,7 @@ const LISSE = 0, PIERRE = 1, MARBRE = 2, METAL = 3, BOIS = 4, ETOFFE = 5, EAU = 
 // Les seuls volumes qu'on regarde des deux côtés : on les traverse, et une étoffe
 // n'a pas d'endroit. Tout le reste du blockout est une boîte fermée.
 export const ETOFFES = new Set(["Parokhet_tissee", "Lin_blanc", "Tekhelet_meil",
-  "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Robe", "Figure_Robe_Royale", "Figure_Voile", "Figure_Meil",
+  "Figure_Lin", "Figure_Laine", "Figure_Velours", "Figure_Kutonet", "Figure_Kutonet_Ceinte", "Figure_Robe", "Figure_Robe_Royale", "Figure_Voile", "Figure_Meil",
   "Figure_Ephod", "Toile_blanche", "Drapeau_blanc", "Drapeau_bleu", "Caprier", "Caprier_sec", "Palme"]);
 // Les matières dont le grain passe par `temperance` : la pierre et le marbre.
 const MINERAUX = new Set([PIERRE, MARBRE, MARBRE_HERODE, TAMBOUR, MONOLITHE, MAISON, DALLE, DALLE_KOTEL, DALLE_DE_PRIERE, MURAILLE, ROCHE,
