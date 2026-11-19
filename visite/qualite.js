@@ -18,7 +18,7 @@
  * léger, `?qualite=sobre` le sobre : c'est ainsi qu'on les vérifie sans téléphone sous la main.
  */
 import { suivreLangue, texte } from "./langue.js";
-import { lireRetenu, oublier, retenir } from "./memoire.js";
+import { confier, lireConfie, lireRetenu, oublier, oublierConfie, retenir } from "./memoire.js";
 
 const demande = new URLSearchParams(location.search).get("qualite");
 
@@ -26,7 +26,7 @@ const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const coeurs = navigator.hardwareConcurrency || 8;
 // Seul Chrome d'Android dit sa mémoire : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
 const faible = tactile && (navigator.deviceMemory <= 4 || coeurs <= 4);
-const RETENU = "visite-profil-retenu", REPLIS = "visite-profil-replis", CHOISI = "visite-profil-choisi";
+const RETENU = "visite-profil-retenu", REPLIS = "visite-profil-replis", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
 // Du plus riche au plus pauvre.
 export const NIVEAUX = ["ultra", "haute", "basse", "minimale", "sobre"];
 // Un téléphone descend et remonte d'un cran à la fois, jamais jusqu'au profil lourd.
@@ -39,6 +39,7 @@ const VERSION = new URL(import.meta.url).search;
 
 const bureau = !tactile && coeurs > 4;
 const niveauRetenu = () => REPLIABLES.find((niveau) => niveau === lireRetenu(RETENU));
+const niveauAutomatiqueConnu = () => (bureau ? "haute" : niveauRetenu() ?? (faible ? "minimale" : "basse"));
 
 async function niveauDeLaMachine() {
   if (bureau) return "haute";
@@ -124,39 +125,22 @@ const ULTRA = { ...LOURD, definitionMax: 2, echelles: [1, 0.85, 0.7],
 
 const PROFILS = { ultra: ULTRA, haute: LOURD, basse: LEGER, minimale: TRES_LEGER, sobre: SOBRE };
 const force = demande in PROFILS;
-const choisi = lireRetenu(CHOISI);
-let manuel = !force && choisi in PROFILS;
-
-export const NIVEAU = force ? demande : manuel ? choisi : await niveauDeLaMachine();
-export const PROFIL = PROFILS[NIVEAU];
-
 const replis = () => Number(lireRetenu(REPLIS) ?? 0);
-let bascule = false;
 
-function basculerVers(voulu) {
-  bascule = true;
-  retenir(RETENU, voulu);
-}
-
-const rang = REPLIABLES.indexOf(NIVEAU);
-
-// Le profil qui n'a pas tenu — contexte perdu, rythme lent au dernier palier — part au cran du dessous à la visite suivante.
-export function seReplier() {
-  if (force || manuel || bascule || rang < 0 || rang === REPLIABLES.length - 1) return;
+// Le profil automatique qui n'a pas tenu part au cran du dessous à la visite suivante ; faux s'il est déjà au dernier.
+function replierDepuis(niveau) {
+  const rang = REPLIABLES.indexOf(niveau);
+  if (rang < 0 || rang === REPLIABLES.length - 1) return false;
   retenir(REPLIS, String(replis() + 1));
-  basculerVers(REPLIABLES[rang + 1]);
+  retenir(RETENU, REPLIABLES[rang + 1]);
+  return true;
 }
 
-// Le profil tenu sans peine à son premier palier repart au cran du dessus à la visite suivante.
-export function seRelever() {
-  if (force || manuel || bascule || rang < 1 || replis() >= REPLIS_MAX) return;
-  basculerVers(REPLIABLES[rang - 1]);
-}
-
-// Le contexte perdu sous un profil choisi le ramène au cran du dessous ; sous le dernier, la main revient à l'automatique.
-export function tomber() {
-  if (!manuel) return seReplier();
-  choisir(NIVEAUX[NIVEAUX.indexOf(NIVEAU) + 1]);
+// Choisi au-dessus de l'automatique, on y revient d'un coup ; à son niveau ou dessous, au cran du dessous ; sous le dernier, à l'automatique.
+function niveauApresChute(choisi) {
+  const rang = NIVEAUX.indexOf(choisi);
+  if (rang < NIVEAUX.indexOf(niveauAutomatiqueConnu())) return "";
+  return NIVEAUX[rang + 1] ?? "";
 }
 
 // "" : l'automatique.
@@ -165,8 +149,53 @@ function choisir(niveau) {
   else oublier(CHOISI);
 }
 
+// iOS tue sans un mot la page qui dépasse sa mémoire, puis la recharge : la marque que le chargement d'avant n'a pas effacée dit qu'il n'a pas tenu.
+function chuterSiChargementTue() {
+  const tue = lireConfie(INACHEVE);
+  if (!tue) return;
+  oublierConfie(INACHEVE);
+  const choisi = lireRetenu(CHOISI);
+  if (choisi in PROFILS) choisir(niveauApresChute(choisi));
+  else replierDepuis(tue);
+}
+
+if (!force) chuterSiChargementTue();
+const choisi = lireRetenu(CHOISI);
+const manuel = !force && choisi in PROFILS;
+
+export const NIVEAU = force ? demande : manuel ? choisi : await niveauDeLaMachine();
+export const PROFIL = PROFILS[NIVEAU];
+if (!force) confier(INACHEVE, NIVEAU);
+
+export function marquerChargementAcheve() {
+  oublierConfie(INACHEVE);
+}
+
+let bascule = false;
+const rang = REPLIABLES.indexOf(NIVEAU);
+
+// Contexte perdu, rythme lent au dernier palier.
+export function seReplier() {
+  if (force || manuel || bascule) return;
+  bascule = replierDepuis(NIVEAU);
+}
+
+// Le profil tenu sans peine à son premier palier repart au cran du dessus à la visite suivante.
+export function seRelever() {
+  if (force || manuel || bascule || rang < 1 || replis() >= REPLIS_MAX) return;
+  bascule = true;
+  retenir(RETENU, REPLIABLES[rang - 1]);
+}
+
+// La chute est comptée ici : la page que `pannes` recharge ne doit pas la recompter sur la marque.
+export function tomber() {
+  oublierConfie(INACHEVE);
+  if (!manuel) return seReplier();
+  choisir(niveauApresChute(NIVEAU));
+}
+
 // Ce que l'automatique prendrait : sous un profil choisi ou forcé, le banc ne se rejoue pas pour le dire.
-const niveauTenu = () => (!manuel && !force ? NIVEAU : bureau ? "haute" : niveauRetenu() ?? (faible ? "minimale" : "basse"));
+const niveauTenu = () => (!manuel && !force ? NIVEAU : niveauAutomatiqueConnu());
 
 // Un cran au-dessus de ce que la machine tient risque de saccader, deux y sont trop lourds.
 const CHARGES = ["fluide", "risque", "lourd"];

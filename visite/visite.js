@@ -12,7 +12,7 @@ import { refleterLesDallages } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, cuireLesNuages, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
-import { NIVEAU, PROFIL, brancherChoix, seRelever, seReplier } from "./qualite.js";
+import { NIVEAU, PROFIL, brancherChoix, marquerChargementAcheve, seRelever, seReplier } from "./qualite.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
 import { panneau } from "./fiche.js";
@@ -781,7 +781,7 @@ renderer.setAnimationLoop(() => {
 const figer = () => renderer.setAnimationLoop(null);
 
 // La première image fige Safari plusieurs secondes : le voile ne part qu'une fois qu'elle est rendue.
-laisserPeindre().then(chargement.lever);
+laisserPeindre().then(() => { chargement.lever(); marquerChargementAcheve(); });
 pannes.lancer();
 if (reprise?.moment === "nuit") passerAuMoment("nuit");
 
