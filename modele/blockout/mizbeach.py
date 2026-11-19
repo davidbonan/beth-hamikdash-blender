@@ -4,9 +4,9 @@ import math
 from mathutils import Vector, noise
 
 from .primitives import tissage
-from .primitives.parametres import MODELE, TEFAH, Z_AZ, Z_MAARAKHA, Z_SOVEV, Z_YESSOD, m
+from .primitives.parametres import MODELE, TEFAH, Z_AZ, Z_EZN, Z_MAARAKHA, Z_SOVEV, Z_YESSOD, m
 from .primitives.matieres import (MAT_ARGENT, MAT_BOIS_CHARBON, MAT_BOIS_MAARAKHA, MAT_BOIS_ROUSSI,
-                                  MAT_BRONZE, MAT_CEDRE, MAT_CENDRE, MAT_CHAUX, MAT_CHAUX_FEU, MAT_EAU,
+                                  MAT_BRONZE, MAT_CEDRE, MAT_CENDRE, MAT_CHAUX, MAT_CHENE, MAT_CHAUX_FEU, MAT_EAU,
                                   MAT_FER, MAT_MARBRE, MAT_SEL, MAT_SIKRA, braise, nuee)
 from .primitives.volumes import (_objet, _poser, alea, box, braises, crochet, cyl, cyl_between, gzir, lampe, link_to,
                                  mesh_from_pydata, revolution, sphere, tore)
@@ -462,36 +462,78 @@ for nm, x, r_bec in (("mayim", HAUT[0] + 1.5, 0.03), ("yayin", HAUT[0] + 2.3, 0.
 # (Bartenura ad loc.) et ne laissent que 3 amot de plat au pied de l'autel. Le bassin se
 # pose donc au sud de la volée, large de 22 (CHOIX), sur le dallage.
 # Bronze, sur son pied (le כַּן, Shemot 30:18) ; douze robinets, « שְׁנֵים עָשָׂר דַּד »,
-# le perfectionnement de Ben Katin (Yoma 3:10 ; fiche §7). Deux cylindres empilés se
-# lisaient en tambour : profil tourné, panse, lèvre, et l'eau dans la vasque.
+# le perfectionnement de Ben Katin (Yoma 3:10 ; fiche §7). « שַׁחֲרִית בְּמִילּוּאוֹ מְקַדֵּשׁ… מִן הָעֶלְיוֹן,
+# עַרְבִית בִּירִידָתוֹ… מִן הַתַּחְתּוֹן » (Yoma 37a), lu par Melekhet Shelomoh (ad loc.) : des deux d'avant,
+# Ben Katin garde l'unique עֶלְיוֹן, posé entre les onze qu'il ajoute en bas, aucun sous lui, à peine plus
+# haut. Le matin, douze cohanim ensemble ; le soir, le tamid se fait à onze (Yoma 2:5), tous en bas.
+# Écarté : douze en haut et douze en bas, « לֹא מַשְׁמָע כֵּן כְּלָל » (Melekhet Shelomoh) ; les douze sur
+# un rang, la baraita ne parlant que des deux d'avant (Rashash Yoma 37a). Hauteurs et profil : CHOIX.
 KIYOR_X, KIYOR_Y = -59, -14
-revolution("Kiyor", KIYOR_X, KIYOR_Y, Z_AZ,
-           [(1.05, 0.0), (1.0, 0.12), (0.55, 0.30), (0.45, 0.55), (0.45, 0.95), (0.60, 1.05),
-            (1.35, 1.25), (1.65, 1.60), (1.72, 2.05), (1.80, 2.20), (1.82, 2.30), (1.68, 2.30),
-            (1.62, 2.05), (1.45, 1.55), (0.0, 1.30)], "30_Mizbeach", MAT_BRONZE(), verts=36)
-cyl("Kiyor_eau", KIYOR_X, KIYOR_Y, Z_AZ + 1.95, Z_AZ + 2.02, 1.66, "30_Mizbeach", MAT_EAU(), verts=36)
-for i in range(12):
-    a = 2 * math.pi * i / 12
+KIYOR_Z = Z_AZ + 0.15
+KIYOR = [(1.05, 0.0), (1.0, 0.12), (0.55, 0.30), (0.42, 0.50), (0.42, 0.70), (0.65, 0.80), (1.30, 0.95),
+         (1.60, 1.25), (1.72, 1.70), (1.74, 2.05), (1.82, 2.20), (1.84, 2.30), (1.70, 2.30), (1.64, 2.05),
+         (1.60, 1.70), (1.48, 1.30), (1.15, 1.08), (0.0, 1.00)]
+DAD_ELYON = (1.62, 2.08, 1.60, 1.38)
+DAD_TAHTON = (1.55, 2.02, 1.40, 1.15)
+DADIM = [("Kiyor_dad_elyon", 0, DAD_ELYON)] + [(f"Kiyor_dad_tahton_{i:02d}", i, DAD_TAHTON) for i in range(1, 12)]
+revolution("Kiyor", KIYOR_X, KIYOR_Y, KIYOR_Z, KIYOR, "30_Mizbeach", MAT_BRONZE(), verts=36)
+cyl("Kiyor_eau", KIYOR_X, KIYOR_Y, KIYOR_Z + 1.95, KIYOR_Z + 2.0, 1.63, "30_Mizbeach", MAT_EAU(), verts=36)
+for nom, place, (r_paroi, r_bec, z, z_bec) in DADIM:
+    a = 2 * math.pi * place / 12
     dx, dy = math.cos(a), math.sin(a)
-    cyl_between(f"Kiyor_dad_{i:02d}", (KIYOR_X + 1.45 * dx, KIYOR_Y + 1.45 * dy, Z_AZ + 1.45),
-                (KIYOR_X + 2.0 * dx, KIYOR_Y + 2.0 * dy, Z_AZ + 1.40), 0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
-    cyl_between(f"Kiyor_dad_{i:02d}_bec", (KIYOR_X + 2.0 * dx, KIYOR_Y + 2.0 * dy, Z_AZ + 1.40),
-                (KIYOR_X + 2.0 * dx, KIYOR_Y + 2.0 * dy, Z_AZ + 1.22), 0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
-# Mukhni de Ben Katin (Yoma 3:10 ; 37a) : la roue qui descend le Kiyor dans son puits
-# chaque soir, « כְּדֵי שֶׁלֹּא יִהְיוּ מֵימָיו נִפְסָלִין בְּלִינָה ». Un poteau, une potence, une
-# roue et une chaîne jusqu'au bord de la cuve ; la forme est un CHOIX.
+    bec = (KIYOR_X + r_bec * dx, KIYOR_Y + r_bec * dy, KIYOR_Z + z - 0.05)
+    cyl_between(nom, (KIYOR_X + r_paroi * dx, KIYOR_Y + r_paroi * dy, KIYOR_Z + z), bec,
+                0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
+    cyl_between(f"{nom}_bec", bec, (bec[0], bec[1], KIYOR_Z + z_bec), 0.06, "30_Mizbeach", MAT_BRONZE(), verts=8)
+# Mukhni de Ben Katin : « גִּילְגְּלָא דַּהֲוָה מְשַׁקְּעָא לֵיהּ » (Abayé, Yoma 37a), « גַּלְגַּל לְשַׁקְּעוֹ בַּבּוֹר,
+# שֶׁיִּהְיוּ מֵימָיו מְחֻבָּרִים בַּבּוֹר » (Bartenura Yoma 3:10), pour la nuit — « מִצְוָה לְשַׁקּוֹעֵי » (R. Yo'hanan,
+# Zeva'him 21b). De jour, le Kiyor pend au-dessus de son puits. Une chaîne suffirait à l'y descendre :
+# la roue sert à le remonter, et c'est elle qu'on entend, « קוֹל הָעֵץ » (Tamid 1:4 ; 3:8 ; Tosfot Yom
+# Tov Yoma 3:10). Treuil, poulie, quatre chaînes aux anses, margelle et cotes du puits : CHOIX.
 MUKHNI_X = KIYOR_X - 3.5
+Z_ROUE, Z_POTENCE, Z_ANNEAU = Z_AZ + 3.8, Z_AZ + 5.3, KIYOR_Z + 4.0
+R_POULIE, Y_TAMBOUR = 0.22, KIYOR_Y + 0.45
+BOR_R, BOR_DEMI = 2.22, (2.25, 1.6)
+KIYOR_BOR = [(KIYOR_X - u, KIYOR_X + u, KIYOR_Y - v, KIYOR_Y + v, Z_EZN, Z_AZ) for u, v in (BOR_DEMI, BOR_DEMI[::-1])]
+revolution("Mukhni_bor_margelle", KIYOR_X, KIYOR_Y, Z_AZ,
+           [(2.85, 0.0), (2.85, 0.25), (2.75, 0.35), (BOR_R + 0.1, 0.35), (BOR_R, 0.25), (BOR_R, -1.0)],
+           "30_Mizbeach", verts=36, capots=False)
+cyl("Mukhni_bor_eau", KIYOR_X, KIYOR_Y, Z_EZN, Z_AZ - 1.5, BOR_R - 0.02, "30_Mizbeach", MAT_EAU(), verts=36)
 cyl("Mukhni_poteau", MUKHNI_X, KIYOR_Y, Z_AZ, Z_AZ + 5.6, 0.22, "30_Mizbeach", MAT_CEDRE(), verts=12)
-cyl_between("Mukhni_potence", (MUKHNI_X, KIYOR_Y, Z_AZ + 5.3), (KIYOR_X, KIYOR_Y, Z_AZ + 5.3), 0.16, "30_Mizbeach", MAT_CEDRE(), verts=10)
+cyl_between("Mukhni_potence", (MUKHNI_X, KIYOR_Y, Z_POTENCE), (KIYOR_X, KIYOR_Y, Z_POTENCE), 0.16, "30_Mizbeach", MAT_CEDRE(), verts=10)
 cyl_between("Mukhni_jambe_de_force", (MUKHNI_X, KIYOR_Y, Z_AZ + 3.6), (MUKHNI_X + 1.8, KIYOR_Y, Z_AZ + 5.2), 0.1, "30_Mizbeach", MAT_CEDRE(), verts=8)
-tore("Mukhni_roue", MUKHNI_X, KIYOR_Y - 0.45, Z_AZ + 3.8, 0.8, 0.08, "30_Mizbeach", MAT_CEDRE(), rotation=(math.pi / 2, 0, 0))
+tore("Mukhni_roue", MUKHNI_X, KIYOR_Y - 0.45, Z_ROUE, 0.8, 0.08, "30_Mizbeach", MAT_CEDRE(), rotation=(math.pi / 2, 0, 0))
 for k in range(6):
     a = math.pi * k / 6
-    cyl_between(f"Mukhni_rayon_{k}", (MUKHNI_X + 0.75 * math.cos(a), KIYOR_Y - 0.45, Z_AZ + 3.8 + 0.75 * math.sin(a)),
-                (MUKHNI_X - 0.75 * math.cos(a), KIYOR_Y - 0.45, Z_AZ + 3.8 - 0.75 * math.sin(a)), 0.04, "30_Mizbeach", MAT_CEDRE(), verts=6)
-cyl_between("Mukhni_essieu", (MUKHNI_X, KIYOR_Y - 0.6, Z_AZ + 3.8), (MUKHNI_X, KIYOR_Y + 0.3, Z_AZ + 3.8), 0.06, "30_Mizbeach", MAT_FER(), verts=8)
-for k, (z0, z1) in enumerate(((5.3, 4.6), (4.6, 3.9), (3.9, 3.2), (3.2, 2.5))):
-    cyl_between(f"Mukhni_chaine_{k}", (KIYOR_X, KIYOR_Y, Z_AZ + z0), (KIYOR_X, KIYOR_Y, Z_AZ + z1), 0.05, "30_Mizbeach", MAT_FER(), verts=6)
+    cyl_between(f"Mukhni_rayon_{k}", (MUKHNI_X + 0.75 * math.cos(a), KIYOR_Y - 0.45, Z_ROUE + 0.75 * math.sin(a)),
+                (MUKHNI_X - 0.75 * math.cos(a), KIYOR_Y - 0.45, Z_ROUE - 0.75 * math.sin(a)), 0.04, "30_Mizbeach", MAT_CEDRE(), verts=6)
+for k in range(8):
+    a = 2 * math.pi * (k + 0.5) / 8
+    x, z = MUKHNI_X + 0.8 * math.cos(a), Z_ROUE + 0.8 * math.sin(a)
+    cyl_between(f"Mukhni_yad_{k}", (x, KIYOR_Y - 0.45, z), (x, KIYOR_Y - 0.8, z), 0.04, "30_Mizbeach", MAT_CEDRE(), verts=6)
+cyl_between("Mukhni_essieu", (MUKHNI_X, KIYOR_Y - 0.6, Z_ROUE), (MUKHNI_X, Y_TAMBOUR + 0.25, Z_ROUE), 0.06, "30_Mizbeach", MAT_FER(), verts=8)
+for k, dy in enumerate((-0.15, 0.15)):
+    cyl_between(f"Mukhni_tambour_joue_{k}", (MUKHNI_X, Y_TAMBOUR + dy - 0.02, Z_ROUE), (MUKHNI_X, Y_TAMBOUR + dy + 0.02, Z_ROUE),
+                0.3, "30_Mizbeach", MAT_CEDRE(), verts=16)
+cyl_between("Mukhni_tambour", (MUKHNI_X, Y_TAMBOUR - 0.13, Z_ROUE), (MUKHNI_X, Y_TAMBOUR + 0.13, Z_ROUE), 0.22,
+            "30_Mizbeach", MAT_CHENE(), verts=16)
+X_POULIE, Z_POULIE = KIYOR_X - R_POULIE, Z_POTENCE - 0.35
+tore("Mukhni_poulie", X_POULIE, KIYOR_Y, Z_POULIE, R_POULIE, 0.05, "30_Mizbeach", MAT_CEDRE(), rotation=(math.pi / 2, 0, 0))
+for k, dy in enumerate((-0.08, 0.08)):
+    cyl_between(f"Mukhni_chape_{k}", (X_POULIE, KIYOR_Y + dy, Z_POTENCE), (X_POULIE, KIYOR_Y + dy, Z_POULIE), 0.025,
+                "30_Mizbeach", MAT_FER(), verts=6)
+cyl_between("Mukhni_hevel_kiyor", (KIYOR_X, KIYOR_Y, Z_POULIE), (KIYOR_X, KIYOR_Y, Z_ANNEAU + 0.1), 0.035,
+            "30_Mizbeach", MAT_CHENE(), verts=6)
+cyl_between("Mukhni_hevel_tambour", (X_POULIE - R_POULIE, KIYOR_Y, Z_POULIE), (MUKHNI_X + 0.15, Y_TAMBOUR, Z_ROUE + 0.16),
+            0.035, "30_Mizbeach", MAT_CHENE(), verts=6)
+tore("Mukhni_tabaat", KIYOR_X, KIYOR_Y, Z_ANNEAU, 0.1, 0.03, "30_Mizbeach", MAT_FER(), rotation=(math.pi / 2, 0, 0))
+for k in range(4):
+    a = 2 * math.pi * (k + 0.5) / 4
+    dx, dy = math.cos(a), math.sin(a)
+    tore(f"Kiyor_ozen_{k}", KIYOR_X + 1.9 * dx, KIYOR_Y + 1.9 * dy, KIYOR_Z + 2.2, 0.1, 0.025, "30_Mizbeach", MAT_BRONZE(),
+         rotation=(math.pi / 2, 0, a))
+    cyl_between(f"Mukhni_shalshelet_{k}", (KIYOR_X + 1.9 * dx, KIYOR_Y + 1.9 * dy, KIYOR_Z + 2.3), (KIYOR_X, KIYOR_Y, Z_ANNEAU - 0.08),
+                0.03, "30_Mizbeach", MAT_FER(), verts=6)
 # Magrefa : « נָטַל אֶחָד אֶת הַמַּגְרֵפָה וְזוֹרְקָהּ בֵּין הָאוּלָם וְלַמִּזְבֵּחַ » (Tamid 5:6), à terre là où
 # elle tombe. « כלי גדול שהיו זורקים אותו כדי להשמיע קול » (Bartenura), « צורתו כצורת מגריפה »
 # (Tosfot Yom Tov) : une pelle à cendres, pas l'instrument à dix trous d'Arakhin 11a, qui se

@@ -5,7 +5,7 @@ from .primitives.ouvrages import dalle_percee, escalier, escalier_a_vis, massif_
 from .ezrat_nashim import EX1, MIKVE
 from .azara import AX0, AY0, AY1, T, X_DOUKHAN
 from .lishkot import BOR, PUITS_MESIBA
-from .mizbeach import HAUT, MX0, MY0
+from .mizbeach import HAUT, KIYOR_BOR, MX0, MY0
 
 
 # ----------------------------------------------------------------------------
@@ -61,6 +61,7 @@ VIDES_SOUS_AZARA = [
     (*SHIT, Z_SHIT_FOND, Z_SHIT_VOUTE),
     (*SHIT_TAVLA, Z_SHIT_VOUTE, Z_AZ),
     (*BOR, Z_EZN, Z_AZ),
+    *KIYOR_BOR,
 ]
 massif_evide("Azara_sol", AX0 - T, X_DOUKHAN, AY0 - T, AY1 + T, Z_AZ - 1, Z_AZ,
              VIDES_SOUS_AZARA, "20_Azara", MAT_SOL())
