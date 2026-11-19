@@ -9,6 +9,7 @@ from beit_hamikdash_visite import AMA, Z_EZN
 from ..matieres import ARGAMAN, CHENE, LIN, OR, metal
 from ..etoffes import Habit
 from ..corps import Gabarit, Humain, _alea
+from ..genere import revetir_du_genere
 from ..maillage import Maillage, _angles, _lisser_cercle, _vers, enveloppe, pave
 from ..habillage import HAUT_Z, ROBE, _crane_et_cheveux, _poils, appliquer_visibilite, lier, porter
 from ..ustensiles import sefer, tabouret
@@ -83,7 +84,7 @@ def melekh(nom, qui, gabarit):
     h.detendre()
     atara(h)
     appliquer_visibilite(h, h.visible & ~h.efface)
-    return h
+    return revetir_du_genere(h, qui)
 
 
 # « יוֹצְאָה וְרֹאשָׁהּ פָּרוּעַ » est contre la dat yehoudit (Ketoubot 7:6) : la tête sous un voile.
@@ -96,7 +97,7 @@ def femme(nom, gabarit):
     h.vetir_mpfb(VOILE)
     h.detendre()
     appliquer_visibilite(h, h.visible & ~h.efface)
-    return h
+    return revetir_du_genere(h, "femme")
 
 
 MELEKH = "melekh"

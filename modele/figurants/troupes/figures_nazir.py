@@ -8,6 +8,7 @@ from beit_hamikdash_visite import AMA, Z_EZI, Z_EZN
 
 from ..matieres import BRONZE
 from ..corps import Gabarit, Humain
+from ..genere import revetir_du_genere
 from ..habillage import BRUN, COSTUME, HAUT_Z, _poils, appliquer_visibilite
 from ..ustensiles import PANSE_DE_LA_TZELOHIT, PROFIL_DE_LA_TZELOHIT, tourner_profil
 from ..mise_en_scene import devant_poitrine, ecouter, repere_vers, tenir, tenir_la_coupe, vers_la_figure
@@ -23,7 +24,7 @@ def rase(nom, gabarit, barbe, sourcils):
     h.vetir_mpfb(COSTUME)
     h.detendre()
     appliquer_visibilite(h, h.visible & ~h.efface)
-    return h
+    return revetir_du_genere(h, "nazir" if barbe else "metzora")
 
 
 # « הָיָה נוֹטֵל שְׂעַר רֹאשׁ נִזְרוֹ וּמְשַׁלֵּחַ תַּחַת הַדּוּד » (Nazir 6:8), mouillé du bouillon de ses shelamim (Rambam Nezirout 8:2) :

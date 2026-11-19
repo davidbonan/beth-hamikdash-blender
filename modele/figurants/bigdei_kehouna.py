@@ -7,6 +7,7 @@ from mathutils import Vector
 
 import beit_hamikdash_gestes as G
 
+from .genere import revetir_du_genere
 from .matieres import ARGAMAN, LIN, OR, SHANI, TEKHELET, _matiere, laine, lin, metal, reteindre, trame
 from .etoffes import _etoffes, surface_de
 from .corps import BRAS, Gabarit, Humain
@@ -22,10 +23,11 @@ from .plis import plisser
 class Habits(NamedTuple):
     avnet: Teintes
     coiffe: object
+    genere: str
 
 
-BIGDEI_KEHOUNA = Habits(AVNET_BRODE, migbaat)
-BIGDEI_LAVAN = Habits(AVNET_DE_LIN, mitznefet)
+BIGDEI_KEHOUNA = Habits(AVNET_BRODE, migbaat, "cohen")
+BIGDEI_LAVAN = Habits(AVNET_DE_LIN, mitznefet, "cohen_gadol_lavan")
 
 
 def cohen(nom, gabarit=Gabarit(), gris=False):
@@ -56,7 +58,7 @@ def vetir_de_lin(h, habits):
     h.ranger()
     coiffer(h, habits.coiffe)
     appliquer_visibilite(h, h.visible & ~h.efface)
-    return h
+    return revetir_du_genere(h, habits.genere)
 
 
 def ceindre(h, robe, teintes):
@@ -88,7 +90,7 @@ def cohen_gadol_en_or(nom):
     hoshen(h, surface_de(h, pans + epaules))
     tzitz(h)
     appliquer_visibilite(h, h.visible & ~h.efface)
-    return h
+    return revetir_du_genere(h, "cohen_gadol_zahav")
 
 
 def ephod_tisse():

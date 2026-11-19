@@ -1,0 +1,14 @@
+{
+ "age": 0.56,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. A Levite musician of the Second Temple period in Jerusalem, a slender man of about thirty-five. He wears a plain white linen ankle-length tunic with long fitted sleeves, finely woven, softly creased, no belt; a small round white linen cap on the head. Full short black beard, short black curly hair, olive skin, attentive expression. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab316e4/PdHqy-KvQPv9WYqWUoON3_GtBhKrl3.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab316ee/AYGSbj8BzRoKMK820yNkI_base_basic_pbr.glb"
+}

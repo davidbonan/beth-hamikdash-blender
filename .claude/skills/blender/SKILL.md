@@ -286,6 +286,12 @@ Le bouc se regénère à part (`$BLENDER -b -P modele/beit_hamikdash_seir.py`, q
 Torches et trompettes ne sont pas liées à la peau : `Accessoire` les anime objet par objet, et la visite allume la
 tête de chaque `*_avouka`.
 
+Ce qu'on voit d'un figurant est un modèle généré sur fal.ai (portrait Nano Banana, volume Rodin) :
+`modele/figurants/generes/<sorte>_<k>.glb`, son âge au `.json`, fait par `python3 modele/beit_hamikdash_generer_figurant.py`.
+`revetir_du_genere(h, sorte)` (`genere.py`), au bout de chaque tenue, prend la variante de cette sorte la plus proche
+de l'âge (les voisines alternent), la lie au squelette par les poids du corps MakeHuman posé bras écartés, et retire
+l'habillage MakeHuman ; une sorte sans variante le garde. Le corps MakeHuman reste le squelette et la mesure des gestes.
+
 Corps, peaux, yeux, cheveux, barbes et vêtements viennent de MakeHuman (extension MPFB) : la
 kutonet est la robe de moine `donitz_monk_robe` (CC0) sans pèlerine ni cordon, la robe et le
 voile de la fidèle `punkduck_medieval_dress` et `elvs_charity_veil1` (CC BY), teints par

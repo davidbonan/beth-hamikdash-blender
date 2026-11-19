@@ -1,0 +1,14 @@
+{
+ "age": 0.62,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. The Judean High Priest (kohen gadol) of the Second Temple period, a dignified man of about forty, tall, full dark brown beard with a few grey hairs. He wears his eight golden garments: over an ankle-length white linen tunic with long sleeves, a sleeveless robe (me'il) entirely of sky-blue wool reaching below the knees, its hem bordered with alternating small golden bells and pomegranates of blue, purple and crimson yarn; over it a short apron-like ephod woven of gold thread with blue, purple and crimson wool and linen, its two shoulder straps each set with an onyx stone in gold; on the chest a square breastplate (hoshen) set with twelve different gemstones in four rows of three; a tall white linen turban with a narrow golden plate across the forehead tied with a blue cord. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab31830/yj1RaQedUHx7-_xrg-k0W_S1shY9ZV.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab31837/MRVTRD_ud6cy8WSIcvi6t_base_basic_pbr.glb"
+}

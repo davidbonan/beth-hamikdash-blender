@@ -1,0 +1,14 @@
+{
+ "age": 0.66,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. A Judean woman of the Second Temple period, about forty-five. She wears an ankle-length dress of deep blue wool with long sleeves and a white linen veil covering her hair, neck and shoulders. Olive skin, attentive expression, no jewellery. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab31826/grkgml_nJBy0tek-Cdmk7_r36UtN36.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab31832/Go6LwCk0Vl4SZgP91ZGdp_base_basic_pbr.glb"
+}

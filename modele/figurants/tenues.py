@@ -1,8 +1,12 @@
 from .matieres import DRAP_NOIR, LIN, feutre, laine, lin, velours
 from .corps import Gabarit, Humain
+from .genere import revetir_du_genere
 from .maillage import Maillage
 from .habillage import (COSTUME, KUTONET, ROBE, TALITH_TISSU, Tissu, _poils, appliquer_visibilite, calotte,
                         chapeau, empiecement, lier, talith, tzitzit)
+
+
+ENFANCE = 0.25
 
 
 # « מְלֻבָּשִׁים בּוּץ » (Divrei HaYamim II 5:12).
@@ -18,7 +22,7 @@ def levi(nom, gabarit=Gabarit(), gris=False, barbe=True):
     calotte(coiffure, h, LIN, rayon=0.066)
     lier(h, coiffure, f"{nom}_kippa", lin(), "head")
     appliquer_visibilite(h, h.visible & ~h.efface)
-    return h
+    return revetir_du_genere(h, "levi_enfant" if gabarit.age < ENFANCE else "levi")
 
 
 # Pieds nus : « לֹא יִכָּנֵס לְהַר הַבַּיִת בְּמַקְלוֹ וּבְמִנְעָלוֹ » (Berakhot 9:5).
@@ -41,7 +45,7 @@ def fidele(nom, tenue, gabarit=Gabarit(), gris=False, barbe=True, tete="kippa"):
         lier(h, coiffure, f"{nom}_kippa", velours(), "head")
     appliquer_visibilite(h, h.visible & ~h.efface)
     h.ranger()
-    return h
+    return revetir_du_genere(h, "enfant" if tenue == "robe" else f"israelite_{tete}")
 
 
 def draper_talith(humain):

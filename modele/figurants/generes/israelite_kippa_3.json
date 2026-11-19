@@ -1,0 +1,14 @@
+{
+ "age": 0.62,
+ "prompt": "Full-body character reference photograph, standing straight in a strict A-pose: both arms held straight out and down at 40 degrees from the body, well clear of the torso and of any sash or mantle, palms facing down, fingers together, legs slightly apart, front view, barefoot. A Judean man of the Second Temple period in Jerusalem, about forty, medium build. He wears an ankle-length tunic of faded indigo wool with long sleeves, girded with a simple leather belt; a small round dark wool cap on the head. Full dark brown beard, olive skin. Plain light grey seamless studio background, soft even lighting, photorealistic, sharp focus, whole body visible from head to feet.",
+ "portrait": "https://v3b.fal.media/files/b/0ab3181e/qES-IC8cQ9CcQHDAAoSfc_Inask1n6.png",
+ "rodin": {
+  "TAPose": true,
+  "geometry_file_format": "glb",
+  "material": "PBR",
+  "quality_mesh_option": "20K Triangle",
+  "tier": "Gen-2.5-Medium",
+  "texture_delight": true
+ },
+ "modele": "https://v3b.fal.media/files/b/0ab31826/1-XYV5ASdUVkfovdAFEWS_base_basic_pbr.glb"
+}
