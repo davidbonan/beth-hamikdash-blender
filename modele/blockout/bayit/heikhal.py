@@ -1,6 +1,6 @@
 from ..primitives.parametres import PORTES_HEIKHAL_OUVERTES, Z_BAT
 from ..primitives.matieres import MAT_CEDRE, MAT_FER_LAME, MAT_MARBRE_HERODE, MAT_OR, MAT_OR_PLAQUE
-from ..primitives.volumes import box, cyl, plage, rampe
+from ..primitives.volumes import box, cyl, empty, plage, rampe
 from ..primitives.gravures import vantail_sculpte
 from ..primitives.ouvrages import (EPAISSEUR_PLACAGE, MAAKE_EP, MAAKE_H, couches_middot, dalle_percee,
                                    paroi_percee)
@@ -259,6 +259,10 @@ paroi_percee("Heikhal_or_mur_N", HK1, HK0, 10 - EPAISSEUR_PLACAGE, 10, Z_BAT, Z_
 paroi_percee("Heikhal_or_mur_S", HK1, HK0, -10, -10 + EPAISSEUR_PLACAGE, Z_BAT, Z_BAT + 40,
              "50_Heikhal", MAT_OR_PLAQUE(), baies_heikhal(*FENETRE_INT))
 box("Heikhal_or_plafond", HK1, HK0, -10, 10, Z_BAT + 40 - EPAISSEUR_PLACAGE, Z_BAT + 40, "50_Heikhal", MAT_OR_PLAQUE())
+# Le jour de chaque fenêtre, au nu du placage : la visite l'allume dans le reflet de la salle.
+for x in FENETRES_X:
+    for y in (10, -10):
+        empty(f"Heikhal_fenetre_{x}_{y}", x, y, (FENETRE_INT[1] + FENETRE_INT[2]) / 2, "50_Heikhal")
 
 
 def lambris_or(piece, x0, x1, col, faces_bout):

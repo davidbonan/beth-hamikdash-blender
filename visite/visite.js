@@ -6,7 +6,7 @@ import { calerLesAssises, deplierLesFibres, habiller, refleteSaCour, ETOFFES, HA
 import { nappes } from "./nappes.js";
 import { cartesLumiere, cartesOcclusion, rechargerCartes } from "./occlusion.js";
 import { adaptation } from "./adaptation.js";
-import { COURS, DANS_HEIKHAL, boitesDesSondes, courDe, separerDuHeikhal, sonderHeikhal, sonderLaCour } from "./sonde.js";
+import { DANS_HEIKHAL, boiteDeLOulam, boiteDuHeikhal, boitesDesSondes, courDe, fenetresDuHeikhal, separerDuHeikhal, separerLesPortes, sonderHeikhal, sonderLaCour } from "./sonde.js";
 import { chaine } from "./chaine.js";
 import { refleterLesDallages } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
@@ -254,8 +254,20 @@ const brut = new URLSearchParams(location.search).has("brut");
 const IDS = new Set(CONCEPTS.keys());
 const habillees = new Set();
 const materiauxHeikhal = [];
-const materiauxDesCours = new Map(COURS.map((cour) => [cour, []]));
-const sondes = boitesDesSondes(EMPRISES, SOLS_DES_COURS);
+// Le mur oriental du Heikhal a six amot, et derrière lui l'Oulam onze sur soixante-dix, sous le même plafond à quarante amot (Middot 4:6-7) :
+// l'emprise du Heikhal monte au toit, par-dessus la salle d'en haut, et finit à la face de l'Oulam.
+const MUR_DU_HEIKHAL = 6 * AMA;
+const sousLePlafond = salleDuHeikhal.clone();
+sousLePlafond.max.y = (6 + 40) * AMA;
+sousLePlafond.max.x -= MUR_DU_HEIKHAL;
+const oulam = new THREE.Box3(new THREE.Vector3(salleDuHeikhal.max.x, 6 * AMA, -35 * AMA), new THREE.Vector3(salleDuHeikhal.max.x + 11 * AMA, (6 + 40) * AMA, 35 * AMA));
+// L'Oulam d'abord : l'emprise de l'Azara le contient.
+const sondes = new Map([["oulam", boiteDeLOulam(oulam)], ...boitesDesSondes(EMPRISES, SOLS_DES_COURS)]);
+const materiauxDesCours = new Map([...sondes.keys()].map((cour) => [cour, []]));
+const sondeDuHeikhal = boiteDuHeikhal(sousLePlafond, unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]), EMPRISES.get("menora"));
+// L'or garde le poli de la feuille battue, dans la salle comme aux cours. Pas un dallage, qui poli se lit mouillé.
+const RUGOSITE_DE_L_OR = 0.25;
+const estDeLOr = (materiau) => /^Or(_|$)/.test(materiau.name);
 
 function conceptDe(objet) {
   for (let n = objet; n; n = n.parent) {
@@ -278,6 +290,7 @@ gltf.scene.traverse((o) => {
   o.userData.concept = conceptDe(o);
   maillages.push(o);
 });
+const portesSurLOulam = new Set(brut ? [] : separerLesPortes(maillages.filter((o) => o.userData.concept === "portes_heikhal"), sousLePlafond.max.x));
 const sousSonde = new Set(brut ? [] : separerDuHeikhal(
   maillages.filter((o) => DANS_HEIKHAL.has(o.userData.concept)), EMPRISES.get("heikhal")));
 const eclairage = eclairerLeTemple({ scene, renderer, rendu, detail, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple: gltf.scene, sousSonde,
@@ -303,16 +316,20 @@ gltf.scene.traverse((o) => {
     const lumiere = lumieres.get(o.userData.groupeCuit);
     // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
     const refletDuDallage = PROFIL.reflets && DALLAGES_REFLETES[o.userData.groupeCuit] === o.material.name;
-    const cour = !sousSonde.has(o) && refleteSaCour(o.material) ? courDe(o, sondes) : null;
+    const cour = portesSurLOulam.has(o) ? "oulam" : !sousSonde.has(o) && refleteSaCour(o.material) ? courDe(o, sondes) : null;
     if (occlusion || lumiere || sousSonde.has(o) || refletDuDallage || cour) o.material = o.material.clone();
     if (refletDuDallage) o.material.userData.refletDuDallage = true;
     if (occlusion) o.material.aoMap = occlusion;
     if (lumiere) Object.assign(o.material, { lightMap: lumiere.texture, lightMapIntensity: lumiere.echelle });
-    if (sousSonde.has(o)) materiauxHeikhal.push(o.material);
+    if (sousSonde.has(o)) {
+      materiauxHeikhal.push(o.material);
+      o.material.userData.sonde = sondeDuHeikhal;
+    }
     if (cour) {
       materiauxDesCours.get(cour).push(o.material);
       o.material.userData.sonde = sondes.get(cour);
     }
+    if ((sousSonde.has(o) || cour) && !refletDuDallage && estDeLOr(o.material)) o.material.roughness = RUGOSITE_DE_L_OR;
   }
   if (!brut && !habillees.has(o.material.uuid)) {
     habillees.add(o.material.uuid);
@@ -342,11 +359,14 @@ await Promise.all([
 // Après les nuanceurs et les arbres : ce qu'une fête montre doit être compilé et arpentable le jour où il paraît.
 const fetes = fetesDuTemple({ maillages, concepts: CONCEPTS, foyers: reperes.foyers ?? [], rendu, obstacles, murs });
 fetes.celebrer();
+const fenetresDuJour = fenetresDuHeikhal(reperes.fenetres);
+scene.add(fenetresDuJour);
 const refleterLeHeikhal = () => sonderHeikhal(renderer, scene, {
-  kelim: unirEmprises(EMPRISES, ["menora", "shulchan", "mizbeach_hazahav"]),
+  boite: sondeDuHeikhal,
   materiaux: materiauxHeikhal,
   lumieres: [soleil, appoint, lampe, cielAmbiant],
-  caches: [ciel],
+  fenetres: fenetresDuJour,
+  jour: lumieresDu(eclairage.moment).cuite,
 });
 const refleterLesCours = () => {
   for (const [cour, materiaux] of materiauxDesCours) sonderLaCour(renderer, scene, { cour, boite: sondes.get(cour), materiaux });
@@ -487,7 +507,10 @@ async function passerAuMoment(voulu) {
   if (voulu === eclairage.moment) return;
   await fondu(async () => {
     await eclairage.passerAu(voulu);
-    if (!brut) refleterLesCours();
+    if (!brut) {
+      refleterLeHeikhal();
+      refleterLesCours();
+    }
   });
   afficherMoment();
 }
@@ -605,8 +628,12 @@ function accorderExposition(dt) {
   renderer.toneMappingExposure = EXPOSITION.value = EXPOSITION_DEHORS * facteur;
 }
 // L'air ne rend que le ciel : sous un toit il n'a rien à rendre, et son voile couvrait le cèdre des lishkot.
+// Les faisceaux des fenêtres, flous à la taille de la carte d'ombre, voilaient d'une fumée les salles qui vivent à leurs lampes.
+let faisceaux = 1;
 function accorderAir(part) {
   brume.density += (AIR_DEHORS * (1 - oeilAdapte.fermeture) - brume.density) * part;
+  faisceaux += ((SANS_ADAPTATION.has(lieuPresent) ? 0 : 1) - faisceaux) * part;
+  rendu.ouvrirLAir(faisceaux);
 }
 
 function releverLeLieu() {

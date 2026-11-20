@@ -18,7 +18,7 @@ const rayonDeLaColonne = (demi, montee) => COLONNE.col * demi + COLONNE.evasemen
 export function foyersDuFeu(lits) {
   return Array.from({ length: FOYERS_MAX }, (_, i) => {
     const lit = lits[i];
-    return lit ? new THREE.Vector4(...lit.getCenter(new THREE.Vector3()).toArray(), demiCote(lit)) : new THREE.Vector4();
+    return lit ? new THREE.Vector4(...lit.getCenter(new THREE.Vector3()).toArray(), demiCote(lit)) : new THREE.Vector4(0, 0, 0, 0);
   });
 }
 

@@ -534,6 +534,7 @@ def exporter(chantier):
     lueurs = {salle: {"points": lampes(f"{prefixe}_lueur"), "salle": repere_de(f"{prefixe}_salle")}
               for salle, prefixe in SALLES_A_LUEURS.items()}
     projecteurs = vides("Kotel_projecteur_")
+    fenetres = vides("Heikhal_fenetre_")
     lits_de_braises = foyers(regles)
     vis_de_degres = vis()
 
@@ -625,6 +626,7 @@ def exporter(chantier):
         "foyers": lits_de_braises,
         "lueurs": lueurs,
         "projecteurs": projecteurs,
+        "fenetres": fenetres,
         "vis": vis_de_degres,
         "occlusion": occlusion,
         "lumiere": lumiere,

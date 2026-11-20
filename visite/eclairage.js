@@ -22,8 +22,8 @@ const ARCHE = { couleur: 0xffeed2, intensite: 9, portee: 6, carte: 512 };
 const BRAISE = { couleur: 0xff7a2a, intensite: 6, portee: 8, carte: 512 };
 // Le feu de l'autel, une lampe au-dessus des ma'arakhot : de nuit, la seule lumière de l'Azara (Tamid 1:4).
 const FEU = { couleur: 0xff8a3a, intensite: 600, portee: 60, carte: 1024, hauteur: 3.0 };
-// L'or est métallique, il ne diffuse rien : sous 150 cd l'environnement couvre l'ombre du Shoulkhan, à 600 le mur brûle.
-const MENORA = { couleur: 0xffe1aa, intensite: 150, portee: 18, carte: 512 };
+// L'or est métallique, il ne diffuse rien : à 150 cd l'or poli du mur brûlait autour d'elle, à 600 il brûlait déjà mat.
+const MENORA = { couleur: 0xffe1aa, intensite: 35, portee: 18, carte: 512 };
 // Les lueurs d'une salle, par concept. Les lampes de terre de la Lishkat HaGazit, une par mèche : sans elles,
 // la salle n'avait que sa lumière cuite, qui n'a pas de direction, et la pierre comme les gradins y rendaient à plat.
 // Les suspensions de l'arche de Wilson sont électriques : elles ne vacillent pas. Les deux foyers du Beit HaMoked

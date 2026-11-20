@@ -62,7 +62,7 @@ SATURATION_CIEL = 0.27
 # La Menora, l'Arche, les braises et les lueurs de la Lishkat HaGazit de visite/visite.js (candela, et le souffle
 # moyen des braises) ; en repère three, comme reperes.json. `une_par_point` : la visite y allume une lampe par
 # position, et non une seule à leur centre.
-LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 150.0, "hauteur": 0.35},
+LAMPES = {"flammes": {"couleur": 0xFFE1AA, "intensite": 35.0, "hauteur": 0.35},
           "arche": {"couleur": 0xFFEED2, "intensite": 9.0, "hauteur": 0.0},
           "braises": {"couleur": 0xFF7A2A, "intensite": 6.0 * 0.86, "hauteur": 0.0},
           "lueurs": {"couleur": 0xFFD8A0, "intensite": 4.0, "hauteur": 0.0, "une_par_point": True}}

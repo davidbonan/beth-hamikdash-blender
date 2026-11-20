@@ -779,17 +779,27 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     rayons.uniforms.uAspect.value = camera.aspect;
   }
 
+  // L'éclat des faisceaux au moment, et `partDeLAir` celle que le lieu en garde : sous un centième, la passe ne se fait plus.
+  let eclatDeLAir = 0, partDeLAir = 1;
+  const allumerLAir = () => { airEclaire.enabled = eclatDeLAir > 0 && partDeLAir > 0.01; };
   function eclairerLAir(versLAstre, teinte, eclat) {
     if (!rayons) return;
-    airEclaire.enabled = eclat > 0;
+    eclatDeLAir = eclat;
+    allumerLAir();
     airEclaire.uniforms.uTeinte.value.set(teinte);
     rayons.uniforms.uVersLAstre.value.copy(versLAstre);
     rayons.uniforms.uDensite.value = PROFIL.rayons.densite * eclat;
   }
 
+  function ouvrirLAir(part) {
+    if (!rayons) return;
+    partDeLAir = part;
+    allumerLAir();
+  }
+
   // Sous un toit l'œil ouvre : sans retenue, l'air du dehors y brûlait jusqu'au blanc.
   function rendreLesRayons() {
-    airEclaire.uniforms.uRetenue.value = EXPOSITION_DEHORS / renderer.toneMappingExposure;
+    airEclaire.uniforms.uRetenue.value = partDeLAir * EXPOSITION_DEHORS / renderer.toneMappingExposure;
     rayons.uniforms.uMonde.value.copy(camera.matrixWorld);
     rayons.uniforms.uOmbreLointaine.value.copy(OMBRE_LOINTAINE.uOmbreLointaine.value);
     rayons.render(renderer, cibleRayons, null, 0, false);
@@ -963,5 +973,5 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     }
   }
 
-  return { rendre, redimensionner, enfumer, embraser, eclairerLeFeu, eclairerLAir, teinterLaLumiereCuite, compiler, get luminance() { return photometre.luminance; } };
+  return { rendre, redimensionner, enfumer, embraser, eclairerLeFeu, eclairerLAir, ouvrirLAir, teinterLaLumiereCuite, compiler, get luminance() { return photometre.luminance; } };
 }

@@ -395,6 +395,13 @@ const float RELIEF_GRAVURE = 0.015;
 const float CADRE_GRAVURE = 1.2;
 const float TAILLE_TUILE = 1.0 / 3.0;
 const float TEXEL_GRAVURE = 1.0 / 3072.0;
+// Le creux du modelé — un point plus bas que ses abords, lus seize texels plus loin dans le mipmap — ne voit
+// qu'un peu de la salle : l'or s'y assombrit, et au pied de la figure la plaque prend son ombre de contact.
+const float ABORDS_GRAVURE = 4.0;
+const float PROFONDEUR_CREUX = 0.12;
+const float CREUX_GRAVURE = 0.35;
+// La distance à sa lampe où le reflet d'une salle tombe à moitié, en mètres.
+const float PORTEE_DU_FOYER = 9.0;
 // La cendre de bois, elle, est claire et froide. C'est le contraste des deux — et non
 // le grain de l'un ou de l'autre — qui fait lire un lit de feu.
 const vec3 GRIS_CENDRE = vec3(0.42, 0.42, 0.43);
@@ -1373,6 +1380,8 @@ void matiere(vec3 P, vec3 N, out vec3 teinte, out vec3 pente, out float rugo, ou
     float dV = texture2D(uGravure, vGravure + pas.yx).r - texture2D(uGravure, vGravure - pas.yx).r;
     pente += (RELIEF_GRAVURE * TAILLE_TUILE / CADRE_GRAVURE / (2.0 * TEXEL_GRAVURE))
            * (dU * tu + dV * vec3(0.0, 1.0, 0.0)) * (1.0 - step(0.5, abs(N.y)));
+    float sousSesAbords = texture2D(uGravure, vGravure, ABORDS_GRAVURE).r - texture2D(uGravure, vGravure).r;
+    teinte *= mix(1.0, CREUX_GRAVURE, smoothstep(0.0, PROFONDEUR_CREUX, sousSesAbords) * (1.0 - step(0.5, abs(N.y))));
   }
 #endif
   teinte = mix(vec3(1.0), teinte, nettete);
@@ -1500,6 +1509,9 @@ function environnementEnBoite() {
   if (!morceau.includes(repere)) throw new Error(`three a changé ${repere} : sonde non projetée`);
   return /* glsl */`
     uniform vec3 uSondeMin, uSondeMax, uSondeCentre;
+    #ifdef FOYER
+    uniform vec3 uFoyer;
+    #endif
     vec3 recouperLaBoite(vec3 d){
       if (any(lessThan(vMonde, uSondeMin)) || any(greaterThan(vMonde, uSondeMax))) return d;
       vec3 sortie = max((uSondeMax - vMonde) / d, (uSondeMin - vMonde) / d);
@@ -1635,6 +1647,7 @@ export function habiller(materiau, horloges, jeux) {
   uniformes.uTeinteCiel = TEINTE_CUITE;
   const { sonde } = materiau.userData;
   if (sonde) Object.assign(uniformes, { uSondeMin: { value: sonde.min }, uSondeMax: { value: sonde.max }, uSondeCentre: { value: sonde.centre } });
+  if (sonde?.foyer) uniformes.uFoyer = { value: sonde.foyer };
   const rayonFil = materiau.userData.rayon;
   if (rayonFil) {
     uniformes.uRayonFil = { value: rayonFil };
@@ -1651,6 +1664,7 @@ export function habiller(materiau, horloges, jeux) {
     + (rayonFil ? "#define FIL\n" : "")
     + (refletDuDallage ? "#define REFLET_DU_DALLAGE\n" : "")
     + (sonde ? "#define SONDE_EN_BOITE\n" : "")
+    + (sonde?.foyer ? "#define FOYER\n" : "")
     + (fine ? "#define NAPPE_FINE\n" : "")
     + (PROFIL.textures.irregularite ? "#define IRREGULARITE\n" : "")
     + (PROFIL.textures.assises && CALEES.has(rendue) ? "#define ASSISES\n" : "")
@@ -1754,6 +1768,13 @@ export function habiller(materiau, horloges, jeux) {
         irradiance *= mPenombre;
         iblIrradiance *= mPenombre;
         radiance *= mPenombre;
+        #ifdef FOYER
+          // La salle ne s'éclaire qu'à sa lampe : ce que l'or y reflète faiblit loin d'elle, et le plafond reste dans l'ombre.
+          vec3 mVersFoyer = vMonde - uFoyer;
+          float mPresDuFoyer = PORTEE_DU_FOYER * PORTEE_DU_FOYER / (PORTEE_DU_FOYER * PORTEE_DU_FOYER + dot(mVersFoyer, mVersFoyer));
+          radiance *= mPresDuFoyer;
+          iblIrradiance *= mPresDuFoyer;
+        #endif
         #include <lights_fragment_end>
         #ifdef USE_LIGHTMAP
           reflectedLight.indirectDiffuse = mCuite * BRDF_Lambert(material.diffuseColor);
