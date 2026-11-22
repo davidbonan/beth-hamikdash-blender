@@ -2744,29 +2744,11 @@
       "echelle": 2.25,
       "secondes": 22
     },
-    "aliyah": {
-      "carte": "lumiere/aliyah.webp",
-      "canal": 0,
-      "echelle": 1.5,
-      "secondes": 10
-    },
     "arche_wilson": {
       "carte": "lumiere/arche_wilson.webp",
       "canal": 0,
       "echelle": 2.0,
       "secondes": 10
-    },
-    "azara": {
-      "carte": "lumiere/azara.webp",
-      "canal": 0,
-      "echelle": 2.75,
-      "secondes": 107
-    },
-    "batiment": {
-      "carte": "lumiere/batiment.webp",
-      "canal": 0,
-      "echelle": 2.5,
-      "secondes": 32
     },
     "beit_avtinas": {
       "carte": "lumiere/beit_avtinas.webp",
@@ -2881,12 +2863,6 @@
       "canal": 1,
       "echelle": 2.75,
       "secondes": 29
-    },
-    "heikhal": {
-      "carte": "lumiere/heikhal.webp",
-      "canal": 0,
-      "echelle": 2.0,
-      "secondes": 19
     },
     "heil": {
       "carte": "lumiere/heil.webp",
@@ -3146,12 +3122,6 @@
       "echelle": 3.75,
       "secondes": 60
     },
-    "parokhet": {
-      "carte": "lumiere/parokhet.webp",
-      "canal": 0,
-      "echelle": 1.5,
-      "secondes": 64
-    },
     "petah_oulam": {
       "carte": "lumiere/petah_oulam.webp",
       "canal": 0,
@@ -3290,12 +3260,6 @@
       "echelle": 2.75,
       "secondes": 5
     },
-    "taim": {
-      "carte": "lumiere/taim.webp",
-      "canal": 0,
-      "echelle": 2.0,
-      "secondes": 34
-    },
     "tavla_hamaftechot": {
       "carte": "lumiere/tavla_hamaftechot.webp",
       "canal": 0,
@@ -3319,6 +3283,42 @@
       "canal": 0,
       "echelle": 2.5,
       "secondes": 5
+    },
+    "aliyah": {
+      "carte": "lumiere/aliyah.webp",
+      "canal": 0,
+      "echelle": 1.5,
+      "secondes": 10
+    },
+    "azara": {
+      "carte": "lumiere/azara.webp",
+      "canal": 0,
+      "echelle": 2.75,
+      "secondes": 73
+    },
+    "batiment": {
+      "carte": "lumiere/batiment.webp",
+      "canal": 0,
+      "echelle": 2.5,
+      "secondes": 15
+    },
+    "heikhal": {
+      "carte": "lumiere/heikhal.webp",
+      "canal": 0,
+      "echelle": 2.0,
+      "secondes": 16
+    },
+    "parokhet": {
+      "carte": "lumiere/parokhet.webp",
+      "canal": 0,
+      "echelle": 1.5,
+      "secondes": 60
+    },
+    "taim": {
+      "carte": "lumiere/taim.webp",
+      "canal": 0,
+      "echelle": 2.0,
+      "secondes": 34
     }
   },
   "empreintes": {
@@ -3414,7 +3414,7 @@
     "netilat_yadayim": "cf3fe12cb50b8be9fe733091d56213454bc92053",
     "niche_bilga": "27cea028dd281567fa5fc73bbaa55efbf0f8cc8d",
     "oulam": "e51636bc1928b5ce250bd804816f9c5bc754de59",
-    "parokhet": "36890b66feb0632cb69835c94431da342de31c10",
+    "parokhet": "86af1e23172682d470e5f2b52ea63c3cc83a5e16",
     "pesakhter": "717e56f274fa8af5408d3aec8f1d7d10c5255448",
     "petah_oulam": "d1064b3a315b386582bb835d609601982ad9ab1a",
     "place_kotel": "8e75ecd6ccb654d4d595c717ec69afa895149504",

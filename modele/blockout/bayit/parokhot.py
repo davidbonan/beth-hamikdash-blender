@@ -1,8 +1,8 @@
 import bpy
 
-from ..primitives.parametres import AMA, MODELE, Z_BAT
+from ..primitives.parametres import AMA, MODELE, Z_BAT, m
 from ..primitives.matieres import MAT_OR, MAT_PAROKHET
-from ..primitives.volumes import ellipsoide, mesh_from_pydata, sphere
+from ..primitives.volumes import ellipsoide, mesh_from_pydata
 from .heikhal import ARON_Y_BAD, ARON_Z_BAD, TR0, TR1
 
 
@@ -11,6 +11,8 @@ from .heikhal import ARON_Y_BAD, ARON_Z_BAD, TR0, TR1
 PAROKHET_EP = 1 / 6            # טפח : l'épaisseur que la michna donne à l'étoffe
 PERIFA_BLEND = MODELE / "perifa.blend"
 PERIFA_HAUT = 24               # amot : la hauteur que la simulation de tissu tient ; au-dessus, l'étoffe pend à plat
+BOSSE_RAYON = 1.1              # amot : CHOIX
+BOSSE_FLECHE = 0.45            # amot : de quoi couvrir le bout du bad, qui passe le rideau d'un dixième d'ama
 
 
 def etoffe_en_x(name, contour, x0, x1, col, mat):
@@ -64,13 +66,25 @@ def parokhet_perufa(name, nom_coin, x_ouest, cote):
                 x_ouest, x_ouest + PAROKHET_EP, "60_KodeshHakodashim", MAT_PAROKHET())
     etoffe, anneau = perifa(nom_coin)
     x_pli = x_ouest + PAROKHET_EP / 2
-    coin_replie(f"{name}_coin", etoffe, x_pli, cote, "60_KodeshHakodashim", MAT_PAROKHET())
+    coin = coin_replie(f"{name}_coin", etoffe, x_pli, cote, "60_KodeshHakodashim", MAT_PAROKHET())
     coin_replie(f"{name}_keres", anneau, x_pli, cote, "60_KodeshHakodashim", MAT_OR())
     bpy.data.meshes.remove(etoffe)
     bpy.data.meshes.remove(anneau)
+    return coin
 
 
-parokhet_perufa("Parokhet_ext", "ext", TR0 - PAROKHET_EP, -1)
+def bomber_vers_l_est(etoffe, centres):
+    """Pousse l'étoffe, ses deux faces ensemble, autour de chaque (y, z) en amot. Le bombé
+    s'annule au bord avec sa pente : il reste de la même étoffe, sans arête."""
+    for v in etoffe.data.vertices:
+        for y, z in centres:
+            r2 = ((v.co.y - m(y)) ** 2 + (v.co.z - m(z)) ** 2) / m(BOSSE_RAYON) ** 2
+            if r2 < 1:
+                v.co.x += m(BOSSE_FLECHE) * (1 - r2) ** 3
+    etoffe.data.update()
+
+
+exterieure = parokhet_perufa("Parokhet_ext", "ext", TR0 - PAROKHET_EP, -1)
 parokhet_perufa("Parokhet_int", "int", TR1, +1)
 # Le motif est dans la matière (voir `parokhet`), et le même sur les deux faces. Un
 # maassé 'hoshev en porte un AUTRE au revers — « מצד זה ארי ומצד זה נשר » (Rashi sur Yoma
@@ -83,7 +97,4 @@ TRAKSIN_VIDE = (TR0 - PAROKHET_EP) - (TR1 + PAROKHET_EP)
 for ns, y in (("N", ARON_Y_BAD), ("S", -ARON_Y_BAD)):
     ellipsoide(f"Parokhet_int_tension_{ns}", (TR0 + TR1) / 2, y, ARON_Z_BAD,
                (TRAKSIN_VIDE / 2, 0.3, 0.3), "60_KodeshHakodashim", MAT_PAROKHET())
-    ellipsoide(f"Parokhet_ext_tension_{ns}", TR0 - PAROKHET_EP, y, ARON_Z_BAD,
-               (PAROKHET_EP + 0.25, 0.92, 0.92), "60_KodeshHakodashim", MAT_PAROKHET())
-    sphere(f"Parokhet_ext_bosse_{ns}", TR0 + 0.16, y, ARON_Z_BAD, 0.36,
-           "60_KodeshHakodashim", MAT_PAROKHET())
+bomber_vers_l_est(exterieure, [(ARON_Y_BAD, ARON_Z_BAD), (-ARON_Y_BAD, ARON_Z_BAD)])
