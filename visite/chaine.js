@@ -21,18 +21,17 @@
  * elle —, et une colonne posée sur un dallage y semble collée dessus. La passe
  * ci-dessous rend cette part-là.
  *
- * Il ne lit PAS le tampon de profondeur, multi-échantillonné et encodé par le moteur.
- * Une passe séparée écrit donc la normale et la distance en clair, en mètres, dans une
- * cible flottante : ce qu'on y lit ne dépend d'aucun réglage du moteur.
+ * Il lit la profondeur que la scène vient d'écrire, résolue dans une texture : la distance
+ * s'en déduit en mètres, la normale de ses voisins, et le décor n'est pas tracé une seconde fois.
  */
 import * as THREE from "three";
 import { FEU_DE_L_AUTEL, empriseDuFeu, foyersDuFeu } from "./feu_de_l_autel.js";
 import { parTranches } from "./fil.js";
 import { COURBE_DE_L_ECRAN, EXPOSITION, EXPOSITION_DEHORS, TEINTE_CUITE } from "./matieres.js";
 import { OMBRE_LOINTAINE, profondeurLointaine } from "./ombres.js";
+import { DISTANCE_LUE, PROFONDEUR_DE_LA_SCENE } from "./profondeur_de_la_scene.js";
 import { PROFIL } from "./qualite.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { Pass, FullScreenQuad } from "three/addons/postprocessing/Pass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
@@ -41,7 +40,7 @@ import { FXAAShader } from "three/addons/shaders/FXAAShader.js";
 // Douze directions par pixel, en demi-résolution : c'est la passe la plus chère de
 // la visite après la géométrie. Le profil léger en garde la moitié — le flou de la
 // passe suivante, qui moyenne déjà neuf voisins, en avale la différence.
-const ECHANTILLONS = PROFIL.occlusion;
+const ECHANTILLONS = PROFIL.occlusion?.prises ?? 0;
 // Une ama et demie : l'occlusion doit dire « ce coin est un coin », pas ombrer la
 // cour. Plus large, elle assombrit les murs entiers dès qu'on s'en approche.
 const RAYON = 1.8;
@@ -53,39 +52,15 @@ const FORCE = 0.8;
 // aplats posés l'un contre l'autre.
 const RAYON_FIN = 0.08;
 const FORCE_FIN = 0.7;
-// Il s'éteint bien plus tôt que l'autre, et pour deux raisons qui tombent ensemble : la
-// passe est en demi-résolution, et 8 cm y valent moins d'un pixel passé quinze mètres ;
-// la distance est stockée en demi-flottant, dont le pas dépasse alors le rayon lui-même.
+// Il s'éteint bien plus tôt que l'autre : la passe est en demi-résolution, et 8 cm y
+// valent moins d'un pixel passé quinze mètres.
 const PORTEE_FIN = [12.0, 26.0];
-// Au-delà, la distance stockée en demi-flottant devient plus grossière que le rayon
-// et l'occlusion se met à clignoter sur les lointains.
+// L'occlusion pose les volumes proches : elle s'éteint entre ces deux distances.
 const PORTEE = [45.0, 120.0];
-// Au-delà de la portée et d'un rayon, rien n'occlut plus rien : la passe de géométrie s'arrête là, et ne trace plus le pays.
-const FOND_GEOMETRIE = PORTEE[1] + RAYON + 1;
-
-const GEOMETRIE = new THREE.ShaderMaterial({
-  vertexShader: /* glsl */`
-    #include <common>
-    #include <skinning_pars_vertex>
-    varying vec3 vN; varying float vZ;
-    void main(){
-      #include <skinbase_vertex>
-      #include <beginnormal_vertex>
-      #include <skinnormal_vertex>
-      #include <begin_vertex>
-      #include <skinning_vertex>
-      vec4 mv = modelViewMatrix * vec4(transformed, 1.0);
-      vN = normalMatrix * objectNormal; vZ = -mv.z;
-      gl_Position = projectionMatrix * mv;
-    }`,
-  fragmentShader: /* glsl */`
-    varying vec3 vN; varying float vZ;
-    void main(){ gl_FragColor = vec4(normalize(vN) * 0.5 + 0.5, vZ); }`,
-});
 
 const OCCLUSION = {
   uniforms: {
-    tGeo: { value: null }, uTanFov: { value: 0 }, uAspect: { value: 1 },
+    uTanFov: { value: 0 }, uAspect: { value: 1 },
     uRayon: { value: RAYON }, uForce: { value: FORCE },
     uRayonFin: { value: RAYON_FIN }, uForceFin: { value: FORCE_FIN },
   },
@@ -93,12 +68,11 @@ const OCCLUSION = {
     varying vec2 vUv;
     void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: /* glsl */`
-    uniform sampler2D tGeo;
+    ${DISTANCE_LUE}
     uniform float uTanFov, uAspect, uRayon, uForce, uRayonFin, uForceFin;
     varying vec2 vUv;
 
-    // La cible garde la distance en mètres : la position de vue s'en déduit par le
-    // rayon qui traverse le pixel, sans rien savoir de la projection du moteur.
+    // La position de vue se déduit de la distance par le rayon qui traverse le pixel.
     vec3 positionVue(vec2 uv, float z){
       return vec3((uv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0) * z, -z);
     }
@@ -111,17 +85,28 @@ const OCCLUSION = {
       vec3 S = P + pas;
       vec2 uvS = 0.5 + 0.5 * (S.xy / -S.z) / (uTanFov * vec2(uAspect, 1.0));
       if (any(lessThan(uvS, vec2(0.0))) || any(greaterThan(uvS, vec2(1.0)))) return 0.0;
-      float zS = texture2D(tGeo, uvS).a;
+      float zS = distanceLue(uvS);
       if (zS <= 0.0) return 0.0;
       float devant = -S.z - zS;
       return step(biais, devant) * clamp(portee / max(devant, 1e-4), 0.0, 1.0);
     }
 
+    // De chaque côté, le voisin le plus proche en distance : celui d'au-delà d'une arête fausserait la face.
+    vec3 normaleVue(vec2 uv, vec3 P, vec2 texel){
+      vec2 dx = vec2(texel.x, 0.0), dy = vec2(0.0, texel.y);
+      vec3 est = positionVue(uv + dx, distanceLue(uv + dx)) - P, ouest = P - positionVue(uv - dx, distanceLue(uv - dx));
+      vec3 nord = positionVue(uv + dy, distanceLue(uv + dy)) - P, sud = P - positionVue(uv - dy, distanceLue(uv - dy));
+      return normalize(cross(abs(est.z) < abs(ouest.z) ? est : ouest, abs(nord.z) < abs(sud.z) ? nord : sud));
+    }
+
     void main(){
-      vec4 g = texture2D(tGeo, vUv);
-      if (g.a <= 0.0) { gl_FragColor = vec4(1.0); return; }   // le ciel n'occlut rien
-      vec3 P = positionVue(vUv, g.a);
-      vec3 N = normalize(g.rgb * 2.0 - 1.0);
+      // En demi-définition, le centre d'un pixel tombe à la jointure de quatre texels de profondeur : on en lit un, en son centre.
+      vec2 texel = 1.0 / vec2(textureSize(tProfondeur, 0));
+      vec2 uv = (floor(vUv / texel) + 0.5) * texel;
+      float z = distanceLue(uv);
+      if (z <= 0.0) { gl_FragColor = vec4(1.0); return; }   // le ciel n'occlut rien
+      vec3 P = positionVue(uv, z);
+      vec3 N = normaleVue(uv, P, texel);
       // Le repère tangent est arbitraire autour de la normale : il tourne sur un motif de
       // 4 × 4 pixels, que le flou 4 × 4 de la composition moyenne exactement.
       vec3 T = normalize(abs(N.z) < 0.9 ? cross(vec3(0.0, 0.0, 1.0), N) : cross(vec3(0.0, 1.0, 0.0), N));
@@ -143,8 +128,8 @@ const OCCLUSION = {
       }
       float ao    = 1.0 - uForce    * occ    / float(${ECHANTILLONS});
       float aoFin = 1.0 - uForceFin * occFin / float(${ECHANTILLONS});
-      ao = mix(ao, 1.0, smoothstep(${PORTEE[0].toFixed(1)}, ${PORTEE[1].toFixed(1)}, g.a));
-      aoFin = mix(aoFin, 1.0, smoothstep(${PORTEE_FIN[0].toFixed(1)}, ${PORTEE_FIN[1].toFixed(1)}, g.a));
+      ao = mix(ao, 1.0, smoothstep(${PORTEE[0].toFixed(1)}, ${PORTEE[1].toFixed(1)}, z));
+      aoFin = mix(aoFin, 1.0, smoothstep(${PORTEE_FIN[0].toFixed(1)}, ${PORTEE_FIN[1].toFixed(1)}, z));
       gl_FragColor = vec4(ao, aoFin, 0.0, 1.0);
     }`,
 };
@@ -173,8 +158,8 @@ const COMPOSITION = {
 // LA FUMÉE de la ketoret, dans le seul volume qui en a : le Kodesh HaKodashim. Une
 // passe d'écran, pas un objet — la scène n'a ni volumes ni particules, et un nuage de
 // cartes alpha se trahit dès qu'on le traverse. Le rayon de chaque pixel est coupé par
-// la boîte de la pièce et par la géométrie qu'il rencontre (la distance de la passe
-// d'occlusion), puis parcouru pas à pas : à chaque pas une densité — une nappe qui
+// la boîte de la pièce et par la géométrie qu'il rencontre (la profondeur de la
+// scène), puis parcouru pas à pas : à chaque pas une densité — une nappe qui
 // s'amasse sous le plafond, et la colonne qui monte des braises en ondulant — et la
 // lumière que ce point reçoit de l'Arche et des braises, en 1/d². C'est cette lumière-là,
 // reprise par la fumée, qui fait lire l'obscurité : sans elle la pièce n'est qu'un écran noir.
@@ -182,16 +167,14 @@ const COMPOSITION = {
 // Elle passe AVANT le halo, pour la même raison que le halo passe avant la sortie : la
 // lueur de l'Arche dans la fumée est une haute lumière, et c'est elle qui doit déborder.
 //
-// Le parcours se fait en demi-définition, sur la grille de la passe de géométrie qu'il lit :
-// au quart les volutes perdent leur détail. Il écrit la lumière reprise et, en alpha, ce qui
+// Le parcours se fait en demi-définition : au quart les volutes perdent leur détail. Il écrit la lumière reprise et, en alpha, ce qui
 // traverse ; `VOILE` pose ça sur l'image.
-// En mètres. De plus loin la pièce est close — ses murs, sa parokhet extérieure à 1,3 m — et la fumée coupée partout : dans le champ, elle coûtait pourtant sa passe, et au profil très léger celle de géométrie.
+// En mètres. De plus loin la pièce est close — ses murs, sa parokhet extérieure à 1,3 m — et la fumée coupée partout : dans le champ, elle coûtait pourtant sa passe.
 const RECUL_FUMEE = 2;
-// En mètres. La colonne de l'autel se voit de tout le Har HaBayit ; de plus loin, la couper demanderait la géométrie du pays entier.
+// En mètres. La colonne de l'autel se voit de tout le Har HaBayit.
 const RECUL_FEU = 300;
 const FUMEE = {
-  uniforms: { tGeo: { value: null },
-              uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
+  uniforms: { uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() },
               uBoiteMin: { value: new THREE.Vector3() }, uBoiteMax: { value: new THREE.Vector3() },
               uBraise: { value: new THREE.Vector3() }, uArche: { value: new THREE.Vector3() },
               uTemps: { value: 0 },
@@ -200,7 +183,7 @@ const FUMEE = {
   defines: { PAS: PROFIL.fumee.pas, OCTAVES: PROFIL.fumee.octaves },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
-    uniform sampler2D tGeo;
+    ${DISTANCE_LUE}
     uniform float uTanFov, uAspect, uTemps, uVoile, uVolutes, uLueur, uLueurArche, uLampe;
     uniform mat4 uMonde;
     uniform vec3 uBoiteMin, uBoiteMax, uBraise, uArche;
@@ -279,7 +262,7 @@ const FUMEE = {
     }
 
     void main(){
-      float z = texture2D(tGeo, vUv).a;
+      float z = distanceLue(vUv);
       vec3 dirVue = normalize(vec3((vUv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0), -1.0));
       vec3 o = uMonde[3].xyz;
       vec3 d = normalize(mat3(uMonde) * dirVue);
@@ -339,13 +322,14 @@ const ECLAT_HORS_CHAMP = 0.12;
 const SOL_DE_L_AIR = 0, EPAISSEUR_DE_L_AIR = 10;
 const BIAIS_RAYONS = 0.4 / 700;
 const RAYONS = PROFIL.rayons && {
-  uniforms: { tGeo: { value: null }, uCarteLointaine: { value: null }, uOmbreLointaine: { value: new THREE.Matrix4() },
+  uniforms: { uCarteLointaine: { value: null }, uOmbreLointaine: { value: new THREE.Matrix4() },
               uMonde: { value: new THREE.Matrix4() }, uVersLAstre: { value: new THREE.Vector3() },
               uTanFov: { value: 0 }, uAspect: { value: 1 }, uDensite: { value: 0 } },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
     #include <packing>
-    uniform sampler2D tGeo, uCarteLointaine;
+    ${DISTANCE_LUE}
+    uniform sampler2D uCarteLointaine;
     uniform mat4 uOmbreLointaine, uMonde;
     uniform vec3 uVersLAstre;
     uniform float uTanFov, uAspect, uDensite;
@@ -359,7 +343,7 @@ const RAYONS = PROFIL.rayons && {
     }
 
     void main(){
-      float z = texture2D(tGeo, vUv).a;
+      float z = distanceLue(vUv);
       vec3 dirVue = normalize(vec3((vUv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0), -1.0));
       vec3 o = uMonde[3].xyz;
       vec3 d = normalize(mat3(uMonde) * dirVue);
@@ -422,20 +406,21 @@ const BOUGE = PROFIL.bouge;
 // Un écart plus grand que ce quart d'écran est un saut, pas un geste ; la traînée reste sous ce quarantième.
 const SAUT = 0.25, TRAINEE_MAX = 0.025;
 const FLOU_DE_BOUGE = BOUGE && {
-  uniforms: { tDiffuse: { value: null }, tGeo: { value: null }, uFacteur: { value: 0 },
+  uniforms: { tDiffuse: { value: null }, uFacteur: { value: 0 },
               uVersAvant: { value: new THREE.Matrix4() }, uProjectionInverse: { value: new THREE.Matrix4() } },
   vertexShader: OCCLUSION.vertexShader,
   fragmentShader: /* glsl */`
-    uniform sampler2D tDiffuse, tGeo;
+    ${DISTANCE_LUE}
+    uniform sampler2D tDiffuse;
     uniform mat4 uVersAvant, uProjectionInverse;
     uniform float uFacteur;
     varying vec2 vUv;
     void main(){
       vec4 c = texture2D(tDiffuse, vUv);
-      float z = texelFetch(tGeo, ivec2(vUv * vec2(textureSize(tGeo, 0))), 0).a;
+      float z = distanceLue(vUv);
       vec4 r = uProjectionInverse * vec4(vUv * 2.0 - 1.0, 1.0, 1.0);
       vec3 rayon = r.xyz / r.w;
-      // Le ciel et ce qui passe la portée de la géométrie sont à l'infini : seule la rotation les déplace.
+      // Le ciel est à l'infini : seule la rotation le déplace.
       vec4 avant = z > 0.0 ? uVersAvant * vec4(rayon * (z / -rayon.z), 1.0) : uVersAvant * vec4(rayon, 0.0);
       if (avant.w <= 0.0) { gl_FragColor = c; return; }
       vec2 ecart = vUv - (avant.xy / avant.w * 0.5 + 0.5);
@@ -590,10 +575,8 @@ class Photometre extends Pass {
 }
 
 // Sous Metal, ce qu'un mur cache passait par tout son nuanceur : la profondeur d'abord, un cheveu en retrait, et seul ce qui se voit s'ombre.
-class Profondeur extends Pass {
+class PrePasseDeProfondeur {
   constructor(scene, camera) {
-    super();
-    this.needsSwap = false;
     this.scene = scene;
     this.camera = camera;
     this.materiau = new THREE.MeshBasicMaterial({ colorWrite: false, polygonOffset: true,
@@ -602,31 +585,45 @@ class Profondeur extends Pass {
   }
 
   // Ce qui n'écrit pas sa profondeur — le dôme, les flammes, ce qu'on voit au travers — ne cache rien.
-  render(renderer, _writeBuffer, readBuffer) {
+  rendre(renderer) {
     this.scene.traverseVisible((o) => {
       if (o.material && (o.material.transparent || !o.material.depthWrite)) this.voiles.push(o);
     });
     for (const o of this.voiles) o.visible = false;
-    const autoClear = renderer.autoClear;
-    renderer.autoClear = false;
+    const ombresSuivies = renderer.shadowMap.autoUpdate;
+    // Un voile caché porte encore son ombre : les cartes attendent la passe de la scène.
+    renderer.shadowMap.autoUpdate = false;
     this.scene.overrideMaterial = this.materiau;
     try {
-      renderer.setRenderTarget(readBuffer);
-      renderer.clear();
       renderer.render(this.scene, this.camera);
     } finally {
       this.scene.overrideMaterial = null;
-      renderer.autoClear = autoClear;
+      renderer.shadowMap.autoUpdate = ombresSuivies;
       for (const o of this.voiles) o.visible = true;
       this.voiles.length = 0;
     }
   }
 }
 
-/**
- * `horsGeo` : ce qui ne doit pas entrer dans la passe de géométrie. Le dôme de ciel
- * en fait partie — il enveloppe la scène, et il occluerait tout.
- */
+// La cible de la scène n'est jamais celle où le composeur écrit : sa profondeur se relit jusqu'à la dernière passe.
+class Composeur extends EffectComposer {
+  constructor(renderer, cibleScene) {
+    super(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false }));
+    this.cibleScene = cibleScene;
+  }
+
+  swapBuffers() {
+    this.readBuffer = this.writeBuffer;
+    this.writeBuffer = this.readBuffer === this.renderTarget1 ? this.renderTarget2 : this.renderTarget1;
+  }
+
+  render() {
+    this.readBuffer = this.cibleScene;
+    this.writeBuffer = this.renderTarget1;
+    super.render();
+  }
+}
+
 // La matière que three prête à un maillage pour la carte d'ombre du soleil ou d'une lampe (WebGLShadowMap.getDepthMaterial) : face retournée, cartes recopiées.
 const FACE_OMBRE = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
 const RECOPIEES = ["map", "alphaMap", "alphaTest", "displacementMap", "displacementScale", "displacementBias"];
@@ -662,32 +659,23 @@ const liaison = (renderer, suivre) => new Promise((lies) => {
 // Three n'interroge un programme qu'à son premier usage, dans l'image qui le trace : interrogés avant elle, par tranches.
 const interrogerAvantUsage = (programme) => programme.getUniforms();
 
-export function chaine(renderer, scene, camera, horsGeo = []) {
-  const cibleGeo = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
-  const cibleAO = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
+export function chaine(renderer, scene, camera) {
+  const cibleScene = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: PROFIL.antiCrenelage });
+  cibleScene.depthTexture = new THREE.DepthTexture(1, 1);
+  PROFONDEUR_DE_LA_SCENE.tProfondeur.value = cibleScene.depthTexture;
   const cibleFumee = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
   const cibleRayons = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: false });
 
-  const teinteFond = new THREE.Color();
-  const composeur = new EffectComposer(renderer,
-    new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: PROFIL.antiCrenelage }));
-  const profondeur = PROFIL.preProfondeur && new Profondeur(scene, camera);
-  if (profondeur) composeur.addPass(profondeur);
-  const passeScene = new RenderPass(scene, camera);
-  passeScene.clear = !PROFIL.preProfondeur;
-  composeur.addPass(passeScene);
-  const passeAO = PROFIL.occlusion > 0 && new ShaderPass(OCCLUSION);
-  const passeComposition = passeAO ? new ShaderPass(COMPOSITION) : null;
+  const composeur = new Composeur(renderer, cibleScene);
+  const prePasse = PROFIL.preProfondeur && new PrePasseDeProfondeur(scene, camera);
+  const cibleAO = PROFIL.occlusion && new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
+  const passeAO = PROFIL.occlusion && new ShaderPass(OCCLUSION);
+  const composition = passeAO && new ShaderPass(COMPOSITION);
   if (passeAO) {
-    passeAO.renderToScreen = false;
-    passeAO.uniforms.tGeo.value = cibleGeo.texture;
-  }
-  if (passeComposition) {
-    passeComposition.uniforms.tAO.value = cibleAO.texture;
-    composeur.addPass(passeComposition);
+    composition.uniforms.tAO.value = cibleAO.texture;
+    composeur.addPass(composition);
   }
   const fumee = new ShaderPass(FUMEE);
-  fumee.uniforms.tGeo.value = cibleGeo.texture;
   const voile = new ShaderPass(VOILE);
   voile.uniforms.tFumee.value = cibleFumee.texture;
   voile.enabled = false;
@@ -696,17 +684,13 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const feu = FEU_DE_L_AUTEL && new ShaderPass({ ...FEU_DE_L_AUTEL, vertexShader: OCCLUSION.vertexShader });
   const voileDuFeu = feu && new ShaderPass(VOILE);
   if (feu) {
-    feu.uniforms.tGeo.value = cibleGeo.texture;
     voileDuFeu.uniforms.tFumee.value = cibleFeu.texture;
     voileDuFeu.enabled = false;
     composeur.addPass(voileDuFeu);
   }
   // Avant le halo : une haute lumière traînée déborde en traînée, comme sur la pellicule.
   const bouge = FLOU_DE_BOUGE && new ShaderPass(FLOU_DE_BOUGE);
-  if (bouge) {
-    bouge.uniforms.tGeo.value = cibleGeo.texture;
-    composeur.addPass(bouge);
-  }
+  if (bouge) composeur.addPass(bouge);
   // Avant le halo : c'est la lumière de la scène qu'on mesure, pas son débordement.
   const photometre = new Photometre();
   composeur.addPass(photometre);
@@ -725,7 +709,6 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const rayons = RAYONS && new ShaderPass(RAYONS);
   const airEclaire = rayons && new ShaderPass(AIR_ECLAIRE);
   if (rayons) {
-    rayons.uniforms.tGeo.value = cibleGeo.texture;
     rayons.uniforms.uCarteLointaine.value = OMBRE_LOINTAINE.uCarteLointaine.value;
     airEclaire.uniforms.tRayons.value = cibleRayons.texture;
     airEclaire.enabled = false;
@@ -743,15 +726,14 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   const etalonnage = new ShaderPass(ETALONNAGE);
   if (PROFIL.etalonnage) etalonnage.uniforms.uReleve.value = PROFIL.etalonnage.releve;
   composeur.addPass(etalonnage);
+  for (const passe of [passeAO, fumee, feu, rayons, bouge]) if (passe) Object.assign(passe.uniforms, PROFONDEUR_DE_LA_SCENE);
 
   // Un composeur construit sur sa propre cible fige sa définition à 1 : la scène était rendue en CSS, puis agrandie.
   function redimensionner(l, h, definition) {
     const p = renderer.getPixelRatio();
     composeur.setPixelRatio(definition);
     composeur.setSize(l, h);
-    cibleGeo.setSize(Math.round(l * p * PROFIL.geometrie), Math.round(h * p * PROFIL.geometrie));
-    cibleAO.setSize(cibleGeo.width, cibleGeo.height);
-    // Fumée, feu et rayons restent en demi-définition, quelle que soit celle de la géométrie qu'ils lisent.
+    cibleScene.setSize(composeur.renderTarget1.width, composeur.renderTarget1.height);
     const demi = { l: Math.round(l * p * 0.5), h: Math.round(h * p * 0.5) };
     cibleFumee.setSize(demi.l, demi.h);
     voile.uniforms.uPas.value.set(1 / cibleFumee.width, 1 / cibleFumee.height);
@@ -760,10 +742,11 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     etalonnage.uniforms.uPas.value.set(1 / composeur.renderTarget1.width, 1 / composeur.renderTarget1.height);
     const tanFov = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
     if (passeAO) {
+      cibleAO.setSize(Math.round(l * p * PROFIL.occlusion.definition), Math.round(h * p * PROFIL.occlusion.definition));
+      composition.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
       passeAO.uniforms.uTanFov.value = tanFov;
       passeAO.uniforms.uAspect.value = camera.aspect;
     }
-    passeComposition?.uniforms.uPas.value.set(1 / cibleAO.width, 1 / cibleAO.height);
     fumee.uniforms.uTanFov.value = tanFov;
     fumee.uniforms.uAspect.value = camera.aspect;
     if (feu) {
@@ -839,45 +822,22 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     feu.uniforms.uPartDuCiel.value = partDuCiel;
   }
 
-  const coin = new THREE.Vector3();
-  function fondDe(boite) {
-    let fond = 0;
-    for (let i = 0; i < 8; i++) {
-      coin.set(i & 1 ? boite.max.x : boite.min.x, i & 2 ? boite.max.y : boite.min.y, i & 4 ? boite.max.z : boite.min.z);
-      fond = Math.max(fond, coin.distanceTo(camera.position));
-    }
-    return fond;
-  }
-
   const dansLeChamp = (boite) => champ.setFromProjectionMatrix(
     vueProjetee.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)).intersectsBox(boite);
   const pieceEnfumeeVue = () => pieceEnfumee !== null && pieceEnfumee.distanceToPoint(camera.position) < RECUL_FUMEE && dansLeChamp(pieceEnfumee);
   const feuDeLAutelVu = () => empriseDuFeuDeLAutel !== null && empriseDuFeuDeLAutel.distanceToPoint(camera.position) < RECUL_FEU
     && dansLeChamp(empriseDuFeuDeLAutel);
 
-  function rendreGeometrie() {
-    const caches = horsGeo.filter((o) => o.visible);
-    for (const o of caches) o.visible = false;
-    scene.overrideMaterial = GEOMETRIE;
-    renderer.getClearColor(teinteFond);
-    const alphaFond = renderer.getClearAlpha();
-    const fond = camera.far;
+  function rendreLaScene() {
+    const autoClear = renderer.autoClear;
+    renderer.autoClear = false;
     try {
-      // Alpha nul = pas de géométrie : c'est ainsi que la passe suivante reconnaît le
-      // ciel, la distance étant stockée dans ce même canal.
-      renderer.setClearColor(0x000000, 0);
-      renderer.setRenderTarget(cibleGeo);
+      renderer.setRenderTarget(cibleScene);
       renderer.clear();
-      // Fumée et feu y lisent ce qui coupe leurs rayons : sans le fond de leur volume, ils se voyaient à travers les murs.
-      camera.far = Math.max(FOND_GEOMETRIE, voile.enabled ? fondDe(pieceEnfumee) : 0, voileDuFeu?.enabled ? fondDe(empriseDuFeuDeLAutel) : 0);
-      camera.updateProjectionMatrix();
+      if (prePasse) prePasse.rendre(renderer);
       renderer.render(scene, camera);
     } finally {
-      camera.far = fond;
-      camera.updateProjectionMatrix();
-      scene.overrideMaterial = null;
-      renderer.setClearColor(teinteFond, alphaFond);
-      for (const o of caches) o.visible = true;
+      renderer.autoClear = autoClear;
     }
   }
 
@@ -899,28 +859,27 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
     voile.enabled = pieceEnfumeeVue();
     if (feu) voileDuFeu.enabled = feuDeLAutelVu();
     const eclaire = rayons && airEclaire.enabled;
-    // Les matrices de la scène se refont à la passe de géométrie, que la suite fige : sans elle, on les refait ici.
-    if (passeAO || bouge || voile.enabled || voileDuFeu?.enabled || eclaire) rendreGeometrie();
-    else scene.updateMatrixWorld();
     poserLeBouge(dt);
-
+    PROFONDEUR_DE_LA_SCENE.uProche.value = camera.near;
+    PROFONDEUR_DE_LA_SCENE.uLoin.value = camera.far;
     etalonnage.uniforms.uTemps.value = performance.now() * 0.001;
     fumee.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
     fumee.uniforms.uMonde.value.copy(camera.matrixWorld);
-    if (passeAO) {
-      passeAO.render(renderer, cibleAO, null, 0, false);
-    }
-    if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
-    if (voileDuFeu?.enabled) {
-      feu.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
-      feu.uniforms.uMonde.value.copy(camera.matrixWorld);
-      feu.render(renderer, cibleFeu, null, 0, false);
-    }
-    if (eclaire) rendreLesRayons();
-    renderer.setRenderTarget(null);
-    // Rien ne bouge depuis la passe de géométrie : sans ça three recalcule les matrices de toute la scène à chaque passe.
+
+    // Les matrices se font une fois : sans ça three recalcule celles de toute la scène à chaque passe.
+    scene.updateMatrixWorld();
     scene.matrixWorldAutoUpdate = false;
     try {
+      rendreLaScene();
+      if (passeAO) passeAO.render(renderer, cibleAO, null, 0, false);
+      if (voile.enabled) fumee.render(renderer, cibleFumee, null, 0, false);
+      if (voileDuFeu?.enabled) {
+        feu.uniforms.uTemps.value = etalonnage.uniforms.uTemps.value;
+        feu.uniforms.uMonde.value.copy(camera.matrixWorld);
+        feu.render(renderer, cibleFeu, null, 0, false);
+      }
+      if (eclaire) rendreLesRayons();
+      renderer.setRenderTarget(null);
       composeur.render();
     } finally {
       scene.matrixWorldAutoUpdate = true;
@@ -928,12 +887,12 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
   }
 
   // Compilés hors cible, les nuanceurs prendraient le tonemapping de l'écran : la scène se rend dans le composeur, sans lui.
-  // compile ne voit que la matière de chaque objet : celles des passes de géométrie et de profondeur se compilaient à leur première image, figée.
+  // compile ne voit que la matière de chaque objet : celle de la pré-passe de profondeur se compilait à sa première image, figée.
   async function compiler(objets = scene, suivre = () => {}) {
-    renderer.setRenderTarget(composeur.readBuffer);
+    renderer.setRenderTarget(cibleScene);
     renderer.compile(objets, camera, scene);
     compilerPleinEcran(passesEnTampon());
-    for (const materiau of [GEOMETRIE, profondeur?.materiau].filter(Boolean)) compilerSous(objets, () => materiau);
+    if (prePasse) compilerSous(objets, () => prePasse.materiau);
     compilerOmbres(objets);
     compilerSous(objets, profondeurLointaine, SANS_LAMPES);
     renderer.setRenderTarget(null);
@@ -949,7 +908,7 @@ export function chaine(renderer, scene, camera, horsGeo = []) {
 
   function passesEnTampon() {
     const halos = halo ? [halo.materialHighPassFilter, ...halo.separableBlurMaterials, halo.compositeMaterial, halo.blendMaterial] : [];
-    return [passeAO, passeComposition, bouge, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
+    return [passeAO, composition, bouge, fumee, voile, feu, voileDuFeu, rayons, airEclaire, arretes].filter(Boolean).map((passe) => passe.material).concat(PHOTOMETRIE, halos);
   }
 
   // Des doubles vêtus de la matière de la passe : three déduit du maillage ses variantes, squelette compris, et une tuile ne se laisse pas rhabiller.

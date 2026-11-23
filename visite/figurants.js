@@ -25,7 +25,7 @@ const MARGE_GESTE = 0.35;
 const MARGE_OBJET = 0.12;
 const HAUTEUR_FLAMME_TORCHE = 0.3;
 
-export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir, obstacles, horsGeometrie,
+export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir, obstacles,
   distributions, conceptDe, lampesPosees }) {
   const troupes = {};
   const chargements = {};
@@ -80,7 +80,6 @@ export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, d
       torche.geometry.computeBoundingBox();
       const meche = flamme((rang + i) * 1.93, HAUTEUR_FLAMME_TORCHE);
       scene.add(meche);
-      horsGeometrie.push(meche);
       return { torche, meche, bout: new THREE.Vector3(0, torche.geometry.boundingBox.max.y - 0.06, 0) };
     });
   }
@@ -203,7 +202,6 @@ export function troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, d
     scene.remove(troupe);
     for (const { meche } of torches) {
       scene.remove(meche);
-      horsGeometrie.splice(horsGeometrie.indexOf(meche), 1);
       meche.material.dispose();
     }
     for (const { prise } of membres) {

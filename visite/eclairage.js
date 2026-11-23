@@ -66,7 +66,7 @@ function coupesDeLaShoeva(candelabres) {
 }
 
 export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple, sousSonde,
-  emprises, reperes, horsGeometrie, annoncerAttente }) {
+  emprises, reperes, annoncerAttente }) {
   let braise = null;
   let vacillement = 0;
   let feuDeLAutel = null;
@@ -140,7 +140,6 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
       const meche = flamme(i * 2.39);
       meche.position.set(...p);
       scene.add(meche);
-      horsGeometrie.push(meche);
       centre.add(meche.position);
     });
     // Au-dessus des mèches et non entre elles : à un doigt de la lampe du milieu, son or brûlait.
@@ -181,7 +180,6 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
       const meche = flamme(i * 2.39, HAUTEUR_FLAMME_SHOEVA);
       meche.position.copy(coupe).y -= 0.1;
       scene.add(meche);
-      horsGeometrie.push(meche);
       return meche;
     });
     const lampes = centresDesGroupes(coupes, 2).map((mat) =>
@@ -294,8 +292,7 @@ export function eclairerLeTemple({ scene, renderer, rendu, detail, astres: { sol
 
   // L'ombre portée est une fenêtre de 110 amot ; à l'échelle du Har HaBayit une seule
   // carte figée serait illisible. Elle suit donc le visiteur — mais par sauts, pas à
-  // chaque image : la refaire coûte une passe de géométrie entière, la troisième de
-  // l'image après la principale et celle de l'occlusion, et la fenêtre fait cinquante
+  // chaque image : la refaire coûte une passe de géométrie entière, et la fenêtre fait cinquante
   // mètres de large quand on n'avance que d'une douzaine de centimètres par image, en
   // courant. Tant qu'on ne la rafraîchit pas, three garde aussi la matrice qui va avec :
   // carte et matrice restent d'accord, et l'ombre reste juste — elle est simplement

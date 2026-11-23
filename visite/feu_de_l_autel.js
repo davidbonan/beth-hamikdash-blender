@@ -1,5 +1,6 @@
 // Le feu de l'autel : les flammes de chaque ma'arakha et la colonne de fumée de la grande, parcourues en volume.
 import * as THREE from "three";
+import { DISTANCE_LUE } from "./profondeur_de_la_scene.js";
 import { PROFIL } from "./qualite.js";
 
 const FOYERS_MAX = 4;
@@ -43,13 +44,12 @@ export function empriseDuFeu(lits) {
 const nombre = (valeur) => valeur.toFixed(4);
 
 export const FEU_DE_L_AUTEL = PROFIL.feuDeLAutel && {
-  uniforms: { tGeo: { value: null },
-              uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() }, uTemps: { value: 0 },
+  uniforms: { uTanFov: { value: 0 }, uAspect: { value: 1 }, uMonde: { value: new THREE.Matrix4() }, uTemps: { value: 0 },
               uFoyers: { value: foyersDuFeu([]) },
               uVersLAstre: { value: new THREE.Vector3(0, 1, 0) }, uAstre: { value: new THREE.Color() }, uPartDuCiel: { value: 1 } },
   defines: { PAS_FLAMMES: PROFIL.feuDeLAutel.flammes, PAS_FUMEE: PROFIL.feuDeLAutel.fumee, OCTAVES: PROFIL.feuDeLAutel.octaves },
   fragmentShader: /* glsl */`
-    uniform sampler2D tGeo;
+    ${DISTANCE_LUE}
     uniform float uTanFov, uAspect, uTemps, uPartDuCiel;
     uniform mat4 uMonde;
     uniform vec4 uFoyers[${FOYERS_MAX}];
@@ -216,7 +216,7 @@ export const FEU_DE_L_AUTEL = PROFIL.feuDeLAutel && {
     }
 
     void main(){
-      float z = texture2D(tGeo, vUv).a;
+      float z = distanceLue(vUv);
       vec3 dirVue = normalize(vec3((vUv * 2.0 - 1.0) * uTanFov * vec2(uAspect, 1.0), -1.0));
       vec3 o = uMonde[3].xyz;
       vec3 d = normalize(mat3(uMonde) * dirVue);

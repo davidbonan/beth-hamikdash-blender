@@ -25,6 +25,7 @@ Netlify porte le certificat. `davidbonan.io/visite` redirige en 301 vers ici.
 ```bash
 $BLENDER -b modele/beit_hamikdash.blend -P modele/beit_hamikdash_visite.py -- --recuire   # si le .blend a bougé — skill cuisson
 python3 modele/beit_hamikdash_traductions.py                          # doit répondre « traductions à jour »
+node .claude/skills/publier/visibilite.mjs <url de la visite servie depuis l'arbre de travail>   # si temple.glb a bougé — 30 min, GPU laissé libre, écrit visite/visibilite.json ; --verifier 400 chiffre ce qui est voilé à tort
 ./construire_site.sh && (cd dist && python3 -m http.server 8790)   # relecture locale, facultative
 git add -u site visite && git commit && git push origin main
 ```

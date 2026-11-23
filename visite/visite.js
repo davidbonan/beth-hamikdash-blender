@@ -35,6 +35,7 @@ import { fetesDuTemple } from "./fete.js";
 import { designation } from "./designation.js";
 import { annonce } from "./annonce.js";
 import { vuesDuTemple } from "./vues.js";
+import { voilerLInvisible } from "./visibilite.js";
 import { conceptsEn, contenusSources, json } from "./encyclopedie.js";
 
 // Une étoffe ne barre pas le passage. La parokhet en particulier : le Cohen Gadol la
@@ -150,10 +151,7 @@ const lampe = new THREE.PointLight(0xffe9c4, 0, 26, 1.7);
 camera.add(lampe);
 scene.add(camera);
 
-// Le dôme n'entre pas dans la passe de géométrie : il enveloppe la scène, et il l'occluerait
-// tout entière. Les flammes de la Menora non plus : elles ne sont pas une surface à ombrer.
-const horsGeometrie = [ciel];
-const rendu = chaine(renderer, scene, camera, horsGeometrie);
+const rendu = chaine(renderer, scene, camera);
 const SALLES_DE_L_AZARA = ["heikhal", "oulam", "kodesh_hakodashim"];
 // Le Heikhal et le Kodesh HaKodashim en deçà du mur de façade, dont la cour voit les portes par l'Oulam.
 const sanctuaireClos = unirEmprises(EMPRISES, ["heikhal", "kodesh_hakodashim"]);
@@ -294,7 +292,7 @@ const portesSurLOulam = new Set(brut ? [] : separerLesPortes(maillages.filter((o
 const sousSonde = new Set(brut ? [] : separerDuHeikhal(
   maillages.filter((o) => DANS_HEIKHAL.has(o.userData.concept)), EMPRISES.get("heikhal")));
 const eclairage = eclairerLeTemple({ scene, renderer, rendu, detail, astres: { soleil, appoint, cielAmbiant }, ciel, brume, temple: gltf.scene, sousSonde,
-  emprises: EMPRISES, reperes, horsGeometrie, annoncerAttente });
+  emprises: EMPRISES, reperes, annoncerAttente });
 
 gltf.scene.traverse((o) => {
   if (!o.isMesh) return;
@@ -380,7 +378,7 @@ if (!brut) {
 }
 
 // Les figurants descendent après le Temple : la visite s'ouvre sans les attendre, et on les traverse.
-const troupes = troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir: accueillirTroupe, obstacles, horsGeometrie,
+const troupes = troupesDeFigurants({ scene, camera, renderer, chargeur, rendu, detail, accueillir: accueillirTroupe, obstacles,
   distributions: figurants, conceptDe, lampesPosees: () => eclairage.lampesPosees });
 troupes.charger(TROUPE_LIBRE);
 
@@ -763,6 +761,7 @@ function conduire(dt) {
 }
 
 await detail.acheve((part) => chargement.avancer("detail", part));
+voilerLInvisible({ renderer, scene, camera, marche, detail, temple: gltf.scene });
 await chargement.glisserPendantLeGel("image");
 function uneImage(dt) {
   const filme = film !== null;
@@ -892,7 +891,7 @@ window.__ombres = (actives) => {
   dessiner(0);
 };
 Object.defineProperty(window, "__figurants", { get: troupes.chargements });
-window.__moteur = { renderer, scene, rendu };
+window.__moteur = { renderer, scene, rendu, detail, temple: gltf.scene };
 window.__sol = marche.solEn;
 window.__sols = marche.solsLibres;
 window.__mur = (origine, direction, portee) => {

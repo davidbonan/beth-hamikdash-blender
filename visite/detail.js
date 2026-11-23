@@ -181,6 +181,7 @@ export function niveauxDeDetail(scene, camera) {
   }
 
   const oeil = new THREE.Vector3();
+  let voilees = [];
   return {
     confier,
     // Tenue quand plus rien de ce qui a été confié n'est en calcul : jusque-là le décor se trace entier.
@@ -219,6 +220,20 @@ export function niveauxDeDetail(scene, camera) {
     // Pour une carte tracée d'ailleurs que de l'œil : tout le décor au même écart, jusqu'au prochain `choisir`.
     niveler(admis) {
       for (const t of tuiles) poser(t, admis, true);
+    },
+    // Les tuiles qui ne bougent pas, sous cette racine : celles qu'une visibilité précalculée peut désigner.
+    fixesSous(racine) {
+      const dessous = new Set();
+      racine.traverse((o) => dessous.add(o));
+      return tuiles.filter((t) => dessous.has(t.source) && !mobiles.has(t.source));
+    },
+    voiler(cachees) {
+      voilees = cachees.filter((t) => t.maille.visible);
+      for (const t of voilees) t.maille.visible = false;
+    },
+    devoiler() {
+      for (const t of voilees) t.maille.visible = true;
+      voilees = [];
     },
   };
 }
