@@ -3,45 +3,49 @@
 const IMAGES_ENTRE_CHANGEMENTS = 120;
 // Une montée de trop se voit en une demi-seconde : l'essai ne coûte pas deux secondes d'à-coups.
 const IMAGES_APRES_MONTEE = 30;
-// Lue contre la synchro à 60 Hz : une image dure 16,7 ms ou 33,3 ms, jamais entre les deux.
-const LENT_MS = 26;
+// Par cadence visée, la durée au-delà de laquelle elle n'est plus tenue. Lue contre la synchro à 60 Hz : une image dure 16,7, 33,3 ou 50 ms, jamais entre.
+const LENT_MS = { 60: 26, 30: 38 };
+// Calée sur la synchro, l'image ne dit plus ce qu'elle coûte : un palier de plus s'essaie.
 const VIF_MS = 18;
 // Une remontée suivie d'une descente dans ces secondes-là a échoué : la suivante attend deux fois plus.
 const ESSAI_S = 10;
 const PAUSE_S = 15;
 const PAUSE_MAX_S = 120;
-// Au dernier palier, la médiane restée lente ce nombre d'images de suite : la machine ne tient pas ce profil.
+// Au dernier palier, la médiane restée sous la moitié de la cadence visée ce nombre d'images de suite : la machine ne tient pas ce profil.
 const IMAGES_A_BOUT = 600;
 // Au premier palier, la médiane restée vive ce nombre d'images de suite, une minute : la machine tiendrait mieux.
 const IMAGES_A_L_AISE = 3600;
 
-// `paliers` du plus fin au plus grossier ; on part de `depart`. `quandABout` : le dernier palier ne suffit pas ; `quandALAise` : le premier est tenu sans peine.
-export function regulerEchelle(paliers, depart, { quandABout, quandALAise }) {
+// `paliers` du plus fin au plus grossier ; on part de `depart`, en visant `cadence` images par seconde. `quandABout` : le dernier palier ne suffit pas ; `quandALAise` : le premier est tenu sans peine.
+export function regulerEchelle({ paliers, depart, cadence }, { quandABout, quandALAise }) {
+  const lentMs = LENT_MS[cadence], imageMs = 1000 / cadence;
   let palier = paliers.indexOf(depart), images = 0, attente = IMAGES_ENTRE_CHANGEMENTS;
-  let montee = -Infinity, remontee = 0, pause = PAUSE_S, lentes = 0, vives = 0;
+  let montee = -Infinity, remontee = 0, pause = PAUSE_S, intenables = 0, vives = 0;
   const durees = new Float32Array(IMAGES_ENTRE_CHANGEMENTS);
   const mediane = () => {
     const n = Math.min(images, IMAGES_ENTRE_CHANGEMENTS);
     return durees.slice(0, n).sort()[n >> 1];
   };
+  // Au-dessus de la synchro, la durée est le coût de l'image, qui suit son nombre de pixels.
+  const tiendraitPlusFin = (typique) => typique * (paliers[palier - 1] / paliers[palier]) ** 2 < imageMs;
   return {
     // L'échelle nouvelle, ou null si elle ne change pas.
     suivre(dt, maintenant) {
       durees[images % IMAGES_ENTRE_CHANGEMENTS] = dt * 1000;
       if (++images < attente) return null;
       const typique = mediane();
-      if (typique > LENT_MS && palier < paliers.length - 1) {
+      if (typique > lentMs && palier < paliers.length - 1) {
         pause = maintenant - montee < ESSAI_S ? Math.min(pause * 2, PAUSE_MAX_S) : PAUSE_S;
         remontee = maintenant + pause;
         palier++;
         attente = IMAGES_ENTRE_CHANGEMENTS;
-      } else if (images >= IMAGES_ENTRE_CHANGEMENTS && typique < VIF_MS && palier > 0 && maintenant >= remontee) {
+      } else if (images >= IMAGES_ENTRE_CHANGEMENTS && palier > 0 && maintenant >= remontee && (typique < VIF_MS || tiendraitPlusFin(typique))) {
         montee = maintenant;
         palier--;
         attente = IMAGES_APRES_MONTEE;
       } else {
-        lentes = typique > LENT_MS ? lentes + 1 : 0;
-        if (lentes === IMAGES_A_BOUT) quandABout();
+        intenables = typique > 2 * imageMs ? intenables + 1 : 0;
+        if (intenables === IMAGES_A_BOUT) quandABout();
         vives = palier === 0 && typique < VIF_MS ? vives + 1 : 0;
         if (vives === IMAGES_A_L_AISE) quandALAise();
         return null;

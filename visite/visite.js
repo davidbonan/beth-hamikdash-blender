@@ -12,7 +12,7 @@ import { refleterLesDallages } from "./reflet_du_dallage.js";
 import { niveauxDeDetail } from "./detail.js";
 import { brumer, cuireLesNuages, domeVu, lumieresDu } from "./ciel.js";
 import { epargner as epargnerOmbres, porterAuLoin, regler as reglerOmbres } from "./ombres.js";
-import { NIVEAU, PROFIL, marquerChargementAcheve, seRelever, seReplier } from "./qualite.js";
+import { CADENCE, NIVEAU, PROFIL, marquerChargementAcheve, seRelever, seReplier } from "./qualite.js";
 import { brancherJauge, signalerSaccade } from "./jauge.js";
 import { regulerEchelle } from "./echelle.js";
 import { commandes } from "./pilotage.js";
@@ -600,7 +600,7 @@ const avantLePas = new THREE.Vector3();
 const corps = new THREE.Vector3(), direction = new THREE.Vector3();
 
 // Seule la définition cède : le miroir du dallage n'est pas un palier, lâché il manquait à l'œil sans que l'image y gagne assez.
-const regulateur = regulerEchelle(PROFIL.echelles, PROFIL.echelleDepart, { quandABout: () => { seReplier(); signalerSaccade(); }, quandALAise: seRelever });
+const regulateur = regulerEchelle({ paliers: PROFIL.echelles, depart: PROFIL.echelleDepart, cadence: CADENCE }, { quandABout: () => { seReplier(); signalerSaccade(); }, quandALAise: seRelever });
 function ajusterEchelle(dt) {
   const voulue = regulateur.suivre(dt, performance.now() / 1000);
   if (voulue === null) return;

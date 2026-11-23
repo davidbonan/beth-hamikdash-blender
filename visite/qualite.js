@@ -23,7 +23,7 @@ const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const coeurs = navigator.hardwareConcurrency || 8;
 // Seul Chrome d'Android dit sa mémoire : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
 const faible = tactile && (navigator.deviceMemory <= 4 || coeurs <= 4);
-const RETENU = "visite-profil-retenu", REPLIS = "visite-profil-replis", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
+const RETENU = "visite-profil-tenu-a-30-images", REPLIS = "visite-profil-replis-a-30-images", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
 // Du plus riche au plus pauvre.
 export const NIVEAUX = ["haute", "basse", "minimale", "sobre"];
 // Un téléphone descend et remonte d'un cran à la fois, jamais jusqu'au profil lourd.
@@ -35,6 +35,8 @@ const LIAISON_LENTE_MS = 40;
 const VERSION = new URL(import.meta.url).search;
 
 const bureau = !tactile && coeurs > 4;
+// Images par seconde que la définition et le profil automatique cherchent à tenir.
+export const CADENCE = bureau ? 60 : 30;
 const niveauRetenu = () => REPLIABLES.find((niveau) => niveau === lireRetenu(RETENU));
 const niveauAutomatiqueConnu = () => (bureau ? "haute" : niveauRetenu() ?? (faible ? "minimale" : "basse"));
 
@@ -91,7 +93,7 @@ const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, defini
   fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 },
   bouge: { pose: 1 / 96, prises: 12 } };
 
-// Un téléphone part à `echelleDepart` et ne monte au-dessus qu'en tenant ses 60 images : chaque iPhone trouve la sienne.
+// Un téléphone part à `echelleDepart`, monte tant que le palier du dessus tiendrait ses 30 images et ne descend que sous elles : chaque iPhone trouve la sienne.
 // `preProfondeur` : à 390 × 844 elle coûte plus de géométrie qu'elle n'épargne de pixels (50 → 39 ms mesurés sans elle).
 const LEGER = { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.75], echelleDepart: 1, antiCrenelage: 4, grainLeger: true, preProfondeur: false,
   habillageEssentiel: false, paysage: true,
