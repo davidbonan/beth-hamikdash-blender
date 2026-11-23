@@ -385,7 +385,7 @@ const vec3 FOND_PAROKHET = vec3(0.1695, 0.1018, 0.2955);
 const vec3 CHAUD_PAROKHET = vec3(0.3510, 0.0953, 0.1740);
 const vec3 CLAIR_PAROKHET = vec3(0.5527, 0.4624, 0.4507);
 const vec3 CLAIR_CHAUD_PAROKHET = vec3(0.5059, 0.3165, 0.3128);
-const vec2 TEXEL_PAROKHET = vec2(1.0 / 2048.0, 1.0 / 4096.0);
+const vec2 TEXEL_PAROKHET = vec2(1.0 / ${PROFIL.textures.parokhet.toFixed(1)}, 1.0 / ${(2 * PROFIL.textures.parokhet).toFixed(1)});
 // Les gravures des parois : le modelé bombe de RELIEF_GRAVURE fois la hauteur de la
 // figure au-dessus de sa plaque — 1,5 cm sur un keruv de paroi, 1 sur la timora d'un
 // jambage —, et une tuile de l'atlas couvre CADRE_GRAVURE hauteurs de figure sur

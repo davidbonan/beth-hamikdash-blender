@@ -23,7 +23,8 @@ point, se ramène à la face du tissage la plus proche — le point du carré (c
 rougeur) dont la laine dosée lui ressemble le plus —, et sa luminance donne le
 modelé, la distance au bord le bombé d'ensemble, comme pour une gravure.
 
-Écrit `visite/matieres/parokhet_2048.webp`, une carte de 20 amot sur 40 — le rideau
+Écrit `visite/matieres/parokhet_2048.webp`, et sa moitié `parokhet_1024.webp` pour le
+profil très léger de la visite : une carte de 20 amot sur 40 — le rideau
 entier, lu par la position de monde (y, z) : R porte la HAUTEUR du bombé, G la CLARTÉ
 de la face (0 les laines sombres, 1 le lin), B sa ROUGEUR (0 tekhelet, 1 tola'at
 shani), alpha le MASQUE de la figure. Deux axes de dosage plutôt qu'un index de face :
@@ -47,6 +48,7 @@ from beit_hamikdash_carte import (MODELE, RACINE, SORTIE, bombe, distance, ecrir
 
 LARGEUR_PX = 2048
 NOM = f"parokhet_{LARGEUR_PX}"
+NOM_REDUIT = f"parokhet_{LARGEUR_PX // 2}"
 TISSAGES = MODELE / "tissages"
 DESSIN = TISSAGES / "parokhet_dessin.png"
 TISSAGE = TISSAGES / "parokhet.png"
@@ -168,6 +170,13 @@ def tisser():
     return flouter(relief, fondu), faces, masque.astype(np.float32)
 
 
+def reduire_de_moitie(carte):
+    """Chaque carré de quatre texels moyenné, sans prémultiplier par le masque : le premier
+    cran du mipmap de la grande carte."""
+    hauteur, largeur = carte.shape[:2]
+    return carte.reshape(hauteur // 2, 2, largeur // 2, 2, *carte.shape[2:]).mean(axis=(1, 3))
+
+
 def ecrire_palette():
     fiche = {"laines": [[nom, list(rgb)] for nom, rgb in LAINES], "dosages": DOSAGES, "jour": JOUR,
              "palette": {face: [round(c, 4) for c in rgb] for face, rgb in PALETTE.items()}}
@@ -182,4 +191,5 @@ if ARGUMENTS[:1] == ["--tisser"]:
 elif __name__ == "__main__":
     relief, faces, masque = tisser()
     ecrire(NOM, relief, masque, faces)
+    ecrire(NOM_REDUIT, *(reduire_de_moitie(carte) for carte in (relief, masque, faces)))
     ecrire_palette()

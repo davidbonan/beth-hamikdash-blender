@@ -2,7 +2,8 @@
 
     python3 modele/beit_hamikdash_nappes.py
 
-Huit jeux, tous CC0 : six de Poly Haven, deux d'ambientCG. Deux fichiers par jeu.
+Huit jeux, tous CC0 : six de Poly Haven, deux d'ambientCG. Deux fichiers par jeu et par
+taille : 1024, et 512 pour le profil très léger de la visite.
 La COULEUR porte la rugosité dans son canal alpha — l'alpha du WebP est codé à part et
 à pleine définition, là où le bleu partirait en 4:2:0 avec le reste de la chrominance.
 La NORMALE est en convention OpenGL, vert vers le haut, celle qu'attend three.
@@ -20,7 +21,7 @@ import urllib.request
 
 SORTIE = pathlib.Path(__file__).resolve().parents[1] / "visite" / "matieres"
 BRUT = SORTIE / ".scans"
-TAILLE = 1024
+TAILLES = (1024, 512)
 
 # Le calcaire est le meleke de Jérusalem : crème, piqué, sans veine. Les travertins
 # sciés, eux, se lisent en carrelage de salle de bain, et les roches de falaise en
@@ -84,35 +85,40 @@ def moyenne(png):
     return ([canal(k, table) for k in range(3)], canal(3, range(256)) / 255)
 
 
+def ecrire_nappe(nom, taille):
+    normale = BRUT / f"{nom}_normale_{taille}.png"
+    ffmpeg("-i", str(BRUT / f"{nom}_normale.jpg"), "-vf", f"scale={taille}:{taille}",
+           "-frames:v", "1", str(normale))
+    subprocess.run(["cwebp", "-quiet", "-q", "88", "-m", "6", "-sharp_yuv",
+                    str(normale), "-o", str(SORTIE / f"{nom}_n_{taille}.webp")], check=True)
+    if nom in SANS_COULEUR:
+        return
+    couleur = BRUT / f"{nom}_couleur_{taille}.png"
+    ffmpeg("-i", str(BRUT / f"{nom}_couleur.jpg"), "-i", str(BRUT / f"{nom}_rugosite.jpg"),
+           "-filter_complex",
+           f"[0:v]scale={taille}:{taille},format=rgb24[c];"
+           f"[1:v]scale={taille}:{taille},format=gray[r];[c][r]alphamerge",
+           "-frames:v", "1", str(couleur))
+    subprocess.run(["cwebp", "-quiet", "-q", "82", "-alpha_q", "72", "-m", "6",
+                    "-sharp_yuv", str(couleur),
+                    "-o", str(SORTIE / f"{nom}_c_{taille}.webp")], check=True)
+    teinte, rugosite = moyenne(couleur)
+    print(f"  {nom} ({taille}): {{ moyenne: [{teinte[0]:.4f}, {teinte[1]:.4f}, "
+          f"{teinte[2]:.4f}], rugosite: {rugosite:.4f} }},")
+
+
 def main():
     SORTIE.mkdir(parents=True, exist_ok=True)
     scans_poly_haven()
     scans_ambient_cg()
 
-    print("  À recopier dans visite/nappes.js :")
+    print("  À recopier dans visite/nappes.js (celles de 1024) :")
     for nom in (*POLY_HAVEN, *AMBIENT_CG):
-        normale = BRUT / f"{nom}_normale_{TAILLE}.png"
-        ffmpeg("-i", str(BRUT / f"{nom}_normale.jpg"), "-vf", f"scale={TAILLE}:{TAILLE}",
-               "-frames:v", "1", str(normale))
-        subprocess.run(["cwebp", "-quiet", "-q", "88", "-m", "6", "-sharp_yuv",
-                        str(normale), "-o", str(SORTIE / f"{nom}_n_{TAILLE}.webp")], check=True)
-        if nom in SANS_COULEUR:
-            continue
-        couleur = BRUT / f"{nom}_couleur_{TAILLE}.png"
-        ffmpeg("-i", str(BRUT / f"{nom}_couleur.jpg"), "-i", str(BRUT / f"{nom}_rugosite.jpg"),
-               "-filter_complex",
-               f"[0:v]scale={TAILLE}:{TAILLE},format=rgb24[c];"
-               f"[1:v]scale={TAILLE}:{TAILLE},format=gray[r];[c][r]alphamerge",
-               "-frames:v", "1", str(couleur))
-        subprocess.run(["cwebp", "-quiet", "-q", "82", "-alpha_q", "72", "-m", "6",
-                        "-sharp_yuv", str(couleur),
-                        "-o", str(SORTIE / f"{nom}_c_{TAILLE}.webp")], check=True)
-        teinte, rugosite = moyenne(couleur)
-        print(f"  {nom}: {{ moyenne: [{teinte[0]:.4f}, {teinte[1]:.4f}, "
-              f"{teinte[2]:.4f}], rugosite: {rugosite:.4f} }},")
-
-    octets = sum(f.stat().st_size for f in SORTIE.glob(f"*_{TAILLE}.webp"))
-    print(f"\n  {TAILLE} : {octets / 1e6:.2f} Mo")
+        for taille in TAILLES:
+            ecrire_nappe(nom, taille)
+    for taille in TAILLES:
+        octets = sum(f.stat().st_size for f in SORTIE.glob(f"*_{taille}.webp"))
+        print(f"\n  {taille} : {octets / 1e6:.2f} Mo")
 
 
 main()

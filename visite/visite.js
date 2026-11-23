@@ -402,7 +402,7 @@ async function poserPays({ scene: pays }) {
   scene.add(pays);
   alleger(pays);
 }
-if (PROFIL.paysage) chargeur.loadAsync("./pays.glb").then(poserPays);
+if (PROFIL.paysage) chargeur.loadAsync(PROFIL.paysage).then(poserPays);
 
 // ---------------------------------------------------------------------------
 // interrogation

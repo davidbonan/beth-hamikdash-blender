@@ -16,7 +16,8 @@ Il produit deux fichiers :
 `-- --sans-occlusion` saute la cuisson (quelques minutes) : le .glb sort alors sans couche
 d'occlusion, et reperes.json sans cartes, ce qui reste cohérent.
 `-- --lumiere azara,oulam` cuit ces concepts en lumière indirecte plutôt qu'en occlusion, `-- --lumiere tout` tous.
-`-- --pays` n'exporte que `visite/pays.glb` : la ville et le relief de `01_Pays`, que la visite charge après le Temple.
+`-- --pays` n'exporte que `visite/pays.glb` : la ville et le relief de `01_Pays`, que la visite charge après le Temple,
+et `visite/pays_leger.glb`, sa version simplifiée pour le profil très léger.
 `-- --recuire [azara,oulam]` ne recuit en lumière que ces concepts, ceux dont la carte ne correspond
 plus à la scène, et leurs voisins (`beit_hamikdash_recuisson.py`) ; les autres cartes restent.
 `-- --simuler`, avec `--recuire`, dit ce qui serait recuit et combien de temps, sans rien cuire.
@@ -653,6 +654,9 @@ def exporter(chantier):
 
 
 PAYS = "01_Pays"
+# `-se` est relatif à l'étendue de chaque maillage : 32 cm sur les 6,4 km du relief, sous l'ama qui le garde sous la place du Kotel.
+# `-sp` : le relief est à facettes, chaque face a ses propres sommets, et sans lui il ne se simplifiait pas.
+SIMPLIFIER_LE_PAYS = ("-si", "0", "-se", "0.00005", "-sp")
 
 
 def exporter_pays():
@@ -676,7 +680,11 @@ def exporter_pays():
                               export_materials="EXPORT", export_normals=True,
                               export_texcoords=False, export_skins=False, export_animations=False)
     comprimer(glb)
-    print(f"\n{len(bpy.data.objects)} maillages · pays.glb {glb.stat().st_size / 1e6:.1f} Mo")
+    leger = DOSSIER / "pays_leger.glb"
+    shutil.copyfile(glb, leger)
+    comprimer(leger, SIMPLIFIER_LE_PAYS)
+    print(f"\n{len(bpy.data.objects)} maillages · pays.glb {glb.stat().st_size / 1e6:.1f} Mo"
+          f" · pays_leger.glb {leger.stat().st_size / 1e6:.1f} Mo")
 
 
 def main():

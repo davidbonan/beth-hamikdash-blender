@@ -159,7 +159,7 @@ $BLENDER -b -P modele/beit_hamikdash_shor.py
 ```
 
 Même logique pour le motif des Parokhot : il n'est pas de la géométrie mais une carte,
-`visite/matieres/parokhet_2048.webp` (et `parokhet.json`, la palette des quatre laines),
+`visite/matieres/parokhet_2048.webp` (sa moitié `parokhet_1024.webp` pour le profil très léger, et `parokhet.json`, la palette des quatre laines),
 écrite par `modele/beit_hamikdash_parokhet.py` (~20 s, numpy de Blender, `cwebp` sur le PATH) et
 lue par `parokhet()` du blockout comme par le nuanceur étoffe de la visite. Les figures —
 lion, keruv — sont tissées par gpt-image-2 depuis des guides, comme les gravures :

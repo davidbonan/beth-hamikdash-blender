@@ -87,10 +87,10 @@ async function liaisonLente() {
 // `assises` : les joints de la pierre de taille calés sur les arêtes de chaque face, plutôt que sur une trame du monde.
 // `etalonnage` : la pierre au soleil sort de l'épaule de la courbe, où sa nappe se tassait ; l'ombre se relève d'autant, et la lumière cuite du jour reprend sa chaleur.
 const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, definitionMax: 1.5, echelles: [1, 0.85, 0.7, 0.6], echelleDepart: 1, antiCrenelage: 4, grainLeger: false, preProfondeur: true,
-  habillageEssentiel: false, paysage: true,
-  textures: { decor: Infinity, figurants: Infinity, nappes: true, nuages: 1024, fines: true, assises: true,
+  habillageEssentiel: false, paysage: "./pays.glb",
+  textures: { decor: Infinity, figurants: Infinity, nappes: 1024, parokhet: 2048, nuages: 1024, fines: true, assises: true,
               irregularite: { bloc: 0.025, bombe: 0.010, dalle: 0.012, bombeDalle: 0.003, nuance: 0.10, nuanceDalle: 0.12, poliDalle: 0.0 } }, ecartDetail: 1, porteeDetail: Infinity,
-  ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: { prises: 12, definition: 0.5 },
+  ombres: { taille: 2048, portee: 40, penombre: true, lointaine: 2048 }, occlusion: { prises: 12, definition: 0.5 }, sondes: { cote: 256 },
   halo: { force: 0.20, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 40 }, sanctuaire: { ombre: true, carte: Infinity }, feux: { ombre: true, carte: Infinity }, figurants: { presents: true, ombre: true },
   fumee: { pas: 48, octaves: 3 }, feuDeLAutel: { flammes: 24, fumee: 48, octaves: 4 }, reflets: { definition: 0.5 },
   bouge: { pose: 1 / 96, prises: 12 } };
@@ -98,15 +98,16 @@ const LOURD = { etalonnage: { exposition: 0.85, releve: 0.6 }, dprMax: 2, defini
 // Un téléphone part à `echelleDepart`, monte tant que le palier du dessus tiendrait ses 30 images et ne descend que sous elles : chaque iPhone trouve la sienne.
 // `preProfondeur` : à 390 × 844 elle coûte plus de géométrie qu'elle n'épargne de pixels (50 → 39 ms mesurés sans elle).
 const LEGER = { dprMax: 1.5, definitionMax: 1, echelles: [1.5, 1.25, 1, 0.85, 0.75], echelleDepart: 1, antiCrenelage: 4, grainLeger: true, preProfondeur: false,
-  habillageEssentiel: false, paysage: true,
-  textures: { decor: 1024, figurants: 512, nappes: true, nuages: 512 }, ecartDetail: 1, porteeDetail: Infinity,
-  ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: { prises: 6, definition: 0.5 },
+  habillageEssentiel: false, paysage: "./pays.glb",
+  textures: { decor: 1024, figurants: 512, nappes: 1024, parokhet: 2048, nuages: 512 }, ecartDetail: 1, porteeDetail: Infinity,
+  ombres: { taille: 1024, portee: 26, penombre: false, lointaine: 1024 }, occlusion: { prises: 6, definition: 0.5 }, sondes: { cote: 256 },
   halo: { force: 0.16, rayon: 0.6, seuil: 1.6 }, rayons: { densite: 0.001, prises: 12 }, sanctuaire: { ombre: true, carte: 256 }, feux: { ombre: false, carte: 256 }, figurants: { presents: true, ombre: false },
   fumee: { pas: 16, octaves: 2 }, feuDeLAutel: { flammes: 12, fumee: 18, octaves: 2 }, reflets: null };
 
 // `occlusion`, `halo` et `rayons` nuls = pas de passe du tout, et pas seulement une force nulle : leurs cibles sont allouées par leur constructeur, qu'elles servent ou non.
-const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echelleDepart: 0.7,
-  textures: { decor: 512, figurants: 256, nappes: true, nuages: 512 }, ecartDetail: 2,
+// Pays simplifié, nappes en 512, parokhet en 1024, sondes en 128 : c'est le pic du chargement qu'iOS juge, et ce qui l'abaisse en perdant le moins.
+const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echelleDepart: 0.7, paysage: "./pays_leger.glb",
+  textures: { decor: 512, figurants: 256, nappes: 512, parokhet: 1024, nuages: 512 }, ecartDetail: 2, sondes: { cote: 128 },
   occlusion: null, halo: null, rayons: null,
   fumee: { pas: 8, octaves: 1 }, feuDeLAutel: null };
 
@@ -114,8 +115,8 @@ const TRES_LEGER = { ...LEGER, dprMax: 1, echelles: [1, 0.85, 0.7, 0.55], echell
 // Sans nappes ni ombre des lampes : sur son GPU l'image passait de 80-106 ms à 52-57, les nappes pour moitié.
 // `antiCrenelage` nul : la cible de la scène n'est plus multi-échantillonnée, le FXAA de la chaîne reste seul sur les arêtes.
 // `porteeDetail` : du parvis, le Kotel et ses abords, derrière les murs, faisaient encore un quart des triangles tracés.
-const SOBRE = { ...TRES_LEGER, antiCrenelage: 0, habillageEssentiel: true, paysage: false, figurants: { presents: false, ombre: false },
-  textures: { decor: 512, figurants: 256, nappes: false, nuages: 512 }, sanctuaire: { ombre: false, carte: 256 }, porteeDetail: 150 };
+const SOBRE = { ...TRES_LEGER, antiCrenelage: 0, habillageEssentiel: true, paysage: null, figurants: { presents: false, ombre: false },
+  textures: { decor: 512, figurants: 256, nappes: null, parokhet: 1024, nuages: 512 }, sanctuaire: { ombre: false, carte: 256 }, porteeDetail: 150 };
 
 const PROFILS = { haute: LOURD, basse: LEGER, minimale: TRES_LEGER, sobre: SOBRE };
 const force = demande in PROFILS;

@@ -22,19 +22,21 @@ import { PROFIL, plafonner } from "./qualite.js";
 // qu'elle sait, l'écart d'un point au suivant.
 // L'étoffe n'a pas de couleur : la sienne est dictée, pas photographiée.
 const JEUX = {
-  pierre: { couleur: "matieres/pierre_c_1024.webp", normale: "matieres/pierre_n_1024.webp", moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
-  enduit: { couleur: "matieres/enduit_c_1024.webp", normale: "matieres/enduit_n_1024.webp", moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
-  bois: { couleur: "matieres/bois_c_1024.webp", normale: "matieres/bois_n_1024.webp", moyenne: [0.1528, 0.1284, 0.1008], rugosite: 0.5094 },
-  placage: { couleur: "matieres/placage_c_1024.webp", normale: "matieres/placage_n_1024.webp", moyenne: [0.3597, 0.2106, 0.0983], rugosite: 0.5303 },
-  ecorce: { couleur: "matieres/ecorce_c_1024.webp", normale: "matieres/ecorce_n_1024.webp", moyenne: [0.2461, 0.1935, 0.1513], rugosite: 0.6939 },
-  metal: { couleur: "matieres/metal_c_1024.webp", normale: "matieres/metal_n_1024.webp", moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
-  marbre: { couleur: "matieres/marbre_c_1024.webp", normale: "matieres/marbre_n_1024.webp", moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
-  etoffe: { normale: "matieres/etoffe_n_1024.webp" },
+  pierre: { couleur: { 1024: "matieres/pierre_c_1024.webp", 512: "matieres/pierre_c_512.webp" }, normale: { 1024: "matieres/pierre_n_1024.webp", 512: "matieres/pierre_n_512.webp" }, moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
+  enduit: { couleur: { 1024: "matieres/enduit_c_1024.webp", 512: "matieres/enduit_c_512.webp" }, normale: { 1024: "matieres/enduit_n_1024.webp", 512: "matieres/enduit_n_512.webp" }, moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
+  bois: { couleur: { 1024: "matieres/bois_c_1024.webp", 512: "matieres/bois_c_512.webp" }, normale: { 1024: "matieres/bois_n_1024.webp", 512: "matieres/bois_n_512.webp" }, moyenne: [0.1528, 0.1284, 0.1008], rugosite: 0.5094 },
+  placage: { couleur: { 1024: "matieres/placage_c_1024.webp", 512: "matieres/placage_c_512.webp" }, normale: { 1024: "matieres/placage_n_1024.webp", 512: "matieres/placage_n_512.webp" }, moyenne: [0.3597, 0.2106, 0.0983], rugosite: 0.5303 },
+  ecorce: { couleur: { 1024: "matieres/ecorce_c_1024.webp", 512: "matieres/ecorce_c_512.webp" }, normale: { 1024: "matieres/ecorce_n_1024.webp", 512: "matieres/ecorce_n_512.webp" }, moyenne: [0.2461, 0.1935, 0.1513], rugosite: 0.6939 },
+  metal: { couleur: { 1024: "matieres/metal_c_1024.webp", 512: "matieres/metal_c_512.webp" }, normale: { 1024: "matieres/metal_n_1024.webp", 512: "matieres/metal_n_512.webp" }, moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
+  marbre: { couleur: { 1024: "matieres/marbre_c_1024.webp", 512: "matieres/marbre_c_512.webp" }, normale: { 1024: "matieres/marbre_n_1024.webp", 512: "matieres/marbre_n_512.webp" }, moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
+  etoffe: { normale: { 1024: "matieres/etoffe_n_1024.webp", 512: "matieres/etoffe_n_512.webp" } },
 };
 const FINES = {
-  meleke: { couleur: "matieres/meleke_c_2048.webp", normale: "matieres/meleke_n_2048.webp", moyenne: [0.7944, 0.6925, 0.5849], rugosite: 0.8110 },
-  dallage: { couleur: "matieres/dallage_c_2048.webp", normale: "matieres/dallage_n_2048.webp", moyenne: [0.7890, 0.6751, 0.5412], rugosite: 0.6961 },
+  meleke: { couleur: { 2048: "matieres/meleke_c_2048.webp" }, normale: { 2048: "matieres/meleke_n_2048.webp" }, moyenne: [0.7944, 0.6925, 0.5849], rugosite: 0.8110 },
+  dallage: { couleur: { 2048: "matieres/dallage_c_2048.webp" }, normale: { 2048: "matieres/dallage_n_2048.webp" }, moyenne: [0.7890, 0.6751, 0.5412], rugosite: 0.6961 },
 };
+const COTE_DES_FINES = 2048;
+const PAROKHETS = { 2048: "matieres/parokhet_2048.webp", 1024: "matieres/parokhet_1024.webp" };
 
 export async function nappes() {
   const chargeur = new THREE.TextureLoader();
@@ -49,10 +51,15 @@ export async function nappes() {
   };
 
   const jeux = new Map();
-  await Promise.all(Object.entries(PROFIL.textures.nappes ? { ...JEUX, ...(PROFIL.textures.fines ? FINES : {}) } : {}).map(async ([nom, jeu]) => {
+  const cote = PROFIL.textures.nappes;
+  const aCharger = cote ? [
+    ...Object.entries(JEUX).map(([nom, jeu]) => [nom, jeu, cote]),
+    ...(PROFIL.textures.fines ? Object.entries(FINES).map(([nom, jeu]) => [nom, jeu, COTE_DES_FINES]) : []),
+  ] : [];
+  await Promise.all(aCharger.map(async ([nom, jeu, coteDuJeu]) => {
     const [couleur, normale] = await Promise.all([
-      jeu.couleur ? chargeur.loadAsync(jeu.couleur) : null,
-      chargeur.loadAsync(jeu.normale),
+      jeu.couleur ? chargeur.loadAsync(jeu.couleur[coteDuJeu]) : null,
+      chargeur.loadAsync(jeu.normale[coteDuJeu]),
     ]);
     jeux.set(nom, {
       normale: regler(normale, THREE.NoColorSpace),
@@ -64,7 +71,7 @@ export async function nappes() {
   // Le motif tissé des Parokhot, que `beit_hamikdash_parokhet.py` écrit : r = hauteur
   // du bombé, (g, b) = face du tissage qui affleure, alpha = figure. Une seule carte
   // aux dimensions du rideau, lue en coordonnées de rideau et jamais répétée.
-  const motif = regler(await chargeur.loadAsync("matieres/parokhet_2048.webp"), THREE.NoColorSpace);
+  const motif = regler(await chargeur.loadAsync(PAROKHETS[PROFIL.textures.parokhet]), THREE.NoColorSpace);
   motif.wrapS = motif.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("parokhet", { motif });
   // Les gravures des parois, que `beit_hamikdash_gravures.py` écrit : neuf tuiles de
