@@ -21,8 +21,10 @@ const demande = new URLSearchParams(location.search).get("qualite");
 
 const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const coeurs = navigator.hardwareConcurrency || 8;
-// Seul Chrome d'Android dit sa mémoire, et Safari annonce quatre cœurs à tout iPhone : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
-const faible = tactile && (navigator.deviceMemory <= 4 || coeurs < 4);
+// Seul Chrome d'Android dit sa mémoire : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
+const faible = tactile && navigator.deviceMemory <= 4;
+// Changer `REGLES_EN_VIGUEUR` fait oublier les profils retenus sous les règles de repli d'avant.
+const REGLES = "visite-profil-regles", REGLES_EN_VIGUEUR = "2";
 const RETENU = "visite-profil-tenu-a-30-images", REPLIS = "visite-profil-replis-a-30-images", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
 // Du plus riche au plus pauvre.
 export const NIVEAUX = ["haute", "basse", "minimale", "sobre"];
@@ -151,6 +153,11 @@ function chuterSiChargementTue() {
   else replierDepuis(tue);
 }
 
+if (lireRetenu(REGLES) !== REGLES_EN_VIGUEUR) {
+  oublier(RETENU);
+  oublier(REPLIS);
+  retenir(REGLES, REGLES_EN_VIGUEUR);
+}
 if (!force) chuterSiChargementTue();
 const choisi = lireRetenu(CHOISI);
 const manuel = !force && choisi in PROFILS;
@@ -159,7 +166,17 @@ export const AUTOMATIQUE = !manuel;
 
 export const NIVEAU = force ? demande : manuel ? choisi : await niveauDeLaMachine();
 export const PROFIL = avecLaPoseDemandee(PROFILS[NIVEAU]);
-if (!force) confier(INACHEVE, NIVEAU);
+
+let chargementEnCours = !force;
+// Quittée, rechargée ou passée à l'arrière-plan en plein chargement, la page n'a pas été tuée : seule la page visible porte la marque.
+function tenirLaMarqueDuChargement() {
+  if (chargementEnCours && !document.hidden) confier(INACHEVE, NIVEAU);
+  else oublierConfie(INACHEVE);
+}
+tenirLaMarqueDuChargement();
+document.addEventListener("visibilitychange", tenirLaMarqueDuChargement);
+addEventListener("pageshow", tenirLaMarqueDuChargement);
+addEventListener("pagehide", () => oublierConfie(INACHEVE));
 
 // `?pose=48` pose le flou de bougé à 1/48 s sur tout profil, `?pose=0` l'ôte : de quoi le comparer.
 function avecLaPoseDemandee(profil) {
@@ -168,8 +185,13 @@ function avecLaPoseDemandee(profil) {
   return { ...profil, bouge: inverse > 0 ? { prises: 12, ...profil.bouge, pose: 1 / inverse } : null };
 }
 
-export function marquerChargementAcheve() {
+function leverLaMarqueDuChargement() {
+  chargementEnCours = false;
   oublierConfie(INACHEVE);
+}
+
+export function marquerChargementAcheve() {
+  leverLaMarqueDuChargement();
 }
 
 let bascule = false;
@@ -190,7 +212,7 @@ export function seRelever() {
 
 // La chute est comptée ici : la page que `pannes` recharge ne doit pas la recompter sur la marque.
 export function tomber() {
-  oublierConfie(INACHEVE);
+  leverLaMarqueDuChargement();
   if (!manuel) return seReplier();
   choisir(niveauApresChute(NIVEAU));
 }
