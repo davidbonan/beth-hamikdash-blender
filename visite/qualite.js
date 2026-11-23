@@ -21,8 +21,8 @@ const demande = new URLSearchParams(location.search).get("qualite");
 
 const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const coeurs = navigator.hardwareConcurrency || 8;
-// Seul Chrome d'Android dit sa mémoire : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
-const faible = tactile && (navigator.deviceMemory <= 4 || coeurs <= 4);
+// Seul Chrome d'Android dit sa mémoire, et Safari annonce quatre cœurs à tout iPhone : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
+const faible = tactile && (navigator.deviceMemory <= 4 || coeurs < 4);
 const RETENU = "visite-profil-tenu-a-30-images", REPLIS = "visite-profil-replis-a-30-images", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
 // Du plus riche au plus pauvre.
 export const NIVEAUX = ["haute", "basse", "minimale", "sobre"];
