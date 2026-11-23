@@ -284,6 +284,13 @@ partage les directions du premier : la seconde échelle ne coûte qu'une prise d
 direction. Il s'éteint dès 12 m, où il vaut moins d'un pixel de la passe en
 demi-résolution et où le pas du demi-flottant dépasse le rayon lui-même.
 
+Ces deux rayons disaient juste, mais trop bas : sous les lampes d'une salle, un banc
+restait posé sur son plancher sans y tenir. Le grand rayon est passé à 1,5 m et le
+contact à 25 cm, l'un et l'autre trois fois plus forts ; la loi est exponentielle, pour
+qu'une force au-dessus de 1 ne passe pas sous zéro ; le contact s'éteint entre 14 et
+30 m. Le plein soleil efface sept dixièmes de la grande occlusion et quatre du contact :
+entières, elles salissaient les aplats qu'il éclaire de face.
+
 Les ombres portées avaient la même dureté partout : le pied d'une colonne et la crête
 d'un mur à quarante mètres y avaient un bord aussi net l'un que l'autre. Le soleil fait
 un demi-degré, et l'ombre qu'il porte s'élargit d'un centimètre par mètre séparant

@@ -41,22 +41,26 @@ import { FXAAShader } from "three/addons/shaders/FXAAShader.js";
 // la visite après la géométrie. Le profil léger en garde la moitié — le flou de la
 // passe suivante, qui moyenne déjà neuf voisins, en avale la différence.
 const ECHANTILLONS = PROFIL.occlusion?.prises ?? 0;
-// Une ama et demie : l'occlusion doit dire « ce coin est un coin », pas ombrer la
+// Un mètre et demi : l'occlusion doit dire « ce coin est un coin », pas ombrer la
 // cour. Plus large, elle assombrit les murs entiers dès qu'on s'en approche.
-const RAYON = 1.8;
-const FORCE = 0.8;
-// Le second rayon, celui du CONTACT. 1,8 m dit « ce coin est un coin » ; il ne dit rien
+const RAYON = 1.5;
+const FORCE = 2.4;
+// Le second rayon, celui du CONTACT. 1,5 m dit « ce coin est un coin » ; il ne dit rien
 // du pli de trois centimètres où la contremarche rencontre le giron, où le fût pose sur
 // sa base, où court le joint d'une assise. C'est ce trait fin, et lui seul, que l'œil
 // lit comme « photographié » : sans lui deux surfaces qui se touchent restent deux
 // aplats posés l'un contre l'autre.
-const RAYON_FIN = 0.08;
-const FORCE_FIN = 0.7;
-// Il s'éteint bien plus tôt que l'autre : la passe est en demi-résolution, et 8 cm y
-// valent moins d'un pixel passé quinze mètres.
-const PORTEE_FIN = [12.0, 26.0];
+const RAYON_FIN = 0.25;
+const FORCE_FIN = 2.2;
+const BIAIS_FIN = 0.01;
+// Il s'éteint bien plus tôt que l'autre : passé trente mètres, 25 cm ne tiennent plus qu'en quelques pixels de la passe.
+const PORTEE_FIN = [14.0, 30.0];
 // L'occlusion pose les volumes proches : elle s'éteint entre ces deux distances.
 const PORTEE = [45.0, 120.0];
+// En clarté linéaire, avant exposition : d'un pixel à l'ombre à un pixel en plein soleil.
+const PLEIN_SOLEIL = [0.3, 0.8];
+// La part d'occlusion que le plein soleil efface : entière, elle salit les aplats qu'il éclaire de face.
+const EPARGNE_AU_SOLEIL = 0.7, EPARGNE_AU_SOLEIL_FIN = 0.4;
 
 const OCCLUSION = {
   uniforms: {
@@ -122,12 +126,13 @@ const OCCLUSION = {
         vec3 dir = T * (cos(ang) * r) + B * (sin(ang) * r) + N * sqrt(max(0.0, 1.0 - r * r));
         float ecart = 0.35 + 0.65 * r;
         occ    += voisin(P, dir * uRayon    * ecart, uRayon,    0.02);
-        // Le biais suit le rayon : deux centimètres sur huit condamneraient le contact
+        // Le biais suit le rayon : les deux centimètres du grand condamneraient le contact
         // avant de l'avoir cherché.
-        occFin += voisin(P, dir * uRayonFin * ecart, uRayonFin, 0.004);
+        occFin += voisin(P, dir * uRayonFin * ecart, uRayonFin, ${BIAIS_FIN});
       }
-      float ao    = 1.0 - uForce    * occ    / float(${ECHANTILLONS});
-      float aoFin = 1.0 - uForceFin * occFin / float(${ECHANTILLONS});
+      // Loi bornée : au-dessus de 1, une force linéaire passerait sous zéro.
+      float ao    = exp(-uForce    * occ    / float(${ECHANTILLONS}));
+      float aoFin = exp(-uForceFin * occFin / float(${ECHANTILLONS}));
       ao = mix(ao, 1.0, smoothstep(${PORTEE[0].toFixed(1)}, ${PORTEE[1].toFixed(1)}, z));
       aoFin = mix(aoFin, 1.0, smoothstep(${PORTEE_FIN[0].toFixed(1)}, ${PORTEE_FIN[1].toFixed(1)}, z));
       gl_FragColor = vec4(ao, aoFin, 0.0, 1.0);
@@ -151,7 +156,9 @@ const COMPOSITION = {
           ao += texture2D(tAO, vUv + vec2(float(x), float(y)) * uPas).rg;
       ao /= 16.0;
       vec4 c = texture2D(tDiffuse, vUv);
-      gl_FragColor = vec4(c.rgb * ao.x * ao.y, c.a);
+      float soleil = smoothstep(${PLEIN_SOLEIL[0].toFixed(2)}, ${PLEIN_SOLEIL[1].toFixed(2)}, dot(c.rgb, vec3(0.2126, 0.7152, 0.0722)));
+      vec2 garde = mix(ao, vec2(1.0), vec2(${EPARGNE_AU_SOLEIL.toFixed(2)}, ${EPARGNE_AU_SOLEIL_FIN.toFixed(2)}) * soleil);
+      gl_FragColor = vec4(c.rgb * garde.x * garde.y, c.a);
     }`,
 };
 
