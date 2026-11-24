@@ -75,8 +75,9 @@ function dessinerLePlan(svg, dessin, cadre) {
 
 function faireTournerLesGestes(ecran) {
   const points = ecran.querySelector(".gestes .points");
-  // Clavier ou doigt, c'est la feuille de style qui choisit le jeu : ne tournent que les gestes qu'elle montre.
+  // Ne tournent que les gestes que la feuille de style montre : au doigt, aucun.
   const gestes = [...ecran.querySelectorAll(".geste")].filter((geste) => geste.offsetParent !== null);
+  if (!gestes.length) return () => {};
   let rang = 0, minuterie = 0;
   function montrer(nouveau) {
     gestes[rang]?.classList.remove("actif");

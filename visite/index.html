@@ -176,21 +176,25 @@
   @keyframes pilier { 0%, 32% { stroke: currentColor; } 40%, 100% { stroke: var(--dore); } }
   #chargement .actif .a-chemin { animation: chemin 3.6s ease-in-out infinite; }
   @keyframes chemin { 0% { offset-distance: 0%; } 90%, 100% { offset-distance: 100%; } }
-  #chargement .actif .a-manche { animation: manche 2.4s ease-in-out infinite; }
-  @keyframes manche { 0%, 15%, 100% { transform: none; } 40%, 70% { transform: translateY(-11px); } }
-  #chargement .actif .a-epingle { animation: epingle 1.8s ease-in-out infinite; }
-  @keyframes epingle { 0%, 100% { transform: none; } 50% { transform: translateY(-5px); } }
   @media (prefers-reduced-motion: reduce) {
     #chargement::before, #chargement .apercu-net, #chargement .picto *, #chargement .change { animation: none !important; }
   }
 
   #chargement .mention { max-width: 46ch; margin: 0; font-size: 11px; line-height: 1.5; color: var(--cendre); text-align: center; }
 
-  /* Téléphone court : le plan garde sa place, la légende et l'en-tête des gestes cèdent la leur. */
+  /* Au doigt, l'initiation apprend les gestes en les faisant faire ; la carte, elle, se fige à chaque gel du chargement. */
+  @media (hover: none) and (pointer: coarse) {
+    #chargement .gestes { display: none; }
+  }
+  /* Téléphone debout : le plan, la frise et une seule ligne d'état. */
+  @media (orientation: portrait) and (max-width: 759px) {
+    #chargement :is(.trace figcaption, .etat-detail) { display: none; }
+  }
+  /* Téléphone court : le plan garde sa place. */
   @media (max-height: 640px) and (orientation: portrait) {
     #chargement .contenu { gap: 14px; }
     #chargement h1 { font-size: 22px; }
-    #chargement :is(.trace figcaption, .gestes figcaption) { display: none; }
+    #chargement .gestes figcaption { display: none; }
   }
   /* Assez de place, ou téléphone couché : le plan à gauche, le reste à droite. */
   @media (min-width: 760px) and (min-height: 600px), (orientation: landscape) and (max-height: 560px) {
@@ -1258,49 +1262,6 @@
               <circle class="plein a-chemin" r="4.5" style="offset-path: path('M6 74 Q48 -4 90 74')"/>
             </svg>
             <div><h2 data-texte="geste_vol">Quitter le sol</h2><p data-texte-html="geste_vol_clavier">Survoler le Temple. <kbd>Espace</kbd> s'élève et traverse les murs, <kbd>C</kbd> redescend jusqu'au sol.</p></div>
-          </div>
-        </div>
-        <div class="au-doigt">
-          <div class="geste">
-            <svg class="picto" viewBox="0 0 96 96" aria-hidden="true">
-              <path class="fin a-avance" d="M40 34 V14"/>
-              <circle class="trait" cx="40" cy="62" r="24"/>
-              <circle class="plein a-manche" cx="40" cy="62" r="10"/>
-            </svg>
-            <div><h2 data-texte="geste_marcher_doigt">Pouce gauche : marcher</h2><p data-texte="geste_manche">Le cercle en bas à gauche. Poussé jusqu'au bord, on presse le pas.</p></div>
-          </div>
-          <div class="geste">
-            <svg class="picto" viewBox="0 0 96 96" aria-hidden="true">
-              <path class="fin" d="M22 36 Q48 20 74 36"/>
-              <path class="trait" d="M24 62 H12 M16 58 L12 62 L16 66 M72 62 H84 M80 58 L84 62 L80 66"/>
-              <circle class="plein a-balance" cx="48" cy="62" r="10"/>
-            </svg>
-            <div><h2 data-texte="geste_regarder_doigt">Pouce droit : regarder</h2><p data-texte="geste_glisser_doigt">Glisser n'importe où ailleurs sur l'écran.</p></div>
-          </div>
-          <div class="geste">
-            <svg class="picto" viewBox="0 0 96 96" aria-hidden="true">
-              <path class="trait a-pilier" d="M10 24 H34 M12 30 H32 M15 30 V76 M29 30 V76 M22 30 V76 M10 80 H34"/>
-              <circle class="onde a-clic" cx="24" cy="52" r="10"/>
-              <g class="a-fiche"><rect class="fiche" x="46" y="20" width="44" height="58" rx="5"/><path class="trait" d="M53 32 H78 M53 42 H83 M53 50 H74 M53 58 H80" opacity=".7"/><path class="onde" d="M53 68 H66" stroke-linecap="round"/></g>
-            </svg>
-            <div><h2 data-texte="geste_toucher">Toucher un élément</h2><p data-texte="geste_fiche">Sa fiche s'ouvre : ses mesures et ses sources.</p></div>
-          </div>
-          <div class="geste">
-            <svg class="picto" viewBox="0 0 96 96" aria-hidden="true">
-              <path class="fin" d="M8 80 C 30 80, 24 50, 48 50 S 70 18, 88 16"/>
-              <circle class="plein" cx="8" cy="80" r="3.5"/><circle class="station" cx="34" cy="62" r="3"/><circle class="station" cx="60" cy="40" r="3"/><circle class="station" cx="88" cy="16" r="3"/>
-              <circle class="plein a-chemin" r="5" style="offset-path: path('M8 80 C 30 80, 24 50, 48 50 S 70 18, 88 16')"/>
-            </svg>
-            <div><h2 data-texte="geste_parcours">Suivre un service, pas à pas</h2><p data-texte="geste_parcours_exemples">Le tamid, Yom Kippour, le korban Pessa'h, Hakhel…</p></div>
-          </div>
-          <div class="geste">
-            <svg class="picto" viewBox="0 0 96 96" aria-hidden="true">
-              <rect class="trait" x="14" y="30" width="68" height="56" rx="4"/>
-              <rect x="34" y="46" width="28" height="26" fill="rgba(201,162,74,.12)" stroke="var(--cendre)" stroke-width="1.2"/>
-              <rect x="40" y="54" width="10" height="10" fill="var(--dore)" opacity=".7"/>
-              <path class="plein a-epingle" d="M66 10 c-6 0 -10 4 -10 10 c0 7 10 17 10 17 s10 -10 10 -17 c0 -6 -4 -10 -10 -10 z M66 16 a4 4 0 1 0 0.01 0 z" fill-rule="evenodd"/>
-            </svg>
-            <div><h2 data-texte="geste_plan">Le plan</h2><p data-texte="geste_plan_detail">Où l'on se tient. « Aller ici » pour s'y rendre.</p></div>
           </div>
         </div>
       </div>
