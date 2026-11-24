@@ -22,23 +22,21 @@ import { PROFIL, plafonner } from "./qualite.js";
 // qu'elle sait, l'écart d'un point au suivant.
 // L'étoffe n'a pas de couleur : la sienne est dictée, pas photographiée.
 const JEUX = {
-  pierre: { moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
-  enduit: { moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
-  bois: { moyenne: [0.1528, 0.1284, 0.1008], rugosite: 0.5094 },
-  placage: { moyenne: [0.3597, 0.2106, 0.0983], rugosite: 0.5303 },
-  ecorce: { moyenne: [0.2461, 0.1935, 0.1513], rugosite: 0.6939 },
-  metal: { moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
-  marbre: { moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
-  etoffe: {},
+  pierre: { couleur: { 1024: "matieres/pierre_c_1024.webp", 512: "matieres/pierre_c_512.webp" }, normale: { 1024: "matieres/pierre_n_1024.webp", 512: "matieres/pierre_n_512.webp" }, moyenne: [0.3967, 0.2754, 0.1448], rugosite: 0.8485 },
+  enduit: { couleur: { 1024: "matieres/enduit_c_1024.webp", 512: "matieres/enduit_c_512.webp" }, normale: { 1024: "matieres/enduit_n_1024.webp", 512: "matieres/enduit_n_512.webp" }, moyenne: [0.3404, 0.2594, 0.1878], rugosite: 0.6211 },
+  bois: { couleur: { 1024: "matieres/bois_c_1024.webp", 512: "matieres/bois_c_512.webp" }, normale: { 1024: "matieres/bois_n_1024.webp", 512: "matieres/bois_n_512.webp" }, moyenne: [0.1528, 0.1284, 0.1008], rugosite: 0.5094 },
+  placage: { couleur: { 1024: "matieres/placage_c_1024.webp", 512: "matieres/placage_c_512.webp" }, normale: { 1024: "matieres/placage_n_1024.webp", 512: "matieres/placage_n_512.webp" }, moyenne: [0.3597, 0.2106, 0.0983], rugosite: 0.5303 },
+  ecorce: { couleur: { 1024: "matieres/ecorce_c_1024.webp", 512: "matieres/ecorce_c_512.webp" }, normale: { 1024: "matieres/ecorce_n_1024.webp", 512: "matieres/ecorce_n_512.webp" }, moyenne: [0.2461, 0.1935, 0.1513], rugosite: 0.6939 },
+  metal: { couleur: { 1024: "matieres/metal_c_1024.webp", 512: "matieres/metal_c_512.webp" }, normale: { 1024: "matieres/metal_n_1024.webp", 512: "matieres/metal_n_512.webp" }, moyenne: [0.5607, 0.3127, 0.0823], rugosite: 0.1592 },
+  marbre: { couleur: { 1024: "matieres/marbre_c_1024.webp", 512: "matieres/marbre_c_512.webp" }, normale: { 1024: "matieres/marbre_n_1024.webp", 512: "matieres/marbre_n_512.webp" }, moyenne: [0.7442, 0.7243, 0.6827], rugosite: 0.1722 },
+  etoffe: { normale: { 1024: "matieres/etoffe_n_1024.webp", 512: "matieres/etoffe_n_512.webp" } },
 };
 const FINES = {
-  meleke: { moyenne: [0.7944, 0.6925, 0.5849], rugosite: 0.8110 },
-  dallage: { moyenne: [0.7890, 0.6751, 0.5412], rugosite: 0.6961 },
+  meleke: { couleur: { 2048: "matieres/meleke_c_2048.webp" }, normale: { 2048: "matieres/meleke_n_2048.webp" }, moyenne: [0.7944, 0.6925, 0.5849], rugosite: 0.8110 },
+  dallage: { couleur: { 2048: "matieres/dallage_c_2048.webp" }, normale: { 2048: "matieres/dallage_n_2048.webp" }, moyenne: [0.7890, 0.6751, 0.5412], rugosite: 0.6961 },
 };
-const SANS_COULEUR = new Set(["etoffe"]);
 const COTE_DES_FINES = 2048;
-// Les noms que `beit_hamikdash_nappes.py` écrit : `c` la couleur, `n` la normale.
-const carte = (nom, sorte, cote) => `matieres/${nom}_${sorte}_${cote}.webp`;
+const PAROKHETS = { 2048: "matieres/parokhet_2048.webp", 1024: "matieres/parokhet_1024.webp" };
 
 export async function nappes() {
   const chargeur = new THREE.TextureLoader();
@@ -60,8 +58,8 @@ export async function nappes() {
   ] : [];
   await Promise.all(aCharger.map(async ([nom, jeu, coteDuJeu]) => {
     const [couleur, normale] = await Promise.all([
-      SANS_COULEUR.has(nom) ? null : chargeur.loadAsync(carte(nom, "c", coteDuJeu)),
-      chargeur.loadAsync(carte(nom, "n", coteDuJeu)),
+      jeu.couleur ? chargeur.loadAsync(jeu.couleur[coteDuJeu]) : null,
+      chargeur.loadAsync(jeu.normale[coteDuJeu]),
     ]);
     jeux.set(nom, {
       normale: regler(normale, THREE.NoColorSpace),
@@ -73,7 +71,7 @@ export async function nappes() {
   // Le motif tissé des Parokhot, que `beit_hamikdash_parokhet.py` écrit : r = hauteur
   // du bombé, (g, b) = face du tissage qui affleure, alpha = figure. Une seule carte
   // aux dimensions du rideau, lue en coordonnées de rideau et jamais répétée.
-  const motif = regler(await chargeur.loadAsync(`matieres/parokhet_${PROFIL.textures.parokhet}.webp`), THREE.NoColorSpace);
+  const motif = regler(await chargeur.loadAsync(PAROKHETS[PROFIL.textures.parokhet]), THREE.NoColorSpace);
   motif.wrapS = motif.wrapT = THREE.ClampToEdgeWrapping;
   jeux.set("parokhet", { motif });
   // Les gravures des parois, que `beit_hamikdash_gravures.py` écrit : neuf tuiles de

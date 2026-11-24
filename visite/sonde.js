@@ -3,7 +3,6 @@
 // bleu, là où le dôme éclairant, beige et uniforme, ne lui donnait qu'un aplat.
 import * as THREE from "three";
 import { filtrePMREM } from "./ciel.js";
-import { PROFIL } from "./qualite.js";
 
 export const DANS_HEIKHAL = new Set(["heikhal", "portes_heikhal", "sculptures_murs", "menora", "shulchan",
                                      "mizbeach_hazahav", "parokhet"]);
@@ -17,6 +16,7 @@ const SALLE = { intensite: 0.3, hauteur: 3, portee: 6000, voitLeCiel: false, reb
 const COUR = { intensite: 1, hauteur: 6, portee: 6000, voitLeCiel: true };
 // `pan` et `retrait`, en mètres : plus grand que la baie, et assez au fond pour qu'elle seule en laisse voir.
 const JOUR_DES_FENETRES = { couleur: 0xcfdcff, eclat: 40, pan: 3, retrait: 0.05 };
+const RESOLUTION = 256;
 const CIEL_DE_LA_BOITE = 1000;
 // L'épaisseur d'une parokhet : l'extérieure, tournée vers la salle, en est ; l'intérieure non.
 const MARGE = 0.25;
@@ -148,6 +148,7 @@ export function sonderLaCour(renderer, scene, { cour, boite, materiaux }) {
 // Sans air ni reflet pendant la prise : le reflet d'avant s'y verrait, et l'air voilerait deux fois.
 // Refaite après une perte de contexte ou un changement de moment, la sonde remplace son reflet sans changer de nuanceur.
 function sonder(renderer, scene, { cle, position, materiaux, lumieres, reglage }) {
+  if (materiaux.length === 0) return;
   for (let prise = 0; prise < (reglage.rebonds ?? 1); prise++) {
     const refletes = new Set(prise > 0 ? materiaux : []);
     prendre(renderer, scene, { cle, position, materiaux, lumieres, reglage, refletes });
@@ -156,7 +157,7 @@ function sonder(renderer, scene, { cle, position, materiaux, lumieres, reglage }
 
 // `refletes` : les matières qui gardent pendant la prise le reflet de la prise d'avant.
 function prendre(renderer, scene, { cle, position, materiaux, lumieres, reglage, refletes }) {
-  const cible = new THREE.WebGLCubeRenderTarget(PROFIL.sondes.cote, { type: THREE.HalfFloatType });
+  const cible = new THREE.WebGLCubeRenderTarget(RESOLUTION, { type: THREE.HalfFloatType });
   const camera = new THREE.CubeCamera(0.1, reglage.portee, cible);
   camera.position.copy(position);
   camera.updateMatrixWorld();

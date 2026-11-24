@@ -314,12 +314,13 @@ gltf.scene.traverse((o) => {
     const lumiere = lumieres.get(o.userData.groupeCuit);
     // Une matière est partagée entre concepts ; ses cartes cuites et son reflet ne le sont pas.
     const refletDuDallage = PROFIL.reflets && DALLAGES_REFLETES[o.userData.groupeCuit] === o.material.name;
-    const cour = portesSurLOulam.has(o) ? "oulam" : !sousSonde.has(o) && refleteSaCour(o.material) ? courDe(o, sondes) : null;
-    if (occlusion || lumiere || sousSonde.has(o) || refletDuDallage || cour) o.material = o.material.clone();
+    const dansLeHeikhal = PROFIL.sondes && sousSonde.has(o);
+    const cour = !PROFIL.sondes ? null : portesSurLOulam.has(o) ? "oulam" : !sousSonde.has(o) && refleteSaCour(o.material) ? courDe(o, sondes) : null;
+    if (occlusion || lumiere || dansLeHeikhal || refletDuDallage || cour) o.material = o.material.clone();
     if (refletDuDallage) o.material.userData.refletDuDallage = true;
     if (occlusion) o.material.aoMap = occlusion;
     if (lumiere) Object.assign(o.material, { lightMap: lumiere.texture, lightMapIntensity: lumiere.echelle });
-    if (sousSonde.has(o)) {
+    if (dansLeHeikhal) {
       materiauxHeikhal.push(o.material);
       o.material.userData.sonde = sondeDuHeikhal;
     }
@@ -327,7 +328,7 @@ gltf.scene.traverse((o) => {
       materiauxDesCours.get(cour).push(o.material);
       o.material.userData.sonde = sondes.get(cour);
     }
-    if ((sousSonde.has(o) || cour) && !refletDuDallage && estDeLOr(o.material)) o.material.roughness = RUGOSITE_DE_L_OR;
+    if ((dansLeHeikhal || cour) && !refletDuDallage && estDeLOr(o.material)) o.material.roughness = RUGOSITE_DE_L_OR;
   }
   if (!brut && !habillees.has(o.material.uuid)) {
     habillees.add(o.material.uuid);
