@@ -34,6 +34,8 @@ sauvegarder, il faut donc chaîner blockout, caméras et export dans la même in
 | `modele/beit_hamikdash_visite.py` | exporte la visite 3D du navigateur | `visite/temple.glb`, `visite/reperes.json`, `visite/occlusion/` |
 | `modele/beit_hamikdash_occlusion.py` | cuit l'occlusion du ciel ou la lumière dans Cycles, appelé par le précédent | `visite/occlusion/*.webp`, `visite/lumiere/*.webp` |
 | `modele/beit_hamikdash_recuisson.py` | ce que `--recuire` refait, et le verrou d'une cuisson à la fois | rien |
+| `modele/beit_hamikdash_collees.py`, `modele/beit_hamikdash_depliage.py` | faces collées de la scène, couche UV de chaque concept ; repris de la mémoire tant que maillages et module n'ont pas bougé | rien |
+| `modele/beit_hamikdash_memoire.py` | la mémoire de l'export, clé = maillages + source du module + Blender | `.git/memoire-export/` (commun aux worktrees) |
 | `modele/beit_hamikdash_figures.py` | figurants de la visite, vêtus et animés, une troupe par parcours (`modele/figurants/`, voir plus bas ; gestes : `modele/beit_hamikdash_gestes.py`) | `visite/figures*.glb`, `visite/figures*.json` |
 | `modele/beit_hamikdash_seir.py` | le bouc émissaire de Kippour, champ de distance polygonisé comme le bœuf (outillage commun : `modele/beit_hamikdash_champ.py`), que les figures posent à côté du Cohen Gadol | `modele/seir.blend` |
 | `modele/beit_hamikdash_shor.py` | le bœuf de bronze des douze qui portent le Yam, champ de distance polygonisé (tronc lofté, membres os par os, sabots fendus), que le blockout lit et pose douze fois | `modele/shor.blend` |
@@ -224,7 +226,8 @@ L'export **cuit l'occlusion du ciel** avant d'aplatir les matières
 (`modele/beit_hamikdash_occlusion.py`) : chaque concept d'architecture — aire ≥ 50 m², au moins 10
 texels par face, hors Kodesh HaKodashim qui a sa pénombre — perd d'abord ses faces collées
 contre une autre, ou les fait reculer d'1 cm si le recouvrement n'est que partiel (cachées, elles
-cuisaient noires), puis reçoit une couche UV `Occlusion` et une carte `visite/occlusion/<concept>.webp`,
+cuisaient noires ; `modele/beit_hamikdash_collees.py`), puis reçoit une couche UV `Occlusion`
+(`modele/beit_hamikdash_depliage.py`) et une carte `visite/occlusion/<concept>.webp`,
 que `reperes.json` liste sous `occlusion` et que la visite pose en `aoMap`. Cuite au double
 puis réduite en WebP à perte (`cwebp` sur le PATH), portée 8 m, 3 m dans le Heikhal où la
 sonde de `visite/sonde.js` écarte déjà le ciel. C'est l'essentiel du temps de l'export :

@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 import pathlib
-import subprocess
 import sys
 
 import bpy
@@ -15,6 +14,7 @@ import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
+from beit_hamikdash_memoire import dossier_commun, hacher_maillage
 from beit_hamikdash_occlusion import VISITE
 
 RACINE = VISITE.parent
@@ -123,13 +123,7 @@ def empreinte(obj, taille, reglages):
     maillage = obj.data
     empreinte_ = hashlib.sha1(reglages.encode())
     empreinte_.update(repr((taille, len(maillage.uv_layers), tuple(map(tuple, obj.matrix_world)))).encode())
-    for collection, attribut, type_ in ((maillage.vertices, "co", np.float32),
-                                        (maillage.loops, "vertex_index", np.int32),
-                                        (maillage.polygons, "loop_total", np.int32),
-                                        (maillage.polygons, "material_index", np.int32)):
-        valeurs = np.empty(len(collection) * (3 if attribut == "co" else 1), dtype=type_)
-        collection.foreach_get(attribut, valeurs)
-        empreinte_.update(valeurs.tobytes())
+    hacher_maillage(empreinte_, maillage)
     for index, fente in enumerate(obj.material_slots):
         empreinte_.update(signature_matiere(fente.material, obj, index).encode())
     return empreinte_.hexdigest()
@@ -315,9 +309,7 @@ def annoncer(raisons, precedent, total):
 @contextlib.contextmanager
 def verrou():
     """Une cuisson à la fois sur la machine, worktrees compris : le verrou vit dans le .git commun et meurt avec le processus."""
-    commun = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=RACINE,
-                            capture_output=True, text=True, check=True).stdout.strip()
-    with open((RACINE / commun).resolve() / "cuisson.lock", "a+", encoding="utf-8") as fichier:
+    with open(dossier_commun() / "cuisson.lock", "a+", encoding="utf-8") as fichier:
         try:
             fcntl.flock(fichier, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:

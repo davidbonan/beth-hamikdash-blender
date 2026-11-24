@@ -46,8 +46,9 @@ from mathutils import Matrix, Vector
 
 MODELE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(MODELE))
-from beit_hamikdash_occlusion import (LAMPES_DE_SALLE, cuire_occlusion, reglages_de_la_lumiere, reglages_du_concept, retenus,  # noqa: E402
-                                      separer_collees)
+from beit_hamikdash_collees import separer_collees  # noqa: E402
+from beit_hamikdash_occlusion import (LAMPES_DE_SALLE, cuire_occlusion, reglages_de_la_lumiere, reglages_du_concept,  # noqa: E402
+                                      retenus)
 from beit_hamikdash_recuisson import Recuisson, empreinte, verrou  # noqa: E402
 
 DOSSIER = MODELE.parent / "visite"
