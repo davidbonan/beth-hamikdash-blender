@@ -246,7 +246,7 @@
   }
   #aide.parti { opacity: 0; }
   #aide span { font-size: 12.5px; line-height: 1.8; color: #a9a094; }
-  /* Le rappel et l'initiation disent chaque geste au clavier et au doigt : l'écran choisit. */
+  /* L'initiation dit chaque geste au clavier et au doigt : l'écran choisit. Au doigt, le rappel se tait. */
   .au-doigt, .en-portrait { display: none; }
   kbd {
     font: inherit; font-size: 12px; padding: 1px 6px; border: 1px solid #4a453e;
@@ -1024,8 +1024,7 @@
   /* ---- au doigt ---- */
   @media (hover: none) and (pointer: coarse) {
     #survol { display: none; }
-    #aide { left: 50%; right: auto; transform: translateX(-50%); width: max-content; max-width: 92vw;
-            text-align: center; bottom: calc(16px + var(--marge-bas)); }
+    #aide { display: none; }
     .au-clavier { display: none; }
     .au-doigt { display: revert; }
   }
@@ -1406,7 +1405,6 @@
         <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> ou les flèches pour marcher ·
         <kbd>Maj</kbd> pour courir<br>
         <kbd>Espace</kbd> et <kbd>C</kbd> pour quitter le sol</span>
-  <span class="au-doigt" data-texte-html="aide_doigt">Pouce gauche : marcher · pouce droit : regarder<br>Toucher un élément : lire sa fiche</span>
 </div>
 
 <div id="initiation" hidden>
