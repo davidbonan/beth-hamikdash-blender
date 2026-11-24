@@ -3,8 +3,8 @@
 const IMAGES_ENTRE_CHANGEMENTS = 120;
 // Une montée de trop se voit en une demi-seconde : l'essai ne coûte pas deux secondes d'à-coups.
 const IMAGES_APRES_MONTEE = 30;
-// Par cadence visée, la durée au-delà de laquelle elle n'est plus tenue. Lue contre la synchro à 60 Hz : une image dure 16,7, 33,3 ou 50 ms, jamais entre.
-const LENT_MS = { 60: 26, 30: 38 };
+// Par cadence, la durée au-delà de laquelle elle n'est plus tenue. Lue contre la synchro à 60 Hz : une image dure 16,7, 33,3, 50, 66,7 ou 83,3 ms, jamais entre.
+const LENT_MS = { 60: 26, 30: 38, 15: 75 };
 // Calée sur la synchro, l'image ne dit plus ce qu'elle coûte : un palier de plus s'essaie.
 const VIF_MS = 18;
 // Une remontée suivie d'une descente dans ces secondes-là a échoué : la suivante attend deux fois plus.
@@ -18,7 +18,7 @@ const IMAGES_A_L_AISE = 3600;
 
 // `paliers` du plus fin au plus grossier ; on part de `depart`, en visant `cadence` images par seconde. `quandABout` : le dernier palier ne suffit pas ; `quandALAise` : le premier est tenu sans peine.
 export function regulerEchelle({ paliers, depart, cadence }, { quandABout, quandALAise }) {
-  const lentMs = LENT_MS[cadence], imageMs = 1000 / cadence;
+  const lentMs = LENT_MS[cadence], intenableMs = LENT_MS[cadence / 2], imageMs = 1000 / cadence;
   let palier = paliers.indexOf(depart), images = 0, attente = IMAGES_ENTRE_CHANGEMENTS;
   let montee = -Infinity, remontee = 0, pause = PAUSE_S, intenables = 0, vives = 0;
   const durees = new Float32Array(IMAGES_ENTRE_CHANGEMENTS);
@@ -44,7 +44,7 @@ export function regulerEchelle({ paliers, depart, cadence }, { quandABout, quand
         palier--;
         attente = IMAGES_APRES_MONTEE;
       } else {
-        intenables = typique > 2 * imageMs ? intenables + 1 : 0;
+        intenables = typique > intenableMs ? intenables + 1 : 0;
         if (intenables === IMAGES_A_BOUT) quandABout();
         vives = palier === 0 && typique < VIF_MS ? vives + 1 : 0;
         if (vives === IMAGES_A_L_AISE) quandALAise();
