@@ -23,8 +23,8 @@ const tactile = matchMedia("(hover: none) and (pointer: coarse)").matches;
 const coeurs = navigator.hardwareConcurrency || 8;
 // Seul Chrome d'Android dit sa mémoire : un iPhone faible ne se reconnaît qu'à l'usage, par `seReplier`, et le téléphone pris pour faible se dément par `seRelever`.
 const faible = tactile && navigator.deviceMemory <= 4;
-// Changer `REGLES_EN_VIGUEUR` fait oublier les profils retenus sous les règles de repli d'avant.
-const REGLES = "visite-profil-regles", REGLES_EN_VIGUEUR = "2";
+// Changer `REGLES_EN_VIGUEUR` fait oublier les profils retenus sous les règles d'avant.
+const REGLES = "visite-profil-regles", REGLES_EN_VIGUEUR = "3";
 const RETENU = "visite-profil-tenu-a-30-images", REPLIS = "visite-profil-replis-a-30-images", CHOISI = "visite-profil-choisi", INACHEVE = "visite-chargement-inacheve";
 // Du plus riche au plus pauvre.
 export const NIVEAUX = ["haute", "basse", "minimale", "sobre"];
@@ -34,6 +34,8 @@ const REPLIABLES = NIVEAUX.slice(NIVEAUX.indexOf("basse"));
 const REPLIS_MAX = 2;
 // Mesuré sur le programme du banc, contexte froid : 10 à 20 ms sur un iPhone et le simulateur, 60 à 4 800 sur l'iPad qui tombe.
 const LIAISON_LENTE_MS = 40;
+// Une machine vive dépasse le délai un chargement sur dix, quand le processus graphique défait encore la page d'avant : seule la lenteur répétée est la sienne.
+const LIAISONS_JUGEES = 3;
 const VERSION = new URL(import.meta.url).search;
 
 const bureau = !tactile && coeurs > 4;
@@ -52,14 +54,25 @@ async function niveauDeLaMachine() {
   return faible ? "minimale" : "basse";
 }
 
-// Avec KHR_parallel_shader_compile on n'attend pas la fin de la liaison : pas liée au délai, elle est lente.
-// Sans elle, la question bloque jusqu'à la liaison, et c'est sa durée qui juge.
 async function liaisonLente() {
   const gl = document.createElement("canvas").getContext("webgl2");
   if (!gl) return false;
-  let sommet, fragment;
-  try { ({ sommet, fragment } = await (await fetch("./banc.json" + VERSION)).json()); } catch { return false; }
+  let sources;
+  try { sources = await (await fetch("./banc.json" + VERSION)).json(); } catch { return false; }
   if (document.hidden) await new Promise((r) => document.addEventListener("visibilitychange", r, { once: true }));
+  const durees = [];
+  do durees.push(await dureeDeLiaison(gl, sources));
+  while (durees.at(-1) >= LIAISON_LENTE_MS && durees.length < LIAISONS_JUGEES);
+  const parallele = !!gl.getExtension("KHR_parallel_shader_compile");
+  gl.getExtension("WEBGL_lose_context")?.loseContext();
+  const lente = durees.at(-1) >= LIAISON_LENTE_MS;
+  window.__banc = { ms: Math.round(durees.at(-1)), liaisons: durees.map(Math.round), parallele, lente };
+  return lente;
+}
+
+// Avec KHR_parallel_shader_compile on n'attend pas la fin de la liaison : pas liée au délai, elle est lente.
+// Sans elle, la question bloque jusqu'à la liaison, et c'est sa durée qui juge ; la liaison qui échoue vaut le délai.
+async function dureeDeLiaison(gl, { sommet, fragment }) {
   const debut = performance.now();
   const programme = gl.createProgram();
   for (const [type, source] of [[gl.VERTEX_SHADER, sommet], [gl.FRAGMENT_SHADER, fragment]]) {
@@ -77,10 +90,7 @@ async function liaisonLente() {
     finie = liee();
   }
   const duree = performance.now() - debut;
-  gl.getExtension("WEBGL_lose_context")?.loseContext();
-  const lente = !finie || duree >= LIAISON_LENTE_MS;
-  window.__banc = { ms: Math.round(duree), parallele: !!parallele, lente };
-  return lente;
+  return finie ? duree : Math.max(duree, LIAISON_LENTE_MS);
 }
 
 // `fines` : la pierre de taille et le dallage en calcaire à vacuoles, en 2048 ; `irregularite` : ce qu'une pierre a de clarté, de chaleur, de pente et de bombé à elle ;
