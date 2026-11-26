@@ -1491,14 +1491,14 @@
     },
     "tabaot": {
       "min": [
-        -24.278400421142578,
-        0.012172307819128036,
-        -17.558401107788086
+        -24.336000442504883,
+        -0.04800000041723251,
+        -16.871999740600586
       ],
       "max": [
-        -12.20159912109375,
-        0.08382768929004669,
-        -8.361599922180176
+        -12.155999183654785,
+        0.41280001401901245,
+        -7.127999782562256
       ]
     },
     "tables_oulam": {
@@ -2780,12 +2780,6 @@
       "echelle": 2.5,
       "secondes": 110
     },
-    "beit_hamitbahayim": {
-      "carte": "lumiere/beit_hamitbahayim.webp",
-      "canal": 0,
-      "echelle": 3.25,
-      "secondes": 16
-    },
     "beit_hamoked": {
       "carte": "lumiere/beit_hamoked.webp",
       "canal": 0,
@@ -2826,12 +2820,6 @@
       "carte": "lumiere/doukhan.webp",
       "canal": 0,
       "echelle": 1.25,
-      "secondes": 3
-    },
-    "douze_marches_oulam": {
-      "carte": "lumiere/douze_marches_oulam.webp",
-      "canal": 0,
-      "echelle": 3.5,
       "secondes": 3
     },
     "esplanade_herode": {
@@ -3248,12 +3236,6 @@
       "echelle": 2.0,
       "secondes": 7
     },
-    "sol_har_habayit": {
-      "carte": "lumiere/sol_har_habayit.webp",
-      "canal": 0,
-      "echelle": 1.5,
-      "secondes": 297
-    },
     "soreg": {
       "carte": "lumiere/soreg.webp",
       "canal": 0,
@@ -3278,23 +3260,11 @@
       "echelle": 3.5,
       "secondes": 253
     },
-    "yessod": {
-      "carte": "lumiere/yessod.webp",
-      "canal": 0,
-      "echelle": 2.5,
-      "secondes": 5
-    },
     "aliyah": {
       "carte": "lumiere/aliyah.webp",
       "canal": 0,
       "echelle": 1.5,
       "secondes": 10
-    },
-    "azara": {
-      "carte": "lumiere/azara.webp",
-      "canal": 0,
-      "echelle": 2.75,
-      "secondes": 73
     },
     "batiment": {
       "carte": "lumiere/batiment.webp",
@@ -3319,6 +3289,36 @@
       "canal": 0,
       "echelle": 2.0,
       "secondes": 34
+    },
+    "azara": {
+      "carte": "lumiere/azara.webp",
+      "canal": 0,
+      "echelle": 2.75,
+      "secondes": 82
+    },
+    "beit_hamitbahayim": {
+      "carte": "lumiere/beit_hamitbahayim.webp",
+      "canal": 0,
+      "echelle": 3.25,
+      "secondes": 16
+    },
+    "douze_marches_oulam": {
+      "carte": "lumiere/douze_marches_oulam.webp",
+      "canal": 0,
+      "echelle": 3.5,
+      "secondes": 4
+    },
+    "sol_har_habayit": {
+      "carte": "lumiere/sol_har_habayit.webp",
+      "canal": 0,
+      "echelle": 1.5,
+      "secondes": 322
+    },
+    "yessod": {
+      "carte": "lumiere/yessod.webp",
+      "canal": 0,
+      "echelle": 2.5,
+      "secondes": 5
     }
   },
   "empreintes": {
@@ -3446,7 +3446,7 @@
     "shulchanot_kevesh": "be60e7ff1233d2fcbaee683a625b49aae184392d",
     "sol_har_habayit": "4ace42b9d001d8edf27357a8e80c8ff60652f218",
     "soreg": "52f891d843eb2f1c4814d006aad140440da9e152",
-    "tabaot": "d5c212838fbfdad0e42eb2f857385db315d5de32",
+    "tabaot": "fc5e551e25a7bd1731074cd9db29886606926d44",
     "tables_oulam": "9ca36b3fa7b3722b56159840c84bdfc9efe2009b",
     "taim": "527e6855209b9ccb8177feb77daf29030413f377",
     "tapuach": "4feb8a8cf127d5eff0c0a58d2ccf31c31373682c",

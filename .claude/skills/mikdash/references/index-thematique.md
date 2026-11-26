@@ -50,6 +50,7 @@ c'est la fiche qui dit ce qui est modélisé, et la source qui dit pourquoi.
 | Les deux trous du yessod et l'amah vers le Kidron ; le shit, les shitin, la dalle à l'anneau | *Middot* 3:2–3 ; *Yoma* 5:6 ; *Meïla* 3:3 ; *Soucca* 4:9, 49a ; Rambam *Beit HaBe'hira* 2:11 ; Rambam et Bartenura sur *Middot* 3:3 ; Tiferet Israël (**écarté**) | §6 |
 | Kiyor : place, matière, mécanisme du mou'hni | *Middot* 3:6 ; *Tamid* 1:4 ; 3:8 ; *Yoma* 3:10 | §7 |
 | Beit HaMitba'haïm : anneaux, tables, colonnes | *Middot* 3:5 ; *Tamid* 3:5 | §7 |
+| Tabaot : nombre, rangées, forme de l'arc, anneau de Bilga, « טבעת שנייה » du tamid | *Middot* 3:5, 5:2 ; *Tamid* 4:1 ; *Sotah* 48a ; *Soucca* 5:8 ; Yerushalmi *Ma'asser Sheni* 5:5 ; Bartenura sur *Middot* 3:5 et *Soucca* 5:8 ; R. Shemaya sur *Middot* 3:5 ; Tosfot Yom Tov sur *Tamid* 4:1 ; Rambam *Temidin* 1:11 ; Rambam sur *Middot* 3:5 (**écarté**) | §7 |
 | Les douze marches entre l'Azara et l'Oulam | *Middot* 3:6 ; *Tamid* 7:2 | §7 |
 
 ## Le bâtiment (Oulam, Heikhal, Kodesh HaKodashim)

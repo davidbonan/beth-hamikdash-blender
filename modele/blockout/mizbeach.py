@@ -712,8 +712,50 @@ for i in range(8):
         for rang, z in enumerate((Z_AZ + 3.25, Z_AZ + 3.6, Z_AZ + 3.95)):
             crochet(f"Pilier_{i}_crochet_{face}{rang}", x + sens * 0.7, 53.2 + (rang - 1) * 0.35, z, sens, "30_Mizbeach")
     table_de_service(f"Table_marbre_{i}", (x - 0.5, x + 0.5, 42, 44), Z_AZ, 1.5, "30_Mizbeach", MAT_MARBRE())
-for r in range(4):
-    for c in range(6):
-        x = MX1 - 4 - c * 4.8
-        y = 18 + r * 6
-        tore(f"Anneau_{r}{c}", x, y, Z_AZ + 0.1, 0.5, 0.08, "30_Mizbeach", MAT_BRONZE())
+# Les tabaot : « פְּתוּחוֹת צַד אֶחָד וְהוֹפְכָהּ לְמַעְלָה… וְחוֹזֵר וְהוֹפֵךְ פִּתְחָה לְמַטָּה לְתוֹךְ הָרִצְפָּה » (Bartenura,
+# Soucca 5:8), « רְחָבוֹת מִלְּמַטָּן וְצָרוֹת מִלְּמַעְלָן » (Yerushalmi Ma'asser Sheni 5:5). Cotes, fer, gond à l'ouest : CHOIX.
+TABAOT_Y = [MY1 + 8 + 4 * k for k in range(6)]     # six sedarim de quatre, le premier à 8 amot de l'autel (Middot 5:2)
+TABAOT_X = [MX0 + 4 + 8 * k for k in range(4)]
+TABAAT_BILGA = 14                                   # Bilga, 15e mishmar (Divrei HaYamim I 24:14) ; l'ordre des anneaux : CHOIX
+PIED_TABAAT, COL_TABAAT, HAUT_TABAAT = 0.55, 0.35, 0.8
+FER_TABAAT, COTES_TABAAT = 0.06, 12
+
+
+def profil_de_tabaat():
+    """La fibre de l'arc dans son plan (u est-ouest, z), d'un pied à l'autre, pieds pris sous le dallage."""
+    arc = [(math.cos(t) * (COL_TABAAT + (PIED_TABAAT - COL_TABAAT) * (1 - math.sin(t))), HAUT_TABAAT * math.sin(t))
+           for t in (math.pi * k / 16 for k in range(17))]
+    return [(PIED_TABAAT, -0.1)] + arc + [(-PIED_TABAAT, -0.1)]
+
+
+def arc_de_tabaat(nom, x, y):
+    """L'arc de fer dressé dans le plan est-ouest, que le cou de la bête traverse du nord au sud."""
+    profil, sommets = profil_de_tabaat(), []
+    for k, (u, z) in enumerate(profil):
+        (u0, z0), (u1, z1) = profil[max(k - 1, 0)], profil[min(k + 1, len(profil) - 1)]
+        longueur = math.hypot(u1 - u0, z1 - z0)
+        nu, nz = -(z1 - z0) / longueur, (u1 - u0) / longueur
+        for a in (2 * math.pi * c / COTES_TABAAT for c in range(COTES_TABAAT)):
+            r_n, r_y = FER_TABAAT * math.cos(a), FER_TABAAT * math.sin(a)
+            sommets.append((x + u + r_n * nu, y + r_y, Z_AZ + z + r_n * nz))
+    n = COTES_TABAAT
+    faces = [[k * n + c, (k + 1) * n + c, (k + 1) * n + (c + 1) % n, k * n + (c + 1) % n]
+             for k in range(len(profil) - 1) for c in range(n)]
+    o = mesh_from_pydata(nom, sommets, faces, "30_Mizbeach", MAT_FER())
+    o.data.shade_smooth()
+    return o
+
+
+for rang, y in enumerate(TABAOT_Y):
+    for place, x in enumerate(TABAOT_X):
+        nom, gond = f"Anneau_{rang}{place}", x - PIED_TABAAT
+        pieces = [arc_de_tabaat(nom, x, y),
+                  box(f"{nom}_platine", gond - 0.15, gond + 0.15, y - 0.15, y + 0.15, Z_AZ, Z_AZ + 0.03, "30_Mizbeach", MAT_FER()),
+                  cyl_between(f"{nom}_gond", (gond, y - 0.14, Z_AZ + 0.09), (gond, y + 0.14, Z_AZ + 0.09), 0.08,
+                              "30_Mizbeach", MAT_FER(), verts=12),
+                  tore(f"{nom}_gaine", x + PIED_TABAAT, y, Z_AZ + 0.01, 0.1, 0.025, "30_Mizbeach", MAT_FER())]
+        if rang * len(TABAOT_X) + place == TABAAT_BILGA:
+            pieces.append(box(f"{nom}_Bilga_scelle", gond - 0.17, gond + 0.17, y - 0.17, y + 0.17, Z_AZ, Z_AZ + 0.2,
+                              "30_Mizbeach", MAT_FER()))
+        for piece in pieces:
+            piece["sans_biseau"] = True

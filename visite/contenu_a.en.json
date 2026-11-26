@@ -1550,11 +1550,11 @@
   "tabaot": {
     "nom": "The Tabaot (Rings)",
     "translit": "Tabaot",
-    "resume": "Twenty-four rings fixed to the ground, in the southernmost strip of the Beit HaMitbachayim — the slaughtering strip. The Mishna arranges them in six rows of four; others say four rows of six.",
+    "resume": "Twenty-four iron rings set into the paving north of the altar, one for each mishmar of kohanim. Yochanan the High Priest installed them so that calves would no longer be stunned before slaughter. With the animal lying down, the arch was swung up on its hinge, the neck passed under it, then it was swung back and its other foot thrust into the ground. They stand in six rows of four, one every four amot, the first eight amot from the altar. The ring of the family of Bilga had been sealed: it no longer swung, and the family had to use the others' rings.",
     "cotes": [
-      "24 rings",
-      "24-ama strip in the north-south division of the Azara",
-      "six rows of four — or four rows of six"
+      "24 rings, one per mishmar",
+      "six east-west rows of four, one every 4 amot; the first 8 amot from the altar",
+      "iron arch: 1.1 ama between the feet, 0.8 high (the tour's choice)"
     ],
     "sources": [
       {
@@ -1565,15 +1565,50 @@
       {
         "oeuvre": "Middot",
         "ref": "5:2",
-        "citation": ""
+        "citation": "מִן הַמִּזְבֵּחַ לַטַּבָּעוֹת שְׁמֹנֶה אַמּוֹת, מְקוֹם הַטַּבָּעוֹת עֶשְׂרִים וְאַרְבַּע"
+      },
+      {
+        "oeuvre": "Sota",
+        "ref": "48a",
+        "citation": "עָמַד וְהִתְקִין לָהֶם טַבָּעוֹת בַּקַּרְקַע"
       },
       {
         "oeuvre": "Bartenura",
         "ref": "Middot 3:5",
-        "citation": "וְהָיוּ קְבוּעוֹת בָּרִצְפָּה"
+        "citation": "עֲשׂוּיוֹת כְּמִין קֶשֶׁת שֶׁהָיוּ מַכְנִיסִים בָּהֶן צַוַּאר בְּהֵמָה בִּשְׁעַת שְׁחִיטָה וְנוֹעֲצִים רֹאשׁ הַטַּבַּעַת בָּאָרֶץ"
+      },
+      {
+        "oeuvre": "Bartenura",
+        "ref": "Soucca 5:8",
+        "citation": "פְּתוּחוֹת צַד אֶחָד וְהוֹפְכָהּ לְמַעְלָה וּמַכְנִיס צַוַּאר הַבְּהֵמָה לְתוֹכָהּ וְחוֹזֵר וְהוֹפֵךְ פִּתְחָה לְמַטָּה לְתוֹךְ הָרִצְפָּה"
+      },
+      {
+        "oeuvre": "R. Shemaya",
+        "ref": "Middot 3:5",
+        "citation": "נותן צואר הבהמה בטבעת שיש לה ב' ראשין ונועצה בקרקע"
+      },
+      {
+        "oeuvre": "Yerushalmi Ma'asser Sheni",
+        "ref": "5:5",
+        "citation": "טבעות רחבות מלמטן וצרות מלמעלן"
+      },
+      {
+        "oeuvre": "Soucca",
+        "ref": "5:8",
+        "citation": "בִּלְגָּה לְעוֹלָם חוֹלֶקֶת בַּדָּרוֹם, וְטַבַּעְתָּהּ קְבוּעָה"
+      },
+      {
+        "oeuvre": "Tosfot Yom Tov",
+        "ref": "Tamid 4:1",
+        "citation": "מקום הטבעות כ\"ד אמות והן ו' סדרים נמצא שעם הטבעת עצמו הוא ד\"א זה מזה"
+      },
+      {
+        "oeuvre": "Rambam sur Middot",
+        "ref": "3:5",
+        "citation": "קבועות בקרקע לאסור בהם רגלי הבהמה בשעת שחיטה"
       }
     ],
-    "note": "Middot 3:5 gives two arrangements: six rows of four rings, or four rows of six. The tour lays out four rows of six."
+    "note": "Followed: six rows of four, the view of the tanna kamma (Middot 3:5), which the Rambam adopts (« שש מערכות », on Tamid 4:1). Tosfot Yom Tov (Tamid 4:1) spaces them four amot apart, the first eight from the altar. Set aside: four rows of six, the view the same mishna introduces with \"some say\". Also followed: the arch through which the neck passes (Bartenura, R. Shemaya, Yerushalmi). Set aside: the Rambam (on Middot 3:5 and Tamid 4:1) and the Meiri (Tamid 30b), for whom the rings held the legs. The tour's choices: iron, since no source names the metal; the arch's dimensions; the hinge on the west; and Bilga's ring, the fifteenth, counted row by row from the altar, west to east."
   },
   "lishkat_hagazit": {
     "nom": "Lishkat HaGazit",

@@ -45,6 +45,7 @@ const OUVRAGES = {
   "bartenura sur soucca": "Bartenura on Mishnah Sukkah",
   "divrei hayamim i": "I Chronicles",
   "yerushalmi soucca": "Jerusalem Talmud Sukkah",
+  "yerushalmi maasser sheni": "Jerusalem Talmud Maaser Sheni",
   "rambam maasse hakorbanot": "Mishneh Torah, Sacrificial Procedure",
   "rambam sanhedrin": "Mishneh Torah, The Sanhedrin and the Penalties within Their Jurisdiction",
   "rambam arakhin": "Mishneh Torah, Appraisals and Devoted Property",
@@ -86,6 +87,7 @@ const COMMENTAIRES = {
   rashash: "Rashash on Mishnah", boaz: "Boaz on Mishnah",
   radak: "Radak on", "metsoudat david": "Metzudat David on", "melekhet shelomoh": "Melekhet Shelomoh on Mishnah",
   "lechem shamayim": "Lechem Shamayim on Mishnah", "rash mishantz": "Rash MiShantz on Mishnah",
+  "r shemaya": "R' Shemaiah on Mishnah",
 };
 
 const pele = (s) => (s || "").toLowerCase().normalize("NFD")

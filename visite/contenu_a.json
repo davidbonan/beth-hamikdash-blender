@@ -779,18 +779,25 @@
   "tabaot": {
     "he": "טבעות",
     "translit": "Tabaot",
-    "resume": "Vingt-quatre anneaux fixés au sol, dans la bande la plus au sud du Beit HaMitba'haïm — la bande de l'abattage. La Mishna les dispose en six rangées de quatre ; d'autres disent quatre rangées de six.",
+    "resume": "Vingt-quatre anneaux de fer scellés dans le dallage au nord de l'autel, un par mishmar de cohanim. Yo'hanan Cohen Gadol les a posés pour qu'on cesse d'assommer les veaux avant de les abattre. La bête couchée, on relevait l'arc sur son gond, on y passait son cou, puis on le rabattait et on en plantait l'autre pied dans le sol. Ils sont en six rangées de quatre, une tous les quatre amot, la première à huit amot de l'autel. L'anneau de la famille de Bilga avait été scellé : il ne basculait plus, et elle devait se servir de ceux des autres.",
     "cotes": [
-      "24 anneaux",
-      "bande de 24 amot dans le découpage nord-sud de l'Azara",
-      "six rangées de quatre — ou quatre rangées de six"
+      "24 anneaux, un par mishmar",
+      "six rangées est-ouest de quatre, une tous les 4 amot ; la première à 8 amot de l'autel",
+      "arc de fer : 1,1 ama entre les pieds, 0,8 de haut (choix de la visite)"
     ],
     "sources": [
       {"oeuvre": "Middot", "ref": "3:5", "citation": "six rangées de quatre, et certains disent quatre rangées de six"},
-      {"oeuvre": "Middot", "ref": "5:2", "citation": ""},
-      {"oeuvre": "Bartenura", "ref": "Middot 3:5", "citation": "וְהָיוּ קְבוּעוֹת בָּרִצְפָּה"}
+      {"oeuvre": "Middot", "ref": "5:2", "citation": "מִן הַמִּזְבֵּחַ לַטַּבָּעוֹת שְׁמֹנֶה אַמּוֹת, מְקוֹם הַטַּבָּעוֹת עֶשְׂרִים וְאַרְבַּע"},
+      {"oeuvre": "Sota", "ref": "48a", "citation": "עָמַד וְהִתְקִין לָהֶם טַבָּעוֹת בַּקַּרְקַע"},
+      {"oeuvre": "Bartenura", "ref": "Middot 3:5", "citation": "עֲשׂוּיוֹת כְּמִין קֶשֶׁת שֶׁהָיוּ מַכְנִיסִים בָּהֶן צַוַּאר בְּהֵמָה בִּשְׁעַת שְׁחִיטָה וְנוֹעֲצִים רֹאשׁ הַטַּבַּעַת בָּאָרֶץ"},
+      {"oeuvre": "Bartenura", "ref": "Soucca 5:8", "citation": "פְּתוּחוֹת צַד אֶחָד וְהוֹפְכָהּ לְמַעְלָה וּמַכְנִיס צַוַּאר הַבְּהֵמָה לְתוֹכָהּ וְחוֹזֵר וְהוֹפֵךְ פִּתְחָה לְמַטָּה לְתוֹךְ הָרִצְפָּה"},
+      {"oeuvre": "R. Shemaya", "ref": "Middot 3:5", "citation": "נותן צואר הבהמה בטבעת שיש לה ב' ראשין ונועצה בקרקע"},
+      {"oeuvre": "Yerushalmi Ma'asser Sheni", "ref": "5:5", "citation": "טבעות רחבות מלמטן וצרות מלמעלן"},
+      {"oeuvre": "Soucca", "ref": "5:8", "citation": "בִּלְגָּה לְעוֹלָם חוֹלֶקֶת בַּדָּרוֹם, וְטַבַּעְתָּהּ קְבוּעָה"},
+      {"oeuvre": "Tosfot Yom Tov", "ref": "Tamid 4:1", "citation": "מקום הטבעות כ\"ד אמות והן ו' סדרים נמצא שעם הטבעת עצמו הוא ד\"א זה מזה"},
+      {"oeuvre": "Rambam sur Middot", "ref": "3:5", "citation": "קבועות בקרקע לאסור בהם רגלי הבהמה בשעת שחיטה"}
     ],
-    "note": "Middot 3:5 donne deux dispositions : six rangées de quatre anneaux, ou quatre rangées de six. La visite pose quatre rangées de six."
+    "note": "Retenu : six rangées de quatre, l'avis du tanna kamma (Middot 3:5), que le Rambam reprend (« שש מערכות », sur Tamid 4:1). Tosfot Yom Tov (Tamid 4:1) les espace de quatre amot, la première à huit de l'autel. Écarté : quatre rangées de six, l'avis que la même michna introduit par « certains disent ». Retenu aussi : l'arc où passe le cou (Bartenura, R. Shemaya, Yerushalmi). Écartés : le Rambam (sur Middot 3:5 et Tamid 4:1) et le Meïri (Tamid 30b), pour qui les anneaux tenaient les pattes. Choix de la visite : le fer, aucune source ne disant le métal ; les cotes de l'arc ; le gond à l'ouest ; et l'anneau de Bilga, le quinzième, compté rangée par rangée depuis l'autel, d'ouest en est."
   },
 
   "lishkat_hagazit": {
